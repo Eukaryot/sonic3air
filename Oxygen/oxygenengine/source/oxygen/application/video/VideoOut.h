@@ -44,6 +44,7 @@ public:
 
 	void preFrameUpdate();
 	void postFrameUpdate();
+	void initAfterSaveStateLoad();
 
 	inline bool useFrameInterpolation() const  { return mFrameInterpolation.mUseInterpolationThisUpdate; }
 	void setInterFramePosition(float position);

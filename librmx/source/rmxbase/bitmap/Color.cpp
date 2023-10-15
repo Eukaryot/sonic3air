@@ -174,6 +174,18 @@ Color Color::blendOver(const Color& dest) const
 	return result;
 }
 
+void Color::serialize(VectorBinarySerializer& serializer)
+{
+	if (serializer.isReading())
+	{
+		setABGR32(serializer.read<uint32>());
+	}
+	else
+	{
+		serializer.write<uint32>(getABGR32());
+	}
+}
+
 Color Color::operator+(const Color& other) const
 {
 	return Color(::saturate(r + other.r), ::saturate(g + other.g), ::saturate(b + other.b), ::saturate(a + other.a));

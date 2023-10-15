@@ -8,6 +8,8 @@
 
 #pragma once
 
+class VectorBinarySerializer;
+
 
 struct API_EXPORT Color : public Vec4f
 {
@@ -66,6 +68,8 @@ public:
 
 	void swapRedBlue();
 	Color blendOver(const Color& dest) const;
+
+	void serialize(VectorBinarySerializer& serializer);
 
 	Color operator+(const Color& other) const;
 	Color operator-(const Color& other) const;

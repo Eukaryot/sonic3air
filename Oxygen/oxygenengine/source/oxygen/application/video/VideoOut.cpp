@@ -181,6 +181,14 @@ void VideoOut::postFrameUpdate()
 	mDebugDrawRenderingRequested = false;
 }
 
+void VideoOut::initAfterSaveStateLoad()
+{
+	mFrameState = FrameState::FRAME_READY;
+	mLastFrameTicks = SDL_GetTicks();
+	mFrameInterpolation.mUseInterpolationThisUpdate = false;
+	mDebugDrawRenderingRequested = false;
+}
+
 void VideoOut::setInterFramePosition(float position)
 {
 	mFrameInterpolation.mInterFramePosition = position;
@@ -199,6 +207,7 @@ bool VideoOut::updateGameScreen()
 	}
 
 	mFrameState = FrameState::OUTSIDE_FRAME;
+	mRequireGameScreenUpdate = false;
 
 	RefreshParameters refreshParameters;
 	refreshParameters.mSkipThisFrame = false;

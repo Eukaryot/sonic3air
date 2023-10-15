@@ -54,6 +54,7 @@ public:
 	protected:
 		inline SpriteInfo(Type type) : mType(type) {}
 		inline ~SpriteInfo() {}
+		void serialize(VectorBinarySerializer& serializer, uint8 formatVersion);
 
 	private:
 		const Type mType = Type::INVALID;
@@ -62,6 +63,7 @@ public:
 	struct VdpSpriteInfo : public SpriteInfo
 	{
 		inline VdpSpriteInfo() : SpriteInfo(Type::VDP) {}
+		void serialize(VectorBinarySerializer& serializer, uint8 formatVersion);	// Not virtual, needs to be used with the correctly casted struct
 
 		Vec2i  mSize;				// In columns / rows of 8 pixels
 		uint16 mFirstPattern = 0;	// Incl. flip bits and atex
@@ -70,6 +72,7 @@ public:
 	struct CustomSpriteInfoBase : public SpriteInfo
 	{
 		inline CustomSpriteInfoBase(Type type) : SpriteInfo(type) {}
+		void serialize(VectorBinarySerializer& serializer, uint8 formatVersion);	// Not virtual, needs to be used with the correctly casted struct
 
 		uint64 mKey = 0;
 		const SpriteCache::CacheItem* mCacheItem = nullptr;
@@ -82,6 +85,7 @@ public:
 	struct PaletteSpriteInfo : public CustomSpriteInfoBase
 	{
 		inline PaletteSpriteInfo() : CustomSpriteInfoBase(Type::PALETTE) {}
+		void serialize(VectorBinarySerializer& serializer, uint8 formatVersion);	// Not virtual, needs to be used with the correctly casted struct
 
 		uint16 mAtex = 0;
 	};
@@ -94,6 +98,7 @@ public:
 	struct SpriteMaskInfo : public SpriteInfo
 	{
 		inline SpriteMaskInfo() : SpriteInfo(Type::MASK) {}
+		void serialize(VectorBinarySerializer& serializer, uint8 formatVersion);
 
 		Vec2i mSize;
 		float mDepth = 0.0f;
@@ -148,6 +153,8 @@ public:
 	inline uint16 getSpriteAttributeTableBase() const  { return mSpriteAttributeTableBase; }
 	inline void setSpriteAttributeTableBase(uint16 vramAddress)  { mSpriteAttributeTableBase = vramAddress; }
 
+	void serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion);
+
 public:
 	bool mLegacyVdpSpriteMode = false;
 
@@ -167,6 +174,7 @@ private:
 	CustomSpriteInfoBase* addSpriteByKey(uint64 key);
 	void checkSpriteTag(SpriteInfo& sprite);
 	void collectLegacySprites();
+	void buildSortedSprites();
 
 private:
 	PatternManager& mPatternManager;

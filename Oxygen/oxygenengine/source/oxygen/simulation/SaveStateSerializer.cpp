@@ -10,6 +10,7 @@
 #include "oxygen/simulation/SaveStateSerializer.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
+#include "oxygen/application/video/VideoOut.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/rendering/parts/PaletteManager.h"
 
@@ -19,7 +20,8 @@ namespace
 	// Version history
 	//  - 2 and lower: See serialization code for changes
 	//  - 3: Using shared memory access flags
-	static const constexpr uint8 STANDALONE_SAVESTATE_FORMATVERSION = 3;
+	//  - 4: Added more rendering data (scroll offsets, sprites, etc.)
+	static const constexpr uint8 STANDALONE_SAVESTATE_FORMATVERSION = 4;
 }
 
 
@@ -164,69 +166,17 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 		}
 
 		// CRAM, actually part of palette manager's data
-		{
-			PaletteManager& paletteManager = mRenderParts.getPaletteManager();
-			uint16 buffer[0x40];
-			if (serializer.isReading())
-			{
-				serializer.serialize(buffer, 0x80);
-				for (int i = 0; i < 0x40; ++i)
-				{
-					paletteManager.writePaletteEntryPacked(0, i, buffer[i]);
-					paletteManager.writePaletteEntryPacked(1, i, buffer[i]);
-				}
-			}
-			else
-			{
-				for (int i = 0; i < 0x40; ++i)
-				{
-					buffer[i] = paletteManager.getPalette(0).getEntryPacked(i, true);
-				}
-				serializer.serialize(buffer, 0x80);
-			}
-		}
+		mRenderParts.getPaletteManager().serializeSaveState(serializer, formatVersion);
 
 		// VSRAM
 		serializer.serialize(emulatorInterface.getVSRam(), 0x80);
 
-		// VDP config
-		PlaneManager& planeManager = mRenderParts.getPlaneManager();
-		ScrollOffsetsManager& scrollOffsetsManager = mRenderParts.getScrollOffsetsManager();
-		if (serializer.isReading())
-		{
-			planeManager.setNameTableBaseA(serializer.read<uint16>());
-			planeManager.setNameTableBaseB(serializer.read<uint16>());
+		// Other graphics managers
+		mRenderParts.getPlaneManager().serializeSaveState(serializer, formatVersion);
+		mRenderParts.getScrollOffsetsManager().serializeSaveState(serializer, formatVersion);
+		mRenderParts.getSpriteManager().serializeSaveState(serializer, formatVersion);
 
-			Vec2i playfieldSize;
-			playfieldSize.x = serializer.read<uint16>();
-			playfieldSize.y = serializer.read<uint16>();
-			planeManager.setPlayfieldSizeInPixels(playfieldSize);
-
-			scrollOffsetsManager.setVerticalScrolling(serializer.read<uint8>() != 0);
-			scrollOffsetsManager.setHorizontalScrollMask(serializer.read<uint8>());
-
-			if (formatVersion >= 2)
-			{
-				scrollOffsetsManager.setHorizontalScrollTableBase(serializer.read<uint16>());
-			}
-		}
-		else
-		{
-			serializer.write<uint16>(planeManager.getNameTableBaseA());
-			serializer.write<uint16>(planeManager.getNameTableBaseB());
-
-			const Vec2i playfieldSize = planeManager.getPlayfieldSizeInPixels();
-			serializer.write<uint16>(playfieldSize.x);
-			serializer.write<uint16>(playfieldSize.y);
-
-			serializer.write<uint8>(scrollOffsetsManager.getVerticalScrolling() ? 1 : 0);
-			serializer.write<uint8>(scrollOffsetsManager.getHorizontalScrollMask());
-
-			if (formatVersion >= 2)
-			{
-				serializer.write<uint16>(scrollOffsetsManager.getHorizontalScrollTableBase());
-			}
-		}
+		// TODO: How about overlay manager and spaces manager?
 
 		// Lemon script runtime state
 		if (!mCodeExec.getLemonScriptRuntime().serializeRuntime(serializer))
@@ -235,7 +185,7 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 
 	if (serializer.isReading())
 	{
-		mRenderParts.getSpriteManager().reset();
+		VideoOut::instance().initAfterSaveStateLoad();
 	}
 
 	return true;

@@ -44,8 +44,10 @@ public:
 	inline const Vec2i& getPlaneWScrollOffset() const			 { return mScrollOffsetW; }
 	inline void setPlaneWScrollOffset(const Vec2i& scrollOffset) { mScrollOffsetW = scrollOffset; }
 
-	inline int16 getVerticalScrollOffsetBias() const		{ return mVerticalScrollOffsetBias; }
+	inline int16 getVerticalScrollOffsetBias() const	{ return mVerticalScrollOffsetBias; }
 	void setVerticalScrollOffsetBias(int16 bias);
+
+	void serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion);
 
 private:
 	PlaneManager& mPlaneManager;

@@ -14,6 +14,69 @@
 #include "oxygen/simulation/EmulatorInterface.h"
 
 
+void SpriteManager::SpriteInfo::serialize(VectorBinarySerializer& serializer, uint8 formatVersion)
+{
+	serializer.serializeAs<int16>(mPosition.x);
+	serializer.serializeAs<int16>(mPosition.y);
+	serializer.serializeAs<uint8>(mPriorityFlag);
+	serializer.serialize(mRenderQueue);
+	mTintColor.serialize(serializer);
+	mAddedColor.serialize(serializer);
+	serializer.serializeAs<uint8>(mUseGlobalComponentTint);
+	serializer.serializeAs<uint8>(mBlendMode);
+	serializer.serializeAs<uint8>(mCoordinatesSpace);
+	serializer.serializeAs<uint8>(mLogicalSpace);
+}
+
+void SpriteManager::VdpSpriteInfo::serialize(VectorBinarySerializer& serializer, uint8 formatVersion)
+{
+	SpriteInfo::serialize(serializer, formatVersion);
+
+	serializer.serializeAs<uint8>(mSize.x);
+	serializer.serializeAs<uint8>(mSize.y);
+	serializer.serialize(mFirstPattern);
+}
+
+void SpriteManager::CustomSpriteInfoBase::serialize(VectorBinarySerializer& serializer, uint8 formatVersion)
+{
+	SpriteInfo::serialize(serializer, formatVersion);
+
+	serializer.serialize(mKey);
+	if (serializer.isReading())
+	{
+		mCacheItem = SpriteCache::instance().getSprite(mKey);
+	}
+
+	serializer.serializeAs<uint16>(mSize.x);
+	serializer.serializeAs<uint16>(mSize.y);
+	serializer.serializeAs<int16>(mPivotOffset.x);
+	serializer.serializeAs<int16>(mPivotOffset.y);
+	serializer.serialize(mTransformation.mMatrix.x);
+	serializer.serialize(mTransformation.mMatrix.y);
+	serializer.serialize(mTransformation.mMatrix.z);
+	serializer.serialize(mTransformation.mMatrix.w);
+	serializer.serialize(mTransformation.mInverse.x);
+	serializer.serialize(mTransformation.mInverse.y);
+	serializer.serialize(mTransformation.mInverse.z);
+	serializer.serialize(mTransformation.mInverse.w);
+	serializer.serializeAs<uint8>(mUseUpscaledSprite);
+}
+
+void SpriteManager::PaletteSpriteInfo::serialize(VectorBinarySerializer& serializer, uint8 formatVersion)
+{
+	CustomSpriteInfoBase::serialize(serializer, formatVersion);
+
+	serializer.serialize(mAtex);
+}
+
+void SpriteManager::SpriteMaskInfo::serialize(VectorBinarySerializer& serializer, uint8 formatVersion)
+{
+	serializer.serializeAs<uint16>(mSize.x);
+	serializer.serializeAs<uint16>(mSize.y);
+	serializer.serialize(mDepth);
+}
+
+
 void SpriteManager::SpriteSets::clear()
 {
 	mVdpSprites.clear();
@@ -140,33 +203,7 @@ void SpriteManager::postFrameUpdate()
 			}
 		}
 
-		// Mix all types of sprites together in one sorted vector
-		mSprites.clear();
-		for (VdpSpriteInfo& sprite : mCurrSpriteSets.mVdpSprites)
-		{
-			mSprites.push_back(&sprite);
-		}
-		for (PaletteSpriteInfo& sprite : mCurrSpriteSets.mPaletteSprites)
-		{
-			mSprites.push_back(&sprite);
-		}
-		for (ComponentSpriteInfo& sprite : mCurrSpriteSets.mComponentSprites)
-		{
-			mSprites.push_back(&sprite);
-		}
-		for (SpriteMaskInfo& sprite : mCurrSpriteSets.mSpriteMasks)
-		{
-			mSprites.push_back(&sprite);
-		}
-
-		// Sorting only cares about render queue, not priority!
-		//  -> Because that's how the VDP works as well
-		std::stable_sort(mSprites.begin(), mSprites.end(),
-						 [](const SpriteInfo* a, const SpriteInfo* b) { return a->mRenderQueue > b->mRenderQueue; });
-
-		// Reverse order, so that the sprites "in front" are rendered last
-		//  -> Note that it makes a difference if this was removed and the sorting order changed, namely for sprites sharing the same render queue
-		std::reverse(mSprites.begin(), mSprites.end());
+		buildSortedSprites();
 
 		// Process coordinates of all sprites
 		const Vec2i worldSpaceOffset = mSpacesManager.getWorldSpaceOffset();
@@ -377,6 +414,41 @@ void SpriteManager::setSpriteTagWithPosition(uint64 spriteTag, const Vec2i& posi
 	mTaggedSpritePosition = position;
 }
 
+void SpriteManager::serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion)
+{
+	if (formatVersion >= 4)
+	{
+		serializer.serializeArraySize(mCurrSpriteSets.mVdpSprites);
+		for (VdpSpriteInfo& sprite : mCurrSpriteSets.mVdpSprites)
+		{
+			sprite.serialize(serializer, formatVersion);
+		}
+
+		serializer.serializeArraySize(mCurrSpriteSets.mPaletteSprites);
+		for (PaletteSpriteInfo& sprite : mCurrSpriteSets.mPaletteSprites)
+		{
+			sprite.serialize(serializer, formatVersion);
+		}
+
+		serializer.serializeArraySize(mCurrSpriteSets.mComponentSprites);
+		for (ComponentSpriteInfo& sprite : mCurrSpriteSets.mComponentSprites)
+		{
+			sprite.serialize(serializer, formatVersion);
+		}
+
+		serializer.serializeArraySize(mCurrSpriteSets.mSpriteMasks);
+		for (SpriteMaskInfo& sprite : mCurrSpriteSets.mSpriteMasks)
+		{
+			sprite.serialize(serializer, formatVersion);
+		}
+
+		if (serializer.isReading())
+		{
+			buildSortedSprites();
+		}
+	}
+}
+
 SpriteManager::CustomSpriteInfoBase* SpriteManager::addSpriteByKey(uint64 key)
 {
 	const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(key);
@@ -470,4 +542,35 @@ void SpriteManager::collectLegacySprites()
 		if (mCurrSpriteSets.mVdpSprites.size() >= 0x100)	// Sanity check
 			break;
 	}
+}
+
+void SpriteManager::buildSortedSprites()
+{
+	// Mix all types of sprites together in one sorted vector
+	mSprites.clear();
+	for (VdpSpriteInfo& sprite : mCurrSpriteSets.mVdpSprites)
+	{
+		mSprites.push_back(&sprite);
+	}
+	for (PaletteSpriteInfo& sprite : mCurrSpriteSets.mPaletteSprites)
+	{
+		mSprites.push_back(&sprite);
+	}
+	for (ComponentSpriteInfo& sprite : mCurrSpriteSets.mComponentSprites)
+	{
+		mSprites.push_back(&sprite);
+	}
+	for (SpriteMaskInfo& sprite : mCurrSpriteSets.mSpriteMasks)
+	{
+		mSprites.push_back(&sprite);
+	}
+
+	// Sorting only cares about render queue, not priority!
+	//  -> Because that's how the VDP works as well
+	std::stable_sort(mSprites.begin(), mSprites.end(),
+		[](const SpriteInfo* a, const SpriteInfo* b) { return a->mRenderQueue > b->mRenderQueue; });
+
+	// Reverse order, so that the sprites "in front" are rendered last
+	//  -> Note that it makes a difference if this was removed and the sorting order changed, namely for sprites sharing the same render queue
+	std::reverse(mSprites.begin(), mSprites.end());
 }
