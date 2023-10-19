@@ -118,6 +118,9 @@ function void fn02c696()
 	objA0.sprite_attributes = 0x03ad
 	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.x = 0x0c
+#if STANDALONE
+	objA0.box_size.y = 0x10
+#endif
 	objA0.sprite_priority = 0x0200
 	objA0.position.y.u16 += 4
 	objA0.update_address = 0x02c6c0

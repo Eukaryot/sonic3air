@@ -595,21 +595,20 @@ function void HInt_000d10()
 			Renderer.enableDefaultPlane(1, false)
 			Renderer.enableDefaultPlane(2, false)
 			Renderer.enableDefaultPlane(3, false)
-			u8 splitScreenHeight = 0x6b
-			u8 splitScreen2Start = getScreenHeight() - splitScreenHeight
 
 			// Upper screen
-			Renderer.setupPlane(0, 0, getScreenWidth(), splitScreenHeight, 0x00, 0, 0x1000)
-			Renderer.setupPlane(0, 0, getScreenWidth(), splitScreenHeight, 0x01, 1, 0x2000)
-			Renderer.setupPlane(0, 0, getScreenWidth(), splitScreenHeight, 0x10, 0, 0x3000)
-			Renderer.setupPlane(0, 0, getScreenWidth(), splitScreenHeight, 0x11, 1, 0x4000)
+			Renderer.setupPlane(0, 0, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_UPPER, 0x00, 0, 0x1000)
+			Renderer.setupPlane(0, 0, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_UPPER, 0x01, 1, 0x2000)
+			Renderer.setupPlane(0, 0, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_UPPER, 0x10, 0, 0x3000)
+			Renderer.setupPlane(0, 0, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_UPPER, 0x11, 1, 0x4000)
 			Renderer.setScrollOffsetV(1, 0, camera.foreground.y.u16)
 
 			// Lower screen
-			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), splitScreenHeight, 0x00, 2, 0x1000)
-			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), splitScreenHeight, 0x01, 3, 0x2000)
-			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), splitScreenHeight, 0x10, 2, 0x3000)
-			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), splitScreenHeight, 0x11, 3, 0x4000)
+			u8 splitScreen2Start = getScreenHeight() - COMPMODE_VIEWPORT_HEIGHT_LOWER
+			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_LOWER, 0x00, 2, 0x1000)
+			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_LOWER, 0x01, 3, 0x2000)
+			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_LOWER, 0x10, 2, 0x3000)
+			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_LOWER, 0x11, 3, 0x4000)
 			Renderer.setScrollOffsetV(2, 0, u16[0xffffee3c])
 			Renderer.setScrollOffsetV(3, 0, u16[0xffffee3a])
 

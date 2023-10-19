@@ -8,6 +8,12 @@
 
 
 
+// Values taken from the original game
+//  -> Note that these can be changed, but at least DPZ would require additional adjustments
+constant u8 COMPMODE_VIEWPORT_HEIGHT_UPPER = 108
+constant u8 COMPMODE_VIEWPORT_HEIGHT_LOWER = 112
+
+
 //# address-hook(0x23a03c) end(0x23a048)
 function void fn23a03c()
 {
@@ -246,14 +252,14 @@ function void fn23a764()
 	A5 = 0xffffa800
 	D0.u16 = camera.background.y.u16
 	D3.u16 = camera.foreground.x.u16
-	D1 = 0x6b
+	D1 = COMPMODE_VIEWPORT_HEIGHT_UPPER - 1
 	fn239e9c()
 
 	A4 = A6
 	A5 = 0xffffa900
 	D0.u16 = camera.background.y.u16.player2 - 4
 	D3.u16 = camera.foreground.x.u16.player2
-	D1 = 0x73
+	D1 = getScreenHeight() - COMPMODE_VIEWPORT_HEIGHT_UPPER - 1
 	fn239e9c()
 
 	fn23a04a()

@@ -646,8 +646,8 @@ function void RenderSprites_CompetitionMode()
 {
 #if STANDALONE
 	// Setup viewports, to be used in render queue ranges for the sprites
-	Renderer.setViewport(0, 0, getScreenWidth(), 0x6b, 0x97ff)
-	Renderer.setViewport(0, 0x75, getScreenWidth(), 0x6b, 0x9bff)
+	Renderer.setViewport(0, 0, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_UPPER, 0x97ff)
+	Renderer.setViewport(0, getScreenHeight() - COMPMODE_VIEWPORT_HEIGHT_LOWER, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_LOWER, 0x9bff)
 #endif
 
 	// Upper screen
@@ -732,7 +732,13 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 		if (D6 & render_flag.COMPETITION_P1_SCREEN)
 			return
 	}
-	u16 offsetY = splitScreenIndex * 0x70
+#if STANDALONE
+	u16 offsetY = (splitScreenIndex == 0) ? 0 : (getScreenHeight() - COMPMODE_VIEWPORT_HEIGHT_LOWER)
+	u16 viewportHeight = (splitScreenIndex == 0) ? COMPMODE_VIEWPORT_HEIGHT_UPPER : COMPMODE_VIEWPORT_HEIGHT_LOWER
+#else
+	u16 offsetY = (splitScreenIndex == 0) ? 0 : 0x70
+	u16 viewportHeight = 0x70
+#endif
 
 	D0.u16 = objA0.position.x.u16
 	D1.u16 = objA0.position.y.u16
@@ -749,7 +755,7 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 		D0.u16 = D0.u16 + 0x80 + offsetY - D3.u16
 		D1.u16 = (D1.u16 - u16[A3 + 0x04] + objA0.box_size.y) & level.height.bitmask
 		D3.u16 = objA0.box_size.y
-		D2.u16 = 0x70 + objA0.box_size.y * 2
+		D2.u16 = viewportHeight + objA0.box_size.y * 2
 		if (D1.u16 >= D2.u16)
 			return
 
@@ -815,7 +821,7 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 			D0.u16 = D0.u16 + 0x80 - D3.u16
 			D1.u16 = (D1.u16 - u16[A3 + 0x04] + objA0.box_size.y) & level.height.bitmask
 			D3.u16 = objA0.box_size.y
-			D2.u16 = 0x70 + objA0.box_size.y * 2
+			D2.u16 = viewportHeight + objA0.box_size.y * 2
 			if (D1.u16 >= D2.u16)
 				return
 
