@@ -33,17 +33,19 @@ public:
 	void addKeyFrame(uint32 frameNumber, const InputData& input, const std::vector<uint8>& data);
 
 	void discardOldFrames(uint32 minKeepNumber = 3600);
-	void discardFramesAfter(uint32 frameNumber);	// Discards from from the frame number on, including that frame itself
+	void discardFramesAfter(uint32 frameNumber);	// Discards all frames from the given frame number on, including that frame itself
 
 	inline uint32 getCurrentNumberOfFrames() const  { return mRangeEnd - mRangeStart; }
 	inline uint32 getRangeStart() const	 { return mRangeStart; }
 	inline uint32 getRangeEnd() const	 { return mRangeEnd; }
+
 	inline bool hasFrameNumber(uint32 frameNumber) const  { return frameNumber >= mRangeStart && frameNumber < mRangeEnd; }
+	bool isKeyframe(uint32 frameNumber) const;
 
 	bool getFrameData(uint32 frameNumber, PlaybackResult& outResult);
 
 	bool loadRecording(const std::wstring& filename);
-	bool saveRecording(const std::wstring& filename) const;
+	bool saveRecording(const std::wstring& filename, uint32 minDistanceBetweenKeyframes = 0) const;
 
 	inline void setIgnoreKeys(bool ignoreKeys)  { mIgnoreKeys = ignoreKeys; }
 
@@ -67,6 +69,8 @@ private:
 private:
 	Frame& createFrameInternal(Frame::Type frameType, uint32 number);
 	void destroyFrame(Frame& frame);
+	Frame* getFrameInternal(uint32 frameNumber);
+	const Frame* getFrameInternal(uint32 frameNumber) const;
 	Frame& addFrameInternal(uint32 frameNumber, const InputData& input, Frame::Type frameType);
 
 private:

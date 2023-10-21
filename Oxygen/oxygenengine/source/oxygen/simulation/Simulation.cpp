@@ -177,9 +177,7 @@ void Simulation::resetIntoGame(const std::vector<std::pair<std::string, std::str
 	mCurrentTargetFrame = 0.0;
 	mNextSingleStep = false;
 	mSingleStepContinue = false;
-
-	if (!Configuration::instance().mGameRecorder.mIsPlayback)
-		mGameRecorder.clear();
+	mGameRecorder.clear();
 }
 
 void Simulation::resetIntoGame(const std::string& entryFunctionName)
@@ -456,7 +454,7 @@ bool Simulation::generateFrame()
 
 				// Keyframe every 3 seconds - except when dev mode is active, because rewinding requires more frequent keyframes
 				const int keyframeFrequency = EngineMain::getDelegate().useDeveloperFeatures() ? 10 : 180;
-				if ((mGameRecorder.getRangeEnd() % keyframeFrequency) == 0)	
+				if (((mFrameNumber + 1) % keyframeFrequency) == 0)	
 				{
 					recordKeyFrame(mFrameNumber + 1, mCodeExec, mGameRecorder, inputData);
 					mGameRecorder.discardOldFrames(1800);
@@ -465,6 +463,18 @@ bool Simulation::generateFrame()
 				{
 					mGameRecorder.addFrame(mFrameNumber + 1, inputData);
 				}
+			}
+		}
+		else if (isGameRecorderPlayback && EngineMain::getDelegate().useDeveloperFeatures())
+		{
+			// Generate a keyframe every 10 frames, to allow for quick rewinds during game recording playback as well
+			const int keyframeFrequency = 10;
+			if (((mFrameNumber + 1) % keyframeFrequency) == 0 && !mGameRecorder.isKeyframe(mFrameNumber + 1))
+			{
+				GameRecorder::InputData inputData;
+				inputData.mInputs[0] = controlsIn.getInputPad(0);
+				inputData.mInputs[1] = controlsIn.getInputPad(1);
+				recordKeyFrame(mFrameNumber + 1, mCodeExec, mGameRecorder, inputData);
 			}
 		}
 
@@ -573,7 +583,7 @@ uint32 Simulation::saveGameRecording(WString* outFilename)
 	}
 	filename = Configuration::instance().mAppDataPath + L"gamerecordings/" + filename;
 
-	if (!mGameRecorder.saveRecording(filename))
+	if (!mGameRecorder.saveRecording(filename, 180))
 		return 0;
 
 	if (nullptr != outFilename)
