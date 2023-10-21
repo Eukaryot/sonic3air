@@ -79,7 +79,9 @@ void ControllerSetupMenu::initialize()
 	const char* buttonNames[NUM_BUTTONS] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back" };
 	for (size_t i = 0; i < NUM_BUTTONS; ++i)
 	{
-		mMenuEntries.addEntry(buttonNames[i], ::BUTTON_UP + (uint32)i);
+		// TODO: Add L/R as well by removing this check - they're left out because the screen is too small, and scrolling is not implemented here
+		if (i < 10)
+			mMenuEntries.addEntry(buttonNames[i], ::BUTTON_UP + (uint32)i);
 	}
 
 	// Back button

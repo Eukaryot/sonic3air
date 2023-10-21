@@ -74,6 +74,8 @@ namespace
 		outControls.push_back(&controller.Y);
 		outControls.push_back(&controller.Start);
 		outControls.push_back(&controller.Back);
+		outControls.push_back(&controller.L);
+		outControls.push_back(&controller.R);
 	}
 
 	bool getControlAssignmentBySDLBinding(InputConfig::Assignment& output, const SDL_GameControllerButtonBind& binding, int axisDirection)
@@ -131,6 +133,8 @@ namespace
 		bindings[(size_t)Button::START].emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_START));
 		bindings[(size_t)Button::START].emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_GUIDE));
 		bindings[(size_t)Button::BACK] .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_BACK));
+		bindings[(size_t)Button::L]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
+		bindings[(size_t)Button::R]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
 
 		device.mControlMappings.resize((size_t)Button::_NUM);
 		for (size_t controlIndex = 0; controlIndex < device.mControlMappings.size(); ++controlIndex)
@@ -625,7 +629,7 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 
 		// Log input mapping as JSON
 		{
-			static const String mappingKeys[12] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back" };
+			static const String mappingKeys[12] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back", "L", "R" };
 			RMX_LOG_INFO("{");
 			for (size_t controlIndex = 0; controlIndex < device.mControlMappings.size(); ++controlIndex)
 			{

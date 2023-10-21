@@ -35,6 +35,8 @@ ControlsIn::ControlsIn()
 		map.emplace(&controller.B,	 	(uint16)Button::B);
 		map.emplace(&controller.X,	 	(uint16)Button::C);
 		map.emplace(&controller.Y,	 	(uint16)Button::Y);
+		map.emplace(&controller.L,	 	(uint16)Button::X);
+		map.emplace(&controller.R,	 	(uint16)Button::Z);
 	}
 }
 

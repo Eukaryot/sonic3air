@@ -16,7 +16,7 @@
 
 namespace
 {
-	static const std::string InputMappingKeys[12] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back" };
+	static const std::string InputMappingKeys[12] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back", "L", "R" };
 
 	void tryParseWindowSize(String string, Vec2i& result)
 	{

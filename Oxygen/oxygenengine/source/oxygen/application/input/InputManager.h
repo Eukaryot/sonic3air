@@ -84,6 +84,8 @@ public:
 		Control Y;
 		Control Start;
 		Control Back;
+		Control L;
+		Control R;
 	};
 
 	struct Touch

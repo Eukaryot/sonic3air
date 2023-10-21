@@ -286,7 +286,7 @@ void InputConfig::setupDefaultKeyboardMappings(DeviceDefinition& outDeviceDefini
 
 	if (keyboardIndex == 0)
 	{
-		// Setup fixed and modifyable assignments for keyboard 1
+		// Setup fixed and modifiable assignments for keyboard 1
 		const std::vector<std::pair<DeviceDefinition::Button, Assignment>> FIXED_ASSIGNMENTS =
 		{
 			{ DeviceDefinition::Button::UP,		{ Assignment::Type::BUTTON, SDLK_UP     } },
@@ -304,6 +304,8 @@ void InputConfig::setupDefaultKeyboardMappings(DeviceDefinition& outDeviceDefini
 			{ DeviceDefinition::Button::X,		{ Assignment::Type::BUTTON, SDLK_q } },
 			{ DeviceDefinition::Button::Y,		{ Assignment::Type::BUTTON, SDLK_w } },
 			{ DeviceDefinition::Button::BACK,	{ Assignment::Type::BUTTON, SDLK_BACKSPACE } },
+			{ DeviceDefinition::Button::L,		{ Assignment::Type::BUTTON, SDLK_e } },
+			{ DeviceDefinition::Button::R,		{ Assignment::Type::BUTTON, SDLK_r } },
 		};
 
 		for (const auto& pair : FIXED_ASSIGNMENTS)

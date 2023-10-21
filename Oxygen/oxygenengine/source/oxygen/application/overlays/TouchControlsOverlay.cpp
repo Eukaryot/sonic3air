@@ -92,6 +92,10 @@ void TouchControlsOverlay::buildTouchControls()
 		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(+0.28f, 0.0f) * size, 0.15f * size, "touch_overlay_B", controller.B, ConfigMode::State::MOVING_BUTTONS);
 		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(0.0f, -0.28f) * size, 0.15f * size, "touch_overlay_Y", controller.Y, ConfigMode::State::MOVING_BUTTONS);
 		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(0.0f, +0.28f) * size, 0.15f * size, "touch_overlay_A", controller.A, ConfigMode::State::MOVING_BUTTONS);
+
+		// TODO: Include the L/R buttons, but make them optional
+		//buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(-0.28f, -0.28f) * size, 0.15f * size, "touch_overlay_L", controller.L, ConfigMode::State::MOVING_BUTTONS);
+		//buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(+0.28f, -0.28f) * size, 0.15f * size, "touch_overlay_R", controller.R, ConfigMode::State::MOVING_BUTTONS);
 	}
 	buildRectangularButton(mSetup.mStartButtonCenter, Vec2f(0.18f, 0.06f), "touch_overlay_start", &controller.Start, ConfigMode::State::MOVING_START);
 	buildRectangularButton(mSetup.mGameRecButtonCenter, Vec2f(0.15f, 0.06f), "touch_overlay_rec", nullptr, ConfigMode::State::MOVING_GAMEREC, TouchArea::SpecialType::GAMEREC);

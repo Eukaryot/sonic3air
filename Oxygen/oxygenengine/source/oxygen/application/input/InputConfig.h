@@ -60,6 +60,8 @@ public:
 			Y,
 			START,
 			BACK,
+			L,
+			R,
 			_NUM
 		};
 
