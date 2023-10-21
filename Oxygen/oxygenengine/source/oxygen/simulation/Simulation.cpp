@@ -106,8 +106,8 @@ bool Simulation::startup()
 		if (mGameRecorder.hasFrameNumber(mFrameNumber))
 		{
 			mGameRecorder.setIgnoreKeys(config.mGameRecorder.mPlaybackIgnoreKeys);
-			mCurrentTargetFrame = (double)config.mGameRecorder.mPlaybackStartFrame;
 			config.setSettingsReadOnly(true);	// Do not overwrite settings
+			jumpToFrame(config.mGameRecorder.mPlaybackStartFrame, false);
 		}
 	}
 
@@ -341,7 +341,7 @@ bool Simulation::generateFrame()
 	const bool isGameRecorderPlayback = Configuration::instance().mGameRecorder.mIsPlayback;
 	const bool isGameRecorderRecording = Configuration::instance().mGameRecorder.mIsRecording;
 
-	const bool beginningNewFrame = (mCodeExec.willBeginNewFrame() || isGameRecorderPlayback);
+	const bool beginningNewFrame = mCodeExec.willBeginNewFrame();
 	const float tickLength = 1.0f / getSimulationFrequency();
 
 	bool completedCurrentFrame = false;
@@ -362,45 +362,35 @@ bool Simulation::generateFrame()
 			recordKeyFrame(0, mCodeExec, mGameRecorder, GameRecorder::InputData());
 		}
 
-		// Game recorder playback
-		if (isGameRecorderPlayback)
+		// If game recorder has input data for the frame transition, then use that
+		//  -> This is particularly relevant for rewinds, namely for the small fast forwards from the previous keyframe
+		GameRecorder::PlaybackResult result;
+		if (mGameRecorder.getFrameData(mFrameNumber + 1, result))
 		{
-			GameRecorder::PlaybackResult result;
-			if (mGameRecorder.updatePlayback(mFrameNumber, result))
+			if (isGameRecorderPlayback)
+				LogDisplay::instance().setModeDisplay("Game recorder playback at frame: " + std::to_string(mFrameNumber + 1));
+
+			if (nullptr != result.mData && !Configuration::instance().mGameRecorder.mPlaybackIgnoreKeys)
 			{
-				if (nullptr != result.mData)
+				// Load save state
+				SaveStateSerializer::StateType stateType;
+				SaveStateSerializer serializer(mCodeExec, RenderParts::instance());
+
+				const bool success = serializer.loadState(*result.mData, &stateType);
+				if (success)
 				{
-					SaveStateSerializer::StateType stateType;
-					SaveStateSerializer serializer(mCodeExec, RenderParts::instance());
-
-					const bool success = serializer.loadState(*result.mData, &stateType);
-					if (success)
-					{
-						mCodeExec.reinitRuntime(nullptr, (stateType == SaveStateSerializer::StateType::GENSX) ? CodeExec::CallStackInitPolicy::READ_FROM_ASM : CodeExec::CallStackInitPolicy::USE_EXISTING);
-						completedCurrentFrame = true;
-					}
-					else
-					{
-						RMX_ERROR("Failed to load save state", );
-					}
+					mCodeExec.reinitRuntime(nullptr, (stateType == SaveStateSerializer::StateType::GENSX) ? CodeExec::CallStackInitPolicy::READ_FROM_ASM : CodeExec::CallStackInitPolicy::USE_EXISTING);
+					completedCurrentFrame = true;
 				}
+				else
+				{
+					RMX_ERROR("Failed to load save state", );
+				}
+			}
 
-				ControlsIn::instance().injectInput(0, result.mInput->mInputs[0]);
-				ControlsIn::instance().injectInput(1, result.mInput->mInputs[1]);
-				inputWasInjected = true;
-			}
-		}
-		else
-		{
-			// If game recorder has input data for the frame transition, then use that
-			//  -> This is particularly relevant for rewinds, namely for the small fast forwards from the previous keyframe
-			GameRecorder::PlaybackResult result;
-			if (mGameRecorder.getFrameData(mFrameNumber + 1, result))
-			{
-				ControlsIn::instance().injectInput(0, result.mInput->mInputs[0]);
-				ControlsIn::instance().injectInput(1, result.mInput->mInputs[1]);
-				inputWasInjected = true;
-			}
+			ControlsIn::instance().injectInput(0, result.mInput->mInputs[0]);
+			ControlsIn::instance().injectInput(1, result.mInput->mInputs[1]);
+			inputWasInjected = true;
 		}
 
 		// Update input state
@@ -492,9 +482,11 @@ bool Simulation::jumpToFrame(uint32 frameNumber, bool clearRecordingAfterwards)
 	const bool isGameRecorderPlayback = Configuration::instance().mGameRecorder.mIsPlayback;
 	const bool isGameRecorderRecording = Configuration::instance().mGameRecorder.mIsRecording;
 
-	// TODO: Support game recorder playback mode here as well
-	if (isGameRecorderRecording)
+	if (isGameRecorderRecording || isGameRecorderPlayback)
 	{
+		if (isGameRecorderPlayback)
+			clearRecordingAfterwards = false;
+
 		// Go back until the most recent keyframe, in case the selected frame is not a keyframe itself
 		GameRecorder::PlaybackResult result;
 		uint32 keyframeNumber = frameNumber;

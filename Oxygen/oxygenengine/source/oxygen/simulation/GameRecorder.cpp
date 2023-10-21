@@ -25,7 +25,14 @@ void GameRecorder::clear()
 void GameRecorder::addFrame(uint32 frameNumber, const InputData& input)
 {
 	RMX_ASSERT(!mFrames.empty(), "First frame must be a keyframe");
-	RMX_ASSERT(frameNumber >= mRangeStart && frameNumber <= mRangeEnd, "Invalid frame number");
+	RMX_ASSERT(frameNumber >= mRangeStart, "Invalid frame number");
+	if (frameNumber > mRangeEnd)
+	{
+		// Correct range; this can happen if enabling the game recorder while the game is already running
+		clear();
+		mRangeStart = frameNumber;
+		mRangeEnd = frameNumber;
+	}
 	addFrameInternal(frameNumber, input, Frame::Type::INPUT_ONLY);
 }
 
@@ -80,27 +87,6 @@ void GameRecorder::discardFramesAfter(uint32 frameNumber)
 
 	mRangeEnd = frameNumber + 1;
 	mFrames.erase(mFrames.begin() + (mRangeEnd - mRangeStart), mFrames.end());
-}
-
-bool GameRecorder::updatePlayback(uint32 frameNumber, PlaybackResult& outResult)
-{
-	if (!hasFrameNumber(frameNumber))
-		return false;
-
-	Frame& frame = *mFrames[frameNumber - mRangeStart];
-	outResult.mInput = &frame.mInput;
-
-	if (frame.mType == Frame::Type::KEYFRAME)
-	{
-		if (!mIgnoreKeys || frameNumber == mRangeStart)
-		{
-			// TODO: Handle "frame.mCompressedData == true" (not needed for pure playback after loading from file)
-			outResult.mData = &frame.mData;
-		}
-	}
-
-	LogDisplay::instance().setModeDisplay("Game recorder playback at frame: " + std::to_string(frameNumber));
-	return true;
 }
 
 bool GameRecorder::getFrameData(uint32 frameNumber, PlaybackResult& outResult)

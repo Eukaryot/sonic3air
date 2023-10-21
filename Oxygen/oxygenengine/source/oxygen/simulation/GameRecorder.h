@@ -38,9 +38,7 @@ public:
 	inline uint32 getCurrentNumberOfFrames() const  { return mRangeEnd - mRangeStart; }
 	inline uint32 getRangeStart() const	 { return mRangeStart; }
 	inline uint32 getRangeEnd() const	 { return mRangeEnd; }
-
 	inline bool hasFrameNumber(uint32 frameNumber) const  { return frameNumber >= mRangeStart && frameNumber < mRangeEnd; }
-	bool updatePlayback(uint32 frameNumber, PlaybackResult& outResult);
 
 	bool getFrameData(uint32 frameNumber, PlaybackResult& outResult);
 
