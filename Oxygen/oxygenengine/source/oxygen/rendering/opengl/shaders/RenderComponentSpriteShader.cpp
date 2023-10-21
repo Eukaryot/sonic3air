@@ -53,6 +53,9 @@ void RenderComponentSpriteShader::refresh(const Vec2i& gameResolution)
 
 void RenderComponentSpriteShader::draw(const SpriteManager::ComponentSpriteInfo& spriteInfo, OpenGLRenderResources& resources)
 {
+	if (nullptr == spriteInfo.mCacheItem)
+		return;
+
 	glActiveTexture(GL_TEXTURE0);
 	const OpenGLTexture* texture = OpenGLSpriteTextureManager::instance().getComponentSpriteTexture(*spriteInfo.mCacheItem);
 	if (nullptr == texture)
