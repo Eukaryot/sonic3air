@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.13)
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
@@ -130,7 +130,7 @@ add_library(rmxmedia ${RMXMEDIA_SOURCES})
 
 target_link_libraries(rmxmedia rmxbase)
 target_link_libraries(rmxmedia SDL2-static)
-target_link_libraries(rmxmedia ${OPENGL_gl_LIBRARY})
+target_link_libraries(rmxmedia OpenGL::GL)
 
 
 
@@ -191,6 +191,11 @@ target_link_libraries(oxygen oxygen_netcore)
 
 if (UNIX AND CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
 	target_link_libraries(oxygen atomic)	# Needed when building on Raspberry Pi
+endif()
+
+if (UNIX)
+	find_package(CURL REQUIRED)
+	target_link_libraries(oxygen CURL::libcurl)
 endif()
 
 
@@ -257,3 +262,4 @@ target_link_libraries(Sonic3AIR oxygen)
 if (USE_DISCORD)
 	target_link_libraries(Sonic3AIR discord_game_sdk_source)
 endif()
+

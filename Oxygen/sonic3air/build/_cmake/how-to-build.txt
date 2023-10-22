@@ -11,7 +11,9 @@ If needed, install them via "sudo apt-get install" (for Debian-based systems, th
 	- libpulse-dev
 	- libxcomposite-dev
 	- libxxf86vm-dev
-	=> Complete line to copy:   sudo apt-get install g++ cmake libgl1-mesa-dev libglu1-mesa-dev libasound2-dev libpulse-dev libxcomposite-dev libxxf86vm-dev
+	- libcurl4-openssl-dev
+	=> Complete line to copy:
+		sudo apt-get install g++ cmake libgl1-mesa-dev libglu1-mesa-dev libasound2-dev libpulse-dev libxcomposite-dev libxxf86vm-dev libcurl4-openssl-dev
 	=> More candidates that might be needed by SDL2 see https://github.com/libsdl-org/SDL/blob/3bdc10f842c3eba74b9837caa21339a68a19efbe/.github/workflows/main.yml
 
 The following commands assume you start in the root directory of the S3AIR Git repo.
