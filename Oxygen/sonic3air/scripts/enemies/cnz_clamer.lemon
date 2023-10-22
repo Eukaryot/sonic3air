@@ -16,12 +16,13 @@
 //# alias(fn088fb4) deprecated
 function void Clamer.Init()
 {
-	Object.InitWithUpdateAddress(0x088fba)
+	Object.InitWithUpdateAddress(addressof(Clamer.BaseUpdate))
 }
 
 
 //# address-hook(0x088fba) end(0x088fd0)
-function void fn088fba()
+//# alias(fn088fba) deprecated
+function void Clamer.BaseUpdate()
 {
 	// Targets:
 	//  - 0x088fdc	-> objA0.base_state = 0x00

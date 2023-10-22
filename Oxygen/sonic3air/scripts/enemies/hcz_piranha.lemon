@@ -16,12 +16,13 @@
 //# alias(fn087f56) deprecated
 function void Piranha.Init()
 {
-	Object.InitWithUpdateAddress(0x087f5c)
+	Object.InitWithUpdateAddress(addressof(Piranha.BaseUpdate))
 }
 
 
 //# address-hook(0x087f5c) end(0x087f7a)
-function void fn087f5c()
+//# alias(fn087f5c) deprecated
+function void Piranha.BaseUpdate()
 {
 	// Targets:
 	//  - 0x087f88	-> objA0.base_state = 0x00  -> Initialization

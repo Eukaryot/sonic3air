@@ -16,12 +16,13 @@
 //# alias(fn08c2e2) deprecated
 function void Ribot.Init()
 {
-	Object.InitWithUpdateAddress(0x08c2e8)
+	Object.InitWithUpdateAddress(addressof(Ribot.BaseUpdate))
 }
 
 
 //# address-hook(0x08c2e8) end(0x08c2f6)
-function void fn08c2e8()
+//# alias(fn08c2e8) deprecated
+function void Ribot.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08c2fe	-> objA0.base_state = 0x00
@@ -63,8 +64,7 @@ function void fn08c34e()
 {
 	if (objA0.flags38 & 0x04)
 	{
-		objA0.flags38 &= ~0x04
-		objA0.flags38 &= 0xfc
+		objA0.flags38 &= ~(0x04 | 0x03)
 
 		objA0.flags38 ^= 0x08
 		D0 = (objA0.flags38 & 0x08) ? 0 : 1

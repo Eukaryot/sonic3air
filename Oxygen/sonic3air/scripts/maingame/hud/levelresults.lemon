@@ -372,7 +372,7 @@ function void LevelResults.UpdateCharacterNameDisplay()
 	A1 = 0xffff0000 + u16[A0 + 0x48]
 	D0 = (u16[A1 + 0x2c] != 0) ? 0x0028 : 0
 	objA0.sprite_attributes = D0.u16
-	objA0.update_address = 0x02dd98
+	objA0.update_address = addressof(LevelResults.UpdateStaticTextDisplay)
 	LevelResults.UpdateStaticTextDisplay()
 }
 

@@ -32,7 +32,7 @@ function void AIZWaterfall.Init()
 	u16[A0 + 0x34] = ((objA0.subtype2c >> 4) & 0x0f) << D2
 	objA0.render_flags = render_flag.WORLD
 
-	objA0.update_address = 0x02b5d4
+	objA0.update_address = addressof(AIZWaterfall.Update)
 	AIZWaterfall.Update()
 }
 
@@ -53,7 +53,7 @@ function void AIZWaterfall.spawnPlatform()
 	// Spawn the next platform
 	if (allocDynamicObjectAfterA0())
 	{
-		objA1.update_address = 0x02b6a0
+		objA1.update_address = addressof(AIZWaterfall.Platform.Update)
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		if (global.act == 0)

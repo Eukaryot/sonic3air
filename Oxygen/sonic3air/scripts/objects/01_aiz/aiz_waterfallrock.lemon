@@ -42,7 +42,7 @@ function void AIZWaterfallRock.Init()
 		objA0.animation.sprite = 5
 	}
 
-	objA0.update_address = 0x02a2d6
+	objA0.update_address = addressof(AIZWaterfallRock.Update)
 	AIZWaterfallRock.Update()
 }
 
@@ -69,7 +69,7 @@ function void AIZWaterfallRock.Update()
 		if (allocDynamicObjectAfterA0())
 		{
 			// Spawn water splashes effect
-			objA1.update_address = 0x02a36c
+			objA1.update_address = addressof(AIZWaterfallRock.SplashEffect.Update)
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 			objA1.mapping_offset = 0x2294c0

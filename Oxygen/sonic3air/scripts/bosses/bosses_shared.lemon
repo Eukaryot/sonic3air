@@ -592,7 +592,7 @@ function void fn083ec6()
 		return
 	}
 
-	objA0.countdown_value = 0x02
+	objA0.countdown_value = 2
 
 	// "spawnSimpleChildObjects(0x083ff6)" replaced by:
 	spawnSimpleChildObjects(addressof(SmallExplosion.BaseUpdate), 1)
@@ -637,7 +637,7 @@ function void fn083f06()
 		return
 	}
 
-	objA0.countdown_value = 0x02
+	objA0.countdown_value = 2
 
 	// "spawnSimpleChildObjects(0x083fe8)" replaced by:
 	spawnSimpleChildObjects(0x083f80, 1)		// Single boss explosion

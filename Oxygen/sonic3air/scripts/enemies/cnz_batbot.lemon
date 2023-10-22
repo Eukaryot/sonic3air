@@ -16,12 +16,13 @@
 //# alias(fn089376) deprecated
 function void Batbot.Init()
 {
-	Object.InitWithUpdateAddress(0x08937c)
+	Object.InitWithUpdateAddress(addressof(Batbot.BaseUpdate))
 }
 
 
 //# address-hook(0x08937c) end(0x08938a)
-function void fn08937c()
+//# alias(fn08937c) deprecated
+function void Batbot.BaseUpdate()
 {
 #if STANDALONE
 	// Put Batbot in front of the stage, #contributed by TheMushrunt

@@ -1409,7 +1409,7 @@ function void fn00972e()
 		++bluespheres.rings_collected
 		bluespheres.rings_flags |= 0x80
 
-		u8 soundId = 0x33
+		u8 soundId = SFX_RING
 		if (bluespheres.minigame_mode == 0)
 		{
 			if (bluespheres.rings_collected >= 50 && (bluespheres.rings_flags & 0x01) == 0)
@@ -1447,11 +1447,11 @@ function void fn00972e()
 					if (!Game.getSetting(SETTING_INFINITE_LIVES))
 					{
 						lives_counter = min(lives_counter + 1, 99)
-						soundId = 0x2a 	// Changed from ring loss sound to proper 1-up jingle, #contributed by mrgrassman14
+						soundId = MUSIC_EXTRALIFE 	// Changed from ring loss sound to proper 1-up jingle, #contributed by mrgrassman14
 					}
 				#else
 					++lives_counter
-					soundId = 0xb9
+					soundId = SFX_SPILLRINGS
 				#endif
 				}
 			}
@@ -1582,7 +1582,7 @@ function void BlueSpheres.RenderSpheres()
 					D0.u16 = u16[0xffffe480 + D0.s16 + 6]
 					D1 = (D0.u16 & 0x8000) ? 0 : size
 					D1.u16 += (D0.u16 & 0x7fff)
-					A3 += u16[A3 + D1.s16 * 2]
+					A3 = tableLookupAddress(A3, D1.s16 * 2)
 
 					// A3 = Pointer to sprite data
 					D1.u16 = u16[A3] - 1
@@ -2879,7 +2879,7 @@ function void BlueSpheres.renderCustomSpheres()
 		D0.u16 = u16[0xffffe480 + D0.u16 + 6]
 		D1 = (D0.u16 & 0x8000) ? 0 : (form * 2)
 		D1.u16 += D0.u16 * 2
-		A3 += u16[A3 + D1.s16]
+		A3 = tableLookupAddress(A3, D1.s16)
 
 		D1.u16 = u16[A3] - 1	// This is always 0, except for Super Emeralds
 		A3 += 2

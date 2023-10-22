@@ -193,7 +193,7 @@ function void fn01f8b4()
 	u16[A1 + 0x20] = 1
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~(char.flag.ROLLING | char.flag.ON_OBJECT)
-	u8[A1 + 0x2e] &= ~0x42
+	u8[A1 + 0x2e] &= ~(control_flag.DISABLE_WALLS | control_flag.DISABLE_ANIMATION)
 	u8[A1 + 0x30] = 0		// "char.rotation.x.count"
 	u8[A1 + 0x31] = 4		// "char.rotation.x.speed"
 	objA0.flags2a &= ~bit
@@ -231,7 +231,7 @@ function void fn01f914()
 	objA1.position.y.u16 = newPosY
 
 	D0 = (u16[A2] >> 1) / 11
-	u8[A1 + 0x22] = u8[0x01f99a + D0.u16]		// Player characters' corkscrew vertical running sprites
-	D0 = u8[A1 + 0x22]
+	objA1.animation.sprite = u8[0x01f99a + D0.u16]		// Player characters' corkscrew vertical running sprites
+	D0 = objA1.animation.sprite
 	SetCharacterSpritePatterns()
 }

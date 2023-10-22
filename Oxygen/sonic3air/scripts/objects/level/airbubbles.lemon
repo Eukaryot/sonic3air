@@ -269,7 +269,7 @@ function void fn02fba8()
 //# address-hook(0x02fbb2)
 function void fn02fbb2()
 {
-	if (u8[A1 + 0x2e] & 0x80)
+	if (u8[A1 + 0x2e] & control_flag.DISABLE_INTERACTION)
 		return
 
 	D0.u16 = objA1.position.x.u16

@@ -118,7 +118,7 @@ function void fn07f15a()
 function void fn07f166()
 {
 	objA0.base_state = 0x04
-	objA0.flags38 &= 0xf3
+	objA0.flags38 &= ~0x0c
 	objA0.countdown_value = 0xb3
 	objA0.countdown_callback = 0x07f194
 }

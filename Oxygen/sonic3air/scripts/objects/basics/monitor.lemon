@@ -532,7 +532,7 @@ function void MonitorIntact.Opening()
 	if (allocDynamicObjectAfterA0())
 	{
 		// Effect icon from the monitor
-		objA1.update_address = 0x01d7ba
+		objA1.update_address = addressof(ItemEffect.BaseUpdate)
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		objA1.render_flags = objA0.render_flags
@@ -850,12 +850,12 @@ function void ItemEffect.ApplyInvincibility()
 
 		if (u8[A0 + 0x43] == 0)
 		{
-			u32[0xffffcd7c] = 0x0187f0	// Invincibility stars
+			u32[0xffffcd7c] = addressof(Invincibility.Init)	// Invincibility stars
 			u16[0xffffcd7c + 0x42] = A1.u16
 		}
 		else
 		{
-			u32[0xffffcea4] = 0x0187f0	// Invincibility stars
+			u32[0xffffcea4] = addressof(Invincibility.Init)	// Invincibility stars
 			u16[0xffffcea4 + 0x42] = A1.u16
 		}
 	}
@@ -923,7 +923,7 @@ function void ItemEffect.ApplySuperTransformation()
 	#endif
 	}
 
-	u8[0xffffb000 + 0x2e] = 0x81
+	u8[0xffffb000 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	u8[0xffffb000 + 0x35] = 0
 	u8[A1 + 0x2b] |= char.bonus.INVINCIBLE
 

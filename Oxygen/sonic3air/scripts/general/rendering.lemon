@@ -837,7 +837,7 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 			if ((D6 & render_flag.STATIC_MAPPING) == 0)
 			{
 				D4.u16 = u16(objA0.animation.sprite) * 2
-				A1 += u16[A1 + D4.u16]
+				A1 = tableLookupAddress(A1, D4.u16)
 				D4.u16 = u16[(A1+=2)-2] - 1
 			}
 

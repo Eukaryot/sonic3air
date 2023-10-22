@@ -727,7 +727,7 @@ function void fn07490a()
 		A1 = 0xffffb000
 		objA0.position.x.u16 = objA1.position.x.u16
 		objA0.position.y.u16 = objA1.position.y.u16
-		u8[A1 + 0x2e] = 0x83
+		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 		objA1.animation.sprite = 0x8c		// Set Sonic's grabbed sprite
 	#if STANDALONE
 		// This makes AI Tails jump
@@ -1139,7 +1139,7 @@ function void fn074c8c()
 	objA1.velocity.y = 0
 	objA1.groundspeed = 0
 	objA1.state = char.state.ROLLING
-	u8[A1 + 0x2e] = 0x81
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 
 #if STANDALONE
 	// Remove spindash cloud
@@ -1443,8 +1443,8 @@ function void fn074fd2()
 		spawnChildObject(0x074e12, 0x00, 0, 16)
 	#else
 		// Release main character if he was grabbed (can happen if second character makes the final hit)
-		if (u8[0xffffb000 + 0x2e] & 0x81)
-			u8[0xffffb000 + 0x2e] &= ~0x81
+		if (u8[0xffffb000 + 0x2e] & (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE))
+			u8[0xffffb000 + 0x2e] &= ~(control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 
 		bool isKnucklesFight = (camera.position.y.u16 < 0x0500)
 		if (!isKnucklesFight)

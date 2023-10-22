@@ -153,7 +153,7 @@ function void fn032784()
 			u8[A1 + 0x1f] = u8[A1 + 0x45]
 			u8[A1 + 0x20] = 0
 			objA1.flags2a &= ~(char.flag.IN_AIR | char.flag.ROLLING | char.flag.CONTROL_LOCK | char.flag.PUSHING)
-			u8[A1 + 0x2e] = 0x03
+			u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 			u8[A1 + 0x40] = 0
 
 			u8[A2] = 1

@@ -585,9 +585,7 @@ function void fn007e64()
 			}
 		#endif
 
-			++levelselect.characters
-			if (levelselect.characters > maxCharacterSelection)
-				levelselect.characters = 0
+			levelselect.characters = (levelselect.characters < maxCharacterSelection) ? (levelselect.characters + 1) : CHARS_SONIC_AND_TAILS
 		}
 	}
 }

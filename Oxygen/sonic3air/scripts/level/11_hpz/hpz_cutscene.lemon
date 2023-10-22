@@ -1015,7 +1015,7 @@ function void fn064ca6()
 
 	A1 = 0xffffb000
 	player1.control_override = 0
-	u8[A1 + 0x2e] = 0x83
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	objA1.animation.sprite = (u8[A1 + 0x38] == CHARACTER_TAILS) ? 0xb0 : 0xc4		// Set Sonic/Tails' looking up sprite
 	objA1.state = char.state.LOOKING_UP
 	control.player1 = 0

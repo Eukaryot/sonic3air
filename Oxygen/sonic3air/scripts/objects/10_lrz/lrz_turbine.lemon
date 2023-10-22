@@ -90,7 +90,7 @@ function void fn044338()
 
 		fn04450a()
 
-		D0 = u8[A1 + 0x22]
+		D0 = objA1.animation.sprite
 		u32 backupA2 = A2
 		SetCharacterSpritePatterns()
 		A2 = backupA2
@@ -107,7 +107,7 @@ function void fn044338()
 	objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK
 	u8[A1 + 0x27] = 0
-	u8[A1 + 0x2e] &= 0xfc
+	u8[A1 + 0x2e] &= ~(control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	u8[A1 + 0x40] = 1
 }
 
@@ -127,7 +127,7 @@ function void fn0443c4()
 	u16[A1 + 0x20] = 0
 	if (D0.s16 < 0)
 	{
-		u16[A1 + 0x20] = 0x1000		// char.state.STRAIGHTJUMP, char.state.RUNNING
+		objA1.state.both = 0x1000		// char.state.STRAIGHTJUMP, char.state.RUNNING
 		objA1.sprite_attributes |= sprite_attribute.PRIORITY
 	}
 
@@ -138,7 +138,7 @@ function void fn0443c4()
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK
 	u8[A1 + 0x27] = 0
-	u8[A1 + 0x2e] &= 0xfc
+	u8[A1 + 0x2e] &= ~(control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	u8[A1 + 0x2f] = 0
 	u8[A1 + 0x3d] = 0
 	u8[A1 + 0x40] = 0
@@ -197,7 +197,7 @@ function void fn044434()
 
 			fn04450a()
 
-			D0 = u8[A1 + 0x22]
+			D0 = objA1.animation.sprite
 			u32 backupA2 = A2
 			SetCharacterSpritePatterns()
 			A2 = backupA2

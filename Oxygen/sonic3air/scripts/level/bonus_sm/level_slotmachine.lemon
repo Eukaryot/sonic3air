@@ -716,7 +716,7 @@ function void fn04c026()
 		objA1.velocity.x = 0
 		objA1.velocity.y = 0
 		objA1.groundspeed = 0
-		u8[A1 + 0x2e] = 0x81
+		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 		u16[(A2+=2)-2] += 2
 		u16[A2] = 0x78
 		objA0.value42 = A1.u16

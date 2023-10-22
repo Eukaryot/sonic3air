@@ -96,7 +96,7 @@ function void fn03a270()
 					u8[A1 + 0x2a] |= char.flag.IN_AIR
 					LetSonicClimbOnObject()
 
-					u8[A1 + 0x2e] = 0x42
+					u8[A1 + 0x2e] = (control_flag.DISABLE_WALLS | control_flag.DISABLE_ANIMATION)
 					fn03a314()
 				}
 			}
@@ -157,7 +157,7 @@ function void fn03a314()
 
 			D0.u16 = (D0.u16 >> 5) & 0x0f
 			D1.s8 = s8[0x03a468 + D0.u16]
-			u8[A1 + 0x22] = u8[0x03a474 + D0.u16]		// Player characters' corkscrew diagonal running sprites
+			objA1.animation.sprite = u8[0x03a474 + D0.u16]		// Player characters' corkscrew diagonal running sprites
 			D2.u16 = objA0.position.y.u16 + u16[A2 + 0x06] + D1.s8
 			D1 = u8[A1 + 0x1e]
 			D1.u16 -= 0x13
@@ -165,7 +165,7 @@ function void fn03a314()
 			objA1.position.y.u16 = D2.u16
 			u8[A1 + 0x20] = 0
 
-			D0 = u8[A1 + 0x22]
+			D0 = objA1.animation.sprite
 			u32 backupA2 = A2
 			SetCharacterSpritePatterns()
 			A2 = backupA2
@@ -175,7 +175,7 @@ function void fn03a314()
 			u8[A1 + 0x2a] &= ~char.flag.ROLLING
 			u8[A1 + 0x1e] = u8[A1 + 0x44]
 			u8[A1 + 0x1f] = u8[A1 + 0x45]
-			u16[A1 + 0x20] = char.state.RUNNING2
+			objA1.state.both = char.state.RUNNING2
 			u8[A1 + 0x2e] = 0
 			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 			objA0.flags2a &= ~bit
@@ -188,7 +188,7 @@ function void fn03a314()
 		u8[A1 + 0x2a] &= ~char.flag.ROLLING
 		u8[A1 + 0x1e] = u8[A1 + 0x44]
 		u8[A1 + 0x1f] = u8[A1 + 0x45]
-		u16[A1 + 0x20] = char.state.RUNNING2
+		objA1.state.both = char.state.RUNNING2
 		u8[A1 + 0x2e] = 0
 		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		objA0.flags2a &= ~(u8(1) << D6.u8)
@@ -263,8 +263,8 @@ function void fn03a480()
 		D0.s8 = -D0.s8
 	}
 	D0.u16 = D0 / 0x0b
-	u8[A1 + 0x22] = u8[0x03a548 + D0.u16]		// Player characters' corkscrew vertical running sprites
+	objA1.animation.sprite = u8[0x03a548 + D0.u16]		// Player characters' corkscrew vertical running sprites
 	u8[A1 + 0x20] = 0
-	D0 = u8[A1 + 0x22]
+	D0 = objA1.animation.sprite
 	SetCharacterSpritePatterns()
 }

@@ -22,7 +22,7 @@ function void SpinLauncher.Init()
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x80
 
-	objA0.update_address = 0x028de4
+	objA0.update_address = addressof(SpinLauncher.Update)
 	SpinLauncher.Update()
 }
 

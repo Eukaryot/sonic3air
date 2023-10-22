@@ -49,7 +49,7 @@ function void fn057c1e()
 	objA1.position.y.u16 = camera.position.y.u16 + 0x65
 	objA1.state = char.state.RUNNING
 	u8[A1 + 0x22] = 0
-	u8[A1 + 0x2e] = 0x03
+	u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 }
 
 
@@ -65,7 +65,7 @@ function void fn057cd2()
 		objA1.velocity.y = -1
 		objA1.state = char.state.ROLLING
 		objA1.flags2a |= char.flag.ROLLING
-		u8[A1 + 0x2e] = 0x01
+		u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 		D1.u16 = objA1.position.y.u16
 		objA0.value3e = D1.u16
 
@@ -161,7 +161,7 @@ function void fn057dcc()
 		u16[A1 + 0x1a] = 0xffff
 		objA1.state = char.state.ROLLING
 		objA1.flags2a |= char.flag.ROLLING
-		u8[A1 + 0x2e] = 0x01
+		u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 	}
 
 	D0 = 0x020000

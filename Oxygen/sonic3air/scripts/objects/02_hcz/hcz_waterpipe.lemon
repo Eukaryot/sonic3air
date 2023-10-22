@@ -294,8 +294,8 @@ function void fn030294()
 	{
 		Kosinski.addToDMAQueue(0x391394, 0xa000)		// Water geyser vertical sprites
 		objA0.animation.sprite = 1
-		u8[0xffffb000 + 0x2e] = 0x81
-		u8[0xffffb04a + 0x2e] = 0x81
+		u8[0xffffb000 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
+		u8[0xffffb04a + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 
 		objA0.update_address = 0x0302e6
 		fn0302e6()
@@ -390,7 +390,7 @@ function void fn030338()
 			objA1.box_size.y = 0x18
 			objA1.velocity.x = u16[(A3+=2)-2]
 			objA1.velocity.y = u16[(A3+=2)-2]
-			u8[A1 + 0x22] = D1.u8
+			objA1.animation.sprite = D1.u8
 
 			--D1.s16
 		}

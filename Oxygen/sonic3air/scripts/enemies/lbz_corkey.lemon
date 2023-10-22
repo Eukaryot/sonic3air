@@ -43,14 +43,16 @@ function void fn08c780()
 
 
 //# address-hook(0x08c728) end(0x08c728)
-function void fn08c728()
+//# alias(fn08c728) deprecated
+function void Corkey.Init()
 {
-	Object.InitWithUpdateAddress(0x08c72e)
+	Object.InitWithUpdateAddress(addressof(Corkey.BaseUpdate))
 }
 
 
 //# address-hook(0x08c72e) end(0x08c73c)
-function void fn08c72e()
+//# alias(fn08c72e) deprecated
+function void Corkey.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08c746	-> objA0.base_state = 0x00

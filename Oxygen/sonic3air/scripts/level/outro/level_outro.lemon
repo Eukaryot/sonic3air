@@ -18,7 +18,7 @@ function void InitLevelTiles.Outro()
 
 	global.pause_disabled.u8 = 0xff
 	player1.camera_lock = 0xff
-	u8[0xffffb000 + 0x2e] = 0x03
+	u8[0xffffb000 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 
 	D0 = 0x02000000
 	camera.position.x = D0

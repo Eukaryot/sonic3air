@@ -16,12 +16,13 @@
 //# alias(fn08bfae) deprecated
 function void SnailBlaster.Init()
 {
-	Object.InitWithUpdateAddress(0x08bfb4)
+	Object.InitWithUpdateAddress(addressof(SnailBlaster.BaseUpdate))
 }
 
 
 //# address-hook(0x08bfb4) end(0x08bfc2)
-function void fn08bfb4()
+//# alias(fn08bfb4) deprecated
+function void SnailBlaster.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08bfd4	-> objA0.base_state = 0x00

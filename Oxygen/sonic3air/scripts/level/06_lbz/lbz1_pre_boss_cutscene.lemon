@@ -94,7 +94,7 @@ function void fn08cbf2()
 	if (stayThere && getNumPlayers() > 1)
 	{
 		A1 = 0xffffb04a
-		if (u8[A1 + 0x2e] != 0x81)	// Check control flag for flying Tails
+		if (u8[A1 + 0x2e] != (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE))	// Check control flag for flying Tails
 		{
 			CheckDistanceToObjectA1()
 			stayThere = (D1.u16 != 0 && (D2.u16 >= 0x70 || D3.u16 >= 0x60 || (u8[A1 + 0x2a] & char.flag.IN_AIR)))

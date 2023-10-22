@@ -55,7 +55,7 @@ function void fn033102()
 			objA1.state = char.state.ROLLING
 			u8[A1 + 0x2a] &= ~char.flag.PUSHING
 			u8[A1 + 0x2a] |= char.flag.IN_AIR
-			u8[A1 + 0x2e] = 0x81
+			u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 
 			u8[A4 + 0x01] = 0
 			D1 = 0x30

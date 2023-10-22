@@ -41,7 +41,7 @@ function void RunOnWaterHandler.Init()
 		u16[A2+8]  = objA0.position.y.u16
 		u16[A2+10] = 0x0505
 
-		objA0.update_address = 0x0384b2
+		objA0.update_address = addressof(RunOnWaterHandler.Update)
 		RunOnWaterHandler.Update()
 	}
 	else

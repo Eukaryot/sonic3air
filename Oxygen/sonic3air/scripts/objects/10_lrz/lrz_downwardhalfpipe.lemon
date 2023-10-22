@@ -71,7 +71,7 @@ function void fn042574()
 						u8[A1 + 0x2a] |= 0x01
 						objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 						objA1.render_flags |= render_flag.FLIP_X
-						u8[A1 + 0x2e] = 0x43
+						u8[A1 + 0x2e] = (control_flag.DISABLE_WALLS | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 					}
 				}
 				else
@@ -86,7 +86,7 @@ function void fn042574()
 
 						u8[A1 + 0x2a] &= ~0x01
 						objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
-						u8[A1 + 0x2e] = 0x43
+						u8[A1 + 0x2e] = (control_flag.DISABLE_WALLS | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 					}
 				}
 			}
@@ -178,9 +178,9 @@ function void fn0426b0()
 	objA1.velocity.y = D0.u16
 	D0 = (u16[A2] >> 1) & 0xff
 	D0.u16 = D0 / 0x16
-	u8[A1 + 0x22] = u8[0x042792 + D0.u16]		// Player characters' halfpipe run sprites
+	objA1.animation.sprite = u8[0x042792 + D0.u16]		// Player characters' halfpipe run sprites
 
-	D0 = u8[A1 + 0x22]
+	D0 = objA1.animation.sprite
 	SetCharacterSpritePatterns()
 }
 
@@ -197,7 +197,7 @@ function void fn0426b6()
 		objA1.groundspeed = -objA1.groundspeed
 	}
 	objA0.flags2a &= ~bit
-	u16[A1 + 0x20] = 0x0001		// char.state.RUNNING, char.state.RUNNING2
+	objA1.state.both = 0x0001		// char.state.RUNNING, char.state.RUNNING2
 	u8[A1 + 0x2e] = 0
 	objA1.velocity.x = u16[A1 + 0x1c]
 	objA1.velocity.y = 0

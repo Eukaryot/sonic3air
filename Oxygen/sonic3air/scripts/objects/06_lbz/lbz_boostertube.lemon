@@ -92,7 +92,7 @@ function void fn029620()
 		objA1.flags2a &= ~char.flag.PUSHING
 		objA1.flags2a |= char.flag.IN_AIR
 		objA1.state = char.state.ROLLING
-		u8[A1 + 0x2e] = 0x81
+		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 		u8[A1 + 0x40] = 0
 
 		fn0297a2()

@@ -69,7 +69,7 @@ function void fn05d8bc()
 	u16[A1 + 0x1c] = 0x0800
 	objA1.state = char.state.LIFTED
 	u8[A1 + 0x2a] = 0
-	u8[A1 + 0x2e] = 0x81
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 
 	u32[0xffffb04a] = 0
 	super.ring_dec.frames = 0x7fff
@@ -247,7 +247,7 @@ function void fn05da74()
 	}
 
 	objA1.state = char.state.STANDING
-	u8[A1 + 0x2e] = 0x83
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	fn05fd88()
 	fn05db2c()
 }
@@ -588,7 +588,7 @@ function void fn05dc2c()
 	objA0.countdown_value = 119
 
 	A1 = 0xffffb000
-	u8[A1 + 0x22] = 0
+	objA1.animation.sprite = 0
 #if STANDALONE
 	objA0.velocity.x = 0x0100 + (getScreenExtend() * 0x80 / 40)
 #else
@@ -959,7 +959,7 @@ function void fn05e1c2()
 	objA1.render_flags |= render_flag.FLIP_X
 	u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 	u8[A1 + 0x0a] &= ~0x80
-	u8[A1 + 0x2e] = 0x83
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	objA1.state = char.state.STANDING
 	if (isMainCharacter(CHARACTER_TAILS))
 	{
@@ -1006,7 +1006,7 @@ function void fn05e288()
 	objA0.countdown_value = 0x1f
 
 	A1 = 0xffffb000
-	u8[A1 + 0x22] = 0x58		// Set player character's looking forward sprite
+	objA1.animation.sprite = 0x58		// Set player character's looking forward sprite
 	objA1.state = char.state.RUNNING
 	UpdatePlayer1SpritePatterns()
 }
@@ -1027,8 +1027,8 @@ function void fn05e2c2()
 	A1 = 0xffffb000
 	objA1.render_flags &= ~render_flag.FLIP_X
 	u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
-	u8[A1 + 0x2e] = 0x81
-	u16[A1 + 0x20] = 0x0200		// char.state.ROLLING, char.state.RUNNING
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
+	objA1.state.both = 0x0200		// char.state.ROLLING, char.state.RUNNING
 	u32[0xffffcc0a] = 0
 
 	D0 = isMainCharacter(CHARACTER_TAILS) ? 0 : (outro.ending_type < 0) ? 4 : 8
@@ -1132,8 +1132,8 @@ function void fn05e3c0()
 	}
 
 	A1 = 0xffffb000
-	u8[A1 + 0x2e] = 0x83
-	u8[A1 + 0x22] = 0
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
+	objA1.animation.sprite = 0
 	DrawObject()
 }
 
@@ -1177,7 +1177,7 @@ function void fn05e412()
 		else
 		{
 			objA0.base_state = 0x0c
-			u8[A1 + 0x2e] = 0x81
+			u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 			objA1.state = char.state.RUNNING
 			u16[A1 + 0x18] = 0x0800
 			u16[A1 + 0x1c] = 0x0800
@@ -1217,8 +1217,8 @@ function void fn05e474()
 	objA0.render_flags &= ~render_flag.FLIP_X
 
 	A1 = 0xffffb000
-	u8[A1 + 0x2e] = 0x83
-	u8[A1 + 0x22] = 0
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
+	objA1.animation.sprite = 0
 
 	if (allocDynamicObjectStd())
 	{
@@ -2095,6 +2095,6 @@ function void fn08648c()
 	}
 
 	u8[0xffffb000 + 0x2b] |= char.bonus.INVINCIBLE
-	u8[0xffffb000 + 0x2e] = 0x81
+	u8[0xffffb000 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	u8[0xffffb000 + 0x35] = 0
 }

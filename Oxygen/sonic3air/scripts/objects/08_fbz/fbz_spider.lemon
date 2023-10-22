@@ -78,7 +78,7 @@ function void fn03d11e()
 			if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 			{
 				objA1.state = char.state.GRABBED
-				u8[A1 + 0x2e] = 0xc1
+				u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_WALLS | control_flag.DISABLE_UPDATE)
 				u8[A1 + 0x3d] = 0
 				u8[A1 + 0x2a] = 0
 				objA1.velocity.x = 0

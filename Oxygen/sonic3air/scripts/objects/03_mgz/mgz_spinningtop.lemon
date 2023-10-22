@@ -481,7 +481,7 @@ function void fn034fbc()
 		playSound(SFX_JUMP)
 	}
 
-	u8[A1 + 0x2e] &= ~0x01
+	u8[A1 + 0x2e] &= ~control_flag.DISABLE_UPDATE
 	u8[A1 + 0x37] = 0
 	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	u8[A4] = 0
@@ -502,7 +502,7 @@ function void fn03519a()
 	if (u8[A0 + 0x40] == 4)
 	{
 		u8[A2 + 0x2a] |= char.flag.IN_AIR
-		u8[A2 + 0x2e] &= ~0x01
+		u8[A2 + 0x2e] &= ~control_flag.DISABLE_UPDATE
 		u8[A2 + 0x37] = 0
 	}
 	if (u8[A0 + 0x40] != 0)
@@ -514,7 +514,7 @@ function void fn03519a()
 	if (u8[A0 + 0x42] == 4)
 	{
 		u8[A2 + 0x2a] |= char.flag.IN_AIR
-		u8[A2 + 0x2e] &= ~0x01
+		u8[A2 + 0x2e] &= ~control_flag.DISABLE_UPDATE
 		u8[A2 + 0x37] = 0
 	}
 	if (u8[A0 + 0x42] != 0)

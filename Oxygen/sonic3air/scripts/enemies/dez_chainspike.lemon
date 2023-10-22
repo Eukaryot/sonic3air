@@ -16,12 +16,13 @@
 //# alias(fn091c3c) deprecated
 function void Chainspike.Init()
 {
-	Object.InitWithUpdateAddress(0x091c42)
+	Object.InitWithUpdateAddress(addressof(Chainspike.BaseUpdate))
 }
 
 
 //# address-hook(0x091c42) end(0x091c50)
-function void fn091c42()
+//# alias(fn091c42) deprecated
+function void Chainspike.BaseUpdate()
 {
 	// Targets:
 	//  - 0x091c62	-> objA0.base_state = 0x00

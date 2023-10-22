@@ -289,12 +289,12 @@ function void fn081a00()
 
 	objA0.base_state = 0x0c
 	objA0.flags2a &= ~0x80
-	objA0.flags38 &= 0xcf
+	objA0.flags38 &= ~0x30
 	D0.u16 = u16[0xfffffa8e]
 	if (D0.u16 != 0)
 	{
 		A1 = 0xffff0000 + D0.u16
-		u8[A1 + 0x38] &= 0xf3
+		u8[A1 + 0x38] &= ~0x0c
 	}
 	level.display_routine = 0x0600
 

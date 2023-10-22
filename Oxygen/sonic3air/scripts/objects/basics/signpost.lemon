@@ -270,7 +270,7 @@ function void fn083912()
 		if (allocDynamicObjectStd())
 		{
 			// Level results
-			objA1.update_address = 0x02dad0
+			objA1.update_address = addressof(LevelResults.Update)
 		}
 
 	#if STANDALONE
@@ -566,7 +566,7 @@ function void StartCharacterWinPose()
 	objA1.groundspeed = 0
 	objA1.state = char.state.WIN_POSE
 	objA1.flags2a &= ~char.flag.PUSHING
-	u8[A1 + 0x2e] = 0x81
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	u8[A1 + 0x3d] = 0
 
 	objA0.flags2a &= ~object.flag.P1_PUSHING

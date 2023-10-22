@@ -52,7 +52,7 @@ function void fn07117e()
 	#endif
 
 	objA0.update_address = 0x0711b0
-	objA0.countdown_callback = 0x0711b6
+	objA0.countdown_callback = addressof(Boss.ICZ1.Init)
 
 	requestLoadingPatterns(0x5f)		// Boss sprites
 	loadPaletteLine1(0x0719da)
@@ -70,7 +70,7 @@ function void fn0711b0()
 //# address-hook(0x0711b6) end(0x0711bc)
 function void Boss.ICZ1.Init()
 {
-	objA0.update_address = 0x0711be
+	objA0.update_address = addressof(Boss.ICZ1.BaseUpdate)
 }
 
 

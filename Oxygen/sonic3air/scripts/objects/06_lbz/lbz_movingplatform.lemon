@@ -75,8 +75,13 @@ function void fn024ef2()
 	//  - 0x024fd4	-> objA0.subtype2c = 0x04	-> Horizontally moving platform (large range)
 	//  - 0x024ff6	-> objA0.subtype2c = 0x06	-> Vertically moving platform (small range)
 	//  - 0x025002	-> objA0.subtype2c = 0x08	-> Vertically moving platform (large range)
-	//  - 0x025024	-> objA0.subtype2c = 0x0a	-> Diagionally moving platform
+	//  - 0x025024	-> objA0.subtype2c = 0x0a	-> Diagonally up moving platform
+	//  - 0x02503e	-> objA0.subtype2c = 0x0c	-> Diagonally down moving platform
 	//  - 0x02505c	-> objA0.subtype2c = 0x0e	-> Moving diagonally, e.g. up a ramp, when stepped on
+	//  - 0x025278	-> objA0.subtype2c = 0x10	-> Square pattern moving platform (small range)
+	//  - 0x02528a	-> objA0.subtype2c = 0x12	-> Square pattern moving platform (big range)
+	//  - 0x02529a	-> objA0.subtype2c = 0x14	-> Square pattern moving platform (bigger range)
+	//  - 0x0252aa	-> objA0.subtype2c = 0x16	-> Square pattern moving platform (biggest range)
 	//  - 0x0250ac	-> objA0.subtype2c = 0x18	-> Horizontally moving platform (large range, using different timing?)
 	//  - 0x025108	-> objA0.subtype2c = 0x1a	-> Falling down when stepped on
 	//  - 0x025132	-> objA0.subtype2c = 0x1c	-> Falling down right now
@@ -319,3 +324,99 @@ function void fn0251ae()
 	}
 	fn024f1c()
 }
+
+
+//# address-hook(0x025278) end(0x025288)
+function void fn025278()
+{
+	D1.u16 = 0x10
+	D0 = u8[0xfffffe98]
+	D0.u16 >>= 1
+	D3.u16 = u16[0xfffffe9a]
+	fn0252b8()
+}
+
+
+//# address-hook(0x02528a) end(0x025298)
+function void fn02528a()
+{
+	D1.u16 = 0x30
+	D0 = u8[0xfffffe9c]
+	D3.u16 = u16[0xfffffe9e]
+	fn0252b8()
+}
+
+
+//# address-hook(0x02529a) end(0x0252a8)
+function void fn02529a()
+{
+	D1.u16 = 0x50
+	D0 = u8[0xfffffea0]
+	D3.u16 = u16[0xfffffea2]
+	fn0252b8()
+}
+
+
+//# address-hook(0x0252aa) end(0x0252b4)
+function void fn0252aa()
+{
+	D1.u16 = 0x70
+	D0 = u8[0xfffffea4]
+	D3.u16 = u16[0xfffffea6]
+	fn0252b8()
+}
+
+
+//# address-hook(0x0252b8) end(0x025336)
+function void fn0252b8()
+{
+	if (D3.u16 == 0)
+	{
+		++u8[A0 + 0x2e]
+		u8[A0 + 0x2e] &= 0x03
+	}
+	D2.u8 = u8[A0 + 0x2e] & 0x03
+	if (D2.u8 == 0)
+	{
+		D0.u16 -= D1.u16
+		D0.u16 += u16[A0 + 0x30]
+		u16[A0 + 0x10] = D0.u16
+		D1.s16 = -D1.s16
+		D1.u16 += u16[A0 + 0x34]
+		u16[A0 + 0x14] = D1.u16
+		return
+	}
+	--D2.u8
+	if (D2.u8 == 0)
+	{
+		--D1.u16
+		D0.u16 -= D1.u16
+		D0.s16 = -D0.s16
+		D0.u16 += u16[A0 + 0x34]
+		u16[A0 + 0x14] = D0.u16
+		++D1.u16
+		D1.u16 += u16[A0 + 0x30]
+		u16[A0 + 0x10] = D1.u16
+		return
+	}
+	--D2.u8
+	if (D2.u8 == 0)
+	{
+		--D1.u16
+		D0.u16 -= D1.u16
+		D0.s16 = -D0.s16
+		D0.u16 += u16[A0 + 0x30]
+		u16[A0 + 0x10] = D0.u16
+		++D1.u16
+		D1.u16 += u16[A0 + 0x34]
+		u16[A0 + 0x14] = D1.u16
+		return
+	}
+	D0.u16 -= D1.u16
+	D0.u16 += u16[A0 + 0x34]
+	u16[A0 + 0x14] = D0.u16
+	D1.s16 = -D1.s16
+	D1.u16 += u16[A0 + 0x30]
+	u16[A0 + 0x10] = D1.u16
+}
+

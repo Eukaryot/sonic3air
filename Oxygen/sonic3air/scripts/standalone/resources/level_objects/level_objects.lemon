@@ -416,7 +416,7 @@ constant u8 OBJECTTABLE1_fe		= 0xfe		// Object address 0x01a51a = Unused (points
 constant u8 OBJECTTABLE1_ff		= 0xff		// Object address 0x03d448 = FBZ Magnetic Pendulum
 
 // Second object table
-// Note: comments on these constants reference significantly from this page: https://info.sonicretro.org/SCHG:Sonic_the_Hedgehog_3_%26_Knuckles/Object_Editing/Pointer_List_2
+// Note: Comments on these constants reference significantly from this page: https://info.sonicretro.org/SCHG:Sonic_the_Hedgehog_3_%26_Knuckles/Object_Editing/Pointer_List_2
 constant u8 OBJECTTABLE2_00		= 0x00		// Object address 0x01a51a = Ring
 constant u8 OBJECTTABLE2_01		= 0x01		// Object address 0x01d566 = Monitor
 constant u8 OBJECTTABLE2_02		= 0x02		// Object address 0x01ccae = Path Swapper

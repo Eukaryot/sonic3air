@@ -16,12 +16,13 @@
 //# alias(fn08daf6) deprecated
 function void Mushmeanie.Init()
 {
-	Object.InitWithUpdateAddress(0x08dafc)
+	Object.InitWithUpdateAddress(addressof(Mushmeanie.BaseUpdate))
 }
 
 
 //# address-hook(0x08dafc) end(0x08db0e)
-function void fn08dafc()
+//# alias(fn08dafc) deprecated
+function void Mushmeanie.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08db1e	-> objA0.base_state = 0x00

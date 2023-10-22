@@ -205,7 +205,7 @@ function void fn02a3d0()
 
 	if (objA0.subtype2c == 0)
 	{
-		objA0.update_address = 0x02a618
+		objA0.update_address = addressof(CorkFloor.Init)
 		CorkFloor.Init()
 	}
 	else

@@ -87,7 +87,7 @@ function void fn02c3e8()
 					s16[A1 + 0x1a] = 0
 				#endif
 					u8[A1 + 0x2d] = 0x80		// Set cylinder walking animation
-					u16[A1 + 0x20] = char.state.RUNNING2
+					objA1.state.both = char.state.RUNNING2
 					if (u16[A1 + 0x1c] == 0)
 					{
 						u16[A1 + 0x1c] = 0x01

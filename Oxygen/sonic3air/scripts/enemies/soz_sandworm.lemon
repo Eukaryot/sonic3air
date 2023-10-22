@@ -16,12 +16,13 @@
 //# alias(fn08ea66) deprecated
 function void Sandworm.Init()
 {
-	Object.InitWithUpdateAddress(0x08ea6c)
+	Object.InitWithUpdateAddress(addressof(Sandworm.BaseUpdate))
 }
 
 
 //# address-hook(0x08ea6c) end(0x08ea7a)
-function void fn08ea6c()
+//# alias(fn08ea6c) deprecated
+function void Sandworm.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08ea88	-> objA0.base_state = 0x00

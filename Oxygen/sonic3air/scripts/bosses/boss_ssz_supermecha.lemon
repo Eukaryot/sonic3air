@@ -361,7 +361,7 @@ function void fn07bcb0()
 	A1 = 0xffffb000
 	u8[A1 + 0x22] = 0
 	objA1.flags2a &= ~char.flag.ON_OBJECT
-	u8[A1 + 0x2e] = 0x83
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	u8[A1 + 0x3d] = 0
 	u8[A1 + 0x40] = 0
 

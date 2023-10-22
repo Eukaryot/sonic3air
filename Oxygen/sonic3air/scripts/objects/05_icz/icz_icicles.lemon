@@ -12,11 +12,6 @@
 // Icicles (in ICZ)                                      //
 //-------------------------------------------------------//
 
-
-//-------------------------------------------------------//
-// Static (non-falling) icicles                          //
-//-------------------------------------------------------//
-
 //# address-hook(0x08b2a0) end(0x08b2a0)
 function void fn08b2a0()
 {
@@ -36,11 +31,16 @@ function void fn08b2a4()
 	}
 	else
 	{
-		objA0.update_address = 0x08b2ee
+		objA0.update_address = addressof(FallingIcicle.Update)
 		objA0.collision_attributes = (collision.flag.THREAT | collision.size.8x16)
 	}
 }
 
+
+
+//-------------------------------------------------------//
+// Static (non-falling) icicles                          //
+//-------------------------------------------------------//
 
 //# address-hook(0x08b2da) end(0x08b2ea)
 function void fn08b2da()

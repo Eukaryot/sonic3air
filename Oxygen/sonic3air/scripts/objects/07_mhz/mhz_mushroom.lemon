@@ -43,7 +43,7 @@ function void MushroomHead.Init()
 	u16[A0 + 0x38] = objA0.position.x.u16
 	u16[A0 + 0x3a] = objA0.position.y.u16
 
-	objA0.update_address = 0x03e080
+	objA0.update_address = addressof(MushroomHead.Update)
 	MushroomHead.Update()
 }
 

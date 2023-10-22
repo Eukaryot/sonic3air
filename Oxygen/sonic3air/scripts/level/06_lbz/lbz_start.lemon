@@ -27,12 +27,12 @@ function void fn039a40()
 	objA0.animation.timer = 0x1e
 
 	A1 = 0xffffb000
-	u8[A1 + 0x2e] = 0x03
+	u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 
 	A1 = 0xffffb04a
 	if (u32[A1] != 0)
 	{
-		u8[A1 + 0x2e] = 0x03
+		u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	}
 }
 
@@ -55,7 +55,7 @@ function void fn039a80()
 	objA1.flags2a |= char.flag.IN_AIR
 	u8[A1 + 0x40] = 0
 	objA1.state = char.state.STRAIGHTJUMP
-	u8[A1 + 0x2e] = 0x01
+	u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 
 	A1 = 0xffffb04a
 	if (u32[A1] != 0)
@@ -64,7 +64,7 @@ function void fn039a80()
 		objA1.flags2a |= char.flag.IN_AIR
 		u8[A1 + 0x40] = 0
 		objA1.state = char.state.STRAIGHTJUMP
-		u8[A1 + 0x2e] = 0x01
+		u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 	}
 }
 

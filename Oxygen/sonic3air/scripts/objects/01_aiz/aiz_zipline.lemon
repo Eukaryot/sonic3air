@@ -56,7 +56,7 @@ function void fn021cb8()
 		--D1.s16
 		if (D1.s16 < 0)
 		{
-			objA1.update_address = 0x022074
+			objA1.update_address = addressof(AIZZipLine.BaseUpdate)
 			objA1.animation.sprite = 0x20
 			u16[A0 + 0x40] = A1.u16
 			break
@@ -542,7 +542,7 @@ function void fn0221ec()
 		D0.s8 = -D0.s8
 
 	D0.u16 = u8(D0.u8 + 8) >> 4
-	u8[A1 + 0x22] = u8[0x022248 + D0.u16]		// Player characters' hanging sprites
+	objA1.animation.sprite = u8[0x022248 + D0.u16]		// Player characters' hanging sprites
 	fn022224()
 }
 
@@ -554,7 +554,7 @@ function void fn022224()
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	objA1.render_flags |= D1.u8
 
-	D0 = u8[A1 + 0x22]
+	D0 = objA1.animation.sprite
 	u32 backupA2 = A2
 	SetCharacterSpritePatterns()
 	A2 = backupA2
@@ -602,7 +602,7 @@ function void fn022258()
 	A3 = 0xffff0000 + u16[A0 + 0x3c]
 
 	u16 offset = (u8(angle + 0x10) >> 5) * 2
-	u8[A1 + 0x22] = u8[0x0222d4 + offset]		// Player characters' bar spinning sprites
+	objA1.animation.sprite = u8[0x0222d4 + offset]		// Player characters' bar spinning sprites
 
 #if STANDALONE
 
@@ -696,7 +696,7 @@ function void AIZZipLineEndPole.Init()
 	objA0.box_size.x = 0x20
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0324)
-	objA0.update_address = 0x01e7dc
+	objA0.update_address = addressof(AIZZipLineEndPole.Update)
 	AIZZipLineEndPole.Update()
 }
 

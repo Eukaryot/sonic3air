@@ -302,7 +302,7 @@ function void fn06b154()
 	control.tails = 0
 	player1.control_override = 0xff
 	player2.control_override = 0xff
-	u8[0xffffb000 + 0x2e] = 0x80
+	u8[0xffffb000 + 0x2e] = control_flag.DISABLE_INTERACTION
 
 	stopCharacterWinPose(0xffffb000)
 	stopCharacterWinPose(0xffffb04a)
@@ -1006,7 +1006,7 @@ function void fn06b882()
 	if (D0.u16 < objA1.position.y.u16)
 	{
 		objA1.state = char.state.GOT_HURT
-		u8[A1 + 0x2e] = 0x81
+		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 		objA0.update_address = 0x06b8c8
 		objA0.countdown_value = 0x5f
 	}
@@ -1215,7 +1215,7 @@ function void fn06bada()
 {
 	u8[A0 + D4.s16] = 0xff
 	u8[A2 + 0x2a] |= 0x02
-	u8[A2 + 0x2e] = 0x01
+	u8[A2 + 0x2e] = control_flag.DISABLE_UPDATE
 	u8[A2 + 0x20] = char.state.DIED
 	u8[A2 + 0x3d] = 0
 	u16[A2 + 0x18] = 0

@@ -43,7 +43,7 @@ function void fn072b46()
 			if (allocDynamicObjectStd())
 			{
 				// Level results
-				objA1.update_address = 0x02dad0
+				objA1.update_address = addressof(LevelResults.Update)
 			}
 
 			if (allocDynamicObjectStd())
@@ -139,13 +139,13 @@ function void fn072c68()
 		objA0.countdown_callback = 0x072cbe
 
 		A1 = 0xffffb000
-		u8[A1 + 0x2e] = 0x83
+		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 		u8[A1 + 0x24] = 0
 		u8[A1 + 0x23] = 0
 
 		A1 = 0xffffb04a
 		objA0.state = 0
-		u8[A1 + 0x2e] = 0x83
+		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 		u8[A1 + 0x24] = 0
 		u8[A1 + 0x23] = 0
 	}

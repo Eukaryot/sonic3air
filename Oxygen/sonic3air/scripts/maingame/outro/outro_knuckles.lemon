@@ -47,7 +47,7 @@ function void fn05e70e()
 	objA0.countdown_value = 299
 
 	A1 = 0xffffb000
-	u8[A1 + 0x2e] = 0x83
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	u8[A1 + 0x22] = 0
 
 	player1.camera_lock = 0xff

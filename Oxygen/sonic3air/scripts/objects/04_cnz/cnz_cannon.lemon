@@ -157,7 +157,7 @@ function void fn0319f4()
 			objA1.state = char.state.ROLLING
 			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 			objA1.flags2a &= ~char.flag.ON_OBJECT
-			u8[A1 + 0x2e] = 0x81
+			u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 
 			u8[A2] = 1
 

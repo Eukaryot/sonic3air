@@ -409,7 +409,7 @@ function void fn06a24c()
 	control.tails = 0
 	player1.control_override = 0xff
 	player2.control_override = 0xff
-	u8[0xffffb000 + 0x2e] = 0x80
+	u8[0xffffb000 + 0x2e] = control_flag.DISABLE_INTERACTION
 
 	fn06a270()
 }
@@ -1006,7 +1006,7 @@ function void fn06a7c4()
 	objA1.groundspeed = 0
 	objA1.state = char.state.LIFTED
 	u8[A1 + 0x2a] |= char.flag.IN_AIR
-	u8[A1 + 0x2e] = 0x01
+	u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 	u8[A1 + 0x3d] = 0
 }
 
@@ -1196,7 +1196,7 @@ function void fn06a9b8()
 function void fn06aa00()
 {
 	u8[A2 + 0x2a] |= 0x02
-	u8[A2 + 0x2e] = 0x01
+	u8[A2 + 0x2e] = control_flag.DISABLE_UPDATE
 	u8[A2 + 0x20] = char.state.LIFTED
 	u8[A2 + 0x3d] = 0
 	u16[A2 + 0x18] = 0

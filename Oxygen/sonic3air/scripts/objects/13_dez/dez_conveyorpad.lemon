@@ -21,7 +21,7 @@ function void fn047966()
 	objA0.sprite_priority = 0x0280
 	objA0.state = 0x02
 	u8[A0 + 0x31] = (objA0.flags2a & 0x01)
-	objA0.flags2a &= 0xfe
+	objA0.flags2a &= ~0x01
 	u16[A0 + 0x34] = 0x01
 
 	D0.u16 = objA0.subtype2c & 0x7f

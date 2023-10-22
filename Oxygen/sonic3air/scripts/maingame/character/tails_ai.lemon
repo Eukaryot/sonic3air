@@ -251,7 +251,7 @@ function void Character.TailsAI.Init()
 			{
 				Character.CheckDiedStateEnd()
 				tails.ai_routine = 0x0a
-				char.control_flags = 0x83
+				char.control_flags = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 				return
 			}
 		}
@@ -278,7 +278,7 @@ function void Character.TailsAI.Init()
 				// For Knuckles & Tails in ICZ 1, make Tails fly in after a short time
 				tails.respawn_counter = 0
 				tails.ai_routine = 0x02
-				char.control_flags = 0x81
+				char.control_flags = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 				char.flags = char.flag.IN_AIR
 				char.position.x.u16 = 0
 				char.position.y.u16 = 0
@@ -290,7 +290,7 @@ function void Character.TailsAI.Init()
 			// Disable Tails
 			RespawnTails()
 			tails.ai_routine = 0x0a
-			char.control_flags = 0x83
+			char.control_flags = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 			return
 		}
 		else if (global.zone_act == 0x0700 && global.lock_on_state == 0)
@@ -351,7 +351,7 @@ function void fn013b26()
 		// Check only every 64 frames
 		if ((level.framecounter & 0x3f) != 0)
 			return
-		if (u8[A1 + 0x2e] & 0x80)	// control_flags
+		if (u8[A1 + 0x2e] & control_flag.DISABLE_INTERACTION)	// control_flags
 			return
 		if (u8[A1 + 0x2a] & 0x80)	// flags
 			return
@@ -376,7 +376,7 @@ function void fn013b26()
 	char.double_jump_state = 0
 	char.flags = char.flag.IN_AIR
 	char.drown_countdown = 30
-	char.control_flags = 0x81
+	char.control_flags = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	u8[A0 + 0x30] = 0
 	u8[A0 + 0x31] = 0
 	char.hlock_countdown = 0
@@ -425,7 +425,7 @@ function void fn013bf8()
 		{
 			tails.respawn_counter = 0
 			tails.ai_routine = 0x02
-			char.control_flags = 0x81
+			char.control_flags = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 			char.flags = char.flag.IN_AIR
 			char.position.x.u16 = 0
 			char.position.y.u16 = 0
@@ -519,7 +519,7 @@ function void fn013bf8()
 			return
 		}
 	}
-	char.control_flags = 0x81
+	char.control_flags = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 }
 
 
@@ -531,7 +531,7 @@ function void fn013d4a()
 		tails.ai_routine = 0x04
 		char.spindash = 0
 		char.spindash_charge = 0
-		char.control_flags = 0x81
+		char.control_flags = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 		char.flags = char.flag.IN_AIR
 		char.state = char.state.TAILS_FLYDOWN
 		return

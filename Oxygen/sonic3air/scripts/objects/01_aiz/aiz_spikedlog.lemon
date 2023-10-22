@@ -33,7 +33,7 @@ function void AIZSpikedLog.Init()
 		u16[A0 + 0x3c] = A1.u16
 	}
 
-	objA0.update_address = 0x02b7b4
+	objA0.update_address = addressof(AIZSpikedLog.Update)
 	AIZSpikedLog.Update()
 }
 

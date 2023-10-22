@@ -156,7 +156,7 @@ function void fn0290f2()
 				objA1.position.x.u16 = objA0.position.x.u16
 				objA1.position.y.u16 = objA0.position.y.u16 + 0x94
 				objA1.state = char.state.HANGING
-				u8[A1 + 0x2e] = 0x01
+				u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 				u8[A2] = 0x01
 
 				playSound(SFX_CLICK)

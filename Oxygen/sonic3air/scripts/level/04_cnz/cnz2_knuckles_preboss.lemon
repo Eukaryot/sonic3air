@@ -61,7 +61,7 @@ function void fn062528()
 
 	control.player1 = 0
 	player1.control_override = 0xff
-	u8[0xffffb000 + 0x2e] = 0x80
+	u8[0xffffb000 + 0x2e] = control_flag.DISABLE_INTERACTION
 	fn065dd6()
 
 #if STANDALONE
