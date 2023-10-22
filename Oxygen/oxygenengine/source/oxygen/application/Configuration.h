@@ -65,6 +65,8 @@ public:
 		int   mFaceButtonsSize = 100;
 		Vec2i mStartButtonCenter;
 		Vec2i mGameRecButtonCenter;
+		Vec2i mShoulderLButtonCenter;
+		Vec2i mShoulderRButtonCenter;
 	};
 
 	struct Mod

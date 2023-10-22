@@ -70,6 +70,8 @@ void TouchControlsOverlay::buildTouchControls()
 	mSetup.mFaceButtonsSize = (float)config.mVirtualGamepad.mFaceButtonsSize * CONFIG_TO_SETUP_SCALE;
 	mSetup.mStartButtonCenter = Vec2f(0.95f, -0.92f) + Vec2f(config.mVirtualGamepad.mStartButtonCenter) * CONFIG_TO_SETUP_SCALE * 0.5f;
 	mSetup.mGameRecButtonCenter = Vec2f(-0.95f, -0.92f) + Vec2f(config.mVirtualGamepad.mGameRecButtonCenter) * CONFIG_TO_SETUP_SCALE * 0.5f;
+	mSetup.mShoulderLButtonCenter = Vec2f(-1.55f, -0.82f) + Vec2f(config.mVirtualGamepad.mShoulderLButtonCenter) * CONFIG_TO_SETUP_SCALE * 0.5f;
+	mSetup.mShoulderRButtonCenter = Vec2f(+1.55f, -0.82f) + Vec2f(config.mVirtualGamepad.mShoulderRButtonCenter) * CONFIG_TO_SETUP_SCALE * 0.5f;
 
 	// Create touch areas and visual elements
 	{
@@ -87,24 +89,18 @@ void TouchControlsOverlay::buildTouchControls()
 		buildPointButton(mSetup.mDirectionalPadCenter + Vec2f(+0.2f, +0.2f) * size, 0.55f * size, 1.0f, controller.Right, &controller.Down);
 	}
 	{
-		// TODO: Include the L/R buttons, but make them optional
-		const bool use6ButtonLayout = false;
 		const float size = mSetup.mFaceButtonsSize;
-		if (use6ButtonLayout)
+		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(-0.28f, 0.0f) * size, 0.15f * size, "touch_overlay_X", controller.X, ConfigMode::State::MOVING_FACE_BUTTONS);
+		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(+0.28f, 0.0f) * size, 0.15f * size, "touch_overlay_B", controller.B, ConfigMode::State::MOVING_FACE_BUTTONS);
+		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(0.0f, -0.28f) * size, 0.15f * size, "touch_overlay_Y", controller.Y, ConfigMode::State::MOVING_FACE_BUTTONS);
+		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(0.0f, +0.28f) * size, 0.15f * size, "touch_overlay_A", controller.A, ConfigMode::State::MOVING_FACE_BUTTONS);
+
+		// TODO: Include the L/R buttons, but make them optional
+		const bool addLRButtons = false;
+		if (addLRButtons)
 		{
-			buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f( 0.0f,  -0.3f) * size, 0.15f * size, "touch_overlay_Y", controller.Y, ConfigMode::State::MOVING_BUTTONS);
-			buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(-0.35f, -0.2f) * size, 0.15f * size, "touch_overlay_L", controller.L, ConfigMode::State::MOVING_BUTTONS);
-			buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(+0.35f, -0.2f) * size, 0.15f * size, "touch_overlay_R", controller.R, ConfigMode::State::MOVING_BUTTONS);
-			buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(-0.35f, +0.2f) * size, 0.15f * size, "touch_overlay_X", controller.X, ConfigMode::State::MOVING_BUTTONS);
-			buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(+0.35f, +0.2f) * size, 0.15f * size, "touch_overlay_B", controller.B, ConfigMode::State::MOVING_BUTTONS);
-			buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f( 0.0f,  +0.3f) * size, 0.15f * size, "touch_overlay_A", controller.A, ConfigMode::State::MOVING_BUTTONS);
-		}
-		else
-		{
-			buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(-0.28f, 0.0f) * size, 0.15f * size, "touch_overlay_X", controller.X, ConfigMode::State::MOVING_BUTTONS);
-			buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(+0.28f, 0.0f) * size, 0.15f * size, "touch_overlay_B", controller.B, ConfigMode::State::MOVING_BUTTONS);
-			buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(0.0f, -0.28f) * size, 0.15f * size, "touch_overlay_Y", controller.Y, ConfigMode::State::MOVING_BUTTONS);
-			buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(0.0f, +0.28f) * size, 0.15f * size, "touch_overlay_A", controller.A, ConfigMode::State::MOVING_BUTTONS);
+			buildRoundButton(mSetup.mShoulderLButtonCenter, 0.15f * size, "touch_overlay_L", controller.L, ConfigMode::State::MOVING_L);
+			buildRoundButton(mSetup.mShoulderRButtonCenter, 0.15f * size, "touch_overlay_R", controller.R, ConfigMode::State::MOVING_R);
 		}
 	}
 	buildRectangularButton(mSetup.mStartButtonCenter, Vec2f(0.18f, 0.06f), "touch_overlay_start", &controller.Start, ConfigMode::State::MOVING_START);
@@ -405,7 +401,7 @@ void TouchControlsOverlay::updateConfigMode()
 				//}
 				else if (touchPosition.sqrDist(mSetup.mFaceButtonsCenter) < square(mSetup.mFaceButtonsSize * 0.5f))
 				{
-					mConfigMode.mState = ConfigMode::State::MOVING_BUTTONS;
+					mConfigMode.mState = ConfigMode::State::MOVING_FACE_BUTTONS;
 					mConfigMode.mLastTargetPosition = Vec2f(config.mVirtualGamepad.mFaceButtonsCenter);
 				}
 				// TODO: This is work-in-progress
@@ -423,6 +419,16 @@ void TouchControlsOverlay::updateConfigMode()
 				{
 					mConfigMode.mState = ConfigMode::State::MOVING_GAMEREC;
 					mConfigMode.mLastTargetPosition = Vec2f(config.mVirtualGamepad.mGameRecButtonCenter);
+				}
+				else if (touchPosition.sqrDist(mSetup.mShoulderLButtonCenter) < square(0.3f))
+				{
+					mConfigMode.mState = ConfigMode::State::MOVING_L;
+					mConfigMode.mLastTargetPosition = Vec2f(config.mVirtualGamepad.mShoulderLButtonCenter);
+				}
+				else if (touchPosition.sqrDist(mSetup.mShoulderRButtonCenter) < square(0.3f))
+				{
+					mConfigMode.mState = ConfigMode::State::MOVING_R;
+					mConfigMode.mLastTargetPosition = Vec2f(config.mVirtualGamepad.mShoulderRButtonCenter);
 				}
 				else if (touchPosition.sqrDist(::DONE_BUTTON_RECT.getClosestPoint(touchPosition)) < square(0.075f))
 				{
@@ -442,49 +448,12 @@ void TouchControlsOverlay::updateConfigMode()
 				break;
 			}
 
-			case ConfigMode::State::MOVING_DPAD:
-			{
-				if (touchPosition != mConfigMode.mLastTouchPosition)
-				{
-					mConfigMode.mLastTargetPosition += (touchPosition - mConfigMode.mLastTouchPosition) / (CONFIG_TO_SETUP_SCALE * 0.5f);
-					config.mVirtualGamepad.mDirectionalPadCenter.set(roundToInt(mConfigMode.mLastTargetPosition.x), roundToInt(mConfigMode.mLastTargetPosition.y));
-					buildTouchControls();
-				}
-				break;
-			}
-
-			case ConfigMode::State::MOVING_BUTTONS:
-			{
-				if (touchPosition != mConfigMode.mLastTouchPosition)
-				{
-					mConfigMode.mLastTargetPosition += (touchPosition - mConfigMode.mLastTouchPosition) / (CONFIG_TO_SETUP_SCALE * 0.5f);
-					config.mVirtualGamepad.mFaceButtonsCenter.set(roundToInt(mConfigMode.mLastTargetPosition.x), roundToInt(mConfigMode.mLastTargetPosition.y));
-					buildTouchControls();
-				}
-				break;
-			}
-
-			case ConfigMode::State::MOVING_START:
-			{
-				if (touchPosition != mConfigMode.mLastTouchPosition)
-				{
-					mConfigMode.mLastTargetPosition += (touchPosition - mConfigMode.mLastTouchPosition) / (CONFIG_TO_SETUP_SCALE * 0.5f);
-					config.mVirtualGamepad.mStartButtonCenter.set(roundToInt(mConfigMode.mLastTargetPosition.x), roundToInt(mConfigMode.mLastTargetPosition.y));
-					buildTouchControls();
-				}
-				break;
-			}
-
-			case ConfigMode::State::MOVING_GAMEREC:
-			{
-				if (touchPosition != mConfigMode.mLastTouchPosition)
-				{
-					mConfigMode.mLastTargetPosition += (touchPosition - mConfigMode.mLastTouchPosition) / (CONFIG_TO_SETUP_SCALE * 0.5f);
-					config.mVirtualGamepad.mGameRecButtonCenter.set(roundToInt(mConfigMode.mLastTargetPosition.x), roundToInt(mConfigMode.mLastTargetPosition.y));
-					buildTouchControls();
-				}
-				break;
-			}
+			case ConfigMode::State::MOVING_DPAD:		  updateButtonPosition(config.mVirtualGamepad.mDirectionalPadCenter, touchPosition);	break;
+			case ConfigMode::State::MOVING_FACE_BUTTONS:  updateButtonPosition(config.mVirtualGamepad.mFaceButtonsCenter, touchPosition);		break;
+			case ConfigMode::State::MOVING_START:		  updateButtonPosition(config.mVirtualGamepad.mStartButtonCenter, touchPosition);		break;
+			case ConfigMode::State::MOVING_GAMEREC:		  updateButtonPosition(config.mVirtualGamepad.mGameRecButtonCenter, touchPosition);		break;
+			case ConfigMode::State::MOVING_L:			  updateButtonPosition(config.mVirtualGamepad.mShoulderLButtonCenter, touchPosition);	break;
+			case ConfigMode::State::MOVING_R:			  updateButtonPosition(config.mVirtualGamepad.mShoulderRButtonCenter, touchPosition);	break;
 
 			case ConfigMode::State::SCALING_DPAD:
 			{
@@ -517,4 +486,14 @@ void TouchControlsOverlay::updateConfigMode()
 
 	// No auto-hide in config mode
 	mAutoHideTimer = 0.0f;
+}
+
+void TouchControlsOverlay::updateButtonPosition(Vec2i& position, Vec2f touchPosition)
+{
+	if (touchPosition != mConfigMode.mLastTouchPosition)
+	{
+		mConfigMode.mLastTargetPosition += (touchPosition - mConfigMode.mLastTouchPosition) / (CONFIG_TO_SETUP_SCALE * 0.5f);
+		position.set(roundToInt(mConfigMode.mLastTargetPosition.x), roundToInt(mConfigMode.mLastTargetPosition.y));
+		buildTouchControls();
+	}
 }

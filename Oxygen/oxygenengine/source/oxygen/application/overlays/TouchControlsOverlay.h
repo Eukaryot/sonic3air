@@ -28,6 +28,8 @@ public:
 		float mFaceButtonsSize = 1.0f;
 		Vec2f mStartButtonCenter;
 		Vec2f mGameRecButtonCenter;
+		Vec2f mShoulderLButtonCenter;
+		Vec2f mShoulderRButtonCenter;
 	};
 	Setup mSetup;
 
@@ -59,9 +61,11 @@ private:
 			DONE_BUTTON_UP,
 			DONE_BUTTON_DOWN,
 			MOVING_DPAD,
-			MOVING_BUTTONS,
+			MOVING_FACE_BUTTONS,
 			MOVING_START,
 			MOVING_GAMEREC,
+			MOVING_L,
+			MOVING_R,
 			SCALING_DPAD,
 			SCALING_BUTTONS
 		};
@@ -109,6 +113,7 @@ private:
 	Rectf getScreenFromNormalizedTouchRect(Rectf rect) const;
 
 	void updateConfigMode();
+	void updateButtonPosition(Vec2i& position, Vec2f touchPosition);
 
 private:
 	Vec2i mLastScreenSize;
