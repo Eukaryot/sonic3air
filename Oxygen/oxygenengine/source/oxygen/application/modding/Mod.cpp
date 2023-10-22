@@ -127,7 +127,9 @@ void Mod::loadFromJson(const Json::Value& json)
 				const uint64 key = rmx::getMurmur2_64(featureName);
 				if (featureJson.asBool())
 				{
-					mUsedFeatures[key].mFeatureName = featureName;
+					UsedFeature& usedFeature = mUsedFeatures[key];
+					usedFeature.mFeatureName = featureName;
+					usedFeature.mFeatureNameHash = key;
 				}
 				else
 				{

@@ -49,6 +49,7 @@ public:
 	struct UsedFeature
 	{
 		std::string mFeatureName;
+		uint64 mFeatureNameHash = 0;
 	};
 
 	struct OtherModInfo

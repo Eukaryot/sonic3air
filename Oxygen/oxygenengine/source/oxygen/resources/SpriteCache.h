@@ -29,12 +29,12 @@ public:
 		bool mGotDumped = false;
 	};
 
-	enum ROMSpriteEncoding
+	enum class ROMSpriteEncoding : uint8
 	{
-		ENCODING_NONE		= 0,
-		ENCODING_CHARACTER	= 1,
-		ENCODING_OBJECT		= 2,
-		ENCODING_KOSINSKI	= 3
+		NONE		= 0,
+		CHARACTER	= 1,
+		OBJECT		= 2,
+		KOSINSKI	= 3
 	};
 
 public:

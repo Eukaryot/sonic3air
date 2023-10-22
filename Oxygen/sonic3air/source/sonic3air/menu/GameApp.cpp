@@ -34,12 +34,8 @@
 
 namespace
 {
-	Color getVisibilityColor(float time, float maxTime, float fadeinTime, float fadeoutTime)
-	{
-		// Assuming that time is a countdown
-		const float visibility = std::min(std::min(time / fadeoutTime, (maxTime - time) / fadeinTime), 1.0f);
-		return Color(visibility, visibility, visibility);
-	}
+	static const constexpr float DISCLAIMER_FADE_IN_TIME  = 0.8f;
+	static const constexpr float DISCLAIMER_FADE_OUT_TIME = 0.2f;
 }
 
 
@@ -109,21 +105,34 @@ void GameApp::update(float timeElapsed)
 {
 	GuiBase::update(timeElapsed);
 
-	if (mCurrentState == State::DISCLAIMER)
+	// Update disclaimer fade-in / fade-out
 	{
-		if (InputManager::instance().anythingPressed())
+		const float dt = std::min(timeElapsed, 0.05f);
+		if (mCurrentState == State::DISCLAIMER)
 		{
-			mStateTimeout = std::min(mStateTimeout, 0.5f);
-		}
+			mDisclaimerVisibility = std::min(mDisclaimerVisibility + dt / DISCLAIMER_FADE_IN_TIME, 1.0f);
 
-		mStateTimeout -= timeElapsed;
-		if (mStateTimeout <= 0.0f)
+			mStateTimeout -= dt;
+			if (mStateTimeout <= 0.0f || InputManager::instance().anythingPressed())
+			{
+				gotoPhase(1);
+			}
+		}
+		else
 		{
-			mDisclaimerTexture.clearBitmap();	// Unload to save on RAM
-			gotoPhase(1);
+			if (mDisclaimerVisibility > 0.0f)
+			{
+				mDisclaimerVisibility -= dt / DISCLAIMER_FADE_OUT_TIME;
+				if (mDisclaimerVisibility <= 0.0f)
+				{
+					mDisclaimerVisibility = 0.0f;
+					mDisclaimerTexture.clearBitmap();	// Unload to save on RAM
+				}
+			}
 		}
 	}
-	else if (mCurrentState == State::INGAME)
+
+	if (mCurrentState == State::INGAME)
 	{
 		// Input
 		Game::instance().updateSpecialInput(timeElapsed);
@@ -164,18 +173,12 @@ void GameApp::render()
 {
 	Drawer& drawer = EngineMain::instance().getDrawer();
 
-	if (mCurrentState == State::DISCLAIMER)
+	if (mDisclaimerVisibility > 0.0f)
 	{
-		// Load disclaimer is not done already
-		if (!mDisclaimerTexture.isValid())
-		{
-			FileHelper::loadTexture(mDisclaimerTexture, L"data/images/menu/disclaimer.png");
-		}
-
 		const Rectf rect = RenderUtils::getLetterBoxRect(FTX::screenRect(), (float)mDisclaimerTexture.getWidth() / (float)mDisclaimerTexture.getHeight());
 		drawer.setBlendMode(BlendMode::OPAQUE);
 		drawer.setSamplingMode(SamplingMode::BILINEAR);
-		drawer.drawRect(rect, mDisclaimerTexture, getVisibilityColor(mStateTimeout, 8.0f, 0.8f, 0.5f));
+		drawer.drawRect(rect, mDisclaimerTexture, Color(mDisclaimerVisibility, mDisclaimerVisibility, mDisclaimerVisibility));
 		drawer.setSamplingMode(SamplingMode::POINT);
 		drawer.performRendering();
 	}
@@ -360,6 +363,12 @@ void GameApp::gotoPhase(int phaseNumber)
 			mCurrentState = State::DISCLAIMER;
 			mStateTimeout = 8.0f;
 			InputManager::instance().setTouchInputMode(InputManager::TouchInputMode::FULLSCREEN_START);
+
+			// Load disclaimer texture if not done already
+			if (!mDisclaimerTexture.isValid())
+			{
+				FileHelper::loadTexture(mDisclaimerTexture, L"data/images/menu/disclaimer.png");
+			}
 			break;
 		}
 
