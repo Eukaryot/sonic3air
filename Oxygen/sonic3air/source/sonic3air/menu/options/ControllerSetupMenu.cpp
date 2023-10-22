@@ -66,7 +66,7 @@ void ControllerSetupMenu::fadeIn()
 void ControllerSetupMenu::initialize()
 {
 	mMenuEntries.clear();
-	mMenuEntries.reserve(16);
+	mMenuEntries.reserve(20);
 	{
 		GameMenuEntry& entry = mMenuEntries.addEntry("", ::CONTROLLER_SELECT);
 		mControllerSelectEntry = &entry;
@@ -76,7 +76,7 @@ void ControllerSetupMenu::initialize()
 	mMenuEntries.addEntry("Assign all buttons", ::ASSIGN_ALL);
 
 	const constexpr size_t NUM_BUTTONS = (size_t)InputConfig::DeviceDefinition::Button::_NUM;
-	const char* buttonNames[NUM_BUTTONS] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back" };
+	const char* buttonNames[NUM_BUTTONS] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back", "L", "R" };
 	for (size_t i = 0; i < NUM_BUTTONS; ++i)
 	{
 		// TODO: Add L/R as well by removing this check - they're left out because the screen is too small, and scrolling is not implemented here
@@ -279,6 +279,9 @@ void ControllerSetupMenu::update(float timeElapsed)
 		}
 	}
 
+	// Scrolling
+	mScrolling.update(timeElapsed);
+
 	// Fading in/out
 	if (mState == State::APPEAR)
 	{
@@ -308,14 +311,13 @@ void ControllerSetupMenu::render()
 	GuiBase::render();
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
-	const Vec2i rectSize(350, 210);
 	const int anchorY = roundToInt((1.0f - mVisibility) * 120.0f);
-	const Recti rect(((int)mRect.width - rectSize.x) / 2, anchorY + ((int)mRect.height - rectSize.y) / 2, rectSize.x, rectSize.y);
+	const int startY = anchorY + 24 - mScrolling.getScrollOffsetYInt();
 	const float alpha = mVisibility;
 	const bool showEmptyMenu = mControllerSelectEntry->mOptions.empty();
 
-	const int baseX = rect.x + rect.width / 2;
-	int py = rect.y + 3;
+	const int baseX = 200;
+	int py = startY;
 	if (showEmptyMenu)
 	{
 		mMenuEntries.setSelectedIndexByValue(::_BACK);
@@ -345,6 +347,10 @@ void ControllerSetupMenu::render()
 
 		const std::string& text = entry.mOptions.empty() ? entry.mText : entry.mOptions[entry.mSelectedIndex].mText;
 		const bool isSelected = ((int)line == mMenuEntries.mSelectedEntryIndex);
+		if (isSelected)
+		{
+			mScrolling.setCurrentSelection(py - startY - 30, py + 70 - startY);
+		}
 
 		Color color = isSelected ? Color::YELLOW : Color::WHITE;
 		color.a *= alpha;
@@ -444,7 +450,7 @@ void ControllerSetupMenu::render()
 		{
 			// Entry without options
 			py += (entry.mData == ::_BACK) ? 10 : 4;
-			drawer.printText(global::mOxyfontRegular, Recti(rect.x, py, rect.width, 10), text, 5, color);
+			drawer.printText(global::mOxyfontRegular, Recti(0, py, 400, 10), text, 5, color);
 
 			if (isSelected)
 			{
