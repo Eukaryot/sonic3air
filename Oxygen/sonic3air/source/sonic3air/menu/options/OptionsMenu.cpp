@@ -1497,12 +1497,12 @@ void OptionsMenu::render()
 		if (ConfigurationImpl::instance().mShowControlsDisplay)
 		{
 			bottomY = 230 - roundToInt(alpha * 16.0f);
-			const int innerIndentX = (global::mDataSelectBackground.getWidth() - 400) / 2;
-			for (int k = 0; k < 5; ++k)
-			{
-				const int y = bottomY + k - 3;
-				drawer.drawRect(Recti(0, y, 400, 1), global::mDataSelectBackground, Recti(innerIndentX, y, 400, 1), Color(1.0f, 1.0f, 1.0f, ((float)k + 0.5f) * 0.2f));
-			}
+			//const int innerIndentX = (global::mDataSelectBackground.getWidth() - 400) / 2;
+			//for (int k = 0; k < 5; ++k)
+			//{
+			//	const int y = bottomY + k - 3;
+			//	drawer.drawRect(Recti(0, y, 400, 1), global::mDataSelectBackground, Recti(innerIndentX, y, 400, 1), Color(1.0f, 1.0f, 1.0f, ((float)k + 0.5f) * 0.2f));
+			//}
 		}
 
 		if (mEnteredFromIngame)

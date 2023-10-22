@@ -566,7 +566,7 @@ void GameMenuControlsDisplay::addControl(std::string_view displayText, bool alig
 void GameMenuControlsDisplay::render(Drawer& drawer, float visibility)
 {
 	Font& font = global::mOxyfontTinyRect;
-	Vec2i pos(0, 217 + roundToInt((1.0f - visibility) * 16));
+	Vec2i pos(0, 216 + roundToInt((1.0f - visibility) * 16));
 
 	// Background
 	drawer.drawRect(Recti(pos.x, pos.y - 1, 400, 225 - pos.y), Color(0.0f, 0.0f, 0.0f));
@@ -574,7 +574,7 @@ void GameMenuControlsDisplay::render(Drawer& drawer, float visibility)
 //		drawer.drawRect(Recti(pos.x, pos.y - 7 + k, 400, 1), Color(0.0f, 0.0f, 0.0f, 0.1f * k - 0.05f));
 
 	// Left-aligned entries
-	pos.x += 16;
+	pos.x += 12;
 	for (Control& control : mControls)
 	{
 		if (control.mSpriteKeys.empty() || control.mAlignRight)
@@ -582,6 +582,7 @@ void GameMenuControlsDisplay::render(Drawer& drawer, float visibility)
 
 		for (uint64 spriteKey : control.mSpriteKeys)
 		{
+			//drawer.drawRect(Recti(pos.x - 4, pos.y - 8, 16, 16), Color(0.0f, 0.0f, 0.0f, 0.6f));
 			drawer.drawSprite(pos + Vec2i(4, 0), spriteKey);
 			pos.x += 16;
 		}
@@ -590,7 +591,7 @@ void GameMenuControlsDisplay::render(Drawer& drawer, float visibility)
 	}
 
 	// Right-aligned entries
-	pos.x = 400 - 10;
+	pos.x = 400 - 8;
 	for (Control& control : mControls)
 	{
 		if (control.mSpriteKeys.empty() || !control.mAlignRight)
