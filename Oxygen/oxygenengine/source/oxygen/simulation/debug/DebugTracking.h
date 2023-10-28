@@ -9,6 +9,7 @@
 #pragma once
 
 #include "oxygen/simulation/DebuggingInterfaces.h"
+#include <optional>
 
 class LemonScriptRuntime;
 namespace lemon
@@ -25,8 +26,9 @@ public:
 	struct Location
 	{
 		const lemon::ScriptFunction* mFunction = nullptr;
-		size_t mProgramCounter = 0;
+		std::optional<size_t> mProgramCounter;
 		mutable std::string mResolvedString;
+		mutable int mLineNumber = -1;
 
 		const std::string& toString(CodeExec& codeExec) const;
 		bool operator==(const Location& other) const;
@@ -35,6 +37,7 @@ public:
 	struct ScriptLogSingleEntry
 	{
 		std::string mValue;
+		Location mLocation;
 		int mCallFrameIndex = -1;
 	};
 	struct ScriptLogEntry
@@ -81,6 +84,8 @@ public:
 public:
 	DebugTracking(CodeExec& codeExec, EmulatorInterface& emulatorInterface, LemonScriptRuntime& lemonScriptRuntime);
 
+	CodeExec& getCodeExec()  { return mCodeExec; }
+
 	void setupForDevMode();
 	void clear();
 	void onBeginFrame();
@@ -105,6 +110,8 @@ public:
 
 	// VRAM writes
 	inline const std::vector<VRAMWrite*>& getVRAMWrites() const  { return mVRAMWrites; }
+
+	void getCallStackFromCallFrameIndex(std::vector<Location>& outCallStack, int callFrameIndex, std::optional<size_t> firstProgramCounter);
 
 private:
 	void deleteWatch(Watch& watch);

@@ -197,9 +197,16 @@ namespace lemon
 
 	size_t RuntimeFunction::translateFromRuntimeProgramCounter(const uint8* runtimeProgramCounter) const
 	{
+		const int result = translateFromRuntimeProgramCounterOptional(runtimeProgramCounter);
+		RMX_ASSERT(result >= 0, "Program counter couldn't be translated");
+		return (size_t)std::max(result, 0);
+	}
+
+	int RuntimeFunction::translateFromRuntimeProgramCounterOptional(const uint8* runtimeProgramCounter) const
+	{
 		// Binary search
 		if (mProgramCounterByOpcodeIndex.empty())
-			return 0;
+			return -1;
 
 		const size_t programCounter = (size_t)(runtimeProgramCounter - getFirstRuntimeOpcode());
 		size_t minimum = 0;
@@ -217,11 +224,10 @@ namespace lemon
 			}
 			else
 			{
-				return median;
+				return (int)median;
 			}
 		}
-		RMX_ASSERT(false, "Program counter couldn't be translated");
-		return 0;
+		return -1;
 	}
 
 	const uint8* RuntimeFunction::translateToRuntimeProgramCounter(size_t originalProgramCounter) const

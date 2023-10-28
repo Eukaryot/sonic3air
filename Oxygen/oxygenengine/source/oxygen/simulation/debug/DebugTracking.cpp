@@ -17,6 +17,7 @@
 #include "oxygen/rendering/parts/PaletteManager.h"
 
 #include <lemon/program/Function.h>
+#include <lemon/runtime/RuntimeFunction.h>
 
 
 const std::string& DebugTracking::Location::toString(CodeExec& codeExec) const
@@ -31,8 +32,16 @@ const std::string& DebugTracking::Location::toString(CodeExec& codeExec) const
 		{
 			std::string scriptFilename;
 			uint32 lineNumber;
-			codeExec.getLemonScriptProgram().resolveLocation(*mFunction, (uint32)mProgramCounter, scriptFilename, lineNumber);
-			mResolvedString = std::string(mFunction->getName().getString()) + ", line " + std::to_string(lineNumber);
+			if (mProgramCounter.has_value())
+			{
+				codeExec.getLemonScriptProgram().resolveLocation(*mFunction, (uint32)*mProgramCounter, scriptFilename, lineNumber);
+				mLineNumber = lineNumber;
+			}
+			else
+			{
+				codeExec.getLemonScriptProgram().resolveLocation(*mFunction, 0, scriptFilename, lineNumber);
+			}
+			mResolvedString = mFunction->getName().getString();
 		}
 	}
 	return mResolvedString;
@@ -241,6 +250,49 @@ void DebugTracking::removeWatch(uint32 address, uint16 bytes)
 	mEmulatorInterface.getWatches().erase(mEmulatorInterface.getWatches().begin() + index);
 }
 
+void DebugTracking::getCallStackFromCallFrameIndex(std::vector<Location>& outCallStack, int callFrameIndex, std::optional<size_t> firstProgramCounter)
+{
+	const std::vector<CodeExec::CallFrame>& callFrames = mCodeExec.getCallFrames();
+	const uint8* lastCallingPC = nullptr;
+	bool isFirst = true;
+	while (callFrameIndex >= 0 && callFrameIndex < (int)callFrames.size())
+	{
+		const CodeExec::CallFrame& callFrame = callFrames[callFrameIndex];
+		if (nullptr != callFrame.mFunction && callFrame.mFunction->getType() == lemon::Function::Type::SCRIPT)
+		{
+			Location& location = vectorAdd(outCallStack);
+			location.mFunction = static_cast<const lemon::ScriptFunction*>(callFrame.mFunction);
+
+			// TODO: Move this inside of a helper function, maybe inside LemonScriptRuntime?
+			lemon::RuntimeFunction* runtimeFunction = mCodeExec.getLemonScriptRuntime().getInternalLemonRuntime().getRuntimeFunction(*location.mFunction);
+			if (nullptr != runtimeFunction)
+			{
+				if (isFirst && firstProgramCounter.has_value())
+				{
+					location.mProgramCounter = *firstProgramCounter;
+				}
+				else
+				{
+					if (nullptr != lastCallingPC)
+					{
+						const int pc = runtimeFunction->translateFromRuntimeProgramCounterOptional(lastCallingPC);
+						if (pc >= 0)
+						{
+							// The program counter refers to the opcode after the call, so we need to reduce it by 1
+							location.mProgramCounter = (size_t)std::max(pc - 1, 0);
+						}
+					}
+				}
+			}
+		}
+
+		// Continue with parent
+		callFrameIndex = callFrame.mParentIndex;
+		lastCallingPC = callFrame.mCallingPC;
+		isFirst = false;
+	}
+}
+
 void DebugTracking::deleteWatch(Watch& watch)
 {
 	for (Watch::Hit* hit : watch.mHits)
@@ -273,6 +325,10 @@ void DebugTracking::onScriptLog(std::string_view key, std::string_view value)
 	ScriptLogSingleEntry& scriptLogSingleEntry = updateScriptLogValue(key, value);
 	scriptLogSingleEntry.mCallFrameIndex = getCurrentCallFrameIndex();
 
+	size_t pc;
+	mLemonScriptRuntime.getLastStepLocation(scriptLogSingleEntry.mLocation.mFunction, pc);
+	scriptLogSingleEntry.mLocation.mProgramCounter = pc;
+
 	Application::instance().getSimulation().stopSingleStepContinue();
 }
 
@@ -282,7 +338,9 @@ void DebugTracking::onWatchTriggered(size_t watchIndex, uint32 address, uint16 b
 		return;
 
 	Location location;
-	mLemonScriptRuntime.getLastStepLocation(location.mFunction, location.mProgramCounter);
+	size_t pc;
+	mLemonScriptRuntime.getLastStepLocation(location.mFunction, pc);
+	location.mProgramCounter = pc;
 
 	Watch& watch = *mWatches[watchIndex];
 	{
@@ -310,7 +368,9 @@ void DebugTracking::onVRAMWrite(uint16 address, uint16 bytes)
 		return;
 
 	Location location;
-	mLemonScriptRuntime.getLastStepLocation(location.mFunction, location.mProgramCounter);
+	size_t pc;
+	mLemonScriptRuntime.getLastStepLocation(location.mFunction, pc);
+	location.mProgramCounter = pc;
 
 	// Check if this can be merged with the VRAM write just before
 	if (!mVRAMWrites.empty())

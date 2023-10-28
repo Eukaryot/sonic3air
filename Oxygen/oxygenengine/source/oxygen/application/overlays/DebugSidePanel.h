@@ -10,10 +10,12 @@
 
 #include <rmxbase.h>
 #include <functional>
+#include <optional>
 
 
-class DebugSidePanelCategory;
 class CustomDebugSidePanelCategory;
+class DebugSidePanelCategory;
+class DebugTracking;
 class Drawer;
 
 class DebugSidePanel : public GuiBase
@@ -38,9 +40,10 @@ public:
 		};
 
 	public:
-		TextLine& addLine(const String& text, const Color& color = Color::WHITE, int intend = 0, uint64 key = INVALID_KEY, int lineSpacing = 12);
-		TextLine& addOption(const String& text, bool value, const Color& color = Color::WHITE, int intend = 0, uint64 key = INVALID_KEY, int lineSpacing = 12);
+		TextLine& addLine(std::string_view text, const Color& color = Color::WHITE, int intend = 0, uint64 key = INVALID_KEY, int lineSpacing = 12);
+		TextLine& addOption(std::string_view text, bool value, const Color& color = Color::WHITE, int intend = 0, uint64 key = INVALID_KEY, int lineSpacing = 12);
 		void addSpacing(int lineSpacing);
+		void addCallStack(DebugTracking& debugTracking, int callFrameIndex, std::optional<size_t> firstProgramCounter);
 
 	private:
 		std::vector<TextLine> mTextLines;

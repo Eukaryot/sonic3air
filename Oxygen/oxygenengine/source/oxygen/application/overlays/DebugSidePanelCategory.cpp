@@ -136,7 +136,7 @@ void CustomDebugSidePanelCategory::buildCategoryContent(DebugSidePanel::Builder&
 
 		for (Line& line : entry.mLines)
 		{
-			builder.addLine(String(0, "%s", line.mText.c_str()), line.mColor, line.mIndent, key);
+			builder.addLine(*String(0, "%s", line.mText.c_str()), line.mColor, line.mIndent, key);
 		}
 		builder.addSpacing(4);
 	}

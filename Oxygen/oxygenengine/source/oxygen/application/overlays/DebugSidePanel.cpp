@@ -41,7 +41,7 @@ namespace
 }
 
 
-DebugSidePanel::Builder::TextLine& DebugSidePanel::Builder::addLine(const String& text, const Color& color, int intend, uint64 key, int lineSpacing)
+DebugSidePanel::Builder::TextLine& DebugSidePanel::Builder::addLine(std::string_view text, const Color& color, int intend, uint64 key, int lineSpacing)
 {
 	TextLine& textLine = vectorAdd(mTextLines);
 	textLine.mText = text;
@@ -52,7 +52,7 @@ DebugSidePanel::Builder::TextLine& DebugSidePanel::Builder::addLine(const String
 	return textLine;
 }
 
-DebugSidePanel::Builder::TextLine& DebugSidePanel::Builder::addOption(const String& text, bool value, const Color& color, int intend, uint64 key, int lineSpacing)
+DebugSidePanel::Builder::TextLine& DebugSidePanel::Builder::addOption(std::string_view text, bool value, const Color& color, int intend, uint64 key, int lineSpacing)
 {
 	TextLine& textLine = vectorAdd(mTextLines);
 	textLine.mText = text;
@@ -68,6 +68,24 @@ void DebugSidePanel::Builder::addSpacing(int lineSpacing)
 {
 	TextLine& textLine = vectorAdd(mTextLines);
 	textLine.mLineSpacing = lineSpacing;
+}
+
+void DebugSidePanel::Builder::addCallStack(DebugTracking& debugTracking, int callFrameIndex, std::optional<size_t> firstProgramCounter)
+{
+	std::vector<DebugTracking::Location> callStack;
+	debugTracking.getCallStackFromCallFrameIndex(callStack, callFrameIndex, firstProgramCounter);
+	for (const DebugTracking::Location& loc : callStack)
+	{
+		const std::string& functionName = loc.toString(debugTracking.getCodeExec());
+		if (loc.mLineNumber >= 0)
+		{
+			addLine(*String(0, "%s, line %d", functionName.c_str(), loc.mLineNumber), Color::fromABGR32(0xffc0c0c0), 32);
+		}
+		else
+		{
+			addLine(functionName, Color::fromABGR32(0xffc0c0c0), 32);
+		}
+	}
 }
 
 
@@ -343,7 +361,7 @@ void DebugSidePanel::render()
 		drawer.printText(mSmallFont, textRect, line.mText, 1, line.mColor);
 	}
 
-	category.mScrollSize = std::max(category.mScrollPosition + rect.y - screenSize.y / 5, 0);
+	category.mScrollSize = std::max(category.mScrollPosition + rect.y - screenSize.y * 2/3, 0);
 
 	if (category.mScrollSize > 0)
 	{
@@ -515,7 +533,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					line << pair.second->getName().getString();
 					if (!visualizationSorting && !filename.empty())
 						line << " | " << filename;
-					builder.addLine(line, Color::WHITE, 10);
+					builder.addLine(*line, Color::WHITE, 10);
 				}
 			}
 			else
@@ -551,7 +569,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					const int indent = callFrame.mDepth * 16;
 					if (callFrame.mType == CodeExec::CallFrame::Type::FAILED_HOOK)
 					{
-						builder.addLine(String(0, "%06x", callFrame.mAddress) + postfix, Color::RED, indent);
+						builder.addLine(*String(0, "%06x", callFrame.mAddress) + postfix, Color::RED, indent);
 					}
 					else
 					{
@@ -584,7 +602,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 			const auto& unknownAddresses = codeExec.getUnknownAddresses();
 			for (uint32 address : unknownAddresses)
 			{
-				builder.addLine(String(0, "0x%06x", address), Color::RED);
+				builder.addLine(*String(0, "0x%06x", address), Color::RED);
 			}
 			break;
 		}
@@ -601,15 +619,15 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 				if (watch->mHits.empty())
 				{
-					builder.addLine(String(0, "Watch 0x%08x (0x%02x bytes)", displayAddress, watch->mBytes), Color::fromABGR32(0xffa0a0a0));
+					builder.addLine(*String(0, "Watch 0x%08x (0x%02x bytes)", displayAddress, watch->mBytes), Color::fromABGR32(0xffa0a0a0));
 					if (watch->mBytes <= 4)
-						builder.addLine(String(0, "= %s at %s", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str(), watch->mLastHitLocation.toString(codeExec).c_str()), Color::fromABGR32(0xffa0a0a0), 8);
+						builder.addLine(*String(0, "= %s at %s", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str(), watch->mLastHitLocation.toString(codeExec).c_str()), Color::fromABGR32(0xffa0a0a0), 8);
 				}
 				else
 				{
-					builder.addLine(String(0, "Watch 0x%08x (0x%02x bytes)", displayAddress, watch->mBytes), Color::WHITE);
+					builder.addLine(*String(0, "Watch 0x%08x (0x%02x bytes)", displayAddress, watch->mBytes), Color::WHITE);
 					if (watch->mBytes <= 4)
-						builder.addLine(String(0, "= %s initially", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str()), Color::WHITE, 8);
+						builder.addLine(*String(0, "= %s initially", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str()), Color::WHITE, 8);
 
 					for (size_t hitIndex = 0; hitIndex < watch->mHits.size(); ++hitIndex)
 					{
@@ -617,9 +635,9 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 						const uint64 key = ((uint64)watch->mAddress << 32) + hitIndex;
 						Builder::TextLine* textLine;
 						if (watch->mBytes <= 4)
-							textLine = &builder.addLine(String(0, "= %s at %s", rmx::hexString(hit.mWrittenValue, watch->mBytes * 2).c_str(), hit.mLocation.toString(codeExec).c_str()), Color::WHITE, 8, key);
+							textLine = &builder.addLine(*String(0, "= %s at %s", rmx::hexString(hit.mWrittenValue, watch->mBytes * 2).c_str(), hit.mLocation.toString(codeExec).c_str()), Color::WHITE, 8, key);
 						else
-							textLine = &builder.addLine(String(0, "u%d[0xffff%04x] = %s at %s", hit.mBytes * 8, hit.mAddress, rmx::hexString(hit.mWrittenValue, std::min(hit.mBytes * 2, 8)).c_str(), hit.mLocation.toString(codeExec).c_str()), Color::WHITE, 8, key);
+							textLine = &builder.addLine(*String(0, "u%d[0xffff%04x] = %s at %s", hit.mBytes * 8, hit.mAddress, rmx::hexString(hit.mWrittenValue, std::min(hit.mBytes * 2, 8)).c_str(), hit.mLocation.toString(codeExec).c_str()), Color::WHITE, 8, key);
 
 						// Just a test
 					#if 0
@@ -641,13 +659,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 						if (category.mOpenKeys.count(key) != 0)
 						{
-							std::vector<uint64> callStack;
-							codeExec.getCallStackFromCallFrameIndex(callStack, hit.mCallFrameIndex);
-							for (uint64 functionNameHash : callStack)
-							{
-								const std::string_view name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
-								builder.addLine(String(name), Color::fromABGR32(0xffc0c0c0), 32);
-							}
+							builder.addCallStack(debugTracking, hit.mCallFrameIndex, hit.mLocation.mProgramCounter);
 						}
 					}
 				}
@@ -683,21 +695,21 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					case 1:
 					{
 						const uint8 value = emulatorInterface.readMemory8(globalDefine.mAddress);
-						builder.addLine(String(0, "%.*s   = 0x%02x", name.length(), name.data(), value), color, indent, key);
+						builder.addLine(*String(0, "%.*s   = 0x%02x", name.length(), name.data(), value), color, indent, key);
 						break;
 					}
 
 					case 2:
 					{
 						const uint16 value = emulatorInterface.readMemory16(globalDefine.mAddress);
-						builder.addLine(String(0, "%.*s   = 0x%04x", name.length(), name.data(), value), color, indent, key);
+						builder.addLine(*String(0, "%.*s   = 0x%04x", name.length(), name.data(), value), color, indent, key);
 						break;
 					}
 
 					case 4:
 					{
 						const uint32 value = emulatorInterface.readMemory32(globalDefine.mAddress);
-						builder.addLine(String(0, "%.*s   = 0x%08x", name.length(), name.data(), value), color, indent, key);
+						builder.addLine(*String(0, "%.*s   = 0x%08x", name.length(), name.data(), value), color, indent, key);
 						break;
 					}
 				}
@@ -740,7 +752,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					case Geometry::Type::PLANE:
 					{
 						const PlaneGeometry& pg = *static_cast<const PlaneGeometry*>(geometry);
-						builder.addLine(String(0, "0x%04x:   Plane:  %d%s", pg.mRenderQueue, pg.mPlaneIndex, pg.mPriorityFlag ? " -- prio" : ""), Color::WHITE);
+						builder.addLine(*String(0, "0x%04x:   Plane:  %d%s", pg.mRenderQueue, pg.mPlaneIndex, pg.mPriorityFlag ? " -- prio" : ""), Color::WHITE);
 						break;
 					}
 
@@ -820,7 +832,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 								str.add(spriteName.data(), (int)spriteName.length());
 								str.add(")");
 							}
-							builder.addLine(str, color, 0, key);
+							builder.addLine(*str, color, 0, key);
 						}
 						break;
 					}
@@ -834,14 +846,14 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 					case Geometry::Type::EFFECT_BLUR:
 					{
-						builder.addLine(String(0, "0x%04x:   Blur effect", geometry->mRenderQueue), Color::fromABGR32(0xffc0ffff));
+						builder.addLine(*String(0, "0x%04x:   Blur effect", geometry->mRenderQueue), Color::fromABGR32(0xffc0ffff));
 						break;
 					}
 
 					case Geometry::Type::VIEWPORT:
 					{
 						const ViewportGeometry& vg = *static_cast<const ViewportGeometry*>(geometry);
-						builder.addLine(String(0, "0x%04x:   Viewport:  (%d, %d, %d, %d)", geometry->mRenderQueue, vg.mRect.x, vg.mRect.y, vg.mRect.width, vg.mRect.height), Color::fromABGR32(0xffc0ffff), 0, key);
+						builder.addLine(*String(0, "0x%04x:   Viewport:  (%d, %d, %d, %d)", geometry->mRenderQueue, vg.mRect.x, vg.mRect.y, vg.mRect.width, vg.mRect.height), Color::fromABGR32(0xffc0ffff), 0, key);
 						break;
 					}
 
@@ -918,17 +930,11 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					if (!showOthers)
 						continue;
 				}
-				builder.addLine(line, color, 0, key);
+				builder.addLine(*line, color, 0, key);
 
 				if (category.mOpenKeys.count(key) != 0)
 				{
-					std::vector<uint64> callStack;
-					codeExec.getCallStackFromCallFrameIndex(callStack, write->mCallFrameIndex);
-					for (uint64 functionNameHash : callStack)
-					{
-						const std::string_view name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
-						builder.addLine(String(name), Color::fromABGR32(0xffc0c0c0), 32);
-					}
+					builder.addCallStack(debugTracking, write->mCallFrameIndex, write->mLocation.mProgramCounter);
 				}
 			}
 
@@ -952,7 +958,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					const float brightness = hasCurrent ? 1.0f : 0.6f;
 					const Color color(brightness, brightness, brightness);
 
-					builder.addLine(String(0, "%s:", pair.first.c_str()), color, 8);
+					builder.addLine(*String(0, "%s:", pair.first.c_str()), color, 8);
 					builder.addSpacing(-12);
 					for (size_t i = 0; i < entry.mEntries.size(); ++i)
 					{
@@ -962,13 +968,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 						if (category.mOpenKeys.count(key) != 0)
 						{
-							std::vector<uint64> callStack;
-							codeExec.getCallStackFromCallFrameIndex(callStack, singleEntry.mCallFrameIndex);
-							for (uint64 functionNameHash : callStack)
-							{
-								const std::string_view name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
-								builder.addLine(String(name), Color::fromABGR32(0xffc0c0c0), 32);
-							}
+							builder.addCallStack(debugTracking, singleEntry.mCallFrameIndex, singleEntry.mLocation.mProgramCounter);
 						}
 					}
 					builder.addSpacing(3);

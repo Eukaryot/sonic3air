@@ -59,6 +59,7 @@ namespace lemon
 		const uint8* getFirstRuntimeOpcode() const	{ return mRuntimeOpcodeBuffer.getStart(); }
 
 		size_t translateFromRuntimeProgramCounter(const uint8* runtimeProgramCounter) const;
+		int translateFromRuntimeProgramCounterOptional(const uint8* runtimeProgramCounter) const;
 		const uint8* translateToRuntimeProgramCounter(size_t originalProgramCounter) const;
 
 	private:
