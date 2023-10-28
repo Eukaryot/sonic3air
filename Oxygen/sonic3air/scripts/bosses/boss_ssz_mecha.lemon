@@ -308,7 +308,7 @@ function void fn07b544()
 		velocity = BossSSZ.Mecha.calculateInitialVelocityForMovement(sign < 0, deceleration, 1.03f)
 	}
 #endif
-	
+
 	objA0.velocity.x = velocity * sign
 	s16[A0 + 0x40] = deceleration * sign
 	objA0.velocity.y = 0

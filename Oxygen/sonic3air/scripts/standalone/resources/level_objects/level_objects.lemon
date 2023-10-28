@@ -335,7 +335,7 @@ constant u8 OBJECTTABLE1_ad		= 0xad		// Object address 0x08bade = ICZ Penguinato
 constant u8 OBJECTTABLE1_ae		= 0xae		// Object address 0x08be2e = ICZ Star Pointer badnik
 constant u8 OBJECTTABLE1_af		= 0xaf		// Object address 0x08a44a = ICZ Huge Crushing Pillar Block
 constant u8 OBJECTTABLE1_b0		= 0xb0		// Object address 0x089f32 = ICZ Floating Platform
-constant u8 OBJECTTABLE1_b1		= 0xb1		// Object address 0x08a26c = ICZ Breakable Wall 
+constant u8 OBJECTTABLE1_b1		= 0xb1		// Object address 0x08a26c = ICZ Breakable Wall
 constant u8 OBJECTTABLE1_b2		= 0xb2		// Object address 0x08a640 = ICZ Freezer Cloud Thrower
 constant u8 OBJECTTABLE1_b3		= 0xb3		// Object address 0x08ab4e = ICZ Segmented Ice Tower
 constant u8 OBJECTTABLE1_b4		= 0xb4		// Object address 0x08ad04 = ICZ Swinging Platform
@@ -539,7 +539,7 @@ constant u8 OBJECTTABLE2_76		= 0x76		// Object address 0x045dae = SSZ Rotating D
 constant u8 OBJECTTABLE2_77		= 0x77		// Object address 0x044f52 = Extending Bridge from the very beginning of SSZ
 constant u8 OBJECTTABLE2_78		= 0x78		// Object address 0x03b934 = Player Launcher in FBZ and DEZ
 constant u8 OBJECTTABLE2_79		= 0x79		// Object address 0x045528 = Teleporter from HPZ and SSZ
-constant u8 OBJECTTABLE2_7a		= 0x7a		// Object address 0x04536c = SSZ Hanging Elevator Bar 
+constant u8 OBJECTTABLE2_7a		= 0x7a		// Object address 0x04536c = SSZ Hanging Elevator Bar
 constant u8 OBJECTTABLE2_7b		= 0x7b		// Object address 0x044d60 = SSZ Diagonal Collapsing Bridge
 constant u8 OBJECTTABLE2_7c		= 0x7c		// Object address 0x044c44 = SSZ Horizontal Collapsing Bridge
 constant u8 OBJECTTABLE2_7d		= 0x7d		// Object address 0x0450a4 = SSZ Bouncy Cloud

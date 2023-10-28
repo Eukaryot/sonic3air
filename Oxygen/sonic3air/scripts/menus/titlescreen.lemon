@@ -291,7 +291,7 @@ function void TitleScreen()
 	D0 = 1
 	fn00440c()
 
-	global.demo_countdown = (global.region_code & 0x40) ? 750 : 900		// 12.5 seconds / 15 seconds 
+	global.demo_countdown = (global.region_code & 0x40) ? 750 : 900		// 12.5 seconds / 15 seconds
 #if STANDALONE
 	// Slightly increase the wait time until demo starts
 	global.demo_countdown += 20

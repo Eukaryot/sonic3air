@@ -258,10 +258,10 @@ function void Character.UpdateNormalState.Sonic()
 		// Call update function depending on flags
 		pushA456()
 		// Targets:
-		//  - 0x010f2c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> Character.UpdateSonicUprightOnGround()
-		//  - 0x010fb6	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR									-> Character.UpdateSonicUprightInAir()
-		//  - 0x010fe0	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING								-> Character.UpdateSonicRollingOnGround()
-		//  - 0x011036	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)			-> Character.UpdateSonicRollingInAir()
+		//  - 0x010f2c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00										-> Character.UpdateSonicUprightOnGround()
+		//  - 0x010fb6	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR							-> Character.UpdateSonicUprightInAir()
+		//  - 0x010fe0	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING						-> Character.UpdateSonicRollingOnGround()
+		//  - 0x011036	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)	-> Character.UpdateSonicRollingInAir()
 		call tableLookupAddress(0x010c90, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 		popA456()
 	}
@@ -393,10 +393,10 @@ function void Character.UpdateNormalState.Tails()
 		// Call update function depending on flags
 		pushA456()
 		// Targets:
-		//  - 0x014748	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> Character.UpdateTailsUprightOnGround()
-		//  - 0x0147b8	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR									-> Character.UpdateTailsUprightInAir()
-		//  - 0x014934	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING								-> Character.UpdateTailsRollingOnGround()
-		//  - 0x0149a2	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)			-> Character.UpdateTailsRollingInAir()
+		//  - 0x014748	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00										-> Character.UpdateTailsUprightOnGround()
+		//  - 0x0147b8	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR							-> Character.UpdateTailsUprightInAir()
+		//  - 0x014934	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING						-> Character.UpdateTailsRollingOnGround()
+		//  - 0x0149a2	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)	-> Character.UpdateTailsRollingInAir()
 		call tableLookupAddress(0x0138f6, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 		popA456()
 	}
@@ -459,10 +459,10 @@ function void Character.UpdateNormalState.Knuckles()
 		// Call update function depending on flags
 		pushA456()
 		// Targets:
-		//  - 0x0167f4	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> Character.UpdateKnucklesUprightOnGround()
-		//  - 0x01684c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR									-> Character.UpdateKnucklesUprightInAir()
-		//  - 0x0170c2	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING								-> Character.UpdateKnucklesRollingOnGround()
-		//  - 0x017118	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)			-> Character.UpdateKnucklesRollingInAir()
+		//  - 0x0167f4	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00										-> Character.UpdateKnucklesUprightOnGround()
+		//  - 0x01684c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR							-> Character.UpdateKnucklesUprightInAir()
+		//  - 0x0170c2	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING						-> Character.UpdateKnucklesRollingOnGround()
+		//  - 0x017118	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)	-> Character.UpdateKnucklesRollingInAir()
 		call tableLookupAddress(0x016642, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 		popA456()
 	}
