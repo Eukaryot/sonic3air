@@ -375,7 +375,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			{
 				case RenderItem::Type::VDP_SPRITE:
 				{
-					const SpriteManager::VdpSpriteInfo& spriteInfo = static_cast<const SpriteManager::VdpSpriteInfo&>(sg.mSpriteInfo);
+					const renderitems::VdpSpriteInfo& spriteInfo = static_cast<const renderitems::VdpSpriteInfo&>(sg.mSpriteInfo);
 					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
 					RenderVdpSpriteShader& shader = mRenderVdpSpriteShader;
 					if (needsRefresh)
@@ -388,7 +388,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 
 				case RenderItem::Type::PALETTE_SPRITE:
 				{
-					const SpriteManager::PaletteSpriteInfo& spriteInfo = static_cast<const SpriteManager::PaletteSpriteInfo&>(sg.mSpriteInfo);
+					const renderitems::PaletteSpriteInfo& spriteInfo = static_cast<const renderitems::PaletteSpriteInfo&>(sg.mSpriteInfo);
 					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
 					const bool useAlphaTest = (spriteInfo.mBlendMode != BlendMode::OPAQUE);
 					RenderPaletteSpriteShader& shader = mRenderPaletteSpriteShader[useAlphaTest ? 1 : 0];
@@ -409,7 +409,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 
 				case RenderItem::Type::COMPONENT_SPRITE:
 				{
-					const SpriteManager::ComponentSpriteInfo& spriteInfo = static_cast<const SpriteManager::ComponentSpriteInfo&>(sg.mSpriteInfo);
+					const renderitems::ComponentSpriteInfo& spriteInfo = static_cast<const renderitems::ComponentSpriteInfo&>(sg.mSpriteInfo);
 					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
 					const bool useAlphaTest = (spriteInfo.mBlendMode != BlendMode::OPAQUE);
 					RenderComponentSpriteShader& shader = mRenderComponentSpriteShader[useAlphaTest ? 1 : 0];
@@ -424,7 +424,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 
 				case RenderItem::Type::SPRITE_MASK:
 				{
-					const SpriteManager::SpriteMaskInfo& mask = static_cast<const SpriteManager::SpriteMaskInfo&>(sg.mSpriteInfo);
+					const renderitems::SpriteMaskInfo& mask = static_cast<const renderitems::SpriteMaskInfo&>(sg.mSpriteInfo);
 					const Vec4f rectf((float)mask.mPosition.x / (float)mGameResolution.x,
 									  (float)mask.mPosition.y / (float)mGameResolution.y,
 									  (float)mask.mSize.x / (float)mGameResolution.x,

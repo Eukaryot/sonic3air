@@ -43,7 +43,6 @@ void RenderParts::preFrameUpdate()
 {
 	// TODO: It could make sense to require an explicit script call for these as well, see "Renderer.resetCustomPlaneConfigurations()"
 	mViewports.clear();
-	mOverlayManager.preFrameUpdate();
 	mPaletteManager.preFrameUpdate();
 	mSpriteManager.preFrameUpdate();
 	mScrollOffsetsManager.preFrameUpdate();
@@ -51,7 +50,6 @@ void RenderParts::preFrameUpdate()
 
 void RenderParts::postFrameUpdate()
 {
-	mOverlayManager.postFrameUpdate(mSpriteManager.shouldResetSprites());	// Needs to be called just before sprite manager's update
 	mSpriteManager.postFrameUpdate();
 	mScrollOffsetsManager.postFrameUpdate();
 }

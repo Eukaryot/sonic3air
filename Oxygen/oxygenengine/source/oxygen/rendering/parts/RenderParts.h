@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "oxygen/rendering/parts/OverlayManager.h"
 #include "oxygen/rendering/parts/PaletteManager.h"
 #include "oxygen/rendering/parts/PatternManager.h"
 #include "oxygen/rendering/parts/PlaneManager.h"
@@ -29,7 +28,6 @@ public:
 public:
 	RenderParts();
 
-	inline OverlayManager&		 getOverlayManager()		{ return mOverlayManager; }
 	inline PaletteManager&		 getPaletteManager()		{ return mPaletteManager; }
 	inline PatternManager&		 getPatternManager()		{ return mPatternManager; }
 	inline PlaneManager&		 getPlaneManager()			{ return mPlaneManager; }
@@ -55,7 +53,6 @@ public:
 	bool mLayerRendering[8];
 
 private:
-	OverlayManager		 mOverlayManager;
 	PaletteManager		 mPaletteManager;
 	PatternManager		 mPatternManager;
 	PlaneManager		 mPlaneManager;

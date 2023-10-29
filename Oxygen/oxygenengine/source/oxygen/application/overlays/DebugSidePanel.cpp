@@ -361,7 +361,7 @@ void DebugSidePanel::render()
 		drawer.printText(mSmallFont, textRect, line.mText, 1, line.mColor);
 	}
 
-	category.mScrollSize = std::max(category.mScrollPosition + rect.y - screenSize.y * 2/3, 0);
+	category.mScrollSize = std::max(category.mScrollPosition + rect.y - screenSize.y * 3/4, 0);
 
 	if (category.mScrollSize > 0)
 	{
@@ -758,7 +758,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 					case Geometry::Type::SPRITE:
 					{
-						const SpriteManager::SpriteInfo& info = static_cast<const SpriteGeometry*>(geometry)->mSpriteInfo;
+						const renderitems::SpriteInfo& info = static_cast<const SpriteGeometry*>(geometry)->mSpriteInfo;
 						const char* spriteType = nullptr;
 						Color color = Color::fromABGR32(0xffa0a0a0);
 						Recti objectRect(info.mPosition.x, info.mPosition.y, 32, 32);
@@ -769,7 +769,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 							{
 								spriteType = "VDP sprite";
 								color.setABGR32(0xffffffc0);
-								SpriteManager::VdpSpriteInfo& vsi = (SpriteManager::VdpSpriteInfo&)info;
+								renderitems::VdpSpriteInfo& vsi = (renderitems::VdpSpriteInfo&)info;
 								objectRect.width = vsi.mSize.x * 8;
 								objectRect.height = vsi.mSize.y * 8;
 								break;
@@ -779,7 +779,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 							{
 								spriteType = "Palette sprite";
 								color.setABGR32(0xffffc0ff);
-								SpriteManager::PaletteSpriteInfo& psi = (SpriteManager::PaletteSpriteInfo&)info;
+								renderitems::PaletteSpriteInfo& psi = (renderitems::PaletteSpriteInfo&)info;
 								objectRect.setPos(objectRect.getPos() + psi.mPivotOffset);
 								objectRect.width = psi.mSize.x;
 								objectRect.height = psi.mSize.y;
@@ -793,7 +793,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 							{
 								spriteType = "Component sprite";
 								color.setABGR32(0xffffc0e0);
-								SpriteManager::ComponentSpriteInfo& csi = (SpriteManager::ComponentSpriteInfo&)info;
+								renderitems::ComponentSpriteInfo& csi = (renderitems::ComponentSpriteInfo&)info;
 								objectRect.setPos(objectRect.getPos() + csi.mPivotOffset);
 								objectRect.width = csi.mSize.x;
 								objectRect.height = csi.mSize.y;
@@ -807,7 +807,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 							{
 								spriteType = "Sprite mask";
 								color.setABGR32(0xffc0ffff);
-								SpriteManager::SpriteMaskInfo& smi = (SpriteManager::SpriteMaskInfo&)info;
+								renderitems::SpriteMaskInfo& smi = (renderitems::SpriteMaskInfo&)info;
 								objectRect.width = smi.mSize.x;
 								objectRect.height = smi.mSize.y;
 								break;

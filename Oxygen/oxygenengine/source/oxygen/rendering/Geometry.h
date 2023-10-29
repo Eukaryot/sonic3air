@@ -61,10 +61,10 @@ public:
 class SpriteGeometry : public Geometry
 {
 public:
-	SpriteGeometry(const SpriteManager::SpriteInfo& spriteInfo);
+	SpriteGeometry(const renderitems::SpriteInfo& spriteInfo);
 
 public:
-	const SpriteManager::SpriteInfo& mSpriteInfo;
+	const renderitems::SpriteInfo& mSpriteInfo;
 };
 
 
@@ -120,7 +120,7 @@ public:
 		return mPlaneGeometryBuffer.createObject(activeRect, planeIndex, priorityFlag, scrollOffsets, renderQueue);
 	}
 
-	SpriteGeometry& createSpriteGeometry(const SpriteManager::SpriteInfo& spriteInfo)
+	SpriteGeometry& createSpriteGeometry(const renderitems::SpriteInfo& spriteInfo)
 	{
 		return mSpriteGeometryBuffer.createObject(spriteInfo);
 	}

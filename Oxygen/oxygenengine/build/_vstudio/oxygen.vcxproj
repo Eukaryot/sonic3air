@@ -96,10 +96,10 @@
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPaletteSpriteShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPlaneShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderVdpSpriteShader.cpp" />
-    <ClCompile Include="..\..\source\oxygen\rendering\parts\OverlayManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\PaletteManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\PatternManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\PlaneManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\RenderItem.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\RenderParts.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\ScrollOffsetsManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\SpriteManager.cpp" />
@@ -214,7 +214,6 @@
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPaletteSpriteShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPlaneShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderVdpSpriteShader.h" />
-    <ClInclude Include="..\..\source\oxygen\rendering\parts\OverlayManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\PaletteManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\PatternManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\PlaneManager.h" />

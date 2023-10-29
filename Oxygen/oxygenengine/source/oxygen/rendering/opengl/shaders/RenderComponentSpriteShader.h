@@ -11,7 +11,7 @@
 #ifdef RMX_WITH_OPENGL_SUPPORT
 
 #include "oxygen/rendering/opengl/shaders/OpenGLShader.h"
-#include "oxygen/rendering/parts/SpriteManager.h"
+#include "oxygen/rendering/parts/RenderItem.h"
 
 class OpenGLDrawer;
 class OpenGLRenderResources;
@@ -22,7 +22,7 @@ class RenderComponentSpriteShader : public OpenGLShader
 public:
 	void initialize(bool alphaTest);
 	void refresh(const Vec2i& gameResolution);
-	void draw(const SpriteManager::ComponentSpriteInfo& spriteInfo, OpenGLRenderResources& resources);
+	void draw(const renderitems::ComponentSpriteInfo& spriteInfo, OpenGLRenderResources& resources);
 
 private:
 	bool  mInitialized = false;

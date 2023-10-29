@@ -365,7 +365,7 @@ namespace
 
 	void Renderer_resetSprites()
 	{
-		RenderParts::instance().getSpriteManager().resetSprites();
+		RenderParts::instance().getSpriteManager().setResetRenderItems(true);
 	}
 
 	void Renderer_drawVdpSprite(int16 px, int16 py, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue)
@@ -520,17 +520,17 @@ namespace
 
 	void debugDrawRect(int32 px, int32 py, int32 width, int32 height)
 	{
-		RenderParts::instance().getOverlayManager().addRectangle(Recti(px, py, width, height), Color(1.0f, 0.0f, 1.0f, 0.75f), 0xffff, SpacesManager::Space::WORLD, false);
+		RenderParts::instance().getSpriteManager().addRectangle(Recti(px, py, width, height), Color(1.0f, 0.0f, 1.0f, 0.75f), 0xffff, SpacesManager::Space::WORLD, false);
 	}
 
 	void debugDrawRect2(int32 px, int32 py, int32 width, int32 height, uint32 color)
 	{
-		RenderParts::instance().getOverlayManager().addRectangle(Recti(px, py, width, height), Color::fromRGBA32(color), 0xffff, SpacesManager::Space::WORLD, false);
+		RenderParts::instance().getSpriteManager().addRectangle(Recti(px, py, width, height), Color::fromRGBA32(color), 0xffff, SpacesManager::Space::WORLD, false);
 	}
 
 	void Renderer_drawRect(int32 px, int32 py, int32 width, int32 height, uint32 color, uint16 renderQueue, bool useWorldSpace)
 	{
-		RenderParts::instance().getOverlayManager().addRectangle(Recti(px, py, width, height), Color::fromRGBA32(color), renderQueue, useWorldSpace ? SpacesManager::Space::WORLD : OverlayManager::Space::SCREEN, false);
+		RenderParts::instance().getSpriteManager().addRectangle(Recti(px, py, width, height), Color::fromRGBA32(color), renderQueue, useWorldSpace ? SpacesManager::Space::WORLD : SpacesManager::Space::SCREEN, false);
 	}
 
 	void Renderer_drawText(lemon::StringRef fontKey, int32 px, int32 py, lemon::StringRef text, uint32 tintColor, uint8 alignment, int8 spacing, uint16 renderQueue, bool useWorldSpace, bool useGlobalComponentTint)
@@ -538,7 +538,7 @@ namespace
 		RMX_CHECK(alignment >= 1 && alignment <= 9, "Invalid alignment " << alignment << " used for drawing text, fallback to alignment = 1", alignment = 1);
 		if (fontKey.isValid() && text.isValid())
 		{
-			RenderParts::instance().getOverlayManager().addText(fontKey.getString(), fontKey.getHash(), Vec2i(px, py), text.getString(), text.getHash(), Color::fromRGBA32(tintColor), (int)alignment, (int)spacing, renderQueue, useWorldSpace ? OverlayManager::Space::WORLD : OverlayManager::Space::SCREEN, useGlobalComponentTint);
+			RenderParts::instance().getSpriteManager().addText(fontKey.getString(), fontKey.getHash(), Vec2i(px, py), text.getString(), text.getHash(), Color::fromRGBA32(tintColor), (int)alignment, (int)spacing, renderQueue, useWorldSpace ? SpacesManager::Space::WORLD : SpacesManager::Space::SCREEN, useGlobalComponentTint);
 		}
 	}
 

@@ -72,7 +72,7 @@ private:
 	RenderPlaneShader* mLastUsedPlaneShader = nullptr;
 	RenderPaletteSpriteShader* mLastUsedRenderPaletteSpriteShader = nullptr;
 	RenderComponentSpriteShader* mLastUsedRenderComponentSpriteShader = nullptr;
-	SpriteManager::SpriteInfo::Type mLastRenderedSpriteType = RenderItem::Type::INVALID;
+	RenderItem::Type mLastRenderedSpriteType = RenderItem::Type::INVALID;
 	bool mIsRenderingToProcessingBuffer = false;
 };
 

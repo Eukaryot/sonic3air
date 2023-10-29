@@ -335,66 +335,133 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 	}
 
 	// Add sprite geometries
-	SpriteManager& spriteManager = mRenderParts->getSpriteManager();
 	{
+		SpriteManager& spriteManager = mRenderParts->getSpriteManager();
 		const Vec2i worldSpaceOffset = mRenderParts->getSpacesManager().getWorldSpaceOffset();
-		const auto& sprites = spriteManager.getSprites();
-		for (auto spriteIterator = sprites.begin(); spriteIterator != sprites.end(); ++spriteIterator)
+		FontCollection& fontCollection = FontCollection::instance();
+
+		for (int index = 0; index < RenderItem::NUM_CONTEXTS; ++index)
 		{
-			RenderItem& renderItem = **spriteIterator;
-			RMX_ASSERT(renderItem.isSprite(), "Expected a sprite");
-			SpriteManager::SpriteInfo& sprite = static_cast<SpriteManager::SpriteInfo&>(renderItem);
-			bool accept = true;
-			switch (sprite.getType())
+			const RenderItem::LifetimeContext lifetimeContext = (RenderItem::LifetimeContext)index;
+			const std::vector<RenderItem*>& renderItems = spriteManager.getRenderItems(lifetimeContext);
+
+			for (RenderItem* renderItem : renderItems)
 			{
-				case RenderItem::Type::VDP_SPRITE:
+				switch (renderItem->getType())
 				{
-					accept = (mRenderParts->mLayerRendering[sprite.mPriorityFlag ? 6 : 2]);
-					break;
+					case RenderItem::Type::RECTANGLE:
+					{
+						const renderitems::Rectangle& rectangle = static_cast<const renderitems::Rectangle&>(*renderItem);
+
+						// Translate rect
+						Recti screenRect = rectangle.mRect;
+						if (rectangle.mCoordinatesSpace == SpacesManager::Space::WORLD)
+						{
+							screenRect -= worldSpaceOffset;
+						}
+
+						Geometry& geometry = mGeometryFactory.createRectGeometry(screenRect, rectangle.mColor);
+						geometry.mRenderQueue = rectangle.mRenderQueue;
+						geometries.push_back(&geometry);
+						break;
+					}
+
+					case RenderItem::Type::TEXT:
+					{
+						const renderitems::Text& text = static_cast<const renderitems::Text&>(*renderItem);
+
+						// Translate position
+						Vec2i screenPosition = text.mPosition;
+						if (text.mCoordinatesSpace == SpacesManager::Space::WORLD)
+						{
+							screenPosition -= worldSpaceOffset;
+						}
+
+						Font* font = fontCollection.getFontByKey(text.mFontKeyHash);
+						if (nullptr == font)
+						{
+							font = fontCollection.createFontByKey(text.mFontKeyString);
+						}
+						if (nullptr != font)
+						{
+							const PrintedTextCache::Key key(text.mFontKeyHash, text.mTextHash, (uint8)text.mSpacing);
+							PrintedTextCache& cache = RenderResources::instance().mPrintedTextCache;
+							PrintedTextCache::CacheItem* cacheItem = cache.getCacheItem(key);
+							if (nullptr == cacheItem)
+							{
+								cacheItem = &cache.addCacheItem(key, *font, text.mTextString);
+							}
+							const Vec2i drawPosition = Font::applyAlignment(Recti(screenPosition, Vec2i(0, 0)), cacheItem->mInnerRect, text.mAlignment);
+							const Recti rect(drawPosition, cacheItem->mTexture.getSize());
+
+							Geometry& geometry = mGeometryFactory.createTexturedRectGeometry(rect, cacheItem->mTexture, text.mColor, text.mUseGlobalComponentTint);
+							geometry.mRenderQueue = text.mRenderQueue;
+							geometries.push_back(&geometry);
+						}
+						break;
+					}
+
+					case RenderItem::Type::VDP_SPRITE:
+					case RenderItem::Type::PALETTE_SPRITE:
+					case RenderItem::Type::COMPONENT_SPRITE:
+					case RenderItem::Type::SPRITE_MASK:
+					{
+						renderitems::SpriteInfo& sprite = static_cast<renderitems::SpriteInfo&>(*renderItem);
+						bool accept = true;
+						switch (renderItem->getType())
+						{
+							case RenderItem::Type::VDP_SPRITE:
+							{
+								accept = (mRenderParts->mLayerRendering[sprite.mPriorityFlag ? 6 : 2]);
+								break;
+							}
+
+							case RenderItem::Type::PALETTE_SPRITE:
+							case RenderItem::Type::COMPONENT_SPRITE:
+							{
+								accept = (mRenderParts->mLayerRendering[sprite.mPriorityFlag ? 7 : 3]);
+								break;
+							}
+
+							default:
+								// Accept everything else
+								break;
+						}
+
+						if (accept)
+						{
+							sprite.mInterpolatedPosition = sprite.mPosition;
+							if (mFrameInterpolation.mCurrentlyInterpolating)
+							{
+								Vec2i difference;
+								if (sprite.mHasLastPosition)
+								{
+									difference = sprite.mLastPositionChange;
+								}
+								else if (sprite.mLogicalSpace == SpriteManager::Space::WORLD)
+								{
+									// Assume sprite is standing still in world space, i.e. moving entirely with camera
+									difference = mLastWorldSpaceOffset - worldSpaceOffset;
+								}
+								else
+								{
+									// Assume sprite is standing still in screen space, i.e. not moving on the screen
+								}
+
+								if ((difference.x != 0 || difference.y != 0) && (abs(difference.x) < 0x40 && abs(difference.y) < 0x40))
+								{
+									const Vec2f interpolatedDifference = Vec2f(difference) * (1.0f - mFrameInterpolation.mInterFramePosition);
+									sprite.mInterpolatedPosition -= Vec2i(roundToInt(interpolatedDifference.x), roundToInt(interpolatedDifference.y));
+								}
+							}
+
+							SpriteGeometry& spriteGeometry = mGeometryFactory.createSpriteGeometry(sprite);
+							spriteGeometry.mRenderQueue = sprite.mRenderQueue;
+							geometries.push_back(&spriteGeometry);
+						}
+						break;
+					}
 				}
-
-				case RenderItem::Type::PALETTE_SPRITE:
-				case RenderItem::Type::COMPONENT_SPRITE:
-				{
-					accept = (mRenderParts->mLayerRendering[sprite.mPriorityFlag ? 7 : 3]);
-					break;
-				}
-
-				default:
-					// Accept everything else
-					break;
-			}
-
-			if (accept)
-			{
-				sprite.mInterpolatedPosition = sprite.mPosition;
-				if (mFrameInterpolation.mCurrentlyInterpolating)
-				{
-					Vec2i difference;
-					if (sprite.mHasLastPosition)
-					{
-						difference = sprite.mLastPositionChange;
-					}
-					else if (sprite.mLogicalSpace == SpriteManager::Space::WORLD)
-					{
-						// Assume sprite is standing still in world space, i.e. moving entirely with camera
-						difference = mLastWorldSpaceOffset - worldSpaceOffset;
-					}
-					else
-					{
-						// Assume sprite is standing still in screen space, i.e. not moving on the screen
-					}
-
-					if ((difference.x != 0 || difference.y != 0) && (abs(difference.x) < 0x40 && abs(difference.y) < 0x40))
-					{
-						const Vec2f interpolatedDifference = Vec2f(difference) * (1.0f - mFrameInterpolation.mInterFramePosition);
-						sprite.mInterpolatedPosition -= Vec2i(roundToInt(interpolatedDifference.x), roundToInt(interpolatedDifference.y));
-					}
-				}
-
-				SpriteGeometry& spriteGeometry = mGeometryFactory.createSpriteGeometry(sprite);
-				spriteGeometry.mRenderQueue = sprite.mRenderQueue;
-				geometries.push_back(&spriteGeometry);
 			}
 		}
 	}
@@ -432,77 +499,6 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 		geometries.push_back(&geometry);
 	}
 
-	// Insert debug draw rects
-	{
-		const OverlayManager& overlayManager = RenderParts::instance().getOverlayManager();
-		const Vec2i worldSpaceOffset = getInterpolatedWorldSpaceOffset();
-		FontCollection& fontCollection = FontCollection::instance();
-
-		for (int index = 0; index < RenderItem::NUM_CONTEXTS; ++index)
-		{
-			const RenderItem::LifetimeContext lifetimeContext = (RenderItem::LifetimeContext)index;
-			const std::vector<RenderItem*>& renderItems = overlayManager.getRenderItems(lifetimeContext);
-
-			for (const RenderItem* renderItem : renderItems)
-			{
-				switch (renderItem->getType())
-				{
-					case RenderItem::Type::RECTANGLE:
-					{
-						const OverlayManager::Rectangle& rectangle = static_cast<const OverlayManager::Rectangle&>(*renderItem);
-						
-						// Translate rect
-						Recti screenRect = rectangle.mRect;
-						if (rectangle.mCoordinatesSpace == SpacesManager::Space::WORLD)
-						{
-							screenRect -= worldSpaceOffset;
-						}
-
-						Geometry& geometry = mGeometryFactory.createRectGeometry(screenRect, rectangle.mColor);
-						geometry.mRenderQueue = rectangle.mRenderQueue;
-						geometries.push_back(&geometry);
-						break;
-					}
-
-					case RenderItem::Type::TEXT:
-					{
-						const OverlayManager::Text& text = static_cast<const OverlayManager::Text&>(*renderItem);
-
-						// Translate position
-						Vec2i screenPosition = text.mPosition;
-						if (text.mCoordinatesSpace == SpacesManager::Space::WORLD)
-						{
-							screenPosition -= worldSpaceOffset;
-						}
-
-						Font* font = fontCollection.getFontByKey(text.mFontKeyHash);
-						if (nullptr == font)
-						{
-							font = fontCollection.createFontByKey(text.mFontKeyString);
-						}
-						if (nullptr != font)
-						{
-							const PrintedTextCache::Key key(text.mFontKeyHash, text.mTextHash, (uint8)text.mSpacing);
-							PrintedTextCache& cache = RenderResources::instance().mPrintedTextCache;
-							PrintedTextCache::CacheItem* cacheItem = cache.getCacheItem(key);
-							if (nullptr == cacheItem)
-							{
-								cacheItem = &cache.addCacheItem(key, *font, text.mTextString);
-							}
-							const Vec2i drawPosition = Font::applyAlignment(Recti(screenPosition, Vec2i(0, 0)), cacheItem->mInnerRect, text.mAlignment);
-							const Recti rect(drawPosition, cacheItem->mTexture.getSize());
-
-							Geometry& geometry = mGeometryFactory.createTexturedRectGeometry(rect, cacheItem->mTexture, text.mColor, text.mUseGlobalComponentTint);
-							geometry.mRenderQueue = text.mRenderQueue;
-							geometries.push_back(&geometry);
-						}
-						break;
-					}
-				}
-			}
-		}
-	}
-
 	// Sort everything by render queue
 	std::stable_sort(geometries.begin(), geometries.end(),
 					 [](const Geometry* a, const Geometry* b) { return a->mRenderQueue < b->mRenderQueue; });
@@ -523,12 +519,12 @@ void VideoOut::renderGameScreen()
 
 void VideoOut::preRefreshDebugging()
 {
-	mRenderParts->getOverlayManager().clearLifetimeContext(RenderItem::LifetimeContext::OUTSIDE_FRAME);
+	mRenderParts->getSpriteManager().clearLifetimeContext(RenderItem::LifetimeContext::OUTSIDE_FRAME);
 }
 
 void VideoOut::postRefreshDebugging()
 {
-	const bool hasOutsideFrameRenderItems = !mRenderParts->getOverlayManager().getRenderItems(RenderItem::LifetimeContext::OUTSIDE_FRAME).empty();
+	const bool hasOutsideFrameRenderItems = !mRenderParts->getSpriteManager().getRenderItems(RenderItem::LifetimeContext::OUTSIDE_FRAME).empty();
 	mDebugDrawRenderingRequested = hasOutsideFrameRenderItems || mPreviouslyHadOutsideFrameDebugDraws;
 	mPreviouslyHadOutsideFrameDebugDraws = hasOutsideFrameRenderItems;
 }

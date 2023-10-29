@@ -51,7 +51,7 @@ void RenderComponentSpriteShader::refresh(const Vec2i& gameResolution)
 	mInitialized = true;
 }
 
-void RenderComponentSpriteShader::draw(const SpriteManager::ComponentSpriteInfo& spriteInfo, OpenGLRenderResources& resources)
+void RenderComponentSpriteShader::draw(const renderitems::ComponentSpriteInfo& spriteInfo, OpenGLRenderResources& resources)
 {
 	if (nullptr == spriteInfo.mCacheItem)
 		return;

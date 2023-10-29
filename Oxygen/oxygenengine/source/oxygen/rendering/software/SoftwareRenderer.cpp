@@ -597,7 +597,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 	{
 		case RenderItem::Type::VDP_SPRITE:
 		{
-			const SpriteManager::VdpSpriteInfo& sprite = static_cast<const SpriteManager::VdpSpriteInfo&>(geometry.mSpriteInfo);
+			const renderitems::VdpSpriteInfo& sprite = static_cast<const renderitems::VdpSpriteInfo&>(geometry.mSpriteInfo);
 
 			const PaletteManager& paletteManager = mRenderParts.getPaletteManager();
 			const uint32* palettes[2] = { paletteManager.getPalette(0).getData(), paletteManager.getPalette(1).getData() };
@@ -666,7 +666,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 		case RenderItem::Type::COMPONENT_SPRITE:
 		{
 			// Shared code for palette & component sprite rendering
-			const SpriteManager::CustomSpriteInfoBase& spriteBase = static_cast<const SpriteManager::CustomSpriteInfoBase&>(geometry.mSpriteInfo);
+			const renderitems::CustomSpriteInfoBase& spriteBase = static_cast<const renderitems::CustomSpriteInfoBase&>(geometry.mSpriteInfo);
 			const bool isPaletteSprite = (geometry.mSpriteInfo.getType() == RenderItem::Type::PALETTE_SPRITE);
 
 			const PaletteManager& paletteManager = mRenderParts.getPaletteManager();
@@ -700,7 +700,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			if (isPaletteSprite)
 			{
 				// Palette sprite specific code
-				const SpriteManager::PaletteSpriteInfo& spriteInfo = static_cast<const SpriteManager::PaletteSpriteInfo&>(spriteBase);
+				const renderitems::PaletteSpriteInfo& spriteInfo = static_cast<const renderitems::PaletteSpriteInfo&>(spriteBase);
 
 				const PaletteSprite& paletteSprite = *static_cast<PaletteSprite*>(spriteInfo.mCacheItem->mSprite);
 				const PaletteBitmap& paletteBitmap = spriteInfo.mUseUpscaledSprite ? paletteSprite.getUpscaledBitmap() : paletteSprite.getBitmap();
@@ -727,7 +727,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			else
 			{
 				// Component sprite specific code
-				const SpriteManager::ComponentSpriteInfo& spriteInfo = static_cast<const SpriteManager::ComponentSpriteInfo&>(spriteBase);
+				const renderitems::ComponentSpriteInfo& spriteInfo = static_cast<const renderitems::ComponentSpriteInfo&>(spriteBase);
 
 				const ComponentSprite& componentSprite = *static_cast<ComponentSprite*>(spriteInfo.mCacheItem->mSprite);
 				const Blitter::SpriteWrapper spriteWrapper(componentSprite.getBitmap(), -componentSprite.mOffset);
@@ -743,7 +743,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 		case RenderItem::Type::SPRITE_MASK:
 		{
 			// Overwrite sprites with plane rendering results in given rect
-			const SpriteManager::SpriteMaskInfo& mask = static_cast<const SpriteManager::SpriteMaskInfo&>(geometry.mSpriteInfo);
+			const renderitems::SpriteMaskInfo& mask = static_cast<const renderitems::SpriteMaskInfo&>(geometry.mSpriteInfo);
 			if (mask.mSize.x > 0 && mask.mSize.y > 0)
 			{
 				const int minX = clamp(mask.mInterpolatedPosition.x, 0, gameScreenBitmap.getWidth());

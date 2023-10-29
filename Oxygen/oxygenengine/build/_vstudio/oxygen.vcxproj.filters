@@ -274,9 +274,6 @@
     <ClCompile Include="..\..\source\oxygen\application\audio\AudioCollection.cpp">
       <Filter>application\audio</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\parts\OverlayManager.cpp">
-      <Filter>rendering\parts</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerResources.cpp">
       <Filter>drawing\opengl</Filter>
     </ClCompile>
@@ -426,6 +423,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\simulation\debug\DebugTracking.cpp">
       <Filter>simulation\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\RenderItem.cpp">
+      <Filter>rendering\parts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -624,9 +624,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\audio\AudioCollection.h">
       <Filter>application\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\parts\OverlayManager.h">
-      <Filter>rendering\parts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerResources.h">
       <Filter>drawing\opengl</Filter>
