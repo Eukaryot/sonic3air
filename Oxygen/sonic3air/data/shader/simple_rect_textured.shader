@@ -32,13 +32,14 @@ out vec4 FragColor;
 uniform sampler2D Texture;
 #ifdef USE_TINT_COLOR
 	uniform vec4 TintColor;
+	uniform vec4 AddedColor;
 #endif
 
 void main()
 {
 	vec4 color = texture(Texture, uv0);
 #ifdef USE_TINT_COLOR
-	color *= TintColor;
+	color = color * TintColor + AddedColor;
 #endif
 #ifdef ALPHA_TEST
 	if (color.a < 0.01)

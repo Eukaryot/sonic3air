@@ -218,6 +218,7 @@
     <ClInclude Include="..\..\source\oxygen\rendering\parts\PaletteManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\PatternManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\PlaneManager.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderItem.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderParts.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderPartsDefinitions.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\ScrollOffsetsManager.h" />

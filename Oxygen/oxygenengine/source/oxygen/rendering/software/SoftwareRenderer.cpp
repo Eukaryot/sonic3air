@@ -160,7 +160,7 @@ void SoftwareRenderer::renderGameScreen(const std::vector<Geometry*>& geometries
 	{
 		for (const Geometry* geometry : geometries)
 		{
-			if (geometry->getType() == Geometry::Type::SPRITE && geometry->as<SpriteGeometry>().mSpriteInfo.getType() == SpriteManager::SpriteInfo::Type::MASK)
+			if (geometry->getType() == Geometry::Type::SPRITE && geometry->as<SpriteGeometry>().mSpriteInfo.getType() == RenderItem::Type::SPRITE_MASK)
 			{
 				usingSpriteMask = true;
 				break;
@@ -306,7 +306,20 @@ void SoftwareRenderer::renderGeometry(const Geometry& geometry)
 
 			Blitter::Options blitterOptions;
 			blitterOptions.mBlendMode = BlendMode::ALPHA;
-			blitterOptions.mTintColor = &tg.mColor;
+
+			if (tg.mUseGlobalComponentTint)
+			{
+				static Color tintColor;
+				static Color addedColor;
+				tintColor = tg.mColor * mRenderParts.getPaletteManager().getGlobalComponentTintColor();
+				addedColor = mRenderParts.getPaletteManager().getGlobalComponentAddedColor();
+				blitterOptions.mTintColor = &tintColor;
+				blitterOptions.mAddedColor = &addedColor;
+			}
+			else
+			{
+				blitterOptions.mTintColor = &tg.mColor;
+			}
 
 			mBlitter.blitSprite(Blitter::OutputWrapper(mGameScreenTexture.accessBitmap()), Blitter::SpriteWrapper(tg.mDrawerTexture.accessBitmap(), Vec2i()), tg.mRect.getPos(), blitterOptions);
 			break;
@@ -582,7 +595,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 
 	switch (geometry.mSpriteInfo.getType())
 	{
-		case SpriteManager::SpriteInfo::Type::VDP:
+		case RenderItem::Type::VDP_SPRITE:
 		{
 			const SpriteManager::VdpSpriteInfo& sprite = static_cast<const SpriteManager::VdpSpriteInfo&>(geometry.mSpriteInfo);
 
@@ -649,12 +662,12 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			break;
 		}
 
-		case SpriteManager::SpriteInfo::Type::PALETTE:
-		case SpriteManager::SpriteInfo::Type::COMPONENT:
+		case RenderItem::Type::PALETTE_SPRITE:
+		case RenderItem::Type::COMPONENT_SPRITE:
 		{
 			// Shared code for palette & component sprite rendering
 			const SpriteManager::CustomSpriteInfoBase& spriteBase = static_cast<const SpriteManager::CustomSpriteInfoBase&>(geometry.mSpriteInfo);
-			const bool isPaletteSprite = (geometry.mSpriteInfo.getType() == SpriteManager::SpriteInfo::Type::PALETTE);
+			const bool isPaletteSprite = (geometry.mSpriteInfo.getType() == RenderItem::Type::PALETTE_SPRITE);
 
 			const PaletteManager& paletteManager = mRenderParts.getPaletteManager();
 			BitmapViewMutable<uint8> depthBufferView(mDepthBuffer, Vec2i(0x200, 0x100));	// Depth buffer uses a fixed size...
@@ -727,7 +740,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			break;
 		}
 
-		case SpriteManager::SpriteInfo::Type::MASK:
+		case RenderItem::Type::SPRITE_MASK:
 		{
 			// Overwrite sprites with plane rendering results in given rect
 			const SpriteManager::SpriteMaskInfo& mask = static_cast<const SpriteManager::SpriteMaskInfo&>(geometry.mSpriteInfo);
@@ -751,7 +764,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			break;
 		}
 
-		case SpriteManager::SpriteInfo::Type::INVALID:
+		case RenderItem::Type::INVALID:
 			break;
 	}
 }

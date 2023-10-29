@@ -12,39 +12,64 @@
 
 void OverlayManager::preFrameUpdate()
 {
-	clear();	// Clear both contexts
-	mCurrentContext = Context::INSIDE_FRAME;
+	mCurrentContext = RenderItem::LifetimeContext::DEFAULT;
 }
 
-void OverlayManager::postFrameUpdate()
+void OverlayManager::postFrameUpdate(bool resetItems)
 {
-	clearContext(Context::OUTSIDE_FRAME);
-	mCurrentContext = Context::OUTSIDE_FRAME;
+	if (resetItems)
+	{
+		for (int index = 0; index < RenderItem::NUM_CONTEXTS; ++index)
+		{
+			clearLifetimeContext((RenderItem::LifetimeContext)index);
+		}
+	}
+
+	// Add render items from "next" to "current"
+	for (RenderItem* renderItem : mAddedItems.mItems)
+	{
+		getItemsByContext(renderItem->mLifetimeContext).mItems.push_back(renderItem);
+	}
+	mAddedItems.mItems.clear();		// Intentionally not using anything like "clearLifetimeContext" here, as it would invalidate the copied instances
+
+	clearLifetimeContext(RenderItem::LifetimeContext::OUTSIDE_FRAME);
+	mCurrentContext = RenderItem::LifetimeContext::OUTSIDE_FRAME;
 }
 
 void OverlayManager::clear()
 {
-	clearContext(Context::INSIDE_FRAME);
-	clearContext(Context::OUTSIDE_FRAME);
+	for (int index = 0; index < RenderItem::NUM_CONTEXTS; ++index)
+	{
+		clearLifetimeContext((RenderItem::LifetimeContext)index);
+	}
+	for (RenderItem* renderItem : mAddedItems.mItems)
+		destroyRenderItem(*renderItem);
+	mAddedItems.mItems.clear();
 }
 
-void OverlayManager::clearContext(Context context)
+void OverlayManager::clearLifetimeContext(RenderItem::LifetimeContext lifetimeContext)
 {
-	mDebugDrawRects[(int)context].clear();
-	mTexts[(int)context].clear();
+	ItemSet& context = getItemsByContext(lifetimeContext);
+	for (RenderItem* renderItem : context.mItems)
+		destroyRenderItem(*renderItem);
+	context.mItems.clear();
 }
 
-void OverlayManager::addDebugDrawRect(const Recti& rect, const Color& color)
+void OverlayManager::addRectangle(const Recti& rect, const Color& color, uint16 renderQueue, Space space, bool useGlobalComponentTint)
 {
-	DebugDrawRect& ddr = vectorAdd(mDebugDrawRects[(int)mCurrentContext]);
-	ddr.mRect = rect;
-	ddr.mColor = color;
-	ddr.mContext = mCurrentContext;
+	Rectangle& newRect = mPoolOfRectangles.createObject();
+	newRect.mRect = rect;
+	newRect.mColor = color;
+	newRect.mRenderQueue = renderQueue;
+	newRect.mCoordinatesSpace = space;
+	newRect.mLifetimeContext = mCurrentContext;
+	newRect.mUseGlobalComponentTint = useGlobalComponentTint;
+	mAddedItems.mItems.push_back(&newRect);
 }
 
-void OverlayManager::addText(std::string_view fontKeyString, uint64 fontKeyHash, const Vec2i& position, std::string_view textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space)
+void OverlayManager::addText(std::string_view fontKeyString, uint64 fontKeyHash, const Vec2i& position, std::string_view textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space, bool useGlobalComponentTint)
 {
-	Text& newText = vectorAdd(mTexts[(int)mCurrentContext]);
+	Text& newText = mPoolOfTexts.createObject();
 	newText.mFontKeyString = fontKeyString;
 	newText.mFontKeyHash = fontKeyHash;
 	newText.mPosition = position;
@@ -54,6 +79,26 @@ void OverlayManager::addText(std::string_view fontKeyString, uint64 fontKeyHash,
 	newText.mAlignment = alignment;
 	newText.mSpacing = spacing;
 	newText.mRenderQueue = renderQueue;
-	newText.mSpace = space;
-	newText.mContext = mCurrentContext;
+	newText.mCoordinatesSpace = space;
+	newText.mLifetimeContext = mCurrentContext;
+	newText.mUseGlobalComponentTint = useGlobalComponentTint;
+	mAddedItems.mItems.push_back(&newText);
+}
+
+OverlayManager::ItemSet& OverlayManager::getItemsByContext(RenderItem::LifetimeContext lifetimeContext)
+{
+	RMX_ASSERT((int)lifetimeContext < RenderItem::NUM_CONTEXTS, "Invalid lifetime context " << (int)lifetimeContext);
+	return mContexts[(int)lifetimeContext];
+}
+
+void OverlayManager::destroyRenderItem(RenderItem& renderItem)
+{
+	switch (renderItem.getType())
+	{
+		case RenderItem::Type::RECTANGLE: mPoolOfRectangles.destroyObject(static_cast<Rectangle&>(renderItem));  break;
+		case RenderItem::Type::TEXT:	  mPoolOfTexts.destroyObject(static_cast<Text&>(renderItem));  break;
+		default:
+			RMX_ASSERT(false, "Trying to destroy unsupported render item type");
+			break;
+	}
 }

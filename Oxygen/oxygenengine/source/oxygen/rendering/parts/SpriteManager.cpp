@@ -77,36 +77,19 @@ void SpriteManager::SpriteMaskInfo::serialize(VectorBinarySerializer& serializer
 }
 
 
-void SpriteManager::SpriteSets::clear()
-{
-	mVdpSprites.clear();
-	mPaletteSprites.clear();
-	mComponentSprites.clear();
-	mSpriteMasks.clear();
-}
-
-void SpriteManager::SpriteSets::swap(SpriteSets& other)
-{
-	other.mVdpSprites.swap(mVdpSprites);
-	other.mPaletteSprites.swap(mPaletteSprites);
-	other.mComponentSprites.swap(mComponentSprites);
-	other.mSpriteMasks.swap(mSpriteMasks);
-}
-
-
 SpriteManager::SpriteManager(PatternManager& patternManager, SpacesManager& spacesManager) :
 	mPatternManager(patternManager),
 	mSpacesManager(spacesManager)
 {
-	reset();
+	clear();
 }
 
-void SpriteManager::reset()
+void SpriteManager::clear()
 {
 	mResetSprites = true;
 
-	mCurrSpriteSets.clear();
-	mNextSpriteSets.clear();
+	clearSpriteSet(mCurrSpriteSet);
+	clearSpriteSet(mNextSpriteSet);
 	mSprites.clear();
 }
 
@@ -114,7 +97,7 @@ void SpriteManager::resetSprites()
 {
 	mResetSprites = true;
 
-	mCurrSpriteSets.clear();
+	clearSpriteSet(mCurrSpriteSet);
 	mSprites.clear();
 }
 
@@ -164,7 +147,7 @@ void SpriteManager::postFrameUpdate()
 			sprite.mTransformation.flipY();
 		}
 
-		if (sprite.getType() == SpriteInfo::Type::PALETTE)
+		if (sprite.getType() == RenderItem::Type::PALETTE_SPRITE)
 		{
 			static_cast<PaletteSpriteInfo&>(sprite).mAtex = data.mAtex;
 		}
@@ -186,11 +169,9 @@ void SpriteManager::postFrameUpdate()
 
 	if (mResetSprites)
 	{
-		// Move over from "next" to "current" sprite sets
-		mCurrSpriteSets.swap(mNextSpriteSets);
-		mNextSpriteSets.clear();
-
-		mResetSprites = false;
+		// Replace render items in "current" with "next"
+		mCurrSpriteSet.mItems.swap(mNextSpriteSet.mItems);
+		clearSpriteSet(mNextSpriteSet);
 
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
@@ -207,37 +188,51 @@ void SpriteManager::postFrameUpdate()
 
 		// Process coordinates of all sprites
 		const Vec2i worldSpaceOffset = mSpacesManager.getWorldSpaceOffset();
-		for (SpriteInfo* sprite : mSprites)
+		for (RenderItem* renderItem : mSprites)
 		{
-			if (sprite->mCoordinatesSpace == SpriteManager::Space::WORLD)
+			RMX_ASSERT(renderItem->isSprite(), "Expected a sprite");
+			SpriteManager::SpriteInfo& sprite = static_cast<SpriteManager::SpriteInfo&>(*renderItem);
+			if (sprite.mCoordinatesSpace == SpriteManager::Space::WORLD)
 			{
-				sprite->mPosition -= worldSpaceOffset;
+				sprite.mPosition -= worldSpaceOffset;
 			}
 		}
+
+		mResetSprites = false;
 	}
 	else
 	{
-		// When maintaining sprites, make sure to reset sprite interpolation
-		for (SpriteInfo* sprite : mSprites)
+		if (!mNextSpriteSet.mItems.empty())
 		{
-			sprite->mLastPositionChange.clear();
+			// Add render items from "next" to "current"
+			for (RenderItem* renderItem : mNextSpriteSet.mItems)
+			{
+				mCurrSpriteSet.mItems.push_back(renderItem);
+			}
+			mNextSpriteSet.mItems.clear();	// Intentionally not using "clearSpriteSet" here, as it would invalidate the copied instances
+
+			buildSortedSprites();
+		}
+
+		// When maintaining sprites, make sure to reset sprite interpolation
+		for (RenderItem* renderItem : mSprites)
+		{
+			RMX_ASSERT(renderItem->isSprite(), "Expected a sprite");
+			SpriteManager::SpriteInfo& sprite = static_cast<SpriteManager::SpriteInfo&>(*renderItem);
+			sprite.mLastPositionChange.clear();
 		}
 	}
-}
-
-void SpriteManager::refresh()
-{
 }
 
 void SpriteManager::drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, const Color& tintColor, const Color& addedColor)
 {
-	if (mNextSpriteSets.mVdpSprites.size() >= 0x400)
+	if (mNextSpriteSet.mItems.size() >= 0x800)
 	{
-		RMX_ERROR("Reached the upper limit of " << mNextSpriteSets.mVdpSprites.size() << " VDP sprites, further sprites will be ignored", );
+		RMX_ERROR("Reached the upper limit of " << mNextSpriteSet.mItems.size() << " sprites, further sprites will be ignored", );
 		return;
 	}
 
-	VdpSpriteInfo& sprite = vectorAdd(mNextSpriteSets.mVdpSprites);
+	VdpSpriteInfo& sprite = mPoolOfVdpSprites.createObject();
 	sprite.mPosition = position;
 	sprite.mSize.x = 1 + ((encodedSize >> 2) & 3);
 	sprite.mSize.y = 1 + (encodedSize & 3);
@@ -248,6 +243,7 @@ void SpriteManager::drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint
 	sprite.mAddedColor = addedColor;
 	sprite.mCoordinatesSpace = Space::SCREEN;
 	sprite.mLogicalSpace = mLogicalSpriteSpace;
+	mNextSpriteSet.mItems.push_back(&sprite);
 
 	if (EngineMain::getDelegate().useDeveloperFeatures())
 	{
@@ -303,7 +299,7 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 		return;
 
 	CustomSpriteInfoBase& sprite = *spritePtr;
-	if (sprite.getType() == SpriteInfo::Type::PALETTE)
+	if (sprite.getType() == RenderItem::Type::PALETTE_SPRITE)
 	{
 		static_cast<PaletteSpriteInfo&>(sprite).mAtex = atex;
 	}
@@ -350,19 +346,21 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 
 void SpriteManager::addSpriteMask(const Vec2i& position, const Vec2i& size, uint16 renderQueue, bool priorityFlag, Space space)
 {
-	if (mNextSpriteSets.mSpriteMasks.size() >= 0x40)
+	// TODO: Originally, the number of sprite masks was 0x40
+	if (mNextSpriteSet.mItems.size() >= 0x800)
 	{
-		RMX_ERROR("Reached the upper limit of " << mNextSpriteSets.mSpriteMasks.size() << " sprite masks, further sprites will be ignored", );
+		RMX_ERROR("Reached the upper limit of " << mNextSpriteSet.mItems.size() << " sprites, further sprites will be ignored", );
 		return;
 	}
 
-	SpriteMaskInfo& sprite = vectorAdd(mNextSpriteSets.mSpriteMasks);
+	SpriteMaskInfo& sprite = mPoolOfSpriteMasks.createObject();
 	sprite.mPosition = position;
 	sprite.mSize = size;
 	sprite.mRenderQueue = renderQueue;
 	sprite.mDepth = priorityFlag ? 0.6f : 0.1f;
 	sprite.mCoordinatesSpace = space;
 	sprite.mLogicalSpace = mLogicalSpriteSpace;
+	mNextSpriteSet.mItems.push_back(&sprite);
 }
 
 uint32 SpriteManager::addSpriteHandle(uint64 key, const Vec2i& position, uint16 renderQueue)
@@ -414,32 +412,41 @@ void SpriteManager::setSpriteTagWithPosition(uint64 spriteTag, const Vec2i& posi
 	mTaggedSpritePosition = position;
 }
 
+void SpriteManager::clearSpriteSet(SpriteSet& spriteSet)
+{
+	for (RenderItem* renderItem : spriteSet.mItems)
+		destroyRenderItem(*renderItem);
+	spriteSet.mItems.clear();
+}
+
 void SpriteManager::serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion)
 {
 	if (formatVersion >= 4)
 	{
-		serializer.serializeArraySize(mCurrSpriteSets.mVdpSprites);
-		for (VdpSpriteInfo& sprite : mCurrSpriteSets.mVdpSprites)
+		serializer.serializeArraySize(mCurrSpriteSet.mItems);
+		if (serializer.isReading())
 		{
-			sprite.serialize(serializer, formatVersion);
+			for (RenderItem*& renderItem : mCurrSpriteSet.mItems)
+			{
+				const RenderItem::Type type = (RenderItem::Type)serializer.read<uint8>();
+				switch (type)
+				{
+					case RenderItem::Type::VDP_SPRITE:		 renderItem = &mPoolOfVdpSprites.createObject();  break;
+					case RenderItem::Type::PALETTE_SPRITE:	 renderItem = &mPoolOfPaletteSprites.createObject();  break;
+					case RenderItem::Type::COMPONENT_SPRITE: renderItem = &mPoolOfComponentSprites.createObject();  break;
+					case RenderItem::Type::SPRITE_MASK:		 renderItem = &mPoolOfSpriteMasks.createObject();  break;
+					default:  return;
+				}
+				renderItem->serialize(serializer, formatVersion);
+			}
 		}
-
-		serializer.serializeArraySize(mCurrSpriteSets.mPaletteSprites);
-		for (PaletteSpriteInfo& sprite : mCurrSpriteSets.mPaletteSprites)
+		else
 		{
-			sprite.serialize(serializer, formatVersion);
-		}
-
-		serializer.serializeArraySize(mCurrSpriteSets.mComponentSprites);
-		for (ComponentSpriteInfo& sprite : mCurrSpriteSets.mComponentSprites)
-		{
-			sprite.serialize(serializer, formatVersion);
-		}
-
-		serializer.serializeArraySize(mCurrSpriteSets.mSpriteMasks);
-		for (SpriteMaskInfo& sprite : mCurrSpriteSets.mSpriteMasks)
-		{
-			sprite.serialize(serializer, formatVersion);
+			for (RenderItem* renderItem : mCurrSpriteSet.mItems)
+			{
+				serializer.writeAs<uint8>(renderItem->getType());
+				renderItem->serialize(serializer, formatVersion);
+			}
 		}
 
 		if (serializer.isReading())
@@ -449,39 +456,51 @@ void SpriteManager::serializeSaveState(VectorBinarySerializer& serializer, uint8
 	}
 }
 
+void SpriteManager::destroyRenderItem(RenderItem& renderItem)
+{
+	switch (renderItem.getType())
+	{
+		case RenderItem::Type::VDP_SPRITE:		 mPoolOfVdpSprites.destroyObject(static_cast<VdpSpriteInfo&>(renderItem));  break;
+		case RenderItem::Type::PALETTE_SPRITE:	 mPoolOfPaletteSprites.destroyObject(static_cast<PaletteSpriteInfo&>(renderItem));  break;
+		case RenderItem::Type::COMPONENT_SPRITE: mPoolOfComponentSprites.destroyObject(static_cast<ComponentSpriteInfo&>(renderItem));  break;
+		case RenderItem::Type::SPRITE_MASK:		 mPoolOfSpriteMasks.destroyObject(static_cast<SpriteMaskInfo&>(renderItem));  break;
+		default:
+			RMX_ASSERT(false, "Trying to destroy unsupported render item type");
+			break;
+	}
+}
+
 SpriteManager::CustomSpriteInfoBase* SpriteManager::addSpriteByKey(uint64 key)
 {
 	const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(key);
 	if (nullptr != item)
 	{
-		if (item->mUsesComponentSprite)
+		if (mNextSpriteSet.mItems.size() < 0x800)
 		{
-			if (mNextSpriteSets.mComponentSprites.size() < 0x400)
+			if (item->mUsesComponentSprite)
 			{
-				ComponentSpriteInfo& sprite = vectorAdd(mNextSpriteSets.mComponentSprites);
+				ComponentSpriteInfo& sprite = mPoolOfComponentSprites.createObject();
 				sprite.mKey = key;
 				sprite.mCacheItem = item;
 				sprite.mPivotOffset = item->mSprite->mOffset;
 				sprite.mSize = static_cast<ComponentSprite*>(item->mSprite)->getBitmap().getSize();
 				sprite.mLogicalSpace = mLogicalSpriteSpace;
+				mNextSpriteSet.mItems.push_back(&sprite);
 				return &sprite;
 			}
-			RMX_ERROR("Reached the upper limit of " << mNextSpriteSets.mComponentSprites.size() << " component sprites, further sprites will be ignored", );
-		}
-		else
-		{
-			if (mNextSpriteSets.mPaletteSprites.size() < 0x400)
+			else
 			{
-				PaletteSpriteInfo& sprite = vectorAdd(mNextSpriteSets.mPaletteSprites);
+				PaletteSpriteInfo& sprite = mPoolOfPaletteSprites.createObject();
 				sprite.mKey = key;
 				sprite.mCacheItem = item;
 				sprite.mPivotOffset = item->mSprite->mOffset;
 				sprite.mSize = static_cast<PaletteSprite*>(sprite.mCacheItem->mSprite)->getBitmap().getSize();
 				sprite.mLogicalSpace = mLogicalSpriteSpace;
+				mNextSpriteSet.mItems.push_back(&sprite);
 				return &sprite;
 			}
-			RMX_ERROR("Reached the upper limit of " << mNextSpriteSets.mPaletteSprites.size() << " palette sprites, further sprites will be ignored", );
 		}
+		RMX_ERROR("Reached the upper limit of " << mNextSpriteSet.mItems.size() << " sprites, further sprites will be ignored", );
 	}
 	return nullptr;
 }
@@ -505,13 +524,12 @@ void SpriteManager::checkSpriteTag(SpriteInfo& sprite)
 void SpriteManager::collectLegacySprites()
 {
 	// Collect sprites to render
-	mCurrSpriteSets.mVdpSprites.clear();
-
+	int numSpritesAdded = 0;
 	for (int link = 0;;)
 	{
 		const uint16* data = (uint16*)&EmulatorInterface::instance().getVRam()[mSpriteAttributeTableBase + link * 2];
 
-		VdpSpriteInfo& sprite = vectorAdd(mCurrSpriteSets.mVdpSprites);
+		VdpSpriteInfo& sprite = mPoolOfVdpSprites.createObject();
 		sprite.mRenderQueue = 0x2000;
 		sprite.mPriorityFlag = (data[2] & 0x8000) != 0;
 
@@ -526,6 +544,9 @@ void SpriteManager::collectLegacySprites()
 
 		sprite.mFirstPattern = data[2];
 
+		mCurrSpriteSet.mItems.push_back(&sprite);
+		++numSpritesAdded;
+
 		// Update "last used atex" of patterns in cache (actually that's only needed for debug output)
 		{
 			const uint16 patterns = (uint16)(sprite.mSize.x * sprite.mSize.y);
@@ -539,7 +560,7 @@ void SpriteManager::collectLegacySprites()
 		link = (data[1] & 0x7f) << 2;
 		if ((link == 0) || (link >= 320))
 			break;
-		if (mCurrSpriteSets.mVdpSprites.size() >= 0x100)	// Sanity check
+		if (numSpritesAdded >= 0x100)	// Sanity check
 			break;
 	}
 }
@@ -547,28 +568,12 @@ void SpriteManager::collectLegacySprites()
 void SpriteManager::buildSortedSprites()
 {
 	// Mix all types of sprites together in one sorted vector
-	mSprites.clear();
-	for (VdpSpriteInfo& sprite : mCurrSpriteSets.mVdpSprites)
-	{
-		mSprites.push_back(&sprite);
-	}
-	for (PaletteSpriteInfo& sprite : mCurrSpriteSets.mPaletteSprites)
-	{
-		mSprites.push_back(&sprite);
-	}
-	for (ComponentSpriteInfo& sprite : mCurrSpriteSets.mComponentSprites)
-	{
-		mSprites.push_back(&sprite);
-	}
-	for (SpriteMaskInfo& sprite : mCurrSpriteSets.mSpriteMasks)
-	{
-		mSprites.push_back(&sprite);
-	}
+	mSprites = mCurrSpriteSet.mItems;
 
 	// Sorting only cares about render queue, not priority!
 	//  -> Because that's how the VDP works as well
 	std::stable_sort(mSprites.begin(), mSprites.end(),
-		[](const SpriteInfo* a, const SpriteInfo* b) { return a->mRenderQueue > b->mRenderQueue; });
+		[](const RenderItem* a, const RenderItem* b) { return a->mRenderQueue > b->mRenderQueue; });
 
 	// Reverse order, so that the sprites "in front" are rendered last
 	//  -> Note that it makes a difference if this was removed and the sorting order changed, namely for sprites sharing the same render queue

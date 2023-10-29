@@ -765,7 +765,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 						std::string_view spriteName;
 						switch (info.getType())
 						{
-							case SpriteManager::SpriteInfo::Type::VDP:
+							case RenderItem::Type::VDP_SPRITE:
 							{
 								spriteType = "VDP sprite";
 								color.setABGR32(0xffffffc0);
@@ -775,7 +775,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 								break;
 							}
 
-							case SpriteManager::SpriteInfo::Type::PALETTE:
+							case RenderItem::Type::PALETTE_SPRITE:
 							{
 								spriteType = "Palette sprite";
 								color.setABGR32(0xffffc0ff);
@@ -789,7 +789,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 								break;
 							}
 
-							case SpriteManager::SpriteInfo::Type::COMPONENT:
+							case RenderItem::Type::COMPONENT_SPRITE:
 							{
 								spriteType = "Component sprite";
 								color.setABGR32(0xffffc0e0);
@@ -803,7 +803,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 								break;
 							}
 
-							case SpriteManager::SpriteInfo::Type::MASK:
+							case RenderItem::Type::SPRITE_MASK:
 							{
 								spriteType = "Sprite mask";
 								color.setABGR32(0xffc0ffff);
@@ -839,8 +839,13 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 					case Geometry::Type::RECT:
 					{
-						// Ignore this type, it's only for debugging anyways
-						ignore = true;
+						builder.addLine(*String(0, "0x%04x:   Rect", geometry->mRenderQueue), Color::fromABGR32(0xffc0ffff));
+						break;
+					}
+
+					case Geometry::Type::TEXTURED_RECT:
+					{
+						builder.addLine(*String(0, "0x%04x:   Textured rect / Text", geometry->mRenderQueue), Color::fromABGR32(0xffc0ffff));
 						break;
 					}
 

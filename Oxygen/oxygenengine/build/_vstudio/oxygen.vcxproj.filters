@@ -802,6 +802,9 @@
     <ClInclude Include="..\..\source\oxygen\simulation\debug\DebugTracking.h">
       <Filter>simulation\debug</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderItem.h">
+      <Filter>rendering\parts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Oxygen.natvis" />

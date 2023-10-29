@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "oxygen/rendering/parts/SpacesManager.h"
+#include "oxygen/rendering/parts/RenderItem.h"
 
 
 class OverlayManager
@@ -16,22 +16,15 @@ class OverlayManager
 public:
 	using Space = SpacesManager::Space;
 
-	enum class Context
-	{
-		INSIDE_FRAME = 0,	// Rendered during frame simulation
-		OUTSIDE_FRAME = 1	// Rendered outside of frame simulation, e.g. for debug side panel update
-	};
-	static const size_t NUM_CONTEXTS = 2;
-
-	struct DebugDrawRect
+	struct Rectangle : public RenderItem
 	{
 		Recti mRect;
 		Color mColor;
-		Space mSpace = Space::WORLD;
-		Context mContext = Context::OUTSIDE_FRAME;
+
+		inline Rectangle() : RenderItem(Type::RECTANGLE) {}
 	};
 
-	struct Text
+	struct Text : public RenderItem
 	{
 		std::string mFontKeyString;
 		uint64 mFontKeyHash = 0;
@@ -41,26 +34,39 @@ public:
 		Color mColor;
 		int mAlignment = 1;
 		int mSpacing = 0;
-		uint16 mRenderQueue = 0xffff;
-		Space mSpace = Space::WORLD;
-		Context mContext = Context::OUTSIDE_FRAME;
+
+		inline Text() : RenderItem(Type::TEXT) {}
 	};
 
 public:
-	void preFrameUpdate();
-	void postFrameUpdate();
+	inline OverlayManager()  { clear(); }
 
-	inline const std::vector<DebugDrawRect>& getDebugDrawRects(Context context) const  { return mDebugDrawRects[(int)context]; }
-	inline const std::vector<Text>& getTexts(Context context) const  { return mTexts[(int)context]; }
+	void preFrameUpdate();
+	void postFrameUpdate(bool resetItems);
+
+	inline const std::vector<RenderItem*>& getRenderItems(RenderItem::LifetimeContext context) const  { return mContexts[(int)context].mItems; }
 
 	void clear();
-	void clearContext(Context context);
+	void clearLifetimeContext(RenderItem::LifetimeContext lifetimeContext);
 
-	void addDebugDrawRect(const Recti& rect, const Color& color = Color(1.0f, 0.0f, 1.0f, 0.75f));
-	void addText(std::string_view fontKeyString, uint64 fontKeyHash, const Vec2i& position, std::string_view textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space);
+	void addRectangle(const Recti& rect, const Color& color, uint16 renderQueue, Space space, bool useGlobalComponentTint);
+	void addText(std::string_view fontKeyString, uint64 fontKeyHash, const Vec2i& position, std::string_view textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space, bool useGlobalComponentTint);
 
 private:
-	Context mCurrentContext = Context::OUTSIDE_FRAME;
-	std::vector<DebugDrawRect> mDebugDrawRects[NUM_CONTEXTS];	// One list per context (see "Context" enum)
-	std::vector<Text> mTexts[NUM_CONTEXTS];
+	struct ItemSet
+	{
+		std::vector<RenderItem*> mItems;
+	};
+
+private:
+	ItemSet& getItemsByContext(RenderItem::LifetimeContext lifetimeContext);
+	void destroyRenderItem(RenderItem& renderItem);
+
+private:
+	RenderItem::LifetimeContext mCurrentContext = RenderItem::LifetimeContext::OUTSIDE_FRAME;
+	ItemSet mContexts[RenderItem::NUM_CONTEXTS];
+	ItemSet mAddedItems;
+
+	ObjectPool<Rectangle> mPoolOfRectangles;
+	ObjectPool<Text> mPoolOfTexts;
 };

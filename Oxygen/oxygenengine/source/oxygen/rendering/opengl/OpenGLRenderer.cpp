@@ -179,7 +179,7 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 	bool usingSpriteMask = false;
 	for (Geometry* geometry : geometries)
 	{
-		if (geometry->getType() == Geometry::Type::SPRITE && static_cast<const SpriteGeometry*>(geometry)->mSpriteInfo.getType() == SpriteManager::SpriteInfo::Type::MASK)
+		if (geometry->getType() == Geometry::Type::SPRITE && static_cast<const SpriteGeometry*>(geometry)->mSpriteInfo.getType() == RenderItem::Type::SPRITE_MASK)
 		{
 			usingSpriteMask = true;
 			break;
@@ -356,7 +356,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			const bool needsRefresh = (mLastRenderedGeometryType != Geometry::Type::SPRITE || mLastRenderedSpriteType != sg.mSpriteInfo.getType());
 			if (needsRefresh)
 			{
-				if (sg.mSpriteInfo.getType() != SpriteManager::SpriteInfo::Type::MASK)
+				if (sg.mSpriteInfo.getType() != RenderItem::Type::SPRITE_MASK)
 				{
 					glEnable(GL_DEPTH_TEST);	// Enable depth test
 					glDepthFunc(GL_GEQUAL);		// Lower depth values get rejected
@@ -373,7 +373,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 
 			switch (sg.mSpriteInfo.getType())
 			{
-				case SpriteManager::SpriteInfo::Type::VDP:
+				case RenderItem::Type::VDP_SPRITE:
 				{
 					const SpriteManager::VdpSpriteInfo& spriteInfo = static_cast<const SpriteManager::VdpSpriteInfo&>(sg.mSpriteInfo);
 					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
@@ -386,7 +386,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 					break;
 				}
 
-				case SpriteManager::SpriteInfo::Type::PALETTE:
+				case RenderItem::Type::PALETTE_SPRITE:
 				{
 					const SpriteManager::PaletteSpriteInfo& spriteInfo = static_cast<const SpriteManager::PaletteSpriteInfo&>(sg.mSpriteInfo);
 					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
@@ -407,7 +407,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 					break;
 				}
 
-				case SpriteManager::SpriteInfo::Type::COMPONENT:
+				case RenderItem::Type::COMPONENT_SPRITE:
 				{
 					const SpriteManager::ComponentSpriteInfo& spriteInfo = static_cast<const SpriteManager::ComponentSpriteInfo&>(sg.mSpriteInfo);
 					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
@@ -422,7 +422,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 					break;
 				}
 
-				case SpriteManager::SpriteInfo::Type::MASK:
+				case RenderItem::Type::SPRITE_MASK:
 				{
 					const SpriteManager::SpriteMaskInfo& mask = static_cast<const SpriteManager::SpriteMaskInfo&>(sg.mSpriteInfo);
 					const Vec4f rectf((float)mask.mPosition.x / (float)mGameResolution.x,
@@ -439,7 +439,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 					break;
 				}
 
-				case SpriteManager::SpriteInfo::Type::INVALID:
+				case RenderItem::Type::INVALID:
 					break;
 			}
 
@@ -492,10 +492,19 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			transform.z = tg.mRect.width / (float)mGameResolution.x * 2.0f;
 			transform.w = tg.mRect.height / (float)mGameResolution.y * 2.0f;
 
+			Color tintColor = tg.mColor;
+			Color addedColor = Color::TRANSPARENT;
+			if (tg.mUseGlobalComponentTint)
+			{
+				tintColor *= mRenderParts.getPaletteManager().getGlobalComponentTintColor();
+				addedColor = mRenderParts.getPaletteManager().getGlobalComponentAddedColor();
+			}
+
 			Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(true, true);
 			shader.bind();
 			shader.setParam("Transform", transform);
-			shader.setParam("TintColor", tg.mColor);
+			shader.setParam("TintColor", tintColor);
+			shader.setParam("AddedColor", addedColor);
 			shader.setTexture("Texture", texture->getTextureHandle(), GL_TEXTURE_2D);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			break;

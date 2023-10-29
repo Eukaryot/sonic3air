@@ -35,7 +35,7 @@ void RenderParts::reset()
 	mViewports.clear();
 
 	mPlaneManager.reset();
-	mSpriteManager.reset();
+	mSpriteManager.clear();
 	mScrollOffsetsManager.reset();
 }
 
@@ -51,7 +51,7 @@ void RenderParts::preFrameUpdate()
 
 void RenderParts::postFrameUpdate()
 {
-	mOverlayManager.postFrameUpdate();
+	mOverlayManager.postFrameUpdate(mSpriteManager.shouldResetSprites());	// Needs to be called just before sprite manager's update
 	mSpriteManager.postFrameUpdate();
 	mScrollOffsetsManager.postFrameUpdate();
 }
@@ -64,7 +64,6 @@ void RenderParts::refresh(const RefreshParameters& refreshParameters)
 		mPlaneManager.refresh();
 		mScrollOffsetsManager.refresh(refreshParameters);
 	}
-	mSpriteManager.refresh();
 }
 
 void RenderParts::dumpPatternsContent()

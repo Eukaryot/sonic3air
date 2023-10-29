@@ -82,12 +82,13 @@ public:
 class TexturedRectGeometry : public Geometry
 {
 public:
-	inline TexturedRectGeometry(const Recti& rect, DrawerTexture& drawerTexture, const Color& color) : Geometry(Type::TEXTURED_RECT), mRect(rect), mDrawerTexture(drawerTexture), mColor(color) {}
+	inline TexturedRectGeometry(const Recti& rect, DrawerTexture& drawerTexture, const Color& color, bool useGlobalComponentTint) : Geometry(Type::TEXTURED_RECT), mRect(rect), mDrawerTexture(drawerTexture), mColor(color), mUseGlobalComponentTint(useGlobalComponentTint) {}
 
 public:
 	Recti mRect;
 	DrawerTexture& mDrawerTexture;
 	Color mColor;
+	bool mUseGlobalComponentTint;
 };
 
 
@@ -129,9 +130,9 @@ public:
 		return mRectGeometryBuffer.createObject(rect, color);
 	}
 
-	TexturedRectGeometry& createTexturedRectGeometry(const Recti& rect, DrawerTexture& drawerTexture, const Color& color)
+	TexturedRectGeometry& createTexturedRectGeometry(const Recti& rect, DrawerTexture& drawerTexture, const Color& color, bool useGlobalComponentTint)
 	{
-		return mTexturedRectGeometryBuffer.createObject(rect, drawerTexture, color);
+		return mTexturedRectGeometryBuffer.createObject(rect, drawerTexture, color, useGlobalComponentTint);
 	}
 
 	EffectBlurGeometry& createEffectBlurGeometry(int blurValue)

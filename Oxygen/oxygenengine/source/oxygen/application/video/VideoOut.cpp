@@ -341,18 +341,20 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 		const auto& sprites = spriteManager.getSprites();
 		for (auto spriteIterator = sprites.begin(); spriteIterator != sprites.end(); ++spriteIterator)
 		{
-			SpriteManager::SpriteInfo& sprite = **spriteIterator;
+			RenderItem& renderItem = **spriteIterator;
+			RMX_ASSERT(renderItem.isSprite(), "Expected a sprite");
+			SpriteManager::SpriteInfo& sprite = static_cast<SpriteManager::SpriteInfo&>(renderItem);
 			bool accept = true;
 			switch (sprite.getType())
 			{
-				case SpriteManager::SpriteInfo::Type::VDP:
+				case RenderItem::Type::VDP_SPRITE:
 				{
 					accept = (mRenderParts->mLayerRendering[sprite.mPriorityFlag ? 6 : 2]);
 					break;
 				}
 
-				case SpriteManager::SpriteInfo::Type::PALETTE:
-				case SpriteManager::SpriteInfo::Type::COMPONENT:
+				case RenderItem::Type::PALETTE_SPRITE:
+				case RenderItem::Type::COMPONENT_SPRITE:
 				{
 					accept = (mRenderParts->mLayerRendering[sprite.mPriorityFlag ? 7 : 3]);
 					break;
@@ -436,53 +438,66 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 		const Vec2i worldSpaceOffset = getInterpolatedWorldSpaceOffset();
 		FontCollection& fontCollection = FontCollection::instance();
 
-		for (int i = 0; i < OverlayManager::NUM_CONTEXTS; ++i)
+		for (int index = 0; index < RenderItem::NUM_CONTEXTS; ++index)
 		{
-			const std::vector<OverlayManager::DebugDrawRect>& debugDrawRects = overlayManager.getDebugDrawRects((OverlayManager::Context)i);
-			for (const OverlayManager::DebugDrawRect& debugDrawRect : debugDrawRects)
+			const RenderItem::LifetimeContext lifetimeContext = (RenderItem::LifetimeContext)index;
+			const std::vector<RenderItem*>& renderItems = overlayManager.getRenderItems(lifetimeContext);
+
+			for (const RenderItem* renderItem : renderItems)
 			{
-				// Translate rect
-				Recti screenRect = debugDrawRect.mRect;
-				if (debugDrawRect.mSpace == SpacesManager::Space::WORLD)
+				switch (renderItem->getType())
 				{
-					screenRect -= worldSpaceOffset;
-				}
-
-				Geometry& geometry = mGeometryFactory.createRectGeometry(screenRect, debugDrawRect.mColor);
-				geometry.mRenderQueue = 0xffff;		// Always on top
-				geometries.push_back(&geometry);
-			}
-
-			const std::vector<OverlayManager::Text>& texts = overlayManager.getTexts((OverlayManager::Context)i);
-			for (const OverlayManager::Text& text : texts)
-			{
-				// Translate position
-				Vec2i screenPosition = text.mPosition;
-				if (text.mSpace == SpacesManager::Space::WORLD)
-				{
-					screenPosition -= worldSpaceOffset;
-				}
-
-				Font* font = fontCollection.getFontByKey(text.mFontKeyHash);
-				if (nullptr == font)
-				{
-					font = fontCollection.createFontByKey(text.mFontKeyString);
-				}
-				if (nullptr != font)
-				{
-					const PrintedTextCache::Key key(text.mFontKeyHash, text.mTextHash, (uint8)text.mSpacing);
-					PrintedTextCache& cache = RenderResources::instance().mPrintedTextCache;
-					PrintedTextCache::CacheItem* cacheItem = cache.getCacheItem(key);
-					if (nullptr == cacheItem)
+					case RenderItem::Type::RECTANGLE:
 					{
-						cacheItem = &cache.addCacheItem(key, *font, text.mTextString);
-					}
-					const Vec2i drawPosition = Font::applyAlignment(Recti(screenPosition, Vec2i(0, 0)), cacheItem->mInnerRect, text.mAlignment);
-					const Recti rect(drawPosition, cacheItem->mTexture.getSize());
+						const OverlayManager::Rectangle& rectangle = static_cast<const OverlayManager::Rectangle&>(*renderItem);
+						
+						// Translate rect
+						Recti screenRect = rectangle.mRect;
+						if (rectangle.mCoordinatesSpace == SpacesManager::Space::WORLD)
+						{
+							screenRect -= worldSpaceOffset;
+						}
 
-					Geometry& geometry = mGeometryFactory.createTexturedRectGeometry(rect, cacheItem->mTexture, text.mColor);
-					geometry.mRenderQueue = text.mRenderQueue;
-					geometries.push_back(&geometry);
+						Geometry& geometry = mGeometryFactory.createRectGeometry(screenRect, rectangle.mColor);
+						geometry.mRenderQueue = rectangle.mRenderQueue;
+						geometries.push_back(&geometry);
+						break;
+					}
+
+					case RenderItem::Type::TEXT:
+					{
+						const OverlayManager::Text& text = static_cast<const OverlayManager::Text&>(*renderItem);
+
+						// Translate position
+						Vec2i screenPosition = text.mPosition;
+						if (text.mCoordinatesSpace == SpacesManager::Space::WORLD)
+						{
+							screenPosition -= worldSpaceOffset;
+						}
+
+						Font* font = fontCollection.getFontByKey(text.mFontKeyHash);
+						if (nullptr == font)
+						{
+							font = fontCollection.createFontByKey(text.mFontKeyString);
+						}
+						if (nullptr != font)
+						{
+							const PrintedTextCache::Key key(text.mFontKeyHash, text.mTextHash, (uint8)text.mSpacing);
+							PrintedTextCache& cache = RenderResources::instance().mPrintedTextCache;
+							PrintedTextCache::CacheItem* cacheItem = cache.getCacheItem(key);
+							if (nullptr == cacheItem)
+							{
+								cacheItem = &cache.addCacheItem(key, *font, text.mTextString);
+							}
+							const Vec2i drawPosition = Font::applyAlignment(Recti(screenPosition, Vec2i(0, 0)), cacheItem->mInnerRect, text.mAlignment);
+							const Recti rect(drawPosition, cacheItem->mTexture.getSize());
+
+							Geometry& geometry = mGeometryFactory.createTexturedRectGeometry(rect, cacheItem->mTexture, text.mColor, text.mUseGlobalComponentTint);
+							geometry.mRenderQueue = text.mRenderQueue;
+							geometries.push_back(&geometry);
+						}
+						break;
+					}
 				}
 			}
 		}
@@ -508,14 +523,14 @@ void VideoOut::renderGameScreen()
 
 void VideoOut::preRefreshDebugging()
 {
-	mRenderParts->getOverlayManager().clearContext(OverlayManager::Context::OUTSIDE_FRAME);
+	mRenderParts->getOverlayManager().clearLifetimeContext(RenderItem::LifetimeContext::OUTSIDE_FRAME);
 }
 
 void VideoOut::postRefreshDebugging()
 {
-	const bool hasOutsideFrameDebugDraws = !mRenderParts->getOverlayManager().getDebugDrawRects(OverlayManager::Context::OUTSIDE_FRAME).empty();
-	mDebugDrawRenderingRequested = hasOutsideFrameDebugDraws || mPreviouslyHadOutsideFrameDebugDraws;
-	mPreviouslyHadOutsideFrameDebugDraws = hasOutsideFrameDebugDraws;
+	const bool hasOutsideFrameRenderItems = !mRenderParts->getOverlayManager().getRenderItems(RenderItem::LifetimeContext::OUTSIDE_FRAME).empty();
+	mDebugDrawRenderingRequested = hasOutsideFrameRenderItems || mPreviouslyHadOutsideFrameDebugDraws;
+	mPreviouslyHadOutsideFrameDebugDraws = hasOutsideFrameRenderItems;
 }
 
 void VideoOut::renderDebugDraw(int debugDrawMode, const Recti& rect)

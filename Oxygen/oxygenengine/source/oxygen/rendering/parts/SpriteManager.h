@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "oxygen/rendering/parts/SpacesManager.h"
+#include "oxygen/rendering/parts/RenderItem.h"
 #include "oxygen/resources/SpriteCache.h"
 #include "oxygen/helper/Transform2D.h"
 
@@ -20,30 +20,14 @@ class SpriteManager
 public:
 	using Space = SpacesManager::Space;
 
-	struct SpriteInfo
+	struct SpriteInfo : public RenderItem
 	{
-	public:
-		enum class Type
-		{
-			INVALID = 0,
-			VDP,
-			PALETTE,
-			COMPONENT,
-			MASK
-		};
-
-	public:
-		inline Type getType() const  { return mType; }
-
 	public:
 		Vec2i  mPosition;
 		bool   mPriorityFlag = false;
-		uint16 mRenderQueue = 0;
 		Color  mTintColor = Color::WHITE;
 		Color  mAddedColor = Color::TRANSPARENT;
-		bool   mUseGlobalComponentTint = true;
 		BlendMode mBlendMode = BlendMode::ALPHA;
-		Space  mCoordinatesSpace = Space::SCREEN;	// The coordinate system that "mPosition" is referring to
 		Space  mLogicalSpace = Space::SCREEN;		// The coordinate system used for frame interpolation, can be different from the coordinates space
 
 		// Frame interpolation
@@ -52,18 +36,14 @@ public:
 		Vec2i  mInterpolatedPosition;
 
 	protected:
-		inline SpriteInfo(Type type) : mType(type) {}
-		inline ~SpriteInfo() {}
-		void serialize(VectorBinarySerializer& serializer, uint8 formatVersion);
-
-	private:
-		const Type mType = Type::INVALID;
+		inline SpriteInfo(Type type) : RenderItem(type) {}
+		virtual void serialize(VectorBinarySerializer& serializer, uint8 formatVersion) override;
 	};
 
 	struct VdpSpriteInfo : public SpriteInfo
 	{
-		inline VdpSpriteInfo() : SpriteInfo(Type::VDP) {}
-		void serialize(VectorBinarySerializer& serializer, uint8 formatVersion);	// Not virtual, needs to be used with the correctly casted struct
+		inline VdpSpriteInfo() : SpriteInfo(Type::VDP_SPRITE) {}
+		virtual void serialize(VectorBinarySerializer& serializer, uint8 formatVersion) override;
 
 		Vec2i  mSize;				// In columns / rows of 8 pixels
 		uint16 mFirstPattern = 0;	// Incl. flip bits and atex
@@ -72,7 +52,7 @@ public:
 	struct CustomSpriteInfoBase : public SpriteInfo
 	{
 		inline CustomSpriteInfoBase(Type type) : SpriteInfo(type) {}
-		void serialize(VectorBinarySerializer& serializer, uint8 formatVersion);	// Not virtual, needs to be used with the correctly casted struct
+		virtual void serialize(VectorBinarySerializer& serializer, uint8 formatVersion) override;
 
 		uint64 mKey = 0;
 		const SpriteCache::CacheItem* mCacheItem = nullptr;
@@ -84,21 +64,21 @@ public:
 
 	struct PaletteSpriteInfo : public CustomSpriteInfoBase
 	{
-		inline PaletteSpriteInfo() : CustomSpriteInfoBase(Type::PALETTE) {}
-		void serialize(VectorBinarySerializer& serializer, uint8 formatVersion);	// Not virtual, needs to be used with the correctly casted struct
+		inline PaletteSpriteInfo() : CustomSpriteInfoBase(Type::PALETTE_SPRITE) {}
+		virtual void serialize(VectorBinarySerializer& serializer, uint8 formatVersion) override;
 
 		uint16 mAtex = 0;
 	};
 
 	struct ComponentSpriteInfo : public CustomSpriteInfoBase
 	{
-		inline ComponentSpriteInfo() : CustomSpriteInfoBase(Type::COMPONENT) {}
+		inline ComponentSpriteInfo() : CustomSpriteInfoBase(Type::COMPONENT_SPRITE) {}
 	};
 
 	struct SpriteMaskInfo : public SpriteInfo
 	{
-		inline SpriteMaskInfo() : SpriteInfo(Type::MASK) {}
-		void serialize(VectorBinarySerializer& serializer, uint8 formatVersion);
+		inline SpriteMaskInfo() : SpriteInfo(Type::SPRITE_MASK) {}
+		virtual void serialize(VectorBinarySerializer& serializer, uint8 formatVersion) override;
 
 		Vec2i mSize;
 		float mDepth = 0.0f;
@@ -128,12 +108,14 @@ public:
 
 public:
 	SpriteManager(PatternManager& patternManager, SpacesManager& spacesManager);
+	inline ~SpriteManager()  { clear(); }
 
-	void reset();
-	void resetSprites();
+	void clear();
 	void preFrameUpdate();
 	void postFrameUpdate();
-	void refresh();
+
+	inline bool shouldResetSprites() const  { return mResetSprites; }
+	void resetSprites();
 
 	void drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, const Color& tintColor = Color::WHITE, const Color& addedColor = Color::TRANSPARENT);
 	void drawCustomSprite(uint64 key, const Vec2i& position, uint16 atex, uint8 flags, uint16 renderQueue, const Color& tintColor = Color::WHITE, float angle = 0.0f, float scale = 1.0f);
@@ -148,7 +130,7 @@ public:
 	void clearSpriteTag();
 	void setSpriteTagWithPosition(uint64 spriteTag, const Vec2i& position);
 
-	inline const std::vector<SpriteInfo*>& getSprites() const  { return mSprites; }
+	inline const std::vector<RenderItem*>& getSprites() const  { return mSprites; }
 
 	inline uint16 getSpriteAttributeTableBase() const  { return mSpriteAttributeTableBase; }
 	inline void setSpriteAttributeTableBase(uint16 vramAddress)  { mSpriteAttributeTableBase = vramAddress; }
@@ -159,18 +141,15 @@ public:
 	bool mLegacyVdpSpriteMode = false;
 
 private:
-	struct SpriteSets
+	struct SpriteSet
 	{
-		std::vector<VdpSpriteInfo>		 mVdpSprites;
-		std::vector<PaletteSpriteInfo>	 mPaletteSprites;
-		std::vector<ComponentSpriteInfo> mComponentSprites;
-		std::vector<SpriteMaskInfo>		 mSpriteMasks;
-
-		void clear();
-		void swap(SpriteSets& other);
+		std::vector<RenderItem*> mItems;
 	};
 
 private:
+	void clearSpriteSet(SpriteSet& spriteSet);
+	void destroyRenderItem(RenderItem& renderItem);
+
 	CustomSpriteInfoBase* addSpriteByKey(uint64 key);
 	void checkSpriteTag(SpriteInfo& sprite);
 	void collectLegacySprites();
@@ -183,9 +162,9 @@ private:
 	bool mResetSprites = false;
 	Space mLogicalSpriteSpace = Space::SCREEN;
 
-	SpriteSets mCurrSpriteSets;
-	SpriteSets mNextSpriteSets;
-	std::vector<SpriteInfo*> mSprites;
+	SpriteSet mCurrSpriteSet;
+	SpriteSet mNextSpriteSet;
+	std::vector<RenderItem*> mSprites;
 	uint32 mNextSpriteHandle = 1;
 
 	std::unordered_map<uint32, SpriteHandleData> mSpritesHandles;
@@ -201,4 +180,9 @@ private:
 	Vec2i mTaggedSpritePosition;
 	std::unordered_map<uint64, TaggedSpriteData> mTaggedSpritesLastFrame;
 	std::unordered_map<uint64, TaggedSpriteData> mTaggedSpritesThisFrame;
+
+	ObjectPool<VdpSpriteInfo>		mPoolOfVdpSprites;
+	ObjectPool<PaletteSpriteInfo>	mPoolOfPaletteSprites;
+	ObjectPool<ComponentSpriteInfo>	mPoolOfComponentSprites;
+	ObjectPool<SpriteMaskInfo>		mPoolOfSpriteMasks;
 };
