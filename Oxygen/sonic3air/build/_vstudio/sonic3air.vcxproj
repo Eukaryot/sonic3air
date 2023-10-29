@@ -58,6 +58,8 @@
     <ClCompile Include="..\..\source\sonic3air\menu\GameApp.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\GameMenuBase.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\GameMenuManager.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\helper\GameMenuControlsDisplay.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\helper\GameMenuScrolling.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\MainMenu.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\MenuBackground.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\mods\ModsMenu.cpp" />
@@ -107,6 +109,8 @@
     <ClInclude Include="..\..\source\sonic3air\menu\GameApp.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\GameMenuBase.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\GameMenuManager.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\helper\GameMenuControlsDisplay.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\helper\GameMenuScrolling.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\MainMenu.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\MenuBackground.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\mods\ModResources.h" />
