@@ -95,6 +95,8 @@ void ControllerSetupMenu::initialize()
 		entry.mMarginAbove += 5;
 		entry.setSelectedIndexByValue(ConfigurationImpl::instance().mGamepadVisualStyle);
 
+		const bool isGamepad = (nullptr != getSelectedDevice() && getSelectedDevice()->mType == InputConfig::DeviceType::GAMEPAD);
+		entry.setVisible(isGamepad);
 	}
 
 	// Back button
@@ -461,8 +463,8 @@ void ControllerSetupMenu::render()
 
 					if (isGamepad && buttonIndex < 12)
 					{
-						const DynamicSprites::GamepadStyle& style = DynamicSprites::GAMEPAD_STYLES[gamepadButtonStyle];
-						drawer.drawSprite(Vec2i(px - 3, py + 4), style.mSpriteKeys[buttonIndex], Color(1.0f, 1.0f, 1.0f, alpha));
+						const uint64 spriteKey = DynamicSprites::getGamepadSpriteKey(buttonIndex, gamepadButtonStyle);
+						drawer.drawSprite(Vec2i(px - 3, py + 4), spriteKey, Color(1.0f, 1.0f, 1.0f, alpha));
 					}
 				}
 			}

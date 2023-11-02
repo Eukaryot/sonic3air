@@ -35,6 +35,7 @@ public:
 	static const GamepadStyle GAMEPAD_STYLES[3];
 
 public:
+	static uint64 getGamepadSpriteKey(size_t controlIndex);
 	static uint64 getGamepadSpriteKey(size_t controlIndex, size_t style);
 
 public:

@@ -118,9 +118,17 @@ namespace
 }
 
 
-uint64 DynamicSprites::getGamepadSpriteKey(size_t index, size_t gamepadVariant)
+uint64 DynamicSprites::getGamepadSpriteKey(size_t buttonIndex)
 {
-	return uint64();
+	return getGamepadSpriteKey(buttonIndex, ConfigurationImpl::instance().mGamepadVisualStyle);
+}
+
+uint64 DynamicSprites::getGamepadSpriteKey(size_t buttonIndex, size_t style)
+{
+	style = std::min<size_t>(style, 2);
+	if (buttonIndex < 12)
+		return GAMEPAD_STYLES[style].mSpriteKeys[buttonIndex];
+	return 0;
 }
 
 void DynamicSprites::updateSpriteRedirects()
