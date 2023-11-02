@@ -8,8 +8,41 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/resources/DynamicSprites.h"
+#include "sonic3air/ConfigurationImpl.h"
 
 #include "oxygen/resources/SpriteCache.h"
+
+
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_UP    = rmx::getMurmur2_64("@input_icon_button_up");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_DOWN  = rmx::getMurmur2_64("@input_icon_button_down");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_LEFT  = rmx::getMurmur2_64("@input_icon_button_left");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_RIGHT = rmx::getMurmur2_64("@input_icon_button_right");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_A     = rmx::getMurmur2_64("@input_icon_button_A");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_B     = rmx::getMurmur2_64("@input_icon_button_B");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_X     = rmx::getMurmur2_64("@input_icon_button_X");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_Y     = rmx::getMurmur2_64("@input_icon_button_Y");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_START = rmx::getMurmur2_64("@input_icon_button_start");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_BACK  = rmx::getMurmur2_64("@input_icon_button_back");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_L     = rmx::getMurmur2_64("@input_icon_button_L");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_R     = rmx::getMurmur2_64("@input_icon_button_R");
+
+DynamicSprites::GamepadStyle::GamepadStyle(const std::string& identifier)
+{
+	mSpriteKeys[0]  = rmx::getMurmur2_64("input_icon_" + identifier + "_up");
+	mSpriteKeys[1]  = rmx::getMurmur2_64("input_icon_" + identifier + "_down");
+	mSpriteKeys[2]  = rmx::getMurmur2_64("input_icon_" + identifier + "_left");
+	mSpriteKeys[3]  = rmx::getMurmur2_64("input_icon_" + identifier + "_right");
+	mSpriteKeys[4]  = rmx::getMurmur2_64("input_icon_" + identifier + "_A");
+	mSpriteKeys[5]  = rmx::getMurmur2_64("input_icon_" + identifier + "_B");
+	mSpriteKeys[6]  = rmx::getMurmur2_64("input_icon_" + identifier + "_X");
+	mSpriteKeys[7]  = rmx::getMurmur2_64("input_icon_" + identifier + "_Y");
+	mSpriteKeys[8]  = rmx::getMurmur2_64("input_icon_" + identifier + "_start");
+	mSpriteKeys[9]  = rmx::getMurmur2_64("input_icon_" + identifier + "_back");
+	mSpriteKeys[10] = rmx::getMurmur2_64("input_icon_" + identifier + "_L");
+	mSpriteKeys[11] = rmx::getMurmur2_64("input_icon_" + identifier + "_R");
+}
+
+const DynamicSprites::GamepadStyle DynamicSprites::GAMEPAD_STYLES[3] = { GamepadStyle("xbox"), GamepadStyle("ps"), GamepadStyle("switch") };
 
 
 namespace
@@ -85,45 +118,40 @@ namespace
 }
 
 
+uint64 DynamicSprites::getGamepadSpriteKey(size_t index, size_t gamepadVariant)
+{
+	return uint64();
+}
+
 void DynamicSprites::updateSpriteRedirects()
 {
 	InputManager& inputManager = InputManager::instance();
 	const InputManager::InputType lastInputType = inputManager.getLastInputType();
+	const int gamepadVisualStyle = clamp(ConfigurationImpl::instance().mGamepadVisualStyle, 0, 2);
 	SpriteCache& spriteCache = SpriteCache::instance();
-	if (mLastInputType == lastInputType && mLastMappingsChangeCounter == inputManager.getMappingsChangeCounter() && mLastSpriteCacheChangeCounter == spriteCache.getGlobalChangeCounter())
+	if (mLastInputType == lastInputType && mLastGamepadVisualStyle == gamepadVisualStyle &&
+		mLastMappingsChangeCounter == inputManager.getMappingsChangeCounter() && mLastSpriteCacheChangeCounter == spriteCache.getGlobalChangeCounter())
 		return;
 
 	mLastInputType = lastInputType;
+	mLastGamepadVisualStyle = gamepadVisualStyle;
 	mLastMappingsChangeCounter = inputManager.getMappingsChangeCounter();
 	mLastSpriteCacheChangeCounter = spriteCache.getGlobalChangeCounter();
 
 	const InputManager::ControllerScheme& keys = inputManager.getController(0);
 
-	static const uint64 INPUT_ICON_BUTTON_A     = rmx::getMurmur2_64("@input_icon_button_A");
-	static const uint64 INPUT_ICON_BUTTON_B     = rmx::getMurmur2_64("@input_icon_button_B");
-	static const uint64 INPUT_ICON_BUTTON_X     = rmx::getMurmur2_64("@input_icon_button_X");
-	static const uint64 INPUT_ICON_BUTTON_Y     = rmx::getMurmur2_64("@input_icon_button_Y");
-	static const uint64 INPUT_ICON_BUTTON_LEFT  = rmx::getMurmur2_64("@input_icon_button_left");
-	static const uint64 INPUT_ICON_BUTTON_RIGHT = rmx::getMurmur2_64("@input_icon_button_right");
-	static const uint64 INPUT_ICON_BUTTON_UP    = rmx::getMurmur2_64("@input_icon_button_up");
-	static const uint64 INPUT_ICON_BUTTON_DOWN  = rmx::getMurmur2_64("@input_icon_button_down");
-	static const uint64 INPUT_ICON_BUTTON_START = rmx::getMurmur2_64("@input_icon_button_start");
-	static const uint64 INPUT_ICON_BUTTON_BACK  = rmx::getMurmur2_64("@input_icon_button_back");
-	static const uint64 INPUT_ICON_BUTTON_L     = rmx::getMurmur2_64("@input_icon_button_L");
-	static const uint64 INPUT_ICON_BUTTON_R     = rmx::getMurmur2_64("@input_icon_button_R");
-
 	switch (mLastInputType)
 	{
 		case InputManager::InputType::KEYBOARD:
 		{
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_UP,    getKeyboardIconSpriteKey(keys.Up));
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  getKeyboardIconSpriteKey(keys.Down));
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_LEFT,  getKeyboardIconSpriteKey(keys.Left));
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_RIGHT, getKeyboardIconSpriteKey(keys.Right));
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     getKeyboardIconSpriteKey(keys.A));
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     getKeyboardIconSpriteKey(keys.B));
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_X,     getKeyboardIconSpriteKey(keys.X));
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_Y,     getKeyboardIconSpriteKey(keys.Y));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_LEFT,  getKeyboardIconSpriteKey(keys.Left));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_RIGHT, getKeyboardIconSpriteKey(keys.Right));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_UP,    getKeyboardIconSpriteKey(keys.Up));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  getKeyboardIconSpriteKey(keys.Down));
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, getKeyboardIconSpriteKey(keys.Start));
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  getKeyboardIconSpriteKey(keys.Back));
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_L,     getKeyboardIconSpriteKey(keys.L));
@@ -133,27 +161,27 @@ void DynamicSprites::updateSpriteRedirects()
 
 		case InputManager::InputType::TOUCH:
 		{
+			static const uint64 INPUT_ICON_TOUCH_UP    = rmx::getMurmur2_64("input_icon_touch_up");
+			static const uint64 INPUT_ICON_TOUCH_DOWN  = rmx::getMurmur2_64("input_icon_touch_down");
+			static const uint64 INPUT_ICON_TOUCH_LEFT  = rmx::getMurmur2_64("input_icon_touch_left");
+			static const uint64 INPUT_ICON_TOUCH_RIGHT = rmx::getMurmur2_64("input_icon_touch_right");
 			static const uint64 INPUT_ICON_TOUCH_A     = rmx::getMurmur2_64("input_icon_touch_A");
 			static const uint64 INPUT_ICON_TOUCH_B     = rmx::getMurmur2_64("input_icon_touch_B");
 			static const uint64 INPUT_ICON_TOUCH_X     = rmx::getMurmur2_64("input_icon_touch_X");
 			static const uint64 INPUT_ICON_TOUCH_Y     = rmx::getMurmur2_64("input_icon_touch_Y");
-			static const uint64 INPUT_ICON_TOUCH_LEFT  = rmx::getMurmur2_64("input_icon_touch_left");
-			static const uint64 INPUT_ICON_TOUCH_RIGHT = rmx::getMurmur2_64("input_icon_touch_right");
-			static const uint64 INPUT_ICON_TOUCH_UP    = rmx::getMurmur2_64("input_icon_touch_up");
-			static const uint64 INPUT_ICON_TOUCH_DOWN  = rmx::getMurmur2_64("input_icon_touch_down");
 			static const uint64 INPUT_ICON_TOUCH_START = rmx::getMurmur2_64("input_icon_touch_start");
 			static const uint64 INPUT_ICON_TOUCH_BACK  = rmx::getMurmur2_64("input_icon_touch_back");
 			static const uint64 INPUT_ICON_TOUCH_L     = rmx::getMurmur2_64("input_icon_touch_L");
 			static const uint64 INPUT_ICON_TOUCH_R     = rmx::getMurmur2_64("input_icon_touch_R");
 
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_UP,    INPUT_ICON_TOUCH_UP);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  INPUT_ICON_TOUCH_DOWN);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_LEFT,  INPUT_ICON_TOUCH_LEFT);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_RIGHT, INPUT_ICON_TOUCH_RIGHT);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     INPUT_ICON_TOUCH_A);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     INPUT_ICON_TOUCH_B);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_X,     INPUT_ICON_TOUCH_X);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_Y,     INPUT_ICON_TOUCH_Y);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_LEFT,  INPUT_ICON_TOUCH_LEFT);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_RIGHT, INPUT_ICON_TOUCH_RIGHT);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_UP,    INPUT_ICON_TOUCH_UP);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  INPUT_ICON_TOUCH_DOWN);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, INPUT_ICON_TOUCH_START);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  INPUT_ICON_TOUCH_BACK);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_L,     INPUT_ICON_TOUCH_L);
@@ -164,31 +192,19 @@ void DynamicSprites::updateSpriteRedirects()
 		default:
 		case InputManager::InputType::GAMEPAD:
 		{
-			static const uint64 INPUT_ICON_XBOX_A     = rmx::getMurmur2_64("input_icon_xbox_A");
-			static const uint64 INPUT_ICON_XBOX_B     = rmx::getMurmur2_64("input_icon_xbox_B");
-			static const uint64 INPUT_ICON_XBOX_X     = rmx::getMurmur2_64("input_icon_xbox_X");
-			static const uint64 INPUT_ICON_XBOX_Y     = rmx::getMurmur2_64("input_icon_xbox_Y");
-			static const uint64 INPUT_ICON_XBOX_LEFT  = rmx::getMurmur2_64("input_icon_xbox_left");
-			static const uint64 INPUT_ICON_XBOX_RIGHT = rmx::getMurmur2_64("input_icon_xbox_right");
-			static const uint64 INPUT_ICON_XBOX_UP    = rmx::getMurmur2_64("input_icon_xbox_up");
-			static const uint64 INPUT_ICON_XBOX_DOWN  = rmx::getMurmur2_64("input_icon_xbox_down");
-			static const uint64 INPUT_ICON_XBOX_START = rmx::getMurmur2_64("input_icon_xbox_start");
-			static const uint64 INPUT_ICON_XBOX_BACK  = rmx::getMurmur2_64("input_icon_xbox_back");
-			static const uint64 INPUT_ICON_XBOX_L     = rmx::getMurmur2_64("input_icon_xbox_L");
-			static const uint64 INPUT_ICON_XBOX_R     = rmx::getMurmur2_64("input_icon_xbox_R");
-
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     INPUT_ICON_XBOX_A);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     INPUT_ICON_XBOX_B);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_X,     INPUT_ICON_XBOX_X);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_Y,     INPUT_ICON_XBOX_Y);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_LEFT,  INPUT_ICON_XBOX_LEFT);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_RIGHT, INPUT_ICON_XBOX_RIGHT);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_UP,    INPUT_ICON_XBOX_UP);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  INPUT_ICON_XBOX_DOWN);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, INPUT_ICON_XBOX_START);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  INPUT_ICON_XBOX_BACK);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_L,     INPUT_ICON_XBOX_L);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_R,     INPUT_ICON_XBOX_R);
+			const size_t style = clamp(gamepadVisualStyle, 0, 2);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_UP,    GAMEPAD_STYLES[style].mSpriteKeys[0]);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  GAMEPAD_STYLES[style].mSpriteKeys[1]);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_LEFT,  GAMEPAD_STYLES[style].mSpriteKeys[2]);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_RIGHT, GAMEPAD_STYLES[style].mSpriteKeys[3]);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     GAMEPAD_STYLES[style].mSpriteKeys[4]);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     GAMEPAD_STYLES[style].mSpriteKeys[5]);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_X,     GAMEPAD_STYLES[style].mSpriteKeys[6]);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_Y,     GAMEPAD_STYLES[style].mSpriteKeys[7]);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, GAMEPAD_STYLES[style].mSpriteKeys[8]);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  GAMEPAD_STYLES[style].mSpriteKeys[9]);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_L,     GAMEPAD_STYLES[style].mSpriteKeys[10]);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_R,     GAMEPAD_STYLES[style].mSpriteKeys[11]);
 			break;
 		}
 	}

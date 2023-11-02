@@ -10,6 +10,8 @@
 #include "sonic3air/menu/options/ControllerSetupMenu.h"
 #include "sonic3air/menu/options/OptionsMenu.h"
 #include "sonic3air/menu/SharedResources.h"
+#include "sonic3air/resources/DynamicSprites.h"
+#include "sonic3air/ConfigurationImpl.h"
 
 #include "oxygen/application/Application.h"
 #include "oxygen/helper/DrawerHelper.h"
@@ -22,6 +24,7 @@ namespace
 	{
 		CONTROLLER_SELECT,
 		ASSIGN_ALL,
+		VISUAL_STYLE,
 		BUTTON_UP		= 0x10,
 		BUTTON_DOWN		= 0x11,
 		BUTTON_LEFT		= 0x12,
@@ -79,9 +82,19 @@ void ControllerSetupMenu::initialize()
 	const char* buttonNames[NUM_BUTTONS] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back", "L", "R" };
 	for (size_t i = 0; i < NUM_BUTTONS; ++i)
 	{
-		// TODO: Add L/R as well by removing this check - they're left out because the screen is too small, and scrolling is not implemented here
+		// TODO: Optionally add L/R as well by removing this check
 		if (i < 10)
 			mMenuEntries.addEntry(buttonNames[i], ::BUTTON_UP + (uint32)i);
+	}
+
+	{
+		GameMenuEntry& entry = mMenuEntries.addEntry("Visual Style", ::VISUAL_STYLE);
+		entry.addOption("XBox", 0);
+		entry.addOption("PS", 1);
+		entry.addOption("Switch", 2);
+		entry.mMarginAbove += 5;
+		entry.setSelectedIndexByValue(ConfigurationImpl::instance().mGamepadVisualStyle);
+
 	}
 
 	// Back button
@@ -191,6 +204,25 @@ void ControllerSetupMenu::update(float timeElapsed)
 					result = mAssignmentType.update();
 				}
 			}
+			else if (result == GameMenuEntries::UpdateResult::OPTION_CHANGED)
+			{
+				switch (mMenuEntries.selected().mData)
+				{
+					case ::CONTROLLER_SELECT:
+					{
+						const bool isGamepad = (nullptr != getSelectedDevice() && getSelectedDevice()->mType == InputConfig::DeviceType::GAMEPAD);
+						mMenuEntries.getEntryByData(::VISUAL_STYLE)->setVisible(isGamepad);
+						break;
+					}
+
+					case ::VISUAL_STYLE:
+					{
+						ConfigurationImpl::instance().mGamepadVisualStyle = mMenuEntries.selected().selected().mValue;
+						break;
+					}
+				}
+			}
+
 			if (result != GameMenuEntries::UpdateResult::NONE)
 			{
 				GameMenuBase::playMenuSound(0x5b);
@@ -316,6 +348,10 @@ void ControllerSetupMenu::render()
 	const float alpha = mVisibility;
 	const bool showEmptyMenu = mControllerSelectEntry->mOptions.empty();
 
+	const InputManager::RealDevice* device = getSelectedDevice();
+	const bool isGamepad = (nullptr != device && device->mType == InputConfig::DeviceType::GAMEPAD);
+	const int gamepadButtonStyle = clamp(ConfigurationImpl::instance().mGamepadVisualStyle, 0, 2);
+
 	const int baseX = 200;
 	int py = startY;
 	if (showEmptyMenu)
@@ -342,6 +378,8 @@ void ControllerSetupMenu::render()
 	for (size_t line = 0; line < mMenuEntries.size(); ++line)
 	{
 		const auto& entry = mMenuEntries[line];
+		if (!entry.isVisible())
+			continue;
 		if (showEmptyMenu && entry.mData != ::_BACK)
 			continue;
 
@@ -359,13 +397,12 @@ void ControllerSetupMenu::render()
 		{
 			// Button entry
 			Font& font = global::mOxyfontSmall;
+			int px = isGamepad ? (baseX - 12) : baseX;
 
-			drawer.printText(font, Recti(baseX - 16, py, 0, 10), entry.mText, 6, color);
+			drawer.printText(font, Recti(px - 16, py, 0, 10), entry.mText, 6, color);
 
-			const InputManager::RealDevice* device = getSelectedDevice();
 			if (nullptr != device)
 			{
-				InputManager& inputManager = InputManager::instance();
 				const size_t buttonIndex = entry.mData - 0x10;
 				RMX_ASSERT(buttonIndex < device->mControlMappings.size(), "Invalid button index " << buttonIndex);
 				if (buttonIndex < device->mControlMappings.size())	// It's unclear how, but an invalid index is possible and led to crashes for some players
@@ -421,6 +458,12 @@ void ControllerSetupMenu::render()
 						drawer.printText(font, Recti(baseX + 16, py, 0, 10), assignmentsString1, 4, cyanColor);
 						drawer.printText(font, Recti(baseX + 16 + font.getWidth(assignmentsString1), py, 0, 10), assignmentsString2, 4, color);
 					}
+
+					if (isGamepad && buttonIndex < 12)
+					{
+						const DynamicSprites::GamepadStyle& style = DynamicSprites::GAMEPAD_STYLES[gamepadButtonStyle];
+						drawer.drawSprite(Vec2i(px - 3, py + 4), style.mSpriteKeys[buttonIndex], Color(1.0f, 1.0f, 1.0f, alpha));
+					}
 				}
 			}
 
@@ -429,7 +472,7 @@ void ControllerSetupMenu::render()
 				// Assignment type selection
 				const auto& entry = mAssignmentType.selected();
 
-				const int center = baseX - 92;
+				const int center = px - 100;
 				const std::string& text = entry.selected().mText;
 				drawer.printText(font, Recti(center, py, 0, 10), text, 5, color);
 
@@ -444,7 +487,7 @@ void ControllerSetupMenu::render()
 					drawer.printText(font, Recti(center + arrowDistance, py, 0, 10), ">", 5, color);
 			}
 
-			py += 12;
+			py += isGamepad ? 17 : 13;
 		}
 		else if (entry.mOptions.empty())
 		{
@@ -467,7 +510,7 @@ void ControllerSetupMenu::render()
 		else
 		{
 			// It's an actual options entry, with multiple options to choose from
-			py += 4;
+			py += 4 + entry.mMarginAbove;
 			Font& font = global::mOxyfontRegular;
 
 			const bool canGoLeft  = (entry.mSelectedIndex > 0);
@@ -481,8 +524,12 @@ void ControllerSetupMenu::render()
 				arrowDistance += ((offset > 3) ? (6 - offset) : offset);
 			}
 
-			// Description
-			drawer.printText(font, Recti(baseX - 40, py, 0, 10), entry.mText, 6, color);
+			if (!entry.mText.empty())
+			{
+				// Description
+				drawer.printText(font, Recti(baseX - 40, py, 0, 10), entry.mText, 6, color);
+				arrowDistance -= 50;
+			}
 
 			// Value text
 			{

@@ -45,6 +45,9 @@ public:
 	float mSoundVolume = 0.8f;
 	int mActiveSoundtrack = 1;		// 0 = emulated, 1 = remastered
 
+	// Input
+	int mGamepadVisualStyle = 0;
+
 	// Time Attack
 	int mInstantTimeAttackRestart = 0;
 

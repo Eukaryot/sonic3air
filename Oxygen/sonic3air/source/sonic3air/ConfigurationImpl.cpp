@@ -92,6 +92,9 @@ bool ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 	rootHelper.tryReadFloat("Audio_SoundVolume", mSoundVolume);
 	rootHelper.tryReadInt("ActiveSoundtrack", mActiveSoundtrack);
 
+	// Input
+	rootHelper.tryReadInt("GamepadVisualStyle", mGamepadVisualStyle);
+
 	// Game simulation
 	if (rootHelper.tryReadInt("SimulationFrequency", mSimulationFrequency))
 	{
@@ -162,6 +165,9 @@ void ConfigurationImpl::saveSettingsInternal(Json::Value& root, SettingsType set
 	root["Audio_MusicVolume"] = mMusicVolume;
 	root["Audio_SoundVolume"] = mSoundVolume;
 	root["ActiveSoundtrack"] = mActiveSoundtrack;
+
+	// Input
+	root["GamepadVisualStyle"] = mGamepadVisualStyle;
 
 	// Game simulation
 	if (mSimulationFrequency != 60)
