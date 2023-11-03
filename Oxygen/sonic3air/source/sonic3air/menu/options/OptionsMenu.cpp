@@ -901,7 +901,8 @@ void OptionsMenu::initialize()
 			if (mod->mSettingCategories.empty())
 				continue;
 
-			const bool visible = (mExpandedMods.count(mod->mLocalDirectoryHash) > 0);
+			// Check if mod  is expanded; if there's only one mod, that one is always expanded by default
+			const bool visible = (mExpandedMods.count(mod->mLocalDirectoryHash) > 0 || activeMods.size() == 1);
 			{
 				ModTitleMenuEntry& entry = entries.addEntry<ModTitleMenuEntry>().initEntry(*mod);
 				entry.addOption("", 0);		// Collapsed

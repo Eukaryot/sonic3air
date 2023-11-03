@@ -100,7 +100,7 @@ void ModTitleMenuEntry::renderEntry(RenderContext& renderContext_)
 	const bool isActive = (mSelectedIndex > 0);
 	const Color color = isSelected ? Color(1.0f, 1.0f, 0.0f, alpha) : Color(0.7f, 1.0f, 0.9f, alpha);
 
-	const float targetIndent = isActive ? 30.0f : 20.0f;
+	const float targetIndent = isActive ? 20.0f : 30.0f;
 	if (mIndent == 0.0f)
 		mIndent = targetIndent;
 	mIndent = moveTowards(mIndent, targetIndent, renderContext.mDeltaSeconds * 250.0f);
