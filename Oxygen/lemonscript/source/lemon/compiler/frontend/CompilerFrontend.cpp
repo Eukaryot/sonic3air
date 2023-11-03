@@ -507,7 +507,7 @@ namespace lemon
 				{
 					UndefinedNode& un = node.as<UndefinedNode>();
 					Node* newNode = processUndefinedNode(un, function, scopeContext, nodesIterator);
-					if (newNode != nullptr)
+					if (nullptr != newNode)
 					{
 						newNode->setLineNumber(node.getLineNumber());
 
@@ -800,7 +800,7 @@ namespace lemon
 				{
 					UndefinedNode& un = nextNode.as<UndefinedNode>();
 					Node* newNode = processUndefinedNode(un, function, scopeContext, nodesIterator);
-					if (newNode != nullptr)
+					if (nullptr != newNode)
 					{
 						newNode->setLineNumber(un.getLineNumber());
 					}

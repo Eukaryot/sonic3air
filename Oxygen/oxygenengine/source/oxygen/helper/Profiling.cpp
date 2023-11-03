@@ -61,7 +61,7 @@ void Profiling::pushRegion(uint16 id)
 	region->mOnStack = true;
 	region->mTimer.resumeTiming();
 
-	if (region->mParent == nullptr)
+	if (nullptr == region->mParent)
 	{
 		region->mParent = mRegionStack[mRegionStack.size() - 2];
 		region->mParent->mChildren.push_back(region);

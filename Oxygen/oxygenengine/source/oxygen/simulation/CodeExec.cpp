@@ -388,13 +388,13 @@ void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enfo
 		mLemonScriptRuntime.getInternalLemonRuntime().clearAllControlFlows();
 
 		bool success = false;
-		if (serializedRuntimeState != nullptr && !serializedRuntimeState->empty())
+		if (nullptr != serializedRuntimeState && !serializedRuntimeState->empty())
 		{
 			VectorBinarySerializer serializer(true, *serializedRuntimeState);
 			success = getLemonScriptRuntime().serializeRuntime(serializer);
 		}
 
-		if (enforcedCallStack != nullptr && !enforcedCallStack->empty())
+		if (nullptr != enforcedCallStack && !enforcedCallStack->empty())
 		{
 			for (const auto& pair : *enforcedCallStack)
 			{

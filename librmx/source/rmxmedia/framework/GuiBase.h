@@ -51,10 +51,10 @@ public:
 	const String& getName() const		{ return mName; }
 
 	virtual void setEnabled(bool value)	{ mEnabled = value; }
-	bool isEnabled() const				{ return mEnabled && (mParent != nullptr); }
+	bool isEnabled() const				{ return mEnabled && (nullptr != mParent); }
 
 	virtual void setVisible(bool value)	{ mVisible = value; }
-	bool isVisible() const				{ return mVisible && (mParent != nullptr); }
+	bool isVisible() const				{ return mVisible && (nullptr != mParent); }
 
 	void setAlpha(float alpha);
 	float getAlpha() const  { return mAlpha; }

@@ -14,7 +14,7 @@ template<class CLASS> class SingleInstance
 public:
 	static bool hasInstance()
 	{
-		return (mSingleInstance != nullptr);
+		return (nullptr != mSingleInstance);
 	}
 
 	static CLASS& instance()
@@ -25,7 +25,7 @@ public:
 protected:
 	SingleInstance()
 	{
-		// TODO: Sanity check: (mSingleInstance == nullptr)
+		// TODO: Sanity check: (nullptr == mSingleInstance)
 		mSingleInstance = static_cast<CLASS*>(this);
 	}
 
