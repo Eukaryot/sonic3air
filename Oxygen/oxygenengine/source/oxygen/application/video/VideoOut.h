@@ -112,6 +112,6 @@ private:
 	GeometryFactory mGeometryFactory;
 
 	bool mDebugDrawRenderingRequested = false;
-	bool mPreviouslyHadOutsideFrameDebugDraws = false;
+	bool mPreviouslyHadNewRenderItems = false;
 	bool mRequireGameScreenUpdate = false;
 };

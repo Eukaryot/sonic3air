@@ -45,60 +45,7 @@ void SpriteManager::preFrameUpdate()
 void SpriteManager::postFrameUpdate()
 {
 	// Process sprite handles
-	for (const auto& [key, data] : mSpritesHandles)
-	{
-		renderitems::CustomSpriteInfoBase* spritePtr = addSpriteByKey(data.mKey);
-		if (nullptr == spritePtr)
-			continue;
-
-		renderitems::CustomSpriteInfoBase& sprite = *spritePtr;
-		sprite.mPosition = data.mPosition;
-		sprite.mRenderQueue = data.mRenderQueue;
-		sprite.mPriorityFlag = data.mPriorityFlag;
-		sprite.mTintColor = data.mTintColor;
-		sprite.mAddedColor = data.mAddedColor;
-		sprite.mUseGlobalComponentTint = data.mUseGlobalComponentTint;
-		sprite.mBlendMode = data.mBlendMode;
-		sprite.mCoordinatesSpace = data.mCoordinatesSpace;
-		sprite.mUseUpscaledSprite = data.mUseUpscaledSprite;
-
-		if (data.mRotation != 0.0f || data.mScale != Vec2f(1.0f, 1.0f))
-		{
-			sprite.mTransformation.setRotationAndScale(data.mRotation, data.mScale);
-		}
-		else
-		{
-			sprite.mTransformation = data.mTransformation;
-		}
-
-		if (data.mFlipX)
-		{
-			sprite.mTransformation.flipX();
-		}
-		if (data.mFlipY)
-		{
-			sprite.mTransformation.flipY();
-		}
-
-		if (sprite.getType() == RenderItem::Type::PALETTE_SPRITE)
-		{
-			static_cast<renderitems::PaletteSpriteInfo&>(sprite).mAtex = data.mAtex;
-		}
-
-		if (data.mSpriteTag != 0)
-		{
-			const auto it = mTaggedSpritesLastFrame.find(data.mSpriteTag);
-			if (it != mTaggedSpritesLastFrame.end())
-			{
-				sprite.mHasLastPosition = true;
-				sprite.mLastPositionChange = data.mTaggedSpritePosition - it->second.mPosition;
-			}
-
-			TaggedSpriteData& taggedSpriteData = mTaggedSpritesThisFrame[data.mSpriteTag];
-			taggedSpriteData.mPosition = data.mTaggedSpritePosition;
-		}
-	}
-	mSpritesHandles.clear();
+	processSpriteHandles();
 
 	// Process render items
 	{
@@ -107,12 +54,8 @@ void SpriteManager::postFrameUpdate()
 			clearAllContexts();
 		}
 
-		// Add render items from "next" to "current", in reverse order
-		for (auto it = mAddedItems.mItems.rbegin(); it != mAddedItems.mItems.rend(); ++it)
-		{
-			getItemsByContext((*it)->mLifetimeContext).mItems.push_back(*it);
-		}
-		mAddedItems.mItems.clear();		// Intentionally not using anything like "clearLifetimeContext" here, as it would invalidate the copied instances
+		// Apply added render items
+		grabAddedSprites();
 
 		clearLifetimeContext(RenderItem::LifetimeContext::OUTSIDE_FRAME);
 		mCurrentContext = RenderItem::LifetimeContext::OUTSIDE_FRAME;
@@ -162,6 +105,11 @@ void SpriteManager::postFrameUpdate()
 			}
 		}
 	}
+}
+
+void SpriteManager::postRefreshDebugging()
+{
+	grabAddedSprites();
 }
 
 void SpriteManager::drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, const Color& tintColor, const Color& addedColor)
@@ -500,6 +448,74 @@ void SpriteManager::checkSpriteTag(renderitems::SpriteInfo& sprite)
 		TaggedSpriteData& taggedSpriteData = mTaggedSpritesThisFrame[mSpriteTag];
 		taggedSpriteData.mPosition = mTaggedSpritePosition;
 	}
+}
+
+void SpriteManager::processSpriteHandles()
+{
+	for (const auto& [key, data] : mSpritesHandles)
+	{
+		renderitems::CustomSpriteInfoBase* spritePtr = addSpriteByKey(data.mKey);
+		if (nullptr == spritePtr)
+			continue;
+
+		renderitems::CustomSpriteInfoBase& sprite = *spritePtr;
+		sprite.mPosition = data.mPosition;
+		sprite.mRenderQueue = data.mRenderQueue;
+		sprite.mPriorityFlag = data.mPriorityFlag;
+		sprite.mTintColor = data.mTintColor;
+		sprite.mAddedColor = data.mAddedColor;
+		sprite.mUseGlobalComponentTint = data.mUseGlobalComponentTint;
+		sprite.mBlendMode = data.mBlendMode;
+		sprite.mCoordinatesSpace = data.mCoordinatesSpace;
+		sprite.mUseUpscaledSprite = data.mUseUpscaledSprite;
+
+		if (data.mRotation != 0.0f || data.mScale != Vec2f(1.0f, 1.0f))
+		{
+			sprite.mTransformation.setRotationAndScale(data.mRotation, data.mScale);
+		}
+		else
+		{
+			sprite.mTransformation = data.mTransformation;
+		}
+
+		if (data.mFlipX)
+		{
+			sprite.mTransformation.flipX();
+		}
+		if (data.mFlipY)
+		{
+			sprite.mTransformation.flipY();
+		}
+
+		if (sprite.getType() == RenderItem::Type::PALETTE_SPRITE)
+		{
+			static_cast<renderitems::PaletteSpriteInfo&>(sprite).mAtex = data.mAtex;
+		}
+
+		if (data.mSpriteTag != 0)
+		{
+			const auto it = mTaggedSpritesLastFrame.find(data.mSpriteTag);
+			if (it != mTaggedSpritesLastFrame.end())
+			{
+				sprite.mHasLastPosition = true;
+				sprite.mLastPositionChange = data.mTaggedSpritePosition - it->second.mPosition;
+			}
+
+			TaggedSpriteData& taggedSpriteData = mTaggedSpritesThisFrame[data.mSpriteTag];
+			taggedSpriteData.mPosition = data.mTaggedSpritePosition;
+		}
+	}
+	mSpritesHandles.clear();
+}
+
+void SpriteManager::grabAddedSprites()
+{
+	// Add render items from "next" to "current", in reverse order
+	for (auto it = mAddedItems.mItems.rbegin(); it != mAddedItems.mItems.rend(); ++it)
+	{
+		getItemsByContext((*it)->mLifetimeContext).mItems.push_back(*it);
+	}
+	mAddedItems.mItems.clear();		// Intentionally not using anything like "clearLifetimeContext" here, as it would invalidate the copied instances
 }
 
 void SpriteManager::collectLegacySprites()

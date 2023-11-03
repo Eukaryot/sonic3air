@@ -518,19 +518,14 @@ namespace
 		RenderParts::instance().getPaletteManager().setGlobalComponentTint(tintColor, addedColor);
 	}
 
-	void debugDrawRect(int32 px, int32 py, int32 width, int32 height)
-	{
-		RenderParts::instance().getSpriteManager().addRectangle(Recti(px, py, width, height), Color(1.0f, 0.0f, 1.0f, 0.75f), 0xffff, SpacesManager::Space::WORLD, false);
-	}
-
-	void debugDrawRect2(int32 px, int32 py, int32 width, int32 height, uint32 color)
-	{
-		RenderParts::instance().getSpriteManager().addRectangle(Recti(px, py, width, height), Color::fromRGBA32(color), 0xffff, SpacesManager::Space::WORLD, false);
-	}
-
 	void Renderer_drawRect(int32 px, int32 py, int32 width, int32 height, uint32 color, uint16 renderQueue, bool useWorldSpace)
 	{
 		RenderParts::instance().getSpriteManager().addRectangle(Recti(px, py, width, height), Color::fromRGBA32(color), renderQueue, useWorldSpace ? SpacesManager::Space::WORLD : SpacesManager::Space::SCREEN, false);
+	}
+
+	void Renderer_drawRect2(int32 px, int32 py, int32 width, int32 height, uint32 color, uint16 renderQueue, bool useWorldSpace, bool useGlobalComponentTint)
+	{
+		RenderParts::instance().getSpriteManager().addRectangle(Recti(px, py, width, height), Color::fromRGBA32(color), renderQueue, useWorldSpace ? SpacesManager::Space::WORLD : SpacesManager::Space::SCREEN, useGlobalComponentTint);
 	}
 
 	void Renderer_drawText(lemon::StringRef fontKey, int32 px, int32 py, lemon::StringRef text, uint32 tintColor, uint8 alignment, int8 spacing, uint16 renderQueue, bool useWorldSpace, bool useGlobalComponentTint)
@@ -1132,27 +1127,23 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		.setParameterInfo(1, "px")
 		.setParameterInfo(2, "py");
 
-	module.addNativeFunction("Debug.drawRect", lemon::wrap(&debugDrawRect), defaultFlags)
-		.setParameterInfo(0, "px")
-		.setParameterInfo(1, "py")
-		.setParameterInfo(2, "width")
-		.setParameterInfo(3, "height");
-
-	module.addNativeFunction("Debug.drawRect", lemon::wrap(&debugDrawRect2), defaultFlags)
-		.setParameterInfo(0, "px")
-		.setParameterInfo(1, "py")
-		.setParameterInfo(2, "width")
-		.setParameterInfo(3, "height")
-		.setParameterInfo(4, "color");
-
 	module.addNativeFunction("Renderer.drawRect", lemon::wrap(&Renderer_drawRect), defaultFlags)
 		.setParameterInfo(0, "px")
 		.setParameterInfo(1, "py")
 		.setParameterInfo(2, "width")
 		.setParameterInfo(3, "height")
 		.setParameterInfo(4, "color")
+		.setParameterInfo(5, "renderQueue");
+
+	module.addNativeFunction("Renderer.drawRect", lemon::wrap(&Renderer_drawRect2), defaultFlags)
+		.setParameterInfo(0, "px")
+		.setParameterInfo(1, "py")
+		.setParameterInfo(2, "width")
+		.setParameterInfo(3, "height")
+		.setParameterInfo(4, "color")
 		.setParameterInfo(5, "renderQueue")
-		.setParameterInfo(6, "useWorldSpace");
+		.setParameterInfo(6, "useWorldSpace")
+		.setParameterInfo(7, "useGlobalComponentTint");
 
 	module.addNativeFunction("Renderer.setScreenSize", lemon::wrap(&Renderer_setScreenSize), defaultFlags)
 		.setParameterInfo(0, "width")

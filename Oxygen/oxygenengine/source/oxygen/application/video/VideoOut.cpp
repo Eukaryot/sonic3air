@@ -69,7 +69,7 @@ void VideoOut::reset()
 	mFrameInterpolation.mUseInterpolationLastUpdate = false;
 	mFrameInterpolation.mUseInterpolationThisUpdate = false;
 	mDebugDrawRenderingRequested = false;
-	mPreviouslyHadOutsideFrameDebugDraws = false;
+	mPreviouslyHadNewRenderItems = false;
 }
 
 void VideoOut::handleActiveModsChanged()
@@ -524,9 +524,14 @@ void VideoOut::preRefreshDebugging()
 
 void VideoOut::postRefreshDebugging()
 {
-	const bool hasOutsideFrameRenderItems = !mRenderParts->getSpriteManager().getRenderItems(RenderItem::LifetimeContext::OUTSIDE_FRAME).empty();
-	mDebugDrawRenderingRequested = hasOutsideFrameRenderItems || mPreviouslyHadOutsideFrameDebugDraws;
-	mPreviouslyHadOutsideFrameDebugDraws = hasOutsideFrameRenderItems;
+	const bool hasNewRenderItems = !mRenderParts->getSpriteManager().getAddedItems().empty();
+	mDebugDrawRenderingRequested = hasNewRenderItems || mPreviouslyHadNewRenderItems;
+	mPreviouslyHadNewRenderItems = hasNewRenderItems;
+
+	if (hasNewRenderItems)
+	{
+		mRenderParts->getSpriteManager().postRefreshDebugging();
+	}
 }
 
 void VideoOut::renderDebugDraw(int debugDrawMode, const Recti& rect)

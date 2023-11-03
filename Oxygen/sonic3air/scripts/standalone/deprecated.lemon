@@ -41,14 +41,24 @@ function void Renderer.enforceClearScreen(u8 enabled)
 
 function void debugDrawRect(s32 px, s32 py, s32 width, s32 height)
 {
-	Debug.drawRect(px, py, width, height)
+	Renderer.drawRect(px, py, width, height, 0xff00ffc0, 0xffff, true)
 }
 
 function void debugDrawRect(s32 px, s32 py, s32 width, s32 height, u32 color)
 {
 	// Convert color from 0xAABBGGRR to 0xRRGGBBAA
 	color = convertColors32(color)
-	Debug.drawRect(px, py, width, height, color)
+	Renderer.drawRect(px, py, width, height, color, 0xffff, true)
+}
+
+function void Debug.drawRect(s32 px, s32 py, s32 width, s32 height)
+{
+	Renderer.drawRect(px, py, width, height, 0xff00ffc0, 0xffff, true)
+}
+
+function void Debug.drawRect(s32 px, s32 py, s32 width, s32 height, u32 color)
+{
+	Renderer.drawRect(px, py, width, height, color, 0xffff, true)
 }
 
 function void Game.onScreenFadedOutBeforeDataSelect()

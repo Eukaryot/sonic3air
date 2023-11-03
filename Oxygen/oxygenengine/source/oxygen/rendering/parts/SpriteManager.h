@@ -49,6 +49,7 @@ public:
 
 	void preFrameUpdate();
 	void postFrameUpdate();
+	void postRefreshDebugging();
 
 	inline void setResetRenderItems(bool reset)  { mResetRenderItems = reset; }
 
@@ -69,6 +70,7 @@ public:
 	void setSpriteTagWithPosition(uint64 spriteTag, const Vec2i& position);
 
 	inline const std::vector<RenderItem*>& getRenderItems(RenderItem::LifetimeContext context) const  { return mContexts[(int)context].mItems; }
+	inline const std::vector<RenderItem*>& getAddedItems() const  { return mAddedItems.mItems; }
 
 	inline uint16 getSpriteAttributeTableBase() const  { return mSpriteAttributeTableBase; }
 	inline void setSpriteAttributeTableBase(uint16 vramAddress)  { mSpriteAttributeTableBase = vramAddress; }
@@ -91,6 +93,9 @@ private:
 
 	renderitems::CustomSpriteInfoBase* addSpriteByKey(uint64 key);
 	void checkSpriteTag(renderitems::SpriteInfo& sprite);
+
+	void processSpriteHandles();
+	void grabAddedSprites();
 	void collectLegacySprites();
 
 private:
