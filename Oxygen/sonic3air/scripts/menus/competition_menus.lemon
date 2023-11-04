@@ -18,7 +18,7 @@ function void CompetitionMode.drawBackground(u8 atex)
 #if STANDALONE
 	// Replace background with widescreen version
 	Renderer.enableDefaultPlane(0, false)
-	Renderer.drawCustomSprite("bg_dataselect", getScreenExtend() - 40, 0, atex, 0, 0x1100)
+	Renderer.drawCustomSprite("bg_dataselect", s16(getScreenWidth() - 512) / 2, 0, atex, 0, 0x1100)
 #endif
 }
 
