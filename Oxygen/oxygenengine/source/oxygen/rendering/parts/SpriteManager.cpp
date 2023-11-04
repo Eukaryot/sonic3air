@@ -80,11 +80,9 @@ void SpriteManager::postFrameUpdate()
 			{
 				for (RenderItem* renderItem : mContexts[contextIndex].mItems)
 				{
-					RMX_ASSERT(renderItem->isSprite(), "Expected a sprite");
-					renderitems::SpriteInfo& sprite = static_cast<renderitems::SpriteInfo&>(*renderItem);
-					if (sprite.mCoordinatesSpace == SpriteManager::Space::WORLD)
+					if (renderItem->mCoordinatesSpace == SpriteManager::Space::WORLD)
 					{
-						sprite.mPosition -= worldSpaceOffset;
+						renderItem->mPosition -= worldSpaceOffset;
 					}
 				}
 			}
@@ -98,9 +96,11 @@ void SpriteManager::postFrameUpdate()
 			{
 				for (RenderItem* renderItem : mContexts[contextIndex].mItems)
 				{
-					RMX_ASSERT(renderItem->isSprite(), "Expected a sprite");
-					renderitems::SpriteInfo& sprite = static_cast<renderitems::SpriteInfo&>(*renderItem);
-					sprite.mLastPositionChange.clear();
+					if (renderItem->isSprite())
+					{
+						renderitems::SpriteInfo& sprite = static_cast<renderitems::SpriteInfo&>(*renderItem);
+						sprite.mLastPositionChange.clear();
+					}
 				}
 			}
 		}
@@ -260,7 +260,8 @@ void SpriteManager::addRectangle(const Recti& rect, const Color& color, uint16 r
 	}
 
 	renderitems::Rectangle& newRect = mPoolOfRenderItems.mRectangles.createObject();
-	newRect.mRect = rect;
+	newRect.mPosition = rect.getPos();
+	newRect.mSize = rect.getSize();
 	newRect.mColor = color;
 	newRect.mRenderQueue = renderQueue;
 	newRect.mCoordinatesSpace = space;

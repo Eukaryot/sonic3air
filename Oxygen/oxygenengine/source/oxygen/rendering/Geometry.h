@@ -82,13 +82,13 @@ public:
 class TexturedRectGeometry : public Geometry
 {
 public:
-	inline TexturedRectGeometry(const Recti& rect, DrawerTexture& drawerTexture, const Color& color, bool useGlobalComponentTint) : Geometry(Type::TEXTURED_RECT), mRect(rect), mDrawerTexture(drawerTexture), mColor(color), mUseGlobalComponentTint(useGlobalComponentTint) {}
+	inline TexturedRectGeometry(const Recti& rect, DrawerTexture& drawerTexture, const Color& tintColor, const Color& addedColor) : Geometry(Type::TEXTURED_RECT), mRect(rect), mDrawerTexture(drawerTexture), mTintColor(tintColor), mAddedColor(addedColor) {}
 
 public:
 	Recti mRect;
 	DrawerTexture& mDrawerTexture;
-	Color mColor;
-	bool mUseGlobalComponentTint;
+	Color mTintColor;
+	Color mAddedColor;
 };
 
 
@@ -130,9 +130,9 @@ public:
 		return mRectGeometryBuffer.createObject(rect, color);
 	}
 
-	TexturedRectGeometry& createTexturedRectGeometry(const Recti& rect, DrawerTexture& drawerTexture, const Color& color, bool useGlobalComponentTint)
+	TexturedRectGeometry& createTexturedRectGeometry(const Recti& rect, DrawerTexture& drawerTexture, const Color& tintColor, const Color& addedColor)
 	{
-		return mTexturedRectGeometryBuffer.createObject(rect, drawerTexture, color, useGlobalComponentTint);
+		return mTexturedRectGeometryBuffer.createObject(rect, drawerTexture, tintColor, addedColor);
 	}
 
 	EffectBlurGeometry& createEffectBlurGeometry(int blurValue)

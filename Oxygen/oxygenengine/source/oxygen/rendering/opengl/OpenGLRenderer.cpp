@@ -492,19 +492,11 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			transform.z = tg.mRect.width / (float)mGameResolution.x * 2.0f;
 			transform.w = tg.mRect.height / (float)mGameResolution.y * 2.0f;
 
-			Color tintColor = tg.mColor;
-			Color addedColor = Color::TRANSPARENT;
-			if (tg.mUseGlobalComponentTint)
-			{
-				tintColor *= mRenderParts.getPaletteManager().getGlobalComponentTintColor();
-				addedColor = mRenderParts.getPaletteManager().getGlobalComponentAddedColor();
-			}
-
 			Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(true, true);
 			shader.bind();
 			shader.setParam("Transform", transform);
-			shader.setParam("TintColor", tintColor);
-			shader.setParam("AddedColor", addedColor);
+			shader.setParam("TintColor", tg.mTintColor);
+			shader.setParam("AddedColor", tg.mAddedColor);
 			shader.setTexture("Texture", texture->getTextureHandle(), GL_TEXTURE_2D);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			break;

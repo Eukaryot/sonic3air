@@ -354,13 +354,19 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 						const renderitems::Rectangle& rectangle = static_cast<const renderitems::Rectangle&>(*renderItem);
 
 						// Translate rect
-						Recti screenRect = rectangle.mRect;
+						Vec2i screenPos = rectangle.mPosition;
 						if (rectangle.mCoordinatesSpace == SpacesManager::Space::WORLD)
 						{
-							screenRect -= worldSpaceOffset;
+							screenPos -= worldSpaceOffset;
 						}
 
-						Geometry& geometry = mGeometryFactory.createRectGeometry(screenRect, rectangle.mColor);
+						Color color = rectangle.mColor;
+						if (rectangle.mUseGlobalComponentTint)
+						{
+							mRenderParts->getPaletteManager().applyGlobalComponentTint(color);
+						}
+
+						Geometry& geometry = mGeometryFactory.createRectGeometry(Recti(screenPos, rectangle.mSize), color);
 						geometry.mRenderQueue = rectangle.mRenderQueue;
 						geometries.push_back(&geometry);
 						break;
@@ -394,7 +400,14 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 							const Vec2i drawPosition = Font::applyAlignment(Recti(screenPosition, Vec2i(0, 0)), cacheItem->mInnerRect, text.mAlignment);
 							const Recti rect(drawPosition, cacheItem->mTexture.getSize());
 
-							Geometry& geometry = mGeometryFactory.createTexturedRectGeometry(rect, cacheItem->mTexture, text.mColor, text.mUseGlobalComponentTint);
+							Color tintColor = text.mColor;
+							Color addedColor = Color::TRANSPARENT;
+							if (text.mUseGlobalComponentTint)
+							{
+								mRenderParts->getPaletteManager().applyGlobalComponentTint(tintColor, addedColor);
+							}
+
+							Geometry& geometry = mGeometryFactory.createTexturedRectGeometry(rect, cacheItem->mTexture, tintColor, addedColor);
 							geometry.mRenderQueue = text.mRenderQueue;
 							geometries.push_back(&geometry);
 						}

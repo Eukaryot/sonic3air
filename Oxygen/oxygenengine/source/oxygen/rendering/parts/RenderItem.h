@@ -45,6 +45,7 @@ public:
 	virtual void serialize(VectorBinarySerializer& serializer, uint8 formatVersion);
 
 public:
+	Vec2i mPosition;
 	uint16 mRenderQueue = 0;
 	SpacesManager::Space mCoordinatesSpace = SpacesManager::Space::WORLD;	// The coordinate system that the render item's position / rect is referring to
 	bool mUseGlobalComponentTint = true;
@@ -64,7 +65,6 @@ namespace renderitems
 	struct SpriteInfo : public RenderItem
 	{
 	public:
-		Vec2i  mPosition;
 		bool   mPriorityFlag = false;
 		Color  mTintColor = Color::WHITE;
 		Color  mAddedColor = Color::TRANSPARENT;
@@ -130,7 +130,7 @@ namespace renderitems
 		inline Rectangle() : RenderItem(Type::RECTANGLE) {}
 		virtual void serialize(VectorBinarySerializer& serializer, uint8 formatVersion) override;
 
-		Recti mRect;
+		Vec2i mSize;
 		Color mColor;
 	};
 
@@ -141,7 +141,6 @@ namespace renderitems
 
 		std::string mFontKeyString;
 		uint64 mFontKeyHash = 0;
-		Vec2i mPosition;
 		std::string mTextString;
 		uint64 mTextHash = 0;
 		Color mColor;

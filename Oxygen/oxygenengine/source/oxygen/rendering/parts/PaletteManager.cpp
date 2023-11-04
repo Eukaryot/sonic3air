@@ -207,6 +207,23 @@ void PaletteManager::setGlobalComponentTint(const Vec4f& tintColor, const Vec4f&
 	mGlobalComponentAddedColor = addedColor;
 }
 
+void PaletteManager::applyGlobalComponentTint(Color& color) const
+{
+	if (mUsesGlobalComponentTint)
+	{
+		color = mGlobalComponentAddedColor + color * mGlobalComponentTintColor;
+	}
+}
+
+void PaletteManager::applyGlobalComponentTint(Color& tintColor, Color& addedColor) const
+{
+	if (mUsesGlobalComponentTint)
+	{
+		tintColor *= mGlobalComponentTintColor;
+		addedColor += mGlobalComponentAddedColor;
+	}
+}
+
 void PaletteManager::serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion)
 {
 	if (formatVersion >= 4)

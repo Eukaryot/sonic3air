@@ -306,20 +306,8 @@ void SoftwareRenderer::renderGeometry(const Geometry& geometry)
 
 			Blitter::Options blitterOptions;
 			blitterOptions.mBlendMode = BlendMode::ALPHA;
-
-			if (tg.mUseGlobalComponentTint)
-			{
-				static Color tintColor;
-				static Color addedColor;
-				tintColor = tg.mColor * mRenderParts.getPaletteManager().getGlobalComponentTintColor();
-				addedColor = mRenderParts.getPaletteManager().getGlobalComponentAddedColor();
-				blitterOptions.mTintColor = &tintColor;
-				blitterOptions.mAddedColor = &addedColor;
-			}
-			else
-			{
-				blitterOptions.mTintColor = &tg.mColor;
-			}
+			blitterOptions.mTintColor = &tg.mTintColor;
+			blitterOptions.mAddedColor = &tg.mAddedColor;
 
 			mBlitter.blitSprite(Blitter::OutputWrapper(mGameScreenTexture.accessBitmap()), Blitter::SpriteWrapper(tg.mDrawerTexture.accessBitmap(), Vec2i()), tg.mRect.getPos(), blitterOptions);
 			break;
@@ -679,11 +667,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			{
 				if (spriteBase.mUseGlobalComponentTint && !isPaletteSprite)
 				{
-					tintColor.r *= paletteManager.getGlobalComponentTintColor().r;
-					tintColor.g *= paletteManager.getGlobalComponentTintColor().g;
-					tintColor.b *= paletteManager.getGlobalComponentTintColor().b;
-					tintColor.a *= paletteManager.getGlobalComponentTintColor().a;
-					addedColor += paletteManager.getGlobalComponentAddedColor();
+					paletteManager.applyGlobalComponentTint(tintColor, addedColor);
 				}
 
 				const bool hasTransform = !spriteBase.mTransformation.isIdentity();

@@ -78,6 +78,9 @@ public:
 	inline const Vec4f& getGlobalComponentAddedColor() const { return mGlobalComponentAddedColor; }
 	void setGlobalComponentTint(const Vec4f& tintColor, const Vec4f& addedColor);
 
+	void applyGlobalComponentTint(Color& color) const;
+	void applyGlobalComponentTint(Color& tintColor, Color& addedColor) const;
+
 	void serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion);
 
 public:

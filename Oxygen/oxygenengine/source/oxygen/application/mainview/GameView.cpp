@@ -675,9 +675,7 @@ void GameView::render()
 			{
 				const float fraction = (float)k / 15.0f;
 				const Color color1 = Color(fraction, fraction, fraction);
-				const Color color2 = Color(paletteManager.getGlobalComponentAddedColor().r + paletteManager.getGlobalComponentTintColor().r * fraction,
-										   paletteManager.getGlobalComponentAddedColor().g + paletteManager.getGlobalComponentTintColor().g * fraction,
-										   paletteManager.getGlobalComponentAddedColor().b + paletteManager.getGlobalComponentTintColor().b * fraction);
+				const Color color2 = paletteManager.getGlobalComponentAddedColor() + color1 * paletteManager.getGlobalComponentTintColor();
 				drawer.drawRect(Recti(baseX + 1, baseY + 1 + k * 3, 3, 3), color2);
 				drawer.drawRect(Recti(baseX + 3, baseY + 1 + k * 3, 1, 1), color1);
 			}

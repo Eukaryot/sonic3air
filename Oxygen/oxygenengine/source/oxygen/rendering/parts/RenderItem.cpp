@@ -12,6 +12,8 @@
 
 void RenderItem::serialize(VectorBinarySerializer& serializer, uint8 formatVersion)
 {
+	serializer.serializeAs<int16>(mPosition.x);
+	serializer.serializeAs<int16>(mPosition.y);
 	serializer.serialize(mRenderQueue);
 	serializer.serializeAs<uint8>(mCoordinatesSpace);
 	serializer.serialize(mUseGlobalComponentTint);
@@ -23,8 +25,6 @@ void renderitems::SpriteInfo::serialize(VectorBinarySerializer& serializer, uint
 {
 	RenderItem::serialize(serializer, formatVersion);
 
-	serializer.serializeAs<int16>(mPosition.x);
-	serializer.serializeAs<int16>(mPosition.y);
 	serializer.serializeAs<uint8>(mPriorityFlag);
 	mTintColor.serialize(serializer);
 	mAddedColor.serialize(serializer);
@@ -86,10 +86,8 @@ void renderitems::Rectangle::serialize(VectorBinarySerializer& serializer, uint8
 {
 	RenderItem::serialize(serializer, formatVersion);
 
-	serializer.serializeAs<int16>(mRect.x);
-	serializer.serializeAs<int16>(mRect.y);
-	serializer.serializeAs<uint16>(mRect.height);
-	serializer.serializeAs<uint16>(mRect.width);
+	serializer.serializeAs<uint16>(mSize.x);
+	serializer.serializeAs<uint16>(mSize.y);
 	mColor.serialize(serializer);
 }
 
@@ -98,8 +96,6 @@ void renderitems::Text::serialize(VectorBinarySerializer& serializer, uint8 form
 	RenderItem::serialize(serializer, formatVersion);
 
 	serializer.serialize(mFontKeyString);
-	serializer.serializeAs<int16>(mPosition.x);
-	serializer.serializeAs<int16>(mPosition.y);
 	serializer.serialize(mTextString);
 	mColor.serialize(serializer);
 	serializer.serializeAs<int8>(mAlignment);

@@ -66,10 +66,7 @@ void RenderComponentSpriteShader::draw(const renderitems::ComponentSpriteInfo& s
 	Vec4f addedColor = spriteInfo.mAddedColor;
 	if (spriteInfo.mUseGlobalComponentTint)
 	{
-		tintColor.r *= paletteManager.getGlobalComponentTintColor().r;
-		tintColor.g *= paletteManager.getGlobalComponentTintColor().g;
-		tintColor.b *= paletteManager.getGlobalComponentTintColor().b;
-		tintColor.a *= paletteManager.getGlobalComponentTintColor().a;
+		tintColor *= paletteManager.getGlobalComponentTintColor();
 		addedColor += paletteManager.getGlobalComponentAddedColor();
 	}
 
