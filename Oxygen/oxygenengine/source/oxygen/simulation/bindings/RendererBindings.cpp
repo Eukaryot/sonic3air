@@ -1133,7 +1133,8 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		.setParameterInfo(2, "width")
 		.setParameterInfo(3, "height")
 		.setParameterInfo(4, "color")
-		.setParameterInfo(5, "renderQueue");
+		.setParameterInfo(5, "renderQueue")
+		.setParameterInfo(6, "useWorldSpace");
 
 	module.addNativeFunction("Renderer.drawRect", lemon::wrap(&Renderer_drawRect2), defaultFlags)
 		.setParameterInfo(0, "px")

@@ -16,7 +16,7 @@ namespace lemon
 	namespace traits
 	{
 		template<> const DataTypeDefinition* getDataType<void>()			{ return &PredefinedDataTypes::VOID; }
-		template<> const DataTypeDefinition* getDataType<bool>()			{ return &PredefinedDataTypes::INT_8; }
+		template<> const DataTypeDefinition* getDataType<bool>()			{ return &PredefinedDataTypes::BOOL; }
 		template<> const DataTypeDefinition* getDataType<int8>()			{ return &PredefinedDataTypes::INT_8; }
 		template<> const DataTypeDefinition* getDataType<uint8>()			{ return &PredefinedDataTypes::UINT_8; }
 		template<> const DataTypeDefinition* getDataType<int16>()			{ return &PredefinedDataTypes::INT_16; }
