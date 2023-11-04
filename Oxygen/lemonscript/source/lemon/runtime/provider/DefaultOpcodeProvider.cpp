@@ -680,7 +680,7 @@ namespace lemon
 				const bool isBaseCall = ((uint32)opcode.mDataType != 0);
 				if (isBaseCall)
 				{
-					runtimeOpcode.mFlags |= RuntimeOpcode::FLAG_CALL_IS_BASE_CALL;
+					runtimeOpcode.mFlags.set(RuntimeOpcode::Flag::CALL_IS_BASE_CALL);
 				}
 				else
 				{

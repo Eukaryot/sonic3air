@@ -1041,7 +1041,7 @@ namespace lemon
 					// Replace the first opcode with a jump directly to where the (now not really) conditional jump would lead to
 					firstOpcode.mType = Opcode::Type::JUMP;
 					firstOpcode.mDataType = BaseType::VOID;
-					firstOpcode.mFlags = Opcode::Flag::CTRLFLOW | Opcode::Flag::JUMP | Opcode::Flag::SEQ_BREAK;
+					firstOpcode.mFlags.set(makeBitFlagSet(Opcode::Flag::CTRLFLOW, Opcode::Flag::JUMP, Opcode::Flag::SEQ_BREAK));
 					firstOpcode.mParameter = jumpTarget;
 					firstOpcode.mLineNumber = condJumpOpcode.mLineNumber;
 				}
@@ -1071,7 +1071,7 @@ namespace lemon
 			// Mark all opcodes as not visited yet, using the temp flag -- except for the very last return, which must never get removed
 			for (size_t i = 0; i < mOpcodes.size() - 1; ++i)
 			{
-				mOpcodes[i].mFlags |= Opcode::Flag::TEMP_FLAG;
+				mOpcodes[i].mFlags.set(Opcode::Flag::TEMP_FLAG);
 			}
 
 			static std::vector<size_t> openSeeds;
@@ -1088,9 +1088,9 @@ namespace lemon
 				size_t position = openSeeds.back();
 				openSeeds.pop_back();
 
-				while (mOpcodes[position].mFlags & Opcode::Flag::TEMP_FLAG)
+				while (mOpcodes[position].mFlags.isSet(Opcode::Flag::TEMP_FLAG))
 				{
-					mOpcodes[position].mFlags &= ~Opcode::Flag::TEMP_FLAG;
+					mOpcodes[position].mFlags.clear(Opcode::Flag::TEMP_FLAG);
 					switch (mOpcodes[position].mType)
 					{
 						case Opcode::Type::JUMP:
@@ -1117,7 +1117,7 @@ namespace lemon
 			// Remove opcodes that are unreachable
 			for (Opcode& opcode : mOpcodes)
 			{
-				if (opcode.mFlags & Opcode::Flag::TEMP_FLAG)
+				if (opcode.mFlags.isSet(Opcode::Flag::TEMP_FLAG))
 				{
 					opcode.mType = Opcode::Type::NOP;
 				}
@@ -1146,7 +1146,7 @@ namespace lemon
 									mOpcodes[i].mType = Opcode::Type::MOVE_STACK;
 									mOpcodes[i].mDataType = BaseType::VOID;			// Because that's what we generally use for MOVE_STACK
 									mOpcodes[i].mParameter = -1;
-									mOpcodes[i].mFlags &= Opcode::Flag::NEW_LINE;	// Clear all other flags
+									mOpcodes[i].mFlags.setOnly(Opcode::Flag::NEW_LINE);	// Clear all other flags
 								}
 								else
 								{
@@ -1227,14 +1227,15 @@ namespace lemon
 			{
 				case Opcode::Type::JUMP:
 				case Opcode::Type::JUMP_CONDITIONAL:
-					opcode.mFlags |= Opcode::Flag::CTRLFLOW | Opcode::Flag::JUMP;
+					opcode.mFlags.set(Opcode::Flag::CTRLFLOW);
+					opcode.mFlags.set(Opcode::Flag::JUMP);
 					break;
 
 				case Opcode::Type::CALL:
 				case Opcode::Type::RETURN:
 				case Opcode::Type::EXTERNAL_CALL:
 				case Opcode::Type::EXTERNAL_JUMP:
-					opcode.mFlags |= Opcode::Flag::CTRLFLOW;
+					opcode.mFlags.set(Opcode::Flag::CTRLFLOW);
 					break;
 
 				default:
@@ -1243,7 +1244,7 @@ namespace lemon
 
 			if (lastLineNumber != opcode.mLineNumber)
 			{
-				opcode.mFlags |= Opcode::Flag::NEW_LINE;
+				opcode.mFlags.set(Opcode::Flag::NEW_LINE);
 				lastLineNumber = opcode.mLineNumber;
 			}
 		}
@@ -1251,30 +1252,30 @@ namespace lemon
 		// Add label targets
 		for (const ScriptFunction::Label& label : mFunction.mLabels)
 		{
-			mOpcodes[label.mOffset].mFlags |= Opcode::Flag::LABEL;
+			mOpcodes[label.mOffset].mFlags.set(Opcode::Flag::LABEL);
 		}
 
 		// Add jump targets
 		for (size_t i = 0; i < numOpcodes; ++i)
 		{
 			const Opcode& opcode = mOpcodes[i];
-			if (opcode.mFlags & Opcode::Flag::JUMP)
+			if (opcode.mFlags.isSet(Opcode::Flag::JUMP))
 			{
 				const size_t jumpTarget = std::min((size_t)mOpcodes[i].mParameter, mOpcodes.size() - 1);
-				mOpcodes[jumpTarget].mFlags |= Opcode::Flag::JUMP_TARGET;
+				mOpcodes[jumpTarget].mFlags.set(Opcode::Flag::JUMP_TARGET);
 			}
 		}
 
 		// Add sequence break flags
 		for (size_t i = 0; i < numOpcodes; ++i)
 		{
-			if ((mOpcodes[i].mFlags & Opcode::Flag::CTRLFLOW) != 0)
+			if (mOpcodes[i].mFlags.isSet(Opcode::Flag::CTRLFLOW))
 			{
-				mOpcodes[i].mFlags |= Opcode::Flag::SEQ_BREAK;
+				mOpcodes[i].mFlags.set(Opcode::Flag::SEQ_BREAK);
 			}
-			else if (i+1 < numOpcodes && (mOpcodes[i+1].mFlags & (Opcode::Flag::LABEL | Opcode::Flag::JUMP_TARGET | Opcode::Flag::NEW_LINE | Opcode::Flag::CTRLFLOW)) != 0)
+			else if (i+1 < numOpcodes && mOpcodes[i+1].mFlags.anySet(makeBitFlagSet(Opcode::Flag::LABEL, Opcode::Flag::JUMP_TARGET, Opcode::Flag::NEW_LINE, Opcode::Flag::CTRLFLOW)))
 			{
-				mOpcodes[i].mFlags |= Opcode::Flag::SEQ_BREAK;
+				mOpcodes[i].mFlags.set(Opcode::Flag::SEQ_BREAK);
 			}
 		}
 	}

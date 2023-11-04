@@ -621,16 +621,16 @@ namespace lemon
 	const Function* Runtime::handleResultCall(const RuntimeOpcode& runtimeOpcode)
 	{
 		// Consider base function call, if additional data says so
-		const size_t baseCallIndex = (runtimeOpcode.mFlags & RuntimeOpcode::FLAG_CALL_IS_BASE_CALL) ? (mSelectedControlFlow->getState().mBaseCallIndex + 1) : 0;
+		const size_t baseCallIndex = runtimeOpcode.mFlags.isSet(RuntimeOpcode::Flag::CALL_IS_BASE_CALL) ? (mSelectedControlFlow->getState().mBaseCallIndex + 1) : 0;
 
-		if (runtimeOpcode.mFlags & RuntimeOpcode::FLAG_CALL_TARGET_RUNTIME_FUNC)
+		if (runtimeOpcode.mFlags.isSet(RuntimeOpcode::Flag::CALL_TARGET_RUNTIME_FUNC))
 		{
 			// Take the runtime function shortcut (this is the most common one)
 			const RuntimeFunction* runtimeFunction = runtimeOpcode.getParameter<const RuntimeFunction*>();
 			callRuntimeFunction(*runtimeFunction, baseCallIndex);
 			return runtimeFunction->mFunction;
 		}
-		else if (runtimeOpcode.mFlags & RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED)
+		else if (runtimeOpcode.mFlags.isSet(RuntimeOpcode::Flag::CALL_TARGET_RESOLVED))
 		{
 			// Take the shortcut to a normal function
 			const Function* function = runtimeOpcode.getParameter<const Function*>();
@@ -648,7 +648,7 @@ namespace lemon
 			{
 				// Create a shortcut for next time
 				runtimeOpcodeMutable.setParameter(runtimeFunction);
-				runtimeOpcodeMutable.mFlags |= RuntimeOpcode::FLAG_CALL_TARGET_RUNTIME_FUNC;
+				runtimeOpcodeMutable.mFlags.set(RuntimeOpcode::Flag::CALL_TARGET_RUNTIME_FUNC);
 
 				// Call the function now
 				callRuntimeFunction(*runtimeFunction, baseCallIndex);
@@ -661,7 +661,7 @@ namespace lemon
 			{
 				// Create a shortcut for next time
 				runtimeOpcodeMutable.setParameter(function);
-				runtimeOpcodeMutable.mFlags |= RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED;
+				runtimeOpcodeMutable.mFlags.set(RuntimeOpcode::Flag::CALL_TARGET_RESOLVED);
 
 				// Call the function now
 				callFunction(*function, baseCallIndex);

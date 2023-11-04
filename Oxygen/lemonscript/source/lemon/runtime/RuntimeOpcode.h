@@ -32,18 +32,18 @@ namespace lemon
 	struct API_EXPORT RuntimeOpcodeBase
 	{
 	public:
-		enum Flags
+		enum class Flag : uint8
 		{
-			FLAG_CALL_IS_BASE_CALL			= 0x20,		// For CALL opcodes only: It is a base call
-			FLAG_CALL_TARGET_RESOLVED		= 0x40,		// For CALL opcodes only: Call target is already resolved and can be found in the parameter (as pointer)
-			FLAG_CALL_TARGET_RUNTIME_FUNC	= 0x80		// For CALL opcodes only: Call target is resolved and is a RuntimeFunction, not a Function
+			CALL_IS_BASE_CALL		 = 0x20,	// For CALL opcodes only: It is a base call
+			CALL_TARGET_RESOLVED	 = 0x40,	// For CALL opcodes only: Call target is already resolved and can be found in the parameter (as pointer)
+			CALL_TARGET_RUNTIME_FUNC = 0x80		// For CALL opcodes only: Call target is resolved and is a RuntimeFunction, not a Function
 		};
 
 		ExecFunc mExecFunc;
 		RuntimeOpcode* mNext = nullptr;
 		Opcode::Type mOpcodeType = Opcode::Type::NOP;
 		uint8 mSize = 0;
-		uint8 mFlags = 0;
+		BitFlagSet<Flag> mFlags;
 		uint8 mSuccessiveHandledOpcodes = 0;	// Number of internally handled opcodes (i.e. not manipulating control flow) in a row from this one -- including this one, so if this is 0, the opcode is not handled
 	};
 

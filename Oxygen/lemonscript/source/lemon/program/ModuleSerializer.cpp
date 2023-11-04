@@ -446,7 +446,7 @@ namespace lemon
 						opcode.mDataType = hasDataType ? (BaseType)serializer.read<uint8>() : DEFAULT_OPCODE_BASETYPES[(size_t)opcode.mType];
 
 						// Load / rebuild the two opcode flags that are actually needed during run-time (see "OpcodeProcessor::buildOpcodeData")
-						opcode.mFlags = isSequenceBreak ? Opcode::Flag::SEQ_BREAK : 0;
+						opcode.mFlags.set(Opcode::Flag::SEQ_BREAK, isSequenceBreak);
 						switch (opcode.mType)
 						{
 							case Opcode::Type::JUMP:
@@ -455,7 +455,7 @@ namespace lemon
 							case Opcode::Type::RETURN:
 							case Opcode::Type::EXTERNAL_CALL:
 							case Opcode::Type::EXTERNAL_JUMP:
-								opcode.mFlags |= Opcode::Flag::CTRLFLOW;
+								opcode.mFlags.set(Opcode::Flag::CTRLFLOW);
 								break;
 							default:
 								break;
@@ -575,7 +575,7 @@ namespace lemon
 							(opcode.mParameter == (int64)(int32)opcode.mParameter) ? 5 :
 							(opcode.mParameter == (int64)(uint32)opcode.mParameter) ? 6 : 7;
 						const bool hasDataType     = (opcode.mDataType != DEFAULT_OPCODE_BASETYPES[(size_t)opcode.mType]);
-						const bool isSequenceBreak = (opcode.mFlags & Opcode::Flag::SEQ_BREAK) != 0;
+						const bool isSequenceBreak = opcode.mFlags.isSet(Opcode::Flag::SEQ_BREAK);
 						const uint8 lineNumberBits = (opcode.mLineNumber >= lastLineNumber && opcode.mLineNumber < lastLineNumber + 31) ? (uint8)(opcode.mLineNumber - lastLineNumber) : 31;
 
 						const uint16 typeAndFlags = (uint16)opcode.mType | ((uint16)parameterBits << 6) | ((uint16)hasDataType * 0x200) | ((uint16)isSequenceBreak * 0x400) | ((uint16)lineNumberBits << 11);

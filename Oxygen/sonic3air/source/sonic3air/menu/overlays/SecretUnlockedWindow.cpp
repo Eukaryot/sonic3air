@@ -28,21 +28,21 @@ void SecretUnlockedWindow::update(float timeElapsed)
 {
 	switch (mPhase)
 	{
-		case PHASE_NONE:
+		case Phase::NONE:
 			break;
-		case PHASE_TITLE_APPEAR:
+		case Phase::TITLE_APPEAR:
 			mPhaseTimer += timeElapsed / 0.3f;
 			break;
-		case PHASE_TITLE_SHOW:
+		case Phase::TITLE_SHOW:
 			mPhaseTimer += timeElapsed / 0.75f;
 			break;
-		case PHASE_CONTENT_APPEAR:
+		case Phase::CONTENT_APPEAR:
 			mPhaseTimer += timeElapsed / 0.3f;
 			break;
-		case PHASE_CONTENT_SHOW:
+		case Phase::CONTENT_SHOW:
 			mPhaseTimer += timeElapsed / 5.0f;
 			break;
-		case PHASE_DISAPPEAR:
+		case Phase::DISAPPEAR:
 			mPhaseTimer += timeElapsed / 0.2f;
 			break;
 	}
@@ -50,9 +50,9 @@ void SecretUnlockedWindow::update(float timeElapsed)
 	if (mPhaseTimer >= 1.0f)
 	{
 		mPhaseTimer = 0.0f;
-		if (mPhase == PHASE_DISAPPEAR)
+		if (mPhase == Phase::DISAPPEAR)
 		{
-			mPhase = PHASE_NONE;
+			mPhase = Phase::NONE;
 			if (mEnqueuedEntries.empty())
 			{
 				getParent()->removeChild(this);
@@ -65,8 +65,8 @@ void SecretUnlockedWindow::update(float timeElapsed)
 		}
 		else
 		{
-			mPhase = (Phase)(mPhase + 1);
-			if (mPhase == PHASE_TITLE_SHOW && mShownEntry.mSoundId != 0)
+			mPhase = (Phase)((int)mPhase + 1);
+			if (mPhase == Phase::TITLE_SHOW && mShownEntry.mSoundId != 0)
 			{
 				AudioOut::instance().playAudioDirect(mShownEntry.mSoundId, AudioOut::SoundRegType::SOUND, AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_SOUND);
 			}
@@ -76,32 +76,32 @@ void SecretUnlockedWindow::update(float timeElapsed)
 
 void SecretUnlockedWindow::render()
 {
-	if (mPhase == PHASE_NONE)
+	if (mPhase == Phase::NONE)
 		return;
 
 	float titleVisibility = 0.0f;
 	float contentVisibility = 0.0f;
 	switch (mPhase)
 	{
-		case PHASE_NONE:
+		case Phase::NONE:
 			break;
-		case PHASE_TITLE_APPEAR:
+		case Phase::TITLE_APPEAR:
 			titleVisibility = mPhaseTimer;
 			contentVisibility = 0.0f;
 			break;
-		case PHASE_TITLE_SHOW:
+		case Phase::TITLE_SHOW:
 			titleVisibility = 1.0f;
 			contentVisibility = 0.0f;
 			break;
-		case PHASE_CONTENT_APPEAR:
+		case Phase::CONTENT_APPEAR:
 			titleVisibility = 1.0f;
 			contentVisibility = mPhaseTimer;
 			break;
-		case PHASE_CONTENT_SHOW:
+		case Phase::CONTENT_SHOW:
 			titleVisibility = 1.0f;
 			contentVisibility = 1.0f;
 			break;
-		case PHASE_DISAPPEAR:
+		case Phase::DISAPPEAR:
 			titleVisibility = 1.0f - mPhaseTimer;
 			contentVisibility = 1.0f;
 			break;
@@ -135,7 +135,7 @@ void SecretUnlockedWindow::show(EntryType entryType, const std::string& title, c
 	newEntry.mContent = content;
 	newEntry.mSoundId = soundId;
 
-	if (mPhase == PHASE_NONE)
+	if (mPhase == Phase::NONE)
 	{
 		showInternal(newEntry);
 	}
@@ -148,7 +148,7 @@ void SecretUnlockedWindow::show(EntryType entryType, const std::string& title, c
 
 void SecretUnlockedWindow::showInternal(Entry& entry)
 {
-	mPhase = PHASE_TITLE_APPEAR;
+	mPhase = Phase::TITLE_APPEAR;
 	mPhaseTimer = 0.0f;
 
 	std::swap(mShownEntry, entry);

@@ -62,7 +62,7 @@ namespace lemon
 		runtimeOpcode.mExecFunc = nullptr;
 		runtimeOpcode.mOpcodeType = Opcode::Type::NOP;
 		runtimeOpcode.mSize = (uint8)size;
-		runtimeOpcode.mFlags = 0;
+		runtimeOpcode.mFlags.clearAll();
 		runtimeOpcode.mSuccessiveHandledOpcodes = 1;
 		return runtimeOpcode;
 	}

@@ -60,7 +60,6 @@ private:
 			SECRETS		 = 1,
 			ACHIEVEMENTS = 2
 		};
-
 		GameMenuEntries mMenuEntries;
 	};
 	Tab mTabs[3];

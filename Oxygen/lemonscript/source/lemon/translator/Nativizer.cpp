@@ -107,7 +107,7 @@ namespace lemon
 
 			MemoryAccessHandler::SpecializationResult result;
 			memoryAccessHandler.getDirectAccessSpecialization(result, address, DataTypeHelper::getSizeOfBaseType(baseType), false);
-			if (result.mResult == MemoryAccessHandler::SpecializationResult::HAS_SPECIALIZATION)
+			if (result.mResult == MemoryAccessHandler::SpecializationResult::Result::HAS_SPECIALIZATION)
 			{
 				outInfo.mConsumedOpcodes = 2;
 				outInfo.mType = Opcode::Type::NOP;

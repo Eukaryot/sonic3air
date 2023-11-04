@@ -438,11 +438,11 @@ void EmulatorInterface::getDirectAccessSpecialization(SpecializationResult& outR
 		if (address + size > sizeof(mInternal.mRam))
 		{
 			RMX_ERROR("Too large memory " << (writeAccess ? "write" : "read") << " access of " << rmx::hexString(size) << " bytes at RAM address " << rmx::hexString(0xffff0000 + address, 6), );
-			outResult.mResult = SpecializationResult::INVALID_ACCESS;
+			outResult.mResult = SpecializationResult::Result::INVALID_ACCESS;
 		}
 		else
 		{
-			outResult.mResult = SpecializationResult::HAS_SPECIALIZATION;
+			outResult.mResult = SpecializationResult::Result::HAS_SPECIALIZATION;
 			outResult.mDirectAccessPointer = &mInternal.mRam[address];
 		}
 	}
@@ -451,11 +451,11 @@ void EmulatorInterface::getDirectAccessSpecialization(SpecializationResult& outR
 		if (address + size > sizeof(mInternal.mRom))
 		{
 			RMX_ERROR("Too large memory " << (writeAccess ? "write" : "read") << " access of " << rmx::hexString(size) << " bytes at ROM address " << rmx::hexString(address, 6), );
-			outResult.mResult = SpecializationResult::INVALID_ACCESS;
+			outResult.mResult = SpecializationResult::Result::INVALID_ACCESS;
 		}
 		else
 		{
-			outResult.mResult = SpecializationResult::HAS_SPECIALIZATION;
+			outResult.mResult = SpecializationResult::Result::HAS_SPECIALIZATION;
 			outResult.mDirectAccessPointer = &mInternal.mRom[address];
 		}
 	}
@@ -465,29 +465,29 @@ void EmulatorInterface::getDirectAccessSpecialization(SpecializationResult& outR
 		if (address + size > sizeof(mInternal.mSharedMemory))
 		{
 			RMX_ERROR("Too large memory " << (writeAccess ? "write" : "read") << " access of " << rmx::hexString(size) << " bytes at shared memory address " << rmx::hexString(0x800000 + address, 6), );
-			outResult.mResult = SpecializationResult::INVALID_ACCESS;
+			outResult.mResult = SpecializationResult::Result::INVALID_ACCESS;
 		}
 		else
 		{
 			// Write access is not supported because mSharedMemoryUsage can't be updated this way
 			if (writeAccess)
 			{
-				outResult.mResult = SpecializationResult::NO_SPECIALIZATION;
+				outResult.mResult = SpecializationResult::Result::NO_SPECIALIZATION;
 				return;
 			}
 
-			outResult.mResult = SpecializationResult::HAS_SPECIALIZATION;
+			outResult.mResult = SpecializationResult::Result::HAS_SPECIALIZATION;
 			outResult.mDirectAccessPointer = &mInternal.mSharedMemory[address];
 		}
 	}
 	else if (address >= 0xa00000 && address < 0xd00000)
 	{
-		outResult.mResult = SpecializationResult::NO_SPECIALIZATION;
+		outResult.mResult = SpecializationResult::Result::NO_SPECIALIZATION;
 	}
 	else
 	{
 		RMX_ERROR("Invalid memory access at " << rmx::hexString(address, 6) << " of " << rmx::hexString(size) << " bytes", );
-		outResult.mResult = SpecializationResult::INVALID_ACCESS;
+		outResult.mResult = SpecializationResult::Result::INVALID_ACCESS;
 	}
 }
 
@@ -509,7 +509,7 @@ void EmulatorInterfaceDev::getDirectAccessSpecialization(SpecializationResult& o
 	if (writeAccess)
 	{
 		// No specialization for write access, as this would not trigger debug watches
-		outResult.mResult = SpecializationResult::NO_SPECIALIZATION;
+		outResult.mResult = SpecializationResult::Result::NO_SPECIALIZATION;
 	}
 	else
 	{

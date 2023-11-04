@@ -111,7 +111,7 @@ namespace lemon
 							const uint64 address = opcode.mParameter;
 							MemoryAccessHandler::SpecializationResult result;
 							runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, DataTypeHelper::getSizeOfBaseType(opcode.mDataType), false);	// No support for write access here
-							RMX_ASSERT(result.mResult == MemoryAccessHandler::SpecializationResult::HAS_SPECIALIZATION, "No memory access specialization found even though this was previously checked");
+							RMX_ASSERT(result.mResult == MemoryAccessHandler::SpecializationResult::Result::HAS_SPECIALIZATION, "No memory access specialization found even though this was previously checked");
 							runtimeOpcode.setParameter(result.mDirectAccessPointer, parameter.mOffset);
 							break;
 						}

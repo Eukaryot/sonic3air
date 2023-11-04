@@ -25,11 +25,11 @@ namespace lemon
 		uint8 sequenceLength = 1;
 		for (int i = (int)numOpcodes-1; i >= 0; --i)
 		{
-			if (opcodes[i].mFlags & Opcode::Flag::CTRLFLOW)
+			if (opcodes[i].mFlags.isSet(Opcode::Flag::CTRLFLOW))
 			{
 				sequenceLength = 0;
 			}
-			else if (opcodes[i].mFlags & Opcode::Flag::SEQ_BREAK)
+			else if (opcodes[i].mFlags.isSet(Opcode::Flag::SEQ_BREAK))
 			{
 				sequenceLength = 1;
 			}
