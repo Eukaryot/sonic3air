@@ -16,9 +16,12 @@ class Drawer;
 class GameMenuControlsDisplay
 {
 public:
+	enum class Hold { YES, NO };
+
+public:
 	void clear();
-	void addControl(std::string_view displayText, bool alignRight, std::string_view spriteName);
-	void addControl(std::string_view displayText, bool alignRight, std::string_view spriteName, std::string_view additionalSpriteName);
+	void addControl(std::string_view displayText, bool alignRight, std::string_view spriteName, Hold hold = Hold::NO);
+	void addControl(std::string_view displayText, bool alignRight, std::string_view spriteName, std::string_view additionalSpriteName, Hold hold = Hold::NO);
 
 	void render(Drawer& drawer, float visibility = 1.0f);
 
@@ -27,9 +30,14 @@ private:
 	{
 		std::string mDisplayText;
 		bool mAlignRight = false;
+		bool mHold = false;
 		std::vector<uint64> mSpriteKeys;
 	};
 
+private:
+	void drawControl(const Control& control, Drawer& drawer, Vec2i& pos);
+
+private:
 	std::vector<Control> mControls;
 };
 

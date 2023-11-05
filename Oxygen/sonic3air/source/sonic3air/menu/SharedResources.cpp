@@ -21,7 +21,8 @@
 namespace global
 {
 	Font mSmallfont;
-	Font mSmallfontOutlined;
+	Font mSmallfontSemiOutlined;
+	Font mSmallfontRect;
 	Font mOxyfontNarrowSimple;
 	Font mOxyfontNarrow;
 	Font mOxyfontTinySimple;
@@ -65,8 +66,11 @@ namespace global
 
 		fontCollection.registerManagedFont(mSmallfont, "smallfont");
 
-		fontCollection.registerManagedFont(mSmallfontOutlined, "smallfont");
-		mSmallfontOutlined.addFontProcessor(outlineFontProcessorTransparent);
+		fontCollection.registerManagedFont(mSmallfontSemiOutlined, "smallfont");
+		mSmallfontSemiOutlined.addFontProcessor(outlineFontProcessorTransparent);
+
+		fontCollection.registerManagedFont(mSmallfontRect, "smallfont");
+		mSmallfontRect.addFontProcessor(outlineFontProcessorRect);
 
 		fontCollection.registerManagedFont(mOxyfontNarrowSimple, "oxyfont_tiny_narrow");
 		mOxyfontNarrowSimple.addFontProcessor(shadowFontProcessor4);

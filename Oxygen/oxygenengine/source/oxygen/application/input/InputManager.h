@@ -62,10 +62,11 @@ public:
 		float mRepeatTimeout = 0.0f;
 		int mPlayerIndex = 0;
 
-		inline bool isPressed() const	{ return mState; }
-		inline bool hasChanged() const	{ return mChange; }
-		inline bool justPressed() const	{ return mState && mChange; }
+		inline bool isPressed() const			{ return mState; }
+		inline bool hasChanged() const			{ return mChange; }
+		inline bool justPressed() const			{ return mState && mChange; }
 		inline bool justPressedOrRepeat() const	{ return justPressed() || mRepeat; }
+		inline bool justReleased() const		{ return !mState && mChange; }
 
 		void clearInputs();
 		void addInput(RealDevice& device, InputConfig::Assignment::Type type, uint32 index);

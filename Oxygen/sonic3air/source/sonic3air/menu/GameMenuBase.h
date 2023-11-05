@@ -83,7 +83,9 @@ public:
 
 	inline bool hasSelected() const  { return mSelectedIndex < mOptions.size(); }
 	inline const Option& selected() const  { return mOptions[mSelectedIndex]; }
+
 	bool setSelectedIndexByValue(uint32 value);
+	bool changeSelectedIndex(int change);
 	bool sanitizeSelectedIndex(bool allowInvisibleEntries = false);
 
 	size_t getPreviousVisibleIndex() const;
@@ -155,11 +157,18 @@ public:
 	inline const GameMenuEntry& operator[](size_t index) const  { return *mEntries[index]; }
 
 	UpdateResult update();
+	int getEntryChangeByInput() const;
+	int getOptionChangeByInput() const;
 
 	inline bool hasSelected() const  { return (mSelectedEntryIndex < (int)mEntries.size()); }
 	inline GameMenuEntry& selected()  { return *mEntries[mSelectedEntryIndex]; }
+
 	bool setSelectedIndexByValue(uint32 value);
+	void changeSelectedIndex(int change);
 	bool sanitizeSelectedIndex(bool allowNonInteractableEntries = false);
+
+	size_t getPreviousInteractableIndex(size_t index) const;
+	size_t getNextInteractableIndex(size_t index) const;
 
 private:
 	std::vector<GameMenuEntry*> mEntries;

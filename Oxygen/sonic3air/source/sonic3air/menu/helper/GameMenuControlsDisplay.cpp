@@ -16,12 +16,12 @@ void GameMenuControlsDisplay::clear()
 	mControls.clear();
 }
 
-void GameMenuControlsDisplay::addControl(std::string_view displayText, bool alignRight, std::string_view spriteName)
+void GameMenuControlsDisplay::addControl(std::string_view displayText, bool alignRight, std::string_view spriteName, Hold hold)
 {
-	addControl(displayText, alignRight, spriteName, "");
+	addControl(displayText, alignRight, spriteName, "", hold);
 }
 
-void GameMenuControlsDisplay::addControl(std::string_view displayText, bool alignRight, std::string_view spriteName, std::string_view additionalSpriteName)
+void GameMenuControlsDisplay::addControl(std::string_view displayText, bool alignRight, std::string_view spriteName, std::string_view additionalSpriteName, Hold hold)
 {
 	const uint64 spriteKey = rmx::getMurmur2_64(spriteName);
 	for (Control& control : mControls)
@@ -36,6 +36,7 @@ void GameMenuControlsDisplay::addControl(std::string_view displayText, bool alig
 	Control& newControl = vectorAdd(mControls);
 	newControl.mDisplayText = displayText;
 	newControl.mAlignRight = alignRight;
+	newControl.mHold = (hold == Hold::YES);
 	newControl.mSpriteKeys.push_back(spriteKey);
 
 	if (!additionalSpriteName.empty())
@@ -44,7 +45,6 @@ void GameMenuControlsDisplay::addControl(std::string_view displayText, bool alig
 
 void GameMenuControlsDisplay::render(Drawer& drawer, float visibility)
 {
-	Font& font = global::mOxyfontTinyRect;
 	Vec2i pos(0, 216 + roundToInt((1.0f - visibility) * 16));
 
 	// Background
@@ -54,35 +54,63 @@ void GameMenuControlsDisplay::render(Drawer& drawer, float visibility)
 
 	// Left-aligned entries
 	pos.x += 12;
-	for (Control& control : mControls)
+	for (const Control& control : mControls)
 	{
-		if (control.mSpriteKeys.empty() || control.mAlignRight)
-			continue;
-
-		for (uint64 spriteKey : control.mSpriteKeys)
+		if (!control.mSpriteKeys.empty() && !control.mAlignRight)
 		{
-			//drawer.drawRect(Recti(pos.x - 4, pos.y - 8, 16, 16), Color(0.0f, 0.0f, 0.0f, 0.6f));
-			drawer.drawSprite(pos + Vec2i(4, 0), spriteKey);
-			pos.x += 16;
+			drawControl(control, drawer, pos);
 		}
-		drawer.printText(font, Vec2i(pos.x, pos.y + 1), control.mDisplayText, 4);
-		pos.x += font.getWidth(control.mDisplayText) + 15;
 	}
 
-	// Right-aligned entries
+	// Right-aligned entries (in reverse order)
 	pos.x = 400 - 8;
-	for (Control& control : mControls)
+	for (auto it = mControls.crbegin(); it != mControls.crend(); ++it)
 	{
-		if (control.mSpriteKeys.empty() || !control.mAlignRight)
-			continue;
+		const Control& control = *it;
+		if (!control.mSpriteKeys.empty() && control.mAlignRight)
+		{
+			drawControl(control, drawer, pos);
+		}
+	}
+}
 
-		pos.x -= font.getWidth(control.mDisplayText);
+void GameMenuControlsDisplay::drawControl(const Control& control, Drawer& drawer, Vec2i& pos)
+{
+	Font& font = global::mOxyfontTinyRect;
+	const int textWidth = font.getWidth(control.mDisplayText);
+
+	if (control.mAlignRight)
+	{
+		pos.x -= textWidth;
 		drawer.printText(font, Vec2i(pos.x, pos.y + 1), control.mDisplayText, 4);
 		pos.x -= 15;
+
 		for (uint64 spriteKey : control.mSpriteKeys)
 		{
 			drawer.drawSprite(pos + Vec2i(4, 0), spriteKey);
+			if (control.mHold)
+			{
+				pos.x -= 15;
+				drawer.printText(global::mSmallfontRect, pos + Vec2i(-4, 0), "HOLD", 4, Color(0.7f, 0.7f, 0.7f));
+			}
 			pos.x -= 16;
 		}
+	}
+	else
+	{
+		for (uint64 spriteKey : control.mSpriteKeys)
+		{
+			drawer.drawSprite(pos + Vec2i(4, 0), spriteKey);
+			if (control.mHold)
+			{
+				drawer.printText(global::mSmallfontRect, pos + Vec2i(8, 1), "HOLD", 4);
+				pos.x += 14;
+			}
+			pos.x += 16;
+		}
+
+		drawer.printText(font, Vec2i(pos.x, pos.y + 1), control.mDisplayText, 4);
+		pos.x += textWidth;
+		pos.x += 15;
 	}
 }

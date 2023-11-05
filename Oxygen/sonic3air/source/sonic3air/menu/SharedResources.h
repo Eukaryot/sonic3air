@@ -24,7 +24,8 @@ namespace global
 	};
 
 	extern Font mSmallfont;
-	extern Font mSmallfontOutlined;
+	extern Font mSmallfontSemiOutlined;
+	extern Font mSmallfontRect;
 	extern Font mOxyfontNarrowSimple;
 	extern Font mOxyfontNarrow;
 	extern Font mOxyfontTinySimple;

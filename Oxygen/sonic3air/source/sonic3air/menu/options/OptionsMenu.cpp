@@ -1061,14 +1061,57 @@ void OptionsMenu::update(float timeElapsed)
 			mActiveMenu->mSelectedEntryIndex = 0;
 		}
 
-		// Update menu entries
-		const GameMenuEntries::UpdateResult result = mActiveMenu->update();
+		if (keys.Y.mChange)
+		{
+			refreshControlsDisplay();
+		}
+
+		GameMenuEntries::UpdateResult result = GameMenuEntries::UpdateResult::NONE;
+		if (keys.Y.isPressed() && (keys.Up.justPressed() || keys.Down.justPressed()) && mActiveMenu->mNavigation == GameMenuEntries::Navigation::VERTICAL)
+		{
+			// Quick navigation while holding Y
+			const int entryChange = mActiveMenu->getEntryChangeByInput();
+			if (entryChange != 0)
+			{
+				for (int tries = 0; tries < 100; ++tries)
+				{
+					mActiveMenu->changeSelectedIndex(entryChange);
+
+					// Stop when reaching certain types of entries
+					if (mActiveMenu->mSelectedEntryIndex <= 0 || mActiveMenu->selected().mData == option::_BACK || mActiveMenu->selected().getMenuEntryType() == ModTitleMenuEntry::MENU_ENTRY_TYPE)
+						break;
+
+					// Also stop at the first entry of each category (including first option of a mods without any categories)
+					const size_t previousIndex = mActiveMenu->getPreviousInteractableIndex(mActiveMenu->mSelectedEntryIndex);
+					bool hasTitleEntryInBetween = false;
+					for (size_t k = previousIndex; k < (size_t)mActiveMenu->mSelectedEntryIndex; ++k)
+					{
+						if (mActiveMenu->getEntries()[k]->getMenuEntryType() == TitleMenuEntry::MENU_ENTRY_TYPE ||
+							mActiveMenu->getEntries()[k]->getMenuEntryType() == ModTitleMenuEntry::MENU_ENTRY_TYPE)
+						{
+							hasTitleEntryInBetween = true;
+							break;
+						}
+					}
+					if (hasTitleEntryInBetween)
+						break;
+				}
+				result = GameMenuEntries::UpdateResult::ENTRY_CHANGED;
+			}
+		}
+		else
+		{
+			// Update menu entries
+			result = mActiveMenu->update();
+		}
+
 		if (result != GameMenuEntries::UpdateResult::NONE)
 		{
 			if (result == GameMenuEntries::UpdateResult::OPTION_CHANGED && mActiveMenu == &mTabMenuEntries)
 			{
 				mActiveTab = mTabMenuEntries[option::_TAB_SELECTION].mSelectedIndex;
 				playMenuSound(0xb7);
+				refreshControlsDisplay();
 			}
 			else
 			{
@@ -1727,29 +1770,43 @@ void OptionsMenu::refreshControlsDisplay()
 	GameMenuEntry& selectedEntry = mActiveMenu->selected();
 	mGameMenuControlsDisplay.clear();
 
-	if (mActiveMenu == &mTabMenuEntries)
+	const InputManager::ControllerScheme& keys = InputManager::instance().getController(0);
+	if (keys.Y.isPressed())
 	{
-		mGameMenuControlsDisplay.addControl("Switch Tab", false, "@input_icon_button_left", "@input_icon_button_right");
-	}
-	else if (selectedEntry.getMenuEntryType() == ModTitleMenuEntry::MENU_ENTRY_TYPE)
-	{
-		if (selectedEntry.mSelectedIndex == 0)
-			mGameMenuControlsDisplay.addControl("Expand", false, "@input_icon_button_right");
-		else
-			mGameMenuControlsDisplay.addControl("Collapse", false, "@input_icon_button_left");
-	}
-	else if (selectedEntry.mOptions.size() >= 2)
-	{
-		mGameMenuControlsDisplay.addControl("Change", false, "@input_icon_button_left", "@input_icon_button_right");
-		if (selectedEntry.mData == option::SOUND_TEST)
-			mGameMenuControlsDisplay.addControl("Play", false, "@input_icon_button_A");
+		mGameMenuControlsDisplay.addControl("Prev / Next category", false, "@input_icon_button_up", "@input_icon_button_down");
 	}
 	else
 	{
-		mGameMenuControlsDisplay.addControl("Select", false, "@input_icon_button_A");
-	}
+		if (mActiveMenu == &mTabMenuEntries)
+		{
+			mGameMenuControlsDisplay.addControl("Switch Tab", false, "@input_icon_button_left", "@input_icon_button_right");
+		}
+		else if (selectedEntry.getMenuEntryType() == ModTitleMenuEntry::MENU_ENTRY_TYPE)
+		{
+			if (selectedEntry.mSelectedIndex == 0)
+				mGameMenuControlsDisplay.addControl("Expand", false, "@input_icon_button_right");
+			else
+				mGameMenuControlsDisplay.addControl("Collapse", false, "@input_icon_button_left");
+		}
+		else if (selectedEntry.mOptions.size() >= 2)
+		{
+			mGameMenuControlsDisplay.addControl("Change", false, "@input_icon_button_left", "@input_icon_button_right");
+			if (selectedEntry.mData == option::SOUND_TEST)
+				mGameMenuControlsDisplay.addControl("Play", false, "@input_icon_button_A");
+		}
+		else
+		{
+			mGameMenuControlsDisplay.addControl("Select", false, "@input_icon_button_A");
+		}
 
-	mGameMenuControlsDisplay.addControl("Back",	true, "@input_icon_button_B");
+		if (mActiveTab == Tab::Id::MODS)
+		{
+			// Show only here, as that's where it's most relevent - however, it works in the other tabs as well
+			mGameMenuControlsDisplay.addControl("Hold: Quick Nav", true, "@input_icon_button_Y");
+		}
+
+		mGameMenuControlsDisplay.addControl("Back",	true, "@input_icon_button_B");
+	}
 }
 
 void OptionsMenu::updateModExpandState(ModTitleMenuEntry& modTitleMenuEntry)
