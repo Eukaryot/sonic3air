@@ -658,14 +658,6 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			.addOption("Assign to Player 1", 0)
 			.addOption("Assign to Player 2", 1);
 
-		for (int k = 0; k < 2; ++k)
-		{
-			GameMenuEntry& entry = entries.addEntry<OptionsMenuEntry>().initEntry(*String(0, "Rumble Player %d", k+1), option::CONTROLLER_RUMBLE_P1 + k);
-			entry.addOption("Off", 0);
-			for (int i = 20; i <= 100; i += 20)
-				entry.addOption(*String(0, "%d %%", i), i);
-		}
-
 		if (Application::instance().hasVirtualGamepad())
 		{
 			entries.addEntry<TitleMenuEntry>().initEntry("Virtual Gamepad");
@@ -674,6 +666,17 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			entries.addEntry<OptionsMenuEntry>().initEntry("D-Pad Size:",	option::VGAMEPAD_DPAD_SIZE).addNumberOptions(50, 150, 10);
 			entries.addEntry<OptionsMenuEntry>().initEntry("Buttons Size:", option::VGAMEPAD_BUTTONS_SIZE).addNumberOptions(50, 150, 10);
 			entries.addEntry<OptionsMenuEntry>().initEntry("Set Touch Gamepad Layout...", option::VGAMEPAD_SETUP);
+		}
+
+
+		entries.addEntry<TitleMenuEntry>().initEntry("Controller Rumble");
+
+		for (int k = 0; k < 2; ++k)
+		{
+			GameMenuEntry& entry = entries.addEntry<OptionsMenuEntry>().initEntry(*String(0, "Rumble Player %d", k+1), option::CONTROLLER_RUMBLE_P1 + k);
+			entry.addOption("Off", 0);
+			for (int i = 20; i <= 100; i += 20)
+				entry.addOption(*String(0, "%d %%", i), i);
 		}
 
 
