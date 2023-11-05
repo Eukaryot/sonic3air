@@ -830,17 +830,8 @@ void Game::onGameRecordingHeaderSave(std::vector<uint8>& buffer)
 void Game::checkActiveModsUsedFeatures()
 {
 	// Check mods for usage of Crowd Control
-	bool usesCrowdControl = false;
 	static const uint64 CC_FEATURE_NAME_HASH = rmx::getMurmur2_64("CrowdControl");
-	for (const Mod* mod : ModManager::instance().getActiveMods())
-	{
-		if (nullptr != mod->getUsedFeature(CC_FEATURE_NAME_HASH))
-		{
-			usesCrowdControl = true;
-			break;
-		}
-	}
-
+	const bool usesCrowdControl = ModManager::instance().anyActiveModUsesFeature(CC_FEATURE_NAME_HASH);
 	if (usesCrowdControl)
 		mCrowdControlClient.startConnection();
 	else

@@ -44,11 +44,12 @@ public:
 
 	void childClosed(GuiBase& child);
 
-	inline Simulation& getSimulation()		   { return *mSimulation; }
-	inline GameView& getGameView()			   { return *mGameView; }
-	inline DebugSidePanel* getDebugSidePanel() { return mDebugSidePanel; }
+	inline Simulation& getSimulation()						{ return *mSimulation; }
+	inline GameView& getGameView()							{ return *mGameView; }
+	inline TouchControlsOverlay* getTouchControlsOverlay()	{ return mTouchControlsOverlay; }
+	inline DebugSidePanel* getDebugSidePanel()				{ return mDebugSidePanel; }
 
-	WindowMode getWindowMode() const		   { return mWindowMode; }
+	WindowMode getWindowMode() const  { return mWindowMode; }
 	void setWindowMode(WindowMode windowMode, bool force = false);
 	void toggleFullscreen();
 

@@ -35,6 +35,8 @@ namespace
 		BUTTON_Y		= 0x17,
 		BUTTON_START	= 0x18,
 		BUTTON_BACK		= 0x19,
+		BUTTON_L		= 0x1a,
+		BUTTON_R		= 0x1b,
 		_BACK			= 0xff
 	};
 
@@ -64,6 +66,10 @@ void ControllerSetupMenu::fadeIn()
 {
 	mState = State::APPEAR;
 	refreshGamepadList(true);
+
+	mUsingControlsLR = InputManager::instance().isUsingControlsLR();
+	mMenuEntries.getEntryByData(::BUTTON_L)->setVisible(mUsingControlsLR);
+	mMenuEntries.getEntryByData(::BUTTON_R)->setVisible(mUsingControlsLR);
 }
 
 void ControllerSetupMenu::initialize()
@@ -78,13 +84,9 @@ void ControllerSetupMenu::initialize()
 
 	mMenuEntries.addEntry("Assign all buttons", ::ASSIGN_ALL);
 
-	const constexpr size_t NUM_BUTTONS = (size_t)InputConfig::DeviceDefinition::Button::_NUM;
-	const char* buttonNames[NUM_BUTTONS] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back", "L", "R" };
-	for (size_t i = 0; i < NUM_BUTTONS; ++i)
+	for (size_t i = 0; i < InputConfig::DeviceDefinition::NUM_BUTTONS; ++i)
 	{
-		// TODO: Optionally add L/R as well by removing this check
-		if (i < 10)
-			mMenuEntries.addEntry(buttonNames[i], ::BUTTON_UP + (uint32)i);
+		mMenuEntries.addEntry(InputConfig::DeviceDefinition::BUTTON_NAME[i], ::BUTTON_UP + (uint32)i);
 	}
 
 	{

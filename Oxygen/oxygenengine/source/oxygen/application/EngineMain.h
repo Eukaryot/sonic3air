@@ -119,8 +119,8 @@ private:
 	struct Internal;
 	Internal& mInternal;
 
-	AudioOutBase*	mAudioOut = nullptr;
-	SDL_Window*		mSDLWindow = nullptr;
-	Drawer			mDrawer;
+	AudioOutBase* mAudioOut = nullptr;
+	SDL_Window*	  mSDLWindow = nullptr;
+	Drawer		  mDrawer;
 	std::vector<PackedFileProvider*> mPackedFileProviders;
 };

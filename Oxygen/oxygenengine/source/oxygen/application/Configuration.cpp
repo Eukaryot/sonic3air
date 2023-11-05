@@ -16,8 +16,6 @@
 
 namespace
 {
-	static const std::string InputMappingKeys[12] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back", "L", "R" };
-
 	void tryParseWindowSize(String string, Vec2i& result)
 	{
 		std::vector<String> resolution;
@@ -78,9 +76,9 @@ namespace
 
 			// Read mappings
 			std::vector<InputConfig::Assignment> newAssignments;
-			for (size_t buttonIndex = 0; buttonIndex < (size_t)InputConfig::DeviceDefinition::Button::_NUM; ++buttonIndex)
+			for (size_t buttonIndex = 0; buttonIndex < InputConfig::DeviceDefinition::NUM_BUTTONS; ++buttonIndex)
 			{
-				const Json::Value& mappingJson = (*it)[InputMappingKeys[buttonIndex]];
+				const Json::Value& mappingJson = (*it)[InputConfig::DeviceDefinition::BUTTON_NAME[buttonIndex]];
 				newAssignments.clear();
 				if (mappingJson.isArray())
 				{
@@ -110,6 +108,11 @@ namespace
 							}
 						}
 					}
+				}
+				else
+				{
+					// Use the previously set default assignments (unfortunately, this only works for keyboards)
+					continue;
 				}
 
 				// Set assignments, and allow for duplicate assignments (i.e. having a real button mapped to multiple controls) in this case
@@ -700,9 +703,9 @@ void Configuration::saveSettingsInput(const std::wstring& filename) const
 			writer.writeLine(line);
 		}
 
-		for (size_t i = 0; i < (size_t)InputConfig::DeviceDefinition::Button::_NUM; ++i)
+		for (size_t i = 0; i < InputConfig::DeviceDefinition::NUM_BUTTONS; ++i)
 		{
-			const std::string& name = InputMappingKeys[i];
+			const std::string& name = InputConfig::DeviceDefinition::BUTTON_NAME[i];
 			String line = "\"" + name + "\":";
 			line.add(' ', 6 - (int)name.length());
 			line << "[ ";
@@ -719,7 +722,7 @@ void Configuration::saveSettingsInput(const std::wstring& filename) const
 				isFirst = false;
 			}
 			line << " ]";
-			if (i+1 < (size_t)InputConfig::DeviceDefinition::Button::_NUM)
+			if (i+1 < InputConfig::DeviceDefinition::NUM_BUTTONS)
 				line << ",";
 			writer.writeLine(line);
 		}

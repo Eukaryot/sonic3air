@@ -168,6 +168,9 @@ public:
 
 	void setControllerLEDsForPlayer(int playerIndex, const Color& color) const;
 
+	inline bool isUsingControlsLR() const  { return mUsingControlsLR; }
+	void handleActiveModsChanged();
+
 private:
 	enum class WaitInputState
 	{
@@ -229,4 +232,6 @@ private:
 
 	TouchInputMode mTouchInputMode = TouchInputMode::HIDDEN_CONTROLS;
 	WaitInputState mWaitingForSingleInput = WaitInputState::NONE;
+
+	bool mUsingControlsLR = false;
 };

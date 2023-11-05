@@ -167,8 +167,33 @@ namespace
 			}
 		}
 	};
+
+	static const std::vector<std::pair<InputConfig::DeviceDefinition::Button, InputConfig::Assignment>> DEFAULT_KB1_FIXED_ASSIGNMENTS =
+	{
+		{ InputConfig::DeviceDefinition::Button::UP,	{ InputConfig::Assignment::Type::BUTTON, SDLK_UP     } },
+		{ InputConfig::DeviceDefinition::Button::DOWN,	{ InputConfig::Assignment::Type::BUTTON, SDLK_DOWN   } },
+		{ InputConfig::DeviceDefinition::Button::LEFT,	{ InputConfig::Assignment::Type::BUTTON, SDLK_LEFT   } },
+		{ InputConfig::DeviceDefinition::Button::RIGHT,	{ InputConfig::Assignment::Type::BUTTON, SDLK_RIGHT  } },
+		{ InputConfig::DeviceDefinition::Button::START,	{ InputConfig::Assignment::Type::BUTTON, SDLK_RETURN } },
+		{ InputConfig::DeviceDefinition::Button::BACK,	{ InputConfig::Assignment::Type::BUTTON, SDLK_ESCAPE } },
+	};
+
+	static const std::vector<std::pair<InputConfig::DeviceDefinition::Button, InputConfig::Assignment>> DEFAULT_KB1_MODIFYABLE_ASSIGNMENTS =
+	{
+		{ InputConfig::DeviceDefinition::Button::A,		{ InputConfig::Assignment::Type::BUTTON, SDLK_a } },
+		{ InputConfig::DeviceDefinition::Button::B,		{ InputConfig::Assignment::Type::BUTTON, SDLK_s } },
+		{ InputConfig::DeviceDefinition::Button::X,		{ InputConfig::Assignment::Type::BUTTON, SDLK_d } },
+		{ InputConfig::DeviceDefinition::Button::X,		{ InputConfig::Assignment::Type::BUTTON, SDLK_q } },
+		{ InputConfig::DeviceDefinition::Button::Y,		{ InputConfig::Assignment::Type::BUTTON, SDLK_w } },
+		{ InputConfig::DeviceDefinition::Button::BACK,	{ InputConfig::Assignment::Type::BUTTON, SDLK_BACKSPACE } },
+		{ InputConfig::DeviceDefinition::Button::L,		{ InputConfig::Assignment::Type::BUTTON, SDLK_e } },
+		{ InputConfig::DeviceDefinition::Button::R,		{ InputConfig::Assignment::Type::BUTTON, SDLK_r } },
+	};
 }
 
+
+
+const std::string InputConfig::DeviceDefinition::BUTTON_NAME[InputConfig::DeviceDefinition::NUM_BUTTONS] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back", "L", "R" };
 
 
 void InputConfig::Assignment::getMappingString(String& outString, DeviceType deviceType) const
@@ -279,7 +304,7 @@ void InputConfig::setupDefaultDeviceDefinitions(std::vector<DeviceDefinition>& o
 void InputConfig::setupDefaultKeyboardMappings(DeviceDefinition& outDeviceDefinition, int keyboardIndex)
 {
 	ControlMapping* mappings = outDeviceDefinition.mMappings;
-	for (size_t k = 0; k < (size_t)DeviceDefinition::Button::_NUM; ++k)
+	for (size_t k = 0; k < (size_t)DeviceDefinition::NUM_BUTTONS; ++k)
 	{
 		mappings[k].mAssignments.clear();
 	}
@@ -287,36 +312,15 @@ void InputConfig::setupDefaultKeyboardMappings(DeviceDefinition& outDeviceDefini
 	if (keyboardIndex == 0)
 	{
 		// Setup fixed and modifiable assignments for keyboard 1
-		const std::vector<std::pair<DeviceDefinition::Button, Assignment>> FIXED_ASSIGNMENTS =
-		{
-			{ DeviceDefinition::Button::UP,		{ Assignment::Type::BUTTON, SDLK_UP     } },
-			{ DeviceDefinition::Button::DOWN,	{ Assignment::Type::BUTTON, SDLK_DOWN   } },
-			{ DeviceDefinition::Button::LEFT,	{ Assignment::Type::BUTTON, SDLK_LEFT   } },
-			{ DeviceDefinition::Button::RIGHT,	{ Assignment::Type::BUTTON, SDLK_RIGHT  } },
-			{ DeviceDefinition::Button::START,	{ Assignment::Type::BUTTON, SDLK_RETURN } },
-			{ DeviceDefinition::Button::BACK,	{ Assignment::Type::BUTTON, SDLK_ESCAPE } },
-		};
-		const std::vector<std::pair<DeviceDefinition::Button, Assignment>> MODIFYABLE_ASSIGNMENTS =
-		{
-			{ DeviceDefinition::Button::A,		{ Assignment::Type::BUTTON, SDLK_a } },
-			{ DeviceDefinition::Button::B,		{ Assignment::Type::BUTTON, SDLK_s } },
-			{ DeviceDefinition::Button::X,		{ Assignment::Type::BUTTON, SDLK_d } },
-			{ DeviceDefinition::Button::X,		{ Assignment::Type::BUTTON, SDLK_q } },
-			{ DeviceDefinition::Button::Y,		{ Assignment::Type::BUTTON, SDLK_w } },
-			{ DeviceDefinition::Button::BACK,	{ Assignment::Type::BUTTON, SDLK_BACKSPACE } },
-			{ DeviceDefinition::Button::L,		{ Assignment::Type::BUTTON, SDLK_e } },
-			{ DeviceDefinition::Button::R,		{ Assignment::Type::BUTTON, SDLK_r } },
-		};
-
-		for (const auto& pair : FIXED_ASSIGNMENTS)
+		for (const auto& pair : DEFAULT_KB1_FIXED_ASSIGNMENTS)
 		{
 			mappings[(size_t)pair.first].mAssignments.push_back(pair.second);
 		}
-		for (size_t k = 0; k < (size_t)DeviceDefinition::Button::_NUM; ++k)
+		for (size_t k = 0; k < (size_t)DeviceDefinition::NUM_BUTTONS; ++k)
 		{
 			mappings[k].mNumFixedAssignments = mappings[k].mAssignments.size();
 		}
-		for (const auto& pair : MODIFYABLE_ASSIGNMENTS)
+		for (const auto& pair : DEFAULT_KB1_MODIFYABLE_ASSIGNMENTS)
 		{
 			mappings[(size_t)pair.first].mAssignments.push_back(pair.second);
 		}
@@ -330,18 +334,17 @@ void InputConfig::setupDefaultKeyboardMappings(DeviceDefinition& outDeviceDefini
 void InputConfig::clearAssignments(DeviceDefinition& deviceDefinition, size_t buttonIndex)
 {
 	// Remove all assignments, except for the fixed ones at the start
-	RMX_ASSERT(buttonIndex < (size_t)DeviceDefinition::Button::_NUM, "Invalid button index " << buttonIndex);
-	ControlMapping& mapping = deviceDefinition.mMappings[buttonIndex];
+	ControlMapping& mapping = getMapping(deviceDefinition, buttonIndex);
 	mapping.mAssignments.resize(mapping.mNumFixedAssignments);
 }
 
 void InputConfig::addAssignment(DeviceDefinition& deviceDefinition, size_t buttonIndex, const Assignment& newAssignment, bool removeDuplicates)
 {
-	RMX_ASSERT(buttonIndex < (size_t)DeviceDefinition::Button::_NUM, "Invalid button index " << buttonIndex);
+	ControlMapping& mapping = getMapping(deviceDefinition, buttonIndex);
 
 	// Check for duplicates in same button
 	{
-		std::vector<Assignment>& buttonMappings = deviceDefinition.mMappings[buttonIndex].mAssignments;
+		std::vector<Assignment>& buttonMappings = mapping.mAssignments;
 		if (std::count(buttonMappings.begin(), buttonMappings.end(), newAssignment) != 0)
 		{
 			// Already added
@@ -353,7 +356,7 @@ void InputConfig::addAssignment(DeviceDefinition& deviceDefinition, size_t butto
 	bool canBeAdded = true;
 	if (removeDuplicates)
 	{
-		for (size_t k = 0; k < (size_t)DeviceDefinition::Button::_NUM; ++k)
+		for (size_t k = 0; k < (size_t)DeviceDefinition::NUM_BUTTONS; ++k)
 		{
 			if (k != buttonIndex)
 			{
@@ -383,7 +386,7 @@ void InputConfig::addAssignment(DeviceDefinition& deviceDefinition, size_t butto
 	if (canBeAdded)
 	{
 		// Add assignment
-		deviceDefinition.mMappings[buttonIndex].mAssignments.push_back(newAssignment);
+		mapping.mAssignments.push_back(newAssignment);
 	}
 }
 
@@ -394,4 +397,10 @@ void InputConfig::setAssignments(DeviceDefinition& deviceDefinition, size_t butt
 	{
 		addAssignment(deviceDefinition, buttonIndex, newAssignment, removeDuplicates);
 	}
+}
+
+InputConfig::ControlMapping& InputConfig::getMapping(DeviceDefinition& deviceDefinition, size_t buttonIndex)
+{
+	RMX_ASSERT(buttonIndex < (size_t)DeviceDefinition::NUM_BUTTONS, "Invalid button index " << buttonIndex);
+	return deviceDefinition.mMappings[buttonIndex];
 }

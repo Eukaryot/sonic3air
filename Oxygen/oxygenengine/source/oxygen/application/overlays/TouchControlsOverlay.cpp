@@ -95,9 +95,7 @@ void TouchControlsOverlay::buildTouchControls()
 		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(0.0f, -0.28f) * size, 0.15f * size, "touch_overlay_Y", controller.Y, ConfigMode::State::MOVING_FACE_BUTTONS);
 		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(0.0f, +0.28f) * size, 0.15f * size, "touch_overlay_A", controller.A, ConfigMode::State::MOVING_FACE_BUTTONS);
 
-		// TODO: Include the L/R buttons, but make them optional
-		const bool addLRButtons = false;
-		if (addLRButtons)
+		if (InputManager::instance().isUsingControlsLR())
 		{
 			buildRoundButton(mSetup.mShoulderLButtonCenter, 0.15f * size, "touch_overlay_L", controller.L, ConfigMode::State::MOVING_L);
 			buildRoundButton(mSetup.mShoulderRButtonCenter, 0.15f * size, "touch_overlay_R", controller.R, ConfigMode::State::MOVING_R);

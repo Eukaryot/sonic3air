@@ -131,6 +131,16 @@ void ModManager::setActiveMods(const std::vector<Mod*>& newActiveModsList)
 	onActiveModsChanged();
 }
 
+bool ModManager::anyActiveModUsesFeature(uint64 featureNameHash) const
+{
+	for (const Mod* mod : mActiveMods)
+	{
+		if (nullptr != mod->getUsedFeature(featureNameHash))
+			return true;
+	}
+	return false;
+}
+
 void ModManager::copyModSettingsFromConfig()
 {
 	Configuration& config = Configuration::instance();

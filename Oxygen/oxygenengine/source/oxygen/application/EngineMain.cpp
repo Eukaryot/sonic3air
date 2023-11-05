@@ -127,6 +127,9 @@ void EngineMain::onActiveModsChanged()
 	// Update audio
 	mAudioOut->handleActiveModsChanged();
 
+	// Update input
+	mInternal.mInputManager.handleActiveModsChanged();
+
 	// Scripts need to be reloaded
 	Application::instance().getSimulation().reloadScriptsAfterModsChange();
 

@@ -57,6 +57,8 @@ private:
 	GameMenuEntry* mControllerSelectEntry = nullptr;
 	GameMenuEntries mAssignmentType;
 	GameMenuScrolling mScrolling;
+
+	bool mUsingControlsLR = false;
 	uint32 mLastGamepadsChangeCounter = 0;
 
 	int mCurrentlyAssigningButtonIndex = -1;
