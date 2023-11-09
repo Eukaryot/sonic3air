@@ -16,12 +16,12 @@ void GameMenuControlsDisplay::clear()
 	mControls.clear();
 }
 
-void GameMenuControlsDisplay::addControl(std::string_view displayText, bool alignRight, std::string_view spriteName, Hold hold)
+void GameMenuControlsDisplay::addControl(std::string_view displayText, bool alignRight, std::string_view spriteName)
 {
-	addControl(displayText, alignRight, spriteName, "", hold);
+	addControl(displayText, alignRight, spriteName, "");
 }
 
-void GameMenuControlsDisplay::addControl(std::string_view displayText, bool alignRight, std::string_view spriteName, std::string_view additionalSpriteName, Hold hold)
+void GameMenuControlsDisplay::addControl(std::string_view displayText, bool alignRight, std::string_view spriteName, std::string_view additionalSpriteName)
 {
 	const uint64 spriteKey = rmx::getMurmur2_64(spriteName);
 	for (Control& control : mControls)
@@ -36,7 +36,6 @@ void GameMenuControlsDisplay::addControl(std::string_view displayText, bool alig
 	Control& newControl = vectorAdd(mControls);
 	newControl.mDisplayText = displayText;
 	newControl.mAlignRight = alignRight;
-	newControl.mHold = (hold == Hold::YES);
 	newControl.mSpriteKeys.push_back(spriteKey);
 
 	if (!additionalSpriteName.empty())
@@ -88,11 +87,6 @@ void GameMenuControlsDisplay::drawControl(const Control& control, Drawer& drawer
 		for (uint64 spriteKey : control.mSpriteKeys)
 		{
 			drawer.drawSprite(pos + Vec2i(4, 0), spriteKey);
-			if (control.mHold)
-			{
-				pos.x -= 15;
-				drawer.printText(global::mSmallfontRect, pos + Vec2i(-4, 0), "HOLD", 4, Color(0.7f, 0.7f, 0.7f));
-			}
 			pos.x -= 16;
 		}
 	}
@@ -101,11 +95,6 @@ void GameMenuControlsDisplay::drawControl(const Control& control, Drawer& drawer
 		for (uint64 spriteKey : control.mSpriteKeys)
 		{
 			drawer.drawSprite(pos + Vec2i(4, 0), spriteKey);
-			if (control.mHold)
-			{
-				drawer.printText(global::mSmallfontRect, pos + Vec2i(8, 1), "HOLD", 4);
-				pos.x += 14;
-			}
 			pos.x += 16;
 		}
 

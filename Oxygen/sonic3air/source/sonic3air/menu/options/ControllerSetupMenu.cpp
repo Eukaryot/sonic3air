@@ -70,6 +70,8 @@ void ControllerSetupMenu::fadeIn()
 	mUsingControlsLR = InputManager::instance().isUsingControlsLR();
 	mMenuEntries.getEntryByData(::BUTTON_L)->setVisible(mUsingControlsLR);
 	mMenuEntries.getEntryByData(::BUTTON_R)->setVisible(mUsingControlsLR);
+
+	refreshControlsDisplay();
 }
 
 void ControllerSetupMenu::initialize()
@@ -119,6 +121,7 @@ void ControllerSetupMenu::keyboard(const rmx::KeyboardEvent& ev)
 			// Abort
 			mCurrentlyAssigningButtonIndex = -1;
 			mControlsBlocked = true;
+			refreshControlsDisplay();
 			return;
 		}
 
@@ -163,6 +166,7 @@ void ControllerSetupMenu::update(float timeElapsed)
 				// Abort
 				mCurrentlyAssigningButtonIndex = -1;
 				mControlsBlocked = true;
+				refreshControlsDisplay();
 			}
 			else if (device->mType == InputConfig::DeviceType::GAMEPAD)
 			{
@@ -227,6 +231,11 @@ void ControllerSetupMenu::update(float timeElapsed)
 				}
 			}
 
+			if (result == GameMenuEntries::UpdateResult::ENTRY_CHANGED)
+			{
+				refreshControlsDisplay();
+			}
+
 			if (result != GameMenuEntries::UpdateResult::NONE)
 			{
 				GameMenuBase::playMenuSound(0x5b);
@@ -259,6 +268,7 @@ void ControllerSetupMenu::update(float timeElapsed)
 								InputManager::instance().getPressedGamepadInputs(mBlockedInputs, *getSelectedDevice());
 								++mMenuEntries.mSelectedEntryIndex;
 								GameMenuBase::playMenuSound(0x63);
+								refreshControlsDisplay();
 							}
 							break;
 						}
@@ -301,6 +311,7 @@ void ControllerSetupMenu::update(float timeElapsed)
 									InputManager::instance().getPressedGamepadInputs(mBlockedInputs, *getSelectedDevice());
 									GameMenuBase::playMenuSound(0x63);
 								}
+								refreshControlsDisplay();
 							}
 							break;
 						}
@@ -550,6 +561,11 @@ void ControllerSetupMenu::render()
 		}
 	}
 
+	if (ConfigurationImpl::instance().mShowControlsDisplay)
+	{
+		mGameMenuControlsDisplay.render(drawer, alpha);
+	}
+
 	drawer.performRendering();
 }
 
@@ -620,6 +636,7 @@ void ControllerSetupMenu::onAssignmentDone(const InputManager::RealDevice& devic
 		mCurrentlyAssigningButtonIndex = -1;
 		if (mAssignAll)
 			++mMenuEntries.mSelectedEntryIndex;
+		refreshControlsDisplay();
 	}
 	mControlsBlocked = true;
 }
@@ -665,4 +682,42 @@ void ControllerSetupMenu::refreshGamepadList(bool forceUpdate)
 		}
 		entry.setSelectedIndexByValue(oldValue);
 	}
+}
+
+void ControllerSetupMenu::refreshControlsDisplay()
+{
+	mGameMenuControlsDisplay.clear();
+
+	if (mCurrentlyAssigningButtonIndex >= 0)
+	{
+		mGameMenuControlsDisplay.addControl("Clear", false, "input_icon_key_esc");
+	}
+	else
+	{
+		const GameMenuEntry& selectedEntry = mMenuEntries.selected();
+		switch (selectedEntry.mData)
+		{
+			case ::CONTROLLER_SELECT:
+				mGameMenuControlsDisplay.addControl("Select Keyboard or Gamepad", false, "@input_icon_button_left", "@input_icon_button_right");
+				break;
+
+			case ::ASSIGN_ALL:
+				mGameMenuControlsDisplay.addControl("Assign all", false, "@input_icon_button_A");
+				break;
+
+			case ::VISUAL_STYLE:
+				mGameMenuControlsDisplay.addControl("Change visual style", false, "@input_icon_button_left", "@input_icon_button_right");
+				break;
+
+			default:
+				if ((selectedEntry.mData & 0xf0) == 0x10)
+				{
+					mGameMenuControlsDisplay.addControl("Select", false, "@input_icon_button_A");
+					mGameMenuControlsDisplay.addControl("Assignment mode", false, "@input_icon_button_left", "@input_icon_button_right");
+				}
+				break;
+		}
+	}
+
+	mGameMenuControlsDisplay.addControl("Back",	true, "@input_icon_button_B");
 }

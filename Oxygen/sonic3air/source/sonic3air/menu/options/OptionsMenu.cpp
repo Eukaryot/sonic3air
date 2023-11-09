@@ -859,8 +859,6 @@ void OptionsMenu::onFadeIn()
 	mMenuBackground->showPreview(false);
 	mMenuBackground->startTransition(MenuBackground::Target::LIGHT);
 
-	refreshControlsDisplay();
-
 	const ConfigurationImpl& config = ConfigurationImpl::instance();
 	mOptionEntries[option::WINDOW_MODE].mGameMenuEntry->setSelectedIndexByValue((int)Application::instance().getWindowMode());
 	mOptionEntries[option::WINDOW_MODE_STARTUP].mGameMenuEntry->setSelectedIndexByValue((int)config.mWindowMode);
@@ -1061,13 +1059,13 @@ void OptionsMenu::update(float timeElapsed)
 			mActiveMenu->mSelectedEntryIndex = 0;
 		}
 
-		if (keys.Y.mChange)
+		if (keys.X.mChange)
 		{
 			refreshControlsDisplay();
 		}
 
 		GameMenuEntries::UpdateResult result = GameMenuEntries::UpdateResult::NONE;
-		if (keys.Y.isPressed() && (keys.Up.justPressed() || keys.Down.justPressed()) && mActiveMenu->mNavigation == GameMenuEntries::Navigation::VERTICAL)
+		if (keys.X.isPressed() && (keys.Up.justPressed() || keys.Down.justPressed()) && mActiveMenu->mNavigation == GameMenuEntries::Navigation::VERTICAL)
 		{
 			// Quick navigation while holding Y
 			const int entryChange = mActiveMenu->getEntryChangeByInput();
@@ -1242,7 +1240,7 @@ void OptionsMenu::update(float timeElapsed)
 			ACCEPT,
 			BACK
 		};
-		const ButtonEffect buttonEffect = (keys.Start.justPressed() || keys.A.justPressed() || keys.X.justPressed()) ? ButtonEffect::ACCEPT :
+		const ButtonEffect buttonEffect = (keys.Start.justPressed() || keys.A.justPressed()) ? ButtonEffect::ACCEPT :
 										  (keys.Back.justPressed() || keys.B.justPressed()) ? ButtonEffect::BACK : ButtonEffect::NONE;
 
 		if (buttonEffect != ButtonEffect::NONE)
@@ -1631,6 +1629,8 @@ void OptionsMenu::setupOptionsMenu(bool enteredFromIngame)
 	mWarningMessageTimeout = enteredFromIngame ? 4.0f : 0.0f;
 	mAudioWarningMessageTimeout = 0.0f;
 	mShowedAudioWarningMessage = false;
+
+	refreshControlsDisplay();
 }
 
 void OptionsMenu::removeControllerSetupMenu()
@@ -1771,7 +1771,7 @@ void OptionsMenu::refreshControlsDisplay()
 	mGameMenuControlsDisplay.clear();
 
 	const InputManager::ControllerScheme& keys = InputManager::instance().getController(0);
-	if (keys.Y.isPressed())
+	if (keys.X.isPressed())
 	{
 		mGameMenuControlsDisplay.addControl("Prev / Next category", false, "@input_icon_button_up", "@input_icon_button_down");
 	}
@@ -1802,7 +1802,7 @@ void OptionsMenu::refreshControlsDisplay()
 		if (mActiveTab == Tab::Id::MODS)
 		{
 			// Show only here, as that's where it's most relevent - however, it works in the other tabs as well
-			mGameMenuControlsDisplay.addControl("Hold: Quick Nav", true, "@input_icon_button_Y");
+			mGameMenuControlsDisplay.addControl("Hold: Quick Nav", true, "@input_icon_button_X");
 		}
 
 		mGameMenuControlsDisplay.addControl("Back",	true, "@input_icon_button_B");
