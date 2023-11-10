@@ -54,7 +54,7 @@ function void fn025d9c()
 			A1 = 0xffffb000
 		#if STANDALONE
 			// Also allow for drop-dashing on the spin wheel, #contributed by iCloudius
-			if (objA1.state == char.state.SPINDASH || objA1.state.former == char.state.SONIC_DROPDASH)
+			if (objA1.state == char.state.SPINDASH || (u8[A1 + 0x38] == CHARACTER_SONIC && objA1.state.former == char.state.SONIC_DROPDASH))
 		#else
 			if (objA1.state == char.state.SPINDASH)
 		#endif
@@ -78,7 +78,7 @@ function void fn025d9c()
 		{
 			A1 = 0xffffb04a
 		#if STANDALONE
-			if (objA1.state == char.state.SPINDASH || objA1.state.former == char.state.SONIC_DROPDASH)
+			if (objA1.state == char.state.SPINDASH || (u8[A1 + 0x38] == CHARACTER_SONIC && objA1.state.former == char.state.SONIC_DROPDASH))
 		#else
 			if (objA1.state == char.state.SPINDASH)
 		#endif
