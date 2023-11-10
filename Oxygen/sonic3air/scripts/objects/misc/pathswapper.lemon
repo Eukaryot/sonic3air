@@ -50,13 +50,13 @@ function void PathSwapperInit()
 
 		if (competition_mode.active)
 		{
-			objA0.update_address = 0x01cf1a
+			objA0.update_address = addressof(PathSwapperCompetitionMode_UpdateHorizontal)
 			objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x03d2)
 			PathSwapperCompetitionMode_UpdateHorizontal()
 		}
 		else
 		{
-			objA0.update_address = 0x01cef2
+			objA0.update_address = addressof(PathSwapperBaseUpdateHorizontal)
 			PathSwapperBaseUpdateHorizontal()
 		}
 	}
@@ -78,13 +78,13 @@ function void PathSwapperInit()
 
 		if (competition_mode.active)
 		{
-			objA0.update_address = 0x01cdb2
+			objA0.update_address = addressof(PathSwapperCompetitionMode_UpdateVertical)
 			objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x03d2)
 			PathSwapperCompetitionMode_UpdateVertical()
 		}
 		else
 		{
-			objA0.update_address = 0x01cd8a
+			objA0.update_address = addressof(PathSwapperBaseUpdateVertical)
 			PathSwapperBaseUpdateVertical()
 		}
 	}

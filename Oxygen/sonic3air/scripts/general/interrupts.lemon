@@ -218,6 +218,16 @@ function void VInt.Update.MainGame()
 			{
 				VDP.writeData16(blendColorsPacked(u16[paletteAddress + i * 2], 0x0eee, blendFactor))
 			}
+
+			if (EXTENDED_CHARACTER_PALETTES)
+			{
+				// Also update additional palettes
+				paletteAddress = (water.fullscreen) ? 0x802300 : 0x802000
+				for (u16 i = 0; i < 0xc0; ++i)
+				{
+					Renderer.setPaletteEntryPacked(i + 0x40, blendColorsPacked(u16[paletteAddress + i * 2], 0x0eee, blendFactor))
+				}
+			}
 		}
 		#else
 		{
@@ -706,10 +716,19 @@ function void HInt_000dd8()
 
 			if (EXTENDED_CHARACTER_PALETTES)
 			{
+				// Consider Hyper Dash screen flash
+				//  -> Note that this will not work in the flash's last frame
+				u16 blendFactor = 0
+				if (global.whiteflash_timeout > 0)
+				{
+					// Use blending instead of showing the full white flash
+					blendFactor = VInt.getBlendFactorForScreenFlash()
+				}
+
 				// Also update additional palettes
 				for (u16 i = 0; i < 0xc0; ++i)
 				{
-					Renderer.setSecondaryPaletteEntryPacked(i + 0x40, u16[0x802300 + i * 2])
+					Renderer.setSecondaryPaletteEntryPacked(i + 0x40, blendColorsPacked(u16[0x802300 + i * 2], 0x0eee, blendFactor))
 				}
 			}
 		}
@@ -821,7 +840,7 @@ function void HInt_001024()
 			// Also update additional palettes
 			for (u16 i = 0; i < 0xc0; ++i)
 			{
-				Renderer.setSecondaryPaletteEntryPacked(i + 0x40, u16[0x802300 + i * 2])
+				Renderer.setSecondaryPaletteEntryPacked(i + 0x40, blendColorsPacked(u16[0x802300 + i * 2], 0x0eee, blendFactor))
 			}
 		}
 	}

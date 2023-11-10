@@ -207,7 +207,7 @@ function void fn08e250()
 
 		if (D1.u8 == 0x03)
 		{
-			objA0.update_address = 0x03dbe0
+			objA0.update_address = addressof(MHZSingleLeaf.Type2)
 			u16[A0 + 0x34] = 0x02
 		}
 

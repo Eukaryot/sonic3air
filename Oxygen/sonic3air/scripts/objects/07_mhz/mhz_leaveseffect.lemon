@@ -89,7 +89,7 @@ function void MHZLeavesEffect.UpdateForPlayer()
 					D0.u16 &= 0x03
 					D0.u16 += 0x02
 					u16[A1 + 0x34] = D0.u16
-					objA1.update_address = 0x03dc18
+					objA1.update_address = addressof(MHZSingleLeaf.Type3)
 					++u8[0xfffff7c0]
 				}
 
@@ -120,7 +120,7 @@ function void MHZLeavesEffect.UpdateForPlayer()
 			D0.u16 &= 0x03
 			D0.u16 += 0x02
 			u16[A1 + 0x34] = D0.u16
-			objA1.update_address = 0x03dbb8
+			objA1.update_address = addressof(MHZSingleLeaf.Type1)
 			++u8[0xfffff7c0]
 		}
 	}
@@ -160,7 +160,7 @@ function void MHZSingleLeaf.Type1()
 	objA0.velocity.y += u16[A0 + 0x34] * 4
 	if (objA0.velocity.y >= 0)
 	{
-		objA0.update_address = 0x03dbe0
+		objA0.update_address = addressof(MHZSingleLeaf.Type2)
 		objA0.value26 = level.framecounter.low
 	}
 
@@ -198,7 +198,7 @@ function void MHZSingleLeaf.Type3()
 	objA0.velocity.y += D0.u16
 	if (objA0.velocity.y >= 0)
 	{
-		objA0.update_address = 0x03dbe0
+		objA0.update_address = addressof(MHZSingleLeaf.Type2)
 	}
 
 	MHZSingleLeaf.SharedUpdate()

@@ -280,7 +280,7 @@ function void fn08cdb8()
 {
 	if (isMainCharacter(CHARACTER_KNUCKLES) || u8[0xfffffaab] != 0)
 	{
-		objA0.update_address = 0x01b5d4		// That is "CheckForUnloadObject()"
+		objA0.update_address = addressof(CheckForUnloadObject)
 		return
 	}
 
