@@ -48,14 +48,17 @@ private:
 	void refreshAllDependencies();
 	void clearDependencies(ModMenuEntry& modMenuEntry);
 	void refreshDependencies(ModMenuEntry& modMenuEntry, size_t modIndex);
-
+	
+	void refreshControlsDisplay();
 	int getInfoOverlayHeight() const;
+
 	bool applyModChanges(bool dryRun = false);
 	void goBack();
 	GameMenuEntry* getSelectedGameMenuEntry();
 
 private:
 	MenuBackground* mMenuBackground = nullptr;
+	GameMenuControlsDisplay mGameMenuControlsDisplay;
 
 	std::map<Mod*, ModResources> mModResources;
 
@@ -90,4 +93,5 @@ private:
 	float mVisibility = 0.0f;
 	float mFadeInDelay = 0.0f;
 	uint32 mApplyingChangesFrameCounter = 0;
+	bool mInMovementMode = false;
 };

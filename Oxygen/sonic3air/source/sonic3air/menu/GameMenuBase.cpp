@@ -392,16 +392,18 @@ bool GameMenuEntries::setSelectedIndexByValue(uint32 value)
 	return false;
 }
 
-void GameMenuEntries::changeSelectedIndex(int change)
+bool GameMenuEntries::changeSelectedIndex(int change, bool loop)
 {
+	const int originalIndex = mSelectedEntryIndex;
 	if (change < 0)
 	{
-		mSelectedEntryIndex = getPreviousInteractableIndex(mSelectedEntryIndex);
+		mSelectedEntryIndex = getPreviousInteractableIndex(mSelectedEntryIndex, loop);
 	}
 	else if (change > 0)
 	{
-		mSelectedEntryIndex = getNextInteractableIndex(mSelectedEntryIndex);
+		mSelectedEntryIndex = getNextInteractableIndex(mSelectedEntryIndex, loop);
 	}
+	return (mSelectedEntryIndex != originalIndex);
 }
 
 bool GameMenuEntries::sanitizeSelectedIndex(bool allowNonInteractableEntries)
@@ -437,36 +439,54 @@ bool GameMenuEntries::sanitizeSelectedIndex(bool allowNonInteractableEntries)
 	return true;
 }
 
-size_t GameMenuEntries::getPreviousInteractableIndex(size_t index) const
+size_t GameMenuEntries::getPreviousInteractableIndex(size_t index, bool loop) const
 {
 	if (mEntries.empty())
 		return 0;
 
+	const size_t originalIndex = index;
 	for (int tries = 0; tries < 100; ++tries)
 	{
-		index = (index > 0) ? (index - 1) : (mEntries.size() - 1);
+		if (index > 0)
+			--index;
+		else if (loop)
+			index = mEntries.size() - 1;
+		else
+			break;	// Failed
 
 		// Continue for invisible and non-interactable entries, so they get skipped
 		if (mEntries[index]->isFullyInteractable())
-			break;
+		{
+			// Found a valid index
+			return index;
+		}
 	}
-	return index;
+	return originalIndex;
 }
 
-size_t GameMenuEntries::getNextInteractableIndex(size_t index) const
+size_t GameMenuEntries::getNextInteractableIndex(size_t index, bool loop) const
 {
 	if (mEntries.empty())
 		return 0;
 
+	const size_t initialIndex = index;
 	for (int tries = 0; tries < 100; ++tries)
 	{
-		index = (index < mEntries.size() - 1) ? (index + 1) : 0;
+		if (index < mEntries.size() - 1)
+			++index;
+		else if (loop)
+			index = 0;
+		else
+			break;	// Failed
 
 		// Continue for invisible and non-interactable entries, so they get skipped
 		if (mEntries[index]->isFullyInteractable())
-			break;
+		{
+			// Found a valid index
+			return index;
+		}
 	}
-	return index;
+	return initialIndex;
 }
 
 

@@ -164,11 +164,11 @@ public:
 	inline GameMenuEntry& selected()  { return *mEntries[mSelectedEntryIndex]; }
 
 	bool setSelectedIndexByValue(uint32 value);
-	void changeSelectedIndex(int change);
+	bool changeSelectedIndex(int change, bool loop = true);
 	bool sanitizeSelectedIndex(bool allowNonInteractableEntries = false);
 
-	size_t getPreviousInteractableIndex(size_t index) const;
-	size_t getNextInteractableIndex(size_t index) const;
+	size_t getPreviousInteractableIndex(size_t index, bool loop = true) const;
+	size_t getNextInteractableIndex(size_t index, bool loop = true) const;
 
 private:
 	std::vector<GameMenuEntry*> mEntries;

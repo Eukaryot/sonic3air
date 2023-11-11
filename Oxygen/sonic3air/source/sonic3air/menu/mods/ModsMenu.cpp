@@ -14,6 +14,7 @@
 #include "sonic3air/menu/mods/ModsMenuEntries.h"
 #include "sonic3air/audio/AudioOut.h"
 #include "sonic3air/helper/DrawingUtils.h"
+#include "sonic3air/ConfigurationImpl.h"
 #include "sonic3air/Game.h"
 
 #include "oxygen/application/Configuration.h"
@@ -90,6 +91,8 @@ void ModsMenu::onFadeIn()
 	mMenuBackground->startTransition(MenuBackground::Target::ALTER);
 
 	AudioOut::instance().setMenuMusic(0x2f);
+
+	refreshControlsDisplay();
 }
 
 bool ModsMenu::canBeRemoved()
@@ -324,34 +327,80 @@ void ModsMenu::update(float timeElapsed)
 		}
 		else
 		{
-			buttonEffect = (keys.Start.justPressed() || keys.A.justPressed() || keys.X.justPressed()) ? ButtonEffect::ACCEPT :
+			buttonEffect = (keys.Start.justPressed() || keys.A.justPressed()) ? ButtonEffect::ACCEPT :
 						   (keys.Back.justPressed() || keys.B.justPressed()) ? ButtonEffect::BACK : ButtonEffect::NONE;
 		}
 
 		// Update menu entries
 		const int previousSelectedEntryIndex = menuEntries.mSelectedEntryIndex;
-		const GameMenuEntries::UpdateResult result = menuEntries.update();
+		GameMenuEntries::UpdateResult result = GameMenuEntries::UpdateResult::NONE;
+
+		if (keys.X.isPressed() && (keys.Up.justPressedOrRepeat() || keys.Down.justPressedOrRepeat()))
+		{
+			// Quick navigation while holding X (can be combined with mod movement)
+			const int entryChange = menuEntries.getEntryChangeByInput();
+			if (entryChange != 0)
+			{
+				const constexpr int NUM_QUICK_NAV_STEPS = 3;
+				for (int k = 0; k < NUM_QUICK_NAV_STEPS; ++k)
+				{
+					if (!menuEntries.changeSelectedIndex(entryChange, false))
+						break;
+				}
+				result = GameMenuEntries::UpdateResult::ENTRY_CHANGED;
+			}
+		}
+		else
+		{
+			result = menuEntries.update();
+		}
+
 		if (result != GameMenuEntries::UpdateResult::NONE)
 		{
 			bool playSound = true;
 			if (result == GameMenuEntries::UpdateResult::ENTRY_CHANGED)
 			{
-				if (keys.A.isPressed() || keys.X.isPressed())
+				if (keys.A.isPressed())
 				{
 					const int diff = menuEntries.mSelectedEntryIndex - previousSelectedEntryIndex;
-					if (diff == -1 || diff == 1)
+					if (diff < 0 && keys.Up.isPressed())
 					{
-						const size_t indexA = previousSelectedEntryIndex;
-						const size_t indexB = menuEntries.mSelectedEntryIndex;
+						const int indexA = previousSelectedEntryIndex;
+						const int indexB = menuEntries.mSelectedEntryIndex;
 
 						// Exchange entry with previous one, effectively moving that one
-						menuEntries.swapEntries(indexA, indexB);
+						for (int i = indexA; i > indexB; --i)
+							menuEntries.swapEntries(i, i - 1);
 
-						refreshDependencies(static_cast<ModMenuEntry&>(menuEntries[indexA]), indexA);
-						refreshDependencies(static_cast<ModMenuEntry&>(menuEntries[indexB]), indexB);
+						if (mActiveTab == 0)
+						{
+							for (int i = indexA; i >= indexB; --i)
+								refreshDependencies(static_cast<ModMenuEntry&>(menuEntries[i]), i);
+						}
 
 						// For animation
-						menuEntries[indexA].mAnimation.mOffset.y = (float)diff;
+						for (int i = indexA; i > indexB; --i)
+							menuEntries[i].mAnimation.mOffset.y = -1.0f;
+						menuEntries[indexB].mAnimation.mOffset.y = -(float)diff;
+					}
+					else if (diff > 0 && keys.Down.isPressed())
+					{
+						const int indexA = previousSelectedEntryIndex;
+						const int indexB = menuEntries.mSelectedEntryIndex;
+
+						// Exchange entry with previous one, effectively moving that one
+						for (int i = indexA; i < indexB; ++i)
+							menuEntries.swapEntries(i, i + 1);
+
+						if (mActiveTab == 0)
+						{
+							for (int i = indexA; i <= indexB; ++i)
+								refreshDependencies(static_cast<ModMenuEntry&>(menuEntries[i]), i);
+						}
+
+						// For animation
+						for (int i = indexA; i < indexB; ++i)
+							menuEntries[i].mAnimation.mOffset.y = 1.0f;
 						menuEntries[indexB].mAnimation.mOffset.y = -(float)diff;
 					}
 					else
@@ -395,7 +444,7 @@ void ModsMenu::update(float timeElapsed)
 
 			case ButtonEffect::SWITCH_TAB:
 			{
-				if (keys.A.isPressed() || keys.X.isPressed())
+				if (keys.A.isPressed())
 				{
 					// Make entry active or inactive
 					//  -> Note that mActiveTab is still the old tab here
@@ -438,6 +487,7 @@ void ModsMenu::update(float timeElapsed)
 
 				mActiveTab = 1 - mActiveTab;
 				preventScrolling = true;
+				refreshControlsDisplay();
 				break;
 			}
 
@@ -463,6 +513,17 @@ void ModsMenu::update(float timeElapsed)
 			default:
 				break;
 		}
+
+		const bool inMovementMode = (keys.A.isPressed() && !mTabs[mActiveTab].mMenuEntries.empty());
+		if (mInMovementMode != inMovementMode)
+		{
+			mInMovementMode = inMovementMode;
+			refreshControlsDisplay();
+		}
+		else if (keys.X.hasChanged())
+		{
+			refreshControlsDisplay();
+		}
 	}
 
 	// Animation
@@ -474,7 +535,7 @@ void ModsMenu::update(float timeElapsed)
 			if (entry.mAnimation.mOffset.x != 0.0f || entry.mAnimation.mOffset.y != 0.0f)
 			{
 				moveFloatTowards(entry.mAnimation.mOffset.x, 0.0f, timeElapsed * 6.0f);
-				moveFloatTowards(entry.mAnimation.mOffset.y, 0.0f, timeElapsed * 12.0f);
+				moveFloatTowards(entry.mAnimation.mOffset.y, 0.0f, timeElapsed * ((std::abs(entry.mAnimation.mOffset.y) <= 1.0f) ? 12.0f : 30.0f));
 			}
 		}
 	}
@@ -599,9 +660,6 @@ void ModsMenu::render()
 		return;
 	}
 
-	const InputManager::ControllerScheme& controller = InputManager::instance().getController(0);
-	const bool inMovementMode = (controller.A.isPressed() || controller.X.isPressed()) && !mTabs[mActiveTab].mMenuEntries.empty();
-
 	int infoOverlayPosition = 224;
 	if (mInfoOverlay.mVisibility > 0.0f)
 	{
@@ -647,7 +705,7 @@ void ModsMenu::render()
 			rect.y += rect.height + 7;
 		}
 
-		const bool showPriorityHints = (tabIndex == 0 && mActiveTab == 0 && inMovementMode && menuEntries.size() >= 2);
+		const bool showPriorityHints = (tabIndex == 0 && mActiveTab == 0 && mInMovementMode && menuEntries.size() >= 2);
 		if (showPriorityHints)
 		{
 			drawer.printText(global::mSmallfont, rect + Vec2i(-12, -12), "HIGH PRIORITY", 1, Color(0.4f, 0.5f, 0.6f, alpha * 0.25f));
@@ -671,7 +729,7 @@ void ModsMenu::render()
 			{
 				const ModEntry* modEntry = (entry.mData < 0xfff0) ? &mModEntries[entry.mData] : nullptr;
 
-				Color color = (tabIndex == mActiveTab) ? (isSelected ? (inMovementMode ? Color(0.25f, 0.75f, 1.0f) : Color::YELLOW) : Color::WHITE) : Color(0.7f, 0.7f, 0.7f);
+				Color color = (tabIndex == mActiveTab) ? (isSelected ? (mInMovementMode ? Color(0.25f, 0.75f, 1.0f) : Color::YELLOW) : Color::WHITE) : Color(0.7f, 0.7f, 0.7f);
 				color.a *= alpha;
 
 				const float lineOffset = (mState < State::SHOW) ? (224.0f - (float)rect.y - startY) : 0.0f;
@@ -685,7 +743,7 @@ void ModsMenu::render()
 				renderContext.mBaseColor = color;
 				renderContext.mIsSelected = isSelected;
 				renderContext.mIsActiveModsTab = (tabIndex == 0);
-				renderContext.mInMovementMode = inMovementMode;
+				renderContext.mInMovementMode = mInMovementMode;
 				renderContext.mNumModsInTab = menuEntries.size();
 
 				if (nullptr != modEntry)
@@ -698,7 +756,7 @@ void ModsMenu::render()
 					drawer.printText(global::mOxyfontSmall, visualRect + Vec2i(24, 0), entry.mText, 1, color);
 				}
 
-				if (inMovementMode && tabIndex != mActiveTab && (int)index == menuEntries.mSelectedEntryIndex)
+				if (mInMovementMode && tabIndex != mActiveTab && (int)index == menuEntries.mSelectedEntryIndex)
 				{
 					// Draw a line to show where the mod would be inserted
 					drawer.drawRect(Recti(visualRect.x + 20, visualRect.y - 6, 100, 1), Color(0.25f, 0.75f, 1.0f));
@@ -815,6 +873,11 @@ void ModsMenu::render()
 		drawer.printText(global::mOxyfontRegular, rect, "Applying changes...", 5);
 	}
 
+	if (ConfigurationImpl::instance().mShowControlsDisplay)
+	{
+		mGameMenuControlsDisplay.render(drawer, mVisibility * 3.0f - 2.0f);
+	}
+
 	drawer.performRendering();
 }
 
@@ -899,9 +962,40 @@ void ModsMenu::refreshDependencies(ModMenuEntry& modMenuEntry, size_t modIndex)
 	modMenuEntry.refreshAfterRemarksChange();
 }
 
+void ModsMenu::refreshControlsDisplay()
+{
+	mGameMenuControlsDisplay.clear();
+
+	const InputManager::ControllerScheme& keys = InputManager::instance().getController(0);
+	if (mInMovementMode)
+	{
+		if (mActiveTab == 0)
+		{
+			mGameMenuControlsDisplay.addControl("Deactivate", false, "@input_icon_button_right");
+			mGameMenuControlsDisplay.addControl("Change priority", false, "@input_icon_button_up", "@input_icon_button_down");
+		}
+		else
+		{
+			mGameMenuControlsDisplay.addControl("Activate", false, "@input_icon_button_left");
+		}
+	}
+	else if (keys.X.isPressed())
+	{
+		mGameMenuControlsDisplay.addControl("Move quickly", false, "@input_icon_button_up", "@input_icon_button_down");
+	}
+	else if (!mTabs[mActiveTab].mMenuEntries.empty())
+	{
+		mGameMenuControlsDisplay.addControl("Hold: Move mod", false, "@input_icon_button_A");
+		mGameMenuControlsDisplay.addControl("Details", false, "@input_icon_button_Y");
+		mGameMenuControlsDisplay.addControl("Hold: Quick Nav", true, "@input_icon_button_X");
+	}
+
+	mGameMenuControlsDisplay.addControl("Back", true, "@input_icon_button_B");
+}
+
 int ModsMenu::getInfoOverlayHeight() const
 {
-	return roundToInt(mInfoOverlay.mVisibility * 150.0f);
+	return roundToInt(mInfoOverlay.mVisibility * 155.0f);
 }
 
 bool ModsMenu::applyModChanges(bool dryRun)

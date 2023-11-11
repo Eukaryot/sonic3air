@@ -1059,21 +1059,22 @@ void OptionsMenu::update(float timeElapsed)
 			mActiveMenu->mSelectedEntryIndex = 0;
 		}
 
-		if (keys.X.mChange)
+		if (keys.X.hasChanged())
 		{
 			refreshControlsDisplay();
 		}
 
 		GameMenuEntries::UpdateResult result = GameMenuEntries::UpdateResult::NONE;
-		if (keys.X.isPressed() && (keys.Up.justPressed() || keys.Down.justPressed()) && mActiveMenu->mNavigation == GameMenuEntries::Navigation::VERTICAL)
+		if (keys.X.isPressed() && (keys.Up.justPressedOrRepeat() || keys.Down.justPressedOrRepeat()) && mActiveMenu->mNavigation == GameMenuEntries::Navigation::VERTICAL)
 		{
-			// Quick navigation while holding Y
+			// Quick navigation while holding X
 			const int entryChange = mActiveMenu->getEntryChangeByInput();
 			if (entryChange != 0)
 			{
 				for (int tries = 0; tries < 100; ++tries)
 				{
-					mActiveMenu->changeSelectedIndex(entryChange);
+					if (!mActiveMenu->changeSelectedIndex(entryChange, false))
+						break;
 
 					// Stop when reaching certain types of entries
 					if (mActiveMenu->mSelectedEntryIndex <= 0 || mActiveMenu->selected().mData == option::_BACK || mActiveMenu->selected().getMenuEntryType() == ModTitleMenuEntry::MENU_ENTRY_TYPE)
