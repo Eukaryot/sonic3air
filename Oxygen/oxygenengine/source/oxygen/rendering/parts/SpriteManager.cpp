@@ -60,6 +60,23 @@ void SpriteManager::postFrameUpdate()
 		clearLifetimeContext(RenderItem::LifetimeContext::OUTSIDE_FRAME);
 		mCurrentContext = RenderItem::LifetimeContext::OUTSIDE_FRAME;
 
+		// Process coordinates of all render items
+		{
+			const Vec2i worldSpaceOffset = mSpacesManager.getWorldSpaceOffset();
+			for (int contextIndex = 0; contextIndex < RenderItem::NUM_CONTEXTS; ++contextIndex)
+			{
+				for (RenderItem* renderItem : mContexts[contextIndex].mItems)
+				{
+					if (renderItem->mCoordinatesSpace == SpriteManager::Space::WORLD)
+					{
+						// Move to screen space
+						renderItem->mPosition -= worldSpaceOffset;
+						renderItem->mCoordinatesSpace = SpriteManager::Space::SCREEN;
+					}
+				}
+			}
+		}
+
 		if (mResetRenderItems)
 		{
 			if (EngineMain::getDelegate().useDeveloperFeatures())
@@ -70,20 +87,6 @@ void SpriteManager::postFrameUpdate()
 				if (mLegacyVdpSpriteMode)
 				{
 					collectLegacySprites();
-				}
-			}
-
-			// Process coordinates of all sprites
-			const Vec2i worldSpaceOffset = mSpacesManager.getWorldSpaceOffset();
-
-			for (int contextIndex = 0; contextIndex < RenderItem::NUM_CONTEXTS; ++contextIndex)
-			{
-				for (RenderItem* renderItem : mContexts[contextIndex].mItems)
-				{
-					if (renderItem->mCoordinatesSpace == SpriteManager::Space::WORLD)
-					{
-						renderItem->mPosition -= worldSpaceOffset;
-					}
 				}
 			}
 
