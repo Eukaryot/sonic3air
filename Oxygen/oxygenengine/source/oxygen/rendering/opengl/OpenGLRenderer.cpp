@@ -454,6 +454,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			if (needsRefresh)
 			{
 				glDisable(GL_DEPTH_TEST);
+				mLastRenderedGeometryType = Geometry::Type::RECT;
 			}
 			OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
 
@@ -483,6 +484,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			if (needsRefresh)
 			{
 				glDisable(GL_DEPTH_TEST);
+				mLastRenderedGeometryType = Geometry::Type::TEXTURED_RECT;
 			}
 			OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
 
@@ -530,6 +532,11 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			break;
 		}
 	}
+
+#ifdef DEBUG
+	const GLenum err = glGetError();
+	RMX_ASSERT(err == GL_NO_ERROR, "OpenGL error: " << (int)err);
+#endif
 }
 
 void OpenGLRenderer::copyGameScreenToProcessingBuffer()
