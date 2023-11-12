@@ -1645,7 +1645,7 @@ function void fn01e0a2()
 			//  -> The win pose: This prevents characters from showing their walking animation when standing next to an object like the capsule during the level results
 			//  -> Super/Hyper transformation: Without this, transforming next to a monitor switched to the run animation, and can even cause a softlock if immediately cancelling the transformation
 			//  -> Hurt state: Occasionally, standing next to an object would show the walking animation instead of the hurt animation (Happens in HCZ2 end cutscene and LRZ1 as examples)
-			if (u8[A1 + 0x20] != char.state.WIN_POSE && u8[A1 + 0x20] != char.state.TRANSFORMING && u8[A1 + 0x20] == char.state.GOT_HURT)
+			if (u8[A1 + 0x20] != char.state.WIN_POSE && u8[A1 + 0x20] != char.state.TRANSFORMING && u8[A1 + 0x20] != char.state.GOT_HURT)
 		#endif
 			{
 				objA1.state = char.state.RUNNING
