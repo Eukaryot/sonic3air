@@ -70,6 +70,12 @@ void Downloader::stopDownload()
 		delete mThread;
 		mThread = nullptr;
 	}
+
+	if (mState == State::RUNNING || mState == State::FAILED)
+	{
+		// Delete the output file
+		FTX::FileSystem->removeFile(Configuration::instance().mAppDataPath + mOutputFilename);
+	}
 	mState = State::NONE;
 }
 
