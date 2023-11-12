@@ -2148,8 +2148,19 @@ function bool Character.CheckStartJump()
 	}
 	else
 	{
-		char.hitbox_extends.x = char.hitbox.x.ROLLING
-		char.hitbox_extends.y = char.hitbox.y.ROLLING
+	#if STANDALONE
+		// Fix incorrect jumping hitbox in Competition Mode
+		if (competition_mode.active)
+		{
+			char.hitbox_extends.x = 3
+			char.hitbox_extends.y = 7
+		}
+		else
+	#endif
+		{
+			char.hitbox_extends.x = char.hitbox.x.ROLLING
+			char.hitbox_extends.y = char.hitbox.y.ROLLING
+		}
 		char.flags |= char.flag.ROLLING
 		char.state = char.state.ROLLING
 

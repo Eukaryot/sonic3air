@@ -105,6 +105,13 @@ function void DebugMode.OnSelectionChanged()
 	char.mapping_offset = u32[A2 + D0.u16 + 4]
 	char.sprite_attributes = u16[A2 + D0.u16 + 8]
 	char.animation.sprite = u8[A2 + D0.u16]
+#if STANDALONE
+	if (global.zone == 0x0b && (debug_mode.selection == 0x08 || debug_mode.selection == 0x09))
+	{
+		// Fix the two badniks in DEZ using the wrong palette line (previously Sonic and Tails's)
+		objA0.sprite_attributes |= sprite_attribute.PALETTE.LINE1
+	}
+#endif
 }
 
 
@@ -230,8 +237,19 @@ function void DebugMode.EvaluateInput()
 		objA1.mapping_offset = debug_mode.backup.mapping_offset
 		objA1.sprite_attributes = debug_mode.backup.sprite_attributes
 		DebugMode.ResetSonic()
-		objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
-		objA1.hitbox_extends.x = char.hitbox.x.UPRIGHT
+	#if STANDALONE
+		// Fix for incorrectly restored hitbox in Competition Mode
+		if (competition_mode.active)
+		{
+			objA1.hitbox_extends.y = u8[A1 + 0x44]
+			objA1.hitbox_extends.x = u8[A1 + 0x45]
+		}
+		else
+	#endif
+		{
+			objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
+			objA1.hitbox_extends.x = char.hitbox.x.UPRIGHT
+		}
 	}
 }
 
