@@ -619,6 +619,7 @@ void Game::updateSpecialInput(float timeElapsed)
 void Game::onActiveModsChanged()
 {
 	checkActiveModsUsedFeatures();
+	mDynamicSprites.updateSpriteRedirects();
 }
 
 bool Game::shouldPauseOnFocusLoss() const
