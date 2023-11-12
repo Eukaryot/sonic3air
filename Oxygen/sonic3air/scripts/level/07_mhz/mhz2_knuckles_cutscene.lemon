@@ -236,6 +236,13 @@ function void fn0632ca()
 		A1 = 0xffff0000 + u16[A0 + 0x46]
 		objA0.respawn_entry = u16[A1 + 0x48]
 	}
+	#if STANDALONE
+	else
+	{
+		// Fix for Knuckles' lever using an unintended palette (which was previously the Cutscene Knuckles palette line)
+		objA0.sprite_attributes &= ~sprite_attribute.PALETTE.LINE1
+	}
+	#endif
 
 	Kosinski.addToDMAQueue(0x16a072, 0xa500)		// Knuckles lever
 }
