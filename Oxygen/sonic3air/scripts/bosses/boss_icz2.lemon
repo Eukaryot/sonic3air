@@ -236,12 +236,12 @@ function void fn071d9e()
 	{
 		// Spawn capsule
 		objA1.update_address = 0x086540
-		objA1.position.x.u16 = 0x4560 - getScreenExtend()
+		objA1.position.x.u16 = 0x4560
 		objA1.position.y.u16 = 0x06a3
 	}
 
 	D0.u16 = level.bossarea.left + 0x0130
-	screenmover_target.right = D0.u16 + getScreenExtend()
+	screenmover_target.right = D0.u16 + getScreenExtend()*2
 
 	if (allocDynamicObjectStd())
 	{
@@ -268,7 +268,7 @@ function void fn071de2()
 
 #if STANDALONE
 	// Make nobody ever sees the blank space where there is no snow
-	screenmover_target.right = 0x4764 - (getScreenWidth() - 320)
+	screenmover_target.right = 0x47c0 - (getScreenExtend() + 120)
 #endif
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
