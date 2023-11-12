@@ -16,12 +16,13 @@
 //# alias(fn08c632) deprecated
 function void Orbinaut.Init()
 {
-	Object.InitWithUpdateAddress(0x08c638)
+	Object.InitWithUpdateAddress(addressof(Orbinaut.BaseUpdate))
 }
 
 
 //# address-hook(0x08c638) end(0x08c646)
-function void fn08c638()
+//# alias(fn08c638) deprecated
+function void Orbinaut.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08c64e	-> objA0.base_state = 0x00

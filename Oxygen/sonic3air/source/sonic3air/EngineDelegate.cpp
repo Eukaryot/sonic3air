@@ -217,7 +217,7 @@ void EngineDelegate::onGameRecordingHeaderSave(std::vector<uint8>& buffer)
 
 Font& EngineDelegate::getDebugFont(int size)
 {
-	return (size >= 10) ? global::mOxyfontRegular : global::mSmallfontOutlined;
+	return (size >= 10) ? global::mOxyfontRegular : global::mSmallfontSemiOutlined;
 }
 
 void EngineDelegate::fillDebugVisualization(Bitmap& bitmap, int& mode)

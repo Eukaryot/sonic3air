@@ -13,9 +13,6 @@
     <Filter Include="generator">
       <UniqueIdentifier>{2ffc19d3-51ef-4726-91ed-a0f64d0d407e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="helper">
-      <UniqueIdentifier>{24e8af96-d3f9-4cb6-9bbb-fb2013119bb2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="menu">
       <UniqueIdentifier>{a4274187-874a-4ff3-8a7d-4417c037e2c2}</UniqueIdentifier>
     </Filter>
@@ -48,6 +45,12 @@
     </Filter>
     <Filter Include="client\crowdcontrol">
       <UniqueIdentifier>{58c44b68-4d4f-4f2e-9fa9-6c314f319434}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="menu\helper">
+      <UniqueIdentifier>{b8db9620-a4d0-4dd3-9f39-584f4dec4c60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="helper">
+      <UniqueIdentifier>{22fada0d-b714-409b-b2d2-c66d0318ee65}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -84,12 +87,6 @@
     <ClCompile Include="..\..\source\sonic3air\menu\MainMenu.cpp">
       <Filter>menu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\sonic3air\helper\BlueSpheresRendering.cpp">
-      <Filter>helper</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\sonic3air\helper\GameUtils.cpp">
-      <Filter>helper</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\data\PlayerProgress.cpp">
       <Filter>data</Filter>
     </ClCompile>
@@ -120,9 +117,6 @@
     <ClCompile Include="..\..\source\sonic3air\main.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\ActSelectMenu.cpp">
       <Filter>menu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\sonic3air\helper\DiscordIntegration.cpp">
-      <Filter>helper</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.cpp">
       <Filter>menu\context</Filter>
@@ -158,20 +152,11 @@
     <ClCompile Include="..\..\source\sonic3air\resources\DynamicSprites.cpp">
       <Filter>resources</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\sonic3air\helper\CommandForwarder.cpp">
-      <Filter>helper</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\sonic3air\helper\PackageBuilder.cpp">
-      <Filter>helper</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\audio\RemasteredMusicDownload.cpp">
       <Filter>audio</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\menu\entries\GeneralMenuEntries.cpp">
       <Filter>menu\entries</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\sonic3air\helper\DrawingUtils.cpp">
-      <Filter>helper</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\menu\mods\ModsMenu.cpp">
       <Filter>menu\mods</Filter>
@@ -181,6 +166,30 @@
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\client\crowdcontrol\CrowdControlClient.cpp">
       <Filter>client\crowdcontrol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\helper\GameMenuControlsDisplay.cpp">
+      <Filter>menu\helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\helper\GameMenuScrolling.cpp">
+      <Filter>menu\helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\helper\BlueSpheresRendering.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\helper\CommandForwarder.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\helper\DiscordIntegration.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\helper\DrawingUtils.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\helper\GameUtils.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\helper\PackageBuilder.cpp">
+      <Filter>helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -220,12 +229,6 @@
     <ClInclude Include="..\..\source\sonic3air\menu\MainMenu.h">
       <Filter>menu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\sonic3air\helper\BlueSpheresRendering.h">
-      <Filter>helper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\sonic3air\helper\GameUtils.h">
-      <Filter>helper</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\data\PlayerProgress.h">
       <Filter>data</Filter>
     </ClInclude>
@@ -257,9 +260,6 @@
     <ClInclude Include="..\..\source\sonic3air\menu\ActSelectMenu.h">
       <Filter>menu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\sonic3air\helper\DiscordIntegration.h">
-      <Filter>helper</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.h">
       <Filter>menu\context</Filter>
     </ClInclude>
@@ -290,23 +290,11 @@
     <ClInclude Include="..\..\source\sonic3air\resources\DynamicSprites.h">
       <Filter>resources</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\sonic3air\helper\CommandForwarder.h">
-      <Filter>helper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\sonic3air\helper\ArgumentsReader.h">
-      <Filter>helper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\sonic3air\helper\PackageBuilder.h">
-      <Filter>helper</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\audio\RemasteredMusicDownload.h">
       <Filter>audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\menu\entries\GeneralMenuEntries.h">
       <Filter>menu\entries</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\sonic3air\helper\DrawingUtils.h">
-      <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\menu\mods\ModsMenu.h">
       <Filter>menu\mods</Filter>
@@ -319,6 +307,33 @@
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\client\crowdcontrol\CrowdControlClient.h">
       <Filter>client\crowdcontrol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\helper\GameMenuControlsDisplay.h">
+      <Filter>menu\helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\helper\GameMenuScrolling.h">
+      <Filter>menu\helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\helper\ArgumentsReader.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\helper\BlueSpheresRendering.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\helper\CommandForwarder.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\helper\DiscordIntegration.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\helper\DrawingUtils.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\helper\GameUtils.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\helper\PackageBuilder.h">
+      <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

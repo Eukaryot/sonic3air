@@ -24,7 +24,7 @@ function void GenericObject.Init()
 	objA0.sprite_priority = u16[A1+2]
 	objA0.box_size.x = u8[A1+4]
 	objA0.box_size.y = u8[A1+5]
-	objA0.update_address = 0x02bf5a
+	objA0.update_address = addressof(GenericObject.Update)
 
 #if STANDALONE
 	// Check if it's a flame in AIZ

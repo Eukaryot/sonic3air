@@ -1344,7 +1344,7 @@ function void AIZ1a.checkPreBossArea()
 				if (allocDynamicObjectStd())
 				{
 					// Trigger boss
-					objA1.update_address = 0x068a24
+					objA1.update_address = addressof(Boss.AIZ1.BaseUpdate)
 					objA1.position.x.u16 = 0x11f0
 					objA1.position.y.u16 = 0x0289
 				}
@@ -1362,7 +1362,7 @@ function void AIZ1a.checkPreBossArea()
 				if (allocDynamicObjectStd())
 				{
 					// Trigger boss
-					objA1.update_address = 0x068a24
+					objA1.update_address = addressof(Boss.AIZ1.BaseUpdate)
 					objA1.position.x.u16 = 0x11d0
 					objA1.position.y.u16 = 0x0420
 				}
@@ -1396,7 +1396,7 @@ function void fn01c690()
 			if (allocDynamicObjectStd())
 			{
 				// Trigger boss
-				objA1.update_address = 0x068a24
+				objA1.update_address = addressof(Boss.AIZ1.BaseUpdate)
 				objA1.position.x.u16 = 0x11f0
 				objA1.position.y.u16 = 0x289
 			}
@@ -1536,7 +1536,7 @@ function void fn01c7b8()
 			if (allocDynamicObjectStd())
 			{
 				// Trigger boss
-				objA1.update_address = 0x068a24
+				objA1.update_address = addressof(Boss.AIZ1.BaseUpdate)
 				objA1.position.x.u16 = 0x11d0
 				objA1.position.y.u16 = 0x0420
 			}

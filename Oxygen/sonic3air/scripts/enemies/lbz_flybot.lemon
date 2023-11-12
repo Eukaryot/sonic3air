@@ -16,12 +16,13 @@
 //# alias(fn08c966) deprecated
 function void FlyBot.Init()
 {
-	Object.InitWithUpdateAddress(0x08c96c)
+	Object.InitWithUpdateAddress(addressof(FlyBot.BaseUpdate))
 }
 
 
 //# address-hook(0x08c96c) end(0x08c982)
-function void fn08c96c()
+//# alias(fn08c96c) deprecated
+function void FlyBot.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08c994	-> objA0.base_state = 0x00  -> Initialization
@@ -206,7 +207,7 @@ function void FlyBotAlert.Init()
 	objA0.sprite_priority = 0x0280
 	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 
-	objA0.update_address = 0x02946a
+	objA0.update_address = addressof(FlyBotAlert.Update)
 	FlyBotAlert.Update()
 }
 

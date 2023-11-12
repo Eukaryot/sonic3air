@@ -99,7 +99,7 @@ function void CupElevator.Init()
 	}
 #endif
 
-	objA0.update_address = 0x026ab2
+	objA0.update_address = addressof(CupElevator.Update)
 	CupElevator.Update()
 }
 

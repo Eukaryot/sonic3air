@@ -205,8 +205,8 @@ function void fn03f6a6()
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	objA1.render_flags |= (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 	D0 = objA0.value26 >> 4
-	u8[A1 + 0x22] = u8[0x03f6ee + D0.u16]		// Player characters' hanging and hang turn sprites
-	D0 = u8[A1 + 0x22]
+	objA1.animation.sprite = u8[0x03f6ee + D0.u16]		// Player characters' hanging and hang turn sprites
+	D0 = objA1.animation.sprite
 
 	u32 backupA2 = A2
 	SetCharacterSpritePatterns()
@@ -250,7 +250,7 @@ function void fn03f6fe()
 			objA1.position.y.u16 += 0x25
 			u8[A1 + 0x20] = 0
 			u8[A1 + 0x3d] = 0
-			u8[A1 + 0x2e] = 0x03
+			u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 			objA1.render_flags &= ~render_flag.FLIP_Y
 			u16[A1 + 0x42] = A0.u16
 			objA1.velocity.x = objA0.velocity.x

@@ -11,6 +11,7 @@
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/GameProfile.h"
 #include "oxygen/application/audio/AudioOutBase.h"
+#include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/helper/Logging.h"
@@ -132,6 +133,9 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 			// Initialize mods
 			RMX_LOG_INFO("Mod manager initialization...");
 			ModManager::instance().startup();
+
+			// Update input after mods are loaded
+			InputManager::instance().handleActiveModsChanged();
 
 			// Load sprites
 			RMX_LOG_INFO("Loading sprites");

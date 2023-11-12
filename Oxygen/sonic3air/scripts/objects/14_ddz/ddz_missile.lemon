@@ -419,7 +419,7 @@ function void fn082b84()
 {
 	objA0.update_address = 0x08565e
 	objA0.countdown_value = 0x03
-	objA0.countdown_callback = 0x085088
+	objA0.countdown_callback = addressof(Enemy.UnloadDelayed)
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
 	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator

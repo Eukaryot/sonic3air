@@ -424,6 +424,13 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 						mSimulation.setNextSingleStep(true, FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_LCTRL));
 						break;
 					}
+
+					case SDLK_KP_9:
+					{
+						setGameSpeed(0.0f);
+						mSimulation.jumpToFrame(mSimulation.getFrameNumber() - 1);
+						break;
+					}
 				}
 			}
 		}
@@ -668,9 +675,7 @@ void GameView::render()
 			{
 				const float fraction = (float)k / 15.0f;
 				const Color color1 = Color(fraction, fraction, fraction);
-				const Color color2 = Color(paletteManager.getGlobalComponentAddedColor().r + paletteManager.getGlobalComponentTintColor().r * fraction,
-										   paletteManager.getGlobalComponentAddedColor().g + paletteManager.getGlobalComponentTintColor().g * fraction,
-										   paletteManager.getGlobalComponentAddedColor().b + paletteManager.getGlobalComponentTintColor().b * fraction);
+				const Color color2 = paletteManager.getGlobalComponentAddedColor() + color1 * paletteManager.getGlobalComponentTintColor();
 				drawer.drawRect(Recti(baseX + 1, baseY + 1 + k * 3, 3, 3), color2);
 				drawer.drawRect(Recti(baseX + 3, baseY + 1 + k * 3, 1, 1), color1);
 			}
@@ -701,7 +706,7 @@ void GameView::render()
 		const double averageTime = Profiling::getRootRegion().mAverageTime;
 		if (averageTime > 0.0)
 		{
-			drawer.printText(EngineMain::getDelegate().getDebugFont(3), Recti(gameScreenRect.width - 3, 2, 0, 0), String(0, "%d FPS", roundToInt((float)(1.0 / averageTime))), 3);
+			drawer.printText(EngineMain::getDelegate().getDebugFont(3), Vec2i(gameScreenRect.width - 3, 2), String(0, "%d FPS", roundToInt((float)(1.0 / averageTime))), 3);
 		}
 	}
 

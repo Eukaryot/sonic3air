@@ -173,13 +173,13 @@ uint64 SharedDatabase::setupCharacterSprite(EmulatorInterface& emulatorInterface
 				break;
 		}
 
-		return SpriteCache::instance().setupSpriteFromROM(emulatorInterface, sourceBase, tableAddress, mappingOffset, (uint8)animationSprite, 0x00, SpriteCache::ENCODING_CHARACTER);
+		return SpriteCache::instance().setupSpriteFromROM(emulatorInterface, sourceBase, tableAddress, mappingOffset, (uint8)animationSprite, 0x00, SpriteCache::ROMSpriteEncoding::CHARACTER);
 	}
 }
 
 uint64 SharedDatabase::setupTailsTailsSprite(EmulatorInterface& emulatorInterface, uint8 animationSprite)
 {
-	return SpriteCache::instance().setupSpriteFromROM(emulatorInterface, 0x336620, 0x344d74, 0x344bb8, animationSprite, 0x00, SpriteCache::ENCODING_CHARACTER);
+	return SpriteCache::instance().setupSpriteFromROM(emulatorInterface, 0x336620, 0x344d74, 0x344bb8, animationSprite, 0x00, SpriteCache::ROMSpriteEncoding::CHARACTER);
 }
 
 uint8 SharedDatabase::getTailsTailsAnimationSprite(uint8 characterAnimationSprite, uint32 globalTime)

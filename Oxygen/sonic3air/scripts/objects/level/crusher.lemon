@@ -39,7 +39,7 @@ function void Crusher.Init()
 	D0 = u16(objA0.subtype2c) * 8
 	u16[A0 + 0x38] = D0.u16
 
-	objA0.update_address = 0x02927c
+	objA0.update_address = addressof(Crusher.Update)
 	Crusher.Update()
 }
 

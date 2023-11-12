@@ -70,9 +70,10 @@ private:
 		TIME_ATTACK_RESULTS
 	};
 	State mCurrentState = State::UNDEFINED;
+	float mStateTimeout = 0.0f;
 
 	DrawerTexture mDisclaimerTexture;
-	float mStateTimeout = 0.0f;
+	float mDisclaimerVisibility = 0.0f;
 
 	GameView* mGameView = nullptr;
 	GameMenuManager* mGameMenuManager = nullptr;

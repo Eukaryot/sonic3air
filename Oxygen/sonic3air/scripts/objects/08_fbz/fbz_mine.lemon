@@ -47,7 +47,7 @@ function void fn03c984()
 		{
 			if (debug_mode.state == 0)
 			{
-				u16[A0 + 0x30] = 30		// Detonation timer, set to half a second 
+				u16[A0 + 0x30] = 30		// Detonation timer, set to half a second
 				objA0.update_address = 0x03c9bc
 			}
 		}

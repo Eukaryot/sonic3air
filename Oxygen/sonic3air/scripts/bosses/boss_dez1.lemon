@@ -659,7 +659,7 @@ function void fn07e384()
 	if (objA1.position.y.u16 >= 0x0360 && (u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 	{
 		objA0.update_address = 0x07e3ca
-		u8[A1 + 0x2e] = 0x83
+		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 		objA1.state = char.state.RUNNING
 		StopObjectA1()
 
@@ -1895,13 +1895,13 @@ function void fn07eeee()
 
 	D0 = u8[A0 + 0x3c]
 	A1 = 0xffffb000
-	u8[A1 + 0x22] = u8[0x07ef2e + D0.u16]		// Player characters' spinning standing sprites
+	objA1.animation.sprite = u8[0x07ef2e + D0.u16]		// Player characters' spinning standing sprites
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 
 	D0.u8 = u8[0x07ef3a + D0.u16]
 	objA1.render_flags |= D0.u8
 
-	D0 = u8[A1 + 0x22]
+	D0 = objA1.animation.sprite
 	UpdatePlayer1SpritePatterns()
 }
 
@@ -1914,6 +1914,6 @@ function void fn05fd88()
 {
 	A1 = 0xffffb000
 	D0.u16 = global.characters & 0x03
-	u8[A1 + 0x22] = u8[0x05fda0 + D0.u16]		// Player characters' standing sprites. notably this includes Knuckles, even though he normally doesn't go to this zone
+	objA1.animation.sprite = u8[0x05fda0 + D0.u16]		// Player characters' standing sprites. notably this includes Knuckles, even though he normally doesn't go to this zone
 	UpdatePlayer1SpritePatterns()
 }

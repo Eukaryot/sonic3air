@@ -142,14 +142,10 @@ void SoftwareRenderer::renderGameScreen(const std::vector<Geometry*>& geometries
 {
 	Bitmap& gameScreenBitmap = mGameScreenTexture.accessBitmap();
 
-	// Clear depth buffer
+	// Clear the screen
+	gameScreenBitmap.clear(mRenderParts.getPaletteManager().getBackdropColor());
 	memset(mDepthBuffer, 0, sizeof(mDepthBuffer));
 	mEmptyDepthBuffer = true;
-
-	if (mRenderParts.getEnforceClearScreen())
-	{
-		gameScreenBitmap.clear(0);
-	}
 
 	mCurrentViewport.set(0, 0, mGameResolution.x, mGameResolution.y);
 	mFullViewport = true;
@@ -159,12 +155,12 @@ void SoftwareRenderer::renderGameScreen(const std::vector<Geometry*>& geometries
 		mBufferedPlaneData[i].mValid = false;
 	}
 
-	// Do some analysis on what's to render
+	// Check if sprite masking needed
 	bool usingSpriteMask = false;
 	{
 		for (const Geometry* geometry : geometries)
 		{
-			if (geometry->getType() == Geometry::Type::SPRITE && geometry->as<SpriteGeometry>().mSpriteInfo.getType() == SpriteManager::SpriteInfo::Type::MASK)
+			if (geometry->getType() == Geometry::Type::SPRITE && geometry->as<SpriteGeometry>().mSpriteInfo.getType() == RenderItem::Type::SPRITE_MASK)
 			{
 				usingSpriteMask = true;
 				break;
@@ -310,7 +306,8 @@ void SoftwareRenderer::renderGeometry(const Geometry& geometry)
 
 			Blitter::Options blitterOptions;
 			blitterOptions.mBlendMode = BlendMode::ALPHA;
-			blitterOptions.mTintColor = &tg.mColor;
+			blitterOptions.mTintColor = &tg.mTintColor;
+			blitterOptions.mAddedColor = &tg.mAddedColor;
 
 			mBlitter.blitSprite(Blitter::OutputWrapper(mGameScreenTexture.accessBitmap()), Blitter::SpriteWrapper(tg.mDrawerTexture.accessBitmap(), Vec2i()), tg.mRect.getPos(), blitterOptions);
 			break;
@@ -586,9 +583,9 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 
 	switch (geometry.mSpriteInfo.getType())
 	{
-		case SpriteManager::SpriteInfo::Type::VDP:
+		case RenderItem::Type::VDP_SPRITE:
 		{
-			const SpriteManager::VdpSpriteInfo& sprite = static_cast<const SpriteManager::VdpSpriteInfo&>(geometry.mSpriteInfo);
+			const renderitems::VdpSpriteInfo& sprite = static_cast<const renderitems::VdpSpriteInfo&>(geometry.mSpriteInfo);
 
 			const PaletteManager& paletteManager = mRenderParts.getPaletteManager();
 			const uint32* palettes[2] = { paletteManager.getPalette(0).getData(), paletteManager.getPalette(1).getData() };
@@ -653,12 +650,12 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			break;
 		}
 
-		case SpriteManager::SpriteInfo::Type::PALETTE:
-		case SpriteManager::SpriteInfo::Type::COMPONENT:
+		case RenderItem::Type::PALETTE_SPRITE:
+		case RenderItem::Type::COMPONENT_SPRITE:
 		{
 			// Shared code for palette & component sprite rendering
-			const SpriteManager::CustomSpriteInfoBase& spriteBase = static_cast<const SpriteManager::CustomSpriteInfoBase&>(geometry.mSpriteInfo);
-			const bool isPaletteSprite = (geometry.mSpriteInfo.getType() == SpriteManager::SpriteInfo::Type::PALETTE);
+			const renderitems::CustomSpriteInfoBase& spriteBase = static_cast<const renderitems::CustomSpriteInfoBase&>(geometry.mSpriteInfo);
+			const bool isPaletteSprite = (geometry.mSpriteInfo.getType() == RenderItem::Type::PALETTE_SPRITE);
 
 			const PaletteManager& paletteManager = mRenderParts.getPaletteManager();
 			BitmapViewMutable<uint8> depthBufferView(mDepthBuffer, Vec2i(0x200, 0x100));	// Depth buffer uses a fixed size...
@@ -670,11 +667,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			{
 				if (spriteBase.mUseGlobalComponentTint && !isPaletteSprite)
 				{
-					tintColor.r *= paletteManager.getGlobalComponentTintColor().r;
-					tintColor.g *= paletteManager.getGlobalComponentTintColor().g;
-					tintColor.b *= paletteManager.getGlobalComponentTintColor().b;
-					tintColor.a *= paletteManager.getGlobalComponentTintColor().a;
-					addedColor += paletteManager.getGlobalComponentAddedColor();
+					paletteManager.applyGlobalComponentTint(tintColor, addedColor);
 				}
 
 				const bool hasTransform = !spriteBase.mTransformation.isIdentity();
@@ -691,7 +684,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			if (isPaletteSprite)
 			{
 				// Palette sprite specific code
-				const SpriteManager::PaletteSpriteInfo& spriteInfo = static_cast<const SpriteManager::PaletteSpriteInfo&>(spriteBase);
+				const renderitems::PaletteSpriteInfo& spriteInfo = static_cast<const renderitems::PaletteSpriteInfo&>(spriteBase);
 
 				const PaletteSprite& paletteSprite = *static_cast<PaletteSprite*>(spriteInfo.mCacheItem->mSprite);
 				const PaletteBitmap& paletteBitmap = spriteInfo.mUseUpscaledSprite ? paletteSprite.getUpscaledBitmap() : paletteSprite.getBitmap();
@@ -718,7 +711,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			else
 			{
 				// Component sprite specific code
-				const SpriteManager::ComponentSpriteInfo& spriteInfo = static_cast<const SpriteManager::ComponentSpriteInfo&>(spriteBase);
+				const renderitems::ComponentSpriteInfo& spriteInfo = static_cast<const renderitems::ComponentSpriteInfo&>(spriteBase);
 
 				const ComponentSprite& componentSprite = *static_cast<ComponentSprite*>(spriteInfo.mCacheItem->mSprite);
 				const Blitter::SpriteWrapper spriteWrapper(componentSprite.getBitmap(), -componentSprite.mOffset);
@@ -731,10 +724,10 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			break;
 		}
 
-		case SpriteManager::SpriteInfo::Type::MASK:
+		case RenderItem::Type::SPRITE_MASK:
 		{
 			// Overwrite sprites with plane rendering results in given rect
-			const SpriteManager::SpriteMaskInfo& mask = static_cast<const SpriteManager::SpriteMaskInfo&>(geometry.mSpriteInfo);
+			const renderitems::SpriteMaskInfo& mask = static_cast<const renderitems::SpriteMaskInfo&>(geometry.mSpriteInfo);
 			if (mask.mSize.x > 0 && mask.mSize.y > 0)
 			{
 				const int minX = clamp(mask.mInterpolatedPosition.x, 0, gameScreenBitmap.getWidth());
@@ -755,7 +748,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			break;
 		}
 
-		case SpriteManager::SpriteInfo::Type::INVALID:
+		case RenderItem::Type::INVALID:
 			break;
 	}
 }

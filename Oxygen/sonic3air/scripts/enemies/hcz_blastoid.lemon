@@ -16,12 +16,13 @@
 //# alias(fn087928) deprecated
 function void Blastoid.Init()
 {
-	Object.InitWithUpdateAddress(0x08792e)
+	Object.InitWithUpdateAddress(addressof(Blastoid.BaseUpdate))
 }
 
 
 //# address-hook(0x08792e) end(0x087940)
-function void fn08792e()
+//# alias(fn08792e) deprecated
+function void Blastoid.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08794a	-> objA0.base_state = 0x00

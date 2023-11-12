@@ -12,11 +12,6 @@
 // Icicles (in ICZ)                                      //
 //-------------------------------------------------------//
 
-
-//-------------------------------------------------------//
-// Static (non-falling) icicles                          //
-//-------------------------------------------------------//
-
 //# address-hook(0x08b2a0) end(0x08b2a0)
 function void fn08b2a0()
 {
@@ -36,11 +31,16 @@ function void fn08b2a4()
 	}
 	else
 	{
-		objA0.update_address = 0x08b2ee
+		objA0.update_address = addressof(FallingIcicle.Update)
 		objA0.collision_attributes = (collision.flag.THREAT | collision.size.8x16)
 	}
 }
 
+
+
+//-------------------------------------------------------//
+// Static (non-falling) icicles                          //
+//-------------------------------------------------------//
 
 //# address-hook(0x08b2da) end(0x08b2ea)
 function void fn08b2da()
@@ -78,9 +78,9 @@ function void FallingIcicle.Update()
 	CheckDistanceToPlayers()
 	if (D2.u16 < 0x40)
 	{
-		objA0.update_address = 0x08b310
+		objA0.update_address = addressof(FallingIcicle.Shake)
 		objA0.countdown_value = 0x0f		// I'd guess this is a timer (see "Object.CountdownAndTrigger")
-		objA0.countdown_callback = 0x08b328	// And this is called when the timer has elapsed
+		objA0.countdown_callback = addressof(FallingIcicle.StartFalling)	// And this is called when the timer has elapsed
 	}
 	Enemy.DrawOrUnload()
 }

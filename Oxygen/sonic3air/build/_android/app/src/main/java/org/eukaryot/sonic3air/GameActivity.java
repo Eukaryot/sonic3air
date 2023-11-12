@@ -182,7 +182,7 @@ public class GameActivity extends SDLActivity
         Uri uri = Uri.parse(url);
         DownloadManager.Request request = new DownloadManager.Request(uri);
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
-        request.setAllowedOverMetered(false);
+        request.setAllowedOverMetered(true);
         request.setDestinationUri(Uri.fromFile(new File(getExternalFilesDir(null).getAbsoluteFile(), filename)));
         request.setVisibleInDownloadsUi(false);     // Only needed until API level 29
 

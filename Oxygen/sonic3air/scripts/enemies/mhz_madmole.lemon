@@ -13,14 +13,16 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x08d580) end(0x08d580)
-function void fn08d580()
+//# alias(fn08d580) deprecated
+function void Madmole.Init()
 {
-	Object.InitWithUpdateAddress(0x08d586)
+	Object.InitWithUpdateAddress(addressof(Madmole.Hole.BaseUpdate))
 }
 
 
 //# address-hook(0x08d586) end(0x08d598)
-function void fn08d586()
+//# alias(fn08d586) deprecated
+function void Madmole.Hole.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08d5a6	-> objA0.base_state = 0x00
@@ -52,7 +54,7 @@ function void fn08d5b0()
 	objA0.flags38 |= 0x02
 
 	// "spawnChildObjects(0x08d9c0)" replaced by:
-	spawnChildObject(0x08d602, 0x00, 0, 16)			// Madmole
+	spawnChildObject(addressof(Madmole.BaseUpdate), 0x00, 0, 16)			// Madmole
 }
 
 
@@ -94,7 +96,8 @@ function void fn08d876()
 
 
 //# address-hook(0x08d602) end(0x08d610)
-function void fn08d602()
+//# alias(fn08d602) deprecated
+function void Madmole.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08d620	-> objA0.base_state = 0x00
@@ -343,7 +346,7 @@ function void fn08d94a()
 				objA0.countdown_callback = 0x08d846
 				playSound(0xae)
 				u8[A2 + 0x2a] |= char.flag.IN_AIR
-				u8[A2 + 0x2e] = 0x01
+				u8[A2 + 0x2e] = control_flag.DISABLE_UPDATE
 				u8[A2 + 0x20] = char.state.GOT_HURT
 				u8[A2 + 0x3d] = 0
 			}

@@ -79,12 +79,12 @@ function void UpdatePaletteEffects.Default()
 	//  - 0x0021bc	-> offset = 0x40, 0x42	-> DPZ		 (empty function)
 	//  - 0x002884	-> offset = 0x44, 0x46	-> CGZ
 	//  - 0x0028ba	-> offset = 0x48, 0x4a	-> EMZ
-	//  - 0x0021bc	-> offset = 0x4c, 0x4e	-> Bonus GM (empty function)
+	//  - 0x0021bc	-> offset = 0x4c, 0x4e	-> Bonus GM	 (empty function)
 	//  - 0x002918	-> offset = 0x50, 0x52	-> Bonus GS
 	//  - 0x0029a8	-> offset = 0x54, 0x56	-> Bonus SM
 	//  - 0x002a50	-> offset = 0x58		-> LRZ Boss
 	//  - 0x002ac0	-> offset = 0x5a		-> HPZ
-	//  - 0x0021bc	-> offset = 0x5c		-> DEZ Boss (empty function)
+	//  - 0x0021bc	-> offset = 0x5c		-> DEZ Boss	 (empty function)
 	//  - 0x002ac0	-> offset = 0x5e		-> HPZ Cave
 	call tableLookupAddress(0x00215c, offset)
 }

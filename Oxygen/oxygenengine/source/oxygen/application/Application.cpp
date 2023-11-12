@@ -526,21 +526,21 @@ void Application::render()
 		{
 			const Recti rect(0, 0, FTX::screenWidth(), 26);
 			drawer.drawRect(rect, Color(0.4f, 0.4f, 0.4f, 0.4f));
-			drawer.printText(mLogDisplayFont, Recti(5, 5, 0, 0), logDisplay.mModeDisplayString);
+			drawer.printText(mLogDisplayFont, Vec2i(5, 5), logDisplay.mModeDisplayString);
 		}
 
 		if (logDisplay.mLogDisplayTimeout > 0.0f)
 		{
-			drawer.printText(mLogDisplayFont, Recti(5, FTX::screenHeight() - 25, 0, 0), logDisplay.mLogDisplayString, 1, Color(1.0f, 1.0f, 1.0f, saturate(logDisplay.mLogDisplayTimeout / 0.25f)));
+			drawer.printText(mLogDisplayFont, Vec2i(5, FTX::screenHeight() - 25), logDisplay.mLogDisplayString, 1, Color(1.0f, 1.0f, 1.0f, saturate(logDisplay.mLogDisplayTimeout / 0.25f)));
 		}
 
 		if (!logDisplay.mLogErrorStrings.empty())
 		{
-			Recti rect(5, FTX::screenHeight() - 30 - (int)logDisplay.mLogErrorStrings.size() * 20, 0, 0);
+			Vec2i pos(5, FTX::screenHeight() - 30 - (int)logDisplay.mLogErrorStrings.size() * 20);
 			for (const String& error : logDisplay.mLogErrorStrings)
 			{
-				drawer.printText(mLogDisplayFont, rect, error, 1, Color(1.0f, 0.2f, 0.2f));
-				rect.y += 20;
+				drawer.printText(mLogDisplayFont, pos, error, 1, Color(1.0f, 0.2f, 0.2f));
+				pos.y += 20;
 			}
 		}
 	}

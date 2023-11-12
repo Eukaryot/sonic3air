@@ -127,8 +127,7 @@ function void fn0338c4()
 					objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 					u8[A1 + 0x20] = 0
 					u8[A1 + 0x2a] &= ~0x01
-					u8[A1 + 0x2e] |= 0x40
-					u8[A1 + 0x2e] |= 0x02
+					u8[A1 + 0x2e] |= (control_flag.DISABLE_WALLS | control_flag.DISABLE_ANIMATION)
 				}
 			}
 		}
@@ -204,8 +203,8 @@ function void fn0338c4()
 				D0.s8 = -D0.s8
 				D0.u16 &= 0xff
 				D0.u16 = D0 / 0x0b
-				u8[A1 + 0x22] = u8[0x033ac6 + D0.u16]		// Player characters' corkscrew horizontal running sprites
-				D0 = u8[A1 + 0x22]
+				objA1.animation.sprite = u8[0x033ac6 + D0.u16]		// Player characters' corkscrew horizontal running sprites
+				D0 = objA1.animation.sprite
 				SetCharacterSpritePatterns()
 				return
 			}
@@ -216,11 +215,10 @@ function void fn0338c4()
 	u8[A1 + 0x2a] &= ~char.flag.ROLLING
 	objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
 	objA1.hitbox_extends.x = char.hitbox.x.UPRIGHT
-	u16[A1 + 0x20] = char.state.RUNNING2
+	objA1.state.both = char.state.RUNNING2
 	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
-	u8[A1 + 0x2e] &= ~0x40
-	u8[A1 + 0x2e] &= ~0x02
+	u8[A1 + 0x2e] &= ~(control_flag.DISABLE_WALLS | control_flag.DISABLE_ANIMATION)
 	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	u8[A2 + 0x01] = 0x10
 }
@@ -287,12 +285,10 @@ function void fn033ade()
 	u8[A1 + 0x2a] &= ~char.flag.ROLLING
 	objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
 	objA1.hitbox_extends.x = char.hitbox.x.UPRIGHT
-	u16[A1 + 0x20] = char.state.RUNNING2
+	objA1.state.both = char.state.RUNNING2
 	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
-	u8[A1 + 0x2e] &= ~0x40
-	u8[A1 + 0x2e] &= ~0x02
-	u8[A1 + 0x2e] &= ~0x01
+	u8[A1 + 0x2e] &= ~(control_flag.DISABLE_WALLS | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	u8[A2 + 0x01] = 0x10
 }
@@ -322,9 +318,9 @@ function void fn033bba()
 	D0.s8 = -D0.s8
 	D0.u16 &= 0xff
 	D0.u16 = D0 / 0x0b
-	u8[A1 + 0x22] = u8[0x033c1c + D0.u16]		// Player characters' pole spinning sprites
+	objA1.animation.sprite = u8[0x033c1c + D0.u16]		// Player characters' pole spinning sprites
 	u8[A1 + 0x20] = 0
-	D0 = u8[A1 + 0x22]
+	D0 = objA1.animation.sprite
 	SetCharacterSpritePatterns()
 }
 

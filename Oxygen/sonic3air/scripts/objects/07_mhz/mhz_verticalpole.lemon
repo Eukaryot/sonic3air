@@ -23,7 +23,7 @@ function void VerticalPole.Init()
 	objA0.box_size.y = 0x20
 	objA0.flags2a |= 0x80
 
-	objA0.update_address = 0x03f08c
+	objA0.update_address = addressof(VerticalPole.Update)
 	VerticalPole.Update()
 }
 
@@ -60,7 +60,7 @@ function void VerticalPole.Update()
 	// Handle second character if he's still attached to the pole
 	if (objA0.update_address == 0 && player2attached)
 	{
-		u8[0xffffb04a + 0x2e] &= 0xfc
+		u8[0xffffb04a + 0x2e] &= ~(control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	}
 #else
 	DrawOrUnloadObject()
@@ -106,7 +106,7 @@ function void fn03f0d8()
 //# address-hook(0x03f10a) end(0x03f11a)
 function void fn03f10a()
 {
-	D0 = u8[A1 + 0x22]
+	D0 = objA1.animation.sprite
 	u32 backupA2 = A2
 	SetCharacterSpritePatterns()
 	A2 = backupA2
@@ -117,7 +117,7 @@ function void fn03f10a()
 function void fn03f11c()
 {
 	D0 = u8[A2 + 0x04] >> 4
-	u8[A1 + 0x22] = u8[0x03f146 + D0.u16]		// Player characters' pole spinning sprites
+	objA1.animation.sprite = u8[0x03f146 + D0.u16]		// Player characters' pole spinning sprites
 
 	D1.s16 = s8[0x03f156 + D0.u16]
 	if (objA1.render_flags & render_flag.FLIP_X)
@@ -148,7 +148,7 @@ function void fn03f17a()
 	objA1.state = char.state.ROLLING
 	objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK
-	u8[A1 + 0x2e] &= 0xfc
+	u8[A1 + 0x2e] &= ~(control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	u8[A1 + 0x27] = 0
 	u8[A1 + 0x40] = 0x01
 }
@@ -161,7 +161,7 @@ function void fn03f1c8()
 	u8[A2 + 0x02] = 0x08
 
 	u16[A1 + 0x20] = 0
-	u8[A1 + 0x2e] &= 0xfc
+	u8[A1 + 0x2e] &= ~(control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	objA1.position.x.u16 = objA0.position.x.u16
 	objA1.velocity.x = 0x1000
 	u8[A1 + 0x2a] &= ~0x01
@@ -248,8 +248,8 @@ function void fn03f246()
 
 				objA1.position.x.u16 = objA0.position.x.u16 + D2.u16
 				u8[A1 + 0x20] = 0
-				u8[A1 + 0x2e] = 0x03
-				u8[A1 + 0x22] = 0x62		// Set Player characters' pole posing sprite; unfortunately, due to an error, it only shows up for one frame
+				u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
+				objA1.animation.sprite = 0x62		// Set Player characters' pole posing sprite; unfortunately, due to an error, it only shows up for one frame
 
 				u8[A2 + 0x04] = 0x08
 				u8[A2] = 0x01
@@ -258,7 +258,7 @@ function void fn03f246()
 					objA1.render_flags |= render_flag.FLIP_X
 				}
 
-				D0 = u8[A1 + 0x22]
+				D0 = objA1.animation.sprite
 				u32 backupA2 = A2
 				SetCharacterSpritePatterns()
 				A2 = backupA2

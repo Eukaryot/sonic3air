@@ -16,8 +16,6 @@
 
 namespace
 {
-	static const std::string InputMappingKeys[12] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back" };
-
 	void tryParseWindowSize(String string, Vec2i& result)
 	{
 		std::vector<String> resolution;
@@ -78,9 +76,9 @@ namespace
 
 			// Read mappings
 			std::vector<InputConfig::Assignment> newAssignments;
-			for (size_t buttonIndex = 0; buttonIndex < (size_t)InputConfig::DeviceDefinition::Button::_NUM; ++buttonIndex)
+			for (size_t buttonIndex = 0; buttonIndex < InputConfig::DeviceDefinition::NUM_BUTTONS; ++buttonIndex)
 			{
-				const Json::Value& mappingJson = (*it)[InputMappingKeys[buttonIndex]];
+				const Json::Value& mappingJson = (*it)[InputConfig::DeviceDefinition::BUTTON_NAME[buttonIndex]];
 				newAssignments.clear();
 				if (mappingJson.isArray())
 				{
@@ -110,6 +108,11 @@ namespace
 							}
 						}
 					}
+				}
+				else
+				{
+					// Use the previously set default assignments (unfortunately, this only works for keyboards)
+					continue;
 				}
 
 				// Set assignments, and allow for duplicate assignments (i.e. having a real button mapped to multiple controls) in this case
@@ -342,17 +345,21 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 		if (!root["VirtualGamepad"].isNull())
 		{
 			JsonHelper vgHelper(root["VirtualGamepad"]);
+			const auto tryReadVec2i = [&](const std::string& key, Vec2i& outValue)
+			{
+				vgHelper.tryReadInt(key + "X", outValue.x);
+				vgHelper.tryReadInt(key + "Y", outValue.y);
+			};
+
 			vgHelper.tryReadFloat("Opacity", mVirtualGamepad.mOpacity);
-			vgHelper.tryReadInt("DPadPosX", mVirtualGamepad.mDirectionalPadCenter.x);
-			vgHelper.tryReadInt("DPadPosY", mVirtualGamepad.mDirectionalPadCenter.y);
+			tryReadVec2i("DPadPos", mVirtualGamepad.mDirectionalPadCenter);
 			vgHelper.tryReadInt("DPadSize", mVirtualGamepad.mDirectionalPadSize);
-			vgHelper.tryReadInt("ButtonsPosX", mVirtualGamepad.mFaceButtonsCenter.x);
-			vgHelper.tryReadInt("ButtonsPosY", mVirtualGamepad.mFaceButtonsCenter.y);
+			tryReadVec2i("ButtonsPos", mVirtualGamepad.mFaceButtonsCenter);
 			vgHelper.tryReadInt("ButtonsSize", mVirtualGamepad.mFaceButtonsSize);
-			vgHelper.tryReadInt("StartPosX", mVirtualGamepad.mStartButtonCenter.x);
-			vgHelper.tryReadInt("StartPosY", mVirtualGamepad.mStartButtonCenter.y);
-			vgHelper.tryReadInt("GameRecPosX", mVirtualGamepad.mGameRecButtonCenter.x);
-			vgHelper.tryReadInt("GameRecPosY", mVirtualGamepad.mGameRecButtonCenter.y);
+			tryReadVec2i("StartPos", mVirtualGamepad.mStartButtonCenter);
+			tryReadVec2i("GameRecPos", mVirtualGamepad.mGameRecButtonCenter);
+			tryReadVec2i("ShoulderLPos", mVirtualGamepad.mShoulderLButtonCenter);
+			tryReadVec2i("ShoulderRPos", mVirtualGamepad.mShoulderRButtonCenter);
 		}
 
 		// Game recorder
@@ -458,17 +465,21 @@ void Configuration::saveSettings()
 		// Virtual gamepad
 		{
 			Json::Value vg = root["VirtualGamepad"];
+			const auto saveVec2i = [&](const std::string& key, Vec2i value)
+			{
+				vg[key + "X"] = value.x;
+				vg[key + "Y"] = value.y;
+			};
+
 			vg["Opacity"] = mVirtualGamepad.mOpacity;
-			vg["DPadPosX"] = mVirtualGamepad.mDirectionalPadCenter.x;
-			vg["DPadPosY"] = mVirtualGamepad.mDirectionalPadCenter.y;
+			saveVec2i("DPadPos", mVirtualGamepad.mDirectionalPadCenter);
 			vg["DPadSize"] = mVirtualGamepad.mDirectionalPadSize;
-			vg["ButtonsPosX"] = mVirtualGamepad.mFaceButtonsCenter.x;
-			vg["ButtonsPosY"] = mVirtualGamepad.mFaceButtonsCenter.y;
+			saveVec2i("ButtonsPos", mVirtualGamepad.mFaceButtonsCenter);
 			vg["ButtonsSize"] = mVirtualGamepad.mFaceButtonsSize;
-			vg["StartPosX"] = mVirtualGamepad.mStartButtonCenter.x;
-			vg["StartPosY"] = mVirtualGamepad.mStartButtonCenter.y;
-			vg["GameRecPosX"] = mVirtualGamepad.mGameRecButtonCenter.x;
-			vg["GameRecPosY"] = mVirtualGamepad.mGameRecButtonCenter.y;
+			saveVec2i("StartPos", mVirtualGamepad.mStartButtonCenter);
+			saveVec2i("GameRecPos", mVirtualGamepad.mGameRecButtonCenter);
+			saveVec2i("ShoulderLPos", mVirtualGamepad.mShoulderLButtonCenter);
+			saveVec2i("ShoulderRPos", mVirtualGamepad.mShoulderRButtonCenter);
 			root["VirtualGamepad"] = vg;
 		}
 
@@ -692,9 +703,9 @@ void Configuration::saveSettingsInput(const std::wstring& filename) const
 			writer.writeLine(line);
 		}
 
-		for (size_t i = 0; i < (size_t)InputConfig::DeviceDefinition::Button::_NUM; ++i)
+		for (size_t i = 0; i < InputConfig::DeviceDefinition::NUM_BUTTONS; ++i)
 		{
-			const std::string& name = InputMappingKeys[i];
+			const std::string& name = InputConfig::DeviceDefinition::BUTTON_NAME[i];
 			String line = "\"" + name + "\":";
 			line.add(' ', 6 - (int)name.length());
 			line << "[ ";
@@ -711,7 +722,7 @@ void Configuration::saveSettingsInput(const std::wstring& filename) const
 				isFirst = false;
 			}
 			line << " ]";
-			if (i+1 < (size_t)InputConfig::DeviceDefinition::Button::_NUM)
+			if (i+1 < InputConfig::DeviceDefinition::NUM_BUTTONS)
 				line << ",";
 			writer.writeLine(line);
 		}

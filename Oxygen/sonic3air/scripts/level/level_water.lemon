@@ -508,13 +508,36 @@ function void UpdateWaterSurfaceLevel()
 	u8 offset = global.zone * 4 + global.act * 2
 
 	// Targets:
-	//  - 0x006ddc	-> offset = 0x00	-> AIZ 1
-	//  - 0x006dde	-> offset = 0x02	-> AIZ 2
-	//  - 0x006e82	-> offset = 0x04	-> HCZ 1
-	//  - 0x006e9c	-> offset = 0x06	-> HCZ 2
-	//  - 0x006eca	-> offset = 0x0e	-> CNZ 2
-	//  - 0x006eca	-> offset = 0x16	-> ICZ 2
-	//  - 0x006ee8	-> offset = 0x1a	-> LBZ 2
+	//  - 0x006ddc	-> offset = 0x00		-> AIZ 1	 (empty function)
+	//  - 0x006dde	-> offset = 0x02		-> AIZ 2
+	//  - 0x006e82	-> offset = 0x04		-> HCZ 1
+	//  - 0x006e9c	-> offset = 0x06		-> HCZ 2
+	//  - 0x006eca	-> offset = 0x08		-> MGZ 1	 (empty function)
+	//  - 0x006eca	-> offset = 0x0a		-> MGZ 2	 (empty function)
+	//  - 0x006eca	-> offset = 0x0c		-> CNZ 1	 (empty function)
+	//  - 0x006eca	-> offset = 0x0e		-> CNZ 2	 (empty function)
+	//  - 0x006eca	-> offset = 0x10		-> FBZ 1	 (empty function)
+	//  - 0x006eca	-> offset = 0x12		-> FBZ 2	 (empty function)
+	//  - 0x006eca	-> offset = 0x14		-> ICZ 1	 (empty function)
+	//  - 0x006eca	-> offset = 0x16		-> ICZ 2	 (empty function)
+	//  - 0x006ecc	-> offset = 0x18		-> LBZ 1
+	//  - 0x006ee8	-> offset = 0x1a		-> LBZ 2
+	//  - 0x006f1a	-> offset = 0x1c		-> MHZ 1	 (empty function)
+	//  - 0x006f1a	-> offset = 0x1e		-> MHZ 2	 (empty function)
+	//  - 0x006f1a	-> offset = 0x20		-> SOZ 1	 (empty function)
+	//  - 0x006f1a	-> offset = 0x22		-> SOZ 2	 (empty function)
+	//  - 0x006f1a	-> offset = 0x24		-> LRZ 1	 (empty function)
+	//  - 0x006f1a	-> offset = 0x26		-> LRZ 2	 (empty function)
+	//  - 0x006f1a	-> offset = 0x28		-> SSZ S/T	 (empty function)
+	//  - 0x006f1a	-> offset = 0x2a		-> SSZ Knux	 (empty function)
+	//  - 0x006f1a	-> offset = 0x2c		-> DEZ 1	 (empty function)
+	//  - 0x006f1a	-> offset = 0x2e		-> DEZ 2	 (empty function)
+	//  - 0x006f1a	-> offset = 0x30, 0x32	-> DDZ		 (empty function)
+	//  - 0x006f1a	-> offset = 0x34		-> Outro S/T (empty function)
+	//  - 0x006f1c	-> offset = 0x36		-> Outro S/T
+	//  - 0x006f1a	-> offset = 0x38, 0x3a	-> ALZ		 (empty function)
+	//  - 0x006f1a	-> offset = 0x3c, 0x3e	-> BPZ		 (empty function)
+	//  ...The table just stops here?
 	call tableLookupAddress(0x006d9c, offset)
 
 	// Update changing water surface height
@@ -638,6 +661,14 @@ function void UpdateWaterSurfaceLevel.Empty()
 }
 
 
+//# address-hook(0x006ecc) end(0x006ed2)
+function void UpdateWaterSurfaceLevel.LBZ1()
+{
+	A1 = 0x006ed4
+	fn006f2c()
+}
+
+
 //# address-hook(0x006ee8) end(0x006f10)
 function void UpdateWaterSurfaceLevel.LBZ2()
 {
@@ -683,6 +714,12 @@ function void UpdateWaterSurfaceLevel.LBZ2()
 		#endif
 		}
 	}
+}
+
+
+//# address-hook(0x006f1a) end(0x006f1a)
+function void UpdateWaterSurfaceLevel.Empty2()
+{
 }
 
 

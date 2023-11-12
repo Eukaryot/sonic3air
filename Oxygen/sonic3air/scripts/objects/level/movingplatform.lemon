@@ -73,7 +73,7 @@ function void MovingPlatform.Init()
 	}
 
 	objA0.subtype2c = (objA0.subtype2c & 0x0f) * 2
-	objA0.update_address = 0x0255f4
+	objA0.update_address = addressof(MovingPlatform.Update)
 	MovingPlatform.Update()
 }
 
@@ -84,15 +84,19 @@ function void MovingPlatform.Update()
 	u16 backup = objA0.position.x.u16
 
 	// Targets:
-	//  - 0x024f90	-> objA0.subtype2c = 0x00
-	//  - 0x024fc8	-> objA0.subtype2c = 0x02
-	//  - 0x024fd4	-> objA0.subtype2c = 0x04
-	//  - 0x024ff6	-> objA0.subtype2c = 0x06
-	//  - 0x025002	-> objA0.subtype2c = 0x08
-	//  - 0x02503e	-> objA0.subtype2c = 0x0c
-	//  - 0x0251e4	-> objA0.subtype2c = 0x0e
-	//  - 0x025278	-> objA0.subtype2c = 0x10
-	//  - 0x02529a	-> objA0.subtype2c = 0x14
+	//  - 0x024f90	-> objA0.subtype2c = 0x00	-> Non-moving platform
+	//  - 0x024fc8	-> objA0.subtype2c = 0x02	-> Horizontally moving platform (small range)
+	//  - 0x024fd4	-> objA0.subtype2c = 0x04	-> Horizontally moving platform (large range)
+	//  - 0x024ff6	-> objA0.subtype2c = 0x06	-> Vertically moving platform (small range)
+	//  - 0x025002	-> objA0.subtype2c = 0x08	-> Vertically moving platform (large range)
+	//  - 0x025024	-> objA0.subtype2c = 0x0a	-> Diagonally up moving platform
+	//  - 0x02503e	-> objA0.subtype2c = 0x0c	-> Diagonally down moving platform
+	//  - 0x0251e4	-> objA0.subtype2c = 0x0e	-> Rising platform
+	//  - 0x025278	-> objA0.subtype2c = 0x10	-> Square pattern moving platform (small range)
+	//  - 0x02528a	-> objA0.subtype2c = 0x12	-> Square pattern moving platform (big range)
+	//  - 0x02529a	-> objA0.subtype2c = 0x14	-> Square pattern moving platform (bigger range)
+	//  - 0x0252aa	-> objA0.subtype2c = 0x16	-> Square pattern moving platform (biggest range)
+	//  - 0x0250ac	-> objA0.subtype2c = 0x18	-> Horizontally moving platform (large range, using different timing?)
 	call tableLookupAddress(0x024f76, objA0.subtype2c)
 
 	D4.u16 = backup

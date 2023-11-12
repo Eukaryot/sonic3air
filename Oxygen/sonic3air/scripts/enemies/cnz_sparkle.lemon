@@ -16,12 +16,13 @@
 //# alias(fn089198) deprecated
 function void Sparkle.Init()
 {
-	Object.InitWithUpdateAddress(0x08919e)
+	Object.InitWithUpdateAddress(addressof(Sparkle.BaseUpdate))
 }
 
 
 //# address-hook(0x08919e) end(0x0891ac)
-function void fn08919e()
+//# alias(fn08919e) deprecated
+function void Sparkle.BaseUpdate()
 {
 	// Targets:
 	//  - 0x0891ba	-> objA0.base_state = 0x00

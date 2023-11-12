@@ -58,7 +58,7 @@ function void fn0223ea()
 		--D1.s16
 		if (D1.s16 < 0)
 		{
-			objA1.update_address = 0x02257e
+			objA1.update_address = addressof(AIZZipLine.BaseUpdate)
 			objA1.animation.sprite = 0x20
 			u16[A0 + 0x40] = A1.u16
 			break

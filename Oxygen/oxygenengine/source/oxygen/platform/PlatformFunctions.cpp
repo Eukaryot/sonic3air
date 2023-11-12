@@ -37,7 +37,7 @@ namespace
 		WCHAR szBuffer[512];
 		DWORD dwBufferSize = sizeof(szBuffer);
 		ULONG nError;
-		nError = RegQueryValueExW(hKey, valueName, 0, NULL, (LPBYTE)szBuffer, &dwBufferSize);
+		nError = RegQueryValueExW(hKey, valueName, 0, nullptr, (LPBYTE)szBuffer, &dwBufferSize);
 		return (ERROR_SUCCESS == nError) ? szBuffer : L"";
 	}
 
@@ -356,7 +356,7 @@ void PlatformFunctions::setAppIcon(int iconResource)
 std::wstring PlatformFunctions::getAppDataPath()
 {
 #ifdef PLATFORM_WINDOWS
-	PWSTR path = NULL;
+	PWSTR path = nullptr;
 	if (S_OK == SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_DONT_UNEXPAND | KF_FLAG_CREATE, nullptr, &path))
 	{
 		std::wstring result(path);

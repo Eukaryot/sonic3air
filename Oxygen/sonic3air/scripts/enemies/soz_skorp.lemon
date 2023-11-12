@@ -180,7 +180,7 @@ function void fn08e7d4()
 			objA0.countdown_callback = 0x08e87c
 
 			A1 = 0xffff0000 + u16[A0 + 0x44]
-			u8[A1 + 0x38] &= 0xf3
+			u8[A1 + 0x38] &= ~0x0c
 		}
 		else
 		{

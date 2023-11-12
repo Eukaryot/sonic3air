@@ -303,7 +303,7 @@ TEMPLATE void STRING::copy(const STRING& str)
 TEMPLATE void STRING::copy(const CHAR* str)
 {
 	// Copy string
-	if (str == nullptr)
+	if (nullptr == str)
 	{
 		clear();
 		return;

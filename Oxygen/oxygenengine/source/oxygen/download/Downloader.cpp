@@ -21,6 +21,13 @@
 	#pragma comment(lib, "wldap32.lib")
 	#pragma comment(lib, "crypt32.lib")
 
+#elif defined(PLATFORM_LINUX)
+	#define PLATFORM_SUPPORTS_DOWNLOADER
+	#define USING_CURL
+
+	#define CURL_STATICLIB
+	#include <curl/curl.h>
+
 #elif defined(PLATFORM_ANDROID)
 	#define PLATFORM_SUPPORTS_DOWNLOADER
 	#include "oxygen/platform/AndroidJavaInterface.h"
@@ -62,6 +69,12 @@ void Downloader::stopDownload()
 		mThread->join();
 		delete mThread;
 		mThread = nullptr;
+	}
+
+	if (mState == State::RUNNING || mState == State::FAILED)
+	{
+		// Delete the output file
+		FTX::FileSystem->removeFile(Configuration::instance().mAppDataPath + mOutputFilename);
 	}
 	mState = State::NONE;
 }

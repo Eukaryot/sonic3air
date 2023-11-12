@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "oxygen/rendering/parts/OverlayManager.h"
 #include "oxygen/rendering/parts/PaletteManager.h"
 #include "oxygen/rendering/parts/PatternManager.h"
 #include "oxygen/rendering/parts/PlaneManager.h"
@@ -29,7 +28,6 @@ public:
 public:
 	RenderParts();
 
-	inline OverlayManager&		 getOverlayManager()		{ return mOverlayManager; }
 	inline PaletteManager&		 getPaletteManager()		{ return mPaletteManager; }
 	inline PatternManager&		 getPatternManager()		{ return mPatternManager; }
 	inline PlaneManager&		 getPlaneManager()			{ return mPlaneManager; }
@@ -39,9 +37,6 @@ public:
 
 	inline bool getActiveDisplay() const	   { return mActiveDisplay; }
 	inline void setActiveDisplay(bool enable)  { mActiveDisplay = enable; }
-
-	inline bool getEnforceClearScreen() const		{ return mEnforceClearScreen; }
-	inline void setEnforceClearScreen(bool enable)	{ mEnforceClearScreen = enable; }
 
 	void addViewport(const Recti& rect, uint16 renderQueue);
 	inline const std::vector<Viewport>& getViewports() const  { return mViewports; }
@@ -58,7 +53,6 @@ public:
 	bool mLayerRendering[8];
 
 private:
-	OverlayManager		 mOverlayManager;
 	PaletteManager		 mPaletteManager;
 	PatternManager		 mPatternManager;
 	PlaneManager		 mPlaneManager;
@@ -67,7 +61,6 @@ private:
 	SpriteManager		 mSpriteManager;
 
 	bool mActiveDisplay = true;
-	bool mEnforceClearScreen = false;
 
 	std::vector<Viewport> mViewports;
 };

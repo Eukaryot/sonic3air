@@ -33,6 +33,8 @@ public:
 
 	void setActiveMods(const std::vector<Mod*>& newActiveModsList);
 
+	bool anyActiveModUsesFeature(uint64 featureNameHash) const;
+
 	void copyModSettingsFromConfig();
 	void copyModSettingsToConfig();
 

@@ -16,12 +16,13 @@
 //# alias(fn08dd32) deprecated
 function void Dragonfly.Init()
 {
-	Object.InitWithUpdateAddress(0x08dd38)
+	Object.InitWithUpdateAddress(addressof(Dragonfly.BaseUpdate))
 }
 
 
 //# address-hook(0x08dd38) end(0x08dd46)
-function void fn08dd38()
+//# alias(fn08dd38) deprecated
+function void Dragonfly.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08dd52	-> objA0.base_state = 0x00

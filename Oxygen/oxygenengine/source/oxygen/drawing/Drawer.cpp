@@ -127,6 +127,17 @@ void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture, const Vec2f& uv
 	}
 }
 
+void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture, const Recti& textureInnerRect, const Color& tintColor)
+{
+	const Vec2f texSize = Vec2f(texture.getSize());
+	if (texSize.x < 1.0f || texSize.y < 1.0f)
+		return;
+
+	const Vec2f uv0 = Vec2f(textureInnerRect.getPos()) / texSize;
+	const Vec2f uv1 = Vec2f(textureInnerRect.getPos() + textureInnerRect.getSize()) / texSize;
+	drawRect(rect, texture, uv0, uv1, tintColor);
+}
+
 void Drawer::drawUpscaledRect(const Rectf& rect, DrawerTexture& texture)
 {
 	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mUpscaledRectDrawCommands.createObject(rect, texture));
@@ -174,10 +185,22 @@ void Drawer::printText(Font& font, const Recti& rect, const String& text, int al
 		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextDrawCommands.createObject(font, rect, text, alignment, color));
 }
 
+void Drawer::printText(Font& font, const Vec2i& position, const String& text, int alignment, Color color)
+{
+	if (!text.empty())
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextDrawCommands.createObject(font, Recti(position.x, position.y, 0, 0), text, alignment, color));
+}
+
 void Drawer::printText(Font& font, const Recti& rect, const String& text, const DrawerPrintOptions& printOptions)
 {
 	if (!text.empty())
 		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextDrawCommands.createObject(font, rect, text, printOptions));
+}
+
+void Drawer::printText(Font& font, const Vec2i& position, const String& text, const DrawerPrintOptions& printOptions)
+{
+	if (!text.empty())
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextDrawCommands.createObject(font, Recti(position.x, position.y, 0, 0), text, printOptions));
 }
 
 void Drawer::printText(Font& font, const Recti& rect, const WString& text, int alignment, Color color)
@@ -186,10 +209,22 @@ void Drawer::printText(Font& font, const Recti& rect, const WString& text, int a
 		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextWDrawCommands.createObject(font, rect, text, alignment, color));
 }
 
+void Drawer::printText(Font& font, const Vec2i& position, const WString& text, int alignment, Color color)
+{
+	if (!text.empty())
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextWDrawCommands.createObject(font, Recti(position.x, position.y, 0, 0), text, alignment, color));
+}
+
 void Drawer::printText(Font& font, const Recti& rect, const WString& text, const DrawerPrintOptions& printOptions)
 {
 	if (!text.empty())
 		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextWDrawCommands.createObject(font, rect, text, printOptions));
+}
+
+void Drawer::printText(Font& font, const Vec2i& position, const WString& text, const DrawerPrintOptions& printOptions)
+{
+	if (!text.empty())
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextWDrawCommands.createObject(font, Recti(position.x, position.y, 0, 0), text, printOptions));
 }
 
 void Drawer::pushScissor(const Recti& rect)

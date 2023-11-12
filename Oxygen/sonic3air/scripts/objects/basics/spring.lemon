@@ -50,13 +50,13 @@ function void SpringHorizontal.Init()
 	objA0.animation.sprite = 3
 	objA0.sprite_attributes = 0x04b4
 	objA0.box_size.x = 8
-	objA0.update_address = 0x023050
+	objA0.update_address = addressof(SpringHorizontal.Update)
 
 	if (competition_mode.active)
 	{
 		objA0.mapping_offset = 0x023904
 		objA0.sprite_attributes = 0x03ad
-		objA0.update_address = 0x0230de
+		objA0.update_address = addressof(SpringHorizontal.Update.CompetitionMode)
 	}
 	Spring.SharedInit()
 }
@@ -89,20 +89,20 @@ function void SpringVertical.initInternal(bool flipY)
 		objA0.animation.sprite = 6
 		if (competition_mode.active)
 		{
-			objA0.update_address = 0x023374
+			objA0.update_address = addressof(SpringVerticalFlipped.Update.CompetitionMode)
 			objA0.mapping_offset = 0x023904
 			objA0.sprite_attributes = 0x0391
 		}
 		else
 		{
-			objA0.update_address = 0x023326
+			objA0.update_address = addressof(SpringVerticalFlipped.Update)
 		}
 	}
 	else
 	{
 		if (competition_mode.active)
 		{
-			objA0.update_address = 0x022f46
+			objA0.update_address = addressof(SpringVertical.Update.CompetitionMode)
 			objA0.mapping_offset = 0x023904
 			objA0.sprite_attributes = 0x0391
 			if (global.zone == 0x12)
@@ -110,7 +110,7 @@ function void SpringVertical.initInternal(bool flipY)
 		}
 		else
 		{
-			objA0.update_address = 0x022ef4
+			objA0.update_address = addressof(SpringVertical.Update)
 		}
 	}
 
@@ -144,11 +144,11 @@ function void SpringDiagonal.initInternal(bool flipY)
 	if (flipY)
 	{
 		objA0.flags2a |= 0x02
-		objA0.update_address = 0x0235d2
+		objA0.update_address = addressof(SpringDiagonalFlipped.Update)
 	}
 	else
 	{
-		objA0.update_address = 0x023490
+		objA0.update_address = addressof(SpringDiagonal.Update)
 	}
 	Spring.SharedInit()
 }

@@ -45,11 +45,17 @@ public:
 	float mSoundVolume = 0.8f;
 	int mActiveSoundtrack = 1;		// 0 = emulated, 1 = remastered
 
+	// Input
+	int mGamepadVisualStyle = 0;
+
 	// Time Attack
 	int mInstantTimeAttackRestart = 0;
 
 	// Settings game version
 	std::string mGameVersionInSettings;
+
+	// Menus
+	bool mShowControlsDisplay = true;
 
 	// Dev mode (in addition to "mDevMode" from base class)
 	DevModeImplSettings mDevModeImpl;

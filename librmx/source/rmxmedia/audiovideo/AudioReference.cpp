@@ -28,7 +28,7 @@ void AudioReference::updateInstance()
 bool AudioReference::valid()
 {
 	updateInstance();
-	return (mInstance != nullptr);
+	return (nullptr != mInstance);
 }
 
 float AudioReference::getPosition()

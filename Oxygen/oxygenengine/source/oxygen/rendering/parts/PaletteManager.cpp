@@ -41,6 +41,12 @@ void Palette::setAllPaletteChangeFlags()
 	memset(mChangeFlags, 0xff, sizeof(mChangeFlags));
 }
 
+void Palette::invalidatePackedColorCache()
+{
+	for (size_t k = 0; k < NUM_COLORS; ++k)
+		mPackedColorCache[k].mIsValid = false;
+}
+
 void Palette::setPaletteEntry(uint16 colorIndex, uint32 color)
 {
 	if (mColor[colorIndex] != color)
@@ -199,4 +205,63 @@ void PaletteManager::setGlobalComponentTint(const Vec4f& tintColor, const Vec4f&
 	mUsesGlobalComponentTint = true;
 	mGlobalComponentTintColor = tintColor;
 	mGlobalComponentAddedColor = addedColor;
+}
+
+void PaletteManager::applyGlobalComponentTint(Color& color) const
+{
+	if (mUsesGlobalComponentTint)
+	{
+		color = mGlobalComponentAddedColor + color * mGlobalComponentTintColor;
+	}
+}
+
+void PaletteManager::applyGlobalComponentTint(Color& tintColor, Color& addedColor) const
+{
+	if (mUsesGlobalComponentTint)
+	{
+		tintColor *= mGlobalComponentTintColor;
+		addedColor += mGlobalComponentAddedColor;
+	}
+}
+
+void PaletteManager::serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion)
+{
+	if (formatVersion >= 4)
+	{
+		serializePalette(serializer, mPalette[0]);
+		serializePalette(serializer, mPalette[1]);
+	}
+	else
+	{
+		uint16 buffer[0x40];
+		if (serializer.isReading())
+		{
+			serializer.serialize(buffer, 0x80);
+			for (int i = 0; i < 0x40; ++i)
+			{
+				writePaletteEntryPacked(0, i, buffer[i]);
+				writePaletteEntryPacked(1, i, buffer[i]);
+			}
+		}
+		else
+		{
+			for (int i = 0; i < 0x40; ++i)
+				buffer[i] = getPalette(0).getEntryPacked(i, true);
+			serializer.serialize(buffer, 0x80);
+		}
+	}
+}
+
+void PaletteManager::serializePalette(VectorBinarySerializer& serializer, Palette& palette)
+{
+	for (size_t k = 0; k < Palette::NUM_COLORS; ++k)
+	{
+		serializer.serialize(palette.mColor[k]);
+
+		if (serializer.isReading())
+		{
+			palette.setAllPaletteChangeFlags();
+			palette.invalidatePackedColorCache();
+		}
+	}
 }

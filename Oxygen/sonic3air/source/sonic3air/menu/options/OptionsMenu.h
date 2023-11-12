@@ -13,6 +13,7 @@
 
 class ControllerSetupMenu;
 class MenuBackground;
+class ModTitleMenuEntry;
 class SoundtrackDownloadMenuEntry;
 
 
@@ -61,6 +62,9 @@ private:
 	void refreshGamepadLists(bool forceUpdate = false);
 	bool isTitleShown(int tabIndex, int line) const;
 	GameMenuEntry* getSelectedGameMenuEntry();
+
+	void refreshControlsDisplay();
+	void updateModExpandState(ModTitleMenuEntry& modTitleMenuEntry);
 	void goBack();
 
 private:
@@ -100,7 +104,9 @@ private:
 
 	State mState = State::INACTIVE;
 	float mVisibility = 0.0f;
+	float mDeltaSecondsForRendering = 0.0f;
 	GameMenuScrolling mScrolling;
+	GameMenuControlsDisplay mGameMenuControlsDisplay;
 
 	bool mEnteredFromIngame = false;
 	float mWarningMessageTimeout = 0.0f;
@@ -109,4 +115,5 @@ private:
 	int mOriginalScriptOptimizationLevel = -1;
 
 	bool mHasAnyModOptions = false;
+	std::set<uint64> mExpandedMods;		// Using the mods' local directory hashes
 };

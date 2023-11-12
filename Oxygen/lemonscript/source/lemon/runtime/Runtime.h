@@ -26,7 +26,7 @@ namespace lemon
 	public:
 		struct SpecializationResult
 		{
-			enum Result
+			enum class Result : uint8
 			{
 				NO_SPECIALIZATION,
 				HAS_SPECIALIZATION,

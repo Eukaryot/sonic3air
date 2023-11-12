@@ -390,7 +390,7 @@ namespace lemon
 					uint64 address = opcodes[0].mParameter;
 					MemoryAccessHandler::SpecializationResult result;
 					runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, DataTypeHelper::getSizeOfBaseType(opcodes[1].mDataType), false);
-					if (result.mResult == MemoryAccessHandler::SpecializationResult::HAS_SPECIALIZATION)
+					if (result.mResult == MemoryAccessHandler::SpecializationResult::Result::HAS_SPECIALIZATION)
 					{
 						RuntimeOpcode& runtimeOpcode = buffer.addOpcode(8);
 						if (result.mSwapBytes)
@@ -422,7 +422,7 @@ namespace lemon
 					uint64 address = opcodes[0].mParameter;
 					MemoryAccessHandler::SpecializationResult result;
 					runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, DataTypeHelper::getSizeOfBaseType(opcodes[1].mDataType), true);
-					if (result.mResult == MemoryAccessHandler::SpecializationResult::HAS_SPECIALIZATION)
+					if (result.mResult == MemoryAccessHandler::SpecializationResult::Result::HAS_SPECIALIZATION)
 					{
 						RuntimeOpcode& runtimeOpcode = buffer.addOpcode(8);
 						if (result.mSwapBytes)

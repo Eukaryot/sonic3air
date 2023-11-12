@@ -16,12 +16,13 @@
 //# alias(fn08eda0) deprecated
 function void Rockn.Init()
 {
-	Object.InitWithUpdateAddress(0x08eda6)
+	Object.InitWithUpdateAddress(addressof(Rockn.BaseUpdate))
 }
 
 
 //# address-hook(0x08eda6) end(0x08edb4)
-function void fn08eda6()
+//# alias(fn08eda6) deprecated
+function void Rockn.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08edc0	-> objA0.base_state = 0x00

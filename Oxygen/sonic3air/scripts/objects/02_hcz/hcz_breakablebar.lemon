@@ -114,7 +114,7 @@ function void fn01edec()
 		u8[A2] = 0
 		u8[A2 + 0x02] = 0x3c
 		level.HCZ_breakable_bar_flags &= ~(1 << D2.u8)
-		u8[A1 + 0x2e] &= 0xfe
+		u8[A1 + 0x2e] &= ~control_flag.DISABLE_UPDATE
 		if ((objA0.subtype2c & 0x40) == 0)
 		{
 			objA0.value3a = 0x01
@@ -158,7 +158,7 @@ function void fn01edec()
 					objA1.position.x.u16 = D0.u16
 					objA1.state = char.state.HOLDING_ON
 					objA1.flags2a &= ~char.flag.FACING_LEFT
-					u8[A1 + 0x2e] = 0x01
+					u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 					level.HCZ_breakable_bar_flags |= (1 << (D2.u8 & 7))
 					u8[A2] = 0x01
 				}
@@ -173,11 +173,11 @@ function void fn01eeec()
 {
 	if (u8[A0 + 0x32] != 0)
 	{
-		u8[0xffffb000 + 0x2e] &= 0xfe
+		u8[0xffffb000 + 0x2e] &= ~control_flag.DISABLE_UPDATE
 	}
 	if (u8[A0 + 0x33] != 0)
 	{
-		u8[0xffffb04a + 0x2e] &= 0xfe
+		u8[0xffffb04a + 0x2e] &= ~control_flag.DISABLE_UPDATE
 	}
 
 	level.HCZ_breakable_bar_flags = 0
@@ -289,7 +289,7 @@ function void fn01efa0()
 		u8[A2] = 0
 		u8[A2 + 0x02] = 0x3c
 		level.HCZ_breakable_bar_flags &= ~(1 << D2.u8)
-		u8[A1 + 0x2e] &= 0xfe
+		u8[A1 + 0x2e] &= ~control_flag.DISABLE_UPDATE
 		if ((objA0.subtype2c & 0x40) == 0)
 		{
 			objA0.value3a = 0x01
@@ -335,7 +335,7 @@ function void fn01efa0()
 						D0.u16 = objA0.position.y.u16 - 0x14
 						objA1.position.y.u16 = D0.u16
 						objA1.state = char.state.HANGING
-						u8[A1 + 0x2e] = 0x01
+						u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 						level.HCZ_breakable_bar_flags |= (1 << D2.u8)
 						u8[A2] = 0x01
 					}
@@ -351,11 +351,11 @@ function void fn01f09a()
 {
 	if (u8[A0 + 0x32] != 0)
 	{
-		u8[0xffffb000 + 0x2e] &= 0xfe
+		u8[0xffffb000 + 0x2e] &= ~control_flag.DISABLE_UPDATE
 	}
 	if (u8[A0 + 0x33] != 0)
 	{
-		u8[0xffffb04a + 0x2e] &= 0xfe
+		u8[0xffffb04a + 0x2e] &= ~control_flag.DISABLE_UPDATE
 	}
 
 	level.HCZ_breakable_bar_flags = 0

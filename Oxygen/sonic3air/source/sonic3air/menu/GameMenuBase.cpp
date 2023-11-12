@@ -102,6 +102,29 @@ bool GameMenuEntry::setSelectedIndexByValue(uint32 value)
 	return false;
 }
 
+bool GameMenuEntry::changeSelectedIndex(int change)
+{
+	if (change < 0)
+	{
+		const size_t newIndex = getPreviousVisibleIndex();
+		if (newIndex != mSelectedIndex)
+		{
+			mSelectedIndex = newIndex;
+			return true;
+		}
+	}
+	else if (change > 0)
+	{
+		const size_t newIndex = getNextVisibleIndex();
+		if (newIndex != mSelectedIndex)
+		{
+			mSelectedIndex = newIndex;
+			return true;
+		}
+	}
+	return false;
+}
+
 bool GameMenuEntry::sanitizeSelectedIndex(bool allowInvisibleEntries)
 {
 	if (mSelectedIndex >= mOptions.size())
@@ -285,106 +308,65 @@ GameMenuEntries::UpdateResult GameMenuEntries::update()
 	// Evaluate input
 	if (!FTX::keyState(SDLK_LALT) && !FTX::keyState(SDLK_RALT))
 	{
-		const InputManager::ControllerScheme& controller = InputManager::instance().getController(0);
-
-		int entryChange = 0;
-		if (mNavigation == Navigation::VERTICAL)
-		{
-			if (controller.Up.justPressedOrRepeat())
-				--entryChange;
-			if (controller.Down.justPressedOrRepeat())
-				++entryChange;
-		}
-		else
-		{
-			if (controller.Left.justPressedOrRepeat())
-				--entryChange;
-			if (controller.Right.justPressedOrRepeat())
-				++entryChange;
-		}
-
-		int optionChange = 0;
-		if (mNavigation == Navigation::VERTICAL)
-		{
-			if (controller.Left.justPressedOrRepeat())
-				--optionChange;
-			if (controller.Right.justPressedOrRepeat())
-				++optionChange;
-		}
-		else
-		{
-			if (controller.Up.justPressedOrRepeat())
-				--optionChange;
-			if (controller.Down.justPressedOrRepeat())
-				++optionChange;
-		}
-
+		const int entryChange = getEntryChangeByInput();
 		if (entryChange != 0)
 		{
-			if (entryChange < 0)
-			{
-				for (int tries = 0; tries < 100; ++tries)
-				{
-					if (mSelectedEntryIndex > 0)
-					{
-						--mSelectedEntryIndex;
-					}
-					else
-					{
-						mSelectedEntryIndex = (int)mEntries.size() - 1;
-					}
-
-					// Continue for invisible and non-interactable entries, so they get skipped
-					if (mEntries[mSelectedEntryIndex]->isFullyInteractable())
-						break;
-				}
-			}
-			else
-			{
-				for (int tries = 0; tries < 100; ++tries)
-				{
-					if (mSelectedEntryIndex < (int)mEntries.size() - 1)
-					{
-						++mSelectedEntryIndex;
-					}
-					else
-					{
-						mSelectedEntryIndex = 0;
-					}
-
-					// Continue for invisible and non-interactable entries, so they get skipped
-					if (mEntries[mSelectedEntryIndex]->isFullyInteractable())
-						break;
-				}
-			}
+			changeSelectedIndex(entryChange);
 			return UpdateResult::ENTRY_CHANGED;
 		}
 
+		const int optionChange = getOptionChangeByInput();
 		if (optionChange != 0)
 		{
-			if (optionChange < 0)
+			if (mEntries[mSelectedEntryIndex]->changeSelectedIndex(optionChange))
 			{
-				GameMenuEntry& entry = *mEntries[mSelectedEntryIndex];
-				const size_t newIndex = entry.getPreviousVisibleIndex();
-				if (newIndex != entry.mSelectedIndex)
-				{
-					entry.mSelectedIndex = newIndex;
-					return UpdateResult::OPTION_CHANGED;
-				}
-			}
-			else
-			{
-				GameMenuEntry& entry = *mEntries[mSelectedEntryIndex];
-				const size_t newIndex = entry.getNextVisibleIndex();
-				if (newIndex != entry.mSelectedIndex)
-				{
-					entry.mSelectedIndex = newIndex;
-					return UpdateResult::OPTION_CHANGED;
-				}
+				return UpdateResult::OPTION_CHANGED;
 			}
 		}
 	}
 	return UpdateResult::NONE;
+}
+
+int GameMenuEntries::getEntryChangeByInput() const
+{
+	const InputManager::ControllerScheme& controller = InputManager::instance().getController(0);
+	int entryChange = 0;
+	if (mNavigation == Navigation::VERTICAL)
+	{
+		if (controller.Up.justPressedOrRepeat())
+			--entryChange;
+		if (controller.Down.justPressedOrRepeat())
+			++entryChange;
+	}
+	else
+	{
+		if (controller.Left.justPressedOrRepeat())
+			--entryChange;
+		if (controller.Right.justPressedOrRepeat())
+			++entryChange;
+	}
+	return entryChange;
+}
+
+int GameMenuEntries::getOptionChangeByInput() const
+{
+	const InputManager::ControllerScheme& controller = InputManager::instance().getController(0);
+	int optionChange = 0;
+	if (mNavigation == Navigation::VERTICAL)
+	{
+		if (controller.Left.justPressedOrRepeat())
+			--optionChange;
+		if (controller.Right.justPressedOrRepeat())
+			++optionChange;
+	}
+	else
+	{
+		if (controller.Up.justPressedOrRepeat())
+			--optionChange;
+		if (controller.Down.justPressedOrRepeat())
+			++optionChange;
+	}
+	return optionChange;
 }
 
 bool GameMenuEntries::setSelectedIndexByValue(uint32 value)
@@ -408,6 +390,20 @@ bool GameMenuEntries::setSelectedIndexByValue(uint32 value)
 
 	// Selected an entry, but it's not an exact match
 	return false;
+}
+
+bool GameMenuEntries::changeSelectedIndex(int change, bool loop)
+{
+	const int originalIndex = mSelectedEntryIndex;
+	if (change < 0)
+	{
+		mSelectedEntryIndex = getPreviousInteractableIndex(mSelectedEntryIndex, loop);
+	}
+	else if (change > 0)
+	{
+		mSelectedEntryIndex = getNextInteractableIndex(mSelectedEntryIndex, loop);
+	}
+	return (mSelectedEntryIndex != originalIndex);
 }
 
 bool GameMenuEntries::sanitizeSelectedIndex(bool allowNonInteractableEntries)
@@ -443,6 +439,56 @@ bool GameMenuEntries::sanitizeSelectedIndex(bool allowNonInteractableEntries)
 	return true;
 }
 
+size_t GameMenuEntries::getPreviousInteractableIndex(size_t index, bool loop) const
+{
+	if (mEntries.empty())
+		return 0;
+
+	const size_t originalIndex = index;
+	for (int tries = 0; tries < 100; ++tries)
+	{
+		if (index > 0)
+			--index;
+		else if (loop)
+			index = mEntries.size() - 1;
+		else
+			break;	// Failed
+
+		// Continue for invisible and non-interactable entries, so they get skipped
+		if (mEntries[index]->isFullyInteractable())
+		{
+			// Found a valid index
+			return index;
+		}
+	}
+	return originalIndex;
+}
+
+size_t GameMenuEntries::getNextInteractableIndex(size_t index, bool loop) const
+{
+	if (mEntries.empty())
+		return 0;
+
+	const size_t initialIndex = index;
+	for (int tries = 0; tries < 100; ++tries)
+	{
+		if (index < mEntries.size() - 1)
+			++index;
+		else if (loop)
+			index = 0;
+		else
+			break;	// Failed
+
+		// Continue for invisible and non-interactable entries, so they get skipped
+		if (mEntries[index]->isFullyInteractable())
+		{
+			// Found a valid index
+			return index;
+		}
+	}
+	return initialIndex;
+}
+
 
 
 void GameMenuBase::playMenuSound(uint8 sfxId)
@@ -475,57 +521,4 @@ GameMenuBase::~GameMenuBase()
 void GameMenuBase::update(float timeElapsed)
 {
 	GuiBase::update(timeElapsed);
-}
-
-
-
-void GameMenuScrolling::setCurrentSelection(int selectionY1, int selectionY2)
-{
-	mCurrentSelectionY1 = (float)selectionY1;
-	mCurrentSelectionY2 = (float)selectionY2;
-}
-
-void GameMenuScrolling::setCurrentSelection(float selectionY1, float selectionY2)
-{
-	mCurrentSelectionY1 = selectionY1;
-	mCurrentSelectionY2 = selectionY2;
-}
-
-int GameMenuScrolling::getScrollOffsetYInt() const
-{
-	return roundToInt(mScrollOffsetY);
-}
-
-void GameMenuScrolling::update(float timeElapsed)
-{
-	const float maxScrollOffset = std::max(mCurrentSelectionY1, 0.0f);
-	const float minScrollOffset = mCurrentSelectionY2 - mVisibleAreaHeight;
-	const float targetY = clamp(mScrollOffsetY, minScrollOffset, maxScrollOffset);
-
-	// Still scrolling at all?
-	if (targetY == mScrollOffsetY)
-	{
-		mScrollingFast = false;
-		return;
-	}
-
-	// Switch to fast scrolling if it's a long way to go; or even skip part of it
-	if (std::fabs(targetY - mScrollOffsetY) > 500.0f)
-	{
-		mScrollOffsetY = clamp(mScrollOffsetY, targetY - 500.0f, targetY + 500.0f);
-	}
-	if (std::fabs(targetY - mScrollOffsetY) > 100.0f)
-	{
-		mScrollingFast = true;
-	}
-
-	const float maxStep = timeElapsed * (mScrollingFast ? 1200.0f : 450.0f);
-	if (mScrollOffsetY < targetY)
-	{
-		mScrollOffsetY = std::min(mScrollOffsetY + maxStep, targetY);
-	}
-	else
-	{
-		mScrollOffsetY = std::max(mScrollOffsetY - maxStep, targetY);
-	}
 }

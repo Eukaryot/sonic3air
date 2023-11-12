@@ -324,7 +324,7 @@ function void fn077966()
 	{
 		objA0.update_address = 0x0779c0
 		objA1.state = char.state.GOT_HURT
-		u8[A1 + 0x2e] = 0x81
+		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	}
 	else
 	{
@@ -404,7 +404,7 @@ function void fn077a6e()
 	A1 = 0xffffb04a
 	u8[A1 + 0x0a] &= ~0x80
 	objA1.state = char.state.GOT_HURT
-	u8[A1 + 0x2e] = 0x81
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	player2.control_override = 0
 
 	fn077a98()

@@ -65,8 +65,11 @@ void RenderPaletteSpriteShader::refresh(const Vec2i& gameResolution, int waterSu
 	mInitialized = true;
 }
 
-void RenderPaletteSpriteShader::draw(const SpriteManager::PaletteSpriteInfo& spriteInfo, OpenGLRenderResources& resources)
+void RenderPaletteSpriteShader::draw(const renderitems::PaletteSpriteInfo& spriteInfo, OpenGLRenderResources& resources)
 {
+	if (nullptr == spriteInfo.mCacheItem)
+		return;
+
 	glActiveTexture(GL_TEXTURE0);
 	const BufferTexture* texture = OpenGLSpriteTextureManager::instance().getPaletteSpriteTexture(*spriteInfo.mCacheItem, spriteInfo.mUseUpscaledSprite);
 	if (nullptr == texture)

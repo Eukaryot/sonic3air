@@ -200,7 +200,7 @@ function void fn058002()
 		{
 			objA1.position.y.u16 = 0x7fff
 			objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
-			u8[A1 + 0x2e] = 0x03
+			u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 			objA1.state = char.state.RUNNING
 		}
 		else
@@ -246,7 +246,7 @@ function void fn05806e()
 			objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 			objA1.state = char.state.ROLLING
 			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
-			u8[A1 + 0x2e] = 0x01
+			u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 			u8[A1 + 0x40] = 0x01
 			objA1.velocity.x = 0x400
 			objA1.velocity.y = -0x680
@@ -316,7 +316,7 @@ function void fn05806e()
 		// Set player characters' spiral run sprites
 		A2 = 0x0587a8
 		D0.u8 = u8[A2 + D2.u16]
-		u8[A1 + 0x22] = D0.u8
+		objA1.animation.sprite = D0.u8
 		SetCharacterSpritePatterns()
 	}
 	else if (s16[A2 + 0x04] < 0)
@@ -332,7 +332,7 @@ function void fn05806e()
 		{
 			objA1.state = char.state.RUNNING
 			u8[A1 + 0x22] = 0
-			u8[A1 + 0x2e] = 0x03
+			u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 			u16[A2 + 0x04] = 0xb4
 		}
 	}

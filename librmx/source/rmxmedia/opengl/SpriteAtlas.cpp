@@ -13,7 +13,7 @@ void SpriteAtlasBase::Node::clear()
 {
 	for (int i = 0; i < 2; ++i)
 	{
-		if (mChildNode[i])
+		if (nullptr != mChildNode[i])
 		{
 			mChildNode[i]->clear();
 			SAFE_DELETE(mChildNode[i]);
@@ -24,9 +24,9 @@ void SpriteAtlasBase::Node::clear()
 
 SpriteAtlasBase::Node* SpriteAtlasBase::Node::insert(const Vec2i& size, int padding)
 {
-	if (mChildNode[0] != nullptr)
+	if (nullptr != mChildNode[0])
 	{
-		assert(mChildNode[1] != nullptr);
+		assert(nullptr != mChildNode[1]);
 
 		// Add to a new child node
 		Node* newNode = mChildNode[0]->insert(size, padding);

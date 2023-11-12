@@ -49,6 +49,7 @@ private:
 
 	void goBack();
 	void refreshGamepadList(bool forceUpdate = false);
+	void refreshControlsDisplay();
 
 private:
 	State mState = State::INACTIVE;
@@ -56,6 +57,11 @@ private:
 	GameMenuEntries mMenuEntries;
 	GameMenuEntry* mControllerSelectEntry = nullptr;
 	GameMenuEntries mAssignmentType;
+
+	GameMenuScrolling mScrolling;
+	GameMenuControlsDisplay mGameMenuControlsDisplay;
+
+	bool mUsingControlsLR = false;
 	uint32 mLastGamepadsChangeCounter = 0;
 
 	int mCurrentlyAssigningButtonIndex = -1;

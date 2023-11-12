@@ -30,7 +30,7 @@ function void InstaShield.Init()
 	objA0.shield.art_offset = 0x18c084
 	Shield.sharedInit()
 
-	objA0.update_address = 0x01952a
+	objA0.update_address = addressof(InstaShield.Update)
 	InstaShield.Update()
 }
 
@@ -113,7 +113,7 @@ function void FireShield.Init()
 	objA0.shield.pattern_offset = 0x019ce6
 	Shield.sharedInit()
 
-	objA0.update_address = 0x019602
+	objA0.update_address = addressof(FireShield.Update)
 	FireShield.Update()
 }
 
@@ -195,7 +195,7 @@ function void LightningShield.Init()
 	objA0.shield.pattern_offset = 0x019efa
 	Shield.sharedInit()
 
-	objA0.update_address = 0x019732
+	objA0.update_address = addressof(LightningShield.Update)
 	LightningShield.Update()
 }
 
@@ -288,7 +288,7 @@ function void Effects.CreateSparks()
 		if (!allocDynamicObjectStd())
 			break
 
-		objA1.update_address = 0x019874
+		objA1.update_address = addressof(LightningShieldSpark.Update)
 		objA1.render_flags = render_flag.WORLD
 		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.mapping_offset = objA0.mapping_offset
@@ -352,7 +352,7 @@ function void BubbleShield.Init()
 
 	A1 = 0xffff0000 + objA0.shield.character_address
 	UpdateMusicOnWaterTransition()
-	objA0.update_address = 0x019922
+	objA0.update_address = addressof(BubbleShield.Update)
 	BubbleShield.Update()
 }
 
@@ -393,7 +393,8 @@ function void BubbleShield.Update()
 //-------------------------------------------------------//
 
 //# address-hook(0x0187f0) end(0x018862)
-function void fn0187f0()
+//# alias(fn0187f0) deprecated
+function void Invincibility.Init()
 {
 	updateSpritePattern(0x18a204, Shield.targetInVRAM, 0x200)
 
@@ -402,7 +403,7 @@ function void fn0187f0()
 	A1 = A0
 	for (u8 i = 0; i < 4; ++i)
 	{
-		objA1.update_address = 0x0188e8
+		objA1.update_address = addressof(Invincibility.Trail.Update)
 		objA1.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
 		objA1.box_size.x = 0x10
 		objA1.sprite_priority = 0x80
@@ -417,14 +418,15 @@ function void fn0187f0()
 		++D2.u16
 	}
 
-	objA0.update_address = 0x018868
+	objA0.update_address = addressof(Invincibility.Update)
 	u8[A0 + 0x34] = 4
-	fn018868()
+	Invincibility.Update()
 }
 
 
 //# address-hook(0x018868) end(0x0188e4)
-function void fn018868()
+//# alias(fn018868) deprecated
+function void Invincibility.Update()
 {
 	if (super.active || super.active.tails)
 	{
@@ -448,6 +450,8 @@ function void fn018868()
 
 	objA0.position.x.u16 = objA1.position.x.u16
 	objA0.position.y.u16 = objA1.position.y.u16
+	D0.u16 = objA1.position.x.u16
+	D1.u16 = objA1.position.y.u16
 
 	A2 = A0 + 0x18
 	A3 = 0x0189e0
@@ -467,15 +471,15 @@ function void fn018868()
 	D6.u8 = u8[A0 + 0x34]
 	fn01898a()
 
-	u16[(A2+=2)-2] = D2.u16
-	u16[(A2+=2)-2] = D3.u16
-	u16[(A2+=2)-2] = D5.u16
+	u16[(A2+=2)-2] = D2.u16		// Compound sprite 1 X-position
+	u16[(A2+=2)-2] = D3.u16		// Compound sprite 1 Y-position
+	u16[(A2+=2)-2] = D5.u16		// Compound sprite 1 animation frame
 	D6.u16 += 0x20
 	fn01898a()
 
-	u16[(A2+=2)-2] = D2.u16
-	u16[(A2+=2)-2] = D3.u16
-	u16[(A2+=2)-2] = D5.u16
+	u16[(A2+=2)-2] = D2.u16		// Compound sprite 2 X-position
+	u16[(A2+=2)-2] = D3.u16		// Compound sprite 2 Y-position
+	u16[(A2+=2)-2] = D5.u16		// Compound sprite 2 animation frame
 	u8[A0 + 0x34] += (u8[A1 + 0x2a] & char.flag.FACING_LEFT) ? -0x12 : 0x12
 
 	DrawObject()
@@ -483,7 +487,8 @@ function void fn018868()
 
 
 //# address-hook(0x0188e8) end(0x018986)
-function void fn0188e8()
+//# alias(fn0188e8) deprecated
+function void Invincibility.Trail.Update()
 {
 	if (super.active || super.active.tails)
 	{
@@ -512,6 +517,7 @@ function void fn0188e8()
 	D1.u16 = u16[A2+2]
 	objA0.position.x.u16 = D0.u16
 	objA0.position.y.u16 = D1.u16
+
 	A2 = A0 + 0x18
 	A3 = u32[A0 + 0x30]
 
@@ -534,16 +540,16 @@ function void fn0188e8()
 	D6.u8 = u8[A0 + 0x34]
 	fn01898a()
 
-	u16[(A2+=2)-2] = D2.u16
-	u16[(A2+=2)-2] = D3.u16
-	u16[(A2+=2)-2] = D5.u16
+	u16[(A2+=2)-2] = D2.u16		// Compound sprite 1 X-position
+	u16[(A2+=2)-2] = D3.u16		// Compound sprite 1 Y-position
+	u16[(A2+=2)-2] = D5.u16		// Compound sprite 1 animation frame
 	D6.u16 += 0x20
 	D5 = (D5 << 16) + (D5 >> 16)
 	fn01898a()
 
-	u16[(A2+=2)-2] = D2.u16
-	u16[(A2+=2)-2] = D3.u16
-	u16[(A2+=2)-2] = D5.u16
+	u16[(A2+=2)-2] = D2.u16		// Compound sprite 2 X-position
+	u16[(A2+=2)-2] = D3.u16		// Compound sprite 2 Y-position
+	u16[(A2+=2)-2] = D5.u16		// Compound sprite 2 animation frame
 	u8[A0 + 0x34] += (u8[A1 + 0x2a] & char.flag.FACING_LEFT) ? -2 : 2
 
 	DrawObject()

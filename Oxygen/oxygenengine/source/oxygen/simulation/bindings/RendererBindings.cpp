@@ -348,11 +348,6 @@ namespace
 		RenderParts::instance().getScrollOffsetsManager().setVerticalScrollOffsetBias(bias);
 	}
 
-	void Renderer_enforceClearScreen(uint8 enabled)
-	{
-		RenderParts::instance().setEnforceClearScreen(enabled != 0);
-	}
-
 	void Renderer_enableDefaultPlane(uint8 planeIndex, uint8 enabled)
 	{
 		RenderParts::instance().getPlaneManager().setDefaultPlaneEnabled(planeIndex, enabled != 0);
@@ -370,7 +365,7 @@ namespace
 
 	void Renderer_resetSprites()
 	{
-		RenderParts::instance().getSpriteManager().resetSprites();
+		RenderParts::instance().getSpriteManager().setResetRenderItems(true);
 	}
 
 	void Renderer_drawVdpSprite(int16 px, int16 py, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue)
@@ -395,27 +390,27 @@ namespace
 
 	uint64 Renderer_setupCustomUncompressedSprite(uint32 sourceBase, uint16 words, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, words / 0x10, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_NONE);
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, words / 0x10, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::NONE);
 	}
 
 	uint64 Renderer_setupCustomCharacterSprite(uint32 sourceBase, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, tableAddress, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_CHARACTER);
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, tableAddress, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::CHARACTER);
 	}
 
 	uint64 Renderer_setupCustomObjectSprite(uint32 sourceBase, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, tableAddress, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_OBJECT);
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, tableAddress, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::OBJECT);
 	}
 
 	uint64 Renderer_setupKosinskiCompressedSprite1(uint32 sourceAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceAddress, 0, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_KOSINSKI);
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceAddress, 0, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::KOSINSKI);
 	}
 
 	uint64 Renderer_setupKosinskiCompressedSprite2(uint32 sourceAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex, int16 indexOffset)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceAddress, 0, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_KOSINSKI, indexOffset);
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceAddress, 0, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::KOSINSKI, indexOffset);
 	}
 
 	void Renderer_drawSprite1(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue)
@@ -523,13 +518,28 @@ namespace
 		RenderParts::instance().getPaletteManager().setGlobalComponentTint(tintColor, addedColor);
 	}
 
-	void Renderer_drawText(lemon::StringRef fontKey, int32 px, int32 py, lemon::StringRef text, uint32 tintColor, uint8 alignment, int8 spacing, uint16 renderQueue, bool useWorldSpace)
+	void Renderer_drawRect(int32 px, int32 py, int32 width, int32 height, uint32 color, uint16 renderQueue, bool useWorldSpace)
+	{
+		RenderParts::instance().getSpriteManager().addRectangle(Recti(px, py, width, height), Color::fromRGBA32(color), renderQueue, useWorldSpace ? SpacesManager::Space::WORLD : SpacesManager::Space::SCREEN, false);
+	}
+
+	void Renderer_drawRect2(int32 px, int32 py, int32 width, int32 height, uint32 color, uint16 renderQueue, bool useWorldSpace, bool useGlobalComponentTint)
+	{
+		RenderParts::instance().getSpriteManager().addRectangle(Recti(px, py, width, height), Color::fromRGBA32(color), renderQueue, useWorldSpace ? SpacesManager::Space::WORLD : SpacesManager::Space::SCREEN, useGlobalComponentTint);
+	}
+
+	void Renderer_drawText(lemon::StringRef fontKey, int32 px, int32 py, lemon::StringRef text, uint32 tintColor, uint8 alignment, int8 spacing, uint16 renderQueue, bool useWorldSpace, bool useGlobalComponentTint)
 	{
 		RMX_CHECK(alignment >= 1 && alignment <= 9, "Invalid alignment " << alignment << " used for drawing text, fallback to alignment = 1", alignment = 1);
 		if (fontKey.isValid() && text.isValid())
 		{
-			RenderParts::instance().getOverlayManager().addText(fontKey.getString(), fontKey.getHash(), Vec2i(px, py), text.getString(), text.getHash(), Color::fromRGBA32(tintColor), (int)alignment, (int)spacing, renderQueue, useWorldSpace ? OverlayManager::Space::WORLD : OverlayManager::Space::SCREEN);
+			RenderParts::instance().getSpriteManager().addText(fontKey.getString(), fontKey.getHash(), Vec2i(px, py), text.getString(), text.getHash(), Color::fromRGBA32(tintColor), (int)alignment, (int)spacing, renderQueue, useWorldSpace ? SpacesManager::Space::WORLD : SpacesManager::Space::SCREEN, useGlobalComponentTint);
 		}
+	}
+
+	void Renderer_drawText2(lemon::StringRef fontKey, int32 px, int32 py, lemon::StringRef text, uint32 tintColor, uint8 alignment, int8 spacing, uint16 renderQueue, bool useWorldSpace)
+	{
+		Renderer_drawText(fontKey, px, py, text, tintColor, alignment, spacing, renderQueue, useWorldSpace, false);
 	}
 
 	int32 Renderer_getTextWidth(lemon::StringRef fontKey, lemon::StringRef text)
@@ -549,16 +559,6 @@ namespace
 	{
 		// Note that this is needed for world space sprite masking, not only debug drawing
 		RenderParts::instance().getSpacesManager().setWorldSpaceOffset(Vec2i(px, py));
-	}
-
-	void debugDrawRect(int32 px, int32 py, int32 width, int32 height)
-	{
-		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, width, height));
-	}
-
-	void debugDrawRect2(int32 px, int32 py, int32 width, int32 height, uint32 color)
-	{
-		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, width, height), Color::fromRGBA32(color));
 	}
 
 
@@ -927,9 +927,6 @@ void RendererBindings::registerBindings(lemon::Module& module)
 	module.addNativeFunction("Renderer.setVerticalScrollOffsetBias", lemon::wrap(&Renderer_setVerticalScrollOffsetBias), defaultFlags)
 		.setParameterInfo(0, "bias");
 
-	module.addNativeFunction("Renderer.enforceClearScreen", lemon::wrap(&Renderer_enforceClearScreen), defaultFlags)
-		.setParameterInfo(0, "enabled");
-
 	module.addNativeFunction("Renderer.enableDefaultPlane", lemon::wrap(&Renderer_enableDefaultPlane), defaultFlags)
 		.setParameterInfo(0, "planeIndex")
 		.setParameterInfo(1, "enabled");
@@ -1130,6 +1127,25 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		.setParameterInfo(1, "px")
 		.setParameterInfo(2, "py");
 
+	module.addNativeFunction("Renderer.drawRect", lemon::wrap(&Renderer_drawRect), defaultFlags)
+		.setParameterInfo(0, "px")
+		.setParameterInfo(1, "py")
+		.setParameterInfo(2, "width")
+		.setParameterInfo(3, "height")
+		.setParameterInfo(4, "color")
+		.setParameterInfo(5, "renderQueue")
+		.setParameterInfo(6, "useWorldSpace");
+
+	module.addNativeFunction("Renderer.drawRect", lemon::wrap(&Renderer_drawRect2), defaultFlags)
+		.setParameterInfo(0, "px")
+		.setParameterInfo(1, "py")
+		.setParameterInfo(2, "width")
+		.setParameterInfo(3, "height")
+		.setParameterInfo(4, "color")
+		.setParameterInfo(5, "renderQueue")
+		.setParameterInfo(6, "useWorldSpace")
+		.setParameterInfo(7, "useGlobalComponentTint");
+
 	module.addNativeFunction("Renderer.setScreenSize", lemon::wrap(&Renderer_setScreenSize), defaultFlags)
 		.setParameterInfo(0, "width")
 		.setParameterInfo(1, "height");
@@ -1152,7 +1168,7 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		.setParameterInfo(4, "addedG")
 		.setParameterInfo(5, "addedB");
 
-	module.addNativeFunction("Renderer.drawText", lemon::wrap(&Renderer_drawText), defaultFlags)
+	module.addNativeFunction("Renderer.drawText", lemon::wrap(&Renderer_drawText2), defaultFlags)
 		.setParameterInfo(0, "fontKey")
 		.setParameterInfo(1, "px")
 		.setParameterInfo(2, "py")
@@ -1163,28 +1179,25 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		.setParameterInfo(7, "renderQueue")
 		.setParameterInfo(8, "useWorldSpace");
 
+	module.addNativeFunction("Renderer.drawText", lemon::wrap(&Renderer_drawText), defaultFlags)
+		.setParameterInfo(0, "fontKey")
+		.setParameterInfo(1, "px")
+		.setParameterInfo(2, "py")
+		.setParameterInfo(3, "text")
+		.setParameterInfo(4, "tintColor")
+		.setParameterInfo(5, "alignment")
+		.setParameterInfo(6, "spacing")
+		.setParameterInfo(7, "renderQueue")
+		.setParameterInfo(8, "useWorldSpace")
+		.setParameterInfo(9, "useGlobalComponentTint");
+
 	module.addNativeFunction("Renderer.getTextWidth", lemon::wrap(&Renderer_getTextWidth), defaultFlags)
 		.setParameterInfo(0, "fontKey")
 		.setParameterInfo(1, "text");
 
-
-	// Debug draw rects
 	module.addNativeFunction("setWorldSpaceOffset", lemon::wrap(&setWorldSpaceOffset), defaultFlags)
 		.setParameterInfo(0, "px")
 		.setParameterInfo(1, "py");
-
-	module.addNativeFunction("Debug.drawRect", lemon::wrap(&debugDrawRect), defaultFlags)
-		.setParameterInfo(0, "px")
-		.setParameterInfo(1, "py")
-		.setParameterInfo(2, "width")
-		.setParameterInfo(3, "height");
-
-	module.addNativeFunction("Debug.drawRect", lemon::wrap(&debugDrawRect2), defaultFlags)
-		.setParameterInfo(0, "px")
-		.setParameterInfo(1, "py")
-		.setParameterInfo(2, "width")
-		.setParameterInfo(3, "height")
-		.setParameterInfo(4, "color");
 
 
 	// Sprite handle

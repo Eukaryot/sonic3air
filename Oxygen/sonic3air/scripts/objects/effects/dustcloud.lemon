@@ -27,7 +27,7 @@ function void fn018b3e()
 	//  - 0x018b54	-> objA0.base_state = 0x00  -> Initialization
 	//  - 0x018baa	-> objA0.base_state = 0x02  -> Regular update
 	//  - 0x018cb2	-> objA0.base_state = 0x04	-> Unloading
-	//  - 0x018cb6	-> objA0.base_state = 0x06
+	//  - 0x018cb6	-> objA0.base_state = 0x06	-> Used in Knuckles glide landing skidding dust
 	call tableLookupAddress(0x018b4c, objA0.base_state)
 }
 
@@ -212,7 +212,7 @@ function void fn018cb6()
 	if (u8[A2 + 0x20] != char.state.BRAKING)
 	{
 		bool b = true
-		if (u8[A2 + 0x38] == 2)
+		if (u8[A2 + 0x38] == CHARACTER_KNUCKLES)
 		{
 			D1 = 0x06
 			b = (u8[A2 + 0x2f] != 3)
@@ -405,7 +405,7 @@ function void fn019064()
 	--u8[A0 + 0x36]
 	if (s8[A0 + 0x36] < 0)
 	{
-		u8[A0 + 0x36] = 0x03
+		u8[A0 + 0x36] = 3
 		if (allocDynamicObjectStd())
 		{
 			// Spawn skidding dust

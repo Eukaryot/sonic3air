@@ -24,7 +24,7 @@ function void Jawz.PostInit()
 {
 	setupObjectAttributesFull(0x087918)
 
-	objA0.update_address = 0x0878ce
+	objA0.update_address = addressof(Jawz.Update)
 	D4.u16 = -0x200
 	fn085416()
 }

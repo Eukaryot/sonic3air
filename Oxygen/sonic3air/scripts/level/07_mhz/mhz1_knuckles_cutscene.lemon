@@ -593,7 +593,7 @@ function void fn06303c()
 	objA0.velocity.y = D0.u16
 	objA0.countdown_value = 63
 	objA0.countdown_callback = 0x0630be
-	fn063a6()
+	fn0630a6()
 }
 
 

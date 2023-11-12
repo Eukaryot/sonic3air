@@ -56,7 +56,7 @@ function void fn053ba2()
 	u16[A1 + 0x04] = 0x0e80
 
 	A1 = 0xffffb000
-	u8[A1 + 0x2e] = 0x01
+	u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 	objA1.state = char.state.ROLLING
 	u8[A1 + 0x2a] |= char.flag.ROLLING
 

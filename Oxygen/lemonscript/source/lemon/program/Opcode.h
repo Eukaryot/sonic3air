@@ -59,23 +59,20 @@ namespace lemon
 			_NUM_TYPES
 		};
 
-		struct Flag
+		enum class Flag : uint8
 		{
-			enum Flags
-			{
-				LABEL		= 0x01,		// Opcode is a label target
-				JUMP_TARGET = 0x02,		// Opcode is a jump target
-				NEW_LINE	= 0x04,		// Start of a new line
-				CTRLFLOW	= 0x08,		// Control flow opcode like jump, call, etc.
-				JUMP		= 0x10,		// Conditional or unconditional jump (implies FLAG_CTRLFLOW)
-				SEQ_BREAK	= 0x20,		// There's a sequence break just after this opcode; this is a result of the other flags of this and the next opcode
-				TEMP_FLAG	= 0x80		// Only used temporarily during optimization
-			};
+			LABEL		= 0x01,		// Opcode is a label target
+			JUMP_TARGET = 0x02,		// Opcode is a jump target
+			NEW_LINE	= 0x04,		// Start of a new line
+			CTRLFLOW	= 0x08,		// Control flow opcode like jump, call, etc.
+			JUMP		= 0x10,		// Conditional or unconditional jump (implies FLAG_CTRLFLOW)
+			SEQ_BREAK	= 0x20,		// There's a sequence break just after this opcode; this is a result of the other flags of this and the next opcode
+			TEMP_FLAG	= 0x80		// Only used temporarily during optimization
 		};
 
 		Type mType = Type::NOP;
 		BaseType mDataType = BaseType::VOID;
-		uint8 mFlags = 0;
+		BitFlagSet<Flag> mFlags;
 		uint32 mLineNumber = 0;
 		int64 mParameter = 0;	// For constants, or ID in case of variables and calls
 

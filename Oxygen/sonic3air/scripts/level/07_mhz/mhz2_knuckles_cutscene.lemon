@@ -133,7 +133,7 @@ function void fn0631a4()
 		A1 = 0xffffb000 + player * 0x4a
 		if (player != 0 && u32[A1] != 0)
 		{
-			u8[A1 + 0x2e] = 0x81
+			u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 			objA1.state = char.state.STANDING
 			StopObjectA1()
 
@@ -309,7 +309,7 @@ function void fn06338e()
 	objA0.velocity.y = -0x1000
 	objA0.position.x.u16 = objA1.position.x.u16
 	objA0.position.y.u16 = objA1.position.y.u16
-	u8[A1 + 0x2e] = 0x81
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	objA1.state = char.state.LIFTED
 	objA1.render_flags &= ~render_flag.FLIP_Y
 	u8[A1 + 0x0a] |= 0x80
@@ -381,11 +381,11 @@ function void fn065e72()
 	{
 		objA1.render_flags |= render_flag.FLIP_Y
 		objA1.state = char.state.RUNNING
-		u8[A1 + 0x2e] = 0x83
+		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 
 		D0 = (global.framecounter & 0x02) ? 2 : 0
 		D0.u8 += u8[A1 + 0x38]
-		u8[A1 + 0x22] = u8[0x065eb0 + D0.u16]		// Sonic/Tails' grasping sprites
+		objA1.animation.sprite = u8[0x065eb0 + D0.u16]		// Sonic/Tails' grasping sprites
 
 		fn085fc4()
 	}

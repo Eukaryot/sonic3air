@@ -230,9 +230,8 @@ function void fn049090()
 
 		objA1.render_flags &= ~render_flag.FLIP_X
 		u8[A1 + 0x2a] &= ~0x01
-		u8[A1 + 0x2e] |= 0x40
-		u8[A1 + 0x2e] |= 0x02
-		u16[A1 + 0x20] = char.state.RUNNING2
+		u8[A1 + 0x2e] |= (control_flag.DISABLE_WALLS | control_flag.DISABLE_ANIMATION)
+		objA1.state.both = char.state.RUNNING2
 		u8[A1 + 0x27] = 0		// Set x-rotation of character
 		u8[A2 + 0x02] = 0
 	}
@@ -266,14 +265,14 @@ function void fn049090()
 	D2 = u8[A2]
 	u8[A2] += 8
 	D2.u16 = D2 / 0x0b
-	u8[A1 + 0x22] = u8[0x0491da + D2.s16]		// Player characters' corkscrew vertical running sprites
+	objA1.animation.sprite = u8[0x0491da + D2.s16]		// Player characters' corkscrew vertical running sprites
 
 	if ((level.framecounter.low & 0x0f) == 0)
 	{
 		playSound(0xc3)
 	}
 
-	D0 = u8[A1 + 0x22]
+	D0 = objA1.animation.sprite
 	SetCharacterSpritePatterns()
 }
 
@@ -382,8 +381,8 @@ function void fn0492d4()
 				objA1.groundspeed = 0
 				u16[A1 + 0x26] = 0
 				objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
-				u16[A1 + 0x20] = char.state.RUNNING2
-				u8[A1 + 0x2e] = 0x83
+				objA1.state.both = char.state.RUNNING2
+				u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 
 				u8[A2] = 1
 			}
@@ -439,9 +438,9 @@ function void fn04939c()
 	}
 
 	D2.u16 >>= 2
-	u8[A1 + 0x22] = u8[0x0493da + D2.s16]		// Player characters' corkscrew horizontal running sprites
+	objA1.animation.sprite = u8[0x0493da + D2.s16]		// Player characters' corkscrew horizontal running sprites
 
-	D0 = u8[A1 + 0x22]
+	D0 = objA1.animation.sprite
 	SetCharacterSpritePatterns()
 }
 

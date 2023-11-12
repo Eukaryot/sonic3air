@@ -165,7 +165,7 @@ function void CompetitionMode.Character.UpdateNormalState.Sonic_Knuckles()
 	}
 
 	UpdateSonicBonusEffects()
-	if ((char.control_flags & 0x01) == 0)
+	if ((char.control_flags & control_flag.DISABLE_UPDATE) == 0)
 	{
 		// Targets:
 		//  - 0x0107f6	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> CompetitionMode.Character.UpdateUprightOnGround.Sonic_Knuckles()
@@ -184,13 +184,13 @@ function void CompetitionMode.Character.UpdateNormalState.Sonic_Knuckles()
 
 	char.angle_sensor_1 = u8[0xfffff768]
 	char.angle_sensor_2 = u8[0xfffff76a]
-	if ((char.control_flags & 0x02) == 0)	// Hanging flag
+	if ((char.control_flags & control_flag.DISABLE_ANIMATION) == 0)	// Hanging flag
 	{
 		CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
 		CompetitionMode.Character.UpdateSpritePatterns.Sonic_Knuckles()
 	}
 
-	D0.u8 = char.control_flags & 0xa0
+	D0.u8 = char.control_flags & (control_flag.DISABLE_INTERACTION | 0x20)
 	if (D0.u8 == 0)
 	{
 		CompetitionMode.Character.CheckCollisionsWithDynamicObjects()
@@ -505,7 +505,7 @@ function void CompetitionMode.Character.UpdateNormalState.Tails()
 	}
 
 	UpdateTailsBonusEffects()
-	if ((char.control_flags & 0x01) == 0)
+	if ((char.control_flags & control_flag.DISABLE_UPDATE) == 0)
 	{
 		// Targets:
 		//  - 0x013336	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> CompetitionMode.Character.UpdateUprightOnGround.Tails()
@@ -524,13 +524,13 @@ function void CompetitionMode.Character.UpdateNormalState.Tails()
 
 	char.angle_sensor_1 = u8[0xfffff768]
 	char.angle_sensor_2 = u8[0xfffff76a]
-	if ((char.control_flags & 0x02) == 0)	// Hanging flag
+	if ((char.control_flags & control_flag.DISABLE_ANIMATION) == 0)	// Hanging flag
 	{
 		CompetitionMode.Character.UpdateAnimation.Tails()
 		CompetitionMode.Character.UpdateSpritePatterns.Tails()
 	}
 
-	D0.u8 = char.control_flags & 0xa0
+	D0.u8 = char.control_flags & (control_flag.DISABLE_INTERACTION | 0x20)
 	if (D0.u8 == 0)
 	{
 		CompetitionMode.Character.CheckCollisionsWithDynamicObjects()

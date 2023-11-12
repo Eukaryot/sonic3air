@@ -287,16 +287,20 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_C4& vertex00, const Verte
 	const float rangeY = endY - startY;
 	Vertex_P2_C4 vertexLeft  = vertex00;
 	Vertex_P2_C4 vertexRight = vertex10;
+	const bool anyColorFade = (vertex00.mColor != vertex01.mColor || vertex00.mColor != vertex10.mColor || vertex00.mColor != vertex11.mColor);
 
 	// Changes of left and right vertex when advancing by one in y-direction
 	Vertex_P2_C4 advanceLeft;
 	Vertex_P2_C4 advanceRight;
 	advanceLeft.mPosition  = (vertex01.mPosition - vertex00.mPosition) / rangeY;
 	advanceRight.mPosition = (vertex11.mPosition - vertex10.mPosition) / rangeY;
-	for (int k = 0; k < 4; ++k)
+	if (anyColorFade)
 	{
-		advanceLeft.mColor[k]  = (vertex01.mColor[k] - vertex00.mColor[k]) / rangeY;
-		advanceRight.mColor[k]  = (vertex11.mColor[k] - vertex10.mColor[k]) / rangeY;
+		for (int k = 0; k < 4; ++k)
+		{
+			advanceLeft.mColor[k]  = (vertex01.mColor[k] - vertex00.mColor[k]) / rangeY;
+			advanceRight.mColor[k]  = (vertex11.mColor[k] - vertex10.mColor[k]) / rangeY;
+		}
 	}
 
 	// Move to the first integer line
@@ -304,10 +308,13 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_C4& vertex00, const Verte
 	const float firstStepY = firstIntegerY - startY;
 	vertexLeft.mPosition  += advanceLeft.mPosition * firstStepY;
 	vertexRight.mPosition += advanceRight.mPosition * firstStepY;
-	for (int k = 0; k < 4; ++k)
+	if (anyColorFade)
 	{
-		vertexLeft.mColor[k] += advanceLeft.mColor[k] * firstStepY;
-		vertexRight.mColor[k] += advanceRight.mColor[k] * firstStepY;
+		for (int k = 0; k < 4; ++k)
+		{
+			vertexLeft.mColor[k] += advanceLeft.mColor[k] * firstStepY;
+			vertexRight.mColor[k] += advanceRight.mColor[k] * firstStepY;
+		}
 	}
 
 	int minY = (int)(firstIntegerY);
@@ -327,48 +334,62 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_C4& vertex00, const Verte
 			uint32* data = mOutput.getPixelPointer(minX, y);
 			const float factor1 = 1.0f / std::max(vertexRight.mPosition.x - vertexLeft.mPosition.x, 1.0f);
 			const float factor2 = (float)minX - vertexLeft.mPosition.x;
-			Color diffColor;
-			Color currentColor;
-			for (int k = 0; k < 4; ++k)
-			{
-				diffColor[k] = (vertexRight.mColor[k] - vertexLeft.mColor[k]) * factor1;
-				currentColor[k] = vertexLeft.mColor[k] + diffColor[k] * factor2;
-			}
 
-			if (mOptions.mBlendMode == BlendMode::ALPHA)
+			if (anyColorFade)
 			{
-				uint8* bytes = (uint8*)data;
-				for (int x = minX; x <= maxX; ++x)
+				Color diffColor;
+				Color currentColor;
+				for (int k = 0; k < 4; ++k)
 				{
-					const uint32 texColor = currentColor.getABGR32();
+					diffColor[k] = (vertexRight.mColor[k] - vertexLeft.mColor[k]) * factor1;
+					currentColor[k] = vertexLeft.mColor[k] + diffColor[k] * factor2;
+				}
 
-					// Alpha blending
-					const uint16 multiplierA = ((texColor >> 16) & 0xff00) / 255;
-					const uint16 multiplierB = 256 - multiplierA;
-					bytes[0] = (((texColor)       & 0xff) * multiplierA + bytes[0] * multiplierB) >> 8;
-					bytes[1] = (((texColor >> 8)  & 0xff) * multiplierA + bytes[1] * multiplierB) >> 8;
-					bytes[2] = (((texColor >> 16) & 0xff) * multiplierA + bytes[2] * multiplierB) >> 8;
-					bytes[3] = 0xff;
-
-					bytes += 4;
-					for (int k = 0; k < 4; ++k)
+				if (mOptions.mBlendMode == BlendMode::ALPHA)
+				{
+					uint8* bytes = (uint8*)data;
+					for (int x = minX; x <= maxX; ++x)
 					{
-						currentColor[k] += diffColor[k];
+						const uint32 texColor = currentColor.getABGR32();
+
+						// Alpha blending
+						const uint16 multiplierA = ((texColor >> 16) & 0xff00) / 255;
+						const uint16 multiplierB = 256 - multiplierA;
+						bytes[0] = (((texColor)       & 0xff) * multiplierA + bytes[0] * multiplierB) >> 8;
+						bytes[1] = (((texColor >> 8)  & 0xff) * multiplierA + bytes[1] * multiplierB) >> 8;
+						bytes[2] = (((texColor >> 16) & 0xff) * multiplierA + bytes[2] * multiplierB) >> 8;
+						bytes[3] = 0xff;
+
+						bytes += 4;
+						for (int k = 0; k < 4; ++k)
+						{
+							currentColor[k] += diffColor[k];
+						}
+					}
+				}
+				else
+				{
+					// No blending, but color fade
+					for (int x = minX; x <= maxX; ++x)
+					{
+						*data = currentColor.getABGR32();
+
+						++data;
+						for (int k = 0; k < 4; ++k)
+						{
+							currentColor[k] += diffColor[k];
+						}
 					}
 				}
 			}
 			else
 			{
+				// No blending, fixed color
+				const uint32 fixedColorABGR = vertex00.mColor.getABGR32();
 				for (int x = minX; x <= maxX; ++x)
 				{
-					// No blending
-					*data = currentColor.getABGR32();
-
+					*data = fixedColorABGR;
 					++data;
-					for (int k = 0; k < 4; ++k)
-					{
-						currentColor[k] += diffColor[k];
-					}
 				}
 			}
 		}

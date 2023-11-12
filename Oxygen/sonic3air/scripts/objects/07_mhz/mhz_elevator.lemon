@@ -396,8 +396,8 @@ function void fn03e658()
 		D1.u8 = (D0.u16 >= 0x20) ? 0x92 : 0x91
 	}
 
-	u8[A1 + 0x22] = D1.u8
-	D0 = u8[A1 + 0x22]
+	objA1.animation.sprite = D1.u8
+	D0 = objA1.animation.sprite
 
 	u32 backupA2 = A2
 	SetCharacterSpritePatterns()
@@ -435,7 +435,7 @@ function void fn03e682()
 				objA1.position.x.u16 = objA0.position.x.u16
 				objA1.position.y.u16 = objA0.position.y.u16 + 0x42
 				objA1.state = char.state.HANGING
-				u8[A1 + 0x2e] = 0x03
+				u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 				u8[A1 + 0x3d] = 0
 				objA1.render_flags &= ~render_flag.FLIP_Y
 

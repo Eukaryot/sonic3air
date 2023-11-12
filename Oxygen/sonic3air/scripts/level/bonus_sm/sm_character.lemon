@@ -37,7 +37,7 @@ function void fn04b97c()
 	fn04b99e()
 
 	A1 = 0xffffb000
-	D0 = u8[A1 + 0x22]
+	D0 = objA1.animation.sprite
 	SetCharacterSpritePatterns()
 
 	fn04bbf4()

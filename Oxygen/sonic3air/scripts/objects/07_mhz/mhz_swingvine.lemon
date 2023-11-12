@@ -349,7 +349,7 @@ function void fn02291a()
 				if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 					angle = -angle
 				D0.u16 = (angle + 8) >> 4
-				u8[A1 + 0x22] = u8[0x022a4c + D0.u16]		// Player characters' hanging sprites
+				objA1.animation.sprite = u8[0x022a4c + D0.u16]		// Player characters' hanging sprites
 
 				fn022a28()
 			}
@@ -407,7 +407,7 @@ function void fn022a28()
 	D1.u8 = u8[A1 + 0x2a] & char.flag.FACING_LEFT
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	objA1.render_flags |= D1.u8
-	D0 = u8[A1 + 0x22]
+	D0 = objA1.animation.sprite
 
 	u32 backupA2 = A2
 	SetCharacterSpritePatterns()
@@ -425,7 +425,7 @@ function void fn022a5c()
 	u16 offset = (u8(angle + 0x10) >> 5) * 2
 
 	u8[A1 + 0x20] = 0
-	u8[A1 + 0x22] = u8[0x022ad8 + offset]		// Player characters' bar spinning sprites
+	objA1.animation.sprite = u8[0x022ad8 + offset]		// Player characters' bar spinning sprites
 	D2.s16 = s8[0x022ae8 + offset]
 	D3.s16 = s8[0x022ae9 + offset]
 	if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
@@ -489,7 +489,7 @@ function void fn022af8()
 			objA1.position.y.u16 = objA0.position.y.u16 + 0x14
 			objA1.state = char.state.HANGING
 			u8[A1 + 0x3d] = 0
-			u8[A1 + 0x2e] = 0x03
+			u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 			objA1.render_flags &= ~render_flag.FLIP_Y
 		}
 	}

@@ -310,24 +310,31 @@ function void Object.TriggerOnGroundHit()
 //# address-hook(0x01dc56) end(0x01dcb4)
 function void fn01dc56()
 {
-	u32 backupD1 = D1
-	u32 backupD2 = D2
-	u32 backupD3 = D3
-	u32 backupD4 = D4
-
+	// Check player 1
 	A1 = 0xffffb000
 	D6 = 3		// object.flag.P1_ON_OBJECT
-	fn01dc74()
+#if STANDALONE
+	if (debug_mode.state == 0)
+#endif
+	{
+		u32 backupD1 = D1
+		u32 backupD2 = D2
+		u32 backupD3 = D3
+		u32 backupD4 = D4
 
-	D1 = backupD1
-	D2 = backupD2
-	D3 = backupD3
-	D4 = backupD4
+		fn01dc74()
 
+		D1 = backupD1
+		D2 = backupD2
+		D3 = backupD3
+		D4 = backupD4
+	}
+
+	// Check player 2
 	A1 = 0xffffb04a
 	if (objA1.render_flags & render_flag.VISIBLE)
 	{
-		++D6.u8		// object.flag.P2_ON_OBJECT, Do not simply set to 4, as upper bits should be preserved
+		++D6.u8		// object.flag.P2_ON_OBJECT, do not simply set to 4, as upper bits should be preserved
 		fn01dc74()
 	}
 }
@@ -347,25 +354,30 @@ function void fn01dc74()
 function void CheckCharacterOnClimbableObject()
 {
 	//debugDrawRect(objA0.position.x.u16 - D1.u16 + 11, objA0.position.y.u16 - D2.u16, (D1.u16 - 11) * 2, D2.u16 * 2, 0xc08080ff)
-
-	u32 backupD1 = D1
-	u32 backupD2 = D2
-	u32 backupD3 = D3
-	u32 backupD4 = D4
 	D6 = 0
 
-	// Check for main character
-	if (fn01dcb6_internal(0xffffb000, 3))
+	// Check player 1
+#if STANDALONE
+	if (debug_mode.state == 0)
+#endif
 	{
-		fn01df90()
+		u32 backupD1 = D1
+		u32 backupD2 = D2
+		u32 backupD3 = D3
+		u32 backupD4 = D4
+
+		if (fn01dcb6_internal(0xffffb000, 3))
+		{
+			fn01df90()
+		}
+
+		D1 = backupD1
+		D2 = backupD2
+		D3 = backupD3
+		D4 = backupD4
 	}
 
-	D1 = backupD1
-	D2 = backupD2
-	D3 = backupD3
-	D4 = backupD4
-
-	// Check for Tails
+	// Check player 2
 	if (fn01dcb6_internal(0xffffb04a, 4))
 	{
 		fn01df90()
@@ -422,23 +434,32 @@ function bool fn01dcb6_internal(u32 characterAddress, u8 bitnum)
 //# address-hook(0x01dd0e) end(0x01dd22)
 function void fn01dd0e()
 {
-	u32 backupD1 = D1
-	u32 backupD2 = D2
-	u32 backupD3 = D3
-	u32 backupD4 = D4
-
+	// Check player 1
 	A1 = 0xffffb000
 	D6 = 3		// object.flag.P1_ON_OBJECT
-	fn01dd24()
+#if STANDALONE
+	if (debug_mode.state == 0)
+#endif
+	{
+		u32 backupD1 = D1
+		u32 backupD2 = D2
+		u32 backupD3 = D3
+		u32 backupD4 = D4
 
-	D1 = backupD1
-	D2 = backupD2
-	D3 = backupD3
-	D4 = backupD4
+		fn01dd24()
 
-	A1 = 0xffffb04a
-	++D6		// object.flag.P2_ON_OBJECT
-	fn01dd24()
+		D1 = backupD1
+		D2 = backupD2
+		D3 = backupD3
+		D4 = backupD4
+	}
+
+	// Check player 2
+	{
+		A1 = 0xffffb04a
+		++D6		// object.flag.P2_ON_OBJECT
+		fn01dd24()
+	}
 }
 
 
@@ -480,20 +501,27 @@ function void fn01dd24()
 //# address-hook(0x01ddc6) end(0x01de1e)
 function void fn01ddc6()
 {
-	u32 backupD1 = D1
-	u32 backupD2 = D2
-	u32 backupD3 = D3
-	u32 backupD4 = D4
-
+	// Check player 1
 	A1 = 0xffffb000
 	D6 = 3		// object.flag.P1_ON_OBJECT
-	fn01dddc()
+#if STANDALONE
+	if (debug_mode.state == 0)
+#endif
+	{
+		u32 backupD1 = D1
+		u32 backupD2 = D2
+		u32 backupD3 = D3
+		u32 backupD4 = D4
 
-	D1 = backupD1
-	D2 = backupD2
-	D3 = backupD3
-	D4 = backupD4
+		fn01dddc()
 
+		D1 = backupD1
+		D2 = backupD2
+		D3 = backupD3
+		D4 = backupD4
+	}
+
+	// Check player 2
 	A1 = 0xffffb04a
 	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn01dddc()
@@ -535,20 +563,27 @@ function void fn01dddc()
 //# address-hook(0x01de20) end(0x01deca)
 function void fn01de20()
 {
-	u32 backupD1 = D1
-	u32 backupD2 = D2
-	u32 backupD3 = D3
-	u32 backupD4 = D4
-
+	// Check player 1
 	A1 = 0xffffb000
 	D6 = 3		// object.flag.P1_ON_OBJECT
-	fn01de36()
+#if STANDALONE
+	if (debug_mode.state == 0)
+#endif
+	{
+		u32 backupD1 = D1
+		u32 backupD2 = D2
+		u32 backupD3 = D3
+		u32 backupD4 = D4
 
-	D1 = backupD1
-	D2 = backupD2
-	D3 = backupD3
-	D4 = backupD4
+		fn01de36()
 
+		D1 = backupD1
+		D2 = backupD2
+		D3 = backupD3
+		D4 = backupD4
+	}
+
+	// Check player 2
 	A1 = 0xffffb04a
 	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn01de36()
@@ -850,7 +885,7 @@ function bool fn085a02()
 	++u8[A1 + 0x03]
 	if (D2.u8 > u8[A1 + 0x03])
 	{
-		 // Restart palette animation
+		// Restart palette animation
 		fn0859fc()
 		return false
 	}
@@ -1216,10 +1251,7 @@ function void stopCharacterWinPose(u32 address)
 //# address-hook(0x085b8e) end(0x085ba6)
 function void StopCharacterWinPose()
 {
-	// objA1.state = char.state.STANDING
-	// objA1.state.former = char.state.STANDING
-	objA1.state.both = 0x0505
-
+	objA1.state.both = 0x0505		// char.state.STANDING, char.state.STANDING
 	objA1.animation.frame = 0
 	objA1.animation.timer = 0
 	objA1.flags2a &= ~char.flag.IN_AIR
@@ -1280,11 +1312,13 @@ function void Object.AnimationUpdate()
 		{
 			if (D0.u8 == 0xff)
 			{
+				// Loop animation from the start
 				objA0.animation.frame = 0
 				D0.u8 = u8[A1 + 1]
 			}
 			else if (D0.u8 == 0xfe)
 			{
+				// Loop animation from specific frame
 				D0.u8 = u8[A1 + objA0.animation.frame + 2]
 				objA0.animation.frame -= D0.u8
 				D0.u8 = u8[A1 + objA0.animation.frame + 1]
@@ -1293,6 +1327,7 @@ function void Object.AnimationUpdate()
 			{
 				if (D0.u8 == 0xfd)
 				{
+					// Change to another animation
 					objA0.state = u8[A1 + objA0.animation.frame + 2]
 				}
 				else if (D0.u8 == 0xfc)
@@ -1309,6 +1344,7 @@ function void Object.AnimationUpdate()
 			}
 		}
 
+		// Advance to next frame
 		objA0.animation.sprite = D0.u8
 		objA0.render_flags = (objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (objA0.flags2a & 0x03)
 		++objA0.animation.frame
@@ -1335,7 +1371,7 @@ function void Object.AlternativeAnimationUpdate()
 	--objA0.animation.timer
 	if (objA0.animation.timer == 0xff)
 	{
-		A1.u16 += u16[A1 + objA0.state * 2]
+		A1.u16 = tableLookupAddress(A1, objA0.state * 2)
 		D1 = objA0.animation.frame * 2
 
 		D0.u8 = u8[A1 + D1.u16]
@@ -1343,12 +1379,14 @@ function void Object.AlternativeAnimationUpdate()
 		{
 			if (D0.u8 == 0xff)
 			{
+				// Loop animation from the start
 				D1 = 0
 				objA0.animation.frame = 0
 				D0.u8 = u8[A1]
 			}
 			else if (D0.u8 == 0xfe)
 			{
+				// Loop animation from specific frame
 				D0.u8 = u8[A1 + D1.u16 + 1]
 				objA0.animation.frame -= D0.u8
 				D1.u8 -= D0.u8 * 2
@@ -1358,6 +1396,7 @@ function void Object.AlternativeAnimationUpdate()
 			{
 				if (D0.u8 == 0xfd)
 				{
+					// Change to another animation
 					objA0.state = u8[A1 + D1.u16 + 1]
 				}
 				else if (D0.u8 == 0xfc)
@@ -1370,6 +1409,7 @@ function void Object.AlternativeAnimationUpdate()
 			}
 		}
 
+		// Advance to next frame
 		objA0.animation.timer = u8[A1 + D1.u16 + 1]
 		objA0.animation.sprite = D0.u8
 		objA0.render_flags = (objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (objA0.flags2a & 0x03)
@@ -1427,7 +1467,7 @@ function void fn01df90()
 //# address-hook(0x01dffe)
 function void fn01dffe()
 {
-	if (u8[A1 + 0x2e] & 0x80)	// Check "char.control_flags" against the no-collision flag
+	if (u8[A1 + 0x2e] & control_flag.DISABLE_INTERACTION)	// Check "char.control_flags" against the no-collision flag
 	{
 		fn01e0a2()
 	}
@@ -1603,7 +1643,7 @@ function void fn01e0a2()
 		#if STANDALONE
 			// Also add exceptions for...
 			//  -> The win pose: This prevents characters from showing their walking animation when standing next to an object like the capsule during the level results
-			//  -> Super/Hyper transformation: Without this, transformating next to a monitor switched to the run animation, and can even cause a softlock if imediately cancelling the transformation
+			//  -> Super/Hyper transformation: Without this, transforming next to a monitor switched to the run animation, and can even cause a softlock if immediately cancelling the transformation
 			if (u8[A1 + 0x20] != char.state.WIN_POSE && u8[A1 + 0x20] != char.state.TRANSFORMING)
 		#endif
 			{
@@ -1665,7 +1705,7 @@ function void fn01e1f4()
 function void updateSonicPositionOnMovingObjectInternal(s8 sign)
 {
 	// First check is against collision interaction flag in "char.control_flags"
-	if ((u8[A1 + 0x2e] & 0x80) == 0 && u8[A1 + 0x05] < 6 && debug_mode.state == 0)
+	if ((u8[A1 + 0x2e] & control_flag.DISABLE_INTERACTION) == 0 && u8[A1 + 0x05] < 6 && debug_mode.state == 0)
 	{
 		objA1.position.x.u16 += objA0.position.x.u16 - D2.u16
 		objA1.position.y.u16 = D0.u16 + u8[A1 + 0x1e] * sign
@@ -1724,20 +1764,27 @@ function void PlatformCheckClimbOn()
 	//  - D4.u16 = Center x-position of the climbable area (in world space)
 	//  - D6.u8  = Bit index, usually depending on the character index to check
 
-	u32 backupD1 = D1
-	u32 backupD2 = D2
-	u32 backupD3 = D3
-	u32 backupD4 = D4
-
+	// Check player 1
 	A1 = 0xffffb000
 	D6 = 3		// object.flag.P1_ON_OBJECT
-	PlatformCheckClimbOnForCharacterA1()
+#if STANDALONE
+	if (debug_mode.state == 0)
+#endif
+	{
+		u32 backupD1 = D1
+		u32 backupD2 = D2
+		u32 backupD3 = D3
+		u32 backupD4 = D4
 
-	D1 = backupD1
-	D2 = backupD2
-	D3 = backupD3
-	D4 = backupD4
+		PlatformCheckClimbOnForCharacterA1()
 
+		D1 = backupD1
+		D2 = backupD2
+		D3 = backupD3
+		D4 = backupD4
+	}
+
+	// Check player 2
 	A1 = 0xffffb04a
 	++D6.u8		// object.flag.P2_ON_OBJECT
 	PlatformCheckClimbOnForCharacterA1()
@@ -1779,20 +1826,27 @@ function void PlatformCheckClimbOnForCharacterA1()
 //# address-hook(0x01e2fe) end(0x01e354)
 function void fn01e2fe()
 {
-	u32 backupD1 = D1
-	u32 backupD2 = D2
-	u32 backupD3 = D3
-	u32 backupD4 = D4
-
+	// Check player 1
 	A1 = 0xffffb000
 	D6 = 3		// object.flag.P1_ON_OBJECT
-	fn01e314()
+#if STANDALONE
+	if (debug_mode.state == 0)
+#endif
+	{
+		u32 backupD1 = D1
+		u32 backupD2 = D2
+		u32 backupD3 = D3
+		u32 backupD4 = D4
 
-	D1 = backupD1
-	D2 = backupD2
-	D3 = backupD3
-	D4 = backupD4
+		fn01e314()
 
+		D1 = backupD1
+		D2 = backupD2
+		D3 = backupD3
+		D4 = backupD4
+	}
+
+	// Check player 2
 	A1 = 0xffffb04a
 	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn01e314()
@@ -2289,12 +2343,12 @@ function void Object.AnimationProgress.CheckFlipY(u32 address)
 //# address-hook(0x0844ce) end(0x08450c)
 function void fn0844ce()
 {
-	--u8[A1 + 0x24]
-	if (s8[A1 + 0x24] < 0)
+	--objA1.animation.timer
+	if (s8(objA1.animation.timer) < 0)
 	{
-		u8[A1 + 0x24] = u8[A2]
-		D0 = u8[A1 + 0x23] + 2
-		u8[A1 + 0x23] = D0.u8
+		objA1.animation.timer = u8[A2]
+		D0 = objA1.animation.frame + 2
+		objA1.animation.frame = D0.u8
 		D1.u8 = u8[A2 + D0.u16 + 1]
 		if (D1.u8 == 0)
 		{
@@ -2304,7 +2358,7 @@ function void fn0844ce()
 			return
 		}
 
-		u8[A1 + 0x22] = D1.u8
+		objA1.animation.sprite = D1.u8
 		objA1.render_flags &= ~render_flag.FLIP_X
 		if (u8[A2 + D0.u16 + 2] != 0)
 		{

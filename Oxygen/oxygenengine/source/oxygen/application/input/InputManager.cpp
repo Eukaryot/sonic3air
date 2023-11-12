@@ -8,6 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/application/input/InputManager.h"
+#include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/helper/Logging.h"
@@ -74,6 +75,8 @@ namespace
 		outControls.push_back(&controller.Y);
 		outControls.push_back(&controller.Start);
 		outControls.push_back(&controller.Back);
+		outControls.push_back(&controller.L);
+		outControls.push_back(&controller.R);
 	}
 
 	bool getControlAssignmentBySDLBinding(InputConfig::Assignment& output, const SDL_GameControllerButtonBind& binding, int axisDirection)
@@ -103,7 +106,7 @@ namespace
 
 	void setupRealDeviceInputMapping(InputManager::RealDevice& device, const InputConfig::DeviceDefinition& inputDeviceDefinition)
 	{
-		device.mControlMappings.resize((size_t)InputConfig::DeviceDefinition::Button::_NUM);
+		device.mControlMappings.resize(InputConfig::DeviceDefinition::NUM_BUTTONS);
 		for (size_t controlIndex = 0; controlIndex < device.mControlMappings.size(); ++controlIndex)
 		{
 			device.mControlMappings[controlIndex] = inputDeviceDefinition.mMappings[controlIndex];
@@ -113,7 +116,7 @@ namespace
 	void setupRealDeviceInputMapping(InputManager::RealDevice& device, SDL_GameController& gameController)
 	{
 		using Button = InputConfig::DeviceDefinition::Button;
-		std::vector<SDL_GameControllerButtonBind> bindings[(size_t)Button::_NUM];
+		std::vector<SDL_GameControllerButtonBind> bindings[InputConfig::DeviceDefinition::NUM_BUTTONS];
 
 		bindings[(size_t)Button::UP]   .emplace_back(SDL_GameControllerGetBindForAxis  (&gameController, SDL_CONTROLLER_AXIS_LEFTY));
 		bindings[(size_t)Button::UP]   .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_DPAD_UP));
@@ -131,8 +134,10 @@ namespace
 		bindings[(size_t)Button::START].emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_START));
 		bindings[(size_t)Button::START].emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_GUIDE));
 		bindings[(size_t)Button::BACK] .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_BACK));
+		bindings[(size_t)Button::L]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
+		bindings[(size_t)Button::R]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
 
-		device.mControlMappings.resize((size_t)Button::_NUM);
+		device.mControlMappings.resize(InputConfig::DeviceDefinition::NUM_BUTTONS);
 		for (size_t controlIndex = 0; controlIndex < device.mControlMappings.size(); ++controlIndex)
 		{
 			std::vector<InputConfig::Assignment>& assignments = device.mControlMappings[controlIndex].mAssignments;
@@ -147,7 +152,22 @@ namespace
 		}
 	}
 
-	void getMatchingInputDeviceDefinition(const InputManager::RealDevice& device, int index, const std::vector<InputConfig::DeviceDefinition>& definitions, const InputConfig::DeviceDefinition*& outMatchingDefinition, const InputConfig::DeviceDefinition*& outFallbackDefinition)
+	void processGamepadInputMapping(InputConfig::DeviceDefinition& inputDeviceDefinition, SDL_GameController& gameController)
+	{
+		// Special handling for L/R buttons (which got added later than the rest): Manually add the bindings, if none were set before
+		if (inputDeviceDefinition.mMappings[(size_t)InputConfig::DeviceDefinition::Button::L].mAssignments.empty() &&
+			inputDeviceDefinition.mMappings[(size_t)InputConfig::DeviceDefinition::Button::R].mAssignments.empty())
+		{
+			InputConfig::Assignment assignmentL;
+			InputConfig::Assignment assignmentR;
+			getControlAssignmentBySDLBinding(assignmentL, SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_LEFTSHOULDER), 0);
+			getControlAssignmentBySDLBinding(assignmentR, SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER), 0);
+			inputDeviceDefinition.mMappings[(size_t)InputConfig::DeviceDefinition::Button::L].mAssignments.emplace_back(assignmentL);
+			inputDeviceDefinition.mMappings[(size_t)InputConfig::DeviceDefinition::Button::R].mAssignments.emplace_back(assignmentR);
+		}
+	}
+
+	void getMatchingInputDeviceDefinition(const InputManager::RealDevice& device, int index, std::vector<InputConfig::DeviceDefinition>& definitions, InputConfig::DeviceDefinition*& outMatchingDefinition, InputConfig::DeviceDefinition*& outFallbackDefinition)
 	{
 		String joystickName = getJoystickName(device.mSDLJoystick);
 		String controllerName = getGameControllerName(device.mSDLGameController);
@@ -169,7 +189,7 @@ namespace
 
 		for (size_t k = 0; k < definitions.size(); ++k)
 		{
-			const InputConfig::DeviceDefinition& inputDeviceDefinition = definitions[k];
+			InputConfig::DeviceDefinition& inputDeviceDefinition = definitions[k];
 			if (!String(inputDeviceDefinition.mIdentifier).startsWith("Keyboard"))		// Ignore keyboard definitions here
 			{
 				for (const auto& pair : inputDeviceDefinition.mDeviceNames)
@@ -599,13 +619,15 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 	#endif
 
 		// Try to find a matching device definition in configuration
-		const InputConfig::DeviceDefinition* matchingInputDeviceDefinition = nullptr;
-		const InputConfig::DeviceDefinition* fallbackInputDeviceDefinition = nullptr;
+		InputConfig::DeviceDefinition* matchingInputDeviceDefinition = nullptr;
+		InputConfig::DeviceDefinition* fallbackInputDeviceDefinition = nullptr;
 		::getMatchingInputDeviceDefinition(device, (uint32)i, config.mInputDeviceDefinitions, matchingInputDeviceDefinition, fallbackInputDeviceDefinition);
 
 		if (nullptr != matchingInputDeviceDefinition)
 		{
 			// Use device definition from config
+			if (nullptr != device.mSDLGameController)
+				::processGamepadInputMapping(*matchingInputDeviceDefinition, *device.mSDLGameController);
 			::setupRealDeviceInputMapping(device, *matchingInputDeviceDefinition);
 		}
 		else if (nullptr != device.mSDLGameController)
@@ -625,11 +647,10 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 
 		// Log input mapping as JSON
 		{
-			static const String mappingKeys[12] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back" };
 			RMX_LOG_INFO("{");
 			for (size_t controlIndex = 0; controlIndex < device.mControlMappings.size(); ++controlIndex)
 			{
-				String line = String("\t\"") + mappingKeys[controlIndex] + "\": [ ";
+				String line = String("\t\"") + InputConfig::DeviceDefinition::BUTTON_NAME[controlIndex] + "\": [ ";
 				const std::vector<InputConfig::Assignment>& assignments = device.mControlMappings[controlIndex].mAssignments;
 				bool first = true;
 				for (const InputConfig::Assignment& assignment : assignments)
@@ -752,7 +773,7 @@ void InputManager::updatePlayerGamepadAssignments()
 	{
 		std::vector<Control*> controls;
 		collectControls(mPlayers[playerIndex].mController, controls);
-		RMX_ASSERT(controls.size() == (size_t)InputConfig::DeviceDefinition::Button::_NUM, "Collect controls did not get all buttons");
+		RMX_ASSERT(controls.size() == InputConfig::DeviceDefinition::NUM_BUTTONS, "Collect controls did not get all buttons");
 
 		for (size_t controlIndex = 0; controlIndex < controls.size(); ++controlIndex)
 		{
@@ -818,10 +839,10 @@ InputConfig::DeviceDefinition* InputManager::getDeviceDefinition(const RealDevic
 	}
 	else
 	{
-		const InputConfig::DeviceDefinition* matchingInputDeviceDefinition = nullptr;
-		const InputConfig::DeviceDefinition* fallbackInputDeviceDefinition = nullptr;
+		InputConfig::DeviceDefinition* matchingInputDeviceDefinition = nullptr;
+		InputConfig::DeviceDefinition* fallbackInputDeviceDefinition = nullptr;
 		::getMatchingInputDeviceDefinition(device, -1, Configuration::instance().mInputDeviceDefinitions, matchingInputDeviceDefinition, fallbackInputDeviceDefinition);
-		return const_cast<InputConfig::DeviceDefinition*>(matchingInputDeviceDefinition);
+		return matchingInputDeviceDefinition;
 	}
 }
 
@@ -901,16 +922,27 @@ void InputManager::setControllerLEDsForPlayer(int playerIndex, const Color& colo
 {
 #if SDL_VERSION_ATLEAST(2, 0, 14)
 	// TODO: Remove some of these exclusions where possible
-#if !defined(PLATFORM_WEB) && !defined(PLATFORM_SWITCH) && !(defined(PLATFORM_WINDOWS) && defined(__GNUC__))
-	for (size_t i = 0; i < mGamepads.size(); ++i)
-	{
-		if (mGamepads[i].mAssignedPlayer == playerIndex && nullptr != mGamepads[i].mSDLGameController)
+	#if !defined(PLATFORM_WEB) && !defined(PLATFORM_SWITCH) && !(defined(PLATFORM_WINDOWS) && defined(__GNUC__))
+		for (size_t i = 0; i < mGamepads.size(); ++i)
 		{
-			SDL_GameControllerSetLED(mGamepads[i].mSDLGameController, (uint8)roundToInt(color.r * 255.0f), (uint8)roundToInt(color.g * 255.0f), (uint8)roundToInt(color.b * 255.0f));
+			if (mGamepads[i].mAssignedPlayer == playerIndex && nullptr != mGamepads[i].mSDLGameController)
+			{
+				SDL_GameControllerSetLED(mGamepads[i].mSDLGameController, (uint8)roundToInt(color.r * 255.0f), (uint8)roundToInt(color.g * 255.0f), (uint8)roundToInt(color.b * 255.0f));
+			}
 		}
+	#endif
+#endif
+}
+
+void InputManager::handleActiveModsChanged()
+{
+	static const uint64 FEATURE_NAME_HASH = rmx::getMurmur2_64("Controls_LR");
+	mUsingControlsLR = ModManager::instance().anyActiveModUsesFeature(FEATURE_NAME_HASH);
+
+	if (TouchControlsOverlay::hasInstance())
+	{
+		TouchControlsOverlay::instance().buildTouchControls();
 	}
-#endif
-#endif
 }
 
 InputManager::RealDevice* InputManager::findGamepadBySDLJoystickInstanceId(int32 joystickInstanceId)

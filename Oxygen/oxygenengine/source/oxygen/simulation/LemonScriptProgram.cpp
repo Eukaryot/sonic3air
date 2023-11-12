@@ -341,11 +341,11 @@ const LemonScriptProgram::Hook* LemonScriptProgram::checkForUpdateHook(bool post
 {
 	if (post)
 	{
-		return (mInternal.mPostUpdateHook.mFunction == nullptr) ? nullptr : &mInternal.mPostUpdateHook;
+		return (nullptr == mInternal.mPostUpdateHook.mFunction) ? nullptr : &mInternal.mPostUpdateHook;
 	}
 	else
 	{
-		return (mInternal.mPreUpdateHook.mFunction == nullptr) ? nullptr : &mInternal.mPreUpdateHook;
+		return (nullptr == mInternal.mPreUpdateHook.mFunction) ? nullptr : &mInternal.mPreUpdateHook;
 	}
 }
 

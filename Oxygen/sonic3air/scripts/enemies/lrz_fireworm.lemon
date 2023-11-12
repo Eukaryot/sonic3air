@@ -18,12 +18,13 @@
 //# alias(fn08f750) deprecated
 function void Fireworm.Init()
 {
-	Object.InitWithUpdateAddress(0x08f756)
+	Object.InitWithUpdateAddress(addressof(Fireworm.Hole.BaseUpdate))
 }
 
 
 //# address-hook(0x08f756) end(0x08f764)
-function void fn08f756()
+//# alias(fn08f756) deprecated
+function void Fireworm.Hole.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08f770	-> objA0.base_state = 0x00
@@ -52,7 +53,7 @@ function void fn08f77a()
 	objA0.base_state = 0x04
 
 	// "spawnChildObjects(0x08fa0e)" replaced by:
-	spawnChildObject(0x08f7a4, 0x00, 0, -8)
+	spawnChildObject(addressof(Fireworm.BaseUpdate), 0x00, 0, -8)		// The actual worm
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = objA0.subtype2c
@@ -70,7 +71,8 @@ function void fn08f7a2()
 // The worm
 
 //# address-hook(0x08f7a4) end(0x08f7da)
-function void fn08f7a4()
+//# alias(fn08f7a4) deprecated
+function void Fireworm.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08f7ea	-> objA0.base_state = 0x00

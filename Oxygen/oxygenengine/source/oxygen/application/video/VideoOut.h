@@ -44,6 +44,7 @@ public:
 
 	void preFrameUpdate();
 	void postFrameUpdate();
+	void initAfterSaveStateLoad();
 
 	inline bool useFrameInterpolation() const  { return mFrameInterpolation.mUseInterpolationThisUpdate; }
 	void setInterFramePosition(float position);
@@ -111,6 +112,6 @@ private:
 	GeometryFactory mGeometryFactory;
 
 	bool mDebugDrawRenderingRequested = false;
-	bool mPreviouslyHadOutsideFrameDebugDraws = false;
+	bool mPreviouslyHadNewRenderItems = false;
 	bool mRequireGameScreenUpdate = false;
 };

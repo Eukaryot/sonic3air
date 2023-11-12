@@ -23,7 +23,7 @@ function void Freezer.Init()
 //# address-hook(0x08a644) end(0x08a652)
 function void Freezer.Init2()
 {
-	objA0.update_address = 0x08a656
+	objA0.update_address = addressof(Freezer.Update)
 	setupObjectAttributesFull(0x08aa96)
 	Enemy.DrawOrUnload()
 }
@@ -76,7 +76,7 @@ function void fn08a67e()
 	}
 	else
 	{
-		objA0.update_address = 0x08a656
+		objA0.update_address = addressof(Freezer.Update)
 		objA0.flags38 &= ~0x02
 		playSound(0xe4)
 	}
@@ -307,7 +307,7 @@ function void fn08a9e0()
 			u16[A4 + 0x1c] = 0
 			u8[A4 + 0x20] = char.state.GOT_HURT
 			u8[A4 + 0x2a] |= 0x02
-			u8[A4 + 0x2e] = 0x81
+			u8[A4 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 			u8[A4 + 0x3d] = 0
 
 			D4 = D0
@@ -386,7 +386,7 @@ function void fn08a84c()
 		A2 = A0
 		A0 = A1
 		Character.GettingHurt()
-		if (objA0.state != 0x18)
+		if (objA0.state != char.state.DIED)
 		{
 			objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 0x200 : -0x200
 		}

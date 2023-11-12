@@ -710,12 +710,12 @@ function void initializeMainGame()
 	if (level.water_present && global.zone == 0x01)
 	{
 		u32[0xffffcf82] = 0x01f202
-		u32[0xffffb172] = 0x0383bc		// HCZ run-on-water handler
+		u32[0xffffb172] = addressof(RunOnWaterHandler.Init)		// HCZ run-on-water handler
 		u8[0xffffb172 + 0x2c] = 1
 	}
 	else if (global.zone == 0x07)
 	{
-		u32[0xffffb128] = 0x03da00		// MHZ leaves effect
+		u32[0xffffb128] = addressof(MHZLeavesEffect.Update)		// MHZ leaves effect
 	}
 
 	if (checkpoint.number == 0)
@@ -1802,7 +1802,7 @@ function void UpdateOscillatingNumbers()
 //# address-hook(0x0067ee) end(0x0069b6)
 function void fn0067ee()
 {
-	u32[0xffffb094] = 0x006c2c
+	u32[0xffffb094] = addressof(ResetDynamicObjectList)
 	InitializeGameCharacters()
 	RestoreShield()
 	if (checkpoint.number != 0 || global.stage_type != 0)
@@ -1816,7 +1816,7 @@ function void fn0067ee()
 		if (isSonicIntro())
 		{
 			// Trigger intro
-			u32[0xffffb172] = 0x067472
+			u32[0xffffb172] = 0x067472		// Intro cutscene controller
 			global.level_started = 0
 		}
 	#if STANDALONE
@@ -1832,10 +1832,7 @@ function void fn0067ee()
 		objA1.state = char.state.FALLING_PANIC
 		if (isMainCharacter(CHARACTER_KNUCKLES))
 		{
-			// objA1.state = char.state.KNUX_FALLING
-			// objA1.state.former = char.state.KNUX_FALLING
-			objA1.state.both = 0x2121
-
+			objA1.state.both = 0x2121	// char.state.KNUX_FALLING, char.state.KNUX_FALLING
 			objA1.animation.frame = 1
 			objA1.animation.timer = 0	// This is A0 instead of A1 in original, thanks to Clownacy (https://forums.sonicretro.org/index.php?showtopic=30778&view=findpost&p=893997)
 		}

@@ -51,8 +51,11 @@ void RenderComponentSpriteShader::refresh(const Vec2i& gameResolution)
 	mInitialized = true;
 }
 
-void RenderComponentSpriteShader::draw(const SpriteManager::ComponentSpriteInfo& spriteInfo, OpenGLRenderResources& resources)
+void RenderComponentSpriteShader::draw(const renderitems::ComponentSpriteInfo& spriteInfo, OpenGLRenderResources& resources)
 {
+	if (nullptr == spriteInfo.mCacheItem)
+		return;
+
 	glActiveTexture(GL_TEXTURE0);
 	const OpenGLTexture* texture = OpenGLSpriteTextureManager::instance().getComponentSpriteTexture(*spriteInfo.mCacheItem);
 	if (nullptr == texture)
@@ -63,10 +66,7 @@ void RenderComponentSpriteShader::draw(const SpriteManager::ComponentSpriteInfo&
 	Vec4f addedColor = spriteInfo.mAddedColor;
 	if (spriteInfo.mUseGlobalComponentTint)
 	{
-		tintColor.r *= paletteManager.getGlobalComponentTintColor().r;
-		tintColor.g *= paletteManager.getGlobalComponentTintColor().g;
-		tintColor.b *= paletteManager.getGlobalComponentTintColor().b;
-		tintColor.a *= paletteManager.getGlobalComponentTintColor().a;
+		tintColor *= paletteManager.getGlobalComponentTintColor();
 		addedColor += paletteManager.getGlobalComponentAddedColor();
 	}
 

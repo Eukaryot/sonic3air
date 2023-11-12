@@ -329,7 +329,7 @@ void PauseMenu::render()
 					color = (std::fmod(FTX::getTime() * 2.0f, 1.0f) < 0.5f) ? Color::YELLOW : Color::WHITE;
 				color.a = mDialogVisibility;
 
-				drawer.printText(global::mSonicFontB, Recti(px, py, 0, 0), entry.mText, 2, color);
+				drawer.printText(global::mSonicFontB, Vec2i(px, py), entry.mText, 2, color);
 				py += LINE_HEIGHT;
 				px -= LINE_HEIGHT / 3;
 			}
@@ -374,7 +374,7 @@ void PauseMenu::render()
 			static const uint64 key = rmx::getMurmur2_64(std::string_view("@input_icon_button_Y"));
 			drawer.drawRect(Recti(0, py - 9, 175, 20), Color(0.0f, 0.0f, 0.0f, 0.8f));
 			drawer.drawSprite(Vec2i(12, py - 1), key);
-			drawer.printText(global::mOxyfontTiny, Recti(24, py, 0, 0), "Hide menu for clean screenshots", 4, Color(0.6f, 0.8f, 1.0f, 1.0f));
+			drawer.printText(global::mOxyfontTiny, Vec2i(24, py), "Hide menu for clean screenshots", 4, Color(0.6f, 0.8f, 1.0f, 1.0f));
 		}
 
 		drawer.performRendering();

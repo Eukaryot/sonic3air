@@ -135,7 +135,7 @@ function void fn049fe4()
 		}
 	}
 
-	u8[A1 + 0x2e] = 0x81
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	if (A1 == 0xffffb000)
 	{

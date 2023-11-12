@@ -33,17 +33,26 @@ constant u8 DROPDASH_FULLCHARGE			= 0x15
 //-------------------------------------------------------//
 
 // Controls
-constant u8 CONTROL_UP		= 0x01
-constant u8 CONTROL_DOWN	= 0x02
-constant u8 CONTROL_LEFT	= 0x04
-constant u8 CONTROL_RIGHT	= 0x08
-constant u8 CONTROL_B		= 0x10
-constant u8 CONTROL_C		= 0x20
-constant u8 CONTROL_A		= 0x40
-constant u8 CONTROL_START	= 0x80
+constant u8 CONTROL_UP			= 0x01
+constant u8 CONTROL_DOWN		= 0x02
+constant u8 CONTROL_LEFT		= 0x04
+constant u8 CONTROL_RIGHT		= 0x08
+constant u8 CONTROL_B			= 0x10
+constant u8 CONTROL_C			= 0x20
+constant u8 CONTROL_A			= 0x40
+constant u8 CONTROL_START		= 0x80
 
-constant u8 CONTROL_DPAD	= 0x0f	// Any of the four directions
-constant u8 CONTROL_ABC		= 0x70	// Any of the three buttons
+// These values are mainly produced by "Input.getController*"
+constant u16 CONTROL_Z			= 0x0100
+constant u16 CONTROL_Y			= 0x0200
+constant u16 CONTROL_X			= 0x0400
+constant u16 CONTROL_MODE		= 0x0800
+
+constant u16 CONTROL_DPAD		= 0x000f	// Any of the four directions
+constant u16 CONTROL_ABC		= 0x0070	// Any of the three buttons
+constant u16 CONTROL_XYZ		= 0x0700	// Any of the three top buttons
+constant u16 CONTROL_ABCXYZ		= 0x0770	// Any of the six buttons
+constant u16 CONTROL_STARTMODE	= 0x0880	// Start + Mode
 
 
 #if STANDALONE
@@ -53,12 +62,15 @@ constant u8 CONTROL_ABC		= 0x70	// Any of the three buttons
 	constant u8 BUTTON_DOWN		= 0x01		// Down on d-pad
 	constant u8 BUTTON_LEFT		= 0x02		// Left on d-pad
 	constant u8 BUTTON_RIGHT	= 0x03		// Right on d-pad
-	constant u8 BUTTON_A		= 0x04		// Button A = lower face button -- resembles button A on Genesis pad
-	constant u8 BUTTON_B		= 0x05		// Button B = right face button -- resembles button B on Genesis pad
-	constant u8 BUTTON_X		= 0x06		// Button X =  left face button -- resembles button C on Genesis pad
+	constant u8 BUTTON_A		= 0x04		// Button A = lower face button -- resembles button B on Genesis pad
+	constant u8 BUTTON_B		= 0x05		// Button B = right face button -- resembles button C on Genesis pad
+	constant u8 BUTTON_X		= 0x06		// Button X =  left face button -- resembles button A on Genesis pad
 	constant u8 BUTTON_START	= 0x07		// Start button
-	constant u8 BUTTON_Y		= 0x09		// Button Y = upper face button
-	constant u8 BUTTON_BACK		= 0x0b		// Back button
+	constant u8 BUTTON_L		= 0x08		// Button L = left shoulder button  -- resembles button X on Genesis 6 Button pad
+	constant u8 BUTTON_Y		= 0x09		// Button Y = upper face button     -- resembles button Y on Genesis 6 Button pad
+	constant u8 BUTTON_R		= 0x0a		// Button R = right shoulder button -- resembles button Z on Genesis 6 Button pad
+	constant u8 BUTTON_BACK		= 0x0b		// Back button -- resembles MODE button on Genesis 6 Button pad
+
 	constant u8 BUTTON_PAD2		= 0x10		// Add to button ID for second controller
 
 	// Touch input modes for "Input.setTouchInputMode"

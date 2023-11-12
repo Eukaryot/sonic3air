@@ -81,8 +81,8 @@ function void fn049cfe()
 			if (objA0.flags2a & bit)
 			{
 				++u8[A3]
-				u16[A1 + 0x20] = 0x0200		// char.state.ROLLING, char.state.RUNNING
-				u8[A1 + 0x2e] = 0x01
+				objA1.state.both = 0x0200		// char.state.ROLLING, char.state.RUNNING
+				u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 				objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 				objA1.state = char.state.ROLLING

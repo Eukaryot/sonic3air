@@ -62,10 +62,11 @@ public:
 		float mRepeatTimeout = 0.0f;
 		int mPlayerIndex = 0;
 
-		inline bool isPressed() const	{ return mState; }
-		inline bool hasChanged() const	{ return mChange; }
-		inline bool justPressed() const	{ return mState && mChange; }
+		inline bool isPressed() const			{ return mState; }
+		inline bool hasChanged() const			{ return mChange; }
+		inline bool justPressed() const			{ return mState && mChange; }
 		inline bool justPressedOrRepeat() const	{ return justPressed() || mRepeat; }
+		inline bool justReleased() const		{ return !mState && mChange; }
 
 		void clearInputs();
 		void addInput(RealDevice& device, InputConfig::Assignment::Type type, uint32 index);
@@ -84,6 +85,8 @@ public:
 		Control Y;
 		Control Start;
 		Control Back;
+		Control L;
+		Control R;
 	};
 
 	struct Touch
@@ -166,6 +169,9 @@ public:
 
 	void setControllerLEDsForPlayer(int playerIndex, const Color& color) const;
 
+	inline bool isUsingControlsLR() const  { return mUsingControlsLR; }
+	void handleActiveModsChanged();
+
 private:
 	enum class WaitInputState
 	{
@@ -227,4 +233,6 @@ private:
 
 	TouchInputMode mTouchInputMode = TouchInputMode::HIDDEN_CONTROLS;
 	WaitInputState mWaitingForSingleInput = WaitInputState::NONE;
+
+	bool mUsingControlsLR = false;
 };

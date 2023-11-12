@@ -84,7 +84,7 @@ function void fn09159a()
 	fn084b5c()
 
 #if STANDALONE
-	// Limit range in x-direction as well, partly to accomodate for earlier spawn in widescreen
+	// Limit range in x-direction as well, partly to accommodate for earlier spawn in widescreen
 	if (D2.u16 < 0x100 && D3.u16 <= 0x08)
 #else
 	if (D3.u16 <= 0x08)
@@ -290,7 +290,7 @@ function void fn0917b4()
 //# address-hook(0x0917c0) end(0x091858)
 function void fn0917c0()
 {
-	objA0.update_address = 0x02c778
+	objA0.update_address = addressof(FreedAnimal.BaseUpdate)
 	objA0.base_state += 2
 
 	// Randomly decide which critter to spawn

@@ -40,7 +40,7 @@ function void CNZBarrel.Init()
 		D1.s16 = -D1.s16
 	s16[A0 + 0x46] = D1.s16
 
-	objA0.update_address = 0x032188
+	objA0.update_address = addressof(CNZBarrel.Update)
 	CNZBarrel.Update()
 }
 
@@ -460,7 +460,7 @@ function void fn032610()
 {
 	D0.u8 += 0x0b
 	D0.u16 = D0 / 0x16
-	u8[A1 + 0x22] = u8[0x03263e + D0.u16]		// Player characters' spinning standing sprites
+	objA1.animation.sprite = u8[0x03263e + D0.u16]		// Player characters' spinning standing sprites
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	objA1.render_flags |= u8[0x03264a + D0.u16]
 	D0 = u8[A1 + 0x22]

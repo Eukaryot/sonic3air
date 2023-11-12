@@ -26,7 +26,7 @@ function void fn063a6a()
 	//  - 0x063aca	-> objA0.base_state = 0x02  -> Waiting for Sonic/Tails to come closer
 	//  - 0x063ae8	-> objA0.base_state = 0x04  -> Punching the boulder
 	//  - 0x063b10	-> objA0.base_state = 0x06  -> back to standing (maybe this was supposed to be a chuckle?...)
-	//  - 0x063b20	-> objA0.base_state = 0x08  -> Standing in place, inactive 
+	//  - 0x063b20	-> objA0.base_state = 0x08  -> Standing in place, inactive
 	call tableLookupAddress(0x063a8c, objA0.base_state)
 
 	fn0661e0()
@@ -188,7 +188,7 @@ function void fn063bbe()
 	move_area.left = 0
 	player1.camera_lock = 0xff
 	player1.control_override = 0
-	u8[A1 + 0x2e] = 0x81
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	objA1.state = char.state.LOOKING_UP
 }
 
@@ -378,10 +378,10 @@ function void fn065f84()
 		player1.camera_lock = 0
 		hud.dirty.timer = 0
 		objA1.state = char.state.RUNNING
-		u8[A1 + 0x22] = D4.u8
+		objA1.animation.sprite = D4.u8
 		u8[A1 + 0x23] = 0
 		u8[A1 + 0x24] = 0
-		u8[A1 + 0x2e] = 0x83
+		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 
 		u32 backupA1 = A1
 		fn085fc4()

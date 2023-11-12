@@ -218,6 +218,16 @@ function void VInt.Update.MainGame()
 			{
 				VDP.writeData16(blendColorsPacked(u16[paletteAddress + i * 2], 0x0eee, blendFactor))
 			}
+
+			if (EXTENDED_CHARACTER_PALETTES)
+			{
+				// Also update additional palettes
+				paletteAddress = (water.fullscreen) ? 0x802300 : 0x802000
+				for (u16 i = 0; i < 0xc0; ++i)
+				{
+					Renderer.setPaletteEntryPacked(i + 0x40, blendColorsPacked(u16[paletteAddress + i * 2], 0x0eee, blendFactor))
+				}
+			}
 		}
 		#else
 		{
@@ -591,26 +601,24 @@ function void HInt_000d10()
 		if (h_int.line < 0xdf)
 		{
 			// Replace both layers of plane A & B with two rects each
-			Renderer.enforceClearScreen(true)
 			Renderer.enableDefaultPlane(0, false)
 			Renderer.enableDefaultPlane(1, false)
 			Renderer.enableDefaultPlane(2, false)
 			Renderer.enableDefaultPlane(3, false)
-			u8 splitScreenHeight = 0x6b
-			u8 splitScreen2Start = getScreenHeight() - splitScreenHeight
 
 			// Upper screen
-			Renderer.setupPlane(0, 0, getScreenWidth(), splitScreenHeight, 0x00, 0, 0x1000)
-			Renderer.setupPlane(0, 0, getScreenWidth(), splitScreenHeight, 0x01, 1, 0x2000)
-			Renderer.setupPlane(0, 0, getScreenWidth(), splitScreenHeight, 0x10, 0, 0x3000)
-			Renderer.setupPlane(0, 0, getScreenWidth(), splitScreenHeight, 0x11, 1, 0x4000)
+			Renderer.setupPlane(0, 0, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_UPPER, 0x00, 0, 0x1000)
+			Renderer.setupPlane(0, 0, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_UPPER, 0x01, 1, 0x2000)
+			Renderer.setupPlane(0, 0, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_UPPER, 0x10, 0, 0x3000)
+			Renderer.setupPlane(0, 0, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_UPPER, 0x11, 1, 0x4000)
 			Renderer.setScrollOffsetV(1, 0, camera.foreground.y.u16)
 
 			// Lower screen
-			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), splitScreenHeight, 0x00, 2, 0x1000)
-			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), splitScreenHeight, 0x01, 3, 0x2000)
-			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), splitScreenHeight, 0x10, 2, 0x3000)
-			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), splitScreenHeight, 0x11, 3, 0x4000)
+			u8 splitScreen2Start = getScreenHeight() - COMPMODE_VIEWPORT_HEIGHT_LOWER
+			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_LOWER, 0x00, 2, 0x1000)
+			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_LOWER, 0x01, 3, 0x2000)
+			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_LOWER, 0x10, 2, 0x3000)
+			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_LOWER, 0x11, 3, 0x4000)
 			Renderer.setScrollOffsetV(2, 0, u16[0xffffee3c])
 			Renderer.setScrollOffsetV(3, 0, u16[0xffffee3a])
 
@@ -708,10 +716,19 @@ function void HInt_000dd8()
 
 			if (EXTENDED_CHARACTER_PALETTES)
 			{
+				// Consider Hyper Dash screen flash
+				//  -> Note that this will not work in the flash's last frame
+				u16 blendFactor = 0
+				if (global.whiteflash_timeout > 0)
+				{
+					// Use blending instead of showing the full white flash
+					blendFactor = VInt.getBlendFactorForScreenFlash()
+				}
+
 				// Also update additional palettes
 				for (u16 i = 0; i < 0xc0; ++i)
 				{
-					Renderer.setSecondaryPaletteEntryPacked(i + 0x40, u16[0x802300 + i * 2])
+					Renderer.setSecondaryPaletteEntryPacked(i + 0x40, blendColorsPacked(u16[0x802300 + i * 2], 0x0eee, blendFactor))
 				}
 			}
 		}
@@ -823,7 +840,7 @@ function void HInt_001024()
 			// Also update additional palettes
 			for (u16 i = 0; i < 0xc0; ++i)
 			{
-				Renderer.setSecondaryPaletteEntryPacked(i + 0x40, u16[0x802300 + i * 2])
+				Renderer.setSecondaryPaletteEntryPacked(i + 0x40, blendColorsPacked(u16[0x802300 + i * 2], 0x0eee, blendFactor))
 			}
 		}
 	}

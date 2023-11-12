@@ -332,7 +332,7 @@ function void fn081554()
 	u8[A1 + 0x0a] |= 0x80
 	objA1.state = char.state.ROLLING
 	u8[A1 + 0x2a] = 0
-	u8[A1 + 0x2e] = 0x81
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	objA0.position.x.u16 = camera.position.x.u16 - 0x20
 	objA0.position.y.u16 = camera.position.y.u16 + 0x20
 
@@ -400,7 +400,7 @@ function void fn08160a()
 	{
 		u8[0xffffb000 + 0x20] = char.state.TRANSFORMING
 	}
-	u8[0xffffb000 + 0x2e] = 0x81
+	u8[0xffffb000 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	global.move.speedcap = 0xa00
 	global.move.acceleration = 0x30
 	global.move.deceleration = 0x100
@@ -429,7 +429,7 @@ function void fn08167c()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 	objA0.flags38 |= 0x04
-	u8[A1 + 0x2e] = 0x01
+	u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 	objA1.state = char.state.RUNNING
 #if STANDALONE
 	if (isMainCharacter(CHARACTER_KNUCKLES))
@@ -599,7 +599,7 @@ function void fn082742()
 
 		A1 = 0xffffb000
 		objA1.state = char.state.GOT_HURT
-		u8[A1 + 0x2e] = 0x81
+		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	}
 }
 

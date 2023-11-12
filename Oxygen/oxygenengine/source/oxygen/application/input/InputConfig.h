@@ -60,13 +60,18 @@ public:
 			Y,
 			START,
 			BACK,
+			L,
+			R,
 			_NUM
 		};
+
+		static const size_t NUM_BUTTONS = (size_t)Button::_NUM;
+		static const std::string BUTTON_NAME[NUM_BUTTONS];
 
 		DeviceType mDeviceType = DeviceType::KEYBOARD;
 		std::string mIdentifier;
 		std::map<uint64, std::string> mDeviceNames;		// Uses string hash as key
-		ControlMapping mMappings[(size_t)Button::_NUM];
+		ControlMapping mMappings[NUM_BUTTONS];
 	};
 
 public:
@@ -76,4 +81,7 @@ public:
 	static void clearAssignments(DeviceDefinition& deviceDefinition, size_t buttonIndex);
 	static void addAssignment(DeviceDefinition& deviceDefinition, size_t buttonIndex, const Assignment& newAssignment, bool removeDuplicates);
 	static void setAssignments(DeviceDefinition& deviceDefinition, size_t buttonIndex, const std::vector<Assignment>& assignments, bool removeDuplicates);
+
+private:
+	static ControlMapping& getMapping(DeviceDefinition& deviceDefinition, size_t buttonIndex);
 };

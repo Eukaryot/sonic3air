@@ -107,6 +107,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 
 		setupOptionEntryBool(option::GHOST_SYNC,				&config.mGameServer.mGhostSync.mEnabled);
 		setupOptionEntryInt(option::GHOST_SYNC_RENDERING,		&config.mGameServer.mGhostSync.mGhostRendering);
+		setupOptionEntryBool(option::SHOW_CONTROLS_DISPLAY,		&config.mShowControlsDisplay);
 		setupOptionEntryInt(option::SCRIPT_OPTIMIZATION,		&config.mScriptOptimizationLevel);
 		setupOptionEntryInt(option::GAME_RECORDING_MODE,		&config.mGameRecorder.mRecordingMode);
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
@@ -245,6 +246,17 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		// TEST
 		//  -> TODO: Needs support for a label text like "Channel" and possibly some explanation text as well
 		//entries.addEntry<InputFieldMenuEntry>().initEntry(L"world");
+
+		// TODO: Add load/save for this. Also, should this even be an option in the first place?
+	#if 0
+		entries.addEntry<TitleMenuEntry>().initEntry("Menus");
+
+		entries.addEntry<OptionsMenuEntry>()
+			.setUseSmallFont(true)
+			.initEntry("Show Controls In Menus", option::SHOW_CONTROLS_DISPLAY)
+			.addOption("Disabled", 0)
+			.addOption("Enabled", 1);
+	#endif
 
 		entries.addEntry<TitleMenuEntry>().initEntry("More Info");
 		entries.addEntry<OptionsMenuEntry>().initEntry("Open Game Homepage", option::_OPEN_HOMEPAGE);
@@ -646,14 +658,6 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			.addOption("Assign to Player 1", 0)
 			.addOption("Assign to Player 2", 1);
 
-		for (int k = 0; k < 2; ++k)
-		{
-			GameMenuEntry& entry = entries.addEntry<OptionsMenuEntry>().initEntry(*String(0, "Rumble Player %d", k+1), option::CONTROLLER_RUMBLE_P1 + k);
-			entry.addOption("Off", 0);
-			for (int i = 20; i <= 100; i += 20)
-				entry.addOption(*String(0, "%d %%", i), i);
-		}
-
 		if (Application::instance().hasVirtualGamepad())
 		{
 			entries.addEntry<TitleMenuEntry>().initEntry("Virtual Gamepad");
@@ -662,6 +666,17 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			entries.addEntry<OptionsMenuEntry>().initEntry("D-Pad Size:",	option::VGAMEPAD_DPAD_SIZE).addNumberOptions(50, 150, 10);
 			entries.addEntry<OptionsMenuEntry>().initEntry("Buttons Size:", option::VGAMEPAD_BUTTONS_SIZE).addNumberOptions(50, 150, 10);
 			entries.addEntry<OptionsMenuEntry>().initEntry("Set Touch Gamepad Layout...", option::VGAMEPAD_SETUP);
+		}
+
+
+		entries.addEntry<TitleMenuEntry>().initEntry("Controller Rumble");
+
+		for (int k = 0; k < 2; ++k)
+		{
+			GameMenuEntry& entry = entries.addEntry<OptionsMenuEntry>().initEntry(*String(0, "Rumble Player %d", k+1), option::CONTROLLER_RUMBLE_P1 + k);
+			entry.addOption("Off", 0);
+			for (int i = 20; i <= 100; i += 20)
+				entry.addOption(*String(0, "%d %%", i), i);
 		}
 
 
@@ -887,7 +902,15 @@ void OptionsMenu::initialize()
 			if (mod->mSettingCategories.empty())
 				continue;
 
-			entries.addEntry<SectionMenuEntry>().initEntry(mod->mDisplayName);
+			// Check if mod  is expanded; if there's only one mod, that one is always expanded by default
+			const bool visible = (mExpandedMods.count(mod->mLocalDirectoryHash) > 0 || activeMods.size() == 1);
+			{
+				ModTitleMenuEntry& entry = entries.addEntry<ModTitleMenuEntry>().initEntry(*mod);
+				entry.addOption("", 0);		// Collapsed
+				entry.addOption("", 1);		// Expanded
+				entry.mSelectedIndex = visible ? 1 : 0;
+				entry.mMarginBelow = visible ? 0 : -10;
+			}
 			bool isFirstTitle = true;
 
 			for (Mod::SettingCategory& modSettingCategory : mod->mSettingCategories)
@@ -910,6 +933,7 @@ void OptionsMenu::initialize()
 				{
 					// Add title
 					TitleMenuEntry& entry = entries.addEntry<TitleMenuEntry>().initEntry(*titleText);
+					entry.setVisible(visible);
 					entry.mMarginBelow += 3;
 					if (isFirstTitle)
 					{
@@ -925,6 +949,7 @@ void OptionsMenu::initialize()
 					{
 						entry.addOption(option.mDisplayName, option.mValue);
 					}
+					entry.setVisible(visible);
 
 					OptionEntry& optionEntry = vectorAdd(mOptionEntries);
 					optionEntry.mOptionId = (option::Option)nextOptionId;
@@ -938,8 +963,11 @@ void OptionsMenu::initialize()
 		for (size_t k = 0; k < entries.size(); ++k)
 		{
 			GameMenuEntry& entry = entries[k];
-			OptionEntry& optionEntry = mOptionEntries[entry.mData];
-			optionEntry.mGameMenuEntry = &entry;
+			if (entry.getMenuEntryType() != ModTitleMenuEntry::MENU_ENTRY_TYPE)
+			{
+				OptionEntry& optionEntry = mOptionEntries[entry.mData];
+				optionEntry.mGameMenuEntry = &entry;
+			}
 		}
 
 		entries.addEntry<OptionsMenuEntry>().initEntry("Back", option::_BACK);
@@ -1008,6 +1036,7 @@ void OptionsMenu::textinput(const rmx::TextInputEvent& ev)
 
 void OptionsMenu::update(float timeElapsed)
 {
+	mDeltaSecondsForRendering += timeElapsed;
 	mActiveTabAnimated += clamp((float)mActiveTab - mActiveTabAnimated, -timeElapsed * 4.0f, timeElapsed * 4.0f);
 
 	// Don't react to input during transitions (i.e. when state is not SHOW), or when child menu is active
@@ -1030,53 +1059,253 @@ void OptionsMenu::update(float timeElapsed)
 			mActiveMenu->mSelectedEntryIndex = 0;
 		}
 
-		// Update menu entries
-		const GameMenuEntries::UpdateResult result = mActiveMenu->update();
+		if (keys.X.hasChanged())
+		{
+			refreshControlsDisplay();
+		}
+
+		GameMenuEntries::UpdateResult result = GameMenuEntries::UpdateResult::NONE;
+		if (keys.X.isPressed() && (keys.Up.justPressedOrRepeat() || keys.Down.justPressedOrRepeat()) && mActiveMenu->mNavigation == GameMenuEntries::Navigation::VERTICAL)
+		{
+			// Quick navigation while holding X
+			const int entryChange = mActiveMenu->getEntryChangeByInput();
+			if (entryChange != 0)
+			{
+				for (int tries = 0; tries < 100; ++tries)
+				{
+					if (!mActiveMenu->changeSelectedIndex(entryChange, false))
+						break;
+
+					// Stop when reaching certain types of entries
+					if (mActiveMenu->mSelectedEntryIndex <= 0 || mActiveMenu->selected().mData == option::_BACK || mActiveMenu->selected().getMenuEntryType() == ModTitleMenuEntry::MENU_ENTRY_TYPE)
+						break;
+
+					// Also stop at the first entry of each category (including first option of a mods without any categories)
+					const size_t previousIndex = mActiveMenu->getPreviousInteractableIndex(mActiveMenu->mSelectedEntryIndex);
+					bool hasTitleEntryInBetween = false;
+					for (size_t k = previousIndex; k < (size_t)mActiveMenu->mSelectedEntryIndex; ++k)
+					{
+						if (mActiveMenu->getEntries()[k]->getMenuEntryType() == TitleMenuEntry::MENU_ENTRY_TYPE ||
+							mActiveMenu->getEntries()[k]->getMenuEntryType() == ModTitleMenuEntry::MENU_ENTRY_TYPE)
+						{
+							hasTitleEntryInBetween = true;
+							break;
+						}
+					}
+					if (hasTitleEntryInBetween)
+						break;
+				}
+				result = GameMenuEntries::UpdateResult::ENTRY_CHANGED;
+			}
+		}
+		else
+		{
+			// Update menu entries
+			result = mActiveMenu->update();
+		}
+
 		if (result != GameMenuEntries::UpdateResult::NONE)
 		{
 			if (result == GameMenuEntries::UpdateResult::OPTION_CHANGED && mActiveMenu == &mTabMenuEntries)
 			{
 				mActiveTab = mTabMenuEntries[option::_TAB_SELECTION].mSelectedIndex;
 				playMenuSound(0xb7);
+				refreshControlsDisplay();
 			}
 			else
 			{
 				playMenuSound(0x5b);
 
-				if (result == GameMenuEntries::UpdateResult::ENTRY_CHANGED && mActiveMenu != &mTabMenuEntries && mActiveMenu->mSelectedEntryIndex == 0)
+				if (result == GameMenuEntries::UpdateResult::ENTRY_CHANGED)
 				{
-					// Switch from tab content to title
-					mActiveMenu = &mTabMenuEntries;
+					if (mActiveMenu != &mTabMenuEntries && mActiveMenu->mSelectedEntryIndex == 0)
+					{
+						// Switch from tab content to title
+						mActiveMenu = &mTabMenuEntries;
+					}
+					refreshControlsDisplay();
 				}
 				else if (result == GameMenuEntries::UpdateResult::OPTION_CHANGED && mActiveMenu != &mTabMenuEntries)
 				{
-					const GameMenuEntry& selectedEntry = mActiveMenu->selected();
-					const uint32 selectedData = selectedEntry.mData;
-					switch (selectedData)
+					GameMenuEntry& selectedEntry = mActiveMenu->selected();
+					if (selectedEntry.getMenuEntryType() == ModTitleMenuEntry::MENU_ENTRY_TYPE)
 					{
+						updateModExpandState(static_cast<ModTitleMenuEntry&>(selectedEntry));
+						refreshControlsDisplay();
+					}
+					else
+					{
+						const uint32 selectedData = selectedEntry.mData;
+						switch (selectedData)
+						{
+							case option::RELEASE_CHANNEL:
+							{
+								mOptionEntries[selectedData].applyValue();
+								GameClient::instance().getUpdateCheck().reset();
+								break;
+							}
+
+							case option::WINDOW_MODE:
+							{
+								Application::instance().setWindowMode((Application::WindowMode)selectedEntry.selected().mValue);
+								break;
+							}
+
+							case option::RENDERER:
+							{
+								EngineMain::instance().switchToRenderMethod((Configuration::RenderMethod)selectedEntry.selected().mValue);
+								break;
+							}
+
+							case option::SOUNDTRACK:
+							{
+								// Change soundtrack and restart music
+								config.mActiveSoundtrack = selectedEntry.selected().mValue;
+								if (AudioOut::instance().hasLoadedRemasteredSoundtrack())
+								{
+									AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
+									AudioOut::instance().onSoundtrackPreferencesChanged();
+									if (nullptr == mPlayingSoundTest)
+									{
+										AudioOut::instance().restartMenuMusic();
+									}
+									else
+									{
+										playSoundtest(*mPlayingSoundTest);
+									}
+								}
+								mSoundtrackDownloadMenuEntry->setVisible(mSoundtrackDownloadMenuEntry->shouldBeShown());
+								break;
+							}
+
+							case option::CONTROLLER_PLAYER_1:
+							case option::CONTROLLER_PLAYER_2:
+							{
+								const InputManager::RealDevice* gamepad = InputManager::instance().getGamepadByJoystickInstanceId(selectedEntry.selected().mValue);
+								InputManager::instance().setPreferredGamepad((int)(selectedEntry.mData - option::CONTROLLER_PLAYER_1), gamepad);
+								break;
+							}
+
+							case option::CONTROLLER_AUTOASSIGN:
+							{
+								mOptionEntries[selectedData].applyValue();
+								InputManager::instance().updatePlayerGamepadAssignments();
+								break;
+							}
+
+							case option::GAME_RECORDING_MODE:
+							{
+								mOptionEntries[selectedData].applyValue();
+								Configuration::instance().evaluateGameRecording();
+								break;
+							}
+
+							default:
+							{
+								// Apply change
+								config.mWindowMode = (Configuration::WindowMode)mOptionEntries[option::WINDOW_MODE_STARTUP].mGameMenuEntry->selected().mValue;
+
+								if (selectedData > option::_TAB_SELECTION && selectedData != option::_BACK)
+								{
+									mOptionEntries[selectedData].applyValue();
+
+									if (selectedData >= option::CONTROLLER_RUMBLE_P1 && selectedData <= option::CONTROLLER_RUMBLE_P2)
+									{
+										InputManager::instance().setControllerRumbleForPlayer(selectedData - option::CONTROLLER_RUMBLE_P1, 1.0f, 1.0f, 300);
+									}
+									else if (selectedData >= option::VGAMEPAD_DPAD_SIZE && selectedData <= option::VGAMEPAD_BUTTONS_SIZE)
+									{
+										TouchControlsOverlay::instance().buildTouchControls();
+									}
+									else if (selectedData == option::FRAME_SYNC)
+									{
+										EngineMain::instance().setVSyncMode((Configuration::FrameSyncType)selectedEntry.selected().mValue);
+									}
+								}
+								if (mEnteredFromIngame && !mShowedAudioWarningMessage && selectedData >= option::TITLE_THEME && selectedData <= option::OUTRO_MUSIC)
+								{
+									mAudioWarningMessageTimeout = 4.0f;
+									mShowedAudioWarningMessage = true;
+								}
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		enum class ButtonEffect
+		{
+			NONE,
+			ACCEPT,
+			BACK
+		};
+		const ButtonEffect buttonEffect = (keys.Start.justPressed() || keys.A.justPressed()) ? ButtonEffect::ACCEPT :
+										  (keys.Back.justPressed() || keys.B.justPressed()) ? ButtonEffect::BACK : ButtonEffect::NONE;
+
+		if (buttonEffect != ButtonEffect::NONE)
+		{
+			if (buttonEffect == ButtonEffect::BACK)
+			{
+				goBack();
+			}
+			else if (buttonEffect == ButtonEffect::ACCEPT && mActiveMenu != &mTabMenuEntries)
+			{
+				Tab& tab = mTabs[mActiveTab];
+				GameMenuEntry& selectedEntry = tab.mMenuEntries.selected();
+
+				if (selectedEntry.getMenuEntryType() == ModTitleMenuEntry::MENU_ENTRY_TYPE)
+				{
+					selectedEntry.mSelectedIndex = 1 - selectedEntry.mSelectedIndex;
+					updateModExpandState(static_cast<ModTitleMenuEntry&>(selectedEntry));
+				}
+				else
+				{
+					switch (selectedEntry.mData)
+					{
+						case option::SOUND_TEST:
+						{
+							playSoundtest(*mSoundTestAudioDefinitions[selectedEntry.selected().mValue]);
+							break;
+						}
+
+						case option::CONTROLLER_SETUP:
+						{
+							playMenuSound(0x63);
+							mControllerSetupMenu->setRect(mRect);
+							mControllerSetupMenu->fadeIn();
+							break;
+						}
+
+						case option::VGAMEPAD_SETUP:
+						{
+							InputManager::instance().setLastInputType(InputManager::InputType::TOUCH);
+							TouchControlsOverlay::instance().enableConfigMode(true);
+							break;
+						}
+
+						case option::_CHECK_FOR_UPDATE:
 						case option::RELEASE_CHANNEL:
 						{
-							mOptionEntries[selectedData].applyValue();
-							GameClient::instance().getUpdateCheck().reset();
+							UpdateCheck& updateCheck = GameClient::instance().getUpdateCheck();
+							if (updateCheck.hasUpdate())
+							{
+								PlatformFunctions::openURLExternal(updateCheck.getResponse()->mUpdateInfoURL.empty() ? "https://sonic3air.org" : updateCheck.getResponse()->mUpdateInfoURL);
+							}
+							else
+							{
+								updateCheck.startUpdateCheck();
+							}
 							break;
 						}
 
-						case option::WINDOW_MODE:
+						case option::SOUNDTRACK_DOWNLOAD:
 						{
-							Application::instance().setWindowMode((Application::WindowMode)selectedEntry.selected().mValue);
-							break;
-						}
+							mSoundtrackDownloadMenuEntry->triggerButton();
+							mSoundtrackDownloadMenuEntry->setVisible(mSoundtrackDownloadMenuEntry->shouldBeShown());
 
-						case option::RENDERER:
-						{
-							EngineMain::instance().switchToRenderMethod((Configuration::RenderMethod)selectedEntry.selected().mValue);
-							break;
-						}
-
-						case option::SOUNDTRACK:
-						{
-							// Change soundtrack and restart music
-							config.mActiveSoundtrack = selectedEntry.selected().mValue;
+							// Restart music if remastered soundtrack was just loaded
 							if (AudioOut::instance().hasLoadedRemasteredSoundtrack())
 							{
 								AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
@@ -1090,165 +1319,30 @@ void OptionsMenu::update(float timeElapsed)
 									playSoundtest(*mPlayingSoundTest);
 								}
 							}
-							mSoundtrackDownloadMenuEntry->setVisible(mSoundtrackDownloadMenuEntry->shouldBeShown());
 							break;
 						}
 
-						case option::CONTROLLER_PLAYER_1:
-						case option::CONTROLLER_PLAYER_2:
+						case option::_OPEN_HOMEPAGE:
 						{
-							const InputManager::RealDevice* gamepad = InputManager::instance().getGamepadByJoystickInstanceId(selectedEntry.selected().mValue);
-							InputManager::instance().setPreferredGamepad((int)(selectedEntry.mData - option::CONTROLLER_PLAYER_1), gamepad);
+							PlatformFunctions::openURLExternal("https://sonic3air.org/");
 							break;
 						}
 
-						case option::CONTROLLER_AUTOASSIGN:
+						case option::_OPEN_MANUAL:
 						{
-							mOptionEntries[selectedData].applyValue();
-							InputManager::instance().updatePlayerGamepadAssignments();
+							PlatformFunctions::openURLExternal("https://sonic3air.org/Manual.pdf");
 							break;
 						}
 
-						case option::GAME_RECORDING_MODE:
+						case option::_BACK:
 						{
-							mOptionEntries[selectedData].applyValue();
-							Configuration::instance().evaluateGameRecording();
+							goBack();
 							break;
 						}
 
 						default:
-						{
-							// Apply change
-							config.mWindowMode = (Configuration::WindowMode)mOptionEntries[option::WINDOW_MODE_STARTUP].mGameMenuEntry->selected().mValue;
-
-							if (selectedData > option::_TAB_SELECTION && selectedData != option::_BACK)
-							{
-								mOptionEntries[selectedData].applyValue();
-
-								if (selectedData >= option::CONTROLLER_RUMBLE_P1 && selectedData <= option::CONTROLLER_RUMBLE_P2)
-								{
-									InputManager::instance().setControllerRumbleForPlayer(selectedData - option::CONTROLLER_RUMBLE_P1, 1.0f, 1.0f, 300);
-								}
-								else if (selectedData >= option::VGAMEPAD_DPAD_SIZE && selectedData <= option::VGAMEPAD_BUTTONS_SIZE)
-								{
-									TouchControlsOverlay::instance().buildTouchControls();
-								}
-								else if (selectedData == option::FRAME_SYNC)
-								{
-									EngineMain::instance().setVSyncMode((Configuration::FrameSyncType)selectedEntry.selected().mValue);
-								}
-							}
-							if (mEnteredFromIngame && !mShowedAudioWarningMessage && selectedData >= option::TITLE_THEME && selectedData <= option::OUTRO_MUSIC)
-							{
-								mAudioWarningMessageTimeout = 4.0f;
-								mShowedAudioWarningMessage = true;
-							}
 							break;
-						}
 					}
-				}
-			}
-		}
-
-		enum class ButtonEffect
-		{
-			NONE,
-			ACCEPT,
-			BACK
-		};
-		const ButtonEffect buttonEffect = (keys.Start.justPressed() || keys.A.justPressed() || keys.X.justPressed()) ? ButtonEffect::ACCEPT :
-										  (keys.Back.justPressed() || keys.B.justPressed()) ? ButtonEffect::BACK : ButtonEffect::NONE;
-
-		if (buttonEffect != ButtonEffect::NONE)
-		{
-			if (buttonEffect == ButtonEffect::BACK)
-			{
-				goBack();
-			}
-			else if (buttonEffect == ButtonEffect::ACCEPT && mActiveMenu != &mTabMenuEntries)
-			{
-				Tab& tab = mTabs[mActiveTab];
-				GameMenuEntry& selectedEntry = tab.mMenuEntries.selected();
-				switch (selectedEntry.mData)
-				{
-					case option::SOUND_TEST:
-					{
-						playSoundtest(*mSoundTestAudioDefinitions[selectedEntry.selected().mValue]);
-						break;
-					}
-
-					case option::CONTROLLER_SETUP:
-					{
-						playMenuSound(0x63);
-						mControllerSetupMenu->setRect(mRect);
-						mControllerSetupMenu->fadeIn();
-						break;
-					}
-
-					case option::VGAMEPAD_SETUP:
-					{
-						InputManager::instance().setLastInputType(InputManager::InputType::TOUCH);
-						TouchControlsOverlay::instance().enableConfigMode(true);
-						break;
-					}
-
-					case option::_CHECK_FOR_UPDATE:
-					case option::RELEASE_CHANNEL:
-					{
-						UpdateCheck& updateCheck = GameClient::instance().getUpdateCheck();
-						if (updateCheck.hasUpdate())
-						{
-							PlatformFunctions::openURLExternal(updateCheck.getResponse()->mUpdateInfoURL.empty() ? "https://sonic3air.org" : updateCheck.getResponse()->mUpdateInfoURL);
-						}
-						else
-						{
-							updateCheck.startUpdateCheck();
-						}
-						break;
-					}
-
-					case option::SOUNDTRACK_DOWNLOAD:
-					{
-						mSoundtrackDownloadMenuEntry->triggerButton();
-						mSoundtrackDownloadMenuEntry->setVisible(mSoundtrackDownloadMenuEntry->shouldBeShown());
-
-						// Restart music if remastered soundtrack was just loaded
-						if (AudioOut::instance().hasLoadedRemasteredSoundtrack())
-						{
-							AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
-							AudioOut::instance().onSoundtrackPreferencesChanged();
-							if (nullptr == mPlayingSoundTest)
-							{
-								AudioOut::instance().restartMenuMusic();
-							}
-							else
-							{
-								playSoundtest(*mPlayingSoundTest);
-							}
-						}
-						break;
-					}
-
-					case option::_OPEN_HOMEPAGE:
-					{
-						PlatformFunctions::openURLExternal("https://sonic3air.org/");
-						break;
-					}
-
-					case option::_OPEN_MANUAL:
-					{
-						PlatformFunctions::openURLExternal("https://sonic3air.org/Manual.pdf");
-						break;
-					}
-
-					case option::_BACK:
-					{
-						goBack();
-						break;
-					}
-
-					default:
-						break;
 				}
 			}
 		}
@@ -1306,6 +1400,8 @@ void OptionsMenu::render()
 	OptionsMenuRenderContext renderContext;
 	renderContext.mOptionsMenu = this;
 	renderContext.mDrawer = &drawer;
+	renderContext.mDeltaSeconds = std::min(mDeltaSecondsForRendering, 0.1f);
+	mDeltaSecondsForRendering = 0.0f;
 
 	int anchorX = 200;
 	int anchorY = 0;
@@ -1443,30 +1539,51 @@ void OptionsMenu::render()
 			}
 		}
 
+		int bottomY = 224;
+		if (ConfigurationImpl::instance().mShowControlsDisplay)
+		{
+			bottomY = 230 - roundToInt(alpha * 16.0f);
+			//const int innerIndentX = (global::mDataSelectBackground.getWidth() - 400) / 2;
+			//for (int k = 0; k < 5; ++k)
+			//{
+			//	const int y = bottomY + k - 3;
+			//	drawer.drawRect(Recti(0, y, 400, 1), global::mDataSelectBackground, Recti(innerIndentX, y, 400, 1), Color(1.0f, 1.0f, 1.0f, ((float)k + 0.5f) * 0.2f));
+			//}
+		}
+
 		if (mEnteredFromIngame)
 		{
-			if (mWarningMessageTimeout > 0.0f)
-			{
-				const float visibility = saturate(mWarningMessageTimeout / 0.3f);
-				const Recti rect(0, 210 + roundToInt((1.0f - visibility) * 16.0f), 400, 16);
-				drawer.drawRect(rect, Color(1.0f, 0.75f, 0.5f, alpha * 0.95f));
-				drawer.printText(global::mOxyfontSmall, rect, "Note: Some options are hidden while in-game.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
-				drawer.drawRect(Recti(rect.x, rect.y-1, rect.width, 1), Color(0.4f, 0.2f, 0.0f, alpha * 0.95f));
-				drawer.drawRect(Recti(rect.x, rect.y-2, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.9f));
-				drawer.drawRect(Recti(rect.x, rect.y-3, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.6f));
-				drawer.drawRect(Recti(rect.x, rect.y-4, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.3f));
-			}
+			const char* message = nullptr;
+			float visibility = 0.0f;
+
 			if (mAudioWarningMessageTimeout > 0.0f)
 			{
-				const float visibility = saturate(mAudioWarningMessageTimeout / 0.3f);
-				const Recti rect(0, 210 + roundToInt((1.0f - visibility) * 16.0f), 400, 16);
+				visibility = saturate(mAudioWarningMessageTimeout / 0.3f);
+				message = "Note: Music changes don't affect already playing tracks.";
+			}
+			else if (mWarningMessageTimeout > 0.0f)
+			{
+				visibility = saturate(mWarningMessageTimeout / 0.3f);
+				message = "Note: Some options are hidden while in-game.";
+			}
+
+			if (visibility > 0.0f && nullptr != message)
+			{
+				bottomY -= 16;
+				const Recti rect(0, bottomY + roundToInt((1.0f - visibility) * 20.0f), 400, 20);
+
 				drawer.drawRect(rect, Color(1.0f, 0.75f, 0.5f, alpha * 0.95f));
-				drawer.printText(global::mOxyfontSmall, rect, "Note: Music changes don't affect already playing tracks.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
+				drawer.printText(global::mOxyfontSmall, rect - Vec2i(0, 2), message, 5, Color(1.0f, 0.9f, 0.8f, alpha));
 				drawer.drawRect(Recti(rect.x, rect.y-1, rect.width, 1), Color(0.4f, 0.2f, 0.0f, alpha * 0.95f));
 				drawer.drawRect(Recti(rect.x, rect.y-2, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.9f));
 				drawer.drawRect(Recti(rect.x, rect.y-3, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.6f));
 				drawer.drawRect(Recti(rect.x, rect.y-4, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.3f));
 			}
+		}
+
+		if (ConfigurationImpl::instance().mShowControlsDisplay)
+		{
+			mGameMenuControlsDisplay.render(drawer, alpha);
 		}
 
 		drawer.performRendering();
@@ -1513,6 +1630,8 @@ void OptionsMenu::setupOptionsMenu(bool enteredFromIngame)
 	mWarningMessageTimeout = enteredFromIngame ? 4.0f : 0.0f;
 	mAudioWarningMessageTimeout = 0.0f;
 	mShowedAudioWarningMessage = false;
+
+	refreshControlsDisplay();
 }
 
 void OptionsMenu::removeControllerSetupMenu()
@@ -1645,6 +1764,70 @@ GameMenuEntry* OptionsMenu::getSelectedGameMenuEntry()
 		}
 	}
 	return nullptr;
+}
+
+void OptionsMenu::refreshControlsDisplay()
+{
+	GameMenuEntry& selectedEntry = mActiveMenu->selected();
+	mGameMenuControlsDisplay.clear();
+
+	const InputManager::ControllerScheme& keys = InputManager::instance().getController(0);
+	if (keys.X.isPressed())
+	{
+		mGameMenuControlsDisplay.addControl("Prev / Next category", false, "@input_icon_button_up", "@input_icon_button_down");
+	}
+	else
+	{
+		if (mActiveMenu == &mTabMenuEntries)
+		{
+			mGameMenuControlsDisplay.addControl("Switch Tab", false, "@input_icon_button_left", "@input_icon_button_right");
+		}
+		else if (selectedEntry.getMenuEntryType() == ModTitleMenuEntry::MENU_ENTRY_TYPE)
+		{
+			if (selectedEntry.mSelectedIndex == 0)
+				mGameMenuControlsDisplay.addControl("Expand", false, "@input_icon_button_right");
+			else
+				mGameMenuControlsDisplay.addControl("Collapse", false, "@input_icon_button_left");
+		}
+		else if (selectedEntry.mOptions.size() >= 2)
+		{
+			mGameMenuControlsDisplay.addControl("Change", false, "@input_icon_button_left", "@input_icon_button_right");
+			if (selectedEntry.mData == option::SOUND_TEST)
+				mGameMenuControlsDisplay.addControl("Play", false, "@input_icon_button_A");
+		}
+		else
+		{
+			mGameMenuControlsDisplay.addControl("Select", false, "@input_icon_button_A");
+		}
+
+		if (mActiveTab == Tab::Id::MODS)
+		{
+			// Show only here, as that's where it's most relevent - however, it works in the other tabs as well
+			mGameMenuControlsDisplay.addControl("Hold: Quick Nav", true, "@input_icon_button_X");
+		}
+
+		mGameMenuControlsDisplay.addControl("Back",	true, "@input_icon_button_B");
+	}
+}
+
+void OptionsMenu::updateModExpandState(ModTitleMenuEntry& modTitleMenuEntry)
+{
+	const bool visible = (modTitleMenuEntry.selected().mValue > 0);
+	const Mod& mod = modTitleMenuEntry.getMod();
+	if (visible)
+		mExpandedMods.insert(mod.mLocalDirectoryHash);
+	else
+		mExpandedMods.erase(mod.mLocalDirectoryHash);
+
+	modTitleMenuEntry.mMarginBelow = visible ? 0 : -10;
+
+	const std::vector<GameMenuEntry*>& entries = mActiveMenu->getEntries();
+	for (int k = mActiveMenu->mSelectedEntryIndex + 1; k < (int)entries.size(); ++k)
+	{
+		if (entries[k]->getMenuEntryType() == ModTitleMenuEntry::MENU_ENTRY_TYPE || entries[k]->mData == option::_BACK)
+			break;
+		entries[k]->setVisible(visible);
+	}
 }
 
 void OptionsMenu::goBack()

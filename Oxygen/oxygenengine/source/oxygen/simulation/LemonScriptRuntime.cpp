@@ -48,55 +48,6 @@ namespace
 		return token.isA<lemon::OperatorToken>() && (token.as<lemon::OperatorToken>().mOperator == op);
 	}
 
-
-	// TODO: Move this into a helper!
-	class PragmaSplitter
-	{
-	public:
-		struct Entry
-		{
-			std::string mArgument;
-			std::string mValue;
-		};
-		std::vector<Entry> mEntries;
-
-	public:
-		PragmaSplitter(const std::string& input)
-		{
-			size_t pos = 0;
-			while (pos < input.length())
-			{
-				// Skip all spaces
-				while (pos < input.length() && input[pos] == 32)
-					++pos;
-
-				if (pos < input.length())
-				{
-					const size_t startPos = pos;
-					while (pos < input.length() && input[pos] != 32)
-						++pos;
-
-					mEntries.emplace_back();
-
-					// Split part string into argument and value
-					const std::string part = input.substr(startPos, pos - startPos);
-					const size_t left = part.find_first_of('(');
-					if (left != std::string::npos)
-					{
-						RMX_CHECK(part.back() == ')', "No matching parentheses in pragma found", continue);
-
-						mEntries.back().mArgument = part.substr(0, left);
-						mEntries.back().mValue = part.substr(left + 1, part.length() - left - 2);
-					}
-					else
-					{
-						mEntries.back().mArgument = part;
-					}
-				}
-			}
-		}
-	};
-
 }
 
 

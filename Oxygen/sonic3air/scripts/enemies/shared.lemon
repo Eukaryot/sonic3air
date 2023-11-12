@@ -675,8 +675,13 @@ function void fn085fc4()
 	A0 = A1
 	if (objA0.update_address != 0)
 	{
-		D0 = u16(objA0.flags38) << 2
+		D0 = u16(char.character) << 2
 		A1 = u32[0x085fb8 + D0.u16]
+
+		// Targets:
+		//  - 0x012cb4	-> UpdateSonicSpritePatterns
+		//  - 0x015c6e	-> UpdateTailsSpritePatterns
+		//  - 0x01810e	-> UpdateKnucklesSpritePatterns
 		call A1
 	}
 	A0 = backupA0

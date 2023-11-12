@@ -59,6 +59,7 @@ public:
 		const lemon::Function* mFunction = nullptr;
 		uint32 mAddress = 0xffffffff;
 		int mParentIndex = -1;
+		const uint8* mCallingPC = nullptr;	// Program counter inside the parent function
 		int mDepth = 0;
 		size_t mSteps = 0;
 		bool mAnyChildFailed = false;
@@ -120,7 +121,6 @@ public:
 
 	void processCallFrames();
 	inline const std::vector<CallFrame>& getCallFrames() const  { return mMainCallFrameTracking.mCallFrames; }
-	void getCallStackFromCallFrameIndex(std::vector<uint64>& outCallStack, int callFrameIndex);
 
 	inline const std::vector<uint32>& getUnknownAddresses() const  { return mUnknownAddressesInOrder; }
 

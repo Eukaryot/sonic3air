@@ -16,12 +16,13 @@
 //# alias(fn08fae6) deprecated
 function void Iwamodoki.Init()
 {
-	Object.InitWithUpdateAddress(0x08faec)
+	Object.InitWithUpdateAddress(addressof(Iwamodoki.BaseUpdate))
 }
 
 
 //# address-hook(0x08faec) end(0x08fb36)
-function void fn08faec()
+//# alias(fn08faec) deprecated
+function void Iwamodoki.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08fb42	-> objA0.base_state = 0x00

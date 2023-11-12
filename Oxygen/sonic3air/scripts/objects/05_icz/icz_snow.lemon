@@ -15,7 +15,7 @@
 //# address-hook(0x08b550) end(0x08b550)
 function void ICZSnow.Init()
 {
-	Object.InitWithUpdateAddress(0x08b554)
+	Object.InitWithUpdateAddress(addressof(ICZSnow.Init2))
 }
 
 

@@ -44,7 +44,7 @@ function void fn03bf68()
 	// Handle second character if he's still attached to the pole
 	if (objA0.update_address == 0 && player2attached)
 	{
-		u8[0xffffb04a + 0x2e] &= 0xfc
+		u8[0xffffb04a + 0x2e] &= ~(control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	}
 #else
 	CheckForUnloadObject()
@@ -101,7 +101,7 @@ function void fn03bfa0()
 //# address-hook(0x03bffe) end(0x03c00e)
 function void fn03bffe()
 {
-	D0 = u8[A1 + 0x22]
+	D0 = objA1.animation.sprite
 	u32 backupA2 = A2
 	SetCharacterSpritePatterns()
 	A2 = backupA2
@@ -154,7 +154,7 @@ function void fn03c096()
 	u8[A1 + 0x27] = 0
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK
-	u8[A1 + 0x2e] &= 0xfc
+	u8[A1 + 0x2e] &= ~(control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	u8[A1 + 0x2f] = 0
 	u8[A1 + 0x3d] = 0
 	u8[A1 + 0x40] = 1
@@ -203,7 +203,7 @@ function void fn03c0d0()
 			u8[A1 + 0x20] = 0
 			objA1.flags2a |= char.flag.IN_AIR
 			objA1.flags2a &= ~char.flag.FACING_LEFT
-			u8[A1 + 0x2e] = 0x03
+			u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 
 			u8[A2 + 0x04] = 0xe0
 			u8[A2] = 1

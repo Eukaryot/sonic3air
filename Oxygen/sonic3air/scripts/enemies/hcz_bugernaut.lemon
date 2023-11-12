@@ -16,12 +16,13 @@
 //# alias(fn087a24) deprecated
 function void Bugernaut.Init()
 {
-	Object.InitWithUpdateAddress(0x087a2a)
+	Object.InitWithUpdateAddress(addressof(Bugernaut.BaseUpdate))
 }
 
 
 //# address-hook(0x087a2a) end(0x087a38)
-function void fn087a2a()
+//# alias(fn087a2a) deprecated
+function void Bugernaut.BaseUpdate()
 {
 	// Targets:
 	//  - 0x087a42	-> objA0.base_state = 0x00
@@ -119,7 +120,7 @@ function void fn087ae6()
 {
 	Object.AnimationProgressByLocalA1()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (objA1.update_address != 0x087a2a)
+	if (objA1.update_address != addressof(Bugernaut.BaseUpdate))
 	{
 		fn087b56()
 		if (_equal())
@@ -163,11 +164,11 @@ function void fn087b4c()
 //# address-hook(0x087b56) end(0x087b86)
 function void fn087b56()
 {
-	// Search for a large bugernaut after own parent was destroyed
+	// Search for a large Bugernaut after own parent was destroyed
 	A2 = 0xffffb128
 	for (u8 i = 0; i < 0x5a; ++i)
 	{
-		if (u32[A2] == 0x087a2a)
+		if (u32[A2] == addressof(Bugernaut.BaseUpdate))
 		{
 			D1.u8 = u8[A2 + 0x39] + 1
 			if (D1.u8 <= 4)

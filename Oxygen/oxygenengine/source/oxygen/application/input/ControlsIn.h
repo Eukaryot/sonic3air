@@ -30,6 +30,15 @@ public:
 		MODE  = 0x0800
 	};
 
+	struct Gamepad
+	{
+		uint16 mCurrentInput = 0;
+		uint16 mPreviousInput = 0;
+		uint16 mIgnoreInput = 0;
+	};
+
+	static const size_t NUM_GAMEPADS = 2;
+
 public:
 	ControlsIn();
 
@@ -40,8 +49,8 @@ public:
 	void setIgnores(uint16 bitmask);
 	void setAllIgnores();
 
-	inline uint16 getInputPad(size_t index) const	   { return mInputPad[index]; }
-	inline uint16 getPrevInputPad(size_t index) const  { return mPrevInputPad[index]; }
+	const Gamepad& getGamepad(size_t index) const;
+	inline uint16 getInputPad(size_t index) const  { return getGamepad(index).mCurrentInput; }
 
 	void injectInput(uint32 padIndex, uint16 inputFlags);
 
@@ -49,8 +58,6 @@ public:
 	bool switchGamepads();
 
 private:
-	uint16 mInputPad[2];
-	uint16 mPrevInputPad[2];
-	uint16 mIgnoreInput[2];
+	Gamepad mGamepad[NUM_GAMEPADS];
 	bool mGamepadsSwitched = false;
 };

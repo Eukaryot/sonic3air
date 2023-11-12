@@ -154,7 +154,7 @@ function void UpdateCameraPositionX()
 			{
 				// Variant A
 				s16 diff = 0
-				if (u8[0xffffb000 + 0x2e] & 0xc0 || u8[0xffffb000 + 0x3c] != 0)		// Reset to normal in certain situations when the player has no direct control, or when on a convex surface
+				if (u8[0xffffb000 + 0x2e] & (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_WALLS) || u8[0xffffb000 + 0x3c] != 0)		// Reset to normal in certain situations when the player has no direct control, or when on a convex surface
 				{
 					diff = clamp(-currentCameraPanning, -2, 2)
 				}

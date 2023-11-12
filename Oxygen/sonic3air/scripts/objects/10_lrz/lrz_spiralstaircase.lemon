@@ -83,7 +83,7 @@ function void fn042278()
 					u8[A1 + 0x2f] = 0
 					u8[A1 + 0x2a] &= ~0x01
 					objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
-					u8[A1 + 0x2e] = 0x43
+					u8[A1 + 0x2e] = (control_flag.DISABLE_WALLS | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 					u8[A1 + 0x20] = 0
 				}
 			}
@@ -185,8 +185,8 @@ function void fn0423d0()
 	objA1.velocity.y = D0.u16
 	D0 = (u16[A2] >> 1) & 0xff
 	D0.u16 = D0 / 0x16
-	u8[A1 + 0x22] = u8[0x04247e + D0.u16]		// Player characters' spiral running sprites
+	objA1.animation.sprite = u8[0x04247e + D0.u16]		// Player characters' spiral running sprites
 
-	D0 = u8[A1 + 0x22]
+	D0 = objA1.animation.sprite
 	SetCharacterSpritePatterns()
 }

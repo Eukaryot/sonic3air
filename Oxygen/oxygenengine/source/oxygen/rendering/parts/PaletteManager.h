@@ -37,6 +37,8 @@ public:
 	void resetAllPaletteChangeFlags();
 	void setAllPaletteChangeFlags();
 
+	void invalidatePackedColorCache();
+
 	void setPaletteEntry(uint16 colorIndex, uint32 color);
 	void setPaletteEntryPacked(uint16 colorIndex, uint32 color, uint16 packedColor);
 
@@ -76,8 +78,16 @@ public:
 	inline const Vec4f& getGlobalComponentAddedColor() const { return mGlobalComponentAddedColor; }
 	void setGlobalComponentTint(const Vec4f& tintColor, const Vec4f& addedColor);
 
+	void applyGlobalComponentTint(Color& color) const;
+	void applyGlobalComponentTint(Color& tintColor, Color& addedColor) const;
+
+	void serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion);
+
 public:
 	int mSplitPositionY = 0xffff;	// Use some large value as default that is definitely larger than any responable screen height
+
+private:
+	void serializePalette(VectorBinarySerializer& serializer, Palette& palette);
 
 private:
 	Palette mPalette[2];			// [0] = Standard palette, [1] = Underwater palette (in S3AIR)

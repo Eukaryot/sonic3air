@@ -49,7 +49,7 @@ function void fn04964a()
 			u8[A1 + 0x27] = 0x01
 			objA1.flags2a &= ~char.flag.CONTROL_LOCK
 			objA1.flags2a |= char.flag.IN_AIR
-			u8[A1 + 0x2e] = 0x01
+			u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 			u8[A1 + 0x30] = 0xff		// "char.rotation.x.count"
 			u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 

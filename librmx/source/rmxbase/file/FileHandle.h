@@ -32,7 +32,7 @@ public:
 	bool open(const WString& filename, uint32 flags = FILE_ACCESS_READ);
 	void close();
 
-	bool isOpen() const  { return (mFile != nullptr); }
+	bool isOpen() const  { return (nullptr != mFile); }
 	int64 getSize() const;
 
 	void seek(int64 position);

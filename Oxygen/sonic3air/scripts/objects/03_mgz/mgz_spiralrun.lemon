@@ -51,7 +51,7 @@ function void fn033cac()
 			--u8[A2 + 0x04]
 			if (u8[A2 + 0x04] == 0)
 			{
-				u8[A1 + 0x2e] &= ~0x01
+				u8[A1 + 0x2e] &= ~control_flag.DISABLE_UPDATE
 			}
 
 			D0.s32 = objA1.velocity.x
@@ -97,9 +97,8 @@ function void fn033cac()
 						}
 
 						objA1.render_flags |= render_flag.FLIP_Y
-						u8[A1 + 0x2e] |= 0x40
-						u8[A1 + 0x2e] |= 0x02
-						u8[A1 + 0x20] = 0
+						u8[A1 + 0x2e] |= (control_flag.DISABLE_WALLS | control_flag.DISABLE_ANIMATION)
+						objA1.state = char.state.RUNNING
 					}
 				}
 			}
@@ -198,9 +197,9 @@ function void fn033cac()
 				}
 				D2.u16 = u8(0x40 - D2.u8)
 				D2.u16 = D2 / 0x0b
-				u8[A1 + 0x22] = u8[0x033f6c + D2.s16]		// Player characters' corkscrew vertical running sprites
+				objA1.animation.sprite = u8[0x033f6c + D2.s16]		// Player characters' corkscrew vertical running sprites
 
-				D0 = u8[A1 + 0x22]
+				D0 = objA1.animation.sprite
 				SetCharacterSpritePatterns()
 				return
 			}
@@ -256,10 +255,9 @@ function void fn033cac()
 	u8[A1 + 0x2a] &= ~char.flag.ROLLING
 	objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
 	objA1.hitbox_extends.x = char.hitbox.x.UPRIGHT
-	u16[A1 + 0x20] = char.state.RUNNING2
+	objA1.state.both = char.state.RUNNING2
 	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
-	u8[A1 + 0x2e] &= ~0x40
-	u8[A1 + 0x2e] &= ~0x02
+	u8[A1 + 0x2e] &= ~(control_flag.DISABLE_WALLS | control_flag.DISABLE_ANIMATION)
 	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 }

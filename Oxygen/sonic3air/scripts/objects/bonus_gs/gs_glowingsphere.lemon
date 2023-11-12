@@ -148,7 +148,7 @@ function void fn04a4b4()
 //# address-hook(0x04a4f0) end(0x04a4f0)
 function void fn04a4f0()
 {
-	u8[A1 + 0x2e] &= 0xfc
+	u8[A1 + 0x2e] &= ~(control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	fn04a4f6()
 }
 
@@ -209,7 +209,7 @@ function void fn04a53a()
 			objA1.velocity.y = 0
 			u16[A1 + 0x1c] = 0x0800
 			objA1.state = char.state.ROLLING
-			u8[A1 + 0x2e] = 0x01
+			u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 			fn04a5e0()
 		}
 	}

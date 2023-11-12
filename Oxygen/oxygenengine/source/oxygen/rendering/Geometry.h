@@ -61,10 +61,10 @@ public:
 class SpriteGeometry : public Geometry
 {
 public:
-	SpriteGeometry(const SpriteManager::SpriteInfo& spriteInfo);
+	SpriteGeometry(const renderitems::SpriteInfo& spriteInfo);
 
 public:
-	const SpriteManager::SpriteInfo& mSpriteInfo;
+	const renderitems::SpriteInfo& mSpriteInfo;
 };
 
 
@@ -82,12 +82,13 @@ public:
 class TexturedRectGeometry : public Geometry
 {
 public:
-	inline TexturedRectGeometry(const Recti& rect, DrawerTexture& drawerTexture, const Color& color) : Geometry(Type::TEXTURED_RECT), mRect(rect), mDrawerTexture(drawerTexture), mColor(color) {}
+	inline TexturedRectGeometry(const Recti& rect, DrawerTexture& drawerTexture, const Color& tintColor, const Color& addedColor) : Geometry(Type::TEXTURED_RECT), mRect(rect), mDrawerTexture(drawerTexture), mTintColor(tintColor), mAddedColor(addedColor) {}
 
 public:
 	Recti mRect;
 	DrawerTexture& mDrawerTexture;
-	Color mColor;
+	Color mTintColor;
+	Color mAddedColor;
 };
 
 
@@ -119,7 +120,7 @@ public:
 		return mPlaneGeometryBuffer.createObject(activeRect, planeIndex, priorityFlag, scrollOffsets, renderQueue);
 	}
 
-	SpriteGeometry& createSpriteGeometry(const SpriteManager::SpriteInfo& spriteInfo)
+	SpriteGeometry& createSpriteGeometry(const renderitems::SpriteInfo& spriteInfo)
 	{
 		return mSpriteGeometryBuffer.createObject(spriteInfo);
 	}
@@ -129,9 +130,9 @@ public:
 		return mRectGeometryBuffer.createObject(rect, color);
 	}
 
-	TexturedRectGeometry& createTexturedRectGeometry(const Recti& rect, DrawerTexture& drawerTexture, const Color& color)
+	TexturedRectGeometry& createTexturedRectGeometry(const Recti& rect, DrawerTexture& drawerTexture, const Color& tintColor, const Color& addedColor)
 	{
-		return mTexturedRectGeometryBuffer.createObject(rect, drawerTexture, color);
+		return mTexturedRectGeometryBuffer.createObject(rect, drawerTexture, tintColor, addedColor);
 	}
 
 	EffectBlurGeometry& createEffectBlurGeometry(int blurValue)

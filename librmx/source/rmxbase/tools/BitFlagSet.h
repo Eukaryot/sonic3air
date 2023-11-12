@@ -44,10 +44,12 @@ public:
 	typedef typename rmx::detail::TypeBySize<sizeof(ENUM)>::Type Storage;
 
 public:
-	inline BitFlagSet() {}
+	inline BitFlagSet() : mFlags(0) {}
 	inline BitFlagSet(Enum value) : mFlags(static_cast<Storage>(value)) {}
 	inline BitFlagSet(Enum valueA, Enum valueB) : mFlags(static_cast<Storage>(valueA) | static_cast<Storage>(valueB)) {}
 	inline BitFlagSet(Enum valueA, Enum valueB, Enum valueC) : mFlags(static_cast<Storage>(valueA) | static_cast<Storage>(valueB) | static_cast<Storage>(valueC)) {}
+	inline BitFlagSet(Enum valueA, Enum valueB, Enum valueC, Enum valueD) : mFlags(static_cast<Storage>(valueA) | static_cast<Storage>(valueB) | static_cast<Storage>(valueC) | static_cast<Storage>(valueD)) {}
+	inline explicit BitFlagSet(Storage flags) : mFlags(flags) {}
 	inline BitFlagSet(const BitFlagSet& other) : mFlags(other.mFlags) {}
 
 	inline bool isSet(Enum flag) const
@@ -80,6 +82,11 @@ public:
 		mFlags |= static_cast<Storage>(flag);
 	}
 
+	inline void set(Storage flags)
+	{
+		mFlags |= flags;
+	}
+
 	inline void set(BitFlagSet bitmask)
 	{
 		mFlags |= bitmask.mFlags;
@@ -97,6 +104,11 @@ public:
 		}
 	}
 
+	inline void setOnly(Enum flag)
+	{
+		mFlags = static_cast<Storage>(flag);
+	}
+
 	inline void clearAll()
 	{
 		mFlags = 0;
@@ -105,6 +117,11 @@ public:
 	inline void clear(Enum flag)
 	{
 		mFlags &= ~static_cast<Storage>(flag);
+	}
+
+	inline void clear(Storage flags)
+	{
+		mFlags &= ~flags;
 	}
 
 	inline void clear(BitFlagSet bitmask)
@@ -136,3 +153,9 @@ public:
 private:
 	Storage mFlags = 0;   // Bitmask of the currently set flags, composed using bitwise OR
 };
+
+
+template<typename ENUM> BitFlagSet<ENUM> makeBitFlagSet(ENUM valueA)										{ return BitFlagSet<ENUM>(valueA); }
+template<typename ENUM> BitFlagSet<ENUM> makeBitFlagSet(ENUM valueA, ENUM valueB)							{ return BitFlagSet<ENUM>(valueA, valueB); }
+template<typename ENUM> BitFlagSet<ENUM> makeBitFlagSet(ENUM valueA, ENUM valueB, ENUM valueC)				{ return BitFlagSet<ENUM>(valueA, valueB, valueC); }
+template<typename ENUM> BitFlagSet<ENUM> makeBitFlagSet(ENUM valueA, ENUM valueB, ENUM valueC, ENUM valueD)	{ return BitFlagSet<ENUM>(valueA, valueB, valueC, valueD); }

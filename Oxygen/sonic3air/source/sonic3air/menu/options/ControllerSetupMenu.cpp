@@ -10,6 +10,8 @@
 #include "sonic3air/menu/options/ControllerSetupMenu.h"
 #include "sonic3air/menu/options/OptionsMenu.h"
 #include "sonic3air/menu/SharedResources.h"
+#include "sonic3air/resources/DynamicSprites.h"
+#include "sonic3air/ConfigurationImpl.h"
 
 #include "oxygen/application/Application.h"
 #include "oxygen/helper/DrawerHelper.h"
@@ -22,6 +24,7 @@ namespace
 	{
 		CONTROLLER_SELECT,
 		ASSIGN_ALL,
+		VISUAL_STYLE,
 		BUTTON_UP		= 0x10,
 		BUTTON_DOWN		= 0x11,
 		BUTTON_LEFT		= 0x12,
@@ -32,6 +35,8 @@ namespace
 		BUTTON_Y		= 0x17,
 		BUTTON_START	= 0x18,
 		BUTTON_BACK		= 0x19,
+		BUTTON_L		= 0x1a,
+		BUTTON_R		= 0x1b,
 		_BACK			= 0xff
 	};
 
@@ -61,12 +66,18 @@ void ControllerSetupMenu::fadeIn()
 {
 	mState = State::APPEAR;
 	refreshGamepadList(true);
+
+	mUsingControlsLR = InputManager::instance().isUsingControlsLR();
+	mMenuEntries.getEntryByData(::BUTTON_L)->setVisible(mUsingControlsLR);
+	mMenuEntries.getEntryByData(::BUTTON_R)->setVisible(mUsingControlsLR);
+
+	refreshControlsDisplay();
 }
 
 void ControllerSetupMenu::initialize()
 {
 	mMenuEntries.clear();
-	mMenuEntries.reserve(16);
+	mMenuEntries.reserve(20);
 	{
 		GameMenuEntry& entry = mMenuEntries.addEntry("", ::CONTROLLER_SELECT);
 		mControllerSelectEntry = &entry;
@@ -75,11 +86,21 @@ void ControllerSetupMenu::initialize()
 
 	mMenuEntries.addEntry("Assign all buttons", ::ASSIGN_ALL);
 
-	const constexpr size_t NUM_BUTTONS = (size_t)InputConfig::DeviceDefinition::Button::_NUM;
-	const char* buttonNames[NUM_BUTTONS] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back" };
-	for (size_t i = 0; i < NUM_BUTTONS; ++i)
+	for (size_t i = 0; i < InputConfig::DeviceDefinition::NUM_BUTTONS; ++i)
 	{
-		mMenuEntries.addEntry(buttonNames[i], ::BUTTON_UP + (uint32)i);
+		mMenuEntries.addEntry(InputConfig::DeviceDefinition::BUTTON_NAME[i], ::BUTTON_UP + (uint32)i);
+	}
+
+	{
+		GameMenuEntry& entry = mMenuEntries.addEntry("Visual Style", ::VISUAL_STYLE);
+		entry.addOption("XBox", 0);
+		entry.addOption("PS", 1);
+		entry.addOption("Switch", 2);
+		entry.mMarginAbove += 5;
+		entry.setSelectedIndexByValue(ConfigurationImpl::instance().mGamepadVisualStyle);
+
+		const bool isGamepad = (nullptr != getSelectedDevice() && getSelectedDevice()->mType == InputConfig::DeviceType::GAMEPAD);
+		entry.setVisible(isGamepad);
 	}
 
 	// Back button
@@ -100,6 +121,7 @@ void ControllerSetupMenu::keyboard(const rmx::KeyboardEvent& ev)
 			// Abort
 			mCurrentlyAssigningButtonIndex = -1;
 			mControlsBlocked = true;
+			refreshControlsDisplay();
 			return;
 		}
 
@@ -144,6 +166,7 @@ void ControllerSetupMenu::update(float timeElapsed)
 				// Abort
 				mCurrentlyAssigningButtonIndex = -1;
 				mControlsBlocked = true;
+				refreshControlsDisplay();
 			}
 			else if (device->mType == InputConfig::DeviceType::GAMEPAD)
 			{
@@ -189,6 +212,30 @@ void ControllerSetupMenu::update(float timeElapsed)
 					result = mAssignmentType.update();
 				}
 			}
+			else if (result == GameMenuEntries::UpdateResult::OPTION_CHANGED)
+			{
+				switch (mMenuEntries.selected().mData)
+				{
+					case ::CONTROLLER_SELECT:
+					{
+						const bool isGamepad = (nullptr != getSelectedDevice() && getSelectedDevice()->mType == InputConfig::DeviceType::GAMEPAD);
+						mMenuEntries.getEntryByData(::VISUAL_STYLE)->setVisible(isGamepad);
+						break;
+					}
+
+					case ::VISUAL_STYLE:
+					{
+						ConfigurationImpl::instance().mGamepadVisualStyle = mMenuEntries.selected().selected().mValue;
+						break;
+					}
+				}
+			}
+
+			if (result == GameMenuEntries::UpdateResult::ENTRY_CHANGED)
+			{
+				refreshControlsDisplay();
+			}
+
 			if (result != GameMenuEntries::UpdateResult::NONE)
 			{
 				GameMenuBase::playMenuSound(0x5b);
@@ -221,6 +268,7 @@ void ControllerSetupMenu::update(float timeElapsed)
 								InputManager::instance().getPressedGamepadInputs(mBlockedInputs, *getSelectedDevice());
 								++mMenuEntries.mSelectedEntryIndex;
 								GameMenuBase::playMenuSound(0x63);
+								refreshControlsDisplay();
 							}
 							break;
 						}
@@ -263,6 +311,7 @@ void ControllerSetupMenu::update(float timeElapsed)
 									InputManager::instance().getPressedGamepadInputs(mBlockedInputs, *getSelectedDevice());
 									GameMenuBase::playMenuSound(0x63);
 								}
+								refreshControlsDisplay();
 							}
 							break;
 						}
@@ -276,6 +325,9 @@ void ControllerSetupMenu::update(float timeElapsed)
 			}
 		}
 	}
+
+	// Scrolling
+	mScrolling.update(timeElapsed);
 
 	// Fading in/out
 	if (mState == State::APPEAR)
@@ -306,14 +358,17 @@ void ControllerSetupMenu::render()
 	GuiBase::render();
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
-	const Vec2i rectSize(350, 210);
 	const int anchorY = roundToInt((1.0f - mVisibility) * 120.0f);
-	const Recti rect(((int)mRect.width - rectSize.x) / 2, anchorY + ((int)mRect.height - rectSize.y) / 2, rectSize.x, rectSize.y);
+	const int startY = anchorY + 24 - mScrolling.getScrollOffsetYInt();
 	const float alpha = mVisibility;
 	const bool showEmptyMenu = mControllerSelectEntry->mOptions.empty();
 
-	const int baseX = rect.x + rect.width / 2;
-	int py = rect.y + 3;
+	const InputManager::RealDevice* device = getSelectedDevice();
+	const bool isGamepad = (nullptr != device && device->mType == InputConfig::DeviceType::GAMEPAD);
+	const int gamepadButtonStyle = clamp(ConfigurationImpl::instance().mGamepadVisualStyle, 0, 2);
+
+	const int baseX = 200;
+	int py = startY;
 	if (showEmptyMenu)
 	{
 		mMenuEntries.setSelectedIndexByValue(::_BACK);
@@ -338,11 +393,17 @@ void ControllerSetupMenu::render()
 	for (size_t line = 0; line < mMenuEntries.size(); ++line)
 	{
 		const auto& entry = mMenuEntries[line];
+		if (!entry.isVisible())
+			continue;
 		if (showEmptyMenu && entry.mData != ::_BACK)
 			continue;
 
 		const std::string& text = entry.mOptions.empty() ? entry.mText : entry.mOptions[entry.mSelectedIndex].mText;
 		const bool isSelected = ((int)line == mMenuEntries.mSelectedEntryIndex);
+		if (isSelected)
+		{
+			mScrolling.setCurrentSelection(py - startY - 30, py + 70 - startY);
+		}
 
 		Color color = isSelected ? Color::YELLOW : Color::WHITE;
 		color.a *= alpha;
@@ -351,13 +412,12 @@ void ControllerSetupMenu::render()
 		{
 			// Button entry
 			Font& font = global::mOxyfontSmall;
+			int px = isGamepad ? (baseX - 12) : baseX;
 
-			drawer.printText(font, Recti(baseX - 16, py, 0, 10), entry.mText, 6, color);
+			drawer.printText(font, Recti(px - 16, py, 0, 10), entry.mText, 6, color);
 
-			const InputManager::RealDevice* device = getSelectedDevice();
 			if (nullptr != device)
 			{
-				InputManager& inputManager = InputManager::instance();
 				const size_t buttonIndex = entry.mData - 0x10;
 				RMX_ASSERT(buttonIndex < device->mControlMappings.size(), "Invalid button index " << buttonIndex);
 				if (buttonIndex < device->mControlMappings.size())	// It's unclear how, but an invalid index is possible and led to crashes for some players
@@ -413,6 +473,12 @@ void ControllerSetupMenu::render()
 						drawer.printText(font, Recti(baseX + 16, py, 0, 10), assignmentsString1, 4, cyanColor);
 						drawer.printText(font, Recti(baseX + 16 + font.getWidth(assignmentsString1), py, 0, 10), assignmentsString2, 4, color);
 					}
+
+					if (isGamepad && buttonIndex < 12)
+					{
+						const uint64 spriteKey = DynamicSprites::getGamepadSpriteKey(buttonIndex, gamepadButtonStyle);
+						drawer.drawSprite(Vec2i(px - 3, py + 4), spriteKey, Color(1.0f, 1.0f, 1.0f, alpha));
+					}
 				}
 			}
 
@@ -421,7 +487,7 @@ void ControllerSetupMenu::render()
 				// Assignment type selection
 				const auto& entry = mAssignmentType.selected();
 
-				const int center = baseX - 92;
+				const int center = px - 100;
 				const std::string& text = entry.selected().mText;
 				drawer.printText(font, Recti(center, py, 0, 10), text, 5, color);
 
@@ -436,13 +502,13 @@ void ControllerSetupMenu::render()
 					drawer.printText(font, Recti(center + arrowDistance, py, 0, 10), ">", 5, color);
 			}
 
-			py += 12;
+			py += isGamepad ? 17 : 13;
 		}
 		else if (entry.mOptions.empty())
 		{
 			// Entry without options
 			py += (entry.mData == ::_BACK) ? 10 : 4;
-			drawer.printText(global::mOxyfontRegular, Recti(rect.x, py, rect.width, 10), text, 5, color);
+			drawer.printText(global::mOxyfontRegular, Recti(0, py, 400, 10), text, 5, color);
 
 			if (isSelected)
 			{
@@ -459,7 +525,7 @@ void ControllerSetupMenu::render()
 		else
 		{
 			// It's an actual options entry, with multiple options to choose from
-			py += 4;
+			py += 4 + entry.mMarginAbove;
 			Font& font = global::mOxyfontRegular;
 
 			const bool canGoLeft  = (entry.mSelectedIndex > 0);
@@ -473,8 +539,12 @@ void ControllerSetupMenu::render()
 				arrowDistance += ((offset > 3) ? (6 - offset) : offset);
 			}
 
-			// Description
-			drawer.printText(font, Recti(baseX - 40, py, 0, 10), entry.mText, 6, color);
+			if (!entry.mText.empty())
+			{
+				// Description
+				drawer.printText(font, Recti(baseX - 40, py, 0, 10), entry.mText, 6, color);
+				arrowDistance -= 50;
+			}
 
 			// Value text
 			{
@@ -489,6 +559,11 @@ void ControllerSetupMenu::render()
 
 			py += (line == 0) ? 20 : 16;
 		}
+	}
+
+	if (ConfigurationImpl::instance().mShowControlsDisplay)
+	{
+		mGameMenuControlsDisplay.render(drawer, alpha);
 	}
 
 	drawer.performRendering();
@@ -561,6 +636,7 @@ void ControllerSetupMenu::onAssignmentDone(const InputManager::RealDevice& devic
 		mCurrentlyAssigningButtonIndex = -1;
 		if (mAssignAll)
 			++mMenuEntries.mSelectedEntryIndex;
+		refreshControlsDisplay();
 	}
 	mControlsBlocked = true;
 }
@@ -606,4 +682,42 @@ void ControllerSetupMenu::refreshGamepadList(bool forceUpdate)
 		}
 		entry.setSelectedIndexByValue(oldValue);
 	}
+}
+
+void ControllerSetupMenu::refreshControlsDisplay()
+{
+	mGameMenuControlsDisplay.clear();
+
+	if (mCurrentlyAssigningButtonIndex >= 0)
+	{
+		mGameMenuControlsDisplay.addControl("Clear", false, "input_icon_key_esc");
+	}
+	else
+	{
+		const GameMenuEntry& selectedEntry = mMenuEntries.selected();
+		switch (selectedEntry.mData)
+		{
+			case ::CONTROLLER_SELECT:
+				mGameMenuControlsDisplay.addControl("Select Keyboard or Gamepad", false, "@input_icon_button_left", "@input_icon_button_right");
+				break;
+
+			case ::ASSIGN_ALL:
+				mGameMenuControlsDisplay.addControl("Assign all", false, "@input_icon_button_A");
+				break;
+
+			case ::VISUAL_STYLE:
+				mGameMenuControlsDisplay.addControl("Change visual style", false, "@input_icon_button_left", "@input_icon_button_right");
+				break;
+
+			default:
+				if ((selectedEntry.mData & 0xf0) == 0x10)
+				{
+					mGameMenuControlsDisplay.addControl("Select", false, "@input_icon_button_A");
+					mGameMenuControlsDisplay.addControl("Assignment mode", false, "@input_icon_button_left", "@input_icon_button_right");
+				}
+				break;
+		}
+	}
+
+	mGameMenuControlsDisplay.addControl("Back",	true, "@input_icon_button_B");
 }

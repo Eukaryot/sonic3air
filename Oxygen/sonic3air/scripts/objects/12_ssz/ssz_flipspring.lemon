@@ -153,7 +153,7 @@ function void fn046536()
 		}
 		u16[A1 + 0x1c] = D1.u16
 		objA1.velocity.x = D1.u16
-		u8[A1 + 0x2a] &= 0xfe
+		u8[A1 + 0x2a] &= ~0x01
 		u8[A1 + 0x2a] |= D2.u8
 		objA1.render_flags &= ~render_flag.FLIP_X
 		objA1.render_flags |= D2.u8

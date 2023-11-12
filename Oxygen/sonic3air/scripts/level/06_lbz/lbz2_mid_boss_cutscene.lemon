@@ -47,7 +47,7 @@ function void fn08d2b6()
 				u8[A1 + 0x0a] |= 0x80
 				objA1.state = char.state.STANDING
 				objA1.flags2a &= ~char.flag.FACING_LEFT
-				u8[A1 + 0x2e] = 0x83
+				u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 
 				playSound(0xd0)
 
@@ -315,13 +315,13 @@ function void fn08d53e()
 	// Special treatment for Knuckles
 	if (D0 == CHARACTER_KNUCKLES)
 	{
-		u8[A1 + 0x22] = 0x56		// Knuckles' standing sprite
+		objA1.animation.sprite = 0x56		// Knuckles' standing sprite
 		D0 = 0
 	}
 	else
 #endif
 	{
-		u8[A1 + 0x22] = u8[0x08d55c + D0.u16]		// Sonic/Tails' standing sprites
+		objA1.animation.sprite = u8[0x08d55c + D0.u16]		// Sonic/Tails' standing sprites
 	}
 
 	A2 = 0xffff0000 + u16[0x08d55e + D0.u16 * 2]

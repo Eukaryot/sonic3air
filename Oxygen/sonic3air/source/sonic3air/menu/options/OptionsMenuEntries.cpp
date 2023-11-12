@@ -19,6 +19,7 @@
 #include "sonic3air/version.inc"
 
 #include "oxygen/application/Application.h"
+#include "oxygen/application/modding/Mod.h"
 #include "oxygen/download/Downloader.h"
 
 
@@ -34,6 +35,18 @@ namespace
 			cachedBuildString.format("v%02x.%02x.%02x.%x", (buildNumber >> 24) & 0xff, (buildNumber >> 16) & 0xff, (buildNumber >> 8) & 0xff, buildNumber & 0xff);
 		}
 		return cachedBuildString;
+	}
+
+	float moveTowards(float value, float target, float maxStep)
+	{
+		if (value != target)
+		{
+			if (value < target)
+				return std::min(value + maxStep, target);
+			else
+				return std::max(value - maxStep, target);
+		}
+		return value;
 	}
 }
 
@@ -63,19 +76,19 @@ void TitleMenuEntry::renderEntry(RenderContext& renderContext_)
 }
 
 
-SectionMenuEntry::SectionMenuEntry()
+ModTitleMenuEntry::ModTitleMenuEntry()
 {
 	mMenuEntryType = MENU_ENTRY_TYPE;
-	setInteractable(false);
 }
 
-SectionMenuEntry& SectionMenuEntry::initEntry(const std::string& text)
+ModTitleMenuEntry& ModTitleMenuEntry::initEntry(const Mod& mod)
 {
-	mText = text;
+	mMod = &mod;
+	mText = mod.mDisplayName;
 	return *this;
 }
 
-void SectionMenuEntry::renderEntry(RenderContext& renderContext_)
+void ModTitleMenuEntry::renderEntry(RenderContext& renderContext_)
 {
 	OptionsMenuRenderContext& renderContext = renderContext_.as<OptionsMenuRenderContext>();
 	Drawer& drawer = *renderContext.mDrawer;
@@ -83,13 +96,23 @@ void SectionMenuEntry::renderEntry(RenderContext& renderContext_)
 	int& py = renderContext.mCurrentPosition.y;
 	const float alpha = renderContext.mTabAlpha;
 
+	const bool isSelected = renderContext.mIsSelected;
+	const bool isActive = (mSelectedIndex > 0);
+	const Color color = isSelected ? Color(1.0f, 1.0f, 0.0f, alpha) : Color(0.7f, 1.0f, 0.9f, alpha);
+
+	const float targetIndent = isActive ? 20.0f : 30.0f;
+	if (mIndent == 0.0f)
+		mIndent = targetIndent;
+	mIndent = moveTowards(mIndent, targetIndent, renderContext.mDeltaSeconds * 250.0f);
+	const int indent = roundToInt(mIndent);
+
 	py += 14;
 	const int textWidth = global::mOxyfontRegular.getWidth(mText);
-	drawer.printText(global::mOxyfontRegular, Recti(baseX - 140, py, 0, 10), mText, 4, Color(0.7f, 1.0f, 0.9f, alpha));
-	drawer.drawRect(Recti(baseX - 185, py + 4, 40, 1), Color(0.7f, 1.0f, 0.9f, alpha));
-	drawer.drawRect(Recti(baseX - 184, py + 5, 40, 1), Color(0.0f, 0.0f, 0.0f, alpha * 0.75f));
-	drawer.drawRect(Recti(baseX - 135 + textWidth, py + 4, 320 - textWidth, 1), Color(0.7f, 1.0f, 0.9f, alpha));
-	drawer.drawRect(Recti(baseX - 134 + textWidth, py + 5, 320 - textWidth, 1), Color(0.0f, 0.0f, 0.0f, alpha * 0.75f));
+	drawer.printText(global::mOxyfontRegular, Recti(baseX - 180 + indent, py, 0, 10), mText, 4, color);
+	drawer.drawRect(Recti(baseX - 185, py + 4, indent, 1), color);
+	drawer.drawRect(Recti(baseX - 184, py + 5, indent, 1), Color(0.0f, 0.0f, 0.0f, alpha * 0.75f));
+	drawer.drawRect(Recti(baseX - 175 + textWidth + indent, py + 4, 360 - textWidth - indent, 1), color);
+	drawer.drawRect(Recti(baseX - 174 + textWidth + indent, py + 5, 360 - textWidth - indent, 1), Color(0.0f, 0.0f, 0.0f, alpha * 0.75f));
 	py += 7;
 }
 
@@ -352,9 +375,6 @@ void SoundtrackDownloadMenuEntry::renderEntry(RenderContext& renderContext_)
 
 			case RemasteredMusicDownload::State::DOWNLOAD_RUNNING:
 				text = "Downloading... " + std::to_string(download.getBytesDownloaded() / (1024*1024)) + " MB";
-			#if defined(PLATFORM_ANDROID)
-				text += "  (Wi-fi required)";
-			#endif
 				mText = "Stop download";
 				break;
 

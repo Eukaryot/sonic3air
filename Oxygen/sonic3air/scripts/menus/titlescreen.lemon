@@ -291,7 +291,7 @@ function void TitleScreen()
 	D0 = 1
 	fn00440c()
 
-	global.demo_countdown = (global.region_code & 0x40) ? 750 : 900		// 12.5 seconds / 15 seconds 
+	global.demo_countdown = (global.region_code & 0x40) ? 750 : 900		// 12.5 seconds / 15 seconds
 #if STANDALONE
 	// Slightly increase the wait time until demo starts
 	global.demo_countdown += 20
@@ -806,28 +806,16 @@ function void fn004a5c()
 function void fn004a88()
 {
 	D2 = titlescreen.selection
+	u8 maxMenuSelection = (levelselect.unlocked) ? 2 : 1
 
 	D0.u8 = (control.pad1.pressed | control.pad2.pressed)
 	if (D0 & CONTROL_UP)
 	{
-		--D2.u8
-		if (D2.s8 < 0)
-		{
-			D2.u8 = (levelselect.unlocked) ? 2 : 1
-		}
+		D2.u8 = (D2.u8 > 0) ? (D2.u8 - 1) : maxMenuSelection
 	}
 	if (D0 & CONTROL_DOWN)
 	{
-		++D2.u8
-		if (levelselect.unlocked)
-		{
-			if (D2.u8 >= 3)
-				D2 = 0
-		}
-		else
-		{
-			D2.u8 &= 0x01
-		}
+		D2.u8 = (D2.u8 < maxMenuSelection) ? (D2.u8 + 1) : 0
 	}
 
 	objA0.animation.sprite = D2.u8

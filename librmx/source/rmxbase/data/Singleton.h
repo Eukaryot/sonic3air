@@ -21,7 +21,7 @@ public:
 
 	static bool valid()
 	{
-		return (mInstance != nullptr);
+		return (nullptr != mInstance);
 	}
 
 	static CLASS& instance()

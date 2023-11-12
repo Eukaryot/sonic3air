@@ -361,8 +361,8 @@ void ExtrasMenu::render()
 		if (!showExtrasMenuTabContent(tabIndex))
 		{
 			const char* text2 = EngineMain::getDelegate().useDeveloperFeatures() ? "because Dev Mode is active" : "because Debug Mode is active";
-			drawer.printText(global::mSonicFontB, Recti(baseX, py + 22, 0, 0), "Achievements are locked", 5, Color(1.0f, 0.75f, 0.5f, alpha));
-			drawer.printText(global::mSonicFontB, Recti(baseX, py + 35, 0, 0), text2, 5, Color(1.0f, 0.75f, 0.5f, alpha));
+			drawer.printText(global::mSonicFontB, Vec2i(baseX, py + 22), "Achievements are locked", 5, Color(1.0f, 0.75f, 0.5f, alpha));
+			drawer.printText(global::mSonicFontB, Vec2i(baseX, py + 35), text2, 5, Color(1.0f, 0.75f, 0.5f, alpha));
 
 			if (mTailsYawning.getWidth() == 0)
 			{

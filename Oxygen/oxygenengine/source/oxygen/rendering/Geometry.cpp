@@ -21,7 +21,7 @@ PlaneGeometry::PlaneGeometry(const Recti& activeRect, int planeIndex, bool prior
 }
 
 
-SpriteGeometry::SpriteGeometry(const SpriteManager::SpriteInfo& spriteInfo) :
+SpriteGeometry::SpriteGeometry(const renderitems::SpriteInfo& spriteInfo) :
 	Geometry(Type::SPRITE),
 	mSpriteInfo(spriteInfo)
 {

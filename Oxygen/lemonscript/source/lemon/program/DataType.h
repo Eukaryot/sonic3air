@@ -135,17 +135,16 @@ namespace lemon
 		inline static const VoidDataType VOID		  = VoidDataType();
 		inline static const AnyDataType ANY			  = AnyDataType();
 
-		inline static const IntegerDataType UINT_8	  = IntegerDataType("u8",  2, 1, IntegerDataType::Semantics::DEFAULT, false, BaseType::UINT_8);
-		inline static const IntegerDataType UINT_16	  = IntegerDataType("u16", 3, 2, IntegerDataType::Semantics::DEFAULT, false, BaseType::UINT_16);
-		inline static const IntegerDataType UINT_32	  = IntegerDataType("u32", 4, 4, IntegerDataType::Semantics::DEFAULT, false, BaseType::UINT_32);
-		inline static const IntegerDataType UINT_64	  = IntegerDataType("u64", 5, 8, IntegerDataType::Semantics::DEFAULT, false, BaseType::UINT_64);
-		inline static const IntegerDataType INT_8	  = IntegerDataType("s8",  6, 1, IntegerDataType::Semantics::DEFAULT, true,  BaseType::INT_8);
-		inline static const IntegerDataType INT_16	  = IntegerDataType("s16", 7, 2, IntegerDataType::Semantics::DEFAULT, true,  BaseType::INT_16);
-		inline static const IntegerDataType INT_32	  = IntegerDataType("s32", 8, 4, IntegerDataType::Semantics::DEFAULT, true,  BaseType::INT_32);
-		inline static const IntegerDataType INT_64	  = IntegerDataType("s64", 9, 8, IntegerDataType::Semantics::DEFAULT, true,  BaseType::INT_64);
+		inline static const IntegerDataType BOOL	  = IntegerDataType("bool", 2, 1, IntegerDataType::Semantics::BOOLEAN, false, BaseType::UINT_8);	// Using the same ID as u8, to not break overriding from before introduction of bool
+		inline static const IntegerDataType UINT_8	  = IntegerDataType("u8",   2, 1, IntegerDataType::Semantics::DEFAULT, false, BaseType::UINT_8);
+		inline static const IntegerDataType UINT_16	  = IntegerDataType("u16",  3, 2, IntegerDataType::Semantics::DEFAULT, false, BaseType::UINT_16);
+		inline static const IntegerDataType UINT_32	  = IntegerDataType("u32",  4, 4, IntegerDataType::Semantics::DEFAULT, false, BaseType::UINT_32);
+		inline static const IntegerDataType UINT_64	  = IntegerDataType("u64",  5, 8, IntegerDataType::Semantics::DEFAULT, false, BaseType::UINT_64);
+		inline static const IntegerDataType INT_8	  = IntegerDataType("s8",   6, 1, IntegerDataType::Semantics::DEFAULT, true,  BaseType::INT_8);
+		inline static const IntegerDataType INT_16	  = IntegerDataType("s16",  7, 2, IntegerDataType::Semantics::DEFAULT, true,  BaseType::INT_16);
+		inline static const IntegerDataType INT_32	  = IntegerDataType("s32",  8, 4, IntegerDataType::Semantics::DEFAULT, true,  BaseType::INT_32);
+		inline static const IntegerDataType INT_64	  = IntegerDataType("s64",  9, 8, IntegerDataType::Semantics::DEFAULT, true,  BaseType::INT_64);
 		inline static const IntegerDataType CONST_INT = IntegerDataType("const_int", 10, 8, IntegerDataType::Semantics::CONSTANT, true, BaseType::INT_CONST);
-		//inline static const IntegerDataType BOOL	  = IntegerDataType("bool", 1, IntegerDataType::Semantics::BOOLEAN, false, BaseType::UINT_8);
-		inline static const IntegerDataType& BOOL	  = UINT_8;
 
 		inline static const FloatDataType& FLOAT	  = FloatDataType("float", 11, 4);
 		inline static const FloatDataType& DOUBLE	  = FloatDataType("double", 12, 8);

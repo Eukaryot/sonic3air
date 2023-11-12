@@ -60,7 +60,7 @@ function void fn040474()
 					objA1.flags2a &= ~char.flag.CONTROL_LOCK
 					u8[A1 + 0x2f] = 0
 					u8[A1 + 0x40] = 0
-					u8[A1 + 0x2e] = 0x81
+					u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 					objA1.velocity.x = 0
 				}
 			}

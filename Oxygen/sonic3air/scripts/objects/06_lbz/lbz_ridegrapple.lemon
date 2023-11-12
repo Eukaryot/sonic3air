@@ -190,8 +190,8 @@ function void fn026768()
 		D0.s8 = -D0.s8
 	D0.u8 += 8
 	D0.u16 >>= 4
-	u8[A1 + 0x22] = u8[0x026794 + D0.u16]		// Player characters' hanging sprites
-	D0 = u8[A1 + 0x22]
+	objA1.animation.sprite = u8[0x026794 + D0.u16]		// Player characters' hanging sprites
+	D0 = objA1.animation.sprite
 
 	u32 backupA2 = A2
 	SetCharacterSpritePatterns()
@@ -229,7 +229,7 @@ function void fn0267a4()
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16 + 0x24
 			objA1.state = char.state.HANGING
-			u8[A1 + 0x2e] = 0x03
+			u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 			u8[A1 + 0x3d] = 0
 
 			u8[A2] = 1

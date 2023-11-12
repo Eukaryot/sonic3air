@@ -260,3 +260,37 @@ void ScrollOffsetsManager::setVerticalScrollOffsetBias(int16 bias)
 {
 	mVerticalScrollOffsetBias = bias;
 }
+
+void ScrollOffsetsManager::serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion)
+{
+	serializer.serializeAs<uint8>(mVerticalScrolling);
+	serializer.serialize(mHorizontalScrollMask);
+
+	if (formatVersion >= 2)
+	{
+		serializer.serialize(mHorizontalScrollTableBase);
+	}
+
+	if (formatVersion >= 4)
+	{
+		for (int k = 0; k < 4; ++k)
+		{
+			ScrollOffsetSet& set = mSets[k];
+			for (int i = 0; i < 0x100; ++i)
+			{
+				serializer.serialize(set.mScrollOffsetsH[i]);
+				serializer.serialize(set.mExplicitOverwriteH[i]);
+			}
+			for (int i = 0; i < 0x20; ++i)
+			{
+				serializer.serialize(set.mScrollOffsetsV[i]);
+				serializer.serialize(set.mExplicitOverwriteV[i]);
+			}
+			serializer.serialize(set.mHorizontalScrollNoRepeat);
+		}
+
+		serializer.serializeAs<int16>(mScrollOffsetW.x);
+		serializer.serializeAs<int16>(mScrollOffsetW.y);
+		serializer.serialize(mVerticalScrollOffsetBias);
+	}
+}

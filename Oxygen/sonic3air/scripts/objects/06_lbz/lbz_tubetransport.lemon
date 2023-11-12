@@ -447,7 +447,7 @@ function void fn02a106()
 		}
 
 		u8[A2] += 2
-		u8[A1 + 0x2e] = 0x83
+		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 		u8[A1 + 0x20] = 0
 		u8[A1 + 0x40] = 0
 		objA1.velocity.x = 0
@@ -489,11 +489,11 @@ function void fn02a106()
 	#endif
 		{
 			D0 = objA0.value26
-			u8[A1 + 0x22] = u8[0x02a218 + D0.u16]		// Player characters' spinning standing sprites
+			objA1.animation.sprite = u8[0x02a218 + D0.u16]		// Player characters' spinning standing sprites
 			objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 			D0.u8 = u8[0x02a224 + D0.u16]
 			objA1.render_flags |= D0.u8
-			D0 = u8[A1 + 0x22]
+			D0 = objA1.animation.sprite
 
 			u32 backupA2 = A2
 			SetCharacterSpritePatterns()

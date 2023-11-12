@@ -184,7 +184,6 @@ function void UpdateLevelScrolling.DEZ_Boss()
 {
 	#if STANDALONE
 		// Draw our own widescreen version of the background
-		Renderer.enforceClearScreen(true)
 		Renderer.enableDefaultPlane(0, false)
 		Renderer.drawCustomSprite("bg_dez2", getScreenExtend() - 40, 0, 0, SPRITE_FLAG_FULLY_OPAQUE, 0x1100)	// Draw fully opaque
 

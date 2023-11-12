@@ -65,17 +65,14 @@ void RenderVdpSpriteShader::refresh(const Vec2i& gameResolution, int waterSurfac
 	mInitialized = true;
 }
 
-void RenderVdpSpriteShader::draw(const SpriteManager::VdpSpriteInfo& spriteInfo, const OpenGLRenderResources& resources)
+void RenderVdpSpriteShader::draw(const renderitems::VdpSpriteInfo& spriteInfo, const OpenGLRenderResources& resources)
 {
 	const PaletteManager& paletteManager = resources.mRenderParts.getPaletteManager();
 	Vec4f tintColor = spriteInfo.mTintColor;
 	Vec4f addedColor = spriteInfo.mAddedColor;
 	if (spriteInfo.mUseGlobalComponentTint)
 	{
-		tintColor.r *= paletteManager.getGlobalComponentTintColor().r;
-		tintColor.g *= paletteManager.getGlobalComponentTintColor().g;
-		tintColor.b *= paletteManager.getGlobalComponentTintColor().b;
-		tintColor.a *= paletteManager.getGlobalComponentTintColor().a;
+		tintColor *= paletteManager.getGlobalComponentTintColor();
 		addedColor += paletteManager.getGlobalComponentAddedColor();
 	}
 

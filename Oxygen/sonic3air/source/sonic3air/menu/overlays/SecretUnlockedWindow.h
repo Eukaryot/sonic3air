@@ -41,17 +41,17 @@ private:
 	void showInternal(Entry& entry);
 
 private:
-	enum Phase
+	enum class Phase
 	{
-		PHASE_NONE,
-		PHASE_TITLE_APPEAR,
-		PHASE_TITLE_SHOW,
-		PHASE_CONTENT_APPEAR,
-		PHASE_CONTENT_SHOW,
-		PHASE_DISAPPEAR
+		NONE,
+		TITLE_APPEAR,
+		TITLE_SHOW,
+		CONTENT_APPEAR,
+		CONTENT_SHOW,
+		DISAPPEAR
 	};
 
-	Phase mPhase = PHASE_NONE;
+	Phase mPhase = Phase::NONE;
 	float mPhaseTimer = 0.0f;	// Between 0.0f and 1.0f
 
 	std::list<Entry> mEnqueuedEntries;

@@ -306,6 +306,11 @@ function void fn018466()
 		}
 		objA1.position.x.u16 += D0.u16
 		objA1.position.y.u16 = u16[A2 + 0x14]
+	#if STANDALONE
+		// Moves Knuckles' respiratory system back into his mouth, #contributed by iCloudius
+		if (u8[A2 + 0x38] == CHARACTER_KNUCKLES)
+			objA1.position.y.u16 -= 5
+	#endif
 		u32[A1 + 0x40] = u32[A0 + 0x40]
 		u8[A1 + 0x2c] = 6
 		if (u16[A0 + 0x30] != 0)

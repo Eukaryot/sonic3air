@@ -24,7 +24,7 @@ function void Toxomister.PostInit()
 {
 	setupObjectAttributesFull(0x09002e)
 
-	objA0.update_address = 0x08fd76
+	objA0.update_address = addressof(Toxomister.Update)
 	objA0.render_flags |= render_flag.COMPOUND
 	objA0.compound.count = 0x01
 
@@ -68,7 +68,7 @@ function void fn08fda0()
 //# address-hook(0x08fdb0) end(0x08fdb6)
 function void fn08fdb0()
 {
-	objA0.update_address = 0x08fd76
+	objA0.update_address = addressof(Toxomister.Update)
 	fn08ff72()
 }
 

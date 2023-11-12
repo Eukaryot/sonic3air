@@ -277,7 +277,10 @@ namespace opengldrawer
 					shader.setParam("Transform", rectParam);
 					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
 					if (needsTintColor)
+					{
 						shader.setParam("TintColor", color);
+						shader.setParam("AddedColor", Color::TRANSPARENT);
+					}
 
 					OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
 				}

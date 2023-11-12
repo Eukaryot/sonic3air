@@ -16,12 +16,13 @@
 //# alias(fn08e17e) deprecated
 function void Cluckoid.Init()
 {
-	Object.InitWithUpdateAddress(0x08e184)
+	Object.InitWithUpdateAddress(addressof(Cluckoid.BaseUpdate))
 }
 
 
 //# address-hook(0x08e184) end(0x08e19c)
-function void fn08e184()
+//# alias(fn08e184) deprecated
+function void Cluckoid.BaseUpdate()
 {
 	// Targets:
 	//  - 0x08e1aa	-> objA0.base_state = 0x00
@@ -206,7 +207,7 @@ function void fn08e250()
 
 		if (D1.u8 == 0x03)
 		{
-			objA0.update_address = 0x03dbe0
+			objA0.update_address = addressof(MHZSingleLeaf.Type2)
 			u16[A0 + 0x34] = 0x02
 		}
 

@@ -34,16 +34,31 @@ function void Renderer.drawCustomSpriteWithTransform(u64 key, s16 px, s16 py, u8
 	Renderer.drawCustomSpriteTransformed(key, px, py, atex, flags, renderQueue, tintColor, transform11, transform12, transform21, transform22)
 }
 
+function void Renderer.enforceClearScreen(u8 enabled)
+{
+	// Obsolete as the screen gets cleared each frame now anyways
+}
+
 function void debugDrawRect(s32 px, s32 py, s32 width, s32 height)
 {
-	Debug.drawRect(px, py, width, height)
+	Renderer.drawRect(px, py, width, height, 0xff00ffc0, 0xffff, true)
 }
 
 function void debugDrawRect(s32 px, s32 py, s32 width, s32 height, u32 color)
 {
 	// Convert color from 0xAABBGGRR to 0xRRGGBBAA
 	color = convertColors32(color)
-	Debug.drawRect(px, py, width, height, color)
+	Renderer.drawRect(px, py, width, height, color, 0xffff, true)
+}
+
+function void Debug.drawRect(s32 px, s32 py, s32 width, s32 height)
+{
+	Renderer.drawRect(px, py, width, height, 0xff00ffc0, 0xffff, true)
+}
+
+function void Debug.drawRect(s32 px, s32 py, s32 width, s32 height, u32 color)
+{
+	Renderer.drawRect(px, py, width, height, color, 0xffff, true)
 }
 
 function void Game.onScreenFadedOutBeforeDataSelect()

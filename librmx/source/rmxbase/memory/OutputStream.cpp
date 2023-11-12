@@ -74,7 +74,7 @@ void DynOutputStream::AccessPage(int pageIndex)
 	for (int i = (int)mPages.size(); i <= pageIndex; ++i)
 		mPages.push_back(nullptr);
 
-	if (mPages[pageIndex] == nullptr)
+	if (nullptr == mPages[pageIndex])
 		mPages[pageIndex] = new uint8[mPageSize];
 
 	mCursor = mPages[pageIndex];

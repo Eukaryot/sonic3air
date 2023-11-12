@@ -124,12 +124,6 @@ function void UpdateLevelScrolling.CNZ1()
 		// Prevent background blur by drawing the background plane at a higher render queue
 		Renderer.enableDefaultPlane(0, false)
 		Renderer.setupPlane(0, 0, getScreenWidth(), getScreenHeight(), 0x00, 0, 0x1800)
-
-		if (level.scrolling_routine >= 0x0c)
-		{
-			// Prevent a small glitch in the right wall, where screen won't be drawn at all
-			Renderer.enforceClearScreen(true)
-		}
 	}
 #endif
 }

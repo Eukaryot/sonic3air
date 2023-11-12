@@ -408,6 +408,9 @@ function void fn0309cc()
 	objA0.sprite_priority = 0x0200
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x04
+#if STANDALONE
+	objA0.box_size.y = 0x10
+#endif
 
 	D0.u16 = ((objA0.subtype2c & 0x0f) + 8) << 4
 	u16[A0 + 0x36] = D0.u16
@@ -466,7 +469,7 @@ function void fn030a38()
 		if (u8[A1 + 0x27] == 0)
 		{
 			u8[A1 + 0x27] = 0x01
-			u8[A1 + 0x20] = char.state.RUNNING
+			objA1.state = char.state.RUNNING
 			u8[A1 + 0x30] = 0x7f		// "char.rotation.x.count"
 			u8[A1 + 0x31] = 0x08		// "char.rotation.x.speed"
 		}

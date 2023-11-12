@@ -43,7 +43,7 @@ public:
 			SAFE_DELETE(mPointer);
 	}
 
-	bool valid() const			{ return mPointer != nullptr; }
+	bool valid() const			{ return nullptr != mPointer; }
 
 	CLASS& operator*() const	{ return *mPointer; }
 	operator CLASS*() const		{ return mPointer; }

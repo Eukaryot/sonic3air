@@ -90,12 +90,12 @@ namespace
 
 	void InitMiniDumpWriter()
 	{
-		if (s_hDbgHelpMod != nullptr)
+		if (nullptr != s_hDbgHelpMod)
 			return;
 
 		// Initialize the member, so we do not load the DLL after the exception has occured which might be not possible anymore...
 		s_hDbgHelpMod = LoadLibraryA("dbghelp.dll");
-		if (s_hDbgHelpMod != nullptr)
+		if (nullptr != s_hDbgHelpMod)
 			s_pMDWD = (tMDWD)GetProcAddress(s_hDbgHelpMod, "MiniDumpWriteDump");
 
 		// Register the unhandled exception filter

@@ -411,7 +411,7 @@ bool TCPSocket::connectTo(const std::string& serverAddress, uint16 serverPort)
 	}
 
 	// Try all addresses until one of them works
-	for (addrinfo* ptr = addressInfos; ptr != nullptr; ptr = ptr->ai_next)
+	for (addrinfo* ptr = addressInfos; nullptr != ptr; ptr = ptr->ai_next)
 	{
 		// Create a socket
 		int result = (int)::socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);

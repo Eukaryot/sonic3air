@@ -120,7 +120,7 @@ function void fn039502()
 	if (D0 != 0 && D0.u8 != u8[A0 + 0x36])
 	{
 		u8[A0 + 0x36] = D0.u8
-		u8[A2 + 0x2e] = 0x03	// Change "char.control_flags" to prevent jumping
+		u8[A2 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)	// Change "char.control_flags" to prevent jumping
 		objA0.update_address = 0x0395fe
 		u16[A0 + 0x34] = 0
 	}
@@ -199,7 +199,7 @@ function void fn0395fe()
 	{
 		u8[A2 + 0x46] = 0x0e
 		u8[A2 + 0x47] = 0x0f
-		u8[A2 + 0x2e] = 0x02
+		u8[A2 + 0x2e] = control_flag.DISABLE_ANIMATION
 		objA0.update_address = 0x0394a0
 	}
 
@@ -257,9 +257,9 @@ function void fn0396e4()
 	objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 	objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 	objA1.state = char.state.ROLLING
-	u8[A1 + 0x22] = 0
+	objA1.animation.sprite = 0
 	objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
-	u8[A1 + 0x2e] = 0x03
+	u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	u8[A1 + 0x40] = 0
 
 	player1.control_override = 1
@@ -353,7 +353,7 @@ function void fn0397d2()
 	if (u16[A2 + 0x10] >= 0x0184)
 	{
 		u8[A2 + 0x22] = 0
-		u8[A2 + 0x2e] = 0x02
+		u8[A2 + 0x2e] = control_flag.DISABLE_ANIMATION
 		if (allocDynamicObjectAfterA0())
 		{
 			// Spawn Sonic snowboarding

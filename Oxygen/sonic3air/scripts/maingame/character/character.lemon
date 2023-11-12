@@ -248,7 +248,7 @@ function void Character.UpdateNormalState.Sonic()
 		control.player1 = control.pad1
 	}
 
-	if (char.control_flags & 0x01)
+	if (char.control_flags & control_flag.DISABLE_UPDATE)
 	{
 		// Character is not directly controllable (but may be indirectly via an object, like when hanging on a pole or similar)
 		char.double_jump_state = 0
@@ -258,10 +258,10 @@ function void Character.UpdateNormalState.Sonic()
 		// Call update function depending on flags
 		pushA456()
 		// Targets:
-		//  - 0x010f2c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> Character.UpdateSonicUprightOnGround()
-		//  - 0x010fb6	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR									-> Character.UpdateSonicUprightInAir()
-		//  - 0x010fe0	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING								-> Character.UpdateSonicRollingOnGround()
-		//  - 0x011036	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)			-> Character.UpdateSonicRollingInAir()
+		//  - 0x010f2c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00										-> Character.UpdateSonicUprightOnGround()
+		//  - 0x010fb6	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR							-> Character.UpdateSonicUprightInAir()
+		//  - 0x010fe0	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING						-> Character.UpdateSonicRollingOnGround()
+		//  - 0x011036	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)	-> Character.UpdateSonicRollingInAir()
 		call tableLookupAddress(0x010c90, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 		popA456()
 	}
@@ -328,7 +328,7 @@ function void Character.UpdateNormalState.Sonic()
 			char.state = char.state.former
 	}
 
-	if ((char.control_flags & 0x02) == 0)	// Hanging flag
+	if ((char.control_flags & control_flag.DISABLE_ANIMATION) == 0)	// Hanging flag
 	{
 		UpdateSonicAnimation()
 		if (global.inv_gravity)
@@ -338,7 +338,7 @@ function void Character.UpdateNormalState.Sonic()
 		UpdateSonicSpritePatterns()
 	}
 
-	if ((char.control_flags & 0xa0) == 0)
+	if ((char.control_flags & (control_flag.DISABLE_INTERACTION | 0x20)) == 0)
 	{
 		Character.CheckCollisionsWithDynamicObjects()
 	}
@@ -382,7 +382,7 @@ function void Character.UpdateNormalState.Tails()
 		}
 	}
 
-	if (char.control_flags & 0x01)
+	if (char.control_flags & control_flag.DISABLE_UPDATE)
 	{
 		// Character is not directly controllable (but may be indirectly via an object, like when hanging on a pole or similar)
 		char.double_jump_state = 0
@@ -393,10 +393,10 @@ function void Character.UpdateNormalState.Tails()
 		// Call update function depending on flags
 		pushA456()
 		// Targets:
-		//  - 0x014748	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> Character.UpdateTailsUprightOnGround()
-		//  - 0x0147b8	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR									-> Character.UpdateTailsUprightInAir()
-		//  - 0x014934	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING								-> Character.UpdateTailsRollingOnGround()
-		//  - 0x0149a2	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)			-> Character.UpdateTailsRollingInAir()
+		//  - 0x014748	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00										-> Character.UpdateTailsUprightOnGround()
+		//  - 0x0147b8	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR							-> Character.UpdateTailsUprightInAir()
+		//  - 0x014934	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING						-> Character.UpdateTailsRollingOnGround()
+		//  - 0x0149a2	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)	-> Character.UpdateTailsRollingInAir()
 		call tableLookupAddress(0x0138f6, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 		popA456()
 	}
@@ -420,7 +420,7 @@ function void Character.UpdateNormalState.Tails()
 			char.state = char.state.former
 	}
 
-	if ((char.control_flags & 0x02) == 0)	// Hanging flag
+	if ((char.control_flags & control_flag.DISABLE_ANIMATION) == 0)	// Hanging flag
 	{
 		UpdateTailsAnimation()
 		if (global.inv_gravity)
@@ -430,7 +430,7 @@ function void Character.UpdateNormalState.Tails()
 		UpdateTailsSpritePatterns()
 	}
 
-	if ((char.control_flags & 0xa0) == 0)
+	if ((char.control_flags & (control_flag.DISABLE_INTERACTION | 0x20)) == 0)
 	{
 		Character.CheckCollisionsWithDynamicObjects()
 	}
@@ -449,7 +449,7 @@ function void Character.UpdateNormalState.Knuckles()
 		control.player1 = control.pad1
 	}
 
-	if (char.control_flags & 0x01)
+	if (char.control_flags & control_flag.DISABLE_UPDATE)
 	{
 		// Character is not directly controllable (but may be indirectly via an object, like when hanging on a pole or similar)
 		char.double_jump_state = 0
@@ -459,10 +459,10 @@ function void Character.UpdateNormalState.Knuckles()
 		// Call update function depending on flags
 		pushA456()
 		// Targets:
-		//  - 0x0167f4	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> Character.UpdateKnucklesUprightOnGround()
-		//  - 0x01684c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR									-> Character.UpdateKnucklesUprightInAir()
-		//  - 0x0170c2	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING								-> Character.UpdateKnucklesRollingOnGround()
-		//  - 0x017118	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)			-> Character.UpdateKnucklesRollingInAir()
+		//  - 0x0167f4	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00										-> Character.UpdateKnucklesUprightOnGround()
+		//  - 0x01684c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR							-> Character.UpdateKnucklesUprightInAir()
+		//  - 0x0170c2	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING						-> Character.UpdateKnucklesRollingOnGround()
+		//  - 0x017118	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)	-> Character.UpdateKnucklesRollingInAir()
 		call tableLookupAddress(0x016642, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 		popA456()
 	}
@@ -486,7 +486,7 @@ function void Character.UpdateNormalState.Knuckles()
 			char.state = char.state.former
 	}
 
-	if ((char.control_flags & 0x02) == 0)	// Hanging flag
+	if ((char.control_flags & control_flag.DISABLE_ANIMATION) == 0)	// Hanging flag
 	{
 		UpdateKnucklesAnimation()
 		if (global.inv_gravity)
@@ -496,7 +496,7 @@ function void Character.UpdateNormalState.Knuckles()
 		UpdateKnucklesSpritePatterns()
 	}
 
-	if ((char.control_flags & 0xa0) == 0)
+	if ((char.control_flags & (control_flag.DISABLE_INTERACTION | 0x20)) == 0)
 	{
 		Character.CheckCollisionsWithDynamicObjects()
 	}
@@ -874,7 +874,7 @@ function void UpdateTailsFlight_innerB()
 			}
 		}
 
-		if (objA0.render_flags & render_flag.VISIBLE)
+		if (char.render_flags & render_flag.VISIBLE)
 		{
 			if (((level.framecounter.low + 8) & 0x0f) == 0)
 			{
@@ -963,8 +963,8 @@ function void Tails.UpdateCarrySonic()
 					{
 						++u8[A1 + 0x23]
 					}
-					u8[A1 + 0x22] = D0.u8
-					D0 = u8[A1 + 0x22]
+					objA1.animation.sprite = D0.u8
+					D0 = objA1.animation.sprite
 
 					u32 backupA2 = A2
 					SetCharacterSpritePatterns()
@@ -1067,7 +1067,7 @@ function void Tails.CheckDropSonic()
 	{
 		A1 = 0xffffb000
 	#if STANDALONE
-		if (objA0.state == char.state.ROLLING)
+		if (char.state == char.state.ROLLING)
 			objA1.state = char.state.ROLLING		// Player 1 should also roll in this case
 	#endif
 		u8[A1 + 0x2e] = 0
@@ -1092,7 +1092,7 @@ function void fn01459e()
 	u8[A1 + 0x21] = 0
 	u8[A1 + 0x24] = 0
 	u8[A1 + 0x23] = 0
-	u8[A1 + 0x2e] = 0x03
+	u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	objA1.flags2a &= ~(char.flag.FACING_LEFT | char.flag.CONTROL_LOCK)
 	objA1.flags2a |= char.flag.IN_AIR
 	u8[A1 + 0x3d] = 0
@@ -1205,16 +1205,18 @@ function void UpdateKnucklesGlide()
 		char.velocity.x = (dx * char.groundspeed) >> 8
 		char.velocity.y += (char.velocity.y >= 0x80) ? -0x20 : 0x20
 
-		// Drastically reduce glide speed around the top boundary of level
+		// Disable this behavior in S3AIR, as it feels like a bug in some places like the HCZ 1 boss fight
+	#if !STANDALONE
+		// Drastically reduce glide speed around the top boundary of the level
 		if (level.vertical_wrap != 0xff00)	// ...but only if vertical wrap is disabled
 		{
-			D0.s16 = level.vertical_wrap + 0x10
-			if (D0.s16 > s16(char.position.y.u16))
+			if (s16(char.position.y.u16) < level.vertical_wrap + 0x10)
 			{
 				char.velocity.x >>= 1
 				char.groundspeed >>= 1
 			}
 		}
+	#endif
 	}
 
 	centerCameraYOffset()
@@ -1352,6 +1354,20 @@ function void UpdateKnucklesGlideCollision()
 						char.animation.frame = 0
 						knuckles.glide_direction = 3
 						char.position.x.frac = char.position.x.u16
+
+					#if STANDALONE
+						// Prevent Knuckles from climbing above the screen limits
+						//  -> This same check is down while climbing up/down, but we do it here to correct the position right away
+						//  -> This is added for S3AIR specifically because it's now much easier to get outside the screen after we removed the stopping effect when gliding the the top of screen (see "UpdateKnucklesGlide")
+						if (level.vertical_wrap != 0xff00)
+						{
+							s16 minY = level.vertical_wrap + 0x10
+							if (s16(char.position.y.u16) < minY)
+							{
+								char.position.y.u16 = minY
+							}
+						}
+					#endif
 						return
 					}
 				}
@@ -1565,13 +1581,12 @@ function void UpdateKnucklesGlideCollision()
 				--char.position.y.u16
 
 			D1 = 1
-			D0.u16 = level.vertical_wrap
-			if (D0.u16 != 0xff00)
+			if (level.vertical_wrap != 0xff00)
 			{
-				D0.u16 += 0x10
-				if (D0.s16 > s16(objA0.position.y.u16))
+				s16 minY = level.vertical_wrap + 0x10
+				if (s16(char.position.y.u16) < minY)
 				{
-					char.position.y.u16 = D0.u16
+					char.position.y.u16 = minY
 				}
 			}
 		}
@@ -1751,7 +1766,7 @@ function void fn016da8()
 				if (level.vertical_wrap != 0xff00)
 				{
 					D0.u16 = move_area.bottom.current + getScreenHeight()
-					if (D0.s16 < s16(objA0.position.y.u16))
+					if (s16(char.position.y.u16) > D0.s16)
 					{
 						char.position.y.u16 = D0.u16
 					}
@@ -3248,7 +3263,7 @@ function bool Character.performSuperTransformation()
 	super.palettefx.state = 1
 	super.palettefx.timer = 0x0f
 	super.ring_dec.frames = 60
-	char.control_flags = 0x81
+	char.control_flags = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 
 	setSpeedCapProperties(A4)
 
@@ -3283,7 +3298,7 @@ function void Character.cancelSuperTransformation()
 
 	if (char.character == CHARACTER_SONIC)
 	{
-		objA0.mapping_offset = 0x146620
+		char.mapping_offset = 0x146620
 	}
 
 	char.state.former = char.state.RUNNING2
@@ -3300,8 +3315,8 @@ function void Character.cancelSuperTransformation()
 
 	// Remove control flags set during super transformation
 	//  -> Otherwise the game can get soft-locked when e.g. the game timer stops when just transforming
-	if (char.state == char.state.TRANSFORMING && (char.control_flags & 0x81) == 0x81)
-		char.control_flags &= ~0x81
+	if (char.state == char.state.TRANSFORMING && (char.control_flags & (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)) == (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE))
+		char.control_flags &= ~(control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 
 	// If lightning shield is active, reload sprite patterns for the sparks
 	if (u32[0xffffcce8] == 0x019732)
@@ -4762,7 +4777,7 @@ function void checkForBalancing()
 //# address-hook(0x011350) end(0x0113f4)
 function void Character.UpdateControlOnGroundShared()
 {
-	if (char.control_flags & 0x40)
+	if (char.control_flags & control_flag.DISABLE_WALLS)
 		return
 
 	if (char.rotation & 0x3f)
@@ -4939,12 +4954,12 @@ function void Character.CheckAgainstMoveBorders()
 		if (global.inv_gravity)
 		{
 			D0.s16 = level.vertical_wrap
-			hitBottom = (D0.s16 >= s16(objA0.position.y.u16))
+			hitBottom = (s16(char.position.y.u16) <= D0.s16)
 		}
 		else
 		{
 			D0.s16 = move_area.bottom.current + getScreenHeight()
-			hitBottom = (D0.s16 < s16(objA0.position.y.u16))
+			hitBottom = (s16(char.position.y.u16) > D0.s16)
 		}
 
 		if (hitBottom)
@@ -5453,7 +5468,7 @@ function void Character.OnThreatCollision()
 		// Different approach for Tails: Deflect only projectiles that are above him, and only if flying
 		if (char.character == CHARACTER_TAILS)
 		{
-			canDeflect = (s16(objA1.position.y.u16) < s16(objA0.position.y.u16)) && (char.state == char.state.TAILS_FLYDOWN || char.state == char.state.TAILS_FLYUP || char.state == char.state.TAILS_CARRYDOWN || char.state == char.state.TAILS_CARRYUP)
+			canDeflect = (s16(objA1.position.y.u16) < s16(char.position.y.u16)) && (char.state == char.state.TAILS_FLYDOWN || char.state == char.state.TAILS_FLYUP || char.state == char.state.TAILS_CARRYDOWN || char.state == char.state.TAILS_CARRYUP)
 		}
 	#endif
 		if (!canDeflect)
@@ -5596,7 +5611,7 @@ function u8 getSoundIdByObstacleAddress(u32 obstacleAddress)
 	if (obstacleAddress >= 0x023f84 && obstacleAddress < 0x024280)
 	{
 		// Some kind of spikes
-		return 0x37
+		return SFX_HITSPIKES
 	}
 	else
 	{
@@ -6391,7 +6406,7 @@ function void Character.updateBonusEffects()
 		if (isSuperActive && char.state != transformingState)
 		{
 			// Not in Doomsday and not in Sonic's AIZ intro
-			if (global.zone_act != 0x0c00 && (char.control_flags & 0x40) == 0)
+			if (global.zone_act != 0x0c00 && (char.control_flags & control_flag.DISABLE_WALLS) == 0)
 			{
 				Character.cancelSuperTransformation()
 				chooseFittingMusic()
@@ -6837,7 +6852,7 @@ function void RespawnTails()
 	tails.respawn_counter = 0
 	tails.ai_routine = 0x02
 
-	char.control_flags = 0x81
+	char.control_flags = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	char.flags = char.flag.IN_AIR
 	char.position.x.u16 = 0x7f00
 	char.position.y.u16 = 0

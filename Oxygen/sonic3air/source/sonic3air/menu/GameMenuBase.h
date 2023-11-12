@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include <rmxmedia.h>
+#include "sonic3air/menu/helper/GameMenuControlsDisplay.h"
+#include "sonic3air/menu/helper/GameMenuScrolling.h"
 
 
 class GameMenuEntry
@@ -40,6 +41,7 @@ public:
 		Drawer* mDrawer = nullptr;
 		Vec2i mCurrentPosition;
 		bool mIsSelected = false;
+		float mDeltaSeconds = 0.0f;
 
 		template<typename T> T& as()  { return *static_cast<T*>(this); }
 	};
@@ -81,7 +83,9 @@ public:
 
 	inline bool hasSelected() const  { return mSelectedIndex < mOptions.size(); }
 	inline const Option& selected() const  { return mOptions[mSelectedIndex]; }
+
 	bool setSelectedIndexByValue(uint32 value);
+	bool changeSelectedIndex(int change);
 	bool sanitizeSelectedIndex(bool allowInvisibleEntries = false);
 
 	size_t getPreviousVisibleIndex() const;
@@ -153,11 +157,18 @@ public:
 	inline const GameMenuEntry& operator[](size_t index) const  { return *mEntries[index]; }
 
 	UpdateResult update();
+	int getEntryChangeByInput() const;
+	int getOptionChangeByInput() const;
 
 	inline bool hasSelected() const  { return (mSelectedEntryIndex < (int)mEntries.size()); }
 	inline GameMenuEntry& selected()  { return *mEntries[mSelectedEntryIndex]; }
+
 	bool setSelectedIndexByValue(uint32 value);
+	bool changeSelectedIndex(int change, bool loop = true);
 	bool sanitizeSelectedIndex(bool allowNonInteractableEntries = false);
+
+	size_t getPreviousInteractableIndex(size_t index, bool loop = true) const;
+	size_t getNextInteractableIndex(size_t index, bool loop = true) const;
 
 private:
 	std::vector<GameMenuEntry*> mEntries;
@@ -188,24 +199,4 @@ public:
 	virtual void setBaseState(BaseState baseState) {}
 	virtual void onFadeIn() {}
 	virtual bool canBeRemoved() { return false; }
-};
-
-
-class GameMenuScrolling
-{
-public:
-	inline void setVisibleAreaHeight(float height)  { mVisibleAreaHeight = height; }
-	void setCurrentSelection(int selectionY1, int selectionY2);
-	void setCurrentSelection(float selectionY1, float selectionY2);
-
-	inline float getScrollOffsetY() const  { return mScrollOffsetY; }
-	int getScrollOffsetYInt() const;
-	void update(float timeElapsed);
-
-public:
-	float mVisibleAreaHeight = 224.0f;
-	float mCurrentSelectionY1 = 0.0f;
-	float mCurrentSelectionY2 = 0.0f;
-	float mScrollOffsetY = 0.0f;
-	bool mScrollingFast = false;
 };

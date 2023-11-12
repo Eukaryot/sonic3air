@@ -77,6 +77,17 @@ namespace
 
 		return nullptr;
 	}
+
+	const uint8* getCallingPCAfterCall()
+	{
+		// After a call was already added to the call stack, we need to go up to the second-to-last element on the stack to get the program counter there
+		//  -> Note that this program counter is already pointing to the next runtime opcode, this needs to be accounted for later
+		const CArray<lemon::ControlFlow::State>& callStack = lemon::Runtime::getActiveControlFlow()->getCallStack();
+		if (callStack.count >= 2)
+			return callStack[callStack.count - 2].mProgramCounter;
+		else
+			return nullptr;
+	}
 }
 
 
@@ -136,6 +147,7 @@ struct RuntimeExecuteConnectorDev : public RuntimeExecuteConnector
 		{
 			CodeExec::CallFrame& callFrame = mCodeExec.mActiveCallFrameTracking->pushCallFrame(CodeExec::CallFrame::Type::SCRIPT_DIRECT);
 			callFrame.mFunction = func;
+			callFrame.mCallingPC = getCallingPCAfterCall();
 		}
 		return true;
 	}
@@ -376,13 +388,13 @@ void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enfo
 		mLemonScriptRuntime.getInternalLemonRuntime().clearAllControlFlows();
 
 		bool success = false;
-		if (serializedRuntimeState != nullptr && !serializedRuntimeState->empty())
+		if (nullptr != serializedRuntimeState && !serializedRuntimeState->empty())
 		{
 			VectorBinarySerializer serializer(true, *serializedRuntimeState);
 			success = getLemonScriptRuntime().serializeRuntime(serializer);
 		}
 
-		if (enforcedCallStack != nullptr && !enforcedCallStack->empty())
+		if (nullptr != enforcedCallStack && !enforcedCallStack->empty())
 		{
 			for (const auto& pair : *enforcedCallStack)
 			{
@@ -570,21 +582,6 @@ void CodeExec::processCallFrames()
 	mMainCallFrameTracking.processCallFrames();
 }
 
-void CodeExec::getCallStackFromCallFrameIndex(std::vector<uint64>& outCallStack, int callFrameIndex)
-{
-	while (callFrameIndex >= 0 && callFrameIndex < (int)mMainCallFrameTracking.mCallFrames.size())
-	{
-		CallFrame& callFrame = mMainCallFrameTracking.mCallFrames[callFrameIndex];
-		if (nullptr != callFrame.mFunction)
-		{
-			outCallStack.push_back(callFrame.mFunction->getName().getHash());
-		}
-
-		// Continue with parent
-		callFrameIndex = callFrame.mParentIndex;
-	}
-}
-
 bool CodeExec::canExecute() const
 {
 	switch (mExecutionState)
@@ -765,6 +762,7 @@ bool CodeExec::tryCallAddressHookDev(uint32 address)
 		CallFrame& callFrame = mActiveCallFrameTracking->pushCallFrame(CallFrame::Type::SCRIPT_HOOK);
 		callFrame.mFunction = mLemonScriptRuntime.getCurrentFunction();
 		callFrame.mAddress = address;
+		callFrame.mCallingPC = getCallingPCAfterCall();
 		return true;
 	}
 	else
