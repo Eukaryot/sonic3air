@@ -375,9 +375,6 @@ void SoundtrackDownloadMenuEntry::renderEntry(RenderContext& renderContext_)
 
 			case RemasteredMusicDownload::State::DOWNLOAD_RUNNING:
 				text = "Downloading... " + std::to_string(download.getBytesDownloaded() / (1024*1024)) + " MB";
-			#if defined(PLATFORM_ANDROID)
-				text += "  (Wi-fi required)";
-			#endif
 				mText = "Stop download";
 				break;
 
