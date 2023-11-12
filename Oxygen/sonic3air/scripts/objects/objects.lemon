@@ -43,9 +43,14 @@ function void GenericObject.Init()
 function void GenericObject.Update()
 {
 #if STANDALONE
-	// Check if it's an underwater flame in AIZ
+	// Check if it's a flame in AIZ
 	if (objA0.sprite_attributes == (sprite_attribute.PALETTE.LINE3 | 0x02e9) && objA0.mapping_offset == 0x02bfda)
 	{
+		// Fix potential sprite priority issue with the signpost
+		A1 = 0x02bf6c + objA0.subtype2c * 6
+		objA0.sprite_priority = u16[A1+2] + 0x80
+		
+		// Check if underwater
 		if (objA0.position.y.u16 >= water.height.current - 10)
 		{
 			UnloadObject()
