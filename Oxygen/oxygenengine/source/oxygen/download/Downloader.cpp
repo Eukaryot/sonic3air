@@ -21,7 +21,7 @@
 	#pragma comment(lib, "wldap32.lib")
 	#pragma comment(lib, "crypt32.lib")
 
-#elif defined(PLATFORM_LINUX)
+#elif defined(PLATFORM_LINUX) || defined(PLATFORM_MAC)
 	#define PLATFORM_SUPPORTS_DOWNLOADER
 	#define USING_CURL
 
