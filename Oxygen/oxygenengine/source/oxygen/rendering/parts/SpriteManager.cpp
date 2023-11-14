@@ -55,27 +55,10 @@ void SpriteManager::postFrameUpdate()
 		}
 
 		// Apply added render items
-		grabAddedSprites();
+		grabAddedItems();
 
 		clearLifetimeContext(RenderItem::LifetimeContext::OUTSIDE_FRAME);
 		mCurrentContext = RenderItem::LifetimeContext::OUTSIDE_FRAME;
-
-		// Process coordinates of all render items
-		{
-			const Vec2i worldSpaceOffset = mSpacesManager.getWorldSpaceOffset();
-			for (int contextIndex = 0; contextIndex < RenderItem::NUM_CONTEXTS; ++contextIndex)
-			{
-				for (RenderItem* renderItem : mContexts[contextIndex].mItems)
-				{
-					if (renderItem->mCoordinatesSpace == SpriteManager::Space::WORLD)
-					{
-						// Move to screen space
-						renderItem->mPosition -= worldSpaceOffset;
-						renderItem->mCoordinatesSpace = SpriteManager::Space::SCREEN;
-					}
-				}
-			}
-		}
 
 		if (mResetRenderItems)
 		{
@@ -112,7 +95,7 @@ void SpriteManager::postFrameUpdate()
 
 void SpriteManager::postRefreshDebugging()
 {
-	grabAddedSprites();
+	grabAddedItems();
 }
 
 void SpriteManager::drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, const Color& tintColor, const Color& addedColor)
@@ -512,13 +495,28 @@ void SpriteManager::processSpriteHandles()
 	mSpritesHandles.clear();
 }
 
-void SpriteManager::grabAddedSprites()
+void SpriteManager::grabAddedItems()
 {
+	const Vec2i worldSpaceOffset = mSpacesManager.getWorldSpaceOffset();
+
 	// Add render items from "next" to "current", in reverse order
 	for (auto it = mAddedItems.mItems.rbegin(); it != mAddedItems.mItems.rend(); ++it)
 	{
-		getItemsByContext((*it)->mLifetimeContext).mItems.push_back(*it);
+		RenderItem* renderItem = *it;
+
+		// Process coordinates if in world space
+		if (renderItem->mCoordinatesSpace == SpriteManager::Space::WORLD)
+		{
+			// Move to screen space
+			renderItem->mPosition -= worldSpaceOffset;
+			renderItem->mCoordinatesSpace = SpriteManager::Space::SCREEN;
+		}
+
+		// Add to the right context
+		ItemSet& itemSet = getItemsByContext(renderItem->mLifetimeContext);
+		itemSet.mItems.push_back(renderItem);
 	}
+
 	mAddedItems.mItems.clear();		// Intentionally not using anything like "clearLifetimeContext" here, as it would invalidate the copied instances
 }
 

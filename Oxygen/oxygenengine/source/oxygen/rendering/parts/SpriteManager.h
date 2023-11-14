@@ -95,7 +95,7 @@ private:
 	void checkSpriteTag(renderitems::SpriteInfo& sprite);
 
 	void processSpriteHandles();
-	void grabAddedSprites();
+	void grabAddedItems();
 	void collectLegacySprites();
 
 private:
