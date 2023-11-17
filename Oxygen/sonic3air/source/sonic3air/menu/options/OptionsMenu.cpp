@@ -289,10 +289,16 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 
 		entries.addEntry<TitleMenuEntry>().initEntry("General");
 
-		entries.addEntry<OptionsMenuEntry>().initEntry("Renderer:", option::RENDERER)
-			.addOption("Fail-Safe / Software", (uint32)Configuration::RenderMethod::SOFTWARE)
-			.addOption("OpenGL Software", (uint32)Configuration::RenderMethod::OPENGL_SOFT)
-			.addOption("OpenGL Hardware", (uint32)Configuration::RenderMethod::OPENGL_FULL);
+		{
+			GameMenuEntry& newEntry = entries.addEntry<OptionsMenuEntry>().initEntry("Renderer:", option::RENDERER);
+			const Configuration::RenderMethod highest = Configuration::getHighestSupportedRenderMethod();
+
+			newEntry.addOption("Fail-Safe / Software", (uint32)Configuration::RenderMethod::SOFTWARE);
+			if (highest >= Configuration::RenderMethod::OPENGL_SOFT)
+				newEntry.addOption("OpenGL Software", (uint32)Configuration::RenderMethod::OPENGL_SOFT);
+			if (highest >= Configuration::RenderMethod::OPENGL_FULL)
+				newEntry.addOption("OpenGL Hardware", (uint32)Configuration::RenderMethod::OPENGL_FULL);
+		}
 
 		entries.addEntry<OptionsMenuEntry>().initEntry("Frame Sync:", option::FRAME_SYNC)
 			.addOption("V-Sync Off", 0)

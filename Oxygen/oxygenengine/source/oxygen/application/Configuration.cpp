@@ -219,6 +219,12 @@ namespace
 
 Configuration* Configuration::mSingleInstance = nullptr;
 
+Configuration::RenderMethod Configuration::getHighestSupportedRenderMethod()
+{
+	// Default is OpenGL Hardware render method (as it's the highest one), but this can be lowered as needed, e.g. for individual platforms or depending on the execution environment
+	return RenderMethod::OPENGL_FULL;
+}
+
 Configuration::Configuration()
 {
 	mSingleInstance = this;

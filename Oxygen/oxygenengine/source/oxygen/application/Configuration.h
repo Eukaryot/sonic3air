@@ -92,6 +92,8 @@ public:
 	inline static bool hasInstance()		 { return (nullptr != mSingleInstance); }
 	inline static Configuration& instance()  { return *mSingleInstance; }
 
+	static RenderMethod getHighestSupportedRenderMethod();
+
 public:
 	Configuration();
 
