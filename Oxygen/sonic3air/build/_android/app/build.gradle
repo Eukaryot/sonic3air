@@ -17,7 +17,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 29     // Can't go higher, as requestLegacyExternalStorage in the manifest won't work otherwise
         versionCode 1
-        versionName "23.10.07.0"
+        versionName "23.11.18.0"
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_APP_PLATFORM=android-18", "-DANDROID_STL=c++_static"
