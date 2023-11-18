@@ -32,7 +32,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 
 endif()
 
-set (CMAKE_CXX_FLAGS "-s USE_VORBIS=1 -s USE_SDL=2 -s FULL_ES2=1 -s FORCE_FILESYSTEM=1 -s ALLOW_MEMORY_GROWTH=1 -s EXIT_RUNTIME=1 -s USE_ZLIB=1")
+set (CMAKE_CXX_FLAGS "-s USE_VORBIS=1 -s USE_SDL=2 -s USE_ZLIB=1")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lidbfs.js -lwebsocket.js")
 
 include_directories(${WORKSPACE_DIR}/framework/external/sdl/SDL2/include)
@@ -152,5 +152,5 @@ target_link_libraries(Sonic3AIR oxygen_enduser)
 
 set_target_properties(Sonic3AIR PROPERTIES OUTPUT_NAME "sonic3air_web")
 
-
+set_target_properties(Sonic3AIR PROPERTIES LINK_FLAGS "-s FULL_ES2=1 -sFORCE_FILESYSTEM -sSTACK_SIZE=2MB -s ALLOW_MEMORY_GROWTH=1 -s EXIT_RUNTIME=1 -s DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=\"['\$ERRNO_CODES']\"")
 

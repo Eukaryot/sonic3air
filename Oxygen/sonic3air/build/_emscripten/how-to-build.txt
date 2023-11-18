@@ -2,7 +2,7 @@
 === Build under Emscripten via docker ===
 
 Make sure docker is installed.
-Use the included Dockerfile to build a docker container named llvm_emscripten:
+Use the included Dockerfile to build a docker container named emscripten_gl:
 	- cd ./Oxygen/sonic3air/build/_emscripten
 	- docker build -t emscripten_gl .
 

@@ -17,17 +17,9 @@
 	#include <direct.h>
 	#include <io.h>
 
-#elif defined(PLATFORM_LINUX)
+#elif defined(PLATFORM_LINUX) || defined(PLATFORM_WEB)
 	#include <filesystem>
 	namespace std_filesystem = std::filesystem;
-	#define USE_STD_FILESYSTEM
-
-	#include <dirent.h>
-	#include <sys/stat.h>
-
-#elif defined(PLATFORM_WEB)
-	#include <experimental/filesystem>
-	namespace std_filesystem = std::experimental::filesystem;
 	#define USE_STD_FILESYSTEM
 
 	#include <dirent.h>
