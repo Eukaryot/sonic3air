@@ -460,6 +460,9 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 						}
 						break;
 					}
+
+					default:
+						break;
 				}
 			}
 		}

@@ -439,6 +439,8 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 					break;
 				}
 
+				case RenderItem::Type::RECTANGLE:
+				case RenderItem::Type::TEXT:
 				case RenderItem::Type::INVALID:
 					break;
 			}

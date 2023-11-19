@@ -748,6 +748,8 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			break;
 		}
 
+		case RenderItem::Type::RECTANGLE:
+		case RenderItem::Type::TEXT:
 		case RenderItem::Type::INVALID:
 			break;
 	}
