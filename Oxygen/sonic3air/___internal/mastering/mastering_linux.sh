@@ -39,6 +39,9 @@ chmod +x $OutputDir/sonic3air_linux
 
 cp source/external/discord_game_sdk/lib/x86_64/libdiscord_game_sdk.so $OutputDir
 
+# Leave out the remastered music, as the Linux build can use an internal downloader
+rm $OutputDir/data/audioremaster.bin
+
 cp ___internal/mastering/setup_linux.sh $OutputDir
 chmod +x $OutputDir/setup_linux.sh
 
