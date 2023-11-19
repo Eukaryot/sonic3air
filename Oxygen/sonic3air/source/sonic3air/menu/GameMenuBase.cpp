@@ -445,7 +445,7 @@ size_t GameMenuEntries::getPreviousInteractableIndex(size_t index, bool loop) co
 		return 0;
 
 	const size_t originalIndex = index;
-	for (int tries = 0; tries < 100; ++tries)
+	for (int tries = 0; tries < (int)mEntries.size(); ++tries)
 	{
 		if (index > 0)
 			--index;
@@ -470,7 +470,7 @@ size_t GameMenuEntries::getNextInteractableIndex(size_t index, bool loop) const
 		return 0;
 
 	const size_t initialIndex = index;
-	for (int tries = 0; tries < 100; ++tries)
+	for (int tries = 0; tries < (int)mEntries.size(); ++tries)
 	{
 		if (index < mEntries.size() - 1)
 			++index;
