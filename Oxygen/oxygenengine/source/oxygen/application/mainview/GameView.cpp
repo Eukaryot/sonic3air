@@ -388,6 +388,7 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 						}
 
 						case SDLK_F11:
+						case SDLK_BACKQUOTE:	// Alternative, especially for Macs, where F11 has other functions already
 						{
 							HighResolutionTimer timer;
 							timer.start();
