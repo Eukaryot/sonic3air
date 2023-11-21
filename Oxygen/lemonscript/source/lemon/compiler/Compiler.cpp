@@ -17,6 +17,27 @@
 
 namespace lemon
 {
+	namespace
+	{
+		int checkIncludeLine(std::string_view str)
+		{
+			// Check for "include", but ignore leading whitespace
+			const constexpr size_t REQUIRED_LENGTH = 8;		// Length of "include" plus a space
+			size_t pos = 0;
+			while (pos + REQUIRED_LENGTH <= str.length() && (str[pos] == ' ' || str[pos] == '\t'))
+				++pos;
+
+			if (pos + REQUIRED_LENGTH <= str.length() && rmx::startsWith(str.substr(pos), "include "))
+			{
+				return (int)(pos + REQUIRED_LENGTH);
+			}
+			else
+			{
+				return -1;
+			}
+		}
+	}
+
 
 	Compiler::Compiler(Module& module, GlobalsLookup& globalsLookup, const CompileOptions& compileOptions) :
 		mModule(module),
@@ -184,10 +205,11 @@ namespace lemon
 			const std::string_view line = fileLines[fileLineIndex];
 
 			// Resolve include
-			if (line.rfind("include ", 0) == 0)
+			const int locationAfterInclude = checkIncludeLine(line);
+			if (locationAfterInclude >= 0)
 			{
-				String includeFilename = line.substr(8);
-				includeFilename.makeSubString(0, includeFilename.findChar(' ', 0, +1));
+				String includeFilename = line.substr(locationAfterInclude);
+				includeFilename.makeSubString(0, includeFilename.findChars(" \t", 0, +1));
 
 				// Use only forward slashes
 				includeFilename.replace('\\', '/');
