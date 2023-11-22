@@ -613,8 +613,7 @@ void GameView::render()
 	// Simple mirror mode implementation: Just mirror the whole screen
 	if (Configuration::instance().mMirrorMode)
 	{
-		const Recti drawRect(gameScreenRect.x + gameScreenRect.width, gameScreenRect.y, -gameScreenRect.width, gameScreenRect.height);
-		drawer.drawRect(drawRect, videoOut.getGameScreenTexture());
+		drawer.drawRect(gameScreenRect, videoOut.getGameScreenTexture(), Vec2f(1.0f, 0.0f), Vec2f(0.0f, 1.0f), Color::WHITE);
 	}
 	else
 	{
