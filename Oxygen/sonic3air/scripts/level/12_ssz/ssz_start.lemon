@@ -648,6 +648,10 @@ function void fn065af6()
 	}
 	else
 	{
+	#if STANDALONE
+		// Signal to the sprite masking object that it's not needed any more
+		u8[0xfffffab8] |= 0x04
+	#endif
 		fn0851e4()
 		Object.TriggerUnloading()
 	}
@@ -677,7 +681,7 @@ function void fn065b24()
 
 		#if STANDALONE
 			// Mask out sprites below the clouds, but not when camera is already out of the cutscene area
-			if (camera.position.x.u16 < 0x0330)
+			if (camera.position.x.u16 < 0x0350 - getScreenWidth())
 			{
 				Renderer.addSpriteMaskWorld(objA0.position.x.u16 - 64, objA0.position.y.u16 - 47, 128, 100, 0xa000 - objA0.sprite_priority, 1)
 			}
