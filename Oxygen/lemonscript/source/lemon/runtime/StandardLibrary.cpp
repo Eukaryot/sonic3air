@@ -71,6 +71,7 @@ namespace lemon
 		template<typename T> T Math_PI()  { return PI_DOUBLE; }
 		template<> float Math_PI()		  { return PI_FLOAT; }
 
+		template<typename T> T Math_sqr(T value)				{ return value * value; }
 		template<typename T> T Math_sqrt(T value)				{ return std::sqrt(value); }
 		template<typename T> T Math_pow(T base, T exponent)		{ return std::pow(base, exponent); }
 		template<typename T> T Math_exp(T value)				{ return std::exp(value); }
@@ -93,10 +94,14 @@ namespace lemon
 		template<typename T> int64 Math_ceilToInt(T value)		{ return (int64)std::ceil(value); }
 		template<typename T> T Math_round(T value)				{ return std::round(value); }
 		template<typename T> int64 Math_roundToInt(T value)		{ return (int64)std::round(value); }
+		template<typename T> T Math_frac(T value)				{ return value - std::floor(value); }
 
 		template<typename T> bool Math_isNumber(T value)		{ return std::isnormal(value) || (value == (T)0); }
 		template<typename T> bool Math_isNaN(T value)			{ return std::isnan(value); }
 		template<typename T> bool Math_isInfinite(T value)		{ return std::isinf(value); }
+
+		template<typename T> T Math_lerp(T a, T b, T factor)	{ return a + (b - a) * factor; }
+		template<typename T> T Math_invlerp(T a, T b, T value)	{ return (a == b) ? 0.0f : (value - a) / (b - a); }
 
 		StringRef stringformat(StringRef format, int argv, uint64* args)
 		{
@@ -396,6 +401,8 @@ namespace lemon
 
 		// Math
 		{
+			module.addNativeFunction("Math.sqr",   lemon::wrap(&functions::Math_sqr<float>),	compileTimeConstant);
+			module.addNativeFunction("Math.sqr",   lemon::wrap(&functions::Math_sqr<double>),	compileTimeConstant);
 			module.addNativeFunction("Math.sqrt",  lemon::wrap(&functions::Math_sqrt<float>),   compileTimeConstant);
 			module.addNativeFunction("Math.sqrt",  lemon::wrap(&functions::Math_sqrt<double>),  compileTimeConstant);
 			module.addNativeFunction("Math.pow",   lemon::wrap(&functions::Math_pow<float>),    compileTimeConstant);
@@ -437,6 +444,8 @@ namespace lemon
 			module.addNativeFunction("Math.round",		lemon::wrap(&functions::Math_round<double>),	  compileTimeConstant);
 			module.addNativeFunction("Math.roundToInt",	lemon::wrap(&functions::Math_roundToInt<float>),  compileTimeConstant);
 			module.addNativeFunction("Math.roundToInt",	lemon::wrap(&functions::Math_roundToInt<double>), compileTimeConstant);
+			module.addNativeFunction("Math.frac",		lemon::wrap(&functions::Math_frac<float>),		  compileTimeConstant);
+			module.addNativeFunction("Math.frac",		lemon::wrap(&functions::Math_frac<double>),		  compileTimeConstant);
 
 			module.addNativeFunction("Math.isNumber",	lemon::wrap(&functions::Math_isNumber<float>),	  compileTimeConstant);
 			module.addNativeFunction("Math.isNumber",	lemon::wrap(&functions::Math_isNumber<double>),   compileTimeConstant);
@@ -444,6 +453,26 @@ namespace lemon
 			module.addNativeFunction("Math.isNaN",		lemon::wrap(&functions::Math_isNaN<double>),	  compileTimeConstant);
 			module.addNativeFunction("Math.isInfinite",	lemon::wrap(&functions::Math_isInfinite<float>),  compileTimeConstant);
 			module.addNativeFunction("Math.isInfinite",	lemon::wrap(&functions::Math_isInfinite<double>), compileTimeConstant);
+
+			module.addNativeFunction("Math.lerp", lemon::wrap(&functions::Math_lerp<float>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "factor");
+
+			module.addNativeFunction("Math.lerp", lemon::wrap(&functions::Math_lerp<double>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "factor");
+
+			module.addNativeFunction("Math.invlerp", lemon::wrap(&functions::Math_invlerp<float>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "value");
+
+			module.addNativeFunction("Math.invlerp", lemon::wrap(&functions::Math_invlerp<double>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "value");
 		}
 
 		module.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat1), defaultFlags)
