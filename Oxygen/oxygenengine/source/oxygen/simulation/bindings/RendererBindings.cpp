@@ -44,6 +44,24 @@ namespace
 	}
 
 
+	uint32 Color_fromHSVA(float hue, float saturation, float value, float alpha)
+	{
+		Color color;
+		color.setFromHSV(Vec3f(hue, saturation, value));
+		color.a = alpha;
+		return color.getRGBA32();
+	}
+
+	uint32 Color_fromHSV(float hue, float saturation, float value)
+	{
+		return Color_fromHSVA(hue, saturation, value, 1.0f);
+	}
+
+	float Color_HSV_getHue(uint32 color)		{ return Color::fromRGBA32(color).getHSV().x; }
+	float Color_HSV_getSaturation(uint32 color)	{ return Color::fromRGBA32(color).getHSV().y; }
+	float Color_HSV_getValue(uint32 color)		{ return Color::fromRGBA32(color).getHSV().z; }
+
+
 	enum class WriteTarget
 	{
 		VRAM,
@@ -786,11 +804,35 @@ void RendererBindings::registerBindings(lemon::Module& module)
 
 
 	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
+	const BitFlagSet<lemon::Function::Flag> compileTimeConstant(lemon::Function::Flag::ALLOW_INLINE_EXECUTION, lemon::Function::Flag::COMPILE_TIME_CONSTANT);
+
 
 	// Screen size query
 	module.addNativeFunction("getScreenWidth", lemon::wrap(&getScreenWidth), defaultFlags);
 	module.addNativeFunction("getScreenHeight", lemon::wrap(&getScreenHeight), defaultFlags);
 	module.addNativeFunction("getScreenExtend", lemon::wrap(&getScreenExtend), defaultFlags);
+
+
+	// Color
+	module.addNativeFunction("Color.fromHSV", lemon::wrap(&Color_fromHSV), compileTimeConstant)
+		.setParameterInfo(0, "hue")
+		.setParameterInfo(1, "saturation")
+		.setParameterInfo(2, "value");
+
+	module.addNativeFunction("Color.fromHSV", lemon::wrap(&Color_fromHSVA), compileTimeConstant)
+		.setParameterInfo(0, "hue")
+		.setParameterInfo(1, "saturation")
+		.setParameterInfo(2, "value")
+		.setParameterInfo(3, "alpha");
+
+	module.addNativeFunction("Color.HSV.getHue", lemon::wrap(&Color_HSV_getHue), compileTimeConstant)
+		.setParameterInfo(0, "color");
+
+	module.addNativeFunction("Color.HSV.getSaturation", lemon::wrap(&Color_HSV_getSaturation), compileTimeConstant)
+		.setParameterInfo(0, "color");
+
+	module.addNativeFunction("Color.HSV.getValue", lemon::wrap(&Color_HSV_getValue), compileTimeConstant)
+		.setParameterInfo(0, "color");
 
 
 	// VDP emulation

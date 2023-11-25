@@ -676,7 +676,7 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 					if (tile & 0x0800)	// Flip vertically
 						angle = 0x80 - angle;
 
-					baseColor.setHSL(Vec3f((float)angle / 256.0f, 1.0f, 0.5f));
+					baseColor.setFromHSL(Vec3f((float)angle / 256.0f * 360.0f, 1.0f, 0.5f));
 					baseColor.a = 0.7f;
 				}
 

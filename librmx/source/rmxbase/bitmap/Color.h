@@ -58,9 +58,11 @@ public:
 	void setABGR32(uint32 colorABGR);	// A is the highest 8 bits, R is the lowest 8 bits
 
 	inline void setGray(float gray, float alpha = 1.0f) { r = gray; g = gray; b = gray; a = alpha; }
-	void setHSL(const Vec3f& hsl);
+	void setFromHSL(const Vec3f& hsl);
 	Vec3f getHSL() const;
-	void setYUV(const Vec3f& yuv);
+	void setFromHSV(const Vec3f& hsv);
+	Vec3f getHSV() const;
+	void setFromYUV(const Vec3f& yuv);
 	Vec3f getYUV() const;
 	inline float getGray() const		{ return (r + g + b) / 3.0f; }
 	inline float getIntensity() const	{ return r * 0.299f + g * 0.587f + b * 0.114f; }

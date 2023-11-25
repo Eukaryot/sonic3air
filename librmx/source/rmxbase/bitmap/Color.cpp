@@ -87,12 +87,18 @@ void Color::setABGR32(uint32 colorABGR)
 	a = (float)((colorABGR >> 24) & 0xff) / 255.0f;
 }
 
-void Color::setHSL(const Vec3f& hsl)
+void Color::setFromHSL(const Vec3f& hsl)
 {
 	// Conversion HSL -> RGB
-	float maximum = (hsl.z < 0.5f) ? (hsl.z * (1.0f + hsl.y)) : (hsl.z * (1.0f - hsl.y) + hsl.y);
-	float minimum = 2.0f * hsl.z - maximum;
-	float hue = hsl.x * 6.0f;
+	float hue = hsl.x / 360.0f;
+	hue -= std::floor(hue);
+	hue *= 6.0f;
+
+	const float saturation = ::saturate(hsl.y);
+	const float lightness = ::saturate(hsl.z);
+
+	const float maximum = (lightness < 0.5f) ? (lightness * (1.0f + saturation)) : (saturation + lightness * (1.0f - saturation));
+	const float minimum = 2.0f * lightness - maximum;
 
 	r = (hue < 4.0f) ? (hue + 2.0f) : (hue - 4.0f);
 	g = hue;
@@ -122,21 +128,75 @@ Vec3f Color::getHSL() const
 		return Vec3f(0.0f, 0.0f, maximum);
 	}
 
-	float lightness = (minimum + maximum) / 2.0f;
-	float saturation = delta / ((lightness < 0.5f) ? (minimum + maximum) : (2.0f - maximum - minimum));
+	float sum = minimum + maximum;
+	float lightness = sum / 2.0f;
+	float saturation = delta / ((sum < 1.0f) ? sum : (2.0f - sum));
 
 	float hue;
 	if (maximum == r)
-		hue = (g - b) / delta + ((g < b) ? 6.0f : 0.0f);
+		hue = (g - b) / delta * 60.0f + ((g < b) ? 360.0f : 0.0f);	// Purple to red to yellow (crossing the 0° / 360° line)
 	else if (maximum == g)
-		hue = (b - r) / delta + 2.0f;
+		hue = (b - r) / delta * 60.0f + 120.0f;						// Yellow to green to cyan
 	else
-		hue = (r - g) / delta + 4.0f;
+		hue = (r - g) / delta * 60.0f + 240.0f;						// Cyan to blue to purple
 
-	return Vec3f(hue / 6.0f, saturation, lightness);
+	return Vec3f(hue * 60.0f, saturation, lightness);
 }
 
-void Color::setYUV(const Vec3f& yuv)
+void Color::setFromHSV(const Vec3f& hsv)
+{
+	// Conversion HSV -> RGB
+	float hue = hsv.x / 360.0f;
+	hue -= std::floor(hue);
+	hue *= 6.0f;
+
+	const float saturation = ::saturate(hsv.y);
+	const float value = ::saturate(hsv.z);
+
+	const float delta = value * saturation;
+	const float maximum = value;
+	const float minimum = maximum - delta;
+
+	const int region = (int)std::floor(hue);
+	const float fraction = hue - (float)region;
+
+	switch (region)
+	{
+		case 0:   r = maximum;  b = minimum;  g = minimum + delta * fraction;  break;	// Red to yellow
+		case 1:   g = maximum;  b = minimum;  r = maximum - delta * fraction;  break;	// Yellow to green
+		case 2:   g = maximum;  r = minimum;  b = minimum + delta * fraction;  break;	// Green to cyan
+		case 3:   b = maximum;  r = minimum;  g = maximum - delta * fraction;  break;	// Cyan to blue
+		case 4:   b = maximum;  g = minimum;  r = minimum + delta * fraction;  break;	// Blue to purple
+		default:  r = maximum;  g = minimum;  b = maximum - delta * fraction;  break;	// Purple to red
+	}
+}
+
+Vec3f Color::getHSV() const
+{
+	// Conversion RGB -> HSV
+	const float minimum = std::min(std::min(r, g), b);
+	const float maximum = std::max(std::max(r, g), b);
+	const float delta = maximum - minimum;
+	if (delta < 0.001f)
+	{
+		return Vec3f(0.0f, 0.0f, maximum);
+	}
+
+	const float value = maximum;
+	const float saturation = delta / maximum;
+
+	float hue;
+	if (maximum == r)
+		hue = (g - b) / delta * 60.0f + ((g < b) ? 360.0f : 0.0f);	// Purple to red to yellow (crossing the 0° / 360° line)
+	else if (maximum == g)
+		hue = (b - r) / delta * 60.0f + 120.0f;						// Yellow to green to cyan
+	else
+		hue = (r - g) / delta * 60.0f + 240.0f;						// Cyan to blue to purple
+
+	return Vec3f(hue, saturation, value);
+}
+
+void Color::setFromYUV(const Vec3f& yuv)
 {
 	// Conversion YUV -> RGB
 	r = yuv.x + yuv.z * 1.14f;

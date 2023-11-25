@@ -578,7 +578,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 						{
 							postfix += " <" + std::to_string(callFrame.mSteps) + ">";
 							const float log = log10f((float)clamp((int)callFrame.mSteps, 100, 1000000));
-							color.setHSL(Vec3f(0.75f - log / 6.0f, 1.0f, 0.5f));
+							color.setFromHSL(Vec3f((0.75f - log / 6.0f) * 360.0f, 1.0f, 0.5f));
 						}
 						else
 						{
