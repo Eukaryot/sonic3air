@@ -202,7 +202,10 @@ function void ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(u16 d
 
 function void ROMManipulation.HCZ.SetBottomHeight()
 {
-	u16[0x01bce4] = 0x0c00 - getScreenHeight()
+	if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
+		u16[0x01bce4] = 0x0c00 - getScreenHeight()
+	else
+		u16[0x01bce4] = 0x1000
 }
 
 function void ROMManipulation.CNZ2.KnucklesPreBossCutscene()
