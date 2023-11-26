@@ -100,8 +100,10 @@ namespace lemon
 		template<typename T> bool Math_isNaN(T value)			{ return std::isnan(value); }
 		template<typename T> bool Math_isInfinite(T value)		{ return std::isinf(value); }
 
-		template<typename T> T Math_lerp(T a, T b, T factor)	{ return a + (b - a) * factor; }
-		template<typename T> T Math_invlerp(T a, T b, T value)	{ return (a == b) ? 0.0f : (value - a) / (b - a); }
+		template<typename T> T Math_lerp(T a, T b, T factor)			{ return a + (b - a) * factor; }
+		template<typename T> T Math_lerp_int(T a, T b, float factor)	{ return a + roundToInt((float)(signed)(b - a) * factor); }
+		template<typename T> T Math_invlerp(T a, T b, T value)			{ return (a == b) ? 0.0f : (value - a) / (b - a); }
+		template<typename T> float Math_invlerp_int(T a, T b, T value)	{ return (a == b) ? 0.0f : (float)(value - a) / (float)(b - a); }
 
 		StringRef stringformat(StringRef format, int argv, uint64* args)
 		{
@@ -464,12 +466,92 @@ namespace lemon
 				.setParameterInfo(1, "b")
 				.setParameterInfo(2, "factor");
 
+			module.addNativeFunction("Math.lerp", lemon::wrap(&functions::Math_lerp_int<int8>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "factor");
+
+			module.addNativeFunction("Math.lerp", lemon::wrap(&functions::Math_lerp_int<uint8>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "factor");
+
+			module.addNativeFunction("Math.lerp", lemon::wrap(&functions::Math_lerp_int<int16>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "factor");
+
+			module.addNativeFunction("Math.lerp", lemon::wrap(&functions::Math_lerp_int<uint16>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "factor");
+
+			module.addNativeFunction("Math.lerp", lemon::wrap(&functions::Math_lerp_int<int32>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "factor");
+
+			module.addNativeFunction("Math.lerp", lemon::wrap(&functions::Math_lerp_int<uint32>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "factor");
+
+			module.addNativeFunction("Math.lerp", lemon::wrap(&functions::Math_lerp_int<int64>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "factor");
+
+			module.addNativeFunction("Math.lerp", lemon::wrap(&functions::Math_lerp_int<uint64>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "factor");
+
 			module.addNativeFunction("Math.invlerp", lemon::wrap(&functions::Math_invlerp<float>), compileTimeConstant)
 				.setParameterInfo(0, "a")
 				.setParameterInfo(1, "b")
 				.setParameterInfo(2, "value");
 
 			module.addNativeFunction("Math.invlerp", lemon::wrap(&functions::Math_invlerp<double>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "value");
+
+			module.addNativeFunction("Math.invlerp", lemon::wrap(&functions::Math_invlerp_int<int8>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "value");
+
+			module.addNativeFunction("Math.invlerp", lemon::wrap(&functions::Math_invlerp_int<uint8>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "value");
+
+			module.addNativeFunction("Math.invlerp", lemon::wrap(&functions::Math_invlerp_int<int16>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "value");
+
+			module.addNativeFunction("Math.invlerp", lemon::wrap(&functions::Math_invlerp_int<uint16>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "value");
+
+			module.addNativeFunction("Math.invlerp", lemon::wrap(&functions::Math_invlerp_int<int32>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "value");
+
+			module.addNativeFunction("Math.invlerp", lemon::wrap(&functions::Math_invlerp_int<uint32>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "value");
+
+			module.addNativeFunction("Math.invlerp", lemon::wrap(&functions::Math_invlerp_int<int64>), compileTimeConstant)
+				.setParameterInfo(0, "a")
+				.setParameterInfo(1, "b")
+				.setParameterInfo(2, "value");
+
+			module.addNativeFunction("Math.invlerp", lemon::wrap(&functions::Math_invlerp_int<uint64>), compileTimeConstant)
 				.setParameterInfo(0, "a")
 				.setParameterInfo(1, "b")
 				.setParameterInfo(2, "value");

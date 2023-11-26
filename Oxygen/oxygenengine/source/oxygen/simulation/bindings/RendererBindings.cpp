@@ -61,6 +61,11 @@ namespace
 	float Color_HSV_getSaturation(uint32 color)	{ return Color::fromRGBA32(color).getHSV().y; }
 	float Color_HSV_getValue(uint32 color)		{ return Color::fromRGBA32(color).getHSV().z; }
 
+	uint32 Color_lerp(uint32 a, uint32 b, float factor)
+	{
+		return Color::interpolateColor(Color::fromRGBA32(a), Color::fromRGBA32(b), factor).getRGBA32();
+	}
+
 
 	enum class WriteTarget
 	{
@@ -833,6 +838,11 @@ void RendererBindings::registerBindings(lemon::Module& module)
 
 	module.addNativeFunction("Color.HSV.getValue", lemon::wrap(&Color_HSV_getValue), compileTimeConstant)
 		.setParameterInfo(0, "color");
+
+	module.addNativeFunction("Color.lerp", lemon::wrap(&Color_lerp), compileTimeConstant)
+		.setParameterInfo(0, "colorA")
+		.setParameterInfo(1, "colorB")
+		.setParameterInfo(2, "factor");
 
 
 	// VDP emulation
