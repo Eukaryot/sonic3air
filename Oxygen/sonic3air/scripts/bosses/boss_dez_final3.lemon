@@ -159,7 +159,11 @@ function void fn08029c()
 function void fn0802b2()
 {
 	objA0.update_address = 0x0802c0
+
 #if STANDALONE
+	// Reset speed to the default one, to handle the case that the boss got defeated right while leaping forward
+	char.velocity.x = 0x278
+
 	if (!DEZFinalBoss3.shouldEscapeWithMasterEmerald())
 #endif
 	{
