@@ -107,21 +107,37 @@ bool ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 	// Game settings
 	if (!mGameVersionInSettings.empty())
 	{
-		const auto& settingsMap = SharedDatabase::getSettings();
-
 		JsonHelper gameSettingsHelper(rootHelper.mJson["GameSettings"]);
 
-		// Load settings as uint32 values
-		for (auto& pair : settingsMap)
+		if (!SharedDatabase::getSettings().empty())		// This is going to be empty when the macOS UI calls loadConfiguration externally, causing crash
 		{
-			if (pair.second.mSerializationType != SharedDatabase::Setting::SerializationType::NONE)
+			const auto& settingsMap = SharedDatabase::getSettings();
+
+			// Load settings as uint32 values
+			for (auto& pair : settingsMap)
 			{
-				int value = 0;
-				if (gameSettingsHelper.tryReadInt(pair.second.mIdentifier, value))
+				if (pair.second.mSerializationType != SharedDatabase::Setting::SerializationType::NONE)
 				{
-					pair.second.mCurrentValue = (uint32)value;
+					int value = 0;
+					if (gameSettingsHelper.tryReadInt(pair.second.mIdentifier, value))
+					{
+						pair.second.mCurrentValue = (uint32)value;
+					}
 				}
 			}
+
+			// Make corrections where needed
+			if (mGameVersionInSettings < "22.12.17.0")
+			{
+				// Reset the SETTING_FIX_GLITCHES, after the default value changed
+				const SharedDatabase::Setting* setting = mapFind(settingsMap, (uint32)SharedDatabase::Setting::SETTING_FIX_GLITCHES);
+				if (nullptr != setting)
+					setting->mCurrentValue = 2;
+			}
+
+			const SharedDatabase::Setting* ghostsSetting = mapFind(settingsMap, (uint32)SharedDatabase::Setting::SETTING_TIME_ATTACK_GHOSTS);
+			if (nullptr != ghostsSetting)
+				ghostsSetting->mCurrentValue = (ghostsSetting->mCurrentValue >= 5) ? 5 : (ghostsSetting->mCurrentValue >= 3) ? 3 : (ghostsSetting->mCurrentValue >= 1) ? 1 : 0;
 		}
 
 		if (mGameVersionInSettings < "20.05.01.0")
@@ -134,19 +150,6 @@ bool ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 		{
 			// Reset script optimization - its default was 3 before introducing -1 for auto
 			mScriptOptimizationLevel = -1;
-		}
-
-		if (mGameVersionInSettings < "22.12.17.0")
-		{
-			// Reset the SETTING_FIX_GLITCHES, after the default value changed
-			settingsMap.at(SharedDatabase::Setting::SETTING_FIX_GLITCHES).mCurrentValue = 2;
-		}
-
-		// Make corrections where needed
-		if (!settingsMap.empty())	// This is going to be empty when the macOS UI calls loadConfiguration externally, causing crash
-		{
-			const SharedDatabase::Setting& ghosts = settingsMap.at(SharedDatabase::Setting::SETTING_TIME_ATTACK_GHOSTS);
-			ghosts.mCurrentValue = (ghosts.mCurrentValue >= 5) ? 5 : (ghosts.mCurrentValue >= 3) ? 3 : (ghosts.mCurrentValue >= 1) ? 1 : 0;
 		}
 	}
 	return true;
