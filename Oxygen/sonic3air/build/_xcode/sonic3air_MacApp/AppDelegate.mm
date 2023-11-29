@@ -5,10 +5,10 @@
 
 #import "AppDelegate.h"
 #define RMX_LIB
+#include "sonic3air/data/SharedDatabase.h"
 #include "sonic3air/pch.h"
 #include "sonic3air/EngineDelegate.h"
 #include "sonic3air/version.inc"
-
 #include "oxygen/platform/CrashHandler.h"
 #include "oxygen/platform/PlatformFunctions.h"
 
@@ -49,6 +49,7 @@ EngineMain* _myMain;
 	[NSFileManager.defaultManager changeCurrentDirectoryPath:appFolder];
 #endif
 	
+	SharedDatabase::initialize();
 	bool loadedSettings = config.loadSettings(config.mAppDataPath + L"settings.json", Configuration::SettingsType::STANDARD);
 	config.loadSettings(config.mAppDataPath + L"settings_input.json", Configuration::SettingsType::INPUT);
 	config.loadSettings(config.mAppDataPath + L"settings_global.json", Configuration::SettingsType::GLOBAL);
