@@ -435,11 +435,18 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 	config.initialization();
 
 	RMX_LOG_INFO("Loading configuration");
+	if (FTX::FileSystem->exists(config.mAppDataPath + L"config.json"))
+	{
+		config.loadConfiguration(config.mAppDataPath + L"config.json");
+	}
+	else
+	{
 #if (defined(PLATFORM_MAC) || defined(PLATFORM_IOS)) && defined(ENDUSER)
-	config.loadConfiguration(config.mGameDataPath + L"/config.json");
+		config.loadConfiguration(config.mGameDataPath + L"/config.json");
 #else
-	config.loadConfiguration(L"config.json");
+		config.loadConfiguration(L"config.json");
 #endif
+	}
 
 	// Setup a custom game profile (like S3AIR does) or load the "oxygenproject.json"
 	const bool hasCustomGameProfile = mDelegate.setupCustomGameProfile();
