@@ -12,6 +12,7 @@
 #include "oxygen/rendering/parts/PatternManager.h"
 #include "oxygen/resources/SpriteCache.h"
 #include "oxygen/simulation/EmulatorInterface.h"
+#include "oxygen/simulation/LogDisplay.h"
 
 
 SpriteManager::SpriteManager(PatternManager& patternManager, SpacesManager& spacesManager) :
@@ -37,6 +38,7 @@ void SpriteManager::preFrameUpdate()
 {
 	mCurrentContext = RenderItem::LifetimeContext::DEFAULT;
 	mLogicalSpriteSpace = Space::SCREEN;
+	mLoggedLimitWarning = false;
 	mSpriteTag = 0;
 	mTaggedSpritesLastFrame.swap(mTaggedSpritesThisFrame);
 	mTaggedSpritesThisFrame.clear();
@@ -100,11 +102,8 @@ void SpriteManager::postRefreshDebugging()
 
 void SpriteManager::drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, const Color& tintColor, const Color& addedColor)
 {
-	if (mAddedItems.mItems.size() >= 0x400)
-	{
-		RMX_ERROR("Reached the upper limit of " << mAddedItems.mItems.size() << " items to render, further ones will be ignored", );
+	if (!checkRenderItemLimit())
 		return;
-	}
 
 	renderitems::VdpSpriteInfo& sprite = mPoolOfRenderItems.mVdpSprites.createObject();
 	sprite.mPosition = position;
@@ -220,12 +219,8 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 
 void SpriteManager::addSpriteMask(const Vec2i& position, const Vec2i& size, uint16 renderQueue, bool priorityFlag, Space space)
 {
-	// TODO: Originally, the number of sprite masks was 0x40
-	if (mAddedItems.mItems.size() >= 0x400)
-	{
-		RMX_ERROR("Reached the upper limit of " << mAddedItems.mItems.size() << " items to render, further ones will be ignored", );
+	if (!checkRenderItemLimit())
 		return;
-	}
 
 	renderitems::SpriteMaskInfo& sprite = mPoolOfRenderItems.mSpriteMasks.createObject();
 	sprite.mPosition = position;
@@ -239,11 +234,8 @@ void SpriteManager::addSpriteMask(const Vec2i& position, const Vec2i& size, uint
 
 void SpriteManager::addRectangle(const Recti& rect, const Color& color, uint16 renderQueue, Space space, bool useGlobalComponentTint)
 {
-	if (mAddedItems.mItems.size() >= 0x400)
-	{
-		RMX_ERROR("Reached the upper limit of " << mAddedItems.mItems.size() << " items to render, further ones will be ignored", );
+	if (!checkRenderItemLimit())
 		return;
-	}
 
 	renderitems::Rectangle& newRect = mPoolOfRenderItems.mRectangles.createObject();
 	newRect.mPosition = rect.getPos();
@@ -258,11 +250,8 @@ void SpriteManager::addRectangle(const Recti& rect, const Color& color, uint16 r
 
 void SpriteManager::addText(std::string_view fontKeyString, uint64 fontKeyHash, const Vec2i& position, std::string_view textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space, bool useGlobalComponentTint)
 {
-	if (mAddedItems.mItems.size() >= 0x400)
-	{
-		RMX_ERROR("Reached the upper limit of " << mAddedItems.mItems.size() << " items to render, further ones will be ignored", );
+	if (!checkRenderItemLimit())
 		return;
-	}
 
 	renderitems::Text& newText = mPoolOfRenderItems.mTexts.createObject();
 	newText.mFontKeyString = fontKeyString;
@@ -391,7 +380,7 @@ renderitems::CustomSpriteInfoBase* SpriteManager::addSpriteByKey(uint64 key)
 	const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(key);
 	if (nullptr != item)
 	{
-		if (mAddedItems.mItems.size() < 0x400)
+		if (checkRenderItemLimit())
 		{
 			if (item->mUsesComponentSprite)
 			{
@@ -416,7 +405,6 @@ renderitems::CustomSpriteInfoBase* SpriteManager::addSpriteByKey(uint64 key)
 				return &sprite;
 			}
 		}
-		RMX_ERROR("Reached the upper limit of " << mAddedItems.mItems.size() << " items to render, further ones will be ignored", );
 	}
 	return nullptr;
 }
@@ -434,6 +422,27 @@ void SpriteManager::checkSpriteTag(renderitems::SpriteInfo& sprite)
 
 		TaggedSpriteData& taggedSpriteData = mTaggedSpritesThisFrame[mSpriteTag];
 		taggedSpriteData.mPosition = mTaggedSpritePosition;
+	}
+}
+
+bool SpriteManager::checkRenderItemLimit()
+{
+	const constexpr size_t LIMIT = 2048;
+	if (mAddedItems.mItems.size() < LIMIT)
+	{
+		// Everything's okay
+		return true;
+	}
+	else
+	{
+		// Reached the limit
+		if (!mLoggedLimitWarning)
+		{
+			if (EngineMain::getDelegate().useDeveloperFeatures())
+				LogDisplay::instance().setLogDisplay("Warning: Exceeded the upper limit of " + std::to_string(LIMIT) + " items to render, further ones will be ignored");
+			mLoggedLimitWarning = true;
+		}
+		return false;
 	}
 }
 
