@@ -54,9 +54,15 @@ void GhostSync::performUpdate()
 		case State::CONNECTING:
 		{
 			// Wait for "evaluateServerFeaturesResponse" to be called, and only check for errors here
-			if (mGameClient.getConnectionState() == GameClient::ConnectionState::FAILED)
+			switch (mGameClient.getConnectionState())
 			{
-				mState = State::FAILED;
+				case GameClient::ConnectionState::NOT_CONNECTED:
+					mState = State::INACTIVE;
+					break;
+
+				case GameClient::ConnectionState::FAILED:
+					mState = State::FAILED;
+					break;
 			}
 			break;
 		}
