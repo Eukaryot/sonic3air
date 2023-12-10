@@ -70,8 +70,8 @@ void TouchControlsOverlay::buildTouchControls()
 	mSetup.mFaceButtonsSize = (float)config.mVirtualGamepad.mFaceButtonsSize * CONFIG_TO_SETUP_SCALE;
 	mSetup.mStartButtonCenter = Vec2f(0.95f, -0.92f) + Vec2f(config.mVirtualGamepad.mStartButtonCenter) * CONFIG_TO_SETUP_SCALE * 0.5f;
 	mSetup.mGameRecButtonCenter = Vec2f(-0.95f, -0.92f) + Vec2f(config.mVirtualGamepad.mGameRecButtonCenter) * CONFIG_TO_SETUP_SCALE * 0.5f;
-	mSetup.mShoulderLButtonCenter = Vec2f(-1.55f, -0.82f) + Vec2f(config.mVirtualGamepad.mShoulderLButtonCenter) * CONFIG_TO_SETUP_SCALE * 0.5f;
-	mSetup.mShoulderRButtonCenter = Vec2f(+1.55f, -0.82f) + Vec2f(config.mVirtualGamepad.mShoulderRButtonCenter) * CONFIG_TO_SETUP_SCALE * 0.5f;
+	mSetup.mShoulderLButtonCenter = Vec2f(-1.55f, -0.87f) + Vec2f(config.mVirtualGamepad.mShoulderLButtonCenter) * CONFIG_TO_SETUP_SCALE * 0.5f;
+	mSetup.mShoulderRButtonCenter = Vec2f(+1.55f, -0.87f) + Vec2f(config.mVirtualGamepad.mShoulderRButtonCenter) * CONFIG_TO_SETUP_SCALE * 0.5f;
 
 	// Create touch areas and visual elements
 	{
@@ -97,12 +97,12 @@ void TouchControlsOverlay::buildTouchControls()
 
 		if (InputManager::instance().isUsingControlsLR())
 		{
-			buildRoundButton(mSetup.mShoulderLButtonCenter, 0.15f * size, "touch_overlay_L", controller.L, ConfigMode::State::MOVING_L);
-			buildRoundButton(mSetup.mShoulderRButtonCenter, 0.15f * size, "touch_overlay_R", controller.R, ConfigMode::State::MOVING_R);
+			buildRectangularButton(mSetup.mShoulderLButtonCenter, Vec2f(0.175f, 0.1f), "touch_overlay_L", &controller.L, ConfigMode::State::MOVING_L);
+			buildRectangularButton(mSetup.mShoulderRButtonCenter, Vec2f(0.175f, 0.1f), "touch_overlay_R", &controller.R, ConfigMode::State::MOVING_R);
 		}
 	}
 	buildRectangularButton(mSetup.mStartButtonCenter, Vec2f(0.18f, 0.06f), "touch_overlay_start", &controller.Start, ConfigMode::State::MOVING_START);
-	buildRectangularButton(mSetup.mGameRecButtonCenter, Vec2f(0.15f, 0.06f), "touch_overlay_rec", nullptr, ConfigMode::State::MOVING_GAMEREC, TouchArea::SpecialType::GAMEREC);
+	buildRectangularButton(mSetup.mGameRecButtonCenter, Vec2f(0.15f, 0.06f), "touch_overlay_rec", nullptr, ConfigMode::State::MOVING_GAMEREC, TouchArea::SpecialType::GAMEREC, 0.1f);
 
 	mLastScreenSize = FTX::screenSize();
 }
@@ -249,7 +249,7 @@ void TouchControlsOverlay::buildPointButton(const Vec2f& center, float radius, f
 		touchArea.mControls.push_back(control2);
 }
 
-void TouchControlsOverlay::buildRectangularButton(const Vec2f& center, const Vec2f& halfExtend, const char* spriteKey, InputManager::Control* control, ConfigMode::State reactToState, TouchArea::SpecialType specialType)
+void TouchControlsOverlay::buildRectangularButton(const Vec2f& center, const Vec2f& halfExtend, const char* spriteKey, InputManager::Control* control, ConfigMode::State reactToState, TouchArea::SpecialType specialType, float radius)
 {
 	VisualElement& visualElement = vectorAdd(mVisualElements);
 	visualElement.mCenter.set(center);
@@ -262,7 +262,7 @@ void TouchControlsOverlay::buildRectangularButton(const Vec2f& center, const Vec
 	TouchArea& touchArea = vectorAdd(mTouchAreas);
 	touchArea.mSpecialType = specialType;
 	touchArea.mRect.set(center - halfExtend, halfExtend * 2.0f);
-	touchArea.mRadius = 0.35f;
+	touchArea.mRadius = radius;
 	touchArea.mPriority = 1.0f;
 	if (nullptr != control)
 		touchArea.mControls.push_back(control);

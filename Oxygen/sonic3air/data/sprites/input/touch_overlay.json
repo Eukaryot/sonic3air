@@ -11,8 +11,8 @@
 	"touch_overlay_down":	{ "File": "touch_overlay.png", "Rect": "105,  0,105,190", "Center": "53,95" },
 	"touch_overlay_start":	{ "File": "touch_overlay.png", "Rect": "  0,415,365,120", "Center": "183,60" },
 	"touch_overlay_rec":	{ "File": "touch_overlay.png", "Rect": "365,415,200,120", "Center": "100,60" },
-	"touch_overlay_L":		{ "File": "touch_overlay.png", "Rect": "580,  0,175,175", "Center": "88,88" },
-	"touch_overlay_R":		{ "File": "touch_overlay.png", "Rect": "580,180,175,175", "Center": "88,88" },
+	"touch_overlay_L":		{ "File": "touch_overlay.png", "Rect": "580,  0,186,106", "Center": "93,53" },
+	"touch_overlay_R":		{ "File": "touch_overlay.png", "Rect": "580,108,186,106", "Center": "93,53" },
 
 	"touch_overlay_A_hl":		{ "File": "touch_overlay_highlight.png", "Rect": "220,  0,175,175", "Center": "88,88" },
 	"touch_overlay_B_hl":		{ "File": "touch_overlay_highlight.png", "Rect": "400,  0,175,175", "Center": "88,88" },
@@ -24,6 +24,6 @@
 	"touch_overlay_down_hl":	{ "File": "touch_overlay_highlight.png", "Rect": "105,  0,105,190", "Center": "53,95" },
 	"touch_overlay_start_hl":	{ "File": "touch_overlay_highlight.png", "Rect": "  0,415,365,120", "Center": "183,60" },
 	"touch_overlay_rec_hl":		{ "File": "touch_overlay_highlight.png", "Rect": "365,415,200,120", "Center": "100,60" },
-	"touch_overlay_L_hl":		{ "File": "touch_overlay_highlight.png", "Rect": "580,  0,175,175", "Center": "88,88" },
-	"touch_overlay_R_hl":		{ "File": "touch_overlay_highlight.png", "Rect": "580,180,175,175", "Center": "88,88" }
+	"touch_overlay_L_hl":		{ "File": "touch_overlay_highlight.png", "Rect": "580,  0,186,106", "Center": "93,53" },
+	"touch_overlay_R_hl":		{ "File": "touch_overlay_highlight.png", "Rect": "580,108,186,106", "Center": "93,53" }
 }

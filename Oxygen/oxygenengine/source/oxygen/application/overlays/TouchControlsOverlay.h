@@ -104,7 +104,7 @@ private:
 
 private:
 	void buildPointButton(const Vec2f& center, float radius, float priority, InputManager::Control& control, InputManager::Control* control2);
-	void buildRectangularButton(const Vec2f& center, const Vec2f& halfExtend, const char* spriteKey, InputManager::Control* control, ConfigMode::State reactToState, TouchArea::SpecialType specialType = TouchArea::SpecialType::NONE);
+	void buildRectangularButton(const Vec2f& center, const Vec2f& halfExtend, const char* spriteKey, InputManager::Control* control, ConfigMode::State reactToState, TouchArea::SpecialType specialType = TouchArea::SpecialType::NONE, float radius = 0.35f);
 	void buildRoundButton(const Vec2f& center, float radius, const char* spriteKey, InputManager::Control& control, ConfigMode::State reactToState);
 
 	const TouchArea* getTouchAreaAtNormalizedPosition(const Vec2f& position) const;
