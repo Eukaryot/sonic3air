@@ -276,7 +276,8 @@ uint32 SpriteManager::addSpriteHandle(uint64 key, const Vec2i& position, uint16 
 	if (mNextSpriteHandle == 0)
 		++mNextSpriteHandle;
 
-	SpriteHandleData& data = mSpritesHandles[spriteHandle];
+	SpriteHandleData& data = vectorAdd(mSpritesHandles);
+	data.mHandle = mNextSpriteHandle;
 	data.mKey = key;
 	data.mPosition = position;
 	data.mRenderQueue = renderQueue;
@@ -292,14 +293,22 @@ SpriteManager::SpriteHandleData* SpriteManager::getSpriteHandleData(uint32 sprit
 	if (mLatestSpriteHandle.first == spriteHandle)
 		return mLatestSpriteHandle.second;
 
-	// Otherwise search the map
-	const auto it = mSpritesHandles.find(spriteHandle);
-	if (it == mSpritesHandles.end())
-		return nullptr;
+	// Otherwise search for the handle
+	//  -> TODO: At least for now, the sprite handles are always in order, so we could do a binary search here
+	SpriteHandleData* data = nullptr;
+	for (auto it = mSpritesHandles.rbegin(); it != mSpritesHandles.rend(); ++it)
+	{
+		if (it->mHandle == spriteHandle)
+		{
+			data = &*it;
+			break;
+		}
+	}
 
-	SpriteHandleData& data = it->second;
-	mLatestSpriteHandle = std::make_pair(spriteHandle, &data);
-	return &data;
+	if (nullptr != data)
+		mLatestSpriteHandle = std::make_pair(spriteHandle, data);
+
+	return data;
 }
 
 void SpriteManager::setLogicalSpriteSpace(Space space)
@@ -448,7 +457,7 @@ bool SpriteManager::checkRenderItemLimit()
 
 void SpriteManager::processSpriteHandles()
 {
-	for (const auto& [key, data] : mSpritesHandles)
+	for (const SpriteHandleData& data : mSpritesHandles)
 	{
 		renderitems::CustomSpriteInfoBase* spritePtr = addSpriteByKey(data.mKey);
 		if (nullptr == spritePtr)

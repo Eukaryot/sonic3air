@@ -20,7 +20,8 @@ public:
 
 	struct SpriteHandleData
 	{
-		uint64 mKey = 0;
+		uint32 mHandle = 0;		// Sprite handle ID
+		uint64 mKey = 0;		// Sprite key
 		Vec2i  mPosition;
 		uint16 mRenderQueue = 0;
 		bool   mFlipX = false;
@@ -115,7 +116,7 @@ private:
 	bool mLoggedLimitWarning = false;
 
 	uint32 mNextSpriteHandle = 1;
-	std::unordered_map<uint32, SpriteHandleData> mSpritesHandles;
+	std::vector<SpriteHandleData> mSpritesHandles;
 	std::pair<uint32, SpriteHandleData*> mLatestSpriteHandle;
 
 	struct TaggedSpriteData
