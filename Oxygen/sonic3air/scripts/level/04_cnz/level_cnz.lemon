@@ -209,8 +209,8 @@ function void fn051caa()
 	{
 		UpdateBackground.CNZ1()
 
-		A6 = addressof(camera.background.y)
-		A5 = addressof(camera.background.y.old)
+		A6 = addressof(camera.background.y)			// Address: 0xffffee90
+		A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
 		D1 = 0
 		D6 = 0x20
 		LoadTileContentInDirY()
@@ -247,8 +247,8 @@ function void fn051d2e()
 	fn0520e8()
 	fn051fb0()
 
-	A6 = addressof(camera.background.x)
-	A5 = addressof(camera.background.x.old)
+	A6 = addressof(camera.background.x)			// Address: 0xffffee8c
+	A5 = addressof(camera.background.x.old)		// Address: 0xffffee94
 	D1.u16 = 0x0200
 	D6 = 0x10
 	LoadTileContentInDirX()
@@ -777,8 +777,8 @@ function void fn05227c()
 //# address-hook(0x052280) end(0x05229c)
 function void fn052280()
 {
-	A6 = addressof(camera.background.y)
-	A5 = addressof(camera.background.y.old)
+	A6 = addressof(camera.background.y)			// Address: 0xffffee90
+	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
