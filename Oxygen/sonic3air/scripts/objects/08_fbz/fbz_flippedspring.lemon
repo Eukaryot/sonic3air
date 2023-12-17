@@ -163,7 +163,7 @@ function void fn023a3c()
 }
 
 
-//# address-hook(0x023a42) end(0x023326)
+//# address-hook(0x023a42) end(0x023a54)
 function void fn023a42()
 {
 	fn023ab8()
