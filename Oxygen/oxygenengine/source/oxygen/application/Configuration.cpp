@@ -188,9 +188,20 @@ namespace
 					const std::string key = it2.key().asString();
 					const uint64 keyHash = rmx::getMurmur2_64(key);
 
+					uint32 value = 0;
+					try
+					{
+						value = it2->asUInt();
+					}
+					catch (std::exception& e)	// Catching exception like "LargestInt out of UInt range"
+					{
+						RMX_ERROR("Failed to read '" << key << "' setting for mod '" << modName << "' with error: " << e.what(), );
+						continue;
+					}
+
 					Configuration::Mod::Setting& setting = mod.mSettings[keyHash];
 					setting.mIdentifier = key;
-					setting.mValue = (uint32)it2->asInt();
+					setting.mValue = value;
 				}
 			}
 		}
