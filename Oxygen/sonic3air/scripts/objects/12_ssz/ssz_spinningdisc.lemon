@@ -77,13 +77,13 @@ function void fn045dfe()
 		PlatformCheckClimbOn()
 
 		A1 = 0xffffb000
-		A2 = addressof(control.player1)		// Address: 0xfffff602
+		A2 = addressof(control.player1)
 		A3 = A0 + 0x2e
 		D6 = 3		// object.flag.P1_ON_OBJECT
 		fn045e6e()
 
 		A1 = 0xffffb04a
-		A2 = addressof(control.tails)		// Address: 0xfffff66a
+		A2 = addressof(control.tails)
 		A3 = A0 + 0x30
 		D6 = 4		// object.flag.P2_ON_OBJECT
 		fn045e6e()
@@ -197,14 +197,14 @@ function void fn045f2e()
 		PlatformCheckClimbOn()
 
 		A1 = 0xffffb000
-		A2 = addressof(control.player1)		// Address: 0xfffff602
+		A2 = addressof(control.player1)
 		A3 = A0 + 0x2e
 		A4 = A0 + 0x34
 		D6 = 3		// object.flag.P1_ON_OBJECT
 		fn045f74()
 
 		A1 = 0xffffb04a
-		A2 = addressof(control.tails)		// Address: 0xfffff66a
+		A2 = addressof(control.tails)
 		A3 = A0 + 0x34
 		A4 = A0 + 0x2e
 		D6 = 4		// object.flag.P2_ON_OBJECT

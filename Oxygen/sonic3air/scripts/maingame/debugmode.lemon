@@ -46,11 +46,11 @@ function void DebugMode.Enter()
 	#if STANDALONE
 		if (!isMainCharacter(CHARACTER_TAILS))
 		{
-			setSpeedCapProperties(addressof(global.move.speedcap))			// Address: 0xfffff760
+			setSpeedCapProperties(addressof(global.move.speedcap))
 		}
 		else
 		{
-			setSpeedCapProperties(addressof(global.move.speedcap.tails))	// Address: 0xfffffec0
+			setSpeedCapProperties(addressof(global.move.speedcap.tails))
 		}
 	#else
 		global.move.speedcap = 0x600

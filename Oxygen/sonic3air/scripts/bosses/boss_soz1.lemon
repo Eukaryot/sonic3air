@@ -544,7 +544,7 @@ function void fn076e5c()
 //# address-hook(0x076e94) end(0x076f08)
 function void fn076e94()
 {
-	A1 = addressof(control.player1)		// Address: 0xfffff602
+	A1 = addressof(control.player1)
 	A2 = 0xffffb000
 	D0.u16 = 0x43a0
 	if ((objA0.flags38 & 0x08) == 0)

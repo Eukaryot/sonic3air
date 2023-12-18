@@ -296,7 +296,7 @@ function void fn01a3fe()
 
 	// Go through all the badniks to destroy
 	D6.u16 = global.dynamic_objects.size
-	A4 = addressof(global.dynamic_objects.size) + 2		// Resulting address: 0xffffe382
+	A4 = addressof(global.dynamic_objects.size) + 2
 	if (D6.u16 != 0)
 	{
 		u8[0xfffff66c] += 2

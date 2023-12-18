@@ -394,13 +394,13 @@ function void fn006f4a()
 
 	if (!isMainCharacter(CHARACTER_TAILS))
 	{
-		A3 = addressof(level.HCZ_water_current_flags.player1)	// Address: 0xfffff7c8
+		A3 = addressof(level.HCZ_water_current_flags.player1)
 		A1 = 0xffffb000
 		D6.u8 = control.player1.state
 		D5 = 0
 		fn006f90()
 
-		A3 = addressof(level.HCZ_water_current_flags.tails)		// Address: 0xfffff7c9
+		A3 = addressof(level.HCZ_water_current_flags.tails)
 		A1 = 0xffffb04a
 		D6.u8 = control.tails.state
 		D5 = 1
@@ -408,7 +408,7 @@ function void fn006f4a()
 	}
 	else
 	{
-		A3 = addressof(level.HCZ_water_current_flags.tails)		// Address: 0xfffff7c9
+		A3 = addressof(level.HCZ_water_current_flags.tails)
 		A1 = 0xffffb000
 		D6.u8 = control.player1.state
 		D5 = 0

@@ -151,8 +151,8 @@ function void fn050bce()
 
 	UpdateBackground.HCZ1()
 
-	A6 = addressof(camera.background.y)			// Address: 0xffffee90
-	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -227,8 +227,8 @@ function void fn050c4c()
 
 	UpdateBackground.HCZ1()
 
-	A6 = addressof(camera.background.y)			// Address: 0xffffee90
-	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -673,8 +673,8 @@ function void fn050fca()
 //# address-hook(0x050fce) end(0x050fec)
 function void fn050fce()
 {
-	A6 = addressof(camera.background.y)			// Address: 0xffffee90
-	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()

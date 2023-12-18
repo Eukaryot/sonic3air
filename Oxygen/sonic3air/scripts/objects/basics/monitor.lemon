@@ -760,11 +760,11 @@ function void ItemEffect.ApplySpeedUp()
 	A0 = A1
 	if (A0 == 0xffffb000 && !isMainCharacter(CHARACTER_TAILS))
 	{
-		setSpeedCapProperties(addressof(global.move.speedcap))			// Address: 0xfffff760
+		setSpeedCapProperties(addressof(global.move.speedcap))
 	}
 	else
 	{
-		setSpeedCapProperties(addressof(global.move.speedcap.tails))	// Address: 0xfffffec0
+		setSpeedCapProperties(addressof(global.move.speedcap.tails))
 	}
 	A0 = backupA0
 #else
@@ -872,7 +872,7 @@ function void ItemEffect.ApplySuperTransformation()
 	super.active = 1
 	super.ring_dec.frames = 60
 #if STANDALONE
-	setSpeedCapProperties(addressof(global.move.speedcap), true)		// Address: 0xfffff760
+	setSpeedCapProperties(addressof(global.move.speedcap), true)
 #else
 	global.move.speedcap = 0x800
 	global.move.acceleration = 0x18
@@ -886,7 +886,7 @@ function void ItemEffect.ApplySuperTransformation()
 		u32[0xffffb000 + 0x0c] = 0x146816		// "char.mapping_offset"
 		super.active = 0xff
 	#if STANDALONE
-		setSpeedCapProperties(addressof(global.move.speedcap), true)	// Address: 0xfffff760
+		setSpeedCapProperties(addressof(global.move.speedcap), true)
 	#else
 		global.move.speedcap = 0xa00
 		global.move.acceleration = 0x30
@@ -906,7 +906,7 @@ function void ItemEffect.ApplySuperTransformation()
 	#endif
 		u8[0xffffb000 + 0x20] = char.state.TAILS_TRANSFORM
 	#if STANDALONE
-		setSpeedCapProperties(addressof(global.move.speedcap.tails), true)	// Address: 0xfffffec0
+		setSpeedCapProperties(addressof(global.move.speedcap.tails), true)
 	#else
 		global.move.speedcap.tails = 0x800
 		global.move.acceleration.tails = 0x18

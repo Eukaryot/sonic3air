@@ -210,8 +210,8 @@ function void fn053780()
 {
 	fn053940()
 
-	A6 = addressof(camera.background.y)			// Address: 0xffffee90
-	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1.u16 = 0x1880
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -897,8 +897,8 @@ function void fn053d78()
 
 		UpdateBackgroundScrolling.ICZ2.Indoors()
 
-		A6 = addressof(camera.background.y)			// Address: 0xffffee90
-		A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
+		A6 = addressof(camera.background.y)
+		A5 = addressof(camera.background.y.old)
 		D1 = 0
 		D6 = 0x20
 		LoadTileContentInDirY()
@@ -969,8 +969,8 @@ function void fn053dfc()
 //# address-hook(0x053e3e)
 function void fn053e3e()
 {
-	A6 = addressof(camera.background.y)			// Address: 0xffffee90
-	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()

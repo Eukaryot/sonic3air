@@ -40,7 +40,7 @@ function void updateCharacterSpritePatterns(u8 character, u8 animationSprite)
 	u32 sourceBase
 	u32 tableAddress
 	u16 targetInVRAM = Char.Player1.targetInVRAM
-	u32 animationSpriteBackup = addressof(char.animation.sprite.backup)			// Address: 0xfffff766
+	u32 animationSpriteBackup = addressof(char.animation.sprite.backup)
 
 	if (character == CHARACTER_SONIC)
 	{
@@ -54,7 +54,7 @@ function void updateCharacterSpritePatterns(u8 character, u8 animationSprite)
 		sourceBase = (animationSprite >= 0xd1) ? 0x143d00 : 0x3200e0
 		tableAddress = 0x14a08a
 		targetInVRAM = Char.Tails.targetInVRAM
-		animationSpriteBackup = addressof(char.animation.sprite.backup.tails)	// Address: 0xfffff7de
+		animationSpriteBackup = addressof(char.animation.sprite.backup.tails)
 	}
 	else
 	{

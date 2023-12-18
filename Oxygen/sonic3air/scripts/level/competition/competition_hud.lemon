@@ -386,12 +386,12 @@ function void fn037c8e()
 //# address-hook(0x037cdc) end(0x037cfe)
 function void fn037cdc()
 {
-	A1 = addressof(player.score)							// Address: 0xfffffe26
+	A1 = addressof(player.score)
 	A2 = 0xffff700a
-	A3 = addressof(timer.minutes)							// Address: 0xffffef61
-	D1 = competition_mode.lap_count.player1					// Address: 0xfffffe23
-	A4 = addressof(hud.dirty.timer)							// Address: 0xfffffe1e
-	A5 = addressof(competition_mode.time_record.player1)	// Address: 0xffffee52
+	A3 = addressof(timer.minutes)
+	D1 = competition_mode.lap_count.player1
+	A4 = addressof(hud.dirty.timer)
+	A5 = addressof(competition_mode.time_record.player1)
 	A6 = 0xffff7828
 	fn037d7c()
 }
@@ -429,12 +429,12 @@ function void fn037d00()
 //# address-hook(0x037d5a) end(0x037d76)
 function void fn037d5a()
 {
-	A1 = addressof(player2.score)							// Address: 0xfffffed6
+	A1 = addressof(player2.score)
 	A2 = 0xffff708a
-	A3 = addressof(timer.minutes.player2)					// Address: 0xfffffed3
-	D1 = competition_mode.lap_count.player2					// Address: 0xffffee5d
-	A4 = addressof(hud.dirty.timer.player2)					// Address: 0xfffffec7
-	A5 = addressof(competition_mode.time_record.player2)	// Address: 0xffffee56
+	A3 = addressof(timer.minutes.player2)
+	D1 = competition_mode.lap_count.player2
+	A4 = addressof(hud.dirty.timer.player2)
+	A5 = addressof(competition_mode.time_record.player2)
 	A6 = 0xffff7840
 	fn037d7c()
 }

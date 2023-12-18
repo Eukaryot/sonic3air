@@ -171,14 +171,14 @@ function void fn057fc0()
 function void fn057fe2()
 {
 	A1 = 0xffffb000
-	A2 = addressof(control.player1)		// Address: 0xfffff602
+	A2 = addressof(control.player1)
 	A3 = A0 + 0x30
 	fn058002()
 
 	if (getNumPlayers() == 2)
 	{
 		A1 = 0xffffb04a
-		A2 = addressof(control.tails)	// Address: 0xfffff66a
+		A2 = addressof(control.tails)
 		A3 = A0 + 0x31
 		fn058002()
 	}

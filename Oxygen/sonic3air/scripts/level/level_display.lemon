@@ -953,14 +953,14 @@ function void fn04ed6c()
 //# address-hook(0x04ed90) end(0x04edb0)
 function void LoadTileContentDefault()
 {
-	A6 = addressof(camera.foreground.x)			// Address: 0xffffee80
-	A5 = addressof(camera.foreground.x.old)		// Address: 0xffffee88
+	A6 = addressof(camera.foreground.x)
+	A5 = addressof(camera.foreground.x.old)
 	D1.u16 = camera.foreground.y.u16
 	D6 = 0x0f
 	LoadTileContentInDirX()
 
-	A6 = addressof(camera.foreground.y)			// Address: 0xffffee84
-	A5 = addressof(camera.foreground.y.old)		// Address: 0xffffee8a
+	A6 = addressof(camera.foreground.y)
+	A5 = addressof(camera.foreground.y.old)
 	D1.u16 = camera.foreground.x.u16
 	D6 = (getScreenWidth() + 31) / 16
 	LoadTileContentInDirY()
@@ -987,14 +987,14 @@ function void fn04f2f6()
 //# address-hook(0x04edb4) end(0x04edd4)
 function void UpdateBackgroundTiles.General()
 {
-	A6 = addressof(camera.background.x)			// Address: 0xffffee8c
-	A5 = addressof(camera.background.x.old)		// Address: 0xffffee94
+	A6 = addressof(camera.background.x)
+	A5 = addressof(camera.background.x.old)
 	D1.u16 = camera.background.y.u16
 	D6 = 0x0f
 	LoadTileContentInDirX()
 
-	A6 = addressof(camera.background.y)			// Address: 0xffffee90
-	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1.u16 = camera.background.x.u16
 	D6 = (getScreenWidth() + 31) / 16
 	LoadTileContentInDirY()
@@ -1008,10 +1008,10 @@ function void fn04edf6()
 	push(A4)
 	push(D5)
 
-	A6 = addressof(camera.background.y)			// Address: 0xffffee90
+	A6 = addressof(camera.background.y)
 	fn04ee84()
 
-	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
+	A5 = addressof(camera.background.y.old)
 	fn04eb22()
 
 	D5 = pop()

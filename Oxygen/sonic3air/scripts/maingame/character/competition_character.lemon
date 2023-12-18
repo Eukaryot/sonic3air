@@ -14,9 +14,9 @@ function void CompetitionMode.Character.BaseUpdate(u32 mainRoutineTableAddress)
 {
 	if (A0 == 0xffffb000)
 	{
-		A4 = addressof(global.move.speedcap)	// Address: 0xfffff760 = Base address of speed caps & acceleration/deceleration for player 1
-		A5 = addressof(camera.yoffset.player)	// Address: 0xffffee2c
-		A6 = 0xffffcc54							// Base address of dust cloud object for player 1
+		A4 = addressof(global.move.speedcap)	// Base address of speed caps & acceleration/deceleration for player 1
+		A5 = addressof(camera.yoffset.player)
+		A6 = 0xffffcc54		// Base address of dust cloud object for player 1
 		if (u8[0xffffb04a + 0x38] == char.character)
 		{
 			char.render_flags ^= render_flag.COMPETITION_P1_SCREEN
@@ -30,9 +30,9 @@ function void CompetitionMode.Character.BaseUpdate(u32 mainRoutineTableAddress)
 	}
 	else
 	{
-		A4 = addressof(global.move.speedcap.tails)	// Address: 0xfffffec0 - Base address of speed caps & acceleration/deceleration for player 2
-		A5 = addressof(camera.yoffset.tails)		// Address: 0xffffee2e
-		A6 = 0xffffcc9e								// Base address of dust cloud object for player 2
+		A4 = addressof(global.move.speedcap.tails)	// Base address of speed caps & acceleration/deceleration for player 2
+		A5 = addressof(camera.yoffset.tails)
+		A6 = 0xffffcc9e		// Base address of dust cloud object for player 2
 		if (u8[0xffffb000 + 0x38] == char.character)
 		{
 			char.render_flags ^= render_flag.COMPETITION_P2_SCREEN
@@ -349,7 +349,7 @@ function void CompetitionMode.Character.UpdateSpindash.Sonic_Knuckles()
 
 	D0 = u8[A0 + 0x3e] * 2
 	char.groundspeed = u16[0x010a14 + D0.u16]
-	A1 = (A0 == 0xffffb000) ? addressof(camera.locktime.player1) : addressof(camera.locktime.player2)	// Addresses: 0xffffee24 / 0xffffee28
+	A1 = (A0 == 0xffffb000) ? addressof(camera.locktime.player1) : addressof(camera.locktime.player2)
 	u16[A1] = 0x2000 - (((u16(char.groundspeed) - 0x0800) * 2) & 0x1f00)
 	if (char.flags & char.flag.FACING_LEFT)
 	{
@@ -702,7 +702,7 @@ function void CompetitionMode.Character.UpdateSpindash.Tails()
 
 	D0 = u8[A0 + 0x3e] * 2
 	char.groundspeed = u16[0x0135ee + D0.u16]
-	A1 = (A0 == 0xffffb000) ? addressof(camera.locktime.player1) : addressof(camera.locktime.player2)	// Addresses: 0xffffee24 / 0xffffee28
+	A1 = (A0 == 0xffffb000) ? addressof(camera.locktime.player1) : addressof(camera.locktime.player2)
 	u16[A1] = 0x2000 - (((u16(char.groundspeed) - 0x0800) * 2) & 0x1f00)
 	if (char.flags & char.flag.FACING_LEFT)
 	{

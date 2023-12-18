@@ -469,10 +469,10 @@ function void fn04ee9e()
 	u32 backupA4 = A4
 	u32 backupA5 = A5
 
-	A6 = addressof(camera.foreground.x)			// Address: 0xffffee80
+	A6 = addressof(camera.foreground.x)
 	fn04ef3c()
 
-	A5 = addressof(camera.foreground.x.old)		// Address: 0xffffee88
+	A5 = addressof(camera.foreground.x.old)
 	LoadTileContentInDirX.LBZ1()
 
 	D5 = backupD5
@@ -491,10 +491,10 @@ function void fn04eebc()
 	u32 backupA4 = A4
 	u32 backupA5 = A5
 
-	A6 = addressof(camera.background.x)			// Address: 0xffffee8c
+	A6 = addressof(camera.background.x)
 	fn04ef3c()
 
-	A5 = addressof(camera.background.x.old)		// Address: 0xffffee94
+	A5 = addressof(camera.background.x.old)
 	LoadTileContentInDirX.LBZ1()
 
 	D5 = backupD5
@@ -1294,8 +1294,8 @@ function void fn05449a()
 //# address-hook(0x0544a4)
 function void fn0544a4()
 {
-	A6 = addressof(camera.background.y)			// Address: 0xffffee90
-	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -1380,8 +1380,8 @@ function void fn0545de()
 	fn0549c6()
 	fn05480c()
 
-	A6 = addressof(camera.background.y)			// Address: 0xffffee90
-	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
