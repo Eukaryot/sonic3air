@@ -987,15 +987,32 @@ void OptionsMenu::initialize()
 	// Fill sound test
 	{
 		mSoundTestAudioDefinitions.clear();
-		const bool hideFastTracks = !Configuration::instance().mDevMode.mEnabled;	// Hide fast tracks, except if in dev mode
+		const bool devModeEnabled = Configuration::instance().mDevMode.mEnabled;
 		const auto& audioDefinitions = AudioOut::instance().getAudioCollection().getAudioDefinitions();
 		for (const auto& [key, audioDefinition] : audioDefinitions)
 		{
-			if (audioDefinition.mType == AudioCollection::AudioDefinition::Type::MUSIC || audioDefinition.mType == AudioCollection::AudioDefinition::Type::JINGLE)
+			bool visible = false;
+			const AudioCollection::AudioDefinition::Visibility visibility = audioDefinition.mSoundTestVisibility;
+			switch (visibility)
 			{
-				if (hideFastTracks && rmx::endsWith(audioDefinition.mKeyString, "_fast"))
-					continue;
+				case AudioCollection::AudioDefinition::Visibility::ALWAYS_HIDDEN:	visible = false;  break;
+				case AudioCollection::AudioDefinition::Visibility::ALWAYS_VISIBLE:	visible = true;   break;
+				case AudioCollection::AudioDefinition::Visibility::DEV_MODE_ONLY:	visible = devModeEnabled;  break;
 
+				default:
+				{
+					// By default, show music & jingles only, not sound effects
+					if (audioDefinition.mType == AudioCollection::AudioDefinition::Type::MUSIC || audioDefinition.mType == AudioCollection::AudioDefinition::Type::JINGLE)
+					{
+						// Hide fast tracks
+						visible = (devModeEnabled || !rmx::endsWith(audioDefinition.mKeyString, "_fast"));
+					}
+					break;
+				}
+			}
+
+			if (visible)
+			{
 				mSoundTestAudioDefinitions.emplace_back(&audioDefinition);
 			}
 		}

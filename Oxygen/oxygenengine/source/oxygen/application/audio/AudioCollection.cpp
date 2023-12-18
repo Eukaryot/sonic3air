@@ -138,6 +138,7 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 		int loopStart = 0;
 		float volume = 1.0f;
 		uint8 channel = (numericKey < 0xff) ? (uint8)numericKey : 0xff;
+		AudioDefinition::Visibility soundTestVisibility = AudioDefinition::Visibility::AUTO;
 
 		for (auto it = iterator->begin(); it != iterator->end(); ++it)
 		{
@@ -208,6 +209,12 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 			{
 				volume = String(value).parseFloat();
 			}
+			else if (key == "SoundTestVisibility" && !value.empty())
+			{
+				soundTestVisibility = (value == "visible") ? AudioDefinition::Visibility::ALWAYS_VISIBLE
+									: (value == "hidden")  ? AudioDefinition::Visibility::ALWAYS_HIDDEN
+									: (value == "devmode") ? AudioDefinition::Visibility::DEV_MODE_ONLY : AudioDefinition::Visibility::AUTO;
+			}
 		}
 
 		AudioDefinition* audioDefinition = mapFind(mAudioDefinitions, numericKey);
@@ -236,6 +243,8 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 		// Set or overwrite values in audio definition
 		if (!displayName.empty())
 			audioDefinition->mDisplayName = displayName;
+		if (soundTestVisibility != AudioDefinition::Visibility::AUTO)
+			audioDefinition->mSoundTestVisibility = soundTestVisibility;
 
 		// Add audio source
 		SourceRegistration& sourceRegistration = vectorAdd(audioDefinition->mSources);

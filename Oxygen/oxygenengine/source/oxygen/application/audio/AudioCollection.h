@@ -60,11 +60,20 @@ public:
 			SOUND   = 2
 		};
 
+		enum class Visibility
+		{
+			AUTO,
+			ALWAYS_VISIBLE,
+			ALWAYS_HIDDEN,
+			DEV_MODE_ONLY
+		};
+
 		uint64 mKeyId = 0;
 		std::string mKeyString;
 		std::string mDisplayName;
 		Type mType = Type::SOUND;
 		uint8 mChannel = 0xff;
+		Visibility mSoundTestVisibility = Visibility::AUTO;
 
 		SourceRegistration* mActiveSource = nullptr;
 		std::vector<SourceRegistration> mSources;
