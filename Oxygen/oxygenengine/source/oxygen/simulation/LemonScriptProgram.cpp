@@ -240,7 +240,11 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 		// Deserialize from compiled scripts
 		if (!scriptsLoaded && !config.mForceCompileScripts)
 		{
-			if (FTX::FileSystem->readFile(L"data/scripts.bin", buffer))
+			bool loaded = FTX::FileSystem->readFile(L"data/scripts.bin", buffer);
+			if (!loaded && !config.mCompiledScriptSavePath.empty())
+				loaded = FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer);
+
+			if (loaded)
 			{
 				VectorBinarySerializer serializer(true, buffer);
 				scriptsLoaded = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
