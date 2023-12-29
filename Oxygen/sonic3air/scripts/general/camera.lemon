@@ -45,15 +45,15 @@ function void UpdateCamera()
 				A0 = addressof(camera.forced_target.x) - 0x10	// This way A0 + 0x10 is 0xfffff678, i.e. start of forced target position
 			}
 
-			A1 = addressof(camera.position.x)
-			A2 = addressof(move_area.left)
-			A4 = 0xffffee00						// Looks like last camera movement (delta x) gets stored here
-			A5 = addressof(camera.locktime.player1)
-			A6 = 0xffffe500						// Address of position backup
+			A1 = addressof(camera.position.x)			// Address: 0xffffee78
+			A2 = addressof(move_area.left)				// Address: 0xffffee14
+			A4 = 0xffffee00								// Looks like last camera movement (delta x) gets stored here
+			A5 = addressof(camera.locktime.player1)		// Address: 0xffffee24
+			A6 = 0xffffe500								// Address of position backup
 			UpdateCameraPositionX()
 
-			A1 = addressof(camera.position.y)
-			A4 = 0xffffee02						// Looks like last camera movement (delta y) gets stored here
+			A1 = addressof(camera.position.y)			// Address: 0xffffee7c
+			A4 = 0xffffee02								// Looks like last camera movement (delta y) gets stored here
 			D3.u16 = isMainCharacter(CHARACTER_TAILS) ? camera.yoffset.tails : camera.yoffset.player
 			UpdateCameraPositionY()
 		}
@@ -64,15 +64,15 @@ function void UpdateCamera()
 		if (player1.camera_lock == 0)
 		{
 			A0 = 0xffffb000
-			A1 = addressof(camera.position.x)
-			A2 = addressof(move_area.left)
+			A1 = addressof(camera.position.x)			// Address: 0xffffee78
+			A2 = addressof(move_area.left)				// Address: 0xffffee14
 			A4 = 0xffffee00
-			A5 = addressof(camera.locktime.player1)
+			A5 = addressof(camera.locktime.player1)		// Address: 0xffffee24
 			A6 = 0xffffe500
 			UpdateCameraPositionX_CompMode()
 
 			A1 = 0xffffee7c
-			A2 = addressof(move_area.left)
+			A2 = addressof(move_area.left)				// Address: 0xffffee14
 			A4 = 0xffffee02
 			D3.u16 = isMainCharacter(CHARACTER_TAILS) ? camera.yoffset.tails : camera.yoffset.player
 			UpdateCameraPositionY()
@@ -82,15 +82,15 @@ function void UpdateCamera()
 		if (player2.camera_lock == 0)
 		{
 			A0 = 0xffffb04a
-			A1 = addressof(camera.position.x.player2)
-			A2 = addressof(move_area.left.player2)
+			A1 = addressof(camera.position.x.player2)	// Address: 0xffffee60
+			A2 = addressof(move_area.left.player2)		// Address: 0xffffee1c
 			A4 = 0xffffee04
-			A5 = addressof(camera.locktime.player2)
+			A5 = addressof(camera.locktime.player2)		// Address: 0xffffee28
 			A6 = 0xffffe400
 			UpdateCameraPositionX_CompMode()
 
 			A1 = 0xffffee64
-			A2 = addressof(move_area.left.player2)
+			A2 = addressof(move_area.left.player2)		// Address: 0xffffee1c
 			A4 = 0xffffee06
 			D3.u16 = camera.yoffset.tails
 			UpdateCameraPositionY()

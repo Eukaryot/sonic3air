@@ -279,8 +279,8 @@ function void fn058c68()
 {
 	fn05928c()
 
-	A6 = addressof(camera.foreground.y)
-	A5 = addressof(camera.foreground.y.old)
+	A6 = addressof(camera.foreground.y)			// Address: 0xffffee84
+	A5 = addressof(camera.foreground.y.old)		// Address: 0xffffee8a
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -326,8 +326,8 @@ function void fn058d1e()
 {
 	fn058d3e()
 
-	A5 = addressof(camera.background.y.old)
-	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
+	A6 = addressof(camera.background.y)			// Address: 0xffffee90
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()

@@ -357,7 +357,7 @@ function void fn061254()
 	u8 shield = (1 << D0.u8)
 
 	u8[A1 + 0x2b] |= shield
-	A2 = addressof(global.shields_backup_1)
+	A2 = addressof(global.shields_backup_1)		// Address: 0xfffffe47
 	u8[A2] &= ~char.bonus.ELEMENTAL_SHIELDS
 	u8[A2] |= shield
 }

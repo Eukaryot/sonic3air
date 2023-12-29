@@ -966,7 +966,7 @@ function void fn06a7c4()
 	if (objA0.subtype2c != 0)
 	{
 		A1 = 0xffffb04a
-		A2 = addressof(player2.control_override)
+		A2 = addressof(player2.control_override)	// Address: 0xfffff7cb
 		if ((u8[A1 + 0x2a] & char.flag.UNDERWATER) == 0)
 		{
 			UnloadObject()
@@ -976,7 +976,7 @@ function void fn06a7c4()
 	else
 	{
 		A1 = 0xffffb000
-		A2 = addressof(player1.control_override)
+		A2 = addressof(player1.control_override)	// Address: 0xfffff7ca
 	}
 
 	u8[A2] = 0
