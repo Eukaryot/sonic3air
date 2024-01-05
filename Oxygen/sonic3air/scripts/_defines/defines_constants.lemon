@@ -66,9 +66,9 @@ constant u16 CONTROL_STARTMODE	= 0x0880	// Start + Mode
 	constant u8 BUTTON_B		= 0x05		// Button B = right face button -- resembles button C on Genesis pad
 	constant u8 BUTTON_X		= 0x06		// Button X =  left face button -- resembles button A on Genesis pad
 	constant u8 BUTTON_START	= 0x07		// Start button
-	constant u8 BUTTON_L		= 0x08		// Button L = left shoulder button  -- resembles button X on Genesis 6 Button pad
+	constant u8 BUTTON_R		= 0x08		// Button R = right shoulder button -- resembles button Z on Genesis 6 Button pad
 	constant u8 BUTTON_Y		= 0x09		// Button Y = upper face button     -- resembles button Y on Genesis 6 Button pad
-	constant u8 BUTTON_R		= 0x0a		// Button R = right shoulder button -- resembles button Z on Genesis 6 Button pad
+	constant u8 BUTTON_L		= 0x0a		// Button L = left shoulder button  -- resembles button X on Genesis 6 Button pad
 	constant u8 BUTTON_BACK		= 0x0b		// Back button -- resembles MODE button on Genesis 6 Button pad
 
 	constant u8 BUTTON_PAD2		= 0x10		// Add to button ID for second controller
