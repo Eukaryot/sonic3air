@@ -63,6 +63,9 @@ void GhostSync::performUpdate()
 				case GameClient::ConnectionState::FAILED:
 					mState = State::FAILED;
 					break;
+
+				default:
+					break;
 			}
 			break;
 		}
