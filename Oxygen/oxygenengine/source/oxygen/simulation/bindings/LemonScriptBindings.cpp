@@ -423,11 +423,11 @@ namespace
 				std::stringstream str;
 				if (param.mType->getBytes() == 4)
 				{
-					str << std::setprecision(std::numeric_limits<float>::digits10) << param.mValue.get<float>() << "f";
+					str << param.mValue.get<float>();
 				}
 				else
 				{
-					str << std::setprecision(std::numeric_limits<double>::digits10) << param.mValue.get<double>();
+					str << param.mValue.get<double>();
 				}
 				debugLogInternal(str.str());
 				break;
