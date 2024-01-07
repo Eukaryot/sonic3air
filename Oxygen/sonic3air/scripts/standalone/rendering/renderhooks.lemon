@@ -513,8 +513,8 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				return true
 			}
 
-			// HCZ Turbospiker (and subobjects)
-			if (objA0.update_address == 0x087bca || objA0.update_address == 0x087d5e)
+			// HCZ Turbospiker (and subobjects); fixed addresses #contributed by Legobouwer
+			if (objA0.update_address == 0x087bca || objA0.update_address == 0x087da4 || objA0.update_address == 0x087dc0 || objA0.update_address == 0x087e3e)
 			{
 				Standalone.renderWithKosinskiCompression(px, py, 0x36a968, 0xff, renderQueue)
 				return true
