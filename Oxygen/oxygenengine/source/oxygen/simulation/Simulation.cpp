@@ -255,6 +255,14 @@ void Simulation::update(float timeElapsed)
 	if (!isRunning() || !mCodeExec.isCodeExecutionPossible())
 		return;
 
+	if (mRewindSteps >= 0)
+	{
+		setSpeed(0.0f);
+		if (mRewindSteps >= 1)
+			jumpToFrame(mFrameNumber - mRewindSteps);
+		mRewindSteps = -1;
+	}
+
 	// Limit length of one frame to 100ms
 	timeElapsed = clamp(timeElapsed, 0.0f, 0.1f);
 
@@ -454,10 +462,11 @@ bool Simulation::generateFrame()
 
 				// Keyframe every 3 seconds - except when dev mode is active, because rewinding requires more frequent keyframes
 				const int keyframeFrequency = EngineMain::getDelegate().useDeveloperFeatures() ? 10 : 180;
+				const int framesToKeep = EngineMain::getDelegate().useDeveloperFeatures() ? 3600 : 1800;
 				if (((mFrameNumber + 1) % keyframeFrequency) == 0)	
 				{
 					recordKeyFrame(mFrameNumber + 1, mCodeExec, mGameRecorder, inputData);
-					mGameRecorder.discardOldFrames(1800);
+					mGameRecorder.discardOldFrames(framesToKeep);
 				}
 				else
 				{

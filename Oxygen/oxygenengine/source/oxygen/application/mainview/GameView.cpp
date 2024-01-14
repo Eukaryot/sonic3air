@@ -425,13 +425,6 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 						mSimulation.setNextSingleStep(true, FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_LCTRL));
 						break;
 					}
-
-					case SDLK_KP_9:
-					{
-						setGameSpeed(0.0f);
-						mSimulation.jumpToFrame(mSimulation.getFrameNumber() - 1);
-						break;
-					}
 				}
 			}
 		}
@@ -488,6 +481,39 @@ void GameView::update(float timeElapsed)
 			mStillImage.mBlurringTimeout = 0.0f;
 			mStillImage.mMode = StillImageMode::STILL_IMAGE;
 		}
+	}
+
+	if (FTX::keyState(SDLK_KP_9) && mSimulation.getFrameNumber() > 0)
+	{
+		int rewindSteps = 0;
+		if (mRewindCounter == 0)
+		{
+			// Rewind in the first frame the key was just pressed
+			rewindSteps = 1;
+		}
+		else
+		{
+			mRewindTimer += timeElapsed;
+			const float speed = (mRewindCounter == 1) ? 5 : (float)std::min(10 + mRewindCounter / 2, 180);
+			const float delay = 1.0f / speed;
+			if (mRewindTimer >= delay)
+			{
+				rewindSteps = std::floor(mRewindTimer / delay);
+				mRewindTimer -= delay * (float)rewindSteps;
+			}
+		}
+
+		if (rewindSteps > 0)
+		{
+			setLogDisplay(String(0, "Rewinding (current frame: %d)", mSimulation.getFrameNumber()));
+			mSimulation.setRewind(rewindSteps);
+			++mRewindCounter;
+		}
+	}
+	else
+	{
+		mRewindTimer = 0.0f;
+		mRewindCounter = 0;
 	}
 
 	// Debug output

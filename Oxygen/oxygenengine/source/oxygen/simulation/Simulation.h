@@ -8,7 +8,6 @@
 
 #pragma once
 
-
 class AudioOutBase;
 class EmulatorInterface;
 class CodeExec;
@@ -51,6 +50,8 @@ public:
 	bool generateFrame();
 	bool jumpToFrame(uint32 frameNumber, bool clearRecordingAfterwards = true);
 
+	inline void setRewind(int rewindSteps) { mRewindSteps = rewindSteps; }
+
 	float getSimulationFrequency() const;
 	void setSimulationFrequencyOverride(float frequency) { mSimulationFrequencyOverride = frequency; }
 	void disableSimulationFrequencyOverride()			 { mSimulationFrequencyOverride = 0.0f; }
@@ -82,6 +83,7 @@ private:
 	double	mCurrentTargetFrame = 0.0f;
 	uint32	mFrameNumber = 0;
 	uint32	mLastCorrectionFrame = 0;
+	int		mRewindSteps = -1;		// -1 is no rewind enabled; 0 if rewind is enabled but inside delay before next rewind step; higher values for number of steps to rewind
 
 	std::wstring mStateLoaded;
 };

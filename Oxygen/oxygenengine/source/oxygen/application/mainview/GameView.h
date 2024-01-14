@@ -81,4 +81,7 @@ private:
 	DrawerTexture mDebugVisualizationsOverlay;
 
 	DrawerTexture mFinalGameTexture;
+
+	float mRewindTimer = 0.0f;
+	int mRewindCounter = 0;
 };
