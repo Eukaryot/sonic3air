@@ -498,7 +498,7 @@ void GameView::update(float timeElapsed)
 			const float delay = 1.0f / speed;
 			if (mRewindTimer >= delay)
 			{
-				rewindSteps = std::floor(mRewindTimer / delay);
+				rewindSteps = (int)std::floor(mRewindTimer / delay);
 				mRewindTimer -= delay * (float)rewindSteps;
 			}
 		}
