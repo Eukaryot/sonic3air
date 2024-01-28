@@ -1240,6 +1240,21 @@
 		9EBAFC352980E062004F13AA /* OpenGLShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EBAFC312980E062004F13AA /* OpenGLShader.cpp */; };
 		9EBAFC362980E062004F13AA /* OpenGLShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EBAFC312980E062004F13AA /* OpenGLShader.cpp */; };
 		9EBAFC372980E062004F13AA /* OpenGLShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EBAFC312980E062004F13AA /* OpenGLShader.cpp */; };
+		9EBFB8E22B5E1C6C00955DB3 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8E12B5E1C6C00955DB3 /* GLKit.framework */; };
+		9EBFB8E52B5E1C8300955DB3 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8E32B5E1C8300955DB3 /* AudioToolbox.framework */; };
+		9EBFB8E82B5E1CBB00955DB3 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8E72B5E1CBA00955DB3 /* AVFoundation.framework */; };
+		9EBFB8F42B5E1F9400955DB3 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8E92B5E1F9300955DB3 /* GameController.framework */; };
+		9EBFB8F52B5E1F9400955DB3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8EA2B5E1F9300955DB3 /* UIKit.framework */; };
+		9EBFB8F62B5E1F9400955DB3 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8EB2B5E1F9300955DB3 /* CoreBluetooth.framework */; };
+		9EBFB8F72B5E1F9400955DB3 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8EC2B5E1F9300955DB3 /* CoreAudio.framework */; };
+		9EBFB8F82B5E1F9400955DB3 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8ED2B5E1F9300955DB3 /* IOKit.framework */; };
+		9EBFB8F92B5E1F9400955DB3 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8EE2B5E1F9300955DB3 /* CoreVideo.framework */; };
+		9EBFB8FA2B5E1F9400955DB3 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8EF2B5E1F9300955DB3 /* Metal.framework */; };
+		9EBFB8FB2B5E1F9400955DB3 /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8F02B5E1F9400955DB3 /* CoreHaptics.framework */; };
+		9EBFB8FC2B5E1F9400955DB3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8F12B5E1F9400955DB3 /* CoreGraphics.framework */; };
+		9EBFB8FD2B5E1F9400955DB3 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8F22B5E1F9400955DB3 /* CoreMotion.framework */; };
+		9EBFB8FE2B5E1F9400955DB3 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8F32B5E1F9400955DB3 /* QuartzCore.framework */; };
+		9EBFB9002B5E1FC900955DB3 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBFB8FF2B5E1FC900955DB3 /* OpenGLES.framework */; };
 		9EC1F739281783EC0073C39E /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E5FD83727EC041600CD430A /* libSDL2.a */; };
 		9EC1F775281785510073C39E /* liboggvorbis_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EC1F7742817853F0073C39E /* liboggvorbis_mac.a */; };
 		9EC1F776281785700073C39E /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E5FD83727EC041600CD430A /* libSDL2.a */; };
@@ -2192,6 +2207,22 @@
 		9EBAFC212980DFFA004F13AA /* PlatformFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlatformFunctions.h; sourceTree = "<group>"; };
 		9EBAFC312980E062004F13AA /* OpenGLShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenGLShader.cpp; sourceTree = "<group>"; };
 		9EBAFC322980E062004F13AA /* OpenGLShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLShader.h; sourceTree = "<group>"; };
+		9EBFB8E12B5E1C6C00955DB3 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/GLKit.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8E32B5E1C8300955DB3 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8E42B5E1C8300955DB3 /* CoreAudioKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudioKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/CoreAudioKit.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8E72B5E1CBA00955DB3 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8E92B5E1F9300955DB3 /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/GameController.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8EA2B5E1F9300955DB3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8EB2B5E1F9300955DB3 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/CoreBluetooth.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8EC2B5E1F9300955DB3 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8ED2B5E1F9300955DB3 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8EE2B5E1F9300955DB3 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/CoreVideo.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8EF2B5E1F9300955DB3 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8F02B5E1F9400955DB3 /* CoreHaptics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreHaptics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/CoreHaptics.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8F12B5E1F9400955DB3 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8F22B5E1F9400955DB3 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/CoreMotion.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8F32B5E1F9400955DB3 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
+		9EBFB8FF2B5E1FC900955DB3 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/OpenGLES.framework; sourceTree = DEVELOPER_DIR; };
 		9EC1F77C281788520073C39E /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		9EC1F78128178BC40073C39E /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		9EC1F78628178C450073C39E /* ForceFeedback.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ForceFeedback.framework; path = System/Library/Frameworks/ForceFeedback.framework; sourceTree = SDKROOT; };
@@ -2341,8 +2372,23 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9EBFB8FE2B5E1F9400955DB3 /* QuartzCore.framework in Frameworks */,
+				9EBFB8F72B5E1F9400955DB3 /* CoreAudio.framework in Frameworks */,
 				9E5FD84427EC081600CD430A /* libSDL2.a in Frameworks */,
+				9EBFB8E22B5E1C6C00955DB3 /* GLKit.framework in Frameworks */,
+				9EBFB8F82B5E1F9400955DB3 /* IOKit.framework in Frameworks */,
+				9EBFB8F62B5E1F9400955DB3 /* CoreBluetooth.framework in Frameworks */,
+				9EBFB8F42B5E1F9400955DB3 /* GameController.framework in Frameworks */,
+				9EBFB8E82B5E1CBB00955DB3 /* AVFoundation.framework in Frameworks */,
 				9E115C2527FA963B001A0FC5 /* liboggvorbis_ios.a in Frameworks */,
+				9EBFB8F52B5E1F9400955DB3 /* UIKit.framework in Frameworks */,
+				9EBFB8F92B5E1F9400955DB3 /* CoreVideo.framework in Frameworks */,
+				9EBFB8FC2B5E1F9400955DB3 /* CoreGraphics.framework in Frameworks */,
+				9EBFB8FA2B5E1F9400955DB3 /* Metal.framework in Frameworks */,
+				9EBFB8FB2B5E1F9400955DB3 /* CoreHaptics.framework in Frameworks */,
+				9EBFB8FD2B5E1F9400955DB3 /* CoreMotion.framework in Frameworks */,
+				9EBFB9002B5E1FC900955DB3 /* OpenGLES.framework in Frameworks */,
+				9EBFB8E52B5E1C8300955DB3 /* AudioToolbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2568,6 +2614,22 @@
 		9E6E7A5B245F784400114DEB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9EBFB8FF2B5E1FC900955DB3 /* OpenGLES.framework */,
+				9EBFB8EC2B5E1F9300955DB3 /* CoreAudio.framework */,
+				9EBFB8EB2B5E1F9300955DB3 /* CoreBluetooth.framework */,
+				9EBFB8F12B5E1F9400955DB3 /* CoreGraphics.framework */,
+				9EBFB8F02B5E1F9400955DB3 /* CoreHaptics.framework */,
+				9EBFB8F22B5E1F9400955DB3 /* CoreMotion.framework */,
+				9EBFB8EE2B5E1F9300955DB3 /* CoreVideo.framework */,
+				9EBFB8E92B5E1F9300955DB3 /* GameController.framework */,
+				9EBFB8ED2B5E1F9300955DB3 /* IOKit.framework */,
+				9EBFB8EF2B5E1F9300955DB3 /* Metal.framework */,
+				9EBFB8F32B5E1F9400955DB3 /* QuartzCore.framework */,
+				9EBFB8EA2B5E1F9300955DB3 /* UIKit.framework */,
+				9EBFB8E72B5E1CBA00955DB3 /* AVFoundation.framework */,
+				9EBFB8E32B5E1C8300955DB3 /* AudioToolbox.framework */,
+				9EBFB8E42B5E1C8300955DB3 /* CoreAudioKit.framework */,
+				9EBFB8E12B5E1C6C00955DB3 /* GLKit.framework */,
 				9E0EFFA42B01CFDC0078ACB6 /* libcurl.tbd */,
 				9E91BADF28B97BE900949235 /* discord_game_sdk.dylib */,
 				9E91BAEC28B98D7600949235 /* discord_game_sdk.dylib */,
@@ -5777,6 +5839,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 436AD92E6J;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -5810,7 +5873,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 23.11.18.0;
+				MARKETING_VERSION = 24.02.02.0;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5825,6 +5888,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 436AD92E6J;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -5858,7 +5922,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 23.11.18.0;
+				MARKETING_VERSION = 24.02.02.0;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5880,6 +5944,8 @@
 					"$(inherited)",
 					"NO_DISCORD=1",
 					ENDUSER,
+					"GL_MAX=GL_MAX_EXT",
+					"GL_MIN=GL_MIN_EXT",
 				);
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -5911,7 +5977,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 23.11.18.0;
+				MARKETING_VERSION = 24.02.02.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air.sonic3air-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -5935,6 +6001,8 @@
 					"GL_SILENCE_DEPRECATION=1",
 					"NO_DISCORD=1",
 					ENDUSER,
+					"GL_MIN=GL_MIN_EXT",
+					"GL_MAX=GL_MAX_EXT",
 				);
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -5966,7 +6034,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 23.11.18.0;
+				MARKETING_VERSION = 24.02.02.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air.sonic3air-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -6130,7 +6198,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 23.11.18.0;
+				MARKETING_VERSION = 24.02.02.0;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air-dev";
 				PRODUCT_NAME = "sonic3air-dev";
@@ -6174,7 +6242,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 23.11.18.0;
+				MARKETING_VERSION = 24.02.02.0;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air-dev";
 				PRODUCT_NAME = "sonic3air-dev";
@@ -6218,7 +6286,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 23.11.18.0;
+				MARKETING_VERSION = 24.02.02.0;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air.oxygenApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6262,7 +6330,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 23.11.18.0;
+				MARKETING_VERSION = 24.02.02.0;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air.oxygenApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
