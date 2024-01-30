@@ -63,6 +63,19 @@ input[type="file"] {display: none;}
 #root{
 	color: black;
 }
+#ios_workaround{
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	text-align: center;
+	padding-top: 40vh;
+	font-size: 2em;
+	user-select: none;
+	cursor: default;
+	background-color: rgba(0,0,0,50%);
+}
 </style>
 <script src="browserfs.min.js"></script>
 <script>
@@ -77,6 +90,36 @@ function startGame(){
 	gameCanvas.style.width = "min(100vw, calc(100vh * 16 / 9))";
 	gameCanvas.style.height = "min(100vh, calc(100vw * 9 / 16))";
 	gameCanvas.style.marginTop = "max(0vh, calc(50vh - (100vw * 9 / 16 / 2)))";
+	
+	if(isRunningOniOS()){
+		let iosoverlay = document.getElementById('ios_workaround');
+		if(iosoverlay){
+			iosoverlay.classList.remove('hidden');
+		}
+	}
+}
+
+function isRunningOniOS() {
+  return [
+    'iPad Simulator',
+    'iPhone Simulator',
+    'iPod Simulator',
+    'iPad',
+    'iPhone',
+    'iPod'
+  ].includes(navigator.platform)
+  // iPad on iOS 13 detection
+  || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+}
+
+function hideIOSoverlay(){
+	//iOS prevents websites from playing sound unless the user interacts with the web page first.
+	//Prior to iOS 16, tapping the canvas used to be enough to enable sound but now they need to tap a normal page element first.
+	//The full screen overlay on iOS is a workaround, once tapped sound will enable and we can get rid of the overlay.
+	let iosoverlay = document.getElementById('ios_workaround');
+	if(iosoverlay){
+		document.body.removeChild(iosoverlay);
+	}
 }
 
 function onPageLoaded(){
@@ -99,6 +142,10 @@ function onPageLoaded(){
 	loader.setAttribute('src', 'loader.js');
 	document.body.appendChild(loader);
 	Module['calledRun'] = true; //We got here from pre-run, so loader needs to know that.
+	
+	if(isRunningOniOS() == false){
+		hideIOSoverlay();
+	}
 }
 
 function onGameExit(){
@@ -332,6 +379,9 @@ function installS3kFile(fileInput) {
 <div id="root" class="hidden"></div>
 <div id="gameView" class="emscripten_border">
 	<canvas class="emscripten" id=canvas oncontextmenu=event.preventDefault() tabindex=-1></canvas>
+</div>
+<div id="ios_workaround" class="hidden" onclick="hideIOSoverlay()">
+	Tap to Start
 </div>
 <script>
 var statusElement = document.getElementById("status"),
