@@ -20,7 +20,7 @@ UpdateCheck::UpdateCheck()
 	// Stable version
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x22091000;
+		definition.mVersionNumber = 0x24020200;
 		definition.mReleaseChannel = ReleaseChannel::STABLE;
 		definition.addPlatform(Platform::WINDOWS);
 		definition.addPlatform(Platform::MAC);
