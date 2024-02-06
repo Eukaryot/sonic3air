@@ -277,7 +277,7 @@ uint32 SpriteManager::addSpriteHandle(uint64 key, const Vec2i& position, uint16 
 		++mNextSpriteHandle;
 
 	SpriteHandleData& data = vectorAdd(mSpritesHandles);
-	data.mHandle = mNextSpriteHandle;
+	data.mHandle = spriteHandle;
 	data.mKey = key;
 	data.mPosition = position;
 	data.mRenderQueue = renderQueue;
@@ -290,6 +290,7 @@ uint32 SpriteManager::addSpriteHandle(uint64 key, const Vec2i& position, uint16 
 SpriteManager::SpriteHandleData* SpriteManager::getSpriteHandleData(uint32 spriteHandle)
 {
 	// Use the quick lookup if possible
+	RMX_ASSERT(nullptr == mLatestSpriteHandle.second || mLatestSpriteHandle.first == mLatestSpriteHandle.second->mHandle, "Latest sprite handle cache is inconsistent");
 	if (mLatestSpriteHandle.first == spriteHandle)
 		return mLatestSpriteHandle.second;
 
