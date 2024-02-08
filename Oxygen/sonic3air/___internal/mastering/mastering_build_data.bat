@@ -1,7 +1,7 @@
 @echo on
 
 set outputDir=_master_image_template
-set msbuildPath="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"
+call ../../../../framework/external/get_msbuild_path.bat
 
 
 pushd ..\..
