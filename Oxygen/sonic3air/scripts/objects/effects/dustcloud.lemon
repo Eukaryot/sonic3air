@@ -112,7 +112,7 @@ function void fn018c20()
 {
 	// The first check is against "sonic.drown_countdown"
 	//  -> Deactivate this while the drown countdown is shown, because the digits use the same VRAM as this effect here
-	if (u8[A2 + 0x2c] < 12 || u8[A2 + 0x05] >= 4)
+	if (u8[A2 + 0x2c] < 12 || u8[A2 + 0x05] >= base_state.HURT)
 	{
 		objA0.state = 0
 		return
@@ -344,7 +344,7 @@ function void fn018fee()
 //# address-hook(0x018ff6) end(0x01903c)
 function void fn018ff6()
 {
-	if (u8[A2 + 0x2c] < 0x0c || u8[A2 + 0x05] >= 0x04 || u8[A2 + 0x3d] == 0)
+	if (u8[A2 + 0x2c] < 0x0c || u8[A2 + 0x05] >= base_state.HURT || u8[A2 + 0x3d] == 0)
 	{
 		objA0.state = 0
 		return

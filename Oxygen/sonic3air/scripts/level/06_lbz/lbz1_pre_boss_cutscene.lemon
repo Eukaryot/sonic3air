@@ -587,7 +587,7 @@ function void fn062800()
 {
 	u8[0xfffffaa9] = 0xff
 	A1 = 0xffff0000 + D0.u16
-	if (u8[A1 + 0x05] >= 0x06)
+	if (u8[A1 + 0x05] >= base_state.DIED)
 	{
 		fn0627c6()
 		return

@@ -714,7 +714,7 @@ function void fn05480c()
 //# address-hook(0x0549c6) end(0x054a92)
 function void fn0549c6()
 {
-	if (u8[0xffffb000 + 0x05] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= base_state.DIED)
 		return
 
 	if (player1.camera_lock)

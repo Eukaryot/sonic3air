@@ -21,7 +21,7 @@ function void UpdateWater()
 		return
 	}
 
-	if (u8[0xffffee30] == 0 && u8[0xffffb000 + 0x05] < 0x06)
+	if (u8[0xffffee30] == 0 && u8[0xffffb000 + 0x05] < base_state.DIED)
 	{
 		fn006f4a()
 		UpdateWaterSurfaceLevel()
@@ -430,7 +430,7 @@ function void fn006f90()
 		D1.u16 = objA1.position.y.u16
 		if (D0.u16 >= u16[A2] && D0.u16 < u16[A2 + 4] && D1.u16 >= u16[A2 + 2] && D1.u16 < u16[A2 + 6])
 		{
-			if (u8[A1 + 0x05] >= 4)
+			if (u8[A1 + 0x05] >= base_state.HURT)
 			{
 				u8[A3] = 0
 				return
@@ -720,6 +720,16 @@ function void UpdateWaterSurfaceLevel.LBZ2()
 //# address-hook(0x006f1a) end(0x006f1a)
 function void UpdateWaterSurfaceLevel.Empty2()
 {
+}
+
+
+//# address-hook(0x006f1c) end(0x006f2a)
+function void UpdateWaterSurfaceLevel.Outro()
+{
+	if (camera.position.x.u16 >= 0x1de0)
+	{
+		water.height.target = 0x0510
+	}
 }
 
 

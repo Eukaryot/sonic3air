@@ -79,12 +79,12 @@ function void fn016340()
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
 			objA1.groundspeed = 0
-			u8[A1 + 0x05] = 0x02
+			u8[A1 + 0x05] = base_state.NORMAL
 			u8[A1 + 0x3d] = 0
 		}
 	}
 
-	if (s8[0xffffb000 + 0x04] >= 0 && u8[0xffffb000 + 0x05] == 0x02)
+	if (s8[0xffffb000 + 0x04] >= 0 && u8[0xffffb000 + 0x05] == base_state.NORMAL)
 	{
 		A1 = 0xffffb04a
 	#if STANDALONE
@@ -102,7 +102,7 @@ function void fn016340()
 			{
 				objA1.position.x.u16 = objA0.position.x.u16
 				objA1.position.y.u16 = objA0.position.y.u16
-				u8[A1 + 0x05] = 0x02
+				u8[A1 + 0x05] = base_state.NORMAL
 				u8[A1 + 0x2e] = 0
 				u8[A1 + 0x3d] = 0
 				tails.ai_routine = 0x14
@@ -138,7 +138,7 @@ function void fn01640a()
 		if (u16[A0 + 0x30] == 0)
 		{
 			objA1.position.y.u16 = D0.u16
-			u8[A1 + 0x05] = 2
+			u8[A1 + 0x05] = base_state.NORMAL
 			u8[A1 + 0x2e] = 0
 			u8[A1 + 0x3d] = 0
 			tails.ai_routine = 0x1a

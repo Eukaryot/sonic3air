@@ -62,7 +62,7 @@ function void fn03ed6e()
 {
 	if (u8[A2] != 0)
 	{
-		if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
+		if (debug_mode.state == 0 && u8[A1 + 0x05] < base_state.HURT)
 		{
 			if (D1 & 0x0400)		// CONTROL_LEFT held
 			{
@@ -125,7 +125,7 @@ function void fn03ed6e()
 					u8[A1 + 0x2e] &= ~(control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 					u8[A1 + 0x40] = 0
 					u8[A1 + 0x3d] = 0
-					u8[A1 + 0x05] = 0x02
+					u8[A1 + 0x05] = base_state.NORMAL
 					objA1.flags2a |= char.flag.IN_AIR
 					objA1.flags2a &= ~char.flag.CONTROL_LOCK
 					u8[A1 + 0x2f] = 0
@@ -179,7 +179,7 @@ function void fn03ed6e()
 			D0.u16 += 0x10
 			if (D0.u16 >= objA1.position.y.u16)
 			{
-				if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
+				if (debug_mode.state == 0 && u8[A1 + 0x05] < base_state.HURT)
 				{
 					if (u8[A1 + 0x2e] == 0)
 					{

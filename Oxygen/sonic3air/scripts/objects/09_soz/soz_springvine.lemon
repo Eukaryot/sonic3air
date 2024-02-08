@@ -192,7 +192,7 @@ function void fn0409ba()
 		objA1.velocity.x = -0xef0
 	}
 
-	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x05] = base_state.NORMAL
 	objA1.state = char.state.STRAIGHTJUMP
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.ON_OBJECT

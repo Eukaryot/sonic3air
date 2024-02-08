@@ -107,7 +107,7 @@ function void fn088c38()
 	if (D2.u16 != 0 && objA0.animation.frame == 4)
 	{
 		A1 = 0xffff0000 + u16[A0 + 0x44]
-		u8[A1 + 0x05] = 0x02
+		u8[A1 + 0x05] = base_state.NORMAL
 		objA1.velocity.y = -0x600
 		objA1.flags2a |= char.flag.IN_AIR
 		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
@@ -281,7 +281,7 @@ function void fn088d98()
 //# address-hook(0x088da6) end(0x088dcc)
 function void fn088da6()
 {
-	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x05] = base_state.NORMAL
 	objA1.position.y.u16 += 6
 	objA1.velocity.y = 0
 	objA1.flags2a |= char.flag.IN_AIR

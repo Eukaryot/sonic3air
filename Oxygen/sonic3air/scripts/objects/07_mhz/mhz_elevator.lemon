@@ -250,7 +250,7 @@ function void fn03e508()
 		return
 	}
 
-	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < base_state.HURT && debug_mode.state == 0)
 	{
 		// Check if jump button pressed
 		D1.u16 = D0.u16 & CONTROL_ABC
@@ -310,27 +310,28 @@ function void fn03e598()
 		if (D0.u8 == u8[0x03e5e8 + D1.u16])
 		{
 			++u8[A0 + 0x40]
-			D1.u8 = u8[0x03e5e9 + D1.u16]
+			D1.u8 = u8[0x03e5e8 + D1.u16 + 1]
 			if (D1.u8 != 0)
 				return
 
-			D1 = 0
-			D1.u16 = -0x20
-			A4 = 0xffff0000 + D1.u16
-			if (u16[A4 - 0x32] == 0)
+			D1 = 0xffe0
+			A4 = 0xffff0000 + D1.u16		// Address of "levelselect.unlocked"
+			if (u16[A4 - 0x32] == 0)		// Checking "global.lock_on_state"
 			{
-				if (u16[A4] == 0)
+				// In Sonic 3 & Knuckles with lock-on, the function of the cheat code changes to unlock Debug Mode, instead of Level Select in Sonic & Knuckles without lock-on
+				if (u16[A4] == 0)			// Check if "levelselect.unlocked" and "pausecheats.unlocked" are clear
 				{
 					D0.u16 = D1.u16
-					u8[A0 + 0x40] = 0
+					u8[A0 + 0x40] = 0		// Reset cheat input progress
 					return
 				}
-				A4 += 2
+				A4 += 2		// Shift to "debug_mode.unlocked"
 			}
 
 			D1 = 1
-			u8[A4] = D1.u8
-			u8[A4+1] = D1.u8
+			u8[A4] = D1.u8				// Set "levelselect.unlocked" in Sonic & Knuckles without lock-on, or "debug_mode.unlocked" in Sonic 3 & Knuckles
+			u8[A4+1] = D1.u8			// Set "pausecheats.unlocked" in Sonic & Knuckles without lock-on, looks unused in Sonic 3 & Knuckles
+
 			D1.u16 = D0.u16
 			playSound(SFX_RING)
 
@@ -419,7 +420,7 @@ function void fn03e682()
 	D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 - 0x30
 	if (D0.u16 < 0x20 && D1.u16 < 0x18)
 	{
-		if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+		if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x05] < base_state.HURT && debug_mode.state == 0)
 		{
 			if (objA1.velocity.y > 0)
 			{

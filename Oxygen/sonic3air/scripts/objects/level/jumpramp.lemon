@@ -63,7 +63,7 @@ function void fn024d9a()
 
 			objA1.velocity.y = -0x700
 			u8[A1 + 0x2a] |= char.flag.IN_AIR
-			u8[A1 + 0x05] = 2
+			u8[A1 + 0x05] = base_state.NORMAL
 			u16[A1 + 0x1c] = 1
 			u8[A1 + 0x27] = 1		// Set x-rotation of character
 			u8[A1 + 0x20] = 0

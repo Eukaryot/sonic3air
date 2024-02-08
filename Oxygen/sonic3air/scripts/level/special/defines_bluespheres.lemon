@@ -12,15 +12,21 @@
 //  -> Level layout, 32x32 bytes
 
 
+define bluespheres.floor.frame				= u16[0xffffe420]	// Current animation frame for the floor; Values starting from 0x10 are when turning
 define bluespheres.position.x				= u16[0xffffe422]	// Upper byte = full grid position, lower byte = position between grid points
 define bluespheres.position.y				= u16[0xffffe424]
 define bluespheres.direction				=  u8[0xffffe426]
 define bluespheres.movement_speed			= s16[0xffffe428]	// Current movement speed, can be negative when going backwards
 define bluespheres.next_direction			=  s8[0xffffe42a]
 define bluespheres.hitting_bumper			=  u8[0xffffe42b]
+define bluespheres.floor.frame.former		=  u8[0xffffe42c]	// Former animation frame for the floor
+define bluespheres.palette.frame			=  u8[0xffffe42f]	// Same as current animation frame for the floor without turning frames
+define bluespheres.turning					=  u8[0xffffe430]
 define bluespheres.going_forward			=  u8[0xffffe431]
 define bluespheres.jumping_flags.player1	=  u8[0xffffe432]	// 0x80: forced spring jump, 0x01: manual player jump
 define bluespheres.stage_exit_animation		=  u8[0xffffe433]	// Counting up during fade to white with fast stage rotation, after collecting the emerald
+define bluespheres.position.x.former		= u16[0xffffe434]
+define bluespheres.position.y.former		= u16[0xffffe436]
 define bluespheres.blue_remaining			= u16[0xffffe438]
 define bluespheres.rings_collected			= u16[0xffffe43a]
 define bluespheres.bs_hud_dirty				=  u8[0xffffe43c]
@@ -29,9 +35,11 @@ define bluespheres.speedup_countdown		= u16[0xffffe43e]
 define bluespheres.jumping_flags.player2	=  u8[0xffffe440]	// 0x80: forced spring jump, 0x01: manual player jump
 define bluespheres.rings_remaining			= u16[0xffffe442]
 define bluespheres.current_gamespeed		= u16[0xffffe444]	// Current game speed, which is the limit for movement speed
+define bluespheres.palette.baseAddress			= u32[0xffffe446]	// Address of current stage palette in ROM
 define bluespheres.lifted_height			= u16[0xffffe44a]	// Height of lifted spheres when all blue spheres were collected
 define bluespheres.stage_exit_state			=  u8[0xffffe44c]	// 0: Stage is still going, 1: Lifting the remaining spheres, 2: Wait time before the jingle, 3: Player approaching the emerald, 4: Fade to white / exiting the stage
 define bluespheres.emerald_jingle_countdown	=  u8[0xffffe44d]	// Timer until emerald jingle plays
+define bluespheres.object_standing_on		= u16[0xffffe44e]	// RAM address of object the player character is standing on
 define bluespheres.started_running			=  u8[0xffffe450]
 
 define bluespheres.backup.zone_act			= u16[0xffffef6a]	// Stores current zone and act while in a special stage

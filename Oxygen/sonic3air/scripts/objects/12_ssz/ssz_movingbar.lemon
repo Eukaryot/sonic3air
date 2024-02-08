@@ -93,7 +93,7 @@ function void fn0453e6()
 		if (D0.u16 >= 0x18)
 			return
 
-		if (u8[A1 + 0x2e] != 0 || u8[A1 + 0x05] >= 0x04 || debug_mode.state != 0)
+		if (u8[A1 + 0x2e] != 0 || u8[A1 + 0x05] >= base_state.HURT || debug_mode.state != 0)
 			return
 
 		playSound(SFX_GRAB)
@@ -114,7 +114,7 @@ function void fn0453e6()
 	else
 	{
 		objA1.position.y.u16 = objA0.position.y.u16 + D1.u16
-		if (u8[A1 + 0x05] >= 0x04)
+		if (u8[A1 + 0x05] >= base_state.HURT)
 		{
 			u8[A1 + 0x2e] = 0
 			u8[A2] = 0

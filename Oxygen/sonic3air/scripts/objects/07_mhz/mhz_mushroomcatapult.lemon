@@ -173,7 +173,7 @@ function void fn03fa26()
 
 	if (u8[A1 + 0x2a] & bit)
 	{
-		u8[A2 + 0x05] = 0x02
+		u8[A2 + 0x05] = base_state.NORMAL
 		u16[A2 + 0x1a] = (u16[A0 + 0x3a] < 0x0900) ? 0xf300 : 0xf180
 		u8[A2 + 0x20] = char.state.STRAIGHTJUMP
 		u8[A2 + 0x2a] |= char.flag.IN_AIR
@@ -192,7 +192,7 @@ function void fn03fa5a()
 
 	if (objA0.flags2a & bit)
 	{
-		u8[A2 + 0x05] = 0x02
+		u8[A2 + 0x05] = base_state.NORMAL
 		u16[A2 + 0x1a] = 0xf300
 		u8[A2 + 0x20] = char.state.STRAIGHTJUMP
 		u8[A2 + 0x2a] |= char.flag.IN_AIR

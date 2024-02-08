@@ -68,7 +68,7 @@ function void fn054e9c()
 		A3 = pop()
 
 		// Configure H-Int to set a different scroll-y offset in between
-		//  -> The same approach is used in AIZ 2 blimb sequence already
+		//  -> The same approach is used in AIZ 2 blimp sequence already
 		u16[0xfffffff6] = 0x4ef9
 		irq_table.lineupdate = 0x050056
 		h_int.line = 0x80

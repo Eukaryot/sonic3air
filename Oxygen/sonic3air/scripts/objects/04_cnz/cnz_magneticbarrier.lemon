@@ -60,7 +60,7 @@ function void fn031f62()
 	D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x20
 	if (D0.u16 < 0xa0 && D1.s16 >= 0 && D1.u16 < 0x40)
 	{
-		if (u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+		if (u8[A1 + 0x05] < base_state.HURT && u8[A1 + 0x2e] == 0)
 		{
 			D0.u16 -= 0x50
 			if (D0.s16 < 0)
@@ -127,7 +127,7 @@ function void fn032010()
 			D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x30
 			if (D1.u16 < 0x50)
 			{
-				if (u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+				if (u8[A1 + 0x05] < base_state.HURT && u8[A1 + 0x2e] == 0)
 				{
 					D1.u16 = 0x50 - D1.u16
 					if (D1.u16 >= 0x40)

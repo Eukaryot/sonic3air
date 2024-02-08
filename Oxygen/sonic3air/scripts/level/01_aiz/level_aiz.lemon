@@ -362,7 +362,7 @@ function void fn04fc46()
 {
 	if (u16[0xffffeed4] == 0)
 	{
-		if (u8[0xffffb000 + 0x05] < 0x06)
+		if (u8[0xffffb000 + 0x05] < base_state.DIED)
 		{
 			D0 = s32((u32(level.display_routine) << 16) - camera.background.y) >> 5
 			camera.background.y += D0
@@ -2066,7 +2066,7 @@ function void UpdateForegroundScrolling.AIZ1()
 //# address-hook(0x23b152) end(0x23b178)
 function void fn23b152()
 {
-	if (u8[0xffffb000 + 0x05] < 0x06)
+	if (u8[0xffffb000 + 0x05] < base_state.DIED)
 	{
 		D0 = min(u16[0xffffeed4] + 0x280, 0xa000)
 		u16[0xffffeed4] = D0.u16
@@ -2079,7 +2079,7 @@ function void fn23b152()
 //# address-hook(0x23b17a) end(0x23b1c4)
 function void fn23b17a()
 {
-	if (u8[0xffffb000 + 0x05] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= base_state.DIED)
 		return
 
 	camera.background.x.frac += 6

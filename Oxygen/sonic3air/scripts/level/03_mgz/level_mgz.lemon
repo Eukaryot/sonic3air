@@ -166,7 +166,7 @@ function void fn0511c8()
 //# address-hook(0x05127c) end(0x0512a4)
 function void fn05127c()
 {
-	if (u8[0xffffb000 + 0x05] < 0x06 && (u16[0xffffeee8] == 0) && (camera.screenshake.state & 0x8000))
+	if (u8[0xffffb000 + 0x05] < base_state.DIED && (u16[0xffffeee8] == 0) && (camera.screenshake.state & 0x8000))
 	{
 		if (((level.framecounter - 1) & 0x0f) == 0)
 		{
@@ -399,7 +399,7 @@ function void fn05132c()
 //# address-hook(0x05134c) end(0x0514a8)
 function void fn05134c()
 {
-	if (u8[0xffffb000 + 0x05] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= base_state.DIED)
 		return
 
 	if ((camera.screenshake.state & 0x8000) == 0)

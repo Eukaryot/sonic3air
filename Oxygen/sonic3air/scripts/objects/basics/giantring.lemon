@@ -102,7 +102,7 @@ function void fn0616e6()
 		if (D0.u16 != 0)
 		{
 			A1 = 0xffffb000
-			if (u8[A1 + 0x05] >= 6)
+			if (u8[A1 + 0x05] >= base_state.DIED)
 				return
 
 			playSound(0xb3)

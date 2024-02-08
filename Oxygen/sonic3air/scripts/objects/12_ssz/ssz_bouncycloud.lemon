@@ -144,7 +144,7 @@ function void fn045170()
 			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 			u8[A1 + 0x40] = 0
 			u8[A1 + 0x3d] = 0
-			u8[A1 + 0x05] = 0x02
+			u8[A1 + 0x05] = base_state.NORMAL
 			u8[A1 + 0x20] = 0
 
 			u8[A2] = 0xff

@@ -488,7 +488,7 @@ function void fn026e08()
 
 	if (u8[A2] != 0)
 	{
-		u8[A1 + 0x05] = 0x04
+		u8[A1 + 0x05] = base_state.HURT
 		objA1.flags2a |= char.flag.IN_AIR
 		objA1.flags2a &= ~(char.flag.ON_OBJECT | char.flag.PUSHING)
 		objA1.velocity.y = D0.u16
@@ -617,7 +617,7 @@ function void fn026eda()
 	}
 	else
 	{
-		if (s8[A1 + 0x04] >= 0 || u8[A1 + 0x05] >= 0x04)
+		if (s8[A1 + 0x04] >= 0 || u8[A1 + 0x05] >= base_state.HURT)
 		{
 			objA0.flags2a &= ~bit
 			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT

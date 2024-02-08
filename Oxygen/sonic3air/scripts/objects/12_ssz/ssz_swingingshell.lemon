@@ -228,7 +228,7 @@ function void fn046324()
 
 	if (u8[A3] == 0)
 	{
-		if (u8[A1 + 0x2e] != 0 || u8[A1 + 0x05] >= 0x04)
+		if (u8[A1 + 0x2e] != 0 || u8[A1 + 0x05] >= base_state.HURT)
 			return
 
 		if (objA0.flags2a & bit)

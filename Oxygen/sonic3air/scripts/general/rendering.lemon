@@ -261,7 +261,7 @@ function void RenderSprites()
 	u8[0xfffff62c] = 0x4f - D6.u8
 	if (u16[0xffffef3a] != 0)
 	{
-		if (u8[0xffffb000 + 0x05] < 0x06)
+		if (u8[0xffffb000 + 0x05] < base_state.DIED)
 		{
 			u16[0xffffef3a] = 0
 		}

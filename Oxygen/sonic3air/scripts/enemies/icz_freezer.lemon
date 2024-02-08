@@ -300,7 +300,7 @@ function void fn08a9e0()
 
 	if (u8[A4 + 0x2e] == 0 && (u8[A4 + 0x2b] & char.bonus.INVINCIBLE) == 0)
 	{
-		if (u8[A4 + 0x34] == 0 && u8[A4 + 0x05] < 0x04)
+		if (u8[A4 + 0x34] == 0 && u8[A4 + 0x05] < base_state.HURT)
 		{
 			u16[A4 + 0x18] = 0
 			u16[A4 + 0x1a] = 0

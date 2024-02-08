@@ -46,7 +46,7 @@ function void fn0329b8()
 
 	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + u16[A0 + 0x34]
 	D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x14
-	if (D0.u16 < objA0.value32 && D1.u16 < 0x28 && u8[A1 + 0x05] < 0x04)
+	if (D0.u16 < objA0.value32 && D1.u16 < 0x28 && u8[A1 + 0x05] < base_state.HURT)
 	{
 		if ((objA0.flags2a & char.flag.FACING_LEFT) == 0)
 		{

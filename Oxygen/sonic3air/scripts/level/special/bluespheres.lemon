@@ -93,18 +93,18 @@ function void SpecialStage()
 	}
 #endif
 
-	Nemesis.loadDataToVRAM(0x0b07b8, SpecialStage.CheckerFloor.targetInVRAM)		// Checkered Floor
+	Nemesis.loadDataToVRAM(0x0b07b8, SpecialStage.CheckerFloor.targetInVRAM)		// Checkerboard Floor
 
 	fn0085b0()
 
-	// Checkered Floor mapping
+	// Checkerboard Floor mapping
 	Enigma.decompress(0x0aef54, 0xffff5500, (SpecialStage.CheckerFloor.targetInVRAM >> 5))
 	copyRectToVRAM(0xffff5500, 0xc000, 0x28, 0x1c)
 
 	Nemesis.loadDataToVRAM(0x0ad904, 0xd000)		// Sphere sprites
 	Nemesis.loadDataToVRAM(0x0adf60, 0xb4e0)		// Special stage ring sprites
 	Nemesis.loadDataToVRAM(0x0aeed0, SpecialStage.Background.targetInVRAM)
-	Nemesis.loadDataToVRAM(0x0ad472, SpecialStage.TextPromps.targetInVRAM)		// "get blue spheres" and "perfect" text
+	Nemesis.loadDataToVRAM(0x0ad472, SpecialStage.TextPromps.targetInVRAM)		// "Get Blue Spheres" and "Perfect" text
 	Nemesis.loadDataToVRAM(0x0ad5f4, 0xdf00)		// Arrow-like icon accompanying the above text
 	Nemesis.loadDataToVRAM(0x0ad650, 0xf020)		// Special Stage HUD digits
 
@@ -135,13 +135,13 @@ function void SpecialStage()
 	camera.foreground.y.u16 = 0
 	level.height.bitmask = 0xffff
 
-	u32[0xffffb000] = 0x008faa
+	u32[0xffffb000] = 0x008faa			// Main Character
 	if (getNumPlayers() >= 2)
 	{
-		u32[0xffffb04a] = 0x009212
+		u32[0xffffb04a] = 0x009212		// Second character Tails
 	}
-	u32[0xffffb094] = 0x008df8
-	u32[0xffffb0de] = 0x008e40
+	u32[0xffffb094] = 0x008df8			// HUD Icons next to ring and spheres counters
+	u32[0xffffb0de] = 0x008e40			// "Get Blue Spheres" text
 	UpdateGameObjects()
 
 	fn009d9e()
@@ -445,7 +445,7 @@ function void fn0085b0()
 	}
 
 	// Load colors
-	u32[0xffffe446] = A1
+	bluespheres.palette.baseAddress = A1
 	A2 = 0xfffffc80
 	copyMemory(A2 + 0x70, A1, 0x10)			// Ground colors
 	copyMemory(A2 + 0x50, A1 + 0x20, 6)		// Emerald colors
@@ -453,7 +453,7 @@ function void fn0085b0()
 #if STANDALONE
 	if (isGeneratedStageInMainGame)
 	{
-		// Overwrite the emerald colors with teh correct ones
+		// Overwrite the emerald colors with the correct ones
 		A1 = u32[0x0088ba + global.next_bluespheres * 0x10]
 		if (useSKLayouts)
 		{
@@ -470,17 +470,17 @@ function void fn0087da()
 {
 	if (bluespheres.stage_exit_animation == 0)
 	{
-		D0.u16 = u16[0xffffe420]
+		D0.u16 = bluespheres.floor.frame
 		if (D0.u16 >= 0x10)
 		{
 			if (bluespheres.next_direction >= 0)
 				return
 
-			D0.u16 = u8[0xffffe42f]
+			D0.u16 = bluespheres.palette.frame
 		}
 
 		D0.u16 = 0x10 - (D0.u16 & 0x0e)
-		A1 = u32[0xffffe446] + D0.u16
+		A1 = bluespheres.palette.baseAddress + D0.u16
 		copyMemory(0xfffffc70, A1, 0x10)
 	}
 }
@@ -490,10 +490,10 @@ function void fn0087da()
 function void fn00881a()
 {
 	A1 = 0x0088b6
-	D0.u16 = u16[0xffffe420]
-	if (D0.u8 != u8[0xffffe42c])
+	D0.u16 = bluespheres.floor.frame
+	if (D0.u8 != bluespheres.floor.frame.former)
 	{
-		u8[0xffffe42c] = D0.u8
+		bluespheres.floor.frame.former = D0.u8
 		D0.u16 <<= 3
 		A3 = u32[A1 + D0.s16]
 
@@ -572,19 +572,18 @@ function void fn008c5e()
 
 
 //# address-hook(0x008d5c) end(0x008d76)
-function void fn008d5c()
+//# alias(fn008d5c) deprecated
+function void BlueSpheres.AllocDynamicObjectAfterA0()
 {
-	A1 = A0
-	D0.u16 = (0xcf82 - A0.u16) >> 6
-	D0.u16 = u8[0x008d78 + D0.s16]
-	while (D0.s16 >= 0)
-	{
-		A1 += 0x4a
-		--D0.s16
-		if (u32[A1] == 0)
-			break
-	}
-	_setZeroFlagByValue(0)	// Is this correct?
+	BlueSpheres.allocDynamicObjectAfterA0()
+}
+
+
+function bool BlueSpheres.allocDynamicObjectAfterA0()
+{
+	u32 offset = (0xffffcfcc - 0x4a - A0) >> 6
+	D0.u16 = u8[0x008d78 + offset]
+	return allocDynamicObject(A0, D0.u16)
 }
 
 
@@ -619,12 +618,12 @@ function void fn008e2a()
 //# address-hook(0x008e40) end(0x008e56)
 function void fn008e40()
 {
-	fn008d5c()
-	if (_equal())
+	if (BlueSpheres.allocDynamicObjectAfterA0())
 	{
+		// Spawn another instance of the object for the other half of the text
 		objA1.update_address = 0x008e5c
-		u8[A1 + 0x2a] |= 0x01
-		u8[A1 + 0x22] = 0x01
+		objA1.flags2a |= 0x01
+		objA1.animation.sprite = 0x01
 	}
 	fn008e5c()
 }
@@ -746,10 +745,9 @@ function void fn008faa()
 		objA0.mapping_offset = 0x2908ba
 		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (SpecialStage.Tails.targetInVRAM >> 5))
 
-		fn008d5c()
-		if (_equal())
+		if (BlueSpheres.allocDynamicObjectAfterA0())
 		{
-			// Spawn tails object
+			// Spawn Tails' tails object
 			objA1.update_address = 0x009444
 			u16[A1 + 0x3e] = A0.u16
 		}
@@ -924,9 +922,9 @@ function void fn009212()
 
 	fn0093e2()
 
-	fn008d5c()
-	if (_equal())
+	if (BlueSpheres.allocDynamicObjectAfterA0())
 	{
+		// Spawn Tails' tails object
 		objA1.update_address = 0x009444
 		u16[A1 + 0x3e] = A0.u16
 	}
@@ -1233,7 +1231,7 @@ function void fn009580()
 			bluespheres.next_direction = 0
 			if (bluespheres.movement_speed != 0)
 			{
-				u8[0xffffe430] = 1
+				bluespheres.turning = 1
 			}
 		}
 	}
@@ -1241,7 +1239,7 @@ function void fn009580()
 	{
 		if (D3.u16 != 0)
 		{
-			u8[0xffffe430] = 0
+			bluespheres.turning = 0
 		}
 	}
 
@@ -1276,7 +1274,7 @@ function void fn009580()
 			D2.s16 = bluespheres.movement_speed
 		}
 
-		if (u8[0xffffe430] == 0)
+		if (bluespheres.turning == 0)
 		{
 			if (D1 & CONTROL_LEFT)
 			{
@@ -1296,7 +1294,7 @@ function void fn009580()
 				D0.u16 = ((bluespheres.position.x + 0x80) >> 8) & 0x1f
 				D1.u16 = ((bluespheres.position.y + 0x80) >> 8) & 0x1f
 				D1.u16 = (D1.u16 << 5) | D0.u16
-				if (D1.u16 != u16[0xffffe44e])
+				if (D1.u16 != bluespheres.object_standing_on)
 				{
 					bluespheres.hitting_bumper = 0
 					bluespheres.movement_speed = (bluespheres.movement_speed >= 0) ? -bluespheres.current_gamespeed : bluespheres.current_gamespeed
@@ -1380,7 +1378,7 @@ function void fn00972e()
 		// Running into bumper
 		if (bluespheres.hitting_bumper == 0)
 		{
-			u16[0xffffe44e] = D1.u16
+			bluespheres.object_standing_on = D1.u16
 			bluespheres.hitting_bumper = 1
 			bluespheres.going_forward = 0
 			playSound(0xaa)
@@ -1507,13 +1505,13 @@ function void BlueSpheres.RenderSpheres()
 	}
 
 	D0.u16 = (D0.u16 >> 5) & 0x0f
-	u16[0xffffe420] = D0.u16
-	u8[0xffffe42f] = D0.u8
+	bluespheres.floor.frame = D0.u16
+	bluespheres.palette.frame = D0.u8
 
 	D0.u16 = bluespheres.direction & 0x38
 	if (D0.u16 != 0)
 	{
-		u16[0xffffe420] = (D0.u16 >> 3) + 0x0f
+		bluespheres.floor.frame = (D0.u16 >> 3) + 0x0f
 	}
 
 #if GAMEAPP
@@ -1526,7 +1524,7 @@ function void BlueSpheres.RenderSpheres()
 	A0 = (bluespheres.lifted_height == 0) ? 0x009af4 : 0x009b18
 
 	D5.u16 = (u16[A5 + 0x02] + D1.u16) & u16[A5 + 0x0a]
-	D0.u16 = u16[0xffffe420] * 4
+	D0.u16 = bluespheres.floor.frame * 4
 	A1 = u32[0xffff0000 + D0.u16]		// Pointer to lookup table for sphere positions and distances
 	D6.u16 = u16(u8[0xfffff62c]) * 8
 	D7 = 0x4f - u8[0xfffff62c]
@@ -1710,7 +1708,7 @@ function void fn009b62()
 		D1.u16 = ((D3.u16 + 0x80) >> 8) & 0x1f
 		D1.u16 = (D1.u16 << 5) | D0.u16
 		u8[A1 + D1.s16] = (global.sk_bluespheres) ? 0x0d : 0x0b
-		u16[0xffffe44e] = D1.u16
+		bluespheres.object_standing_on = D1.u16
 		u16[0xffffe428] = 0x0800
 		bluespheres.emerald_jingle_countdown = 0x78
 
@@ -1739,7 +1737,7 @@ function void fn009b62()
 		D0.u16 = ((bluespheres.position.x + 0x80) >> 8) & 0x1f
 		D1.u16 = ((bluespheres.position.y + 0x80) >> 8) & 0x1f
 		D1.u16 = (D1.u16 << 5) | D0.u16
-		if (D1.u16 == u16[0xffffe44e])
+		if (D1.u16 == bluespheres.object_standing_on)
 		{
 			D0.u16 = (bluespheres.position.x | bluespheres.position.y) & 0xe0
 			if (D0.u16 == 0)
@@ -1778,9 +1776,9 @@ function void fn009b62()
 function void fn009d5e()
 {
 	if (bluespheres.direction & 0x40)
-		D0.u16 = bluespheres.position.x - u16[0xffffe434]
+		D0.u16 = bluespheres.position.x - bluespheres.position.x.former
 	else
-		D0.u16 = bluespheres.position.y - u16[0xffffe436]
+		D0.u16 = bluespheres.position.y - bluespheres.position.y.former
 
 	if (s8(bluespheres.direction) >= 0)
 	{
@@ -1794,8 +1792,8 @@ function void fn009d5e()
 	u16[0xffffe000] = getScreenExtend()
 #endif
 	u16[0xffffe002] = bluespheres.direction * 4
-	u16[0xffffe434] = bluespheres.position.x
-	u16[0xffffe436] = bluespheres.position.y
+	bluespheres.position.x.former = bluespheres.position.x
+	bluespheres.position.y.former = bluespheres.position.y
 }
 
 
@@ -2608,7 +2606,7 @@ function void fn02df64()
 	fn01aa6e()
 	u16[0xffffef68] = 0x98
 	u8[0xffffef6c] = 0xff
-	u32[0xffffb940] = 0x02e3b8
+	u32[0xffffb940] = 0x02e3b8		// Special Stage results object
 
 	VDP.Config.setActiveDisplay(true)
 
@@ -2702,6 +2700,8 @@ function void BlueSpheres.FadeIn()
 		--countdown
 
 	#if GAMEAPP
+		// Draw our own widescreen version of the background
+		//  -> For this to work, we need to update the sprites as well
 		UpdateGameObjects()
 		RenderSprites()
 
@@ -2881,6 +2881,7 @@ function void BlueSpheres.renderCustomSpheres()
 		D1.u16 += D0.u16 * 2
 		A3 = tableLookupAddress(A3, D1.s16)
 
+		// A3 = Pointer to sprite data
 		D1.u16 = u16[A3] - 1	// This is always 0, except for Super Emeralds
 		A3 += 2
 		while (D1.s16 >= 0)

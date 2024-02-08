@@ -116,12 +116,12 @@ function void fn031e96()
 	{
 	#if STANDALONE
 		// Also consider the "hurt" state
-		if (u8[A1 + 0x05] <= 0x04 && u8[A1 + 0x2e] == 0)
+		if (u8[A1 + 0x05] <= base_state.HURT && u8[A1 + 0x2e] == 0)
 		{
-			if (u8[A1 + 0x05] == 0x04)
-				u8[A1 + 0x05] = 0x02
+			if (u8[A1 + 0x05] == base_state.HURT)
+				u8[A1 + 0x05] = base_state.NORMAL
 	#else
-		if (u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+		if (u8[A1 + 0x05] < base_state.HURT && u8[A1 + 0x2e] == 0)
 		{
 	#endif
 			D1.u16 = dy - u16[A0 + 0x36]

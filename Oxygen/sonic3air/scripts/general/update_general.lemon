@@ -663,7 +663,7 @@ function void UpdateRollingDemo()
 
 
 // "JumpToSegaScreen" according to s3unlocked
-// The same game mode index value was used for in Sonic 2 for Vs Mode results screen, so this is probably a dummy
+// The same game mode index value was used in Sonic 2 for Vs Mode results screen, so this is probably a dummy
 
 //# address-hook(0x00051a) end(0x000520)
 function void fn00051a()

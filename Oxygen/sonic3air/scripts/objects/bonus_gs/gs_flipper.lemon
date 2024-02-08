@@ -202,7 +202,7 @@ function void fn049d72()
 	objA1.velocity.x = D1.u16
 	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
-	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x05] = base_state.NORMAL
 	u8[A1 + 0x2e] = 0
 	u8[A3] = 0
 

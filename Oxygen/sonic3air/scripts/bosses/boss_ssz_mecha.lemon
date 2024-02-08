@@ -899,8 +899,8 @@ function void fn07d216()
 	// Targets:
 	//  - 0x07b462		-> Changes base state to 0x0a
 	//  - 0x07b5c2		-> Stops at border and changes base state to 0x12
-	//  - 0x07b698		-> Stops at border
-	//  - 0x07d7d6		-> Unknown (is this address even correct?)
+	//  - 0x07b698		-> Stops at border and changes base state to 0x0a
+	//  - 0x07b7d6		-> Changes base state to 0x26
 	call A1
 }
 

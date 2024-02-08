@@ -29,7 +29,7 @@ function void Spring.BaseUpdate()
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x200
-	u16[A0 + 0x32] = objA0.position.x.u16
+	objA0.value32 = objA0.position.x.u16
 	u16[A0 + 0x34] = objA0.position.y.u16
 
 	// Targets:
@@ -334,7 +334,7 @@ function void SpringVertical.ApplyToCharacter()
 	else
 		objA1.position.y.u16 += 8
 
-	u8[A1 + 0x05] = 2
+	u8[A1 + 0x05] = base_state.NORMAL
 	objA1.velocity.y = u16[A0 + 0x30]
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.ON_OBJECT
@@ -448,7 +448,7 @@ function void SpringVerticalFlipped.ApplyToCharacter.CompetitionMode()
 		u8[A1 + 0x47] = 0x0f
 	}
 
-	u8[A1 + 0x05] = 2
+	u8[A1 + 0x05] = base_state.NORMAL
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.ON_OBJECT
 	u8[A1 + 0x2f] = 0
@@ -694,7 +694,7 @@ function void SpringDiagonal.ApplyToCharacter()
 		objA1.velocity.x = s16[A0 + 0x30]
 	}
 
-	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x05] = base_state.NORMAL
 	objA1.state = char.state.STRAIGHTJUMP
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.ON_OBJECT
@@ -800,7 +800,7 @@ function void SpringDiagonalFlipped.ApplyToCharacter()
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.ON_OBJECT
 	u8[A1 + 0x40] = 0
-	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x05] = base_state.NORMAL
 
 	if (objA0.subtype2c & 0x01)
 	{

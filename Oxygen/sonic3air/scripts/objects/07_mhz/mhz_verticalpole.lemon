@@ -77,7 +77,7 @@ function void fn03f0d8()
 		return
 	}
 
-	if (debug_mode.state || u8[A1 + 0x05] >= 0x04)
+	if (debug_mode.state || u8[A1 + 0x05] >= base_state.HURT)
 	{
 		fn03f17a()
 		return
@@ -174,7 +174,7 @@ function void fn03f1c8()
 	objA1.groundspeed = objA1.velocity.x
 	u8[A1 + 0x40] = 0
 	u8[A1 + 0x3d] = 0
-	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x05] = base_state.NORMAL
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK
 	u8[A1 + 0x2f] = 0
 	u8[A1 + 0x27] = 0
@@ -225,7 +225,7 @@ function void fn03f246()
 		D2 = 0x12
 	}
 
-	if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
+	if (debug_mode.state == 0 && u8[A1 + 0x05] < base_state.HURT)
 	{
 		if (u8[A1 + 0x2e] == 0)
 		{

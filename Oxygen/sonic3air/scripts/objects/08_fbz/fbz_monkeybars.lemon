@@ -101,7 +101,7 @@ function void fn03a8b8()
 {
 	if (u8[A2] != 0)
 	{
-		if ((objA1.render_flags & render_flag.VISIBLE) && debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
+		if ((objA1.render_flags & render_flag.VISIBLE) && debug_mode.state == 0 && u8[A1 + 0x05] < base_state.HURT)
 		{
 			// Check if jump button pressed
 			D0.u8 &= CONTROL_ABC
@@ -171,7 +171,7 @@ function void fn03a8b8()
 	D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 - 0x90
 	if (D0.u16 < 0x20 && D1.u16 < 0x18)
 	{
-		if (s8[A1 + 0x2e] >= 0 && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+		if (s8[A1 + 0x2e] >= 0 && u8[A1 + 0x05] < base_state.HURT && debug_mode.state == 0)
 		{
 		#if STANDALONE
 			// Ignore for Tails while he's carrying the main player
@@ -247,7 +247,7 @@ function void fn03aa7e()
 		return
 	}
 
-	if ((objA1.render_flags & render_flag.VISIBLE) && debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
+	if ((objA1.render_flags & render_flag.VISIBLE) && debug_mode.state == 0 && u8[A1 + 0x05] < base_state.HURT)
 	{
 		// Check if jump button pressed
 		D0.u8 &= CONTROL_ABC
@@ -424,7 +424,7 @@ function void fn03ac86()
 	D2.u16 *= 2
 	if (D0.u16 < D2.u16 && D1.u16 < 0x18)
 	{
-		if (s8[A1 + 0x2e] >= 0 && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+		if (s8[A1 + 0x2e] >= 0 && u8[A1 + 0x05] < base_state.HURT && debug_mode.state == 0)
 		{
 		#if STANDALONE
 			// Ignore for Tails while he's carrying the main player

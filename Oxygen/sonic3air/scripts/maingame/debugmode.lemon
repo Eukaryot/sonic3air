@@ -239,7 +239,7 @@ function void DebugMode.EvaluateInput()
 //# address-hook(0x092c54) end(0x092c86)
 function void DebugMode.ResetSonic()
 {
-	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x05] = base_state.NORMAL
 	u16[A1 + 0x12] = 0
 	u16[A1 + 0x16] = 0
 	objA1.velocity.x = 0

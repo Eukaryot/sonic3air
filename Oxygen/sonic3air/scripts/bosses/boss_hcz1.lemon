@@ -1180,7 +1180,7 @@ function void fn06a9b8()
 	}
 
 	A2 = 0xffffb04a
-	if (D0.u16 <= u16[A2 + 0x14] && u8[A2 + 0x05] < 0x06)
+	if (D0.u16 <= u16[A2 + 0x14] && u8[A2 + 0x05] < base_state.DIED)
 	{
 		u16[A0 + 0x44] = A2.u16
 		fn06aa30()

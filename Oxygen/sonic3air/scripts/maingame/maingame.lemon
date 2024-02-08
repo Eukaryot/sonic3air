@@ -295,7 +295,7 @@ function void UpdateGamePause()
 		else
 		{
 			global.game.paused = true
-			bool canRestart = !global.pause_disabled && (global.game_mode == 0x0c && global.stage_type == 0 && u8[0xffffb000 + 0x05] <= 0x04) && !competition_mode.active
+			bool canRestart = !global.pause_disabled && (global.game_mode == 0x0c && global.stage_type == 0 && u8[0xffffb000 + 0x05] <= base_state.HURT) && !competition_mode.active
 			Game.onGamePause(canRestart)
 
 			global.frame_state = 0x10
@@ -1756,7 +1756,7 @@ function void ResetOscillatingNumbers()
 //# address-hook(0x00773c) end(0x007790)
 function void UpdateOscillatingNumbers()
 {
-	if (competition_mode.active == 0 && u8[0xffffb000 + 0x05] >= 0x06)
+	if (competition_mode.active == 0 && u8[0xffffb000 + 0x05] >= base_state.DIED)
 		return
 
 	A1 = 0xfffffe6e
@@ -2307,7 +2307,7 @@ function void fn0075d2()
 function void UpdateSpecialScrolling()
 {
 	// Update of auto-scrolling (and similar)
-	if (u8[0xffffb000 + 0x05] < 0x06)
+	if (u8[0xffffb000 + 0x05] < base_state.DIED)
 	{
 		// Call targets:
 		//  - 0x04f366	-> level.special_scrolling == 0x00	-> Default, does nothing at all

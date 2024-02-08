@@ -50,7 +50,7 @@ function void fn040474()
 			D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x10
 			if (D0.u16 < 0x20)
 			{
-				if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0 && objA1.velocity.y >= 0x0800)
+				if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0 && u8[A1 + 0x05] < base_state.HURT && u8[A1 + 0x2e] == 0 && objA1.velocity.y >= 0x0800)
 				{
 					objA0.flags2a |= bit
 					objA1.hitbox_extends.y = char.hitbox.y.ROLLING

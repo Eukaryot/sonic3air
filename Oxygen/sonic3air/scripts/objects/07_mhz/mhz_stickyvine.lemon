@@ -73,7 +73,7 @@ function void fn03eada()
 	u16 dy = objA1.position.y.u16 - objA0.position.y.u16 + 0x18
 	if (dx < 0x18 && dy < 0x30)
 	{
-		if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+		if (debug_mode.state == 0 && u8[A1 + 0x05] < base_state.HURT && u8[A1 + 0x2e] == 0)
 		{
 			objA0.update_address = 0x03eb26
 			u32[A0 + 0x2e] = A1

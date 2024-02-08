@@ -352,7 +352,7 @@ function void fn03d78c()
 	if (u8[A1 + 0x2f] == 0)
 	{
 		A2 = 0xffffb000
-		if (u8[A2 + 0x2e] == 0 && u8[A2 + 0x05] < 0x04 && debug_mode.state == 0)
+		if (u8[A2 + 0x2e] == 0 && u8[A2 + 0x05] < base_state.HURT && debug_mode.state == 0)
 		{
 			bool goto03d8e2 = false
 			if (s8[A1 + 0x2c] < 0)

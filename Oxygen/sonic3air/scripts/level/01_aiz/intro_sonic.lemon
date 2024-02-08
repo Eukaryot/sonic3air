@@ -309,7 +309,7 @@ function void fn067704()
 	level.palettefx.state = 0xff
 
 	A1 = 0xffffb000
-	u8[A1 + 0x05] = 0x04
+	u8[A1 + 0x05] = base_state.HURT
 	objA1.velocity.y = -0x400
 	objA1.velocity.x = -0x200
 	objA1.groundspeed = 0

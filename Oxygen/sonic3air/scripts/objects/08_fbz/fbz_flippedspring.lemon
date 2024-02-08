@@ -70,7 +70,7 @@ function void fn03cb66()
 //# address-hook(0x03cbce) end(0x03cc46)
 function void fn03cbce()
 {
-	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x05] = base_state.NORMAL
 	objA1.velocity.y = (objA0.subtype2c & 0x02) ? -0xa00 : -0x1000
 	objA1.state = char.state.STRAIGHTJUMP
 	u8[A1 + 0x2a] |= char.flag.IN_AIR

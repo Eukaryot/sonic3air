@@ -157,7 +157,7 @@ function void fn018466()
 {
 	A2 = u32[A0 + 0x40]
 	#if GAMEAPP
-		if (A2 == 0xffffb000 && u8[0xffffb000 + 0x05] <= 0x04)
+		if (A2 == 0xffffb000 && u8[0xffffb000 + 0x05] <= base_state.HURT)
 		{
 			if (Game.getSetting(SETTING_UNDERWATER_AUDIO))
 			{
@@ -175,7 +175,7 @@ function void fn018466()
 	if (u16[A0 + 0x30] == 0)
 	{
 		// Character died?
-		if (u8[A2 + 0x05] >= 0x06)
+		if (u8[A2 + 0x05] >= base_state.DIED)
 			return
 
 		// Protected by bubble shield?
@@ -278,7 +278,7 @@ function void fn018466()
 		--u16[A0 + 0x30]
 		if (u16[A0 + 0x30] == 0)
 		{
-			u8[A2 + 0x05] = 0x06
+			u8[A2 + 0x05] = base_state.DIED
 			return
 		}
 	}

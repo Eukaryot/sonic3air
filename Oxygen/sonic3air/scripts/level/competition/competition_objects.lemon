@@ -85,7 +85,7 @@ function void fn032c92()
 //# address-hook(0x032d16) end(0x032dec)
 function void fn032d16()
 {
-	if (u8[A1 + 0x05] >= 0x04)
+	if (u8[A1 + 0x05] >= base_state.HURT)
 		return
 
 	u16[A1 + 0x1a] = 0x0400
@@ -99,7 +99,7 @@ function void fn032d16()
 		u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 		s16[A1 + 0x18] = -0x800
 	}
-	u16[A1 + 0x32] = 0x0f
+	objA1.value32 = 0x0f
 	u16[A1 + 0x1c] = u16[A1 + 0x18]
 	if ((u8[A1 + 0x2a] & char.flag.ROLLING) == 0)
 	{
@@ -308,7 +308,7 @@ function void fn023b38()
 			u16[A1 + 0x14] += D3.u16
 		}
 		u16[A1 + 0x30] = D2.u16
-		u16[A1 + 0x32] = D3.u16
+		objA1.value32 = D3.u16
 		if (objA0.flags2a & 0x02)
 		{
 			objA0.flags2a &= ~0x02
@@ -1000,7 +1000,7 @@ function void fn035f8c()
 
 
 
-// Unknown in DPZ
+// Button in DPZ
 
 //# address-hook(0x0362a2) end(0x0362c8)
 function void fn0362a2()

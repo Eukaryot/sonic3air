@@ -129,7 +129,7 @@ function void fn03f5c2()
 
 	if (objA1.render_flags & render_flag.VISIBLE)
 	{
-		if (u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+		if (u8[A1 + 0x05] < base_state.HURT && debug_mode.state == 0)
 		{
 			if (u16[A0 + 0x34] == objA1.velocity.x && u16[A0 + 0x36] == objA1.velocity.y)
 			{
@@ -229,7 +229,7 @@ function void fn03f6fe()
 	if (D0.u16 >= 0x20 || D1.u16 >= 0x18)
 		return
 
-	if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+	if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x05] < base_state.HURT && debug_mode.state == 0)
 	{
 		if (objA1.velocity.y > 0)
 		{

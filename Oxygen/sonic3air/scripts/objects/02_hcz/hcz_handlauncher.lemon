@@ -204,7 +204,7 @@ function void fn030cf8()
 
 #if STANDALONE
 	// Bug fix: If character gets hurt, don't launch him
-	if (u8[A1 + 0x05] != 0x02)
+	if (u8[A1 + 0x05] != base_state.NORMAL)
 	{
 		u8[A0 + 0x35] &= ~bit
 		if (u8[A0 + 0x35] == 0)

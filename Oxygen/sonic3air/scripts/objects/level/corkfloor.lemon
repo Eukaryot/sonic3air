@@ -293,7 +293,7 @@ function void fn02a588()
 	{
 		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
-		u8[A1 + 0x05] = 2
+		u8[A1 + 0x05] = base_state.NORMAL
 	}
 }
 
@@ -307,7 +307,7 @@ function void fn02a58e()
 	objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 	objA1.state = char.state.ROLLING
 	objA1.velocity.y = -0x300
-	u8[A1 + 0x05] = 2
+	u8[A1 + 0x05] = base_state.NORMAL
 }
 
 
@@ -450,7 +450,7 @@ function void fn02a7b0()
 	{
 		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
-		u8[A1 + 0x05] = 0x02
+		u8[A1 + 0x05] = base_state.NORMAL
 	}
 }
 
@@ -458,7 +458,7 @@ function void fn02a7b0()
 //# address-hook(0x02a7b6)
 function void fn02a7b6()
 {
-	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x05] = base_state.NORMAL
 	objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 	objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 	objA1.state = char.state.ROLLING

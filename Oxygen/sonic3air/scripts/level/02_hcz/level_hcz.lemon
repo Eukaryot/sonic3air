@@ -691,7 +691,7 @@ function void fn050fce()
 //# address-hook(0x050ff0) end(0x05106e)
 function void fn050ff0()
 {
-	if (u8[0xffffb000 + 0x05] < 0x06)
+	if (u8[0xffffb000 + 0x05] < base_state.DIED)
 	{
 		D0 = (u16[0xffffb000 + 0x10] < 0x0a88) ? 0x00e000 : 0x014000
 		D1.u16 = level.display_routine

@@ -159,8 +159,11 @@ function void fn09026e()
 		u16[A0 + 0x3a] = u16[0x0902ec + objA0.subtype2c]
 		move_area.bottom.target = screenmover_target.bottom
 
-		A2 = 0x090660
-		fn084258()
+		// "spawnChildObjectsStd(0x090660)" replaced by:
+		spawnChildObjectsStd(0x084aa4, 0x00, 0, 0)		// Screen mover for the upper border
+		spawnChildObjectsStd(0x084ad2, 0x02, 0, 0)		// Screen mover for the lower border
+		spawnChildObjectsStd(0x084a76, 0x04, 0, 0)		// Screen mover for the left border
+		spawnChildObjectsStd(0x084a48, 0x06, 0, 0)		// Screen mover for the right border
 	}
 }
 
@@ -436,8 +439,12 @@ function void fn090512()
 		}
 
 		move_area.bottom.target = screenmover_target.bottom
-		A2 = 0x090660
-		fn084258()
+
+		// "spawnChildObjectsStd(0x090660)" replaced by:
+		spawnChildObjectsStd(0x084aa4, 0x00, 0, 0)		// Screen mover for the upper border
+		spawnChildObjectsStd(0x084ad2, 0x02, 0, 0)		// Screen mover for the lower border
+		spawnChildObjectsStd(0x084a76, 0x04, 0, 0)		// Screen mover for the left border
+		spawnChildObjectsStd(0x084a48, 0x06, 0, 0)		// Screen mover for the right border
 	}
 
 	UnloadObject()

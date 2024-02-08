@@ -47,7 +47,7 @@ function void fn03fbc4()
 		return
 #endif
 
-	if (u8[A1 + 0x05] >= 0x04)
+	if (u8[A1 + 0x05] >= base_state.HURT)
 		return
 
 	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x40

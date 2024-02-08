@@ -551,7 +551,7 @@ function void fn000c50()
 			parity = !parity
 		}
 
-		u32 fieldColorBaseAddress = u32[0xffffe446]
+		u32 fieldColorBaseAddress = bluespheres.palette.baseAddress
 		u32 colorA = unpackColor(u16[fieldColorBaseAddress + (parity ? 8 : 0)])
 		u32 colorB = unpackColor(u16[fieldColorBaseAddress + (parity ? 0 : 8)])
 

@@ -76,7 +76,7 @@ function void fn08b3aa()
 		return
 	}
 
-	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x05] = base_state.NORMAL
 	objA1.velocity.y = -0x300
 	objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 	objA1.hitbox_extends.x = char.hitbox.x.ROLLING

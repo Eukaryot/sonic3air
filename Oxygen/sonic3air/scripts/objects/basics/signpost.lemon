@@ -518,7 +518,7 @@ function void fn086932()
 		return
 	if (u8[A1 + 0x2a] & char.flag.IN_AIR)
 		return
-	if (u8[A1 + 0x05] >= 0x06)
+	if (u8[A1 + 0x05] >= base_state.DIED)
 		return
 
 	objA0.flags38 |= 0x80

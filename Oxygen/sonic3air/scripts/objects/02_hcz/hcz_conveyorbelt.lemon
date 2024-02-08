@@ -92,7 +92,7 @@ function void fn031226()
 {
 	if (u8[A2] != 0)
 	{
-		if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
+		if (debug_mode.state == 0 && u8[A1 + 0x05] < base_state.HURT)
 		{
 			if (D1 & 0x0400)		// CONTROL_LEFT held
 			{
@@ -174,7 +174,7 @@ function void fn031226()
 
 		if (objA1.position.y.u16 > py && objA1.position.y.u16 <= py + 0x10)
 		{
-			if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+			if (debug_mode.state == 0 && u8[A1 + 0x05] < base_state.HURT && u8[A1 + 0x2e] == 0)
 			{
 				if (upperBelt)
 				{

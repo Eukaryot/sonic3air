@@ -86,7 +86,7 @@ function void fn04952a()
 		D2.u16 = D0.u16 + 0x20
 		D1 = objA1.position.y.u16 - objA0.position.y.u16 + D0.u16
 
-		if (D1.u16 < D2.u16 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+		if (D1.u16 < D2.u16 && u8[A1 + 0x05] < base_state.HURT && u8[A1 + 0x2e] == 0)
 		{
 			D1.u16 -= D0.u16
 			if (D1.s16 >= 0)

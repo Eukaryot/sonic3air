@@ -42,7 +42,7 @@ function void InitLevelTiles.FBZ1()
 //# address-hook(0x052424) end(0x05243e)
 function void UpdateLevelTiles.FBZ1()
 {
-	if (u8[0xffffb000 + 0x05] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= base_state.DIED)
 		return
 
 	A1 = 0x05282c
@@ -871,7 +871,7 @@ function void fn052972()
 	}
 	else
 	{
-		if (u8[0xffffb000 + 0x05] >= 0x06)
+		if (u8[0xffffb000 + 0x05] >= base_state.DIED)
 			return
 
 		fn052ab2()
@@ -1492,7 +1492,7 @@ function void fn052e50()
 //# address-hook(0x052e54) end(0x052e6e)
 function void fn052e54()
 {
-	if (u8[0xffffb000 + 0x05] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= base_state.DIED)
 		return
 
 	A1 = 0x052fa0
@@ -1855,7 +1855,7 @@ function void fn053096()
 		return
 	}
 
-	if (u8[0xffffb000 + 0x05] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= base_state.DIED)
 		return
 
 	fn053234()

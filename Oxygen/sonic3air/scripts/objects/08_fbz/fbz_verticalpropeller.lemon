@@ -61,7 +61,7 @@ function void fn03bfa0()
 		return
 	}
 
-	if (debug_mode.state != 0 || u8[A1 + 0x05] >= 0x04 || s8[A1 + 0x2e] < 0)
+	if (debug_mode.state != 0 || u8[A1 + 0x05] >= base_state.HURT || s8[A1 + 0x2e] < 0)
 	{
 		fn03c096()
 		return
@@ -175,7 +175,7 @@ function void fn03c0d0()
 	{
 		D1.u16 = u16[A0 + 0x36]
 		D0.u16 = objA0.position.y.u16 - objA1.position.y.u16 + 0x10
-		if (D0.u16 < u16[A0 + 0x36] && debug_mode.state == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+		if (D0.u16 < u16[A0 + 0x36] && debug_mode.state == 0 && u8[A1 + 0x05] < base_state.HURT && u8[A1 + 0x2e] == 0)
 		{
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0

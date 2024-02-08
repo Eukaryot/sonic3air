@@ -141,7 +141,7 @@ function void fn0868f8()
 		return
 
 	A1 = 0xffffb000
-	if ((u8[A1 + 0x2a] & 0x80) == 0 && (u8[A1 + 0x2a] & char.flag.IN_AIR) == 0 && u8[A1 + 0x05] < 0x06)
+	if ((u8[A1 + 0x2a] & 0x80) == 0 && (u8[A1 + 0x2a] & char.flag.IN_AIR) == 0 && u8[A1 + 0x05] < base_state.DIED)
 	{
 		objA0.base_state = D0.u8
 		StartCharacterWinPose()
@@ -171,7 +171,7 @@ function void fn086984()
 		return
 
 	A1 = 0xffffb000
-	if (u8[A1 + 0x05] < 0x06 && (objA1.render_flags & render_flag.VISIBLE))
+	if (u8[A1 + 0x05] < base_state.DIED && (objA1.render_flags & render_flag.VISIBLE))
 	{
 		if (u8[A1 + 0x38] != 1 && !tails.carrying)
 			return

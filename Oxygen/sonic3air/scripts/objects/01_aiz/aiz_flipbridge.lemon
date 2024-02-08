@@ -223,7 +223,7 @@ function void fn02ac08()
 			D0.u16 -= D1.u16
 			if (D0.s16 <= 0 && D0.s16 >= -0x10)
 			{
-				if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x05] < 0x06)
+				if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x05] < base_state.DIED)
 				{
 					D4.u16 = (D4.u16 >> 5) * 6
 					D4.u8 = u8[A3 + D4.s16 + 0x1d]

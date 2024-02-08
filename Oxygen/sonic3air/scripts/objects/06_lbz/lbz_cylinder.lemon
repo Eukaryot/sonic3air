@@ -68,7 +68,7 @@ function void fn02c3e8()
 						return
 				}
 
-				if (u8[A1 + 0x05] < 0x06 && debug_mode.state == 0)
+				if (u8[A1 + 0x05] < base_state.DIED && debug_mode.state == 0)
 				{
 					if (D0.u16 < 0x08)
 					{

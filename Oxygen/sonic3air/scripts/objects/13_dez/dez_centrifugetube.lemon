@@ -66,7 +66,7 @@ function void fn048f12()
 	D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + objA0.value32
 	if (D0.u16 < D5.u16 && D1.u16 < objA0.value32 * 2)
 	{
-		if (u8[A1 + 0x05] < 0x06 && debug_mode.state == 0)
+		if (u8[A1 + 0x05] < base_state.DIED && debug_mode.state == 0)
 		{
 			u16 backupD1 = D1.u16
 			LetSonicClimbOnObject()
@@ -206,7 +206,7 @@ function void fn049090()
 		if (D0.u16 >= 0x40 || D1.u16 >= D5.u16)
 			return
 
-		if (u8[A1 + 0x05] >= 0x06 || debug_mode.state != 0 || s8[A1 + 0x2e] < 0)
+		if (u8[A1 + 0x05] >= base_state.DIED || debug_mode.state != 0 || s8[A1 + 0x2e] < 0)
 			return
 
 		u16 backupD0 = D0.u16
@@ -373,7 +373,7 @@ function void fn0492d4()
 		D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x20
 		if (D0.u16 < 0x40 && D1.u16 < 0x40)
 		{
-			if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0 && u8[A1 + 0x05] < 0x06 && debug_mode.state == 0)
+			if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0 && u8[A1 + 0x05] < base_state.DIED && debug_mode.state == 0)
 			{
 				u8[A1 + 0x2a] |= char.flag.IN_AIR
 				objA1.velocity.x = 0

@@ -1499,7 +1499,7 @@ function void fn056706()
 {
 	camera.background.x.u16 = camera.foreground.x.u16 - 0x4010 + (0x5250 - u16[0xffffeede])
 	camera.background.y.u16 = camera.foreground.y.u16 - 0x0250 + (0x06d8 - u16[0xffffeee0])
-	if (u8[0xffffb000 + 0x05] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= base_state.DIED)
 	{
 		fn056936()
 		return

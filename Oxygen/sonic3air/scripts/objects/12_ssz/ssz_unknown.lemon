@@ -8,7 +8,7 @@
 
 
 
-// Unknown object 1
+// Object that controls the floating motion of the big green towers
 
 //# address-hook(0x057b6a) end(0x057b70)
 function void fn057b6a()
@@ -30,7 +30,7 @@ function void fn057b76()
 
 
 
-// Unknown object 2
+// Object that adds collision to the big green towers
 //  -> Appears multiple times right at the start of SSZ S/T
 
 //# address-hook(0x057b8e) end(0x057bac)

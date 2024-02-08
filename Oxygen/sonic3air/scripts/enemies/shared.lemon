@@ -689,39 +689,93 @@ function void fn085fc4()
 
 
 
-//# address-hook(0x084258) end(0x0842a6)
-function void fn084258()
+function void spawnChildObjectsStd(u32 address)
 {
-	D2 = 0
-	D6.u16 = u16[(A2+=2)-2]
-	while (true)
+	A2 = address
+	SpawnChildObjectsStd()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
 	{
-		if (!allocDynamicObjectStd())
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnChildObjectsStd")
+
+			A2 = address
+			u16 count = u16[A2] + 1
+			A2 += 2
+
+			for (u16 i = 0; i < count; ++i)
+			{
+				u32 updateAddress = u32[A2]
+				s8 offset_x = s8[A2 + 4]
+				s8 offset_y = s8[A2 + 5]
+				u8 subtype = (i * 2)
+
+				ROMDataAnalyser.beginObject(stringformat("%d", i))
+				ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+				ROMDataAnalyser.addKeyValue("subtype", stringformat("0x%02x", subtype))
+				ROMDataAnalyser.addKeyValue("offset_x", stringformat((offset_x < 0) ? "-%d" : "%d", abs(offset_x)))
+				ROMDataAnalyser.addKeyValue("offset_y", stringformat((offset_y < 0) ? "-%d" : "%d", abs(offset_y)))
+				ROMDataAnalyser.endObject()
+				A2 += 6
+			}
+
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
+}
+
+
+//# address-hook(0x084258) end(0x0842a6)
+//# alias(fn084258) deprecated
+function void SpawnChildObjectsStd()
+{
+	// This is similar to "SpawnChildObjects", but searches the whole object RAM for free slots instead of only after the parent.
+	// Stored data per child:
+	//  - Update routine
+	//  - Offset relative to parent
+
+	D2 = 0
+	u16 count = u16[A2] + 1
+	A2 += 2
+
+	for (u16 i = 0; i < count; ++i)
+	{
+		u32 updateAddress = u32[A2]
+		s8 offset_x = s8[A2 + 4]
+		s8 offset_y = s8[A2 + 5]
+
+		if (!spawnChildObjectsStd(updateAddress, D2.u8, offset_x, offset_y))
 			return
 
-		u16[A1 + 0x46] = A0.u16
-		objA1.mapping_offset = objA0.mapping_offset
-		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.update_address = u32[(A2+=4)-4]
-		u8[A1 + 0x2c] = D2.u8
-		D1.s8 = s8[(A2+=1)-1]
-		u8[A1 + 0x42] = D1.s8
-		objA1.position.x.u16 = objA0.position.x.u16 + D1.s8
-
-		D0.u16 = objA0.position.y.u16
-		D1.u8 = u8[(A2+=1)-1]
-		u8[A1 + 0x43] = D1.u8
-		D0.u16 += D1.s8
-		objA1.position.y.u16 = D0.u16
+		A2 += 6
 		D2.u16 += 2
-
-		--D6.s16
-		if (D6.s16 < 0)
-			break
 	}
+}
 
-	D0 = 0
-	_setZeroFlagByValue(0)
+
+
+function bool spawnChildObjectsStd(u32 updateAddress, u8 subtype, s8 offset_x, s8 offset_y)
+{
+	if (!allocDynamicObjectStd())
+		return false
+
+	objA1.update_address = updateAddress
+	objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
+	objA1.sprite_attributes = objA0.sprite_attributes
+	objA1.subtype2c = subtype							// Usually a simple enumeration of children (in steps of 2)
+	u16[A1 + 0x46] = A0.u16								// Reference to parent
+
+	s8[A1 + 0x42] = offset_x
+	u8[A1 + 0x43] = offset_y
+	objA1.position.x.u16 = objA0.position.x.u16 + offset_x
+	objA1.position.y.u16 = objA0.position.y.u16 + offset_y
+
+	_setZeroFlagByValue(false)
+	return true
 }
 
 
@@ -2042,7 +2096,7 @@ function void fn086334()
 function void fn08635e()
 {
 	objA1.velocity.y = D0.u16
-	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x05] = base_state.NORMAL
 	objA1.state = char.state.STRAIGHTJUMP
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.ON_OBJECT

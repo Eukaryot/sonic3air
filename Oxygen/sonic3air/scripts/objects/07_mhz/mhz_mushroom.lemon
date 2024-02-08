@@ -118,7 +118,7 @@ function void fn03e172()
 		D1.u16 += 0x20
 		D1.s16 = -D1.s16
 		objA1.velocity.y = D1.u16
-		u8[A1 + 0x05] = 0x02
+		u8[A1 + 0x05] = base_state.NORMAL
 		objA1.state = char.state.STRAIGHTJUMP
 		objA1.flags2a |= char.flag.IN_AIR
 		objA1.flags2a &= ~char.flag.ON_OBJECT

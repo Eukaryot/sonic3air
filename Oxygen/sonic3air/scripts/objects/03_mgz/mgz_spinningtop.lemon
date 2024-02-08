@@ -350,7 +350,7 @@ function void fn034f6a()
 //# address-hook(0x034fbc) end(0x03518e)
 function void fn034fbc()
 {
-	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < base_state.HURT && debug_mode.state == 0)
 	{
 		// Check if jump button pressed
 		if ((D5.u16 & CONTROL_ABC) == 0)

@@ -178,7 +178,7 @@ function void fn0349ba()
 {
 	if (u8[A2] != 0)
 	{
-		if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04)
+		if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < base_state.HURT)
 		{
 			// Check if jump button pressed
 			if ((D0.u8 & CONTROL_ABC) == 0)
@@ -244,7 +244,7 @@ function void fn0349ba()
 		D1.u16 = objA1.position.y.u16 - D3.u16 + 0x0c
 		if (D0.u16 < 0x18 && D1.u16 < 0x18)
 		{
-			if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+			if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x05] < base_state.HURT && debug_mode.state == 0)
 			{
 				D0.u16 = objA1.velocity.x
 				if (objA0.flags2a & 0x01)

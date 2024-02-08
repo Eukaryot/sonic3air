@@ -162,7 +162,7 @@ function void fn032784()
 		return
 	}
 
-	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04)
+	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < base_state.HURT)
 	{
 		if ((objA0.flags2a & bit) == 0)
 		{

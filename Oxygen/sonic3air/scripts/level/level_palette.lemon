@@ -115,7 +115,11 @@ function void LevelPaletteUpdate.AIZ1()
 			if (level.palettefx.state == 0)
 			{
 				D0.u16 = level.palettefx.frame_2
-				level.palettefx.frame_2 = (level.palettefx.frame_2 >= 42) ? 0 : (level.palettefx.frame_2 + 6)	// No modulo here, does not verify
+			#if STANDALONE
+				level.palettefx.frame_2 = (level.palettefx.frame_2 + 6) % 48
+			#else
+				level.palettefx.frame_2 = (level.palettefx.frame_2 >= 42) ? 0 : (level.palettefx.frame_2 + 6)	// No modulo here, as it leads to an actual difference to the original code behavior
+			#endif
 				copyMemory(0xfffffc78, 0x002bf6 + D0.u16, 6)
 			}
 		}
@@ -127,11 +131,19 @@ function void LevelPaletteUpdate.AIZ1()
 		{
 			level.palettefx.timer_1 = 9
 			D0.u16 = level.palettefx.frame_1
+		#if STANDALONE
+			level.palettefx.frame_1 = (level.palettefx.frame_1 + 8) % 128		// Restore full palette cycle for AIZ Intro water
+		#else
 			level.palettefx.frame_1 = (level.palettefx.frame_1 + 8) % 80
+		#endif
 			copyMemory(0xfffffc64, 0x002b16 + D0.u16, 8)
 
 			D0.u16 = level.palettefx.frame_2
+		#if STANDALONE
+			level.palettefx.frame_2 = (level.palettefx.frame_2 + 6) % 96		// Restore full palette cycle for AIZ Intro water
+		#else
 			level.palettefx.frame_2 = (level.palettefx.frame_2 + 6) % 60
+		#endif
 			copyMemory(0xfffffc7a, 0x002b96 + D0.u16, 6)
 		}
 	}
@@ -734,7 +746,11 @@ function void LevelPaletteUpdate.EMZ()
 		A0 = 0x0035e8
 		D0.u16 = level.palettefx.frame_2
 		level.palettefx.frame_2 += 0x04
+	#if STANDALONE
+		if (level.palettefx.frame_2 >= 0x38)		// Restore full palette cycle
+	#else
 		if (level.palettefx.frame_2 >= 0x34)
+	#endif
 		{
 			level.palettefx.frame_2 = 0
 		}

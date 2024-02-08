@@ -119,7 +119,7 @@ function void fn08b9d8()
 //# address-hook(0x08b9fa)
 function void fn08b9fa()
 {
-	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x05] = base_state.NORMAL
 	objA1.velocity.y = D2.u16
 	objA1.state = char.state.STRAIGHTJUMP
 	objA1.flags2a |= char.flag.IN_AIR

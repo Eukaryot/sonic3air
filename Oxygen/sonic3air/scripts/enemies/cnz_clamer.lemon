@@ -162,7 +162,7 @@ function void fn0890d8()
 		D0.s16 = 0x800
 		u8[A1 + 0x2a] &= ~render_flag.FLIP_X
 	}
-	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x05] = base_state.NORMAL
 	objA1.position.y.u16 += 6
 	objA1.velocity.x = D0.u16
 	objA1.velocity.y = -0x800

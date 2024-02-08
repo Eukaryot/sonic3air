@@ -69,7 +69,7 @@ function void fn04a428()
 		return
 	}
 
-	if (debug_mode.state != 0 || u8[A1 + 0x05] >= 0x04)
+	if (debug_mode.state != 0 || u8[A1 + 0x05] >= base_state.HURT)
 	{
 		fn04a4f0()
 		return
@@ -188,7 +188,7 @@ function void fn04a53a()
 	D2.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x38
 	if (D1.u16 < 0x70 && D2.u16 < 0x70)
 	{
-		if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+		if (debug_mode.state == 0 && u8[A1 + 0x05] < base_state.HURT && u8[A1 + 0x2e] == 0)
 		{
 			D1.u16 -= 0x38
 			D2.u16 -= 0x38

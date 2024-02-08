@@ -719,7 +719,7 @@ function void fn065b5a()
 
 
 
-// Unknown
+// Egg Robos flying out of the Death Egg, in the SSZ intro
 
 //# address-hook(0x065b70) end(0x065ba8)
 function void fn065b70()

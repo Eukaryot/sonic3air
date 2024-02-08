@@ -201,7 +201,7 @@ function void UpdateScreenShake()
 {
 	camera.screenshake.prev_offset = camera.screenshake.offset
 	D1 = 0
-	if (u8[0xffffb000 + 0x05] < 0x06 && camera.screenshake.state != 0)
+	if (u8[0xffffb000 + 0x05] < base_state.DIED && camera.screenshake.state != 0)
 	{
 		if ((camera.screenshake.state & 0x8000) == 0)
 		{

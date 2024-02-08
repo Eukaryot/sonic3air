@@ -185,7 +185,7 @@ function void DamageCharacter()
 {
 	if ((u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
 	{
-		if (u8[A1 + 0x34] == 0 && u8[A1 + 0x05] < 4)
+		if (u8[A1 + 0x34] == 0 && u8[A1 + 0x05] < base_state.HURT)
 		{
 			D0 = s32(objA1.velocity.y) << 8
 			D3 = objA1.position.y - D0

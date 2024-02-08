@@ -179,7 +179,7 @@ function void fn03077e()
 		return
 #endif
 
-	if (u8[A1 + 0x05] >= 0x04)
+	if (u8[A1 + 0x05] >= base_state.HURT)
 		return
 
 	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x18
@@ -443,7 +443,7 @@ function void fn030a10()
 //# address-hook(0x030a38) end(0x030ace)
 function void fn030a38()
 {
-	if (u8[A1 + 0x05] >= 0x04 || u8[A1 + 0x2e] != 0)
+	if (u8[A1 + 0x05] >= base_state.HURT || u8[A1 + 0x2e] != 0)
 		return
 
 	u16 dx = u16[A1 + 0x10] - objA0.position.x.u16 + 0x14

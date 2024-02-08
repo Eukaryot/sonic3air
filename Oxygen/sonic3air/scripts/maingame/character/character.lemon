@@ -902,7 +902,7 @@ function void Tails.UpdateCarrySonic()
 		return
 	}
 
-	if (u8[A1 + 0x05] < 0x04)
+	if (u8[A1 + 0x05] < base_state.HURT)
 	{
 		if ((objA1.flags2a & char.flag.IN_AIR) && (objA1.velocity.x == tails.carried_velocity_x))
 		{
@@ -1051,7 +1051,7 @@ function void Tails.CheckCatchSonic()
 	u16 dy = objA1.position.y.u16 - char.position.y.u16 + 0x08 + ((global.inv_gravity) ? 0x28 : -0x28)
 	if (dx < 0x20 && dy < 0x10)
 	{
-		if (u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0 && u8[A1 + 0x3d] == 0 && debug_mode.state == 0)
+		if (u8[A1 + 0x05] < base_state.HURT && u8[A1 + 0x2e] == 0 && u8[A1 + 0x3d] == 0 && debug_mode.state == 0)
 		{
 			fn01459e()
 			playSound(SFX_GRAB)

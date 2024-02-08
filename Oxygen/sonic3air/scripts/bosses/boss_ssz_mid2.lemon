@@ -596,7 +596,7 @@ function void fn07ac06()
 		return
 	}
 
-	if (u8[0xffffb000 + 0x05] == 0x04 || u8[0xffffb04a + 0x05] == 0x04)
+	if (u8[0xffffb000 + 0x05] == base_state.HURT || u8[0xffffb04a + 0x05] == base_state.HURT)
 	{
 		A1 = 0xfffffa82
 		D0.u8 = u8[A1 + 0x02] & 0x0f

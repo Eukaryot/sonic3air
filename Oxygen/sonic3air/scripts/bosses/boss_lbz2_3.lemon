@@ -456,7 +456,7 @@ function void fn074640()
 	{
 		// Handling primarily for Super forms
 		A1 = 0xffffb000
-		u8[A1 + 0x05] = 0x02
+		u8[A1 + 0x05] = base_state.NORMAL
 		objA1.velocity.x = -objA0.velocity.x
 		objA1.velocity.y = -0x400
 		objA1.state = char.state.ROLLING

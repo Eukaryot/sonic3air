@@ -815,8 +815,8 @@ function void fn06b694()
 	objA0.base_state = 0x02
 	if (objA0.subtype2c == 0)
 	{
-		A2 = 0x06bdaa
-		fn084258()
+		// "spawnChildObjectsStd(0x06bdaa)" replaced by:
+		spawnChildObjectsStd(0x06b5c4, 0x00, 19, 10)
 		if (_equal())
 		{
 			u16[A1 + 0x46] = u16[A0 + 0x46]
@@ -1149,7 +1149,7 @@ function void fn06ba06()
 		return
 	}
 
-	if (u8[A2 + 0x05] < 0x06 && u8[A2 + 0x34] == 0)
+	if (u8[A2 + 0x05] < base_state.DIED && u8[A2 + 0x34] == 0)
 	{
 		if (u8[A2 + 0x2e] == 0 || u8[A0 + D4.s16] == 0)
 		{
@@ -1277,7 +1277,7 @@ function void fn06bb5c()
 
 #if STANDALONE
 	// Ignore if character is not in normal state, but e.g. in got hurt state
-	if (u8[A2 + 0x05] != 0x02)
+	if (u8[A2 + 0x05] != base_state.NORMAL)
 		return
 #endif
 

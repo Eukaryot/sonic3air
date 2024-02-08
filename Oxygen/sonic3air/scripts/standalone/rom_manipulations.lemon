@@ -70,6 +70,10 @@ function void ROMManipulation.RepairSpriteMappings()
 	u16[0x187b8a] = 0xc0
 	u16[0x187bec] = 0xc0
 	u16[0x187c4e] = 0xc0
+
+	// Fix missing mapping piece in one of the LRZ turbine sprites
+	u16[0x0447b0] = 0x0a		// Increase mapping count to include missing piece
+	 u8[0x0447ea] = 0x48		// Fix palette on missing piece
 }
 
 
