@@ -667,6 +667,11 @@ function void fn08d018()
 	{
 		objA0.update_address = 0x08d02e
 		u16[0xffffeec4] = 0x55
+
+	#if STANDALONE
+		// Reload object palette when the platform disappears to fix incorrectly colored animated tiles seen before the signpost lands, #contributed by mrgrassman14
+		copyMemory(0xfffffc20, 0x0a92fc, 0x20)
+	#endif
 	}
 }
 

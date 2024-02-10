@@ -199,6 +199,11 @@ function void fn077822()
 		objA0.update_address = 0x077848
 		objA0.flags2a &= ~0x80
 		objA0.render_flags |= render_flag.FLIP_X
+
+	#if STANDALONE
+		// Change priority of Egg Mobile so it isn't underneath its own exhaust flame, #contributed by mrgrassman14
+		objA0.sprite_priority = 0x100
+	#endif
 	}
 	DrawObject()
 }

@@ -839,15 +839,30 @@ function void UpdateTailsFlight_innerB()
 		// Swimming
 		if (tails.flight_countdown == 0)
 		{
-			char.state = char.state.TAILS_SWIMTIRED
-		}
-		else if (tails.carrying)
-		{
-			char.state = char.state.TAILS_SWIMCARRY
+			// Tired
+		#if STANDALONE
+			// Use proper animation when both exhausted and carrying Sonic at the same time underwater, #contributed by mrgrassman14
+			if (tails.carrying)
+			{
+				char.state = char.state.TAILS_SWIMCARRY
+			}
+			else
+		#endif
+			{
+				char.state = char.state.TAILS_SWIMTIRED
+			}
 		}
 		else
 		{
-			char.state = (char.velocity.y < 0) ? char.state.TAILS_SWIMUP : char.state.TAILS_SWIMDOWN
+			// Not tired
+			if (tails.carrying)
+			{
+				char.state = char.state.TAILS_SWIMCARRY
+			}
+			else
+			{
+				char.state = (char.velocity.y < 0) ? char.state.TAILS_SWIMUP : char.state.TAILS_SWIMDOWN
+			}
 		}
 	}
 	else
