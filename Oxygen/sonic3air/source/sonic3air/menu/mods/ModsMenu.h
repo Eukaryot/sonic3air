@@ -48,7 +48,7 @@ private:
 	void refreshAllDependencies();
 	void clearDependencies(ModMenuEntry& modMenuEntry);
 	void refreshDependencies(ModMenuEntry& modMenuEntry, size_t modIndex);
-	
+
 	void refreshControlsDisplay();
 	int getInfoOverlayHeight() const;
 

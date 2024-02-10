@@ -37,7 +37,7 @@ public:
 		OUTSIDE_FRAME = 3,	// Debug output rendered outside of frame simulation
 	};
 	static const uint8 NUM_CONTEXTS = 4;
-	
+
 public:
 	inline Type getType() const   { return mRenderItemType; }
 	inline bool isSprite() const  { return (mRenderItemType >= Type::VDP_SPRITE && mRenderItemType <= Type::COMPONENT_SPRITE); }

@@ -1559,7 +1559,7 @@ function void fn05675c()
 
 	A1 = 0xffffa934
 	D0 = 0xffffffff
-    D1 = 0x08
+	D1 = 0x08
 	while (D1.s16 >= 0)
 	{
 		u16[A1-=2] = D0.u16

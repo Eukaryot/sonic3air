@@ -463,7 +463,7 @@ bool Simulation::generateFrame()
 				// Keyframe every 3 seconds - except when dev mode is active, because rewinding requires more frequent keyframes
 				const int keyframeFrequency = EngineMain::getDelegate().useDeveloperFeatures() ? 10 : 180;
 				const int framesToKeep = EngineMain::getDelegate().useDeveloperFeatures() ? 3600 : 1800;
-				if (((mFrameNumber + 1) % keyframeFrequency) == 0)	
+				if (((mFrameNumber + 1) % keyframeFrequency) == 0)
 				{
 					recordKeyFrame(mFrameNumber + 1, mCodeExec, mGameRecorder, inputData);
 					mGameRecorder.discardOldFrames(framesToKeep);
