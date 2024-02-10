@@ -25,6 +25,7 @@ function void ApplyROMManipulations()
 	ROMManipulation.ALZ.MusicFix()
 	ROMManipulation.DPZ.LoopBugFix()
 	ROMManipulation.RollingDemoFix()
+	ROMManipulation.S3A.MusicFix()
 }
 
 
@@ -254,4 +255,29 @@ function void ROMManipulation.DPZ.LoopBugFix()
 function void ROMManipulation.RollingDemoFix()
 {
 	u8[0x15fd6c] = 0x9d
+}
+
+function void ROMManipulation.S3A.MusicFix.ReplaceInstruments(u32 startAddress, u32 numBytes)
+{
+	// Replace every instance of B2 and B3 in that track with C5 and C6
+	A0 = startAddress
+	for (u32 offset = 0; offset < numBytes; ++offset)
+	{
+		if (u8[A0 + offset] == 0xb2)
+			u8[A0 + offset] = 0xc5
+		else if (u8[A0 + offset] == 0xb3)
+			u8[A0 + offset] = 0xc6
+	}
+}
+
+function void ROMManipulation.S3A.MusicFix()
+{
+	// Fix for emulated Sonic 3 versions of mini-boss music and Knuckles theme, which are otherwise using a wrong instrument, fix #contributed by Legobouwer
+
+	// Adds 2 entries to the DAC pointer list
+	u32[0x2f0088] = 0x5f816481
+
+	// Replaces every instance of B2 and B3 in the S3A mini-boss and Knuckles themes with C5 and C6
+	ROMManipulation.S3A.MusicFix.ReplaceInstruments(0x2c71a0 + 0x704, 0x122)
+	ROMManipulation.S3A.MusicFix.ReplaceInstruments(0x2d97fd + 0x149, 0x64)
 }
