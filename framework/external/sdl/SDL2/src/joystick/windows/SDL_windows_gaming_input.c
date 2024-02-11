@@ -32,8 +32,16 @@
 #define COBJMACROS
 #include "windows.gaming.input.h"
 #include <cfgmgr32.h>
+#include <objidlbase.h>
 #include <roapi.h>
 
+
+#ifdef ____FIReference_1_INT32_INTERFACE_DEFINED__
+/* MinGW-64 uses __FIReference_1_INT32 instead of Microsoft's __FIReference_1_int */
+#define __FIReference_1_int __FIReference_1_INT32
+#define __FIReference_1_int_get_Value __FIReference_1_INT32_get_Value
+#define __FIReference_1_int_Release __FIReference_1_INT32_Release
+#endif
 
 struct joystick_hwdata
 {
@@ -206,11 +214,15 @@ static HRESULT STDMETHODCALLTYPE IEventHandler_CRawGameControllerVtbl_QueryInter
     }
 
     *ppvObject = NULL;
-    if (WIN_IsEqualIID(riid, &IID_IUnknown) || WIN_IsEqualIID(riid, &IID_IEventHandler_RawGameController)) {
+    if (WIN_IsEqualIID(riid, &IID_IUnknown) || WIN_IsEqualIID(riid, &IID_IAgileObject) || WIN_IsEqualIID(riid, &IID_IEventHandler_RawGameController)) {
         *ppvObject = This;
         return S_OK;
+    } else if (WIN_IsEqualIID(riid, &IID_IMarshal)) {
+        // This seems complicated. Let's hope it doesn't happen.
+        return E_OUTOFMEMORY;
+    } else {
+        return E_NOINTERFACE;
     }
-    return E_NOINTERFACE;
 }
 
 static ULONG STDMETHODCALLTYPE IEventHandler_CRawGameControllerVtbl_AddRef(__FIEventHandler_1_Windows__CGaming__CInput__CRawGameController * This)
@@ -586,6 +598,12 @@ WGI_JoystickGetDeviceName(int device_index)
     return wgi.controllers[device_index].name;
 }
 
+static const char *
+WGI_JoystickGetDevicePath(int device_index)
+{
+    return NULL;
+}
+
 static int
 WGI_JoystickGetDevicePlayerIndex(int device_index)
 {
@@ -893,6 +911,7 @@ SDL_JoystickDriver SDL_WGI_JoystickDriver =
     WGI_JoystickGetCount,
     WGI_JoystickDetect,
     WGI_JoystickGetDeviceName,
+    WGI_JoystickGetDevicePath,
     WGI_JoystickGetDevicePlayerIndex,
     WGI_JoystickSetDevicePlayerIndex,
     WGI_JoystickGetDeviceGUID,

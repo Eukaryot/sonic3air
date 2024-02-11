@@ -855,8 +855,9 @@ static int OS2_CreateWindowFrom(_THIS, SDL_Window *window, const void *data)
     if (cbText != 0)
         window->title = OS2_SysToUTF8(pszText);
 
-    if (pszText != NULL)
+    if (pszText != NULL) {
         SDL_stack_free(pszText);
+    }
 
     /* Set SDL-window flags */
     window->flags &= ~(SDL_WINDOW_SHOWN     | SDL_WINDOW_BORDERLESS |
@@ -1137,8 +1138,8 @@ static SDL_bool OS2_GetWindowWMInfo(_THIS, SDL_Window * window,
         return SDL_TRUE;
     }
 
-    SDL_SetError("Application not compiled with SDL %u.%u",
-                 SDL_MAJOR_VERSION, SDL_MINOR_VERSION);
+    SDL_SetError("Application not compiled with SDL %u",
+                 SDL_MAJOR_VERSION);
     return SDL_FALSE;
 }
 
@@ -1572,7 +1573,7 @@ static void OS2_GetDisplayModes(_THIS, SDL_VideoDisplay *display)
     SDL_DisplayMode mode;
 
     debug_os2("Enter");
-    SDL_memcpy(&mode, &display->current_mode, sizeof(SDL_DisplayMode));
+    SDL_copyp(&mode, &display->current_mode);
     mode.driverdata = (MODEDATA *) SDL_malloc(sizeof(MODEDATA));
     if (!mode.driverdata) return; /* yikes.. */
     SDL_memcpy(mode.driverdata, display->current_mode.driverdata, sizeof(MODEDATA));
@@ -1592,7 +1593,7 @@ static void OS2_DeleteDevice(SDL_VideoDevice *device)
     SDL_free(device);
 }
 
-static SDL_VideoDevice *OS2_CreateDevice(int devindex)
+static SDL_VideoDevice *OS2_CreateDevice(void)
 {
     SDL_VideoDevice *device;
 
@@ -1647,37 +1648,36 @@ static SDL_VideoDevice *OS2_CreateDevice(int devindex)
     return device;
 }
 
-static SDL_VideoDevice *OS2DIVE_CreateDevice(int devindex)
+static SDL_VideoDevice *OS2DIVE_CreateDevice(void)
 {
     VIDEOOUTPUTINFO stVOInfo;
     if (!voDive.QueryInfo(&stVOInfo)) {
         return NULL;
     }
-    return OS2_CreateDevice(devindex);
+    return OS2_CreateDevice();
 }
 
-static SDL_VideoDevice *OS2VMAN_CreateDevice(int devindex)
+static SDL_VideoDevice *OS2VMAN_CreateDevice(void)
 {
     VIDEOOUTPUTINFO stVOInfo;
     if (!voVMan.QueryInfo(&stVOInfo)) {
           return NULL;
     }
-    return OS2_CreateDevice(devindex);
+    return OS2_CreateDevice();
 }
 
 
-/* Both bootstraps for DIVE and VMAN are uing same function OS2_CreateDevice().
+/* DIVE and VMAN bootstraps both call the same OS2_CreateDevice() function.
  * Video output system will be selected in OS2_VideoInit() by driver name.  */
 VideoBootStrap OS2DIVE_bootstrap =
 {
-  OS2DRIVER_NAME_DIVE, "OS/2 video driver",
-  OS2DIVE_CreateDevice
+    OS2DRIVER_NAME_DIVE, "OS/2 video driver",
+    OS2DIVE_CreateDevice
 };
-
 VideoBootStrap OS2VMAN_bootstrap =
 {
-  OS2DRIVER_NAME_VMAN, "OS/2 video driver",
-  OS2VMAN_CreateDevice
+    OS2DRIVER_NAME_VMAN, "OS/2 video driver",
+    OS2VMAN_CreateDevice
 };
 
 #endif /* SDL_VIDEO_DRIVER_OS2 */

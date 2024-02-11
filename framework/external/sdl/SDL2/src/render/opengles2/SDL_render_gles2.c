@@ -169,6 +169,7 @@ typedef struct GLES2_RenderData
 #endif
 
     GLES2_DrawStateCache drawstate;
+    GLES2_ShaderIncludeType texcoord_precision_hint;
 } GLES2_RenderData;
 
 #define GLES2_MAX_CACHED_PROGRAMS 8
@@ -492,20 +493,56 @@ GLES2_CacheProgram(GLES2_RenderData *data, GLuint vertex, GLuint fragment)
 static GLuint
 GLES2_CacheShader(GLES2_RenderData *data, GLES2_ShaderType type, GLenum shader_type)
 {
-    GLuint id;
+    GLuint id = 0;
     GLint compileSuccessful = GL_FALSE;
-    const char *shader_src = (char *)GLES2_GetShader(type);
+    int attempt, num_src;
+    const GLchar *shader_src_list[3];
+    const GLchar *shader_body = GLES2_GetShader(type);
 
-    if (!shader_src) {
-        SDL_SetError("No shader src");
+    if (!shader_body) {
+        SDL_SetError("No shader body src");
         return 0;
     }
 
-    /* Compile */
-    id = data->glCreateShader(shader_type);
-    data->glShaderSource(id, 1, &shader_src, NULL);
-    data->glCompileShader(id);
-    data->glGetShaderiv(id, GL_COMPILE_STATUS, &compileSuccessful);
+    for (attempt = 0; attempt < 2 && !compileSuccessful; ++attempt) {
+        num_src = 0;
+
+        shader_src_list[num_src++] = GLES2_GetShaderPrologue(type);
+
+        if (shader_type == GL_FRAGMENT_SHADER) {
+            if (attempt == 0) {
+                shader_src_list[num_src++] = GLES2_GetShaderInclude(data->texcoord_precision_hint);
+            } else {
+                shader_src_list[num_src++] = GLES2_GetShaderInclude(GLES2_SHADER_FRAGMENT_INCLUDE_UNDEF_PRECISION);
+            }
+        }
+
+        shader_src_list[num_src++] = shader_body;
+
+        SDL_assert(num_src <= SDL_arraysize(shader_src_list));
+
+#ifdef DEBUG_PRINT_SHADERS
+        {
+            int i;
+            char *message = NULL;
+
+            SDL_asprintf(&message, "Compiling shader:\n");
+            for (i = 0; i < num_src; ++i) {
+                char *last_message = message;
+                SDL_asprintf(&message, "%s%s", last_message, shader_src_list[i]);
+                SDL_free(last_message);
+            }
+            SDL_Log("%s\n", message);
+            SDL_free(message);
+        }
+#endif
+
+        /* Compile */
+        id = data->glCreateShader(shader_type);
+        data->glShaderSource(id, num_src, shader_src_list, NULL);
+        data->glCompileShader(id);
+        data->glGetShaderiv(id, GL_COMPILE_STATUS, &compileSuccessful);
+    }
 
     if (!compileSuccessful) {
         SDL_bool isstack = SDL_FALSE;
@@ -520,10 +557,10 @@ GLES2_CacheShader(GLES2_RenderData *data, GLES2_ShaderType type, GLenum shader_t
             }
         }
         if (info) {
-            SDL_SetError("Failed to load the shader: %s", info);
+            SDL_SetError("Failed to load the shader %d: %s", type, info);
             SDL_small_free(info, isstack);
         } else {
-            SDL_SetError("Failed to load the shader");
+            SDL_SetError("Failed to load the shader %d", type);
         }
         data->glDeleteShader(id);
         return 0;
@@ -533,6 +570,27 @@ GLES2_CacheShader(GLES2_RenderData *data, GLES2_ShaderType type, GLenum shader_t
     data->shader_id_cache[(Uint32)type] = id;
 
     return id;
+}
+
+static int GLES2_CacheShaders(GLES2_RenderData * data)
+{
+    int shader;
+
+    data->texcoord_precision_hint = GLES2_GetTexCoordPrecisionEnumFromHint();
+
+    for (shader = 0; shader < GLES2_SHADER_FRAGMENT_TEXTURE_EXTERNAL_OES; ++shader) {
+        GLenum shader_type;
+
+        if (shader == GLES2_SHADER_VERTEX_DEFAULT) {
+            shader_type = GL_VERTEX_SHADER;
+        } else {
+            shader_type = GL_FRAGMENT_SHADER;
+        }
+        if (!GLES2_CacheShader(data, (GLES2_ShaderType) shader, shader_type)) {
+            return -1;
+        }
+    }
+    return 0;
 }
 
 static int
@@ -1155,8 +1213,8 @@ GLES2_RunCommandQueue(SDL_Renderer * renderer, SDL_RenderCommand *cmd, void *ver
 
             case SDL_RENDERCMD_SETVIEWPORT: {
                 SDL_Rect *viewport = &data->drawstate.viewport;
-                if (SDL_memcmp(viewport, &cmd->data.viewport.rect, sizeof (SDL_Rect)) != 0) {
-                    SDL_memcpy(viewport, &cmd->data.viewport.rect, sizeof (SDL_Rect));
+                if (SDL_memcmp(viewport, &cmd->data.viewport.rect, sizeof(cmd->data.viewport.rect)) != 0) {
+                    SDL_copyp(viewport, &cmd->data.viewport.rect);
                     data->drawstate.viewport_dirty = SDL_TRUE;
                 }
                 break;
@@ -1169,8 +1227,8 @@ GLES2_RunCommandQueue(SDL_Renderer * renderer, SDL_RenderCommand *cmd, void *ver
                     data->drawstate.cliprect_enabled_dirty = SDL_TRUE;
                 }
 
-                if (SDL_memcmp(&data->drawstate.cliprect, rect, sizeof (SDL_Rect)) != 0) {
-                    SDL_memcpy(&data->drawstate.cliprect, rect, sizeof (SDL_Rect));
+                if (SDL_memcmp(&data->drawstate.cliprect, rect, sizeof(*rect)) != 0) {
+                    SDL_copyp(&data->drawstate.cliprect, rect);
                     data->drawstate.cliprect_dirty = SDL_TRUE;
                 }
                 break;
@@ -2071,6 +2129,13 @@ GLES2_CreateRenderer(SDL_Window *window, Uint32 flags)
         goto error;
     }
 
+    if (GLES2_CacheShaders(data) < 0) {
+        SDL_GL_DeleteContext(data->context);
+        SDL_free(renderer);
+        SDL_free(data);
+        goto error;
+    }
+
 #if __WINRT__
     /* DLudwig, 2013-11-29: ANGLE for WinRT doesn't seem to work unless VSync
      * is turned on.  Not doing so will freeze the screen's contents to that
@@ -2144,7 +2209,9 @@ GLES2_CreateRenderer(SDL_Window *window, Uint32 flags)
     renderer->info.texture_formats[renderer->info.num_texture_formats++] = SDL_PIXELFORMAT_NV21;
 #endif
 #ifdef GL_TEXTURE_EXTERNAL_OES
-    renderer->info.texture_formats[renderer->info.num_texture_formats++] = SDL_PIXELFORMAT_EXTERNAL_OES;
+    if (GLES2_CacheShader(data, GLES2_SHADER_FRAGMENT_TEXTURE_EXTERNAL_OES, GL_FRAGMENT_SHADER)) {
+        renderer->info.texture_formats[renderer->info.num_texture_formats++] = SDL_PIXELFORMAT_EXTERNAL_OES;
+    }
 #endif
 
     /* Set up parameters for rendering */

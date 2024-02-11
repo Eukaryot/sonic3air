@@ -35,7 +35,7 @@
 #include "SDL_syswm.h"
 
 #undef SDL_PRIs64
-#if defined(__WIN32__) && !defined(__CYGWIN__)
+#if (defined(__WIN32__) || defined(__GDK__)) && !defined(__CYGWIN__)
 #define SDL_PRIs64  "I64d"
 #else
 #define SDL_PRIs64  "lld"
@@ -102,9 +102,9 @@ static struct
 static SDL_bool SDL_update_joysticks = SDL_TRUE;
 
 static void
-SDL_CalculateShouldUpdateJoysticks()
+SDL_CalculateShouldUpdateJoysticks(SDL_bool hint_value)
 {
-    if (SDL_GetHintBoolean(SDL_HINT_AUTO_UPDATE_JOYSTICKS, SDL_TRUE) &&
+    if (hint_value &&
         (!SDL_disabled_events[SDL_JOYAXISMOTION >> 8] || SDL_JoystickEventState(SDL_QUERY))) {
         SDL_update_joysticks = SDL_TRUE;
     } else {
@@ -115,7 +115,7 @@ SDL_CalculateShouldUpdateJoysticks()
 static void SDLCALL
 SDL_AutoUpdateJoysticksChanged(void *userdata, const char *name, const char *oldValue, const char *hint)
 {
-    SDL_CalculateShouldUpdateJoysticks();
+    SDL_CalculateShouldUpdateJoysticks(SDL_GetStringBoolean(hint, SDL_TRUE));
 }
 
 #endif /* !SDL_JOYSTICK_DISABLED */
@@ -126,9 +126,9 @@ SDL_AutoUpdateJoysticksChanged(void *userdata, const char *name, const char *old
 static SDL_bool SDL_update_sensors = SDL_TRUE;
 
 static void
-SDL_CalculateShouldUpdateSensors()
+SDL_CalculateShouldUpdateSensors(SDL_bool hint_value)
 {
-    if (SDL_GetHintBoolean(SDL_HINT_AUTO_UPDATE_SENSORS, SDL_TRUE) &&
+    if (hint_value &&
         !SDL_disabled_events[SDL_SENSORUPDATE >> 8]) {
         SDL_update_sensors = SDL_TRUE;
     } else {
@@ -139,7 +139,7 @@ SDL_CalculateShouldUpdateSensors()
 static void SDLCALL
 SDL_AutoUpdateSensorsChanged(void *userdata, const char *name, const char *oldValue, const char *hint)
 {
-    SDL_CalculateShouldUpdateSensors();
+    SDL_CalculateShouldUpdateSensors(SDL_GetStringBoolean(hint, SDL_TRUE));
 }
 
 #endif /* !SDL_SENSOR_DISABLED */
@@ -150,13 +150,19 @@ SDL_PollSentinelChanged(void *userdata, const char *name, const char *oldValue, 
     SDL_EventState(SDL_POLLSENTINEL, SDL_GetStringBoolean(hint, SDL_TRUE) ? SDL_ENABLE : SDL_DISABLE);
 }
 
-/* 0 (default) means no logging, 1 means logging, 2 means logging with mouse and finger motion */
-static int SDL_DoEventLogging = 0;
+/**
+ * Verbosity of logged events as defined in SDL_HINT_EVENT_LOGGING:
+ *  - 0: (default) no logging
+ *  - 1: logging of most events
+ *  - 2: as above, plus mouse and finger motion
+ *  - 3: as above, plus SDL_SysWMEvents
+ */
+static int SDL_EventLoggingVerbosity = 0;
 
 static void SDLCALL
 SDL_EventLoggingChanged(void *userdata, const char *name, const char *oldValue, const char *hint)
 {
-    SDL_DoEventLogging = (hint && *hint) ? SDL_clamp(SDL_atoi(hint), 0, 2) : 0;
+    SDL_EventLoggingVerbosity = (hint && *hint) ? SDL_clamp(SDL_atoi(hint), 0, 3) : 0;
 }
 
 static void
@@ -166,12 +172,17 @@ SDL_LogEvent(const SDL_Event *event)
     char details[128];
 
     /* sensor/mouse/finger motion are spammy, ignore these if they aren't demanded. */
-    if ( (SDL_DoEventLogging < 2) &&
+    if ( (SDL_EventLoggingVerbosity < 2) &&
             ( (event->type == SDL_MOUSEMOTION) ||
               (event->type == SDL_FINGERMOTION) ||
               (event->type == SDL_CONTROLLERTOUCHPADMOTION) ||
               (event->type == SDL_CONTROLLERSENSORUPDATE) ||
               (event->type == SDL_SENSORUPDATE) ) ) {
+        return;
+    }
+
+    /* window manager events are even more spammy, and don't provide much useful info. */
+    if ((SDL_EventLoggingVerbosity < 3) && (event->type == SDL_SYSWMEVENT)) {
         return;
     }
 
@@ -590,7 +601,7 @@ SDL_AddEvent(SDL_Event * event)
         SDL_EventQ.free = entry->next;
     }
 
-    if (SDL_DoEventLogging) {
+    if (SDL_EventLoggingVerbosity > 0) {
         SDL_LogEvent(event);
     }
 
@@ -892,13 +903,12 @@ SDL_events_need_periodic_poll() {
 
 #if !SDL_JOYSTICK_DISABLED
     need_periodic_poll =
-        SDL_WasInit(SDL_INIT_JOYSTICK) &&
-        (!SDL_disabled_events[SDL_JOYAXISMOTION >> 8] || SDL_JoystickEventState(SDL_QUERY));
+        SDL_WasInit(SDL_INIT_JOYSTICK) && SDL_update_joysticks;
 #endif
 
 #if !SDL_SENSOR_DISABLED
     need_periodic_poll = need_periodic_poll ||
-        (SDL_WasInit(SDL_INIT_SENSOR) && !SDL_disabled_events[SDL_SENSORUPDATE >> 8]);
+        (SDL_WasInit(SDL_INIT_SENSOR) && SDL_update_sensors);
 #endif
 
     return need_periodic_poll;
@@ -962,7 +972,10 @@ SDL_WaitEventTimeout_Device(_THIS, SDL_Window *wakeup_window, SDL_Event * event,
             status = _this->WaitEventTimeout(_this, loop_timeout);
             /* Set wakeup_window to NULL without holding the lock. */
             _this->wakeup_window = NULL;
-            if (status <= 0) {
+            if (status == 0 && need_periodic_poll && loop_timeout == PERIODIC_POLL_INTERVAL_MS) {
+                /* We may have woken up to poll. Try again */
+                continue;
+            } else if (status <= 0) {
                 /* There is either an error or the timeout is elapsed: return */
                 return status;
             }
@@ -980,13 +993,13 @@ SDL_events_need_polling() {
 #if !SDL_JOYSTICK_DISABLED
     need_polling =
         SDL_WasInit(SDL_INIT_JOYSTICK) &&
-        (!SDL_disabled_events[SDL_JOYAXISMOTION >> 8] || SDL_JoystickEventState(SDL_QUERY)) &&
+        SDL_update_joysticks &&
         (SDL_NumJoysticks() > 0);
 #endif
 
 #if !SDL_SENSOR_DISABLED
     need_polling = need_polling ||
-        (SDL_WasInit(SDL_INIT_SENSOR) && !SDL_disabled_events[SDL_SENSORUPDATE >> 8] && (SDL_NumSensors() > 0));
+        (SDL_WasInit(SDL_INIT_SENSOR) && SDL_update_sensors && (SDL_NumSensors() > 0));
 #endif
 
     return need_polling;
@@ -1292,10 +1305,10 @@ SDL_EventState(Uint32 type, int state)
         }
 
 #if !SDL_JOYSTICK_DISABLED
-        SDL_CalculateShouldUpdateJoysticks();
+        SDL_CalculateShouldUpdateJoysticks(SDL_GetHintBoolean(SDL_HINT_AUTO_UPDATE_JOYSTICKS, SDL_TRUE));
 #endif
 #if !SDL_SENSOR_DISABLED
-        SDL_CalculateShouldUpdateSensors();
+        SDL_CalculateShouldUpdateSensors(SDL_GetHintBoolean(SDL_HINT_AUTO_UPDATE_SENSORS, SDL_TRUE));
 #endif
     }
 

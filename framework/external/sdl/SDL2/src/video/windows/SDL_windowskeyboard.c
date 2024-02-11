@@ -20,7 +20,7 @@
 */
 #include "../../SDL_internal.h"
 
-#if SDL_VIDEO_DRIVER_WINDOWS
+#if SDL_VIDEO_DRIVER_WINDOWS && !defined(__XBOXONE__) && !defined(__XBOXSERIES__)
 
 #include "SDL_windowsvideo.h"
 #include "SDL_hints.h"
@@ -65,7 +65,7 @@ WIN_InitKeyboard(_THIS)
     data->ime_hwnd_current = 0;
     data->ime_himc = 0;
     data->ime_composition_length = 32 * sizeof(WCHAR);
-    data->ime_composition = (WCHAR*)SDL_malloc(data->ime_composition_length);
+    data->ime_composition = (WCHAR*)SDL_malloc(data->ime_composition_length + sizeof(WCHAR));
     data->ime_composition[0] = 0;
     data->ime_readingstring[0] = 0;
     data->ime_cursor = 0;
@@ -102,7 +102,7 @@ WIN_InitKeyboard(_THIS)
     data->ime_uielemsink = 0;
     data->ime_ippasink = 0;
 
-    WIN_UpdateKeymap();
+    WIN_UpdateKeymap(SDL_FALSE);
 
     SDL_SetScancodeName(SDL_SCANCODE_APPLICATION, "Menu");
     SDL_SetScancodeName(SDL_SCANCODE_LGUI, "Left Windows");
@@ -115,7 +115,7 @@ WIN_InitKeyboard(_THIS)
 }
 
 void
-WIN_UpdateKeymap()
+WIN_UpdateKeymap(SDL_bool send_event)
 {
     int i;
     SDL_Scancode scancode;
@@ -152,15 +152,22 @@ WIN_UpdateKeymap()
         }
     }
 
-    SDL_SetKeymap(0, keymap, SDL_NUM_SCANCODES);
+    SDL_SetKeymap(0, keymap, SDL_NUM_SCANCODES, send_event);
 }
 
 void
 WIN_QuitKeyboard(_THIS)
 {
+    SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
+
 #ifndef SDL_DISABLE_WINDOWS_IME
-    IME_Quit((SDL_VideoData *)_this->driverdata);
+    IME_Quit(data);
 #endif
+
+    if (data->ime_composition) {
+        SDL_free(data->ime_composition);
+        data->ime_composition = NULL;
+    }
 }
 
 void
@@ -235,7 +242,7 @@ WIN_StopTextInput(_THIS)
 }
 
 void
-WIN_SetTextInputRect(_THIS, SDL_Rect *rect)
+WIN_SetTextInputRect(_THIS, const SDL_Rect *rect)
 {
     SDL_VideoData *videodata = (SDL_VideoData *)_this->driverdata;
     HIMC himc = 0;
@@ -623,7 +630,7 @@ IME_GetId(SDL_VideoData *videodata, UINT uIndex)
         dwRet[0] = dwRet[1] = 0;
         return dwRet[0];
     }
-    if (ImmGetIMEFileNameA(hkl, szTemp, sizeof(szTemp) - 1) <= 0) {
+    if (!ImmGetIMEFileNameA(hkl, szTemp, sizeof(szTemp) - 1)) {
         dwRet[0] = dwRet[1] = 0;
         return dwRet[0];
     }
@@ -689,7 +696,7 @@ IME_SetupAPI(SDL_VideoData *videodata)
         return;
 
     hkl = videodata->ime_hkl;
-    if (ImmGetIMEFileNameA(hkl, ime_file, sizeof(ime_file) - 1) <= 0)
+    if (!ImmGetIMEFileNameA(hkl, ime_file, sizeof(ime_file) - 1))
         return;
 
     hime = SDL_LoadObject(ime_file);
@@ -813,7 +820,7 @@ IME_GetCompositionString(SDL_VideoData *videodata, HIMC himc, DWORD string)
 
         length = ImmGetCompositionStringW(himc, GCS_COMPATTR, NULL, 0);
         if (length > 0) {
-            Uint8* attributes = (Uint8*)SDL_malloc(length);
+            Uint8* attributes = (Uint8*)SDL_malloc(length + sizeof(WCHAR));
             ImmGetCompositionString(himc, GCS_COMPATTR, attributes, length);
 
             for (start = 0; start < length; ++start) {
@@ -863,7 +870,7 @@ IME_SendEditingEvent(SDL_VideoData *videodata)
         size_t len = SDL_min(SDL_wcslen(videodata->ime_composition), (size_t)videodata->ime_cursor);
 
         size += sizeof(videodata->ime_readingstring);
-        buffer = (WCHAR*)SDL_malloc(size);
+        buffer = (WCHAR*)SDL_malloc(size + sizeof(WCHAR));
         buffer[0] = 0;
 
         SDL_wcslcpy(buffer, videodata->ime_composition, len + 1);
@@ -871,7 +878,7 @@ IME_SendEditingEvent(SDL_VideoData *videodata)
         SDL_wcslcat(buffer, &videodata->ime_composition[len], size);
     }
     else {
-        buffer = (WCHAR*)SDL_malloc(size);
+        buffer = (WCHAR*)SDL_malloc(size + sizeof(WCHAR));
         buffer[0] = 0;
         SDL_wcslcpy(buffer, videodata->ime_composition, size);
     }

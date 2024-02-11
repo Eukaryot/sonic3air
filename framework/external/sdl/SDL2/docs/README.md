@@ -34,6 +34,7 @@ More documentation and FAQs are available online at [the wiki](http://wiki.libsd
 - [DirectFB](README-directfb.md)
 - [DynAPI](README-dynapi.md)
 - [Emscripten](README-emscripten.md)
+- [GDK](README-gdk.md)
 - [Gesture](README-gesture.md)
 - [Git](README-git.md)
 - [iOS](README-ios.md)
@@ -45,12 +46,15 @@ More documentation and FAQs are available online at [the wiki](http://wiki.libsd
 - [Supported Platforms](README-platforms.md)
 - [Porting information](README-porting.md)
 - [PSP](README-psp.md)
+- [PS2](README-ps2.md)
 - [Raspberry Pi](README-raspberrypi.md)
 - [Touch](README-touch.md)
+- [Versions](README-versions.md)
 - [WinCE](README-wince.md)
 - [Windows](README-windows.md)
 - [WinRT](README-winrt.md)
 - [PSVita](README-vita.md)
+- [Nokia N-Gage](README-ngage.md)
 
 If you need help with the library, or just want to discuss SDL related
 issues, you can join the [SDL Discourse](https://discourse.libsdl.org/),
