@@ -483,7 +483,7 @@ void GameView::update(float timeElapsed)
 		}
 	}
 
-	if (FTX::keyState(SDLK_KP_9) && mSimulation.getFrameNumber() > 0)
+	if (EngineMain::getDelegate().useDeveloperFeatures() && FTX::keyState(SDLK_KP_9) && mSimulation.getFrameNumber() > 0)
 	{
 		int rewindSteps = 0;
 		if (mRewindCounter == 0)
