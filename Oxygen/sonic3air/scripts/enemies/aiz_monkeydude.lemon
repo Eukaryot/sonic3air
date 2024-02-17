@@ -407,6 +407,13 @@ function void fn08744c()
 {
 	fn087518()
 
+#if STANDALONE
+	// Fix for the coconut palette before it's thrown, #contributed by Legobouwer
+	objA0.sprite_attributes = 0x0548
+	if (objA0.animation.sprite != 6)
+		objA0.sprite_attributes |= sprite_attribute.PALETTE.LINE1
+#endif
+
 	// Targets:
 	//  - 0x087468	-> objA0.base_state = 0x00
 	//  - 0x087472	-> objA0.base_state = 0x02
@@ -466,8 +473,7 @@ function void fn08756a()
 	{
 		objA0.base_state = D1.u8
 		objA0.flags38 |= 0x02
-		D0.u8 = objA0.value3a >> 1
-		objA0.value3a = D0.u8
+		objA0.value3a = objA0.value3a >> 1
 		objA0.value3b = 1
 	}
 }
