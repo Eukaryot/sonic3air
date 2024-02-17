@@ -172,9 +172,6 @@ declare function u32 pop()
 declare function u32 System.loadPersistentData(u32 targetAddress, string key, u32 bytes)
 declare function void System.savePersistentData(u32 sourceAddress, string key, u32 bytes)
 
-declare function u32 SRAM.load(u32 address, u16 offset, u16 bytes)
-declare function void SRAM.save(u32 address, u16 offset, u16 bytes)
-
 declare function bool System.callFunctionByName(string functionName)
 declare function void System.setupCallFrame(string functionName)
 declare function void System.setupCallFrame(string functionName, string labelName)

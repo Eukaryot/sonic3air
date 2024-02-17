@@ -54,8 +54,6 @@ function void InitSaveSlots()
 		}
 
 		// Now overwrite it if there is persistent data to load; otherwise this has no effect
-		//  -> This is even done twice, once using the old SRAM system (for legacy support), once using the more flexible persistent data system
-		SRAM.load(0xffffe6ac, 0, 0x50)
 		System.loadPersistentData(0xffffe6ac, "SRAM_Saveslots", 0x50)
 
 	/*
@@ -399,7 +397,6 @@ function void SaveGameSlot()
 
 	if (!invalidOrDefault)
 	{
-		SRAM.save(0xffffe6ac, 0, 0x50)
 		System.savePersistentData(0xffffe6ac, "SRAM_Saveslots", 0x50)
 		System.savePersistentData(0x801100, "SRAM_SaveslotsExt", 0x100)
 	}

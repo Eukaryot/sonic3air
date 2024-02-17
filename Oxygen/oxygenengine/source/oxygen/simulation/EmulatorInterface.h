@@ -27,7 +27,6 @@ struct RuntimeMemory
 	uint16 mVSRam[0x40] = { 0 };			// Buffer for vertical scroll offsets
 	uint8 mSharedMemory[0x100000] = { 0 };	// 1 MB of additional shared memory between script and C++ (usage similar to RAM, but not used by original code, obviously)
 	uint64 mSharedMemoryUsage = 0;			// Each bit represents 16 KB of shared memory and tells us if anything non-zero is written there at all
-	std::vector<uint8> mSRam;				// Persistent memory to be saved on disk
 	uint32 mRegisters[16] = { 0 };			// Registers
 	bool mFlagZ = false;					// Zero flag
 	bool mFlagN = false;					// Negative flag
@@ -114,10 +113,6 @@ public:
 
 	// VSRAM = Vertical scroll RAM
 	uint16* getVSRam();
-
-	// SRAM
-	size_t loadSRAM(uint32 address, size_t offset, size_t bytes);
-	void saveSRAM(uint32 address, size_t offset, size_t bytes);
 
 	// RAM watches
 	std::vector<Watch>& getWatches();

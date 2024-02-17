@@ -132,7 +132,6 @@ public:
 	std::wstring mSaveStatesDir;
 	std::wstring mSaveStatesDirLocal;
 	std::wstring mAnalysisDir;
-	std::wstring mSRamFilename;
 	std::wstring mPersistentDataFilename;
 
 	// General

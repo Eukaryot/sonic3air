@@ -136,8 +136,7 @@ function void fn04c97e()
 	fn04cca6()
 
 #if STANDALONE
-	// Try to load progress from SRAM
-	SRAM.load(0xffffffa6, 0x50, 4)		// Writing to the address of bluespheregame.current_stage
+	// Try to load progress from persistent data
 	System.loadPersistentData(0xffffffa6, "SRAM_BlueSphereProgress", 4)
 
 	// Switch to the correct seed for this stage
@@ -1047,8 +1046,7 @@ function void fn04d488()
 		BlueSphere.setGeneratedStage(bluespheregame.current_stage)
 
 	#if STANDALONE
-		// Save progress to SRAM
-		SRAM.save(0xffffffa6, 0x50, 4)		// Copying from the address of bluespheregame.current_stage
+		// Save progress
 		System.savePersistentData(0xffffffa6, "SRAM_BlueSphereProgress", 4)
 	#endif
 
@@ -1623,8 +1621,7 @@ function void BlueSphereGame.advanceStages(u8 numStages)
 	}
 
 #if STANDALONE
-	// Save progress to SRAM
-	SRAM.save(0xffffffa6, 0x50, 4)		// Copying from the address of bluespheregame.current_stage
+	// Save progress
 	System.savePersistentData(0xffffffa6, "SRAM_BlueSphereProgress", 4)
 #endif
 }

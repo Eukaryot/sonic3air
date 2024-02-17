@@ -380,49 +380,6 @@ uint16* EmulatorInterface::getVSRam()
 	return mInternal.mVSRam;
 }
 
-size_t EmulatorInterface::loadSRAM(uint32 address, size_t offset, size_t bytes)
-{
-	if (mInternal.mSRam.empty())
-	{
-		// Load from disk first
-		FTX::FileSystem->readFile(Configuration::instance().mSRamFilename, mInternal.mSRam);
-	}
-
-	bytes = (offset >= mInternal.mSRam.size()) ? 0 : std::min(bytes, mInternal.mSRam.size() - offset);
-	if (bytes > 0)
-	{
-		uint8* mem = mInternal.accessMemory<MEMORY_MODE_WRITE>(address, (uint32)bytes);
-		memcpy(mem, &mInternal.mSRam[offset], bytes);
-	}
-	return bytes;
-}
-
-void EmulatorInterface::saveSRAM(uint32 address, size_t offset, size_t bytes)
-{
-	const uint8* mem = mInternal.accessMemory<MEMORY_MODE_READ>(address, (uint32)bytes);
-
-	// Check if there's any change
-	const size_t checkBytes = (offset >= mInternal.mSRam.size()) ? 0 : std::min(bytes, mInternal.mSRam.size() - offset);
-	if (checkBytes == bytes)
-	{
-		if (memcmp(mem, &mInternal.mSRam[offset], checkBytes) == 0)
-		{
-			// Nothing to do
-			return;
-		}
-	}
-
-	// Extend SRAM if needed and write data
-	if (mInternal.mSRam.size() < offset + bytes)
-	{
-		mInternal.mSRam.resize(offset + bytes);
-	}
-	memcpy(&mInternal.mSRam[offset], mem, bytes);
-
-	// Save to disk
-	FTX::FileSystem->saveFile(Configuration::instance().mSRamFilename, mInternal.mSRam);
-}
-
 std::vector<EmulatorInterface::Watch>& EmulatorInterface::getWatches()
 {
 	return mInternal.mWatches;

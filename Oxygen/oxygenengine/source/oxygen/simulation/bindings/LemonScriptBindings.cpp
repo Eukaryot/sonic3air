@@ -221,17 +221,6 @@ namespace
 		}
 	}
 
-	uint32 SRAM_load(uint32 address, uint16 offset, uint16 bytes)
-	{
-		return (uint32)getEmulatorInterface().loadSRAM(address, (size_t)offset, (size_t)bytes);
-	}
-
-	void SRAM_save(uint32 address, uint16 offset, uint16 bytes)
-	{
-		getEmulatorInterface().saveSRAM(address, (size_t)offset, (size_t)bytes);
-	}
-
-
 	bool System_callFunctionByName(lemon::StringRef functionName)
 	{
 		if (!functionName.isValid())
@@ -930,18 +919,6 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		module.addNativeFunction("System.savePersistentData", lemon::wrap(&System_savePersistentData), defaultFlags)
 			.setParameterInfo(0, "sourceAddress")
 			.setParameterInfo(1, "key")
-			.setParameterInfo(2, "bytes");
-
-
-		// SRAM
-		module.addNativeFunction("SRAM.load", lemon::wrap(&SRAM_load), defaultFlags)
-			.setParameterInfo(0, "address")
-			.setParameterInfo(1, "offset")
-			.setParameterInfo(2, "bytes");
-
-		module.addNativeFunction("SRAM.save", lemon::wrap(&SRAM_save), defaultFlags)
-			.setParameterInfo(0, "address")
-			.setParameterInfo(1, "offset")
 			.setParameterInfo(2, "bytes");
 
 

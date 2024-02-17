@@ -424,7 +424,6 @@ void EngineMain::initDirectories()
 	}
 
 	config.mSaveStatesDirLocal = config.mAppDataPath + L"savestates/";
-	config.mSRamFilename = config.mAppDataPath + L"sram.bin";
 	config.mPersistentDataFilename = config.mAppDataPath + L"persistentdata.bin";
 }
 
