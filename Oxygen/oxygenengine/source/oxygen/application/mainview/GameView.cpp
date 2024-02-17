@@ -493,8 +493,8 @@ void GameView::update(float timeElapsed)
 		}
 		else
 		{
-			mRewindTimer += timeElapsed;
-			const float speed = (mRewindCounter == 1) ? 5 : (float)std::min(10 + mRewindCounter / 2, 180);
+			mRewindTimer += (SDL_GetModState() & KMOD_SHIFT) ? (timeElapsed * 3.0f) : timeElapsed;
+			const float speed = (mRewindCounter == 1) ? 5 : (float)std::min(10 + mRewindCounter / 3, 120);
 			const float delay = 1.0f / speed;
 			if (mRewindTimer >= delay)
 			{
