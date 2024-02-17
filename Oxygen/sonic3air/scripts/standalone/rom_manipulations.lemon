@@ -75,6 +75,20 @@ function void ROMManipulation.RepairSpriteMappings()
 	// Fix missing mapping piece in one of the LRZ turbine sprites
 	u16[0x0447b0] = 0x0a		// Increase mapping count to include missing piece
 	 u8[0x0447ea] = 0x48		// Fix palette on missing piece
+
+	// Fix for offset in Sonic's first ending pose sprite (after credits roll), #contributed by mrgrassman14
+	u16[0x0607f2] = 0xdc0f
+	u16[0x0607f6] = 0xfff0
+	u16[0x0607f8] = 0xe401
+	u16[0x0607fc] = 0x0010
+	u16[0x0607fe] = 0xe402
+	u16[0x060802] = 0xffe8
+	u16[0x060804] = 0xfc0e
+	u16[0x060808] = 0xffe8
+	u16[0x06080a] = 0xfc01
+	u16[0x06080e] = 0x0008
+	u16[0x060810] = 0x1405
+	u16[0x060814] = 0xfff0
 }
 
 
