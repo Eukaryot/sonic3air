@@ -2577,7 +2577,7 @@ function void fn02df64()
 		Kosinski.addToDMAQueue(0x1bee58, 0x0000)
 		Kosinski.addToDMAQueue(0x1c3f2c, D4.u16)
 
-		requestLoadingPatterns(0x48)		// HPZ object sprites
+		requestLoadingPatterns(0x48)	// HPZ object sprites
 
 		global.zone_act = 0x1701		// Hidden Palace emerald cave
 		camera.position.x.u16 = 0x15a0 - getScreenExtend()
