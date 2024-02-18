@@ -1,0 +1,13 @@
+{
+	// Blue Spheres stage
+	"bluespheres_glow_background":	{ "File": "bluespheres_glow.png", "Rect": "0,115,496,85", "Center": "248,0" },
+	"bluespheres_glow_foreground":	{ "File": "bluespheres_glow.png", "Rect": "0,0,496,115",  "Center": "248,0" },
+
+	"bluespheres_shadow_1P_pixel":	{ "File": "bluespheres_shadows.png", "Rect": "0,0,34,30" },
+	"bluespheres_shadow_2P_pixel":	{ "File": "bluespheres_shadows.png", "Rect": "0,30,34,46" },
+	"bluespheres_shadow_1P_smooth":	{ "File": "bluespheres_shadows.png", "Rect": "34,0,34,30" },
+	"bluespheres_shadow_2P_smooth":	{ "File": "bluespheres_shadows.png", "Rect": "34,30,34,46" },
+
+	// Sonic & Knuckles Logo (in Blue Spheres mode BG)
+	"sklogo": { "File": "sklogo.png", "Rect": "0,0,96,64", "Center": "48,32" }
+}
