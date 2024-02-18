@@ -1117,6 +1117,8 @@ function void fn05e334()
 //# address-hook(0x05e3c0) end(0x05e3e8)
 function void fn05e3c0()
 {
+	// Medium end pose sprite
+
 #if STANDALONE
 	u32 targetAddress = 0x802000 + getMainCharacter() * 0x40
 	loadCharacterEndPosePalette(getMainCharacter(), targetAddress, 0)
@@ -1131,6 +1133,12 @@ function void fn05e3c0()
 		objA0.render_flags |= render_flag.FLIP_X
 	}
 
+#if STANDALONE
+	// Flip sprite horizontally to reflect larger sprite's hand/foot position, #contributed by mrgrassman14
+	if (isMainCharacter(CHARACTER_SONIC) && objA0.animation.sprite == 0)
+		objA0.render_flags &= ~render_flag.FLIP_X
+#endif
+
 	A1 = 0xffffb000
 	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	objA1.animation.sprite = 0
@@ -1141,11 +1149,19 @@ function void fn05e3c0()
 //# address-hook(0x05e3ee) end(0x05e40c)
 function void fn05e3ee()
 {
+	// Big end pose sprite
+
 	--objA0.countdown_value
 	if (objA0.countdown_value < 0)
 	{
 		objA0.base_state = 0x12
 		++objA0.animation.sprite
+
+	#if STANDALONE
+		// Flip sprite horizontally to original position as it was affected by the change in fn05e3c0()
+		if (isMainCharacter(CHARACTER_SONIC))
+			objA0.render_flags |= render_flag.FLIP_X
+	#endif
 
 		if (allocDynamicObjectStd())
 		{
