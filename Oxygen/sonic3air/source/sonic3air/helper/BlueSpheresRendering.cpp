@@ -183,25 +183,29 @@ void BlueSpheresRendering::createSprites(Vec2i screenSize)
 	for (int index = 0; index < 0x2f; ++index)
 	{
 		const uint8* lookupDataBase;
-		uint64 spriteKeys[2];
+		String spriteIdentifier[2];
 		if (index < 0x20)
 		{
 			lookupDataBase = &mStraightIntensityLookup[index][0];
-			spriteKeys[0] = rmx::getMurmur2_64(String(0, "bluespheres_ground_alpha_movement_0x%02x", index));
-			spriteKeys[1] = rmx::getMurmur2_64(String(0, "bluespheres_ground_opaque_movement_0x%02x", index));
+			spriteIdentifier[0] = String(0, "bluespheres_ground_alpha_movement_0x%02x", index);
+			spriteIdentifier[1] = String(0, "bluespheres_ground_opaque_movement_0x%02x", index);
 		}
 		else
 		{
 			lookupDataBase = &mRotationIntensityLookup[index - 0x20][0];
-			spriteKeys[0] = rmx::getMurmur2_64(String(0, "bluespheres_ground_alpha_rotation_0x%02x", index - 0x1f));
-			spriteKeys[1] = rmx::getMurmur2_64(String(0, "bluespheres_ground_opaque_rotation_0x%02x", index - 0x1f));
+			spriteIdentifier[0] = String(0, "bluespheres_ground_alpha_rotation_0x%02x", index - 0x1f);
+			spriteIdentifier[1] = String(0, "bluespheres_ground_opaque_rotation_0x%02x", index - 0x1f);
 		}
 
 		SpriteCache::CacheItem* items[2];
 		PaletteBitmap* bitmaps[2];
 		for (int k = 0; k < 2; ++k)
 		{
-			SpriteCache::CacheItem& item = SpriteCache::instance().getOrCreatePaletteSprite(spriteKeys[k]);
+			const uint64 spriteKey = rmx::getMurmur2_64(spriteIdentifier[k]);
+			SpriteCache::CacheItem& item = SpriteCache::instance().getOrCreatePaletteSprite(spriteKey);
+		#ifdef DEBUG
+			item.mSourceIdentifier = *spriteIdentifier[k];
+		#endif
 			++item.mChangeCounter;
 			bitmaps[k] = &static_cast<PaletteSprite*>(item.mSprite)->accessBitmap();
 			items[k] = &item;

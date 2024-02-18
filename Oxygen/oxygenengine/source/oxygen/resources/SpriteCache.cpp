@@ -433,6 +433,9 @@ void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 				}
 
 				CacheItem& item = createCacheItem(key);
+			#ifdef DEBUG
+				item.mSourceIdentifier = *identifier;
+			#endif
 				const std::wstring fullpath = fileEntry.mPath + filename;
 
 				// Palette or RGBA?

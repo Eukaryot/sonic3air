@@ -22,6 +22,9 @@ public:
 	struct CacheItem
 	{
 		uint64 mKey = 0;
+	#ifdef DEBUG
+		std::string mSourceIdentifier;
+	#endif
 		bool mUsesComponentSprite = false;
 		SpriteBase* mSprite = nullptr;
 		uint32 mChangeCounter = 0;
