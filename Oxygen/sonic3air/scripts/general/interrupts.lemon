@@ -534,7 +534,7 @@ function void fn000c50()
 	}
 
 	// Special handling for Blue Spheres
-	if (global.game_mode == 0x34 || global.game_mode == 0x2c || global.game_mode == 0x48)
+	if (global.game_mode == 0x34 || global.game_mode == 0x2c || global.game_mode == 0x30 || global.game_mode == 0x48)
 	{
 		u16 px = bluespheres.position.x
 		u16 py = bluespheres.position.y
