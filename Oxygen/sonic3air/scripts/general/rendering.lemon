@@ -331,7 +331,7 @@ function void renderNextObject()
 			if (D1.u16 >= D2.u16)
 				return
 
-			D1.u16 = D1.u16 + 0x80 - objA0.box_size.y
+			D1.u16 += 0x80 - objA0.box_size.y
 		}
 
 		objA0.render_flags |= render_flag.VISIBLE	// Set visibility flag
@@ -388,10 +388,10 @@ function void renderNextObject()
 				D1.u16 = (D1.u16 + 0x80 - cameraY) & level.height.bitmask
 			}
 
-			D4 = u16(u8[A0 + 5]) * 2	// Compound sprite map frame id
-			A0 += 6	// To next compound sprite (?)
+			D4 = u8[A0 + 5]		// Compound sprite map frame id
+			A0 += 6				// To next compound sprite
 
-			A1 = tableLookupAddress(A2, D4.u16)
+			A1 = tableLookupAddress(A2, D4.u16 * 2)
 			D4.u16 = u16[A1] - 1
 			A1 += 2
 			u32 spriteTag = A0
@@ -409,7 +409,7 @@ function void renderNextObject()
 				D6.u16 = backup
 			}
 
-			--D3.u16
+			--D3.s16
 		}
 	}
 	else
@@ -452,7 +452,7 @@ function void renderNextObject()
 		D4 = 0
 		if ((objA0.render_flags & render_flag.STATIC_MAPPING) == 0)
 		{
-			A1 = tableLookupAddress(A1, s16(objA0.animation.sprite) * 2)
+			A1 = tableLookupAddress(A1, u16(objA0.animation.sprite) * 2)
 			D4.u16 = u16[A1] - 1
 			A1 += 2
 			if (D4.s16 < 0)
@@ -718,20 +718,23 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 {
 	u16 renderQueue = 0x9800 + u16(splitScreenIndex) * 0x400
 
-	A0 = 0xffff0000 + u16[(A4+=2)-2]
+	u32 objAddress = 0xffff0000 + u16[A4]
+	A0 = objAddress
+	A4 += 2
+
 	if (splitScreenIndex == 0)
 	{
 		objA0.render_flags &= ~render_flag.VISIBLE		// Reset visibility flag
-		D6.u8 = objA0.render_flags
-		if (D6 & render_flag.COMPETITION_P2_SCREEN)
+		if (objA0.render_flags & render_flag.COMPETITION_P2_SCREEN)
 			return
 	}
 	else
 	{
-		D6.u8 = objA0.render_flags
-		if (D6 & render_flag.COMPETITION_P1_SCREEN)
+		if (objA0.render_flags & render_flag.COMPETITION_P1_SCREEN)
 			return
 	}
+	D6.u8 = objA0.render_flags
+
 #if STANDALONE
 	u16 offsetY = (splitScreenIndex == 0) ? 0 : (getScreenHeight() - COMPMODE_VIEWPORT_HEIGHT_LOWER)
 	u16 viewportHeight = (splitScreenIndex == 0) ? COMPMODE_VIEWPORT_HEIGHT_UPPER : COMPMODE_VIEWPORT_HEIGHT_LOWER
@@ -747,22 +750,30 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 	if (objA0.render_flags & render_flag.COMPOUND)
 	{
 		D0.u16 = (D0.u16 - u16[A3] + objA0.box_size.x) & level.width.bitmask
-		D3.u16 = objA0.box_size.x
 		D2.u16 = getScreenWidth() + objA0.box_size.x * 2
 		if (D0.u16 >= D2.u16)
 			return
 
-		D0.u16 = D0.u16 + 0x80 + offsetY - D3.u16
+		D0.u16 += 0x80 + offsetY - objA0.box_size.x
+
 		D1.u16 = (D1.u16 - u16[A3 + 0x04] + objA0.box_size.y) & level.height.bitmask
-		D3.u16 = objA0.box_size.y
 		D2.u16 = viewportHeight + objA0.box_size.y * 2
 		if (D1.u16 >= D2.u16)
 			return
 
-		D1.u16 = D1.u16 + 0x80 - D3.u16
+		D1.u16 += 0x80 - objA0.box_size.y
+
 		objA0.render_flags |= render_flag.VISIBLE	// Set visibility flag
+
+	#if STANDALONE
+		if (Standalone.shouldUseFrameInterpolation(objAddress))
+			Renderer.setSpriteTagWithPosition(A0, D0.u16 - 0x80, D1.u16 - 0x80)
+		else
+			Renderer.clearSpriteTag()
+	#else
 		if (D7.s16 < 0)
 			return
+	#endif
 
 		D5.u16 = objA0.sprite_attributes
 		A2 = objA0.mapping_offset
@@ -774,9 +785,9 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 			A1 += 2
 			if (D4.s16 >= 0)
 			{
-				D3.u16 = D6.u16
+				u16 backup = D6.u16
 				writeToSpriteTableCompound(renderQueue)
-				D6.u16 = D3.u16
+				D6.u16 = backup
 				if (D7.s16 < 0)
 					return
 			}
@@ -791,11 +802,12 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 				D0.u16 = (u16[A0]   - u16[A3]   + 0x80) & level.width.bitmask	// Compound sprite X position
 				D1.u16 = (u16[A0+2] - u16[A3+4] + 0x80) & level.height.bitmask	// Compound sprite Y position
 				D1.u16 += offsetY
-				D4 = u8[A0+5]	// Compound sprite map frame id
-				A0 += 6			// To next compound sprite (?)
+
+				D4 = u8[A0 + 5]		// Compound sprite map frame id
+				A0 += 6				// To next compound sprite
 
 				A1 = tableLookupAddress(A2, D4.u16 * 2)
-				D4.s16 = s16[A1] - 1
+				D4.u16 = u16[A1] - 1
 				A1 += 2
 				if (D4.s16 >= 0)
 				{
@@ -810,42 +822,49 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 	else
 	{
 		// Normal (non-compound) object
-		if (D6 & render_flag.WORLD)
+		if (objA0.render_flags & render_flag.WORLD)
 		{
 			D0.u16 = (D0.u16 - u16[A3] + objA0.box_size.x) & level.width.bitmask
-			D3.u16 = objA0.box_size.x
 			D2.u16 = getScreenWidth() + objA0.box_size.x * 2
 			if (D0.u16 >= D2.u16)
 				return
 
-			D0.u16 = D0.u16 + 0x80 - D3.u16
+			D0.u16 += 0x80 - objA0.box_size.x
+
 			D1.u16 = (D1.u16 - u16[A3 + 0x04] + objA0.box_size.y) & level.height.bitmask
-			D3.u16 = objA0.box_size.y
 			D2.u16 = viewportHeight + objA0.box_size.y * 2
 			if (D1.u16 >= D2.u16)
 				return
 
-			D1.u16 = D1.u16 + 0x80 - D3.u16
+			D1.u16 += 0x80 - objA0.box_size.y
 		}
 		D1.u16 += offsetY
 
 		objA0.render_flags |= render_flag.VISIBLE
-		if (D7.s16 >= 0)
-		{
-			A1 = objA0.mapping_offset
-			D4 = 0
-			if ((D6 & render_flag.STATIC_MAPPING) == 0)
-			{
-				D4.u16 = u16(objA0.animation.sprite) * 2
-				A1 = tableLookupAddress(A1, D4.u16)
-				D4.u16 = u16[(A1+=2)-2] - 1
-			}
 
-			if (D4.s16 >= 0)
-			{
-				D5.u16 = objA0.sprite_attributes
-				writeToSpriteTable(renderQueue)
-			}
+	#if STANDALONE
+		if (Standalone.shouldUseFrameInterpolation(objAddress))
+			Renderer.setSpriteTagWithPosition(A0, D0.u16 - 0x80, D1.u16 - 0x80)
+		else
+			Renderer.clearSpriteTag()
+	#else
+		if (D7.s16 < 0)
+			return
+	#endif
+
+		A1 = objA0.mapping_offset
+		D4 = 0
+		if ((objA0.render_flags & render_flag.STATIC_MAPPING) == 0)
+		{
+			A1 = tableLookupAddress(A1, u16(objA0.animation.sprite) * 2)
+			D4.u16 = u16[A1] - 1
+			A1 += 2
+		}
+
+		if (D4.s16 >= 0)
+		{
+			D5.u16 = objA0.sprite_attributes
+			writeToSpriteTable(renderQueue)
 		}
 	}
 }
