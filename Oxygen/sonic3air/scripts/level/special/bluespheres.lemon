@@ -1360,6 +1360,12 @@ function void fn00972e()
 				checkpoint.number |= 0x80
 			}
 			playSound(0x6a)
+
+			#if STANDALONE
+				// Correct grid position to avoid jittering of the sphere sprites during the fade-out (noticable on the red sphere just touched)
+				bluespheres.position.x = (bluespheres.position.x + 0x80) & 0xff00
+				bluespheres.position.y = (bluespheres.position.y + 0x80) & 0xff00
+			#endif
 		}
 	}
 	else if (D2.u8 == 2)
@@ -1766,6 +1772,12 @@ function void fn009b62()
 				}
 
 				playSound(0x6a)
+
+			#if STANDALONE
+				// Correct grid position to avoid jittering of the emerald sprite during the fade-out
+				bluespheres.position.x = (bluespheres.position.x + 0x80) & 0xff00
+				bluespheres.position.y = (bluespheres.position.y + 0x80) & 0xff00
+			#endif
 			}
 		}
 	}
