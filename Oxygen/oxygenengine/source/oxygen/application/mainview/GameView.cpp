@@ -375,11 +375,6 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 							setGameSpeed(FTX::keyState(SDLK_LCTRL) ? 0.01f : 0.05f);
 							break;
 
-						case SDLK_KP_PERIOD:
-							// Supporting both Shift and Ctrl, as the Shift + Peroid combination does not seem to work for all keyboards
-							mSimulation.setNextSingleStep(true, FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_LCTRL));
-							break;
-
 						case SDLK_F7:
 						{
 							mSimulation.reloadLastState();
@@ -422,7 +417,10 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 					case SDLK_KP_PERIOD:
 					{
 						// Supporting both Shift and Ctrl, as the Shift + Peroid combination does not seem to work for all keyboards
-						mSimulation.setNextSingleStep(true, FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_LCTRL));
+						const bool continueToDebugEvent = FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_LCTRL);
+						mSimulation.setNextSingleStep(true, continueToDebugEvent);
+						if (!continueToDebugEvent)
+							setLogDisplay(String(0, "Single step | Frame: %d", mSimulation.getFrameNumber() + 1));
 						break;
 					}
 				}
@@ -505,7 +503,7 @@ void GameView::update(float timeElapsed)
 
 		if (rewindSteps > 0)
 		{
-			setLogDisplay(String(0, "Rewinding (current frame: %d)", mSimulation.getFrameNumber()));
+			setLogDisplay(String(0, "  Rewinding | Frame: %d", mSimulation.getFrameNumber() - rewindSteps));
 			mSimulation.setRewind(rewindSteps);
 			++mRewindCounter;
 		}
