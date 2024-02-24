@@ -85,8 +85,12 @@ namespace lemon
 		template<typename T> T Math_atan(T value)				{ return std::atan(value); }
 		template<typename T> T Math_atan2(T y, T x)				{ return std::atan2(y, x); }
 
-		template<typename T> T Math_degreesToRadians(T degrees)	{ return degrees * (Math_PI<T>() / (T)180); }
-		template<typename T> T Math_radiansToDegrees(T radians)	{ return radians * ((T)180 / Math_PI<T>()); }
+		template<typename T> T Math_degreesToRadians(T degrees)		{ return degrees * (Math_PI<T>() / (T)180); }
+		template<typename T> T Math_radiansToDegrees(T radians)		{ return radians * ((T)180 / Math_PI<T>()); }
+		template<typename T> T Math_u8ToDegrees(uint8 angle)		{ return (T)angle * ((T)360 / (T)256); }
+		template<typename T> T Math_u8ToRadians(uint8 angle)		{ return (T)angle * (Math_PI<T>() / (T)128); }
+		template<typename T> uint8 Math_u8FromDegrees(T degrees)	{ return (uint8)std::round(degrees * ((T)256 / (T)360)); }
+		template<typename T> uint8 Math_u8FromRadians(T radians)	{ return (uint8)std::round(radians * ((T)128 / Math_PI<T>())); }
 
 		template<typename T> T Math_floor(T value)				{ return std::floor(value); }
 		template<typename T> int64 Math_floorToInt(T value)		{ return (int64)std::floor(value); }
@@ -433,6 +437,10 @@ namespace lemon
 			module.addNativeFunction("Math.degreesToRadians", lemon::wrap(&functions::Math_degreesToRadians<double>), compileTimeConstant);
 			module.addNativeFunction("Math.radiansToDegrees", lemon::wrap(&functions::Math_radiansToDegrees<float>),  compileTimeConstant);
 			module.addNativeFunction("Math.radiansToDegrees", lemon::wrap(&functions::Math_radiansToDegrees<double>), compileTimeConstant);
+			module.addNativeFunction("Math.u8ToDegrees",	  lemon::wrap(&functions::Math_u8ToDegrees<float>),		  compileTimeConstant);
+			module.addNativeFunction("Math.u8ToRadians",	  lemon::wrap(&functions::Math_u8ToRadians<float>),		  compileTimeConstant);
+			module.addNativeFunction("Math.u8FromDegrees",	  lemon::wrap(&functions::Math_u8FromDegrees<float>),	  compileTimeConstant);
+			module.addNativeFunction("Math.u8FromRadians",	  lemon::wrap(&functions::Math_u8FromRadians<float>),	  compileTimeConstant);
 
 			module.addNativeFunction("Math.floor",		lemon::wrap(&functions::Math_floor<float>),		  compileTimeConstant);
 			module.addNativeFunction("Math.floor",		lemon::wrap(&functions::Math_floor<double>),	  compileTimeConstant);
