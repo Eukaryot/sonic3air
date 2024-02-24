@@ -1,0 +1,23 @@
+
+OXYGEN ENGINE PERSISTENT DATA FORMAT v1.0
+
+Using little Endian byte order
+
+
+HEADER:
+----------------------------------------------------------------
+  Offset	Size		Description
+  0x00		9 Bytes		Format identifier "OXY.PDATA"
+  0x09		2 Bytes		Format Version 0x0100 (for v1.0)
+  0x0b		4 Bytes		Number of entries
+  0x0f		varying		Multiple entries, see below
+----------------------------------------------------------------
+
+EACH ENTRY:
+----------------------------------------------------------------
+  Offset	Size		Description
+  0x00		4 Bytes		Length N of the key string
+  0x04		N Bytes		Key string (without terminating zero)
+  0x04+N	4 Bytes		Saved data size in bytes
+  0x08+N	varying		The saved data itself
+----------------------------------------------------------------
