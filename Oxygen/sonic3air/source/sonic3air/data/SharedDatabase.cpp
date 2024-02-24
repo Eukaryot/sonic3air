@@ -148,38 +148,44 @@ uint64 SharedDatabase::setupCharacterSprite(EmulatorInterface& emulatorInterface
 	}
 	else
 	{
-		uint32 sourceBase;
-		uint32 tableAddress;
-		uint32 mappingOffset;
+		SpriteCache::ROMSpriteData romSpriteData;
 		switch (character)
 		{
 			default:
 			case 0:		// Sonic
-				sourceBase    = (animationSprite >= 0xda) ? 0x140060 : 0x100000;
-				tableAddress  = (superActive) ? 0x148378 : 0x148182;
-				mappingOffset = (superActive) ? 0x146816 : 0x146620;
+				romSpriteData.mPatternsBaseAddress = (animationSprite >= 0xda) ? 0x140060 : 0x100000;
+				romSpriteData.mTableAddress  = (superActive) ? 0x148378 : 0x148182;
+				romSpriteData.mMappingOffset = (superActive) ? 0x146816 : 0x146620;
 				break;
 
 			case 1:		// Tails
-				sourceBase    = (animationSprite >= 0xd1) ? 0x143d00 : 0x3200e0;
-				tableAddress  = 0x14a08a;
-				mappingOffset = 0x148eb8;
+				romSpriteData.mPatternsBaseAddress = (animationSprite >= 0xd1) ? 0x143d00 : 0x3200e0;
+				romSpriteData.mTableAddress  = 0x14a08a;
+				romSpriteData.mMappingOffset = 0x148eb8;
 				break;
 
 			case 2:		// Knuckles
-				sourceBase    = 0x1200e0;
-				tableAddress  = 0x14bd0a;
-				mappingOffset = 0x14a8d6;
+				romSpriteData.mPatternsBaseAddress = 0x1200e0;
+				romSpriteData.mTableAddress  = 0x14bd0a;
+				romSpriteData.mMappingOffset = 0x14a8d6;
 				break;
 		}
 
-		return SpriteCache::instance().setupSpriteFromROM(emulatorInterface, sourceBase, tableAddress, mappingOffset, (uint8)animationSprite, 0x00, SpriteCache::ROMSpriteEncoding::CHARACTER);
+		romSpriteData.mAnimationSprite = (uint8)animationSprite;
+		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::CHARACTER;
+		return SpriteCache::instance().setupSpriteFromROM(emulatorInterface, romSpriteData, 0x00).mKey;
 	}
 }
 
 uint64 SharedDatabase::setupTailsTailsSprite(EmulatorInterface& emulatorInterface, uint8 animationSprite)
 {
-	return SpriteCache::instance().setupSpriteFromROM(emulatorInterface, 0x336620, 0x344d74, 0x344bb8, animationSprite, 0x00, SpriteCache::ROMSpriteEncoding::CHARACTER);
+	SpriteCache::ROMSpriteData romSpriteData;
+	romSpriteData.mPatternsBaseAddress = 0x336620;
+	romSpriteData.mTableAddress = 0x344d74;
+	romSpriteData.mMappingOffset = 0x344bb8;
+	romSpriteData.mAnimationSprite = animationSprite;
+	romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::CHARACTER;
+	return SpriteCache::instance().setupSpriteFromROM(emulatorInterface, romSpriteData, 0x00).mKey;
 }
 
 uint8 SharedDatabase::getTailsTailsAnimationSprite(uint8 characterAnimationSprite, uint32 globalTime)

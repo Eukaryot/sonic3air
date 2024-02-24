@@ -413,27 +413,52 @@ namespace
 
 	uint64 Renderer_setupCustomUncompressedSprite(uint32 sourceBase, uint16 words, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, words / 0x10, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::NONE);
+		SpriteCache::ROMSpriteData romSpriteData;
+		romSpriteData.mPatternsBaseAddress = sourceBase;
+		romSpriteData.mTableAddress = words / 0x10;
+		romSpriteData.mMappingOffset = mappingOffset;
+		romSpriteData.mAnimationSprite = animationSprite;
+		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::NONE;
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
 	}
 
 	uint64 Renderer_setupCustomCharacterSprite(uint32 sourceBase, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, tableAddress, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::CHARACTER);
+		SpriteCache::ROMSpriteData romSpriteData;
+		romSpriteData.mPatternsBaseAddress = sourceBase;
+		romSpriteData.mTableAddress = tableAddress;
+		romSpriteData.mMappingOffset = mappingOffset;
+		romSpriteData.mAnimationSprite = animationSprite;
+		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::CHARACTER;
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
 	}
 
 	uint64 Renderer_setupCustomObjectSprite(uint32 sourceBase, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, tableAddress, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::OBJECT);
-	}
-
-	uint64 Renderer_setupKosinskiCompressedSprite1(uint32 sourceAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
-	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceAddress, 0, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::KOSINSKI);
+		SpriteCache::ROMSpriteData romSpriteData;
+		romSpriteData.mPatternsBaseAddress = sourceBase;
+		romSpriteData.mTableAddress = tableAddress;
+		romSpriteData.mMappingOffset = mappingOffset;
+		romSpriteData.mAnimationSprite = animationSprite;
+		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::OBJECT;
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
 	}
 
 	uint64 Renderer_setupKosinskiCompressedSprite2(uint32 sourceAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex, int16 indexOffset)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceAddress, 0, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::KOSINSKI, indexOffset);
+		SpriteCache::ROMSpriteData romSpriteData;
+		romSpriteData.mPatternsBaseAddress = sourceAddress;
+		romSpriteData.mTableAddress = 0;
+		romSpriteData.mMappingOffset = mappingOffset;
+		romSpriteData.mAnimationSprite = animationSprite;
+		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::KOSINSKI;
+		romSpriteData.mIndexOffset = indexOffset;
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
+	}
+
+	uint64 Renderer_setupKosinskiCompressedSprite1(uint32 sourceAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
+	{
+		return Renderer_setupKosinskiCompressedSprite2(sourceAddress, mappingOffset, animationSprite, atex, 0);
 	}
 
 	void Renderer_drawSprite1(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue)

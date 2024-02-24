@@ -204,7 +204,7 @@ void BlueSpheresRendering::createSprites(Vec2i screenSize)
 			const uint64 spriteKey = rmx::getMurmur2_64(spriteIdentifier[k]);
 			SpriteCache::CacheItem& item = SpriteCache::instance().getOrCreatePaletteSprite(spriteKey);
 		#ifdef DEBUG
-			item.mSourceIdentifier = *spriteIdentifier[k];
+			item.mSourceInfo.mSourceIdentifier = *spriteIdentifier[k];
 		#endif
 			++item.mChangeCounter;
 			bitmaps[k] = &static_cast<PaletteSprite*>(item.mSprite)->accessBitmap();

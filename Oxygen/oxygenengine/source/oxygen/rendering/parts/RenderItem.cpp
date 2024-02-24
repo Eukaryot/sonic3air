@@ -8,6 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/rendering/parts/RenderItem.h"
+#include "oxygen/simulation/EmulatorInterface.h"
 
 
 void RenderItem::serialize(VectorBinarySerializer& serializer, uint8 formatVersion)
@@ -60,9 +61,39 @@ void renderitems::CustomSpriteInfoBase::serialize(VectorBinarySerializer& serial
 	serializer.serialize(mTransformation.mInverse.w);
 	serializer.serializeAs<uint8>(mUseUpscaledSprite);
 
-	if (serializer.isReading())
+	if (formatVersion >= 5)
 	{
-		mCacheItem = SpriteCache::instance().getSprite(mKey);
+		if (serializer.isReading())
+		{
+			bool isROMBased = serializer.read<bool>();
+			if (isROMBased && nullptr == mCacheItem)
+			{
+				SpriteCache::ROMSpriteData romSpriteData;
+				romSpriteData.serialize(serializer);
+				mCacheItem = &SpriteCache::instance().setupSpriteFromROM(EmulatorInterface::instance(), romSpriteData, 0x00);
+			}
+			else
+			{
+				mCacheItem = SpriteCache::instance().getSprite(mKey);
+			}
+		}
+		else
+		{
+			const bool isROMBased = (nullptr != mCacheItem && mCacheItem->mSourceInfo.mType == SpriteCache::SourceInfo::Type::ROM_DATA);
+			serializer.write(isROMBased);
+			if (isROMBased)
+			{
+				// TODO: Avoid the const_cast here
+				const_cast<SpriteCache::ROMSpriteData&>(mCacheItem->mSourceInfo.mROMSpriteData).serialize(serializer);
+			}
+		}
+	}
+	else
+	{
+		if (serializer.isReading())
+		{
+			mCacheItem = SpriteCache::instance().getSprite(mKey);
+		}
 	}
 }
 
