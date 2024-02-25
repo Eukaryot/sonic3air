@@ -19,9 +19,17 @@ function void InitLevelTiles.BonusGM()
 	level.height.tilemask = 0x03f0
 	level.chunksize.bitmask = 0x1c
 	gfx.plane_update_routine = 0x04		// Enter vertical scroll mode
+
 #if STANDALONE
 	verticalScrollOffsetBias = getScreenExtend() & 0x0f
 	u8[0x818080] = 0	// Do not use the custom vertical scroll offsets buffer
+
+	// Fill up originally unused parts of foreground chunks on the screen edges for widescreen
+	for (u32 y = 0; y < 8; ++y)
+	{
+		copyMemory(0xffff0408 + y * 0x10, 0xffff0388 + y * 0x10, 8)
+		copyMemory(0xffff0380 + y * 0x10, 0xffff0400 + y * 0x10, 8)
+	}
 #endif
 
 	D0.u16 = 0xc0
@@ -69,18 +77,6 @@ function void UpdateLevelTiles.BonusGM()
 	D6 = 0x0f
 	D5 = 3
 	fn239d1e()
-
-#if STANDALONE
-	// Copy some foreground tiles to fill in the outer columns
-	// TODO: This is quite hacked in, better do this in the right way
-	for (u16 base = 0xc000; base < 0xd000; base += 0x80)
-	{
-		setVRAM(base + 0x0c, getVRAM(base + 0x5c))
-		setVRAM(base + 0x0e, getVRAM(base + 0x5e))
-		setVRAM(base + 0x70, getVRAM(base + 0x20))
-		setVRAM(base + 0x72, getVRAM(base + 0x22))
-	}
-#endif
 }
 
 
@@ -262,23 +258,25 @@ function void fn239d58()
 	D1.u16 = D6.u16
 	while (true)
 	{
-		D6.u16 -= u16[(A4+=2)-2]
+		D6.u16 -= u16[A4]
+		A4 += 2
 		if (D6.s16 < 0)
 			break
 
-		D0.u16 = u16[(A6+=2)-2] & level.height.tilemask
-		u16[(A6+=2)-2] = D0.u16
+		D0.u16 = u16[A6] & level.height.tilemask
+		u16[A6+2] = D0.u16
+		A6 += 4
 		--D5.u16
 	}
 
 	D6.s16 = -D6.s16
 	D6.u16 >>= 4
-	D4 = 0x15
+	D4 = (getScreenWidth() + 31) / 16
 	D4.u16 -= D6.u16
 	if (D4.s16 < 0)
 	{
 		D4 = 0
-		D6 = 0x15
+		D6 = (getScreenWidth() + 31) / 16
 	}
 
 	while (true)
@@ -323,8 +321,9 @@ function void fn239d58()
 		if (D5.u16 == 0)
 			break
 
-		D0.u16 = u16[(A6+=2)-2] & level.height.tilemask
-		u16[(A6+=2)-2] = D0.u16
+		D0.u16 = u16[A6] & level.height.tilemask
+		u16[A6+2] = D0.u16
+		A6 += 4
 	}
 }
 
@@ -685,12 +684,11 @@ function void fn239a22()
 	// Fill plane pattern update table
 	D1.s16 >>= 4
 	D2.u16 = D1.u16
-	D4.u16 = D1.u16
+	D4.u16 = D1.u16 & 0x1f
 	D1.s16 >>= 3
 	D2.u16 *= 2
 	D3.u16 = (D2.u16 * 2) & 0x7c
 	D2.u16 &= 0x0e
-	D4.u16 &= 0x1f
 	D5 = 0x20
 	D5.u16 -= D4.u16
 	D4.u16 = D5.u16
