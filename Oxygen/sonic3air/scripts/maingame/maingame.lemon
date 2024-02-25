@@ -709,7 +709,7 @@ function void initializeMainGame()
 	global.level_started = 0
 	if (level.water_present && global.zone == 0x01)
 	{
-		u32[0xffffcf82] = 0x01f202
+		u32[0xffffcf82] = 0x01f202								// HCZ waves effect
 		u32[0xffffb172] = addressof(RunOnWaterHandler.Init)		// HCZ run-on-water handler
 		u8[0xffffb172 + 0x2c] = 1
 	}

@@ -32,6 +32,7 @@ namespace s3air
 		uint32& A0 = emulatorInterface.getRegister(EmulatorInterface::Register::A0);
 		uint32& A1 = emulatorInterface.getRegister(EmulatorInterface::Register::A1);
 
+		// TODO: The RAM writes here won't trigger watches, though they should
 		uint8* initialPointer = emulatorInterface.getMemoryPointer(A1, false, 1);
 		uint8* pointer = initialPointer;
 		Kosinski::decompress(emulatorInterface, pointer, A0);
