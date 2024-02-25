@@ -7,6 +7,7 @@
 	"aiz1_layout": { "File": "zone01_aiz/layout_act1.bin" },
 	"aiz2_layout": { "File": "zone01_aiz/layout_act2.bin" },
 	"hcz2_layout": { "File": "zone02_hcz/layout_act2.bin" },
+	"mgz2_layout": { "File": "zone03_mgz/layout_act2.bin" },
 	"cnz1_layout": { "File": "zone04_cnz/layout_act1.bin" },
 	"cnz2_layout": { "File": "zone04_cnz/layout_act2.bin" },
 	"lbz2_layout": { "File": "zone06_lbz/layout_act2.bin" },
