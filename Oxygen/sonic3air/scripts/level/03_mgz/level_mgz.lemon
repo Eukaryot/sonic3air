@@ -415,6 +415,7 @@ function void fn05134c()
 		{
 		#if STANDALONE
 			u8[A1-1] = 0	// Need to clear one more chunk on the left for widescreen
+			u8[A1+3] = 0	// And one on the right for ultrawide
 		#endif
 			u8[A1]   = 0
 			u8[A1+1] = 0
