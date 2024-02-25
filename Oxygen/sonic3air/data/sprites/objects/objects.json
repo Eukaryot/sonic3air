@@ -66,6 +66,10 @@
 	"ddz_missile_01": { "File": "ddz_missile.png", "Rect": "0,16,64,16", "Center": "24,8" },
 	
 	// "Sonic" text on Tornado when facing left
-	"tornado_text_sonic": { "File": "tornado_text_sonic.bmp", "Rect": "0,0,27,5" }
+	"tornado_text_sonic": { "File": "tornado_text_sonic.bmp", "Rect": "0,0,27,5" },
+
+	// Knuckles' Lever in MHZ 2
+	"mhz_lever_00": { "File": "mhz_lever.png", "Rect": "0,0,12,20", "Center": "8,8" },
+	"mhz_lever_01": { "File": "mhz_lever.png", "Rect": "12,0,12,20", "Center": "8,8" },
 
 }

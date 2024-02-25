@@ -873,6 +873,14 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		}
 	}
 
+	// Render Knuckles' red lever as a component sprite since his raw palette is no longer loaded, #contributed by mrgrassman14 (with additional custom changes)
+	if (objA0.update_address == 0x063308)
+	{
+		u64 key = (objA0.animation.sprite == 0) ? "mhz_lever_00" : "mhz_lever_01"
+		Renderer.drawCustomSprite(key, px, py, 0x00, 0x00, renderQueue)
+		return true
+	}
+
 	return false
 }
 
