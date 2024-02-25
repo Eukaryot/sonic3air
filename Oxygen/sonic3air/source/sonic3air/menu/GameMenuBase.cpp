@@ -39,6 +39,15 @@ GameMenuEntry& GameMenuEntry::addOption(const std::string& text, uint32 value)
 	return *this;
 }
 
+GameMenuEntry& GameMenuEntry::addOptions(const OptionsConfig::Setting& setting)
+{
+	for (const OptionsConfig::Setting::Option& option : setting.mOptions)
+	{
+		addOptionRef(option.mName, option.mValue);
+	}
+	return *this;
+}
+
 GameMenuEntry& GameMenuEntry::addNumberOptions(int minValue, int maxValue, int step)
 {
 	for (int value = minValue; value <= maxValue; value += step)

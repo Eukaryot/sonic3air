@@ -8,7 +8,9 @@
 
 #pragma once
 
+#include "sonic3air/menu/options/OptionsConfig.h"
 #include "sonic3air/menu/options/OptionsEntry.h"
+#include "sonic3air/menu/GameMenuBase.h"
 #include "oxygen/application/audio/AudioCollection.h"
 
 class ControllerSetupMenu;
@@ -50,28 +52,6 @@ private:
 		FADE_TO_GAME
 	};
 
-private:
-	void setupOptionEntry(option::Option optionId, SharedDatabase::Setting::Type setting);
-	void setupOptionEntryBitmask(option::Option optionId, SharedDatabase::Setting::Type setting);
-	void setupOptionEntryInt(option::Option optionId, int* valuePointer);
-	void setupOptionEntryBool(option::Option optionId, bool* valuePointer);
-	void setupOptionEntryEnum8(option::Option optionId, void* valuePointer);
-	void setupOptionEntryPercent(option::Option optionId, float* valuePointer);
-
-	void playSoundtest(const AudioCollection::AudioDefinition& audioDefinition);
-	void refreshGamepadLists(bool forceUpdate = false);
-	bool isTitleShown(int tabIndex, int line) const;
-	GameMenuEntry* getSelectedGameMenuEntry();
-
-	void refreshControlsDisplay();
-	void updateModExpandState(ModTitleMenuEntry& modTitleMenuEntry);
-	void goBack();
-
-private:
-	MenuBackground* mMenuBackground = nullptr;
-	ControllerSetupMenu* mControllerSetupMenu = nullptr;
-
-	GameMenuEntries mTabMenuEntries;
 	struct Tab
 	{
 		enum Id
@@ -88,6 +68,35 @@ private:
 		};
 		GameMenuEntries mMenuEntries;
 	};
+
+private:
+	void setupOptionEntry(option::Option optionId, SharedDatabase::Setting::Type setting);
+	void setupOptionEntryBitmask(option::Option optionId, SharedDatabase::Setting::Type setting);
+	void setupOptionEntryInt(option::Option optionId, int* valuePointer);
+	void setupOptionEntryBool(option::Option optionId, bool* valuePointer);
+	void setupOptionEntryEnum8(option::Option optionId, void* valuePointer);
+	void setupOptionEntryPercent(option::Option optionId, float* valuePointer);
+
+	void createOptionMenuTab(Tab::Id tabId, const OptionsConfig::OptionsTab& optionsTab);
+	void createOptionMenuEntry(GameMenuEntries& entries, const OptionsConfig::Setting& setting);
+
+	void createModsTab();
+
+	void playSoundtest(const AudioCollection::AudioDefinition& audioDefinition);
+	void refreshGamepadLists(bool forceUpdate = false);
+	bool isTitleShown(int tabIndex, int line) const;
+	GameMenuEntry* getSelectedGameMenuEntry();
+
+	void refreshControlsDisplay();
+	void updateModExpandState(ModTitleMenuEntry& modTitleMenuEntry);
+	void goBack();
+
+private:
+	MenuBackground* mMenuBackground = nullptr;
+	ControllerSetupMenu* mControllerSetupMenu = nullptr;
+
+	OptionsConfig mOptionsConfig;
+	GameMenuEntries mTabMenuEntries;
 	Tab mTabs[Tab::Id::_NUM];
 	size_t mActiveTab = 0;
 	float mActiveTabAnimated = 0.0f;

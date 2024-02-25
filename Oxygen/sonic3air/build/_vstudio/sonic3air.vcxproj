@@ -65,6 +65,7 @@
     <ClCompile Include="..\..\source\sonic3air\menu\mods\ModsMenu.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\mods\ModsMenuEntries.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\options\ControllerSetupMenu.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\options\OptionsConfig.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\options\OptionsEntry.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\options\OptionsMenu.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\options\OptionsMenuEntries.cpp" />
@@ -117,6 +118,7 @@
     <ClInclude Include="..\..\source\sonic3air\menu\mods\ModsMenu.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\mods\ModsMenuEntries.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\options\ControllerSetupMenu.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\options\OptionsConfig.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\options\OptionsEntry.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\options\OptionsMenu.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\options\OptionsMenuEntries.h" />

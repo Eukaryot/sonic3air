@@ -191,6 +191,9 @@
     <ClCompile Include="..\..\source\sonic3air\helper\PackageBuilder.cpp">
       <Filter>helper</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\options\OptionsConfig.cpp">
+      <Filter>menu\options</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -334,6 +337,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\helper\PackageBuilder.h">
       <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\options\OptionsConfig.h">
+      <Filter>menu\options</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

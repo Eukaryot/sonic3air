@@ -9,7 +9,8 @@
 #pragma once
 
 #include "sonic3air/data/SharedDatabase.h"
-#include "sonic3air/menu/GameMenuBase.h"
+
+class GameMenuEntry;
 
 
 namespace option

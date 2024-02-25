@@ -10,6 +10,7 @@
 
 #include "sonic3air/menu/helper/GameMenuControlsDisplay.h"
 #include "sonic3air/menu/helper/GameMenuScrolling.h"
+#include "sonic3air/menu/options/OptionsConfig.h"
 
 
 class GameMenuEntry
@@ -71,6 +72,7 @@ public:
 
 	Option& addOptionRef(const std::string& text, uint32 value = 0);
 	GameMenuEntry& addOption(const std::string& text, uint32 value = 0);
+	GameMenuEntry& addOptions(const OptionsConfig::Setting& setting);
 	GameMenuEntry& addNumberOptions(int minValue, int maxValue, int step);
 	GameMenuEntry& addPercentageOptions(int minValue, int maxValue, int step);
 	Option* getOptionByValue(uint32 value);
