@@ -94,9 +94,12 @@ function void ROMManipulation.RepairSpriteMappings()
 
 function void ROMManipulation.RepairAnimations()
 {
-	// Apply changes to Super Sonic's idle animation to use the third frame
-	u8[0x012c45] = 0x5c			// Shift the pointer back a bit to an otherwise empty area
-	u32[0x012c96] = 0x07bcbbba	// Add additional frames
+	// Apply changes to Super Sonic's idle and balancing animations to make the hair flow as it did in Sonic 2, #contributed by Veenee (idle animation) and mrgrassman14 (balancing animation)
+	u8[0x012c45] = 0x5a			// Shift the idle animation pointer back a bit to an otherwise empty area
+	u8[0x012c47] = 0x60			// Shift the balance animation pointer back to our newly created space
+	u32[0x012c94] = 0x07babbbc	// Add additional frames (idle speed + first three idle frames)
+	u32[0x012c98] = 0xbbff07a1  // Add additional frames (4th idle frame + balance speed + first balance frame)
+	u32[0x012c9c] = 0xa2a3a2ff  // Add additional frames (last 3 balance frames)
 
 	// Fix for Tails' rolling animation playing backwards
 	u32[0x015b18] = 0x01989796
