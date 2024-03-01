@@ -31,6 +31,14 @@ function void fn06e488()
 
 	requestLoadingPatterns(0x6e)		// Boss sprites
 	loadPaletteLine1(0x06ee48)
+
+#if STANDALONE
+	// Fix for a softlock in ultrawide (together with a similar calculation in fn05227c; note that level.bossarea.right)
+	level.bossarea.right = max(level.bossarea.right, level.bossarea.left + getScreenWidth() - 320)
+
+	// Let Robotnik start just outside the screen, so he does not clip in (like he does in the original game)
+	objA0.position.x.u16 = level.bossarea.right + 320 + 52
+#endif
 }
 
 
@@ -44,11 +52,6 @@ function void fn06e4b8()
 //# address-hook(0x06e4be) end(0x06e4c4)
 function void fn06e4be()
 {
-#if STANDALONE
-	// Let Robotnik start slightly more to the right, so he does not clip in
-	objA0.position.x.u16 += 16
-#endif
-
 	objA0.update_address = 0x06e4c6
 }
 
@@ -337,8 +340,11 @@ function void fn06e724()
 
 #if STANDALONE
 	// Exchange rightmost chunks
-	u8[0xffff8417] = u8[0xffff8416]
-	u8[0xffff84af] = u8[0xffff84ae]
+	u8[0xffff8380] = 0x00
+	u8[0xffff8417] = 0x02
+	u8[0xffff8418] = 0x02
+	u8[0xffff84af] = 0x01
+	u8[0xffff84b0] = 0x01
 #endif
 }
 
@@ -406,8 +412,13 @@ function void fn06e7e4()
 	objA0.update_address = 0x06e80c
 
 	control.player1 = 0x7070		// CONTROL_ABC, CONTROL_ABC
-
 	player1.control_override = 0xff
+
+#if STANDALONE
+	// Prevent that character gets stopped by right screen border after getting shot out of the cannon
+	player1.camera_lock = 1
+	move_area.right += 0x100
+#endif
 }
 
 
@@ -415,8 +426,8 @@ function void fn06e7e4()
 function void fn06e80c()
 {
 #if STANDALONE
-	// Minor tweak: Fade out a little later
-	if (u16[0xffffb000 + 0x14] > camera.position.y.u16)
+	// Minor tweak: Fade out a little later, when character has fully left the screen
+	if (u16[0xffffb000 + 0x14] > camera.position.y.u16 - 0x20)
 		return
 #else
 	if (u16[0xffffb000 + 0x14] > camera.position.y.u16 + 0x20)

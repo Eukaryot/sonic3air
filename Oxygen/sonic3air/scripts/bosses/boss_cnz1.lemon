@@ -15,15 +15,19 @@
 //# address-hook(0x06d99c) end(0x06d9fa)
 function void fn06d99c()
 {
-	D0.u16 = 0x31e0
-	if (D0.u16 > camera.position.x.u16)
+	u16 leftScreenBorder = 0x31e0
+#if STANDALONE
+	// Properly center the area in ultrawide resolutions
+	if (getScreenWidth() > 448)
+		leftScreenBorder -= (getScreenWidth() - 448) / 2
+#endif
+	if (camera.position.x.u16 < leftScreenBorder)
 		return
 
 	screenmover_target.right = move_area.right
 	level.vertical_wrap = 0x01c0
-	move_area.left = D0.u16
-	D0.u16 += 0x80
-	move_area.right = D0.u16
+	move_area.left = leftScreenBorder
+	move_area.right = leftScreenBorder + 0x80
 	move_area.bottom.current = 0x02b8
 	move_area.bottom.target = 0x02b8
 	objA0.update_address = addressof(Object.CountdownAndTrigger)

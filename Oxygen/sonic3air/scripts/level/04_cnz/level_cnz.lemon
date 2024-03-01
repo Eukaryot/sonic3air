@@ -175,7 +175,7 @@ function void fn051ca6()
 function void fn051caa()
 {
 #if STANDALONE
-	if (camera.position.x.u16 >= 0x3000 - getScreenExtend() && (camera.position.y.u16 < 0x280 || camera.position.y.u16 >= 0x880))
+	if (camera.position.x.u16 >= 0x2f80 && (camera.position.y.u16 < 0x280 || camera.position.y.u16 >= 0x880))
 	{
 		// Lock screen here so nobody can get to see the ugly parts to the left
 		move_area.left = 0x2f80
@@ -767,7 +767,7 @@ function void fn05227c()
 	// Limit movement to where the boss area ends, to prevent Knuckles from gliding over the boss
 	if (global.zone_act == 0x0301 && move_area.right == 0x6000 && camera.position.x.u16 >= 0x4500 && camera.position.y.u16 < 0x320)
 	{
-		move_area.right = 0x47e0
+		move_area.right = max(0x4620 + getScreenWidth(), 0x47e0)
 		level.vertical_wrap = 0x0200
 	}
 #endif
