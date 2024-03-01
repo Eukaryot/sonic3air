@@ -95,6 +95,73 @@ function bool fn08b598()
 }
 
 
+
+//# address-hook(0x08b5dc) end(0x08b608)
+function void fn08b5dc()
+{
+	A1 = 0x08b60e
+	fn0858f8()
+	if (D0.u16 == 0)
+	{
+		Object.DrawOrUnload()
+	}
+	else
+	{
+		u16[A0 + 0x44] = D0.u16
+		if (u16[A0 + 0x44] != 0)	// This check feels weird... we already established that it's not zero
+		{
+			A1 = 0xffff0000 + D0.u16
+			objA1.velocity.x = 0x0800
+			u16[A1 + 0x1c] = 0x0800
+
+			// "spawnChildObjects(0x08b872)" replaced by:
+			spawnChildObject(0x08b768, 0x00, 0, -8)
+			spawnChildObject(0x08b768, 0x02, 0, 8)
+		}
+		Object.TriggerUnloading()
+	}
+}
+
+
+
+// Piece of snow tunnel at the very end of ICZ 2, which also triggers the transition to LBZ
+
+//# address-hook(0x08b616) end(0x08b652)
+function void fn08b616()
+{
+	A1 = 0x08b658
+	fn0858f8()
+	if (D0.u16 == 0)
+	{
+		Enemy.DrawOrUnload()
+	}
+	else
+	{
+		// D0.u16 is the RAM address of the object that collides with this one, at this point usually 0xb000 for player 1
+		u16[A0 + 0x44] = D0.u16
+		if (u16[A0 + 0x44] != 0)	// This check feels weird... we already established that it's not zero
+		{
+			A1 = 0xffff0000 + D0.u16
+			objA1.velocity.x = 0x0800
+			objA1.groundspeed = 0x0800
+
+			// "spawnChildObjects(0x08b880)" replaced by:
+			spawnChildObject(0x08b768, 0x00, -8, -8)
+			spawnChildObject(0x08b768, 0x02, 0, 8)
+			spawnChildObject(0x08b768, 0x04, 8, -8)
+			spawnChildObject(0x08b768, 0x06, 8, 8)
+
+			if (objA0.subtype2c & 0x80)
+			{
+				TriggerNextZone(0x0600)		// Launch Base Act 1
+			}
+		}
+		Object.TriggerUnloading()
+	}
+}
+
+
+
 // Get blown away by a character
 
 //# address-hook(0x08b768) end(0x08b78a)

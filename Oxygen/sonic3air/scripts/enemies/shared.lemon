@@ -620,6 +620,15 @@ function void fn085ad2()
 	else
 	{
 		objA0.update_address = objA0.countdown_callback
+
+	#if STANDALONE
+		// Special handling for the snow tunnel after ICZ 2 boss, to prevent a frame where the object is not drawn
+		if (objA0.update_address == addressof(ICZSnow.Init2))
+		{
+			ICZSnow.Init2()
+			DrawObject()
+		}
+	#endif
 	}
 }
 

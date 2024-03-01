@@ -264,11 +264,11 @@ function void fn071de2()
 
 	PlayMusicAfterLevelResults()
 	move_area.bottom.target = screenmover_target.bottom
-	screenmover_target.right = 0x47c0
 
 #if STANDALONE
-	// Make nobody ever sees the blank space where there is no snow
-	screenmover_target.right = 0x4764 - (getScreenWidth() - 320)
+	screenmover_target.right = 0x4720
+#else
+	screenmover_target.right = 0x47c0
 #endif
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
