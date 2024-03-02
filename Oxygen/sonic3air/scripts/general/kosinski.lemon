@@ -151,15 +151,6 @@ function void uncompressKosinskiData(u32 sourceAddress, u16 targetInVRAM)
 
 function void Kosinski.addToDMAQueue(u32 sourceAddress, u16 targetInVRAM)
 {
-//#if STANDALONE
-//	// Just for testing
-//	if (sourceAddress == 0x36ad8a)
-//	{
-//		uncompressKosinskiData(sourceAddress, targetInVRAM)
-//		return
-//	}
-//#endif
-
 	A1 = sourceAddress
 	D2.u16 = targetInVRAM
 	Kosinski.AddToDMAQueue()

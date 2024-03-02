@@ -262,11 +262,11 @@ function void UpdateBackground.HCZ1()
 			for (u8 i = 0; i < 0x60; ++i)
 			{
 				u16[A1] = (D1 >> 16)
-				#if STANDALONE
-					// Add a nice moving waves effect
-					s16 distance = (0x1200 / (0x80 - i))
-					u16[A1] += (lookupSin(distance * 10 - level.framecounter) / s32(distance))
-				#endif
+			#if STANDALONE
+				// Add a nice moving waves effect
+				s16 distance = (0x1200 / (0x80 - i))
+				u16[A1] += (lookupSin(distance * 10 - level.framecounter) / s32(distance))
+			#endif
 				A1 += 2
 				D1 -= D3
 			}
@@ -278,11 +278,11 @@ function void UpdateBackground.HCZ1()
 			{
 				A1 -= 2
 				u16[A1] = D1 >> 16
-				#if STANDALONE
-					// Add a nice moving waves effect
-					s16 distance = (0x1200 / (0x80 - i))
-					u16[A1] += (lookupSin(distance * 10 - level.framecounter) / s32(distance))
-				#endif
+			#if STANDALONE
+				// Add a nice moving waves effect
+				s16 distance = (0x1200 / (0x80 - i))
+				u16[A1] += (lookupSin(distance * 10 - level.framecounter) / s32(distance))
+			#endif
 				D1 -= D3
 			}
 
