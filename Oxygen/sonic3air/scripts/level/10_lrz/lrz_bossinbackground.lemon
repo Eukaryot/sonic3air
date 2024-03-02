@@ -241,7 +241,7 @@ function void fn079192()
 		objA0.update_address = 0x0791b0
 		objA0.countdown_value = 0x0f
 	}
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -256,7 +256,7 @@ function void fn0791b0()
 		objA0.position.y.u16 = u16[A0 + 0x3c]
 		objA0.countdown_value = 0x0b
 	}
-	fn08494e()
+	Child.CheckParent()
 }
 
 
@@ -346,7 +346,7 @@ function void fn079290()
 	objA0.position.x.u16 = objA1.position.x.u16
 	objA0.position.y.u16 = objA1.position.y.u16
 	Object.AnimationProgressByLocalA1()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -438,7 +438,7 @@ function void fn07939c()
 	objA0.position.x.u16 = objA1.position.x.u16
 	objA0.position.y.u16 = objA1.position.y.u16
 	Object.AnimationProgressByLocalA1.DistinctTimer()
-	fn084920()
+	Child.DrawSprite()
 }
 
 

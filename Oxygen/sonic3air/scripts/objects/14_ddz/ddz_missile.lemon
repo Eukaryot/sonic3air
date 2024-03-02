@@ -94,7 +94,7 @@ function void fn08209e()
 	objA0.position.y.u16 = objA1.position.y.u16
 	UpdateMovementStraightSimple()
 	Object.CountdownAndTrigger()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -201,12 +201,12 @@ function void fn082160()
 	if ((global.framecounter.low & 0x02) == 0)
 	{
 		MoveWithParent()
-		fn084920()
+		Child.DrawSprite()
 	}
 	else
 	{
 		objA0.render_flags &= ~render_flag.VISIBLE
-		fn08494e()
+		Child.CheckParent()
 	}
 }
 

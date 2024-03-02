@@ -120,7 +120,7 @@ function void fn08de26()
 	//  - 0x08def4	-> objA0.base_state = 0x08
 	call tableLookupAddress(0x08de3a, objA0.base_state)
 
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 
@@ -241,7 +241,7 @@ function void fn08df3c()
 {
 	setupObjectAttributesBasic(0x08dfa2)
 	objA0.update_address = 0x08df52
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -250,5 +250,5 @@ function void fn08df52()
 {
 	MoveWithParent()
 	Object.animationProgress(0x08dfbc)
-	fn084920()
+	Child.DrawSprite()
 }

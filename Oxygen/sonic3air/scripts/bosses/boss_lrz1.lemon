@@ -342,7 +342,7 @@ function void fn0787e0()
 	spawnChildObject(0x078a70, 0x12, -18, 12)
 	spawnChildObject(0x078a70, 0x14, 18, 12)
 
-	fn085ba8()
+	SetupAsSignpostSpawner()
 }
 
 

@@ -198,7 +198,7 @@ function void fn087d4c()
 	setupObjectAttributesBasic(0x087ec0)
 
 	objA0.update_address = 0x087d5e
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 
@@ -212,7 +212,7 @@ function void fn087d5e()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if ((u8[A1 + 0x38] & 0x02) == 0)
 	{
-		fn084934()
+		Child.DrawSprite_DynObj()
 		return
 	}
 
@@ -246,7 +246,7 @@ function void fn087dae()
 	setupObjectAttributesBasic(0x087ec6)
 
 	objA0.update_address = 0x087dc0
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -354,7 +354,7 @@ function void fn087e9e()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if ((u8[A1 + 0x38] & 0x01) == 0)
 	{
-		fn084920()
+		Child.DrawSprite()
 	}
 	else
 	{

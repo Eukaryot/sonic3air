@@ -525,7 +525,7 @@ function void fn07205e()
 		A1 = 0x07208a
 		fn08a9c6()
 	}
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -540,7 +540,7 @@ function void fn072092()
 		A1 = 0x0720be
 		fn08a9c6()
 	}
-	fn084920()
+	Child.DrawSprite()
 }
 
 

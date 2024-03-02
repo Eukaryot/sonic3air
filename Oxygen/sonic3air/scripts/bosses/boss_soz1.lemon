@@ -496,7 +496,7 @@ function void fn076e0a()
 		objA1.update_address = 0x076e4e
 	}
 
-	fn085ba8()
+	SetupAsSignpostSpawner()
 }
 
 
@@ -612,7 +612,7 @@ function void fn076f24()
 	if ((u8[A1 + 0x2a] & 0x40) == 0)
 	{
 		fn07710c()
-		fn084934()
+		Child.DrawSprite_DynObj()
 	}
 	else
 	{
@@ -634,7 +634,7 @@ function void fn076f46()
 	//  - 0x07701c	-> objA0.base_state = 0x08
 	call tableLookupAddress(0x076f60, objA0.base_state)
 
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 
@@ -736,7 +736,7 @@ function void fn077022()
 	objA0.update_address = 0x077062
 	objA0.velocity.y = -0x100
 	objA0.countdown_value = 0x3f
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 

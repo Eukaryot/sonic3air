@@ -163,7 +163,7 @@ function void fn091d52()
 	//  - 0x091de2	-> objA0.base_state = 0x04
 	call tableLookupAddress(0x091d66, objA0.base_state)
 
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 
@@ -266,7 +266,7 @@ function void fn091e5a()
 function void fn091e72()
 {
 	MoveWithParent()
-	fn08495e()
+	Child.CheckParent_DynObj()
 }
 
 

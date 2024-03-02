@@ -577,7 +577,7 @@ function void fn06303c()
 
 		if (u8[0xfffffaa9] == 0 || D0.u16 != 0 || D2.u16 >= 0x40 || D3.u16 >= 0x60)
 		{
-			fn084920()
+			Child.DrawSprite()
 			return
 		}
 		u8[0xfffffaa9] = 0
@@ -604,7 +604,7 @@ function void fn0630a6()
 	UpdateMovementStraightSimple()
 	fn065e4c()
 	Object.CountdownAndTrigger()
-	fn084920()
+	Child.DrawSprite()
 }
 
 

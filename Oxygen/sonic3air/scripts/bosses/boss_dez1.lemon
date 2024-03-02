@@ -528,7 +528,7 @@ function void fn07e23c()
 	spawnChildObject(0x07eb0e, 0x04, -12, 24)
 	spawnChildObject(0x07eb0e, 0x06, 12, 24)
 
-	fn085ba8()
+	SetupAsSignpostSpawner()
 }
 
 
@@ -1399,7 +1399,7 @@ function void fn07ea12()
 
 	u8[A0 + 0x43] += 8
 	MoveWithParent()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -1415,7 +1415,7 @@ function void fn07ea3c()
 			playSound(0xc4)
 		}
 		fn07eb34()
-		fn084920()
+		Child.DrawSprite()
 	}
 	else
 	{
@@ -1452,7 +1452,7 @@ function void fn07ea9a()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D0.u16 = objA1.position.x.u16 + u16[A0 + 0x3a]
 	objA0.position.x.u16 = D0.u16
-	fn084920()
+	Child.DrawSprite()
 }
 
 

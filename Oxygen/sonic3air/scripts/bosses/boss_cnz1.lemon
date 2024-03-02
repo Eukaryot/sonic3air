@@ -229,7 +229,7 @@ function void fn06dbae()
 {
 	objA0.update_address = 0x085c00
 	level.boss_encounter = 0
-	fn083c06()
+	AfterBoss_Cleanup()
 
 	addPatternLoadingCue(0x085bc8)		// Signpost pole sprite
 }
@@ -585,7 +585,7 @@ function void fn06df4a()
 	MoveWithParent()
 	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 
@@ -608,7 +608,7 @@ function void fn06df94()
 	{
 		MoveWithParent()
 		Object.AnimationProgressByLocalA1.DistinctTimer()
-		fn084934()
+		Child.DrawSprite_DynObj()
 	}
 	else
 	{

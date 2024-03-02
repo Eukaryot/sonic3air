@@ -210,7 +210,7 @@ function void fn08c11e()
 	//  - 0x08459c	-> objA0.base_state = 0x04
 	call tableLookupAddress(0x08c134, objA0.base_state)
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -246,7 +246,7 @@ function void fn08c17c()
 	//  - 0x08c226	-> objA0.base_state = 0x06
 	call tableLookupAddress(0x08c192, objA0.base_state)
 
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 

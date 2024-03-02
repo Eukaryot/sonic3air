@@ -240,7 +240,7 @@ function void fn08b8c2()
 function void fn08b8f2()
 {
 	fn08b930()
-	fn084920()
+	Child.DrawSprite()
 }
 
 

@@ -91,7 +91,7 @@ function void fn08c370()
 	//  - 0x08c4ba	-> objA0.base_state = 0x08
 	call tableLookupAddress(0x08c38c, objA0.base_state)
 
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 
@@ -282,7 +282,7 @@ function void fn08c502()
 	objA0.update_address = 0x08c522
 	objA0.value3e = objA0.position.x.u16
 	u16[A0 + 0x40] = objA0.position.y.u16
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -298,7 +298,7 @@ function void fn08c522()
 	//  - 0x08c568	-> objA0.subtype2c = 0x02
 	//  - 0x08c57e	-> objA0.subtype2c = 0x04
 	call tableLookupAddress(0x08c548, objA0.subtype2c)
-	fn084920()
+	Child.DrawSprite()
 }
 
 

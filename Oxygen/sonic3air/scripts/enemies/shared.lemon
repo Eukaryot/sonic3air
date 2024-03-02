@@ -201,7 +201,8 @@ function void fn085416()
 // Movement towards target position
 
 //# address-hook(0x085436) end(0x08548c)
-function void fn085436()
+//# alias(fn085436) deprecated
+function void Enemy.ChaseObject()
 {
 	D2.s16 = -D0.s16
 	D3.u16 = D1.u16
@@ -1538,7 +1539,8 @@ function void fn0848fe()
 
 
 //# address-hook(0x084920) end(0x08492e)
-function void fn084920()
+//# alias(fn084920) deprecated
+function void Child.DrawSprite()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
@@ -1553,7 +1555,8 @@ function void fn084920()
 
 
 //# address-hook(0x084934) end(0x084948)
-function void fn084934()
+//# alias(fn084934) deprecated
+function void Child.DrawSprite_DynObj()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
@@ -1569,7 +1572,8 @@ function void fn084934()
 
 
 //# address-hook(0x08494e) end(0x08495c)
-function void fn08494e()
+//# alias(fn08494e) deprecated
+function void Child.CheckParent()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
@@ -1580,7 +1584,8 @@ function void fn08494e()
 
 
 //# address-hook(0x08495e) end(0x08496c)
-function void fn08495e()
+//# alias(fn08495e) deprecated
+function void Child.CheckParent_DynObj()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)

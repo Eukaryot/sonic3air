@@ -340,7 +340,7 @@ function void fn05ea52()
 	call tableLookupAddress(0x05ea6a, objA0.base_state)
 
 	fn060038()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -506,7 +506,7 @@ function void fn05ebb4()
 {
 	fn085a5a()
 	MoveAndFlipWithParent()
-	fn084920()
+	Child.DrawSprite()
 }
 
 

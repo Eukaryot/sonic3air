@@ -304,7 +304,7 @@ function void fn079e7c()
 	objA0.position.y.u16 = objA1.position.y.u16
 
 	Object.animationProgress(0x07a1e5)
-	fn084920()
+	Child.DrawSprite()
 }
 
 

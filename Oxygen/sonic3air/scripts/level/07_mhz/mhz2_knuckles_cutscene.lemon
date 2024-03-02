@@ -258,7 +258,7 @@ function void fn063308()
 		{
 			objA0.animation.sprite = 1
 		}
-		fn084920()
+		Child.DrawSprite()
 	}
 	else
 	{

@@ -579,7 +579,7 @@ function void fn072562()
 			objA1.update_address = 0x085b0a
 		}
 		objA0.position.x.u16 = u16[A0 + 0x3c]
-		fn085ba8()
+		SetupAsSignpostSpawner()
 	}
 	else
 	{

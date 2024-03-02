@@ -175,7 +175,7 @@ function void fn08dc24()
 	objA0.position.y.u16 = objA1.position.y.u16
 	if ((u8[A1 + 0x2a] & 0x40) == 0)
 	{
-		fn084920()
+		Child.DrawSprite()
 		return
 	}
 

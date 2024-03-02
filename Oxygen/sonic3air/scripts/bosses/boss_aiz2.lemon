@@ -631,7 +631,7 @@ function void fn069738()
 	MoveAndFlipWithParent()
 	if ((objA0.flags38 & 0x40) == 0)
 	{
-		fn084920()
+		Child.DrawSprite()
 	}
 }
 

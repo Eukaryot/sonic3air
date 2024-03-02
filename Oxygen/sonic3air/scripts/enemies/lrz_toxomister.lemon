@@ -84,7 +84,7 @@ function void fn08fdba()
 	//  - 0x08fe50	-> objA0.base_state = 0x08
 	call tableLookupAddress(0x08fdce, objA0.base_state)
 
-	fn08495e()
+	Child.CheckParent_DynObj()
 }
 
 
@@ -184,7 +184,7 @@ function void fn08fe8e()
 	objA0.subtype2c = D0.u8
 	objA0.value2f = D0.u8 * 4
 	objA0.countdown_callback = 0x08fed4
-	fn08494e()
+	Child.CheckParent()
 }
 
 
@@ -192,7 +192,7 @@ function void fn08fe8e()
 function void fn08fec8()
 {
 	Object.CountdownAndTrigger()
-	fn08494e()
+	Child.CheckParent()
 }
 
 
@@ -219,7 +219,7 @@ function void fn08fedc()
 		}
 		if (D0.u8 == 0)
 		{
-			fn084920()
+			Child.DrawSprite()
 		}
 		return
 	}

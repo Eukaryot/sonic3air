@@ -114,7 +114,7 @@ function void fn08bee6()
 	fn08bf80()
 	D2 = 4
 	fn084c42()
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 

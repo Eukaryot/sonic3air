@@ -134,7 +134,7 @@ function void fn0890aa()
 		A1 = 0xffff0000 + u16[A0 + 0x46]
 		u8[A1 + 0x38] |= 0x01
 	}
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 

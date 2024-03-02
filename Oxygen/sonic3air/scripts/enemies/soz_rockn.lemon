@@ -276,7 +276,7 @@ function void fn08f024()
 		objA0.animation.sprite = 3
 	}
 	MoveAndFlipWithParent()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -284,5 +284,5 @@ function void fn08f024()
 function void fn08f042()
 {
 	MoveAndFlipWithParent()
-	fn084920()
+	Child.DrawSprite()
 }

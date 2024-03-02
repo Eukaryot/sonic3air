@@ -339,7 +339,7 @@ function void fn0713d2()
 //# address-hook(0x0713e8) end(0x07141a)
 function void fn0713e8()
 {
-	fn085ba8()
+	SetupAsSignpostSpawner()
 
 	A1 = 0xffff0000 + u16[0xfffffaae]
 	if (objA1.update_address == 0x08b660)

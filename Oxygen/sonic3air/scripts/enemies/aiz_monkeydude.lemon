@@ -172,7 +172,7 @@ function void fn08724e()
 		A1 = 0xffff0000 + u16[A1 + 0x46]
 		u16[A0 + 0x44] = A1.u16
 	}
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -190,7 +190,7 @@ function void fn0872cc()
 	//  - 0x087330	-> objA0.base_state = 0x0a
 	call tableLookupAddress(0x0872e2, objA0.base_state)
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -373,7 +373,7 @@ function void fn08741c()
 	//  - 0x08743e	-> objA0.base_state = 0x04
 	call tableLookupAddress(0x087432, objA0.base_state)
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -419,7 +419,7 @@ function void fn08744c()
 	//  - 0x087472	-> objA0.base_state = 0x02
 	call tableLookupAddress(0x087462, objA0.base_state)
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 

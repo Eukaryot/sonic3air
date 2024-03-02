@@ -361,7 +361,7 @@ function void fn086770()
 			u8[A1 + 0x38] |= 0x02
 		}
 	}
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -417,7 +417,7 @@ function void fn086810()
 {
 	MoveWithParent()
 	Object.animationProgress(0x086bf6)
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -509,7 +509,7 @@ function void fn0867ca()
 {
 	MoveWithParent()
 	fn086a54()
-	fn084920()
+	Child.DrawSprite()
 }
 
 

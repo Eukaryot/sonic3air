@@ -367,7 +367,7 @@ function void fn083a40()
 {
 	MoveWithParent()
 	fn085a5a()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -487,7 +487,7 @@ function void fn08672a()
 		objA1.flags38 |= 0x02
 		objA0.animation.sprite = 0x0c
 	}
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -495,7 +495,7 @@ function void fn08672a()
 function void fn086754()
 {
 	fn086a3e()
-	fn084920()
+	Child.DrawSprite()
 }
 
 

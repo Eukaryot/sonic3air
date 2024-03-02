@@ -130,7 +130,7 @@ function void fn0805ae()
 	{
 		fn081024()
 		AddAsDynamicObject()
-		fn08494e()
+		Child.CheckParent()
 		return
 	}
 
@@ -160,7 +160,7 @@ function void fn0805f0()
 		objA0.update_address = 0x0805ae
 		u8[A0 + 0x28] = u8[A0 + 0x25]
 	}
-	fn08494e()
+	Child.CheckParent()
 }
 
 
@@ -200,7 +200,7 @@ function void fn080634()
 	}
 
 	fn081024()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -210,7 +210,7 @@ function void fn08067a()
 	if (objA0.flags38 & 0x04)
 	{
 		fn081024()
-		fn08494e()
+		Child.CheckParent()
 		return
 	}
 
@@ -240,7 +240,7 @@ function void fn0806a6()
 	}
 
 	fn081024()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -267,7 +267,7 @@ function void fn0807ee()
 
 	Object.AnimationProgress.DistinctTimer(0x08135a)
 	fn081024()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -292,7 +292,7 @@ function void fn080810()
 
 		objA0.animation.sprite = (D0 & 0x01) ? 0x1a : 0x1f
 		fn081024()
-		fn084920()
+		Child.DrawSprite()
 		return
 	}
 
@@ -323,7 +323,7 @@ function void fn08086c()
 
 	fn080fa6()
 	fn081024()
-	fn08494e()
+	Child.CheckParent()
 }
 
 
@@ -342,7 +342,7 @@ function void fn080894()
 	--objA0.countdown_value
 	if (objA0.countdown_value >= 0)
 	{
-		fn08494e()
+		Child.CheckParent()
 	}
 	else
 	{

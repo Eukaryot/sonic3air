@@ -580,7 +580,7 @@ function void fn0757a0()
 //# address-hook(0x0757ba) end(0x0757ba)
 function void fn0757ba()
 {
-	fn085ba8()
+	SetupAsSignpostSpawner()
 }
 
 
@@ -616,7 +616,7 @@ function void fn0757d6()
 				}
 			}
 
-			fn084934()
+			Child.DrawSprite_DynObj()
 			return
 		}
 	}
@@ -632,7 +632,7 @@ function void fn0757d6()
 function void fn07583a()
 {
 	call tableLookupAddress(0x07584e, objA0.base_state)
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 
@@ -777,7 +777,7 @@ function void fn0759d0()
 	if ((D0 & 0x01) == 0)
 	{
 		MoveWithParent()
-		fn084934()
+		Child.DrawSprite_DynObj()
 	}
 	else if (u8[A1 + 0x2a] & 0x80)
 	{

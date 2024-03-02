@@ -95,7 +95,7 @@ function void fn08c692()
 	D0.u8 = objA0.subtype2c
 	D0.u8 <<= 5
 	u8[A0 + 0x3c] = D0.u8
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 
@@ -111,5 +111,5 @@ function void fn08c6b0()
 
 	D2 = 4
 	fn084c42()
-	fn084934()
+	Child.DrawSprite_DynObj()
 }

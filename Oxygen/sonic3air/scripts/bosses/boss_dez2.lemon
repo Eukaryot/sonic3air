@@ -348,7 +348,7 @@ function void fn07f398()
 	setupObjectAttributesBasic(0x07fc62)
 	objA0.update_address = 0x07f3b0
 	objA0.hitbox_extends.y = 0x0b
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -359,7 +359,7 @@ function void fn07f3b0()
 	if ((u8[A1 + 0x38] & 0x04) == 0)
 	{
 		MoveWithParent()
-		fn084920()
+		Child.DrawSprite()
 		return
 	}
 
@@ -381,7 +381,7 @@ function void fn07f3d0()
 			++u8[A0 + 0x43]
 		}
 		MoveWithParent()
-		fn084920()
+		Child.DrawSprite()
 		return
 	}
 
@@ -720,7 +720,7 @@ function void fn07f64a()
 	// "spawnSimpleChildObjects(0x07fcae)" replaced by:
 	spawnSimpleChildObjects(0x07f6fa, 1)
 
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 
@@ -732,7 +732,7 @@ function void fn07f66c()
 	{
 		MoveWithParent()
 		Object.AnimationProgressByLocalA1.DistinctTimer()
-		fn084934()
+		Child.DrawSprite_DynObj()
 		return
 	}
 
@@ -755,7 +755,7 @@ function void fn07f690()
 		}
 		MoveWithParent()
 		Object.AnimationProgressByLocalA1.DistinctTimer()
-		fn084920()
+		Child.DrawSprite()
 		return
 	}
 
@@ -773,7 +773,7 @@ function void fn07f6ba()
 	{
 		MoveWithParent()
 		Object.AnimationProgressByLocalA1.DistinctTimer()
-		fn084920()
+		Child.DrawSprite()
 		return
 	}
 
@@ -797,7 +797,7 @@ function void fn07f6d2()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x08)
 	{
-		fn084934()
+		Child.DrawSprite_DynObj()
 	}
 	else
 	{
@@ -823,7 +823,7 @@ function void fn07f708()
 	objA0.position.x.u16 = objA1.position.x.u16
 	objA0.position.y.u16 = objA1.position.y.u16
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 

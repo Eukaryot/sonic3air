@@ -1440,7 +1440,7 @@ function void fn065048()
 	if ((u8[0xfffffab8] & 0x01) == 0)
 	{
 		MoveAndFlipWithParent()
-		fn084920()
+		Child.DrawSprite()
 	}
 	else
 	{
@@ -1487,7 +1487,7 @@ function void fn065068()
 	}
 
 	MoveAndFlipWithParent()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -1525,7 +1525,7 @@ function void fn06510c()
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16 - s8[0xfffffabd]
 	}
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -1544,7 +1544,7 @@ function void fn065148()
 	MoveAndFlipWithParent()
 	D0.u8 = u8[A1 + 0x22] + 1
 	objA0.animation.sprite = D0.u8
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -1563,7 +1563,7 @@ function void fn06516e()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	objA0.animation.sprite = 4 + (u8[A1 + 0x1a] >> 4)
 	MoveWithParent()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -1721,7 +1721,7 @@ function void fn065348()
 		objA0.flags38 |= 0x80
 	}
 	MoveAndFlipWithParent()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -1811,7 +1811,7 @@ function void fn06540a()
 	{
 		fn0662a6()
 	}
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -1840,7 +1840,7 @@ function void fn06546e()
 	{
 		D2 = 5
 		fn084c42()
-		fn084920()
+		Child.DrawSprite()
 	}
 	else
 	{
@@ -1848,7 +1848,7 @@ function void fn06546e()
 
 		A2 = 0x184d9c
 		fn084cf4()
-		fn084920()
+		Child.DrawSprite()
 	}
 }
 
@@ -1920,7 +1920,7 @@ function void fn0654fa()
 		objA0.countdown_value = objA0.value32
 	}
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 

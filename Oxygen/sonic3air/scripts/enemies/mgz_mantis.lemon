@@ -130,7 +130,7 @@ function void fn088f50()
 	//  - 0x088f72	-> objA0.base_state = 0x02
 	call tableLookupAddress(0x088f66, objA0.base_state)
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 

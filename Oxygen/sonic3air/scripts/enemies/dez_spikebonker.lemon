@@ -127,14 +127,14 @@ function void fn091aec()
 			objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 4 : -4
 			objA0.countdown_value = 0x1f
 			objA0.countdown_callback = 0x091b68
-			fn08494e()
+			Child.CheckParent()
 			return
 		}
 	}
 
 	D0.u8 -= 8
 	u8[A1 + 0x3c] = D0.u8
-	fn08494e()
+	Child.CheckParent()
 }
 
 
@@ -144,7 +144,7 @@ function void fn091b3e()
 	D0.u16 = objA0.position.x.u16 + objA0.velocity.x
 	objA0.position.x.u16 = D0.u16
 	Object.CountdownAndTrigger()
-	fn08494e()
+	Child.CheckParent()
 }
 
 
@@ -182,7 +182,7 @@ function void fn091b70()
 		objA0.countdown_callback = 0x091b56
 	}
 
-	fn08494e()
+	Child.CheckParent()
 }
 
 
@@ -197,7 +197,7 @@ function void fn091ba8()
 	//  - 0x091bd4	-> objA0.base_state = 0x02
 	call tableLookupAddress(0x091bbc, objA0.base_state)
 
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 

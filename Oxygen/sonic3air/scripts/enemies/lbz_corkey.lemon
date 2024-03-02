@@ -114,7 +114,7 @@ function void fn08c7de()
 	//  - 0x08c8a8	-> objA0.base_state = 0x06
 	call tableLookupAddress(0x08c7f0, objA0.base_state)
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -216,5 +216,5 @@ function void fn08c8e6()
 {
 	++u16[A0 + 0x3a]
 	Object.AnimationProgressByLocalA1.DistinctTimer()
-	fn084934()
+	Child.DrawSprite_DynObj()
 }

@@ -642,7 +642,7 @@ function void fn073384()
 {
 	MoveAndFlipWithParent()
 	Object.AnimationProgressByLocalA1()
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 
@@ -669,7 +669,7 @@ function void fn0733ca()
 	++u8[A0 + 0x3c]
 	D2 = 3
 	fn084cac()
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 

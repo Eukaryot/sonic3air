@@ -13,7 +13,8 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x085ba8) end(0x085bc6)
-function void fn085ba8()
+//# alias(fn085ba8) deprecated
+function void SetupAsSignpostSpawner()
 {
 	// Wait briefly, then spawn the signpost
 	objA0.update_address = 0x085bd6
@@ -42,7 +43,7 @@ function void fn085bda()
 
 	addPatternLoadingCue(0x085bc8)		// Signpost pole sprite
 
-	fn083c06()
+	AfterBoss_Cleanup()
 }
 
 
@@ -408,7 +409,8 @@ function void fn0694aa()
 
 
 //# address-hook(0x083c06) end(0x083c18)
-function void fn083c06()
+//# alias(fn083c06) deprecated
+function void AfterBoss_Cleanup()
 {
 	// Cleanup after boss
 	//  -> Interesting read on this function: https://s3unlocked.blogspot.com/2017/09/after-boss-cleanup.html

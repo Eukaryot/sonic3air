@@ -85,7 +85,7 @@ function void fn087a92()
 
 	D0.u16 = 0x0200
 	D1 = 0x10
-	fn085436()
+	Enemy.ChaseObject()
 
 	fn087b88()
 	UpdateMovementStraightSimple()
@@ -147,7 +147,7 @@ function void fn087ae6()
 
 	D0.u16 = 0x0200
 	D1 = 0x20
-	fn085436()
+	Enemy.ChaseObject()
 	fn087b88()
 	UpdateMovementStraightSimple()
 }

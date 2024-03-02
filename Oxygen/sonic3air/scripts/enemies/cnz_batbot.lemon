@@ -74,7 +74,7 @@ function void fn0893cc()
 	A1 = 0xffffb000
 	D0.u16 = 0x0200
 	D1 = 8
-	fn085436()
+	Enemy.ChaseObject()
 
 	UpdateMovementStraightSimple()
 }
@@ -91,7 +91,7 @@ function void fn0893e8()
 	//  - 0x089426	-> objA0.base_state = 0x04
 	call tableLookupAddress(0x0893fe, objA0.base_state)
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -136,7 +136,7 @@ function void fn08942e()
 	//  - 0x089452	-> objA0.base_state = 0x04
 	call tableLookupAddress(0x089444, objA0.base_state)
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 

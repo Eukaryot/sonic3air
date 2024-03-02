@@ -513,7 +513,7 @@ function void fn05df98()
 		objA0.update_address = 0x05dfb2
 	}
 	MoveWithParent()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -528,7 +528,7 @@ function void fn05dfb2()
 		u16[0xfffffaa4] = A0.u16
 	}
 	MoveWithParent()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -542,7 +542,7 @@ function void fn05dfd8()
 	}
 	else
 	{
-		fn084920()
+		Child.DrawSprite()
 	}
 }
 

@@ -382,7 +382,7 @@ function void fn06a216()
 function void fn06a22a()
 {
 	u8[0xfffffaa2] = 0xff
-	fn085ba8()
+	SetupAsSignpostSpawner()
 
 	if (allocDynamicObjectStd())
 	{

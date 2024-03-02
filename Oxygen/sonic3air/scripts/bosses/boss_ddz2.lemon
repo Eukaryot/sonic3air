@@ -444,7 +444,7 @@ function void fn082588()
 {
 	objA0.update_address = 0x08259a
 	setupObjectAttributesBasic(0x08323e)
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -460,7 +460,7 @@ function void fn08259a()
 	Object.AnimationProgress.DistinctTimer(0x0832c3)
 
 	MoveWithParent()
-	fn084920()
+	Child.DrawSprite()
 }
 
 

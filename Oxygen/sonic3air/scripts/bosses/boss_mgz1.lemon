@@ -265,7 +265,7 @@ function void fn0887ba()
 //# address-hook(0x0887ca) end(0x0887d4)
 function void fn0887ca()
 {
-	fn085ba8()
+	SetupAsSignpostSpawner()
 
 	// Spawn boss giblets
 	// "spawnChildObjects(0x088b42)" replaced by:

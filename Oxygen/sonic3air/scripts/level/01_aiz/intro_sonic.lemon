@@ -410,7 +410,7 @@ function void fn06784a()
 {
 	Object.animationProgress(0x067a8f)
 	MoveWithParent()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -432,7 +432,7 @@ function void fn067888()
 {
 	Object.animationProgress(0x067a97)
 	MoveWithParent()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -752,7 +752,7 @@ function void fn061f10()
 
 	level.palettefx.state = 0
 	player1.control_override = 0
-	fn083c06()
+	AfterBoss_Cleanup()
 	fn0851e4()
 
 	if (allocDynamicObjectStd())

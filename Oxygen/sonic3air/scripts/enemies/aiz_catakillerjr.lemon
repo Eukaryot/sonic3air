@@ -185,7 +185,7 @@ function void fn08780a()
 	objA0.update_address = 0x08782c
 	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	objA0.flags2b |= char.bonus.SHIELD_FIRE
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -194,5 +194,5 @@ function void fn08782c()
 {
 	MoveAndFlipWithParent()
 	Object.AnimationProgress.DistinctTimer(0x0878a8)
-	fn084920()
+	Child.DrawSprite()
 }

@@ -555,7 +555,7 @@ function void fn07abc2()
 	--objA0.countdown_value
 	if (objA0.countdown_value >= 0)
 	{
-		fn084920()
+		Child.DrawSprite()
 		return
 	}
 

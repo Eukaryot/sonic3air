@@ -146,7 +146,7 @@ function void fn06ef88()
 		// Create the object that fades out the boss theme and starts the level music afterwards
 		objA1.update_address = 0x085b0a
 	}
-	fn085ba8()
+	SetupAsSignpostSpawner()
 
 	// "spawnSimpleChildObjects(0x06fab0)" replaced by:
 	spawnSimpleChildObjects(0x06f74c, 1)			// Opened capsule

@@ -107,7 +107,7 @@ function void Madmole.BaseUpdate()
 	//  - 0x08d6ca	-> objA0.base_state = 0x08
 	call tableLookupAddress(0x08d616, objA0.base_state)
 
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 

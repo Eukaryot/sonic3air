@@ -112,7 +112,7 @@ function void fn08e2be()
 //# address-hook(0x08e2ce)
 function void fn08e2ce()
 {
-	fn084920()
+	Child.DrawSprite()
 }
 
 

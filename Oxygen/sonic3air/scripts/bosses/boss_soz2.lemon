@@ -993,7 +993,7 @@ function void fn077f94()
 		u8[A0 + 0x43] += u8[A0 + 0x1a]
 
 		MoveWithParent()
-		fn084920()
+		Child.DrawSprite()
 	}
 	else
 	{
