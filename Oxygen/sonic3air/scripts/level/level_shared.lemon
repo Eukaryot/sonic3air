@@ -282,50 +282,6 @@ function void fn04f8f8()
 
 
 
-//# translated(0x085c36) end(0x085c7c)
-function bool InitBoss(u32 returnAddress)
-{
-	return InitBoss(returnAddress, false)
-}
-
-
-function bool InitBoss(u32 returnAddress, bool useScreenExtend)
-{
-	D1.u16 = camera.position.x.u16
-	D0.u16 = camera.position.y.u16
-	u16 minY = u16[(A1+=2)-2]
-	u16 maxY = u16[(A1+=2)-2]
-	u16 minX = u16[(A1+=2)-2]
-	u16 maxX = u16[(A1+=2)-2]
-	if (useScreenExtend)
-		minX -= getScreenExtend() * 2
-
-	if (D0.u16 >= minY && D0.u16 <= maxY && D1.u16 >= minX && D1.u16 <= maxX)
-	{
-		if (D0.u16 > u16[A1])
-			u8[A0 + 0x27] |= 0x80
-		else
-			u8[A0 + 0x27] &= ~0x80
-
-		if (D1.u16 > u16[A1 + 0x04])
-			u8[A0 + 0x27] |= 0x40
-		else
-			u8[A0 + 0x27] &= ~0x40
-
-		// Originally this is "objA0.update_address = u32[A7]"
-		//  -> But this wouldn't work in script, as the system stack is not used the same way
-		//  -> So the value has to be given explicitly
-		objA0.update_address = returnAddress
-		return false
-	}
-	else
-	{
-		CheckForUnloadObject()
-		return true
-	}
-}
-
-
 //# address-hook(0x085d6a) end(0x085d6a)
 function void StartBossFight()
 {

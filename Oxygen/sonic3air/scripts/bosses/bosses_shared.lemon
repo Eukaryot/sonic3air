@@ -15,6 +15,7 @@
 //# address-hook(0x085ba8) end(0x085bc6)
 function void fn085ba8()
 {
+	// Wait briefly, then spawn the signpost
 	objA0.update_address = 0x085bd6
 	objA0.flags38 |= 0x10
 	objA0.countdown_value = 119
@@ -44,6 +45,72 @@ function void fn085bda()
 	fn083c06()
 }
 
+
+//# address-hook(0x085c00) end(0x085c16)
+function void fn085c00()
+{
+	if (level.wait_for_results)
+		return
+
+	objA0.update_address = 0x085c1a
+
+	stopCharacterWinPose(0xffffb000)
+	stopCharacterWinPose(0xffffb04a)
+}
+
+
+//# address-hook(0x085c1a) end(0x085c26)
+function void fn085c1a()
+{
+	if (!level.results_done)
+		return
+
+	fn085da8()
+	UnloadObject()
+}
+
+
+//# translated(0x085c36) end(0x085c7c)
+function bool InitBoss(u32 returnAddress)
+{
+	return InitBoss(returnAddress, false)
+}
+
+function bool InitBoss(u32 returnAddress, bool useScreenExtend)
+{
+	D1.u16 = camera.position.x.u16
+	D0.u16 = camera.position.y.u16
+	u16 minY = u16[(A1+=2)-2]
+	u16 maxY = u16[(A1+=2)-2]
+	u16 minX = u16[(A1+=2)-2]
+	u16 maxX = u16[(A1+=2)-2]
+	if (useScreenExtend)
+		minX -= getScreenExtend() * 2
+
+	if (D0.u16 >= minY && D0.u16 <= maxY && D1.u16 >= minX && D1.u16 <= maxX)
+	{
+		if (D0.u16 > u16[A1])
+			u8[A0 + 0x27] |= 0x80
+		else
+			u8[A0 + 0x27] &= ~0x80
+
+		if (D1.u16 > u16[A1 + 0x04])
+			u8[A0 + 0x27] |= 0x40
+		else
+			u8[A0 + 0x27] &= ~0x40
+
+		// Originally this is "objA0.update_address = u32[A7]"
+		//  -> But this wouldn't work in script, as the system stack is not used the same way
+		//  -> So the value has to be given explicitly
+		objA0.update_address = returnAddress
+		return false
+	}
+	else
+	{
+		CheckForUnloadObject()
+		return true
+	}
+}
 
 
 //# address-hook(0x085c7e) end(0x085ca2)
@@ -321,15 +388,7 @@ function void Boss.updateHitFlashing(u8 numColors, u32 destAddresses, u32 source
 
 
 
-// Not sure if this is shared code (taken from AIZ 2 boss)
-
-//# address-hook(0x0694a4) end(0x0694a4)
-function void fn0694a4()
-{
-	objA0.update_address = 0x0694d4
-	fn0694aa()
-}
-
+// Spawn flying capsule, used after AIZ 2, MGZ 2 bosses and Big Arms in LBZ 2
 
 //# address-hook(0x0694aa) end(0x0694ce)
 function void fn0694aa()
@@ -344,37 +403,6 @@ function void fn0694aa()
 
 	objA1.render_flags |= render_flag.FLIP_Y
 	StartLoadingPatternsForZone()
-}
-
-
-//# address-hook(0x0694d4) end(0x069520)
-function void fn0694d4()
-{
-	// Used in AIZ 2 post-boss cutscene
-	if (level.wait_for_results)
-		return
-
-#if STANDALONE
-	Game.startSkippableCutscene()
-#endif
-
-	objA0.update_address = 0x069526
-	stopCharacterWinPose(0xffffb000)
-	stopCharacterWinPose(0xffffb04a)
-
-	PlayMusicAfterLevelResults()
-	player1.control_override = 0xff
-	control.player1 = 0
-
-	if (allocDynamicObjectStd())
-	{
-		objA1.update_address = 0x0863c0
-	}
-
-	screenmover_target.right = u16[0xfffffa84] + 0x0158
-
-	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 }
 
 

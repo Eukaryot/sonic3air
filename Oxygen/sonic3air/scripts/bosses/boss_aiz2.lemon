@@ -291,43 +291,61 @@ function void fn069476()
 }
 
 
-//# address-hook(0x069a66) end(0x069ac6)
-function void fn069a66()
+//# address-hook(0x069482) end(0x06949e)
+function void fn069482()
 {
-	while (true)
+	objA0.countdown_callback = 0x0694a4
+	u8[0xfffffaa3] = 0xff
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
+	objA0.flags38 |= 0x10
+
+	// Spawn boss giblets
+	// "spawnChildObjects(0x069d66)" replaced by:
+	spawnChildObject(0x069a3a, 0x00, -16, -16)
+	spawnChildObject(0x069a3a, 0x02, 16, -16)
+	spawnChildObject(0x069a3a, 0x04, -16, 8)
+	spawnChildObject(0x069a3a, 0x06, 16, 8)
+	spawnChildObject(0x069a3a, 0x08, -12, 24)
+	spawnChildObject(0x069a3a, 0x0a, 12, 24)
+}
+
+
+//# address-hook(0x0694a4) end(0x0694a4)
+function void fn0694a4()
+{
+	objA0.update_address = 0x0694d4
+	fn0694aa()
+}
+
+
+//# address-hook(0x0694d4) end(0x069520)
+function void fn0694d4()
+{
+	// Used in AIZ 2 post-boss cutscene
+	if (level.wait_for_results)
+		return
+
+#if STANDALONE
+	Game.startSkippableCutscene()
+#endif
+
+	objA0.update_address = 0x069526
+	stopCharacterWinPose(0xffffb000)
+	stopCharacterWinPose(0xffffb04a)
+
+	PlayMusicAfterLevelResults()
+	player1.control_override = 0xff
+	control.player1 = 0
+
+	if (allocDynamicObjectStd())
 	{
-		GetRandomNumber()
-		D0.u16 &= 0x0c
-		D1.u16 = u16[A0 + 0x26]
-		u16[A0 + 0x26] = D0.u16
-		if (D0.u16 != D1.u16)
-			break
+		objA1.update_address = 0x0863c0
 	}
 
-	A1 = 0x069ac8 + D0.u16
+	screenmover_target.right = u16[0xfffffa84] + 0x0158
 
-	D2 = u16[0xfffffa84] + u16[(A1+=2)-2]
-	D2 = (D2 << 16)
-	D2 -= objA0.position.x
-	D2 *= 2
-	D2 = (D2 >> 16)
-	objA0.velocity.x = D2.u16
-
-	D3 = u16[0xfffffa86] + u16[(A1+=2)-2]
-	D3 = (D3 << 16)
-	D3 -= objA0.position.y
-	D3 *= 2
-	D3 = (D3 >> 16)
-	objA0.velocity.y = D3.u16
-
-	objA0.countdown_value = 0x7f
-	if (D2.u16 != 0)
-	{
-		if (D2.s16 >= 0)
-			objA0.render_flags |= render_flag.FLIP_X
-		else
-			objA0.render_flags &= ~render_flag.FLIP_X
-	}
+	// "spawnSimpleChildObjects(0x084b00)" replaced by:
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 }
 
 
@@ -1163,6 +1181,46 @@ function void fn069a3a()
 	D0 = 0
 	fn0852d0()
 	DrawObject()
+}
+
+
+//# address-hook(0x069a66) end(0x069ac6)
+function void fn069a66()
+{
+	while (true)
+	{
+		GetRandomNumber()
+		D0.u16 &= 0x0c
+		D1.u16 = u16[A0 + 0x26]
+		u16[A0 + 0x26] = D0.u16
+		if (D0.u16 != D1.u16)
+			break
+	}
+
+	A1 = 0x069ac8 + D0.u16
+
+	D2 = u16[0xfffffa84] + u16[(A1+=2)-2]
+	D2 = (D2 << 16)
+	D2 -= objA0.position.x
+	D2 *= 2
+	D2 = (D2 >> 16)
+	objA0.velocity.x = D2.u16
+
+	D3 = u16[0xfffffa86] + u16[(A1+=2)-2]
+	D3 = (D3 << 16)
+	D3 -= objA0.position.y
+	D3 *= 2
+	D3 = (D3 >> 16)
+	objA0.velocity.y = D3.u16
+
+	objA0.countdown_value = 0x7f
+	if (D2.u16 != 0)
+	{
+		if (D2.s16 >= 0)
+			objA0.render_flags |= render_flag.FLIP_X
+		else
+			objA0.render_flags &= ~render_flag.FLIP_X
+	}
 }
 
 

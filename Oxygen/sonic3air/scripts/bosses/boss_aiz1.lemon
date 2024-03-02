@@ -661,26 +661,6 @@ function void Boss.AIZ1.RegularUpdate()
 
 
 
-//# address-hook(0x069482) end(0x06949e)
-function void fn069482()
-{
-	objA0.countdown_callback = 0x0694a4
-	u8[0xfffffaa3] = 0xff
-	objA0.update_address = addressof(Object.CountdownAndTrigger)
-	objA0.flags38 |= 0x10
-
-	// Spawn boss giblets
-	// "spawnChildObjects(0x069d66)" replaced by:
-	spawnChildObject(0x069a3a, 0x00, -16, -16)
-	spawnChildObject(0x069a3a, 0x02, 16, -16)
-	spawnChildObject(0x069a3a, 0x04, -16, 8)
-	spawnChildObject(0x069a3a, 0x06, 16, 8)
-	spawnChildObject(0x069a3a, 0x08, -12, 24)
-	spawnChildObject(0x069a3a, 0x0a, 12, 24)
-}
-
-
-
 //# address-hook(0x0686be) end(0x0686e2)
 function void fn0686be()
 {
@@ -1051,14 +1031,6 @@ function void fn0689f8()
 			dx = -dx
 		objA0.position.x.u16 += dx
 	}
-}
-
-
-
-//# address-hook(0x0757ba) end(0x0757ba)
-function void fn0757ba()
-{
-	fn085ba8()
 }
 
 

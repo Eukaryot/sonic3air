@@ -577,6 +577,12 @@ function void fn0757a0()
 }
 
 
+//# address-hook(0x0757ba) end(0x0757ba)
+function void fn0757ba()
+{
+	fn085ba8()
+}
+
 
 //# address-hook(0x0757c0) end(0x0757d0)
 function void fn0757c0()

@@ -633,31 +633,18 @@ function void fn085ad2()
 }
 
 
-
-//# address-hook(0x085c1a) end(0x085c26)
-function void fn085c1a()
-{
-	if (!level.results_done)
-		return
-
-	fn085da8()
-	UnloadObject()
-}
-
-
-//# address-hook(0x085da8) end(0x085de4)
+//# address-hook(0x085da8) end(0x085dd8)
 function void fn085da8()
 {
-	if (global.zone == 0x08)
+	if (global.zone == 0x08)	// Exception for SOZ, as it has its own transition to Act 2
 		return
 
 	A1 = 0x01bcce + (global.zone * 16)
-	screenmover_target.left = u16[(A1+=2)-2]
-	screenmover_target.right = u16[(A1+=2)-2]
-	screenmover_target.top = u16[(A1+=2)-2]
-	D1.u16 = u16[(A1+=2)-2]
-	screenmover_target.bottom = D1.u16
-	move_area.bottom.target = D1.u16
+	screenmover_target.left   = u16[A1]
+	screenmover_target.right  = u16[A1+2]
+	screenmover_target.top    = u16[A1+4]
+	screenmover_target.bottom = u16[A1+6]
+	move_area.bottom.target   = u16[A1+6]
 
 	// Don't call for Hydrocity, it's explicitly called there
 	if (global.zone != 0x01)

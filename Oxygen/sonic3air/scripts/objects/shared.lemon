@@ -1267,19 +1267,6 @@ function void StopCharacterWinPose()
 }
 
 
-//# address-hook(0x085c00) end(0x085c16)
-function void fn085c00()
-{
-	if (level.wait_for_results)
-		return
-
-	objA0.update_address = 0x085c1a
-
-	stopCharacterWinPose(0xffffb000)
-	stopCharacterWinPose(0xffffb04a)
-}
-
-
 
 //-------------------------------------------------------//
 // Animation                                             //
