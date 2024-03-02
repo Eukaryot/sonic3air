@@ -280,7 +280,8 @@ function void fn089dee()
 	D2.u16 = u16[0x089e6c + D0.u16]
 	objA0.velocity.y = D2.u16
 	objA0.value3e = D2.u16
-	objA0.sprite_attributes = u16[0x089e74 + (D0.u16 & 0x02)]
+	D0.u16 &= 0x02
+	objA0.sprite_attributes = u16[0x089e74 + D0.u16]
 
 	D2 = global.zone * 2
 	A1 = 0x02c7ba + D2.u16
