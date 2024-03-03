@@ -8,14 +8,14 @@
 	"intro_wideframe2": { "File": "intro_wideframe2.bmp" },
 
 	// Sonic 3 title screen
-	"bg_title_screen":    { "File": "title_background.bmp" },
+	"bg_title_screen":    { "File": "title_background.bmp", "Center": "40,0" },
 	"title_screen_air":   { "File": "title_screen.png", "Rect": "0,0,152,18",  "Center": "76,9" },
 	"title_screen_air_h": { "File": "title_screen.png", "Rect": "0,18,152,18", "Center": "76,9" },
 	"title_screen_start": { "File": "title_screen.png", "Rect": "0,36,140,8",  "Center": "70,4" },
 	"title_screen_cr":    { "File": "title_screen.png", "Rect": "0,46,72,18" },
 
 	// Sonic & Knuckles title screen
-	"bg_title_screen_sk": { "File": "title_sk_background.bmp", "Center": "0,112" },
+	"bg_title_screen_sk": { "File": "title_sk_background.bmp", "Center": "40,112" },
 	"bg_title_screen_sk2":{ "File": "title_sk_foreground_extension.bmp", "Center": "-24,-152" }
 
 }
