@@ -68,18 +68,14 @@ function void fn03b64c()
 //# address-hook(0x03b534) end(0x03b560)
 function void fn03b534()
 {
-	D2 = 0x19
-	D1 = 2
-	while (D1.s16 >= 0)
+	for (u16 k = 0; k < 3; ++k)
 	{
-		if (allocDynamicObjectAfterA0())
-		{
-			objA1.update_address = 0x03b566
-			u8[A1 + 0x24] = D2.u8
-			D2.u8 += 0x18
-			u8[A1 + 0x2c] = objA0.subtype2c
-		}
-		--D1.s16
+		if (!allocDynamicObjectAfterA0())
+			break
+
+		objA1.update_address = 0x03b566
+		u8[A1 + 0x24] = 0x19 + k * 0x18
+		u8[A1 + 0x2c] = objA0.subtype2c
 	}
 
 	objA0.animation.timer = 1

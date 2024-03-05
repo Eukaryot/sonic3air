@@ -117,10 +117,9 @@ function void SuperSonicStars.CreateSparks()
 	// This is all technically unused
 	objA0.state = 0
 	A2 = 0xffffb000
-	D5 = 0x0f
 	D4.u16 = 0x0488
 
-	while (D5.s16 >= 0)
+	for (u16 k = 0; k < 0x10; ++k)
 	{
 		// Spawn super sparks
 		if (!allocDynamicObjectStd())
@@ -160,7 +159,6 @@ function void SuperSonicStars.CreateSparks()
 		objA1.velocity.y = D3.u16
 		D2.s16 = -D2.s16
 		D4.s16 = -D4.s16
-		--D5.s16
 	}
 #endif
 }

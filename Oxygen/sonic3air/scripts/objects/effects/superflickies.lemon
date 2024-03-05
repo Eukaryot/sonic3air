@@ -15,15 +15,11 @@ function void fn01a170()
 	Kosinski.addToDMAQueue(0x14c7d4, Char.Player1.targetInVRAM)
 
 	A1 = A0
-	D0 = 0
-	D1 = 3
-	while (D1.s16 >= 0)
+	for (u16 k = 0; k < 4; ++k)
 	{
 		objA1.update_address = 0x01a19c
-		u8[A1 + 0x34] = D0.u8
-		D0.u8 += 0x40
+		u8[A1 + 0x34] = k * 0x40
 		A1 += 0x4a
-		--D1.s16
 	}
 
 	fn01a19c()

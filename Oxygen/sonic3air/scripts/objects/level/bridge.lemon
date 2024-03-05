@@ -86,9 +86,8 @@ function void fn038756()
 		objA1.position.y.u16 = objA0.position.y.u16
 		objA1.mapping_offset = objA0.mapping_offset
 		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.render_flags = objA0.render_flags
 		objA1.sprite_priority = objA0.sprite_priority
-		objA1.render_flags |= render_flag.COMPOUND
+		objA1.render_flags = objA0.render_flags | render_flag.COMPOUND
 		objA1.box_size.x = 0x40
 	#if STANDALONE
 		objA1.box_size.y = 0x30	// For ICZ skewed bridges

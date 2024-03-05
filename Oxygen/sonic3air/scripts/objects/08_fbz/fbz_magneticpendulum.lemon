@@ -522,8 +522,8 @@ function void fn03d93a()
 	D1 += D5
 	D0 += D4
 	A1 = A0 + 0x18
-	D4 = 4
-	while (D4.s16 >= 0)
+
+	for (u16 k = 0; k < 5; ++k)
 	{
 		u16[A1]   = D3 >> 16
 		u16[A1+2] = D2 >> 16
@@ -531,7 +531,6 @@ function void fn03d93a()
 		D3 += D1
 		D2 += D0
 		A1 += 6
-		--D4.s16
 	}
 
 	DrawObject()

@@ -368,8 +368,7 @@ function void fn02d47e()
 	}
 
 	D4 = 0
-	D5 = 2
-	while (D5.s16 >= 0)
+	for (u16 k = 0; k < 3; ++k)
 	{
 		D2.u16 >>= 1
 		if (D2.u16 != 0)
@@ -377,7 +376,6 @@ function void fn02d47e()
 			D4.u16 += D1.u16
 		}
 		D1.s16 <<= 1
-		--D5.s16
 	}
 
 	D4.s16 >>= 4
@@ -444,7 +442,7 @@ function void fn01bb7e()
 	}
 
 	A2 = 0xffffef80
-	D1.u16 = u16[(A2+=2)-2]
+	D1.s16 = s16[(A2+=2)-2]
 	while (D1.s16 > 0)
 	{
 		while (true)

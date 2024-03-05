@@ -164,8 +164,7 @@ function void fn045170()
 
 			if (allocDynamicObjectAfterA0())
 			{
-				D2 = 3
-				while (D2.s16 >= 0)
+				for (u16 k = 0; k < 4; ++k)
 				{
 					objA1.update_address = 0x0452da
 					u16[A1 + 0x2e] = A0.u16
@@ -180,8 +179,6 @@ function void fn045170()
 
 					if (!allocDynamicObjectAfterA1())
 						break
-
-					--D2.s16
 				}
 			}
 		}

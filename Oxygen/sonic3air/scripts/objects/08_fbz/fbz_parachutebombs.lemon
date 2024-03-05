@@ -163,22 +163,18 @@ function void fn03c636()
 	if (u8[A1 + 0x40] == 0)
 	{
 		A2 = 0x03c6bc
-		D1 = 3
-		while (D1.s16 >= 0)
+		for (u16 k = 0; k < 4; ++k)
 		{
-			if (allocDynamicObjectAfterA0())
-			{
-				objA1.update_address = addressof(SmallExplosion.BaseUpdate)
-				u8[A1 + 0x05] = 0x06
-				objA1.sprite_attributes = sprite_attribute.PRIORITY
-				objA1.position.x.u16 = objA0.position.x.u16
-				objA1.position.y.u16 = objA0.position.y.u16
-				D0.u16 = u16[(A2+=2)-2]
-				objA1.position.x.u16 += D0.u16
-				D0.u16 = u16[(A2+=2)-2]
-				objA1.position.y.u16 += D0.u16
-			}
-			--D1.s16
+			if (!allocDynamicObjectAfterA0())
+				break
+
+			objA1.update_address = addressof(SmallExplosion.BaseUpdate)
+			u8[A1 + 0x05] = 0x06
+			objA1.sprite_attributes = sprite_attribute.PRIORITY
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16
+			objA1.position.x.u16 += u16[(A2+=2)-2]
+			objA1.position.y.u16 += u16[(A2+=2)-2]
 		}
 
 		objA0.position.x.u16 = 0x7f00

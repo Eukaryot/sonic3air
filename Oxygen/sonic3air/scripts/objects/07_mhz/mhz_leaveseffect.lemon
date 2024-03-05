@@ -61,39 +61,35 @@ function void MHZLeavesEffect.UpdateForPlayer()
 		{
 			D2.u16 = 0x0100
 			A4 = 0x03db50
-			D6 = 5
-			while (D6.s16 >= 0)
+			for (u16 k = 0; k < 6; ++k)
 			{
-				if (allocDynamicObjectAfterA0())
-				{
-					fn03db68()
+				if (!allocDynamicObjectAfterA0())
+					break
 
-					objA1.render_flags |= render_flag.WORLD
-					objA1.sprite_priority = 0
-					objA1.box_size.x = 0x04
-					objA1.box_size.y = 0x04
-					objA1.position.x.u16 = u16[A2 + 0x10]
-					objA1.position.y.u16 = u16[A2 + 0x14] + 0x18
+				fn03db68()
 
-					GetRandomNumber()
-					u16[A1 + 0x26] = D0.u16
-					D0.u16 &= 0x01ff
-					D0.u16 += u16[(A4+=2)-2] - 0x0100
-					objA1.velocity.x = D0.u16
-					D0 = (D0 << 16) + (D0 >> 16)
-					D0.u16 &= 0xff
-					D0.u16 += D2.u16 - u16[(A4+=2)-2]
-					D0.s16 = -D0.s16
-					objA1.velocity.y = D0.u16
-					D0 = (D0 << 16) + (D0 >> 16)
-					D0.u16 &= 0x03
-					D0.u16 += 0x02
-					u16[A1 + 0x34] = D0.u16
-					objA1.update_address = addressof(MHZSingleLeaf.Type3)
-					++u8[0xfffff7c0]
-				}
+				objA1.render_flags |= render_flag.WORLD
+				objA1.sprite_priority = 0
+				objA1.box_size.x = 0x04
+				objA1.box_size.y = 0x04
+				objA1.position.x.u16 = u16[A2 + 0x10]
+				objA1.position.y.u16 = u16[A2 + 0x14] + 0x18
 
-				--D6.s16
+				GetRandomNumber()
+				u16[A1 + 0x26] = D0.u16
+				D0.u16 &= 0x01ff
+				D0.u16 += u16[(A4+=2)-2] - 0x0100
+				objA1.velocity.x = D0.u16
+
+				D0 = (D0 >> 16) & 0xff
+				D0.u16 += D2.u16 - u16[(A4+=2)-2]
+				D0.s16 = -D0.s16
+				objA1.velocity.y = D0.u16
+
+				D0 = 2 + (objA1.velocity.x & 0x03)
+				u16[A1 + 0x34] = D0.u16
+				objA1.update_address = addressof(MHZSingleLeaf.Type3)
+				++u8[0xfffff7c0]
 			}
 			return
 		}

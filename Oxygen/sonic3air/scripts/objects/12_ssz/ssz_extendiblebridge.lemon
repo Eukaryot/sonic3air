@@ -96,13 +96,11 @@ function void fn045026()
 
 	A1 = A0 + 0x18
 	D0.u16 = objA0.position.x.u16 - 0x40
-	D1 = 2
-	while (D1.s16 >= 0)
+	for (u16 k = 0; k < 3; ++k)
 	{
 		u16[A1]   = D0.u16
 		u16[A1+2] = objA0.position.y.u16
 		A1 += 6
 		D0.u16 += 0x40
-		--D1.s16
 	}
 }
