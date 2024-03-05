@@ -1951,13 +1951,10 @@ function void fn0530f0()
 		move_area.bottom.target = move_area.bottom.current
 
 		A1 = 0xffff005c + u16[0xffff8034]
-		D0.u16 = u16[0xffff8000] - 0x14
-		D1 = 3
-		while (D1.s16 >= 0)
+		for (u32 k = 0; k < 4; ++k)
 		{
 			zeroMemory(A1, 0x14)
-			A1 += D0.u16 + 0x14
-			--D1.s16
+			A1 += u16[0xffff8000]
 		}
 	}
 }
@@ -1984,40 +1981,30 @@ function void fn05318c()
 	D2 = s32[0xffffa9fc] >> 3
 	u32[0xffffa9fc] += 0x8000
 
-	D3 = 9
-	while (D3.s16 >= 0)
+	for (u32 k = 0; k < 10; ++k)
 	{
 		D4.u16 = u16[(A5+=2)-2]
 		D0 += D2
-		u16[A1 + D4.s16] = D0 >> 16
+		u16[A1 + D4.u16] = D0 >> 16
 		D0 += D1
-		--D3.s16
 	}
 
+	// Update cloud positions
 	A1 = 0xffffa800
 	A5 = 0xffffeeea		// Start address of vertical scroll offsets
-	D0.u16 = camera.background.y.u16 - camera.screenshake.offset
-	D1.u16 = camera.screenshake.offset
-	D0.s16 >>= 1
-	D0.u16 += D1.u16
-	D0.s16 = -D0.s16
-	D0.u16 += u16[0xffffeeda]
+	D0.s16 = s16(camera.background.y.u16 - camera.screenshake.offset) >> 1
+	D0.s16 = u16[0xffffeeda] - (D0.u16 + camera.screenshake.offset)
 
-	D1 = 9
-	while (D1.s16 >= 0)
+	for (u32 k = 0; k < 10; ++k)
 	{
 		D2.u16 = u16[(A5+=2)-2]
 		if (D2.u16 != 0)
 		{
 			A6 = 0xffff0000 + D2.u16
-			D3.u16 = (u16[A6 + 0x30] + D0.u16) & 0xff
-			D3.u16 += 0x74
-			u16[A6 + 0x14] = D3.u16
-			D3.u16 = (u16[A6 + 0x2e] - u16[(A1+=2)-2]) & 0x01ff
-			D3.u16 += 0x54
-			u16[A6 + 0x10] = D3.u16
+			s16 dy = s16[(A1+=2)-2]
+			u16[A6 + 0x10] = 0x54 + ((u16[A6 + 0x2e] - dy) & 0x01ff)
+			u16[A6 + 0x14] = 0x74 + ((u16[A6 + 0x30] + D0.u16) & 0xff)
 		}
-		--D1.s16
 	}
 }
 

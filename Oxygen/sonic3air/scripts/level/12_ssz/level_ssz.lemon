@@ -39,26 +39,21 @@ function void InitLevelTiles.SSZ()
 
 	zeroMemory(0xffffa9f6, 0x0a)
 	A1 = 0xffffaa00
-	A5 = 0xffffa9f6
-
-	A6 = 0x058758
-	D1 = 4
 	if (allocDynamicObjectStd())
 	{
-		while (D1.s16 >= 0)
+		for (u32 k = 0; k < 5; ++k)
 		{
-			u16[(A5+=2)-2] = A1.u16
-			objA1.update_address = 0x057bb2
-			u16[A1 + 0x38] = u16[(A6+=2)-2]
-			u16[A1 + 0x3a] = u16[(A6+=2)-2]
-			u16[A1 + 0x40] = u16[(A6+=2)-2]
-			D2.u16 = u16[(A6+=2)-2]
-			u8[A1 + 0x22] = D2.u8
+			A5 = 0xffffa9f6 + k * 2
+			A6 = 0x058758 + k * 8
+			u16[A5] = A1.u16
+			objA1.update_address = 0x057bb2		// Cloud
+			u16[A1 + 0x38] = u16[A6]
+			u16[A1 + 0x3a] = u16[A6+2]
+			u16[A1 + 0x40] = u16[A6+4]
+			u8[A1 + 0x22]  = u16[A6+6]
 
 			if (!allocDynamicObjectAfterA1())
 				break
-
-			--D1.s16
 		}
 	}
 

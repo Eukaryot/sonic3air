@@ -1106,6 +1106,13 @@ function bool Standalone.onDrawVdpSpriteCompound(s16 px, s16 py, u8 size, u16 in
 	{
 		Renderer.drawVdpSpriteWithAlpha(px,   py, size, index, 0xd000, 140)
 		Renderer.drawVdpSpriteWithAlpha(px+1, py, size, index, 0xd000, 144)
+
+		if (getScreenWidth() > 400)
+		{
+			// Draw an additional copy of the cloud one loop further to the right
+			Renderer.drawVdpSpriteWithAlpha(px+512, py, size, index, 0xd000, 140)
+			Renderer.drawVdpSpriteWithAlpha(px+513, py, size, index, 0xd000, 144)
+		}
 		return true
 	}
 
