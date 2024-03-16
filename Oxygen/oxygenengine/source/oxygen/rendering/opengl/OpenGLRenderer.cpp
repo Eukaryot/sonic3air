@@ -125,7 +125,7 @@ void OpenGLRenderer::setGameResolution(const Vec2i& gameResolution)
 		mGameResolution = gameResolution;
 
 		mGameScreenBuffer.setSize(mGameResolution.x, mGameResolution.y);
-		mGameScreenDepth.create(GL_DEPTH_COMPONENT, mGameResolution.x, mGameResolution.y);
+		mGameScreenDepth.create(rmx::OpenGLHelper::FORMAT_DEPTH, mGameResolution.x, mGameResolution.y);
 
 		mProcessingBuffer.setSize(mGameResolution.x, mGameResolution.y);
 		mProcessingTexture.setup(mGameResolution, rmx::OpenGLHelper::FORMAT_RGB);

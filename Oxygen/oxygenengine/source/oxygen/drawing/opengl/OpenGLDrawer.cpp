@@ -85,17 +85,17 @@ namespace opengldrawer
 
 		const char* titleString = (type == GL_DEBUG_TYPE_ERROR) ? "OpenGL Error" : "OpenGL Message";
 		const char* severityString = (severity == GL_DEBUG_SEVERITY_HIGH)		  ? "High" :
-										(severity == GL_DEBUG_SEVERITY_MEDIUM)		  ? "Medium" :
-										(severity == GL_DEBUG_SEVERITY_LOW)		  ? "Low" :
-										(severity == GL_DEBUG_SEVERITY_NOTIFICATION) ? "Notification" : "<unknown>";
+									 (severity == GL_DEBUG_SEVERITY_MEDIUM)		  ? "Medium" :
+									 (severity == GL_DEBUG_SEVERITY_LOW)		  ? "Low" :
+									 (severity == GL_DEBUG_SEVERITY_NOTIFICATION) ? "Notification" : "<unknown>";
 		const char* typeString = (type == GL_DEBUG_TYPE_ERROR)				 ? "Error" :
-									(type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR) ? "Deprecated Behavior" :
-									(type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)	 ? "Undefined Behavior" :
-									(type == GL_DEBUG_TYPE_PORTABILITY)		 ? "Portability" :
-									(type == GL_DEBUG_TYPE_PERFORMANCE)		 ? "Performance" :
-									(type == GL_DEBUG_TYPE_MARKER)				 ? "Marker" :
-									(type == GL_DEBUG_TYPE_PUSH_GROUP)			 ? "Push Group" :
-									(type == GL_DEBUG_TYPE_POP_GROUP)			 ? "Pop Group" : "<other>";
+								 (type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR) ? "Deprecated Behavior" :
+								 (type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)	 ? "Undefined Behavior" :
+								 (type == GL_DEBUG_TYPE_PORTABILITY)		 ? "Portability" :
+								 (type == GL_DEBUG_TYPE_PERFORMANCE)		 ? "Performance" :
+								 (type == GL_DEBUG_TYPE_MARKER)				 ? "Marker" :
+								 (type == GL_DEBUG_TYPE_PUSH_GROUP)			 ? "Push Group" :
+								 (type == GL_DEBUG_TYPE_POP_GROUP)			 ? "Pop Group" : "<other>";
 
 		RMX_ERROR(titleString << " (severity = " << severityString << ", type = " << typeString << "):\n" << message, );
 	}
