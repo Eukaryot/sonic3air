@@ -751,7 +751,7 @@ namespace lemon
 			CHECK_ERROR(isOperator(tokens[1], Operator::COLON), "Expected a colon operator after label", lineNumber);
 
 			LabelNode& node = NodeFactory::create<LabelNode>();
-			node.mLabel = tokens[0].as<LabelToken>().mName;
+			node.mLabel = tokens[0].as<LabelToken>().mName;		// Note that the label includes the '@' character
 			node.setLineNumber(lineNumber);
 			return &node;
 		}
