@@ -1,0 +1,433 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2024 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Act Select Screen (new menu for S3AIR)                //
+//-------------------------------------------------------//
+
+constant array<string> ActSelect.ZONES =
+{
+	"Angel Island Zone",
+	"Hydrocity Zone",
+	"Marble Garden Zone",
+	"Carnival Night Zone",
+	"IceCap Zone",
+	"Launch Base Zone",
+	"Mushroom Hill Zone",
+	"Flying Battery Zone",
+	"Sandopolis Zone",	
+	"Lava Reef Zone",
+	"Hidden Palace Zone",
+	"Sky Sanctuary Zone",
+	"Death Egg Zone",
+	"Doomsday Zone"			// TODO: DDZ must respect the unlocked secret flag
+}
+
+constant array<u8> ActSelect.ACTS_PER_ZONE =
+{
+	2,	// Angel Island Zone
+	2,	// Hydrocity Zone
+	2,	// Marble Garden Zone
+	2,	// Carnival Night Zone
+	2,	// IceCap Zone
+	2,	// Launch Base Zone
+	2,	// Mushroom Hill Zone
+	2,	// Flying Battery Zone
+	2,	// Sandopolis Zone"
+	2,	// Lava Reef Zone
+	1,	// Hidden Palace Zone
+	1,	// Sky Sanctuary Zone
+	2,	// Death Egg Zone
+	1	// Doomsday Zone
+}
+
+constant array<u8> ActSelect.ZONE_INTERNAL_IDS =
+{
+	0x00,	// Angel Island Zone
+	0x01,	// Hydrocity Zone
+	0x02,	// Marble Garden Zone
+	0x03,	// Carnival Night Zone
+	0x05,	// IceCap Zone
+	0x06,	// Launch Base Zone
+	0x07,	// Mushroom Hill Zone
+	0x04,	// Flying Battery Zone
+	0x08,	// Sandopolis Zone"
+	0x09,	// Lava Reef Zone
+	0x16,	// Hidden Palace Zone
+	0x0a,	// Sky Sanctuary Zone
+	0x0b,	// Death Egg Zone
+	0x0c	// Doomsday Zone
+}
+
+function u8 ActSelect.GetNumZones()
+{
+	return ActSelect.ZONES.length()
+}
+
+function string ActSelect.GetZoneName(u8 zoneNumber)
+{
+	return ActSelect.ZONES[zoneNumber]
+}
+
+function u8 ActSelect.GetNumActs(u8 zoneNumber)
+{
+	return ActSelect.ACTS_PER_ZONE[zoneNumber]
+}
+
+function u16 ActSelect.TranslateZoneAct(u8 zoneNumber, u8 act)
+{
+	return (u16(ActSelect.ZONE_INTERNAL_IDS[zoneNumber]) << 8) + act
+}
+
+
+constant array<string> ActSelect.CHARACTER_COMBINATION_NAME =
+{
+	"Sonic & Tails",
+	"Sonic",
+	"Tails",
+	"Knuckles",
+	"Knuckles & Tails"		// TODO: "Knuckles & Tails" must respect the unlocked secret flag
+}
+
+constant array<string> ActSelect.CHARACTER_COMBINATION_SPRITE =
+{
+	"menu_characters_sonic_tails",
+	"menu_characters_sonic",
+	"menu_characters_tails",
+	"menu_characters_knuckles",
+	"menu_characters_knuckles_tails"
+}
+
+function u8 ActSelect.GetNumCharacterCombinations()
+{
+	return ActSelect.CHARACTER_COMBINATION_NAME.length()
+}
+
+function string ActSelect.GetCharacterCombinationName(u8 index)
+{
+	return ActSelect.CHARACTER_COMBINATION_NAME[index]
+}
+
+function string ActSelect.GetCharacterCombinationSprite(u8 index)
+{
+	return ActSelect.CHARACTER_COMBINATION_SPRITE[index]
+}
+
+function string ActSelect.GetZonePreviewKey(u8 zone, u8 act, u8 image)
+{
+	return stringformat("zone%02d_act%d%s", zone + 1, act + 1, (image % 2 == 0) ? "a" : "b")
+}
+
+function u8 ActSelect.GetNumZonePreviews(u8 zone, u8 act)
+{
+	return 2
+}
+
+
+function void ActSelect.Menu(u8 fadeInMethod)
+{
+	constant string MENU_FONT = "oxyfont_regular:gradient:outline(0x000000ff,1,false):shadow(1,1,0.5f,0.8f)"
+	constant string TITLE_FONT = "sonic3_fontC:gradient:outline(0x000000ff,1,false):shadow(1,1,0.5f,1.0f)"
+
+	// TODO: Add a proper fade-in, depending on fadeInMethod
+
+	// Load palette for the background
+	{
+		copyMemory(0xfffffc00, 0x39d262, 0x20)
+		for (u32 i = 0; i < 0x20; ++i)
+		{
+			u16[0xfffffc00 + i * 2] = blendColorsPacked(u16[0xfffffc00 + i * 2], 0x0eee, 0x80)
+		}
+
+		copyMemory(0xfffffc80, 0xfffffc00, 0x20)
+		for (u32 i = 0; i < 0x20; ++i)
+		{
+			Renderer.setPaletteColor(i, unpackColor(u16[0xfffffc80 + i * 2]))
+		}
+	}
+
+	// TODO: Make these persistent, or somehow semi-persistent (only persist during application run-time)?
+	u8 selectedEntry = 0
+	u8 selectedZone = 0			// Using the order of zones as shown to the player, not the internal zone IDs
+	u8 selectedAct = 0			// Starting at 0 for Act 1
+	levelselect.characters = 0
+
+	u8 previewImage = 0
+	float previewAnimationDelay = 0.0f
+	float previewAnimationPosition = 0.0f
+
+	constant float KEY_REPEAT_TIMEOUT = 0.4f
+	constant float KEY_REPEAT_DELAY   = 0.125f
+	float keyRepeatTimer = KEY_REPEAT_TIMEOUT
+	s8 lastPressedInput = -1
+
+	constant u8 RESULT_NONE       = 0
+	constant u8 RESULT_START_GAME = 1
+	constant u8 RESULT_GO_BACK    = 2
+
+	u8 result = RESULT_NONE
+	while (result == RESULT_NONE)
+	{
+		Renderer.resetSprites()
+
+		s16 anchorX = getScreenWidth() / 2
+		float deltaSeconds = 1.0f / 60.0f
+
+		// Background
+		{
+			SpriteHandle spr = Renderer.addSpriteHandle("bg_dataselect", s16(getScreenWidth() - 512) / 2, 0, 0x5000)
+			spr.setBlendMode(0)		// Render fully opaque
+
+			Renderer.enableDefaultPlane(0, false)
+			Renderer.enableDefaultPlane(1, false)
+			Renderer.enableDefaultPlane(2, false)
+			Renderer.enableDefaultPlane(3, false)
+		}
+
+		// Level preview
+		{
+			// Update animation
+			constant float MOVE_TIME = 2.5f
+			constant float CHANGE_TIME = 0.6f
+
+			if (previewAnimationDelay < MOVE_TIME)
+			{
+				previewAnimationDelay += deltaSeconds
+			}
+			else
+			{
+				previewAnimationPosition += deltaSeconds / CHANGE_TIME
+				if (previewAnimationPosition >= 1.0f)
+				{
+					previewAnimationDelay = 0.0f
+					previewAnimationPosition = 0.0f
+					previewImage = (previewImage + 1) % ActSelect.GetNumZonePreviews(selectedZone, selectedAct)
+				}
+			}
+
+			// Render the preview sprites
+			s16 offset = -Math.roundToInt((1.0f - Math.cos(previewAnimationPosition * PI_FLOAT)) * 40.0f)
+			string key = ActSelect.GetZonePreviewKey(selectedZone, selectedAct, previewImage)
+			Renderer.drawSprite(key, s16(getScreenWidth() - 480) / 2 + offset, 18, 0, 0x10, 0xf004)
+
+			if (previewAnimationPosition > 0.0f)
+			{
+				s16 splitX = Math.roundToInt((1.0f - previewAnimationPosition) * getScreenWidth())
+				Renderer.setViewport(splitX, 0, getScreenWidth() - splitX, getScreenHeight(), 0xf005)
+
+				offset += 80
+				key = ActSelect.GetZonePreviewKey(selectedZone, selectedAct, previewImage + 1)
+				Renderer.drawSprite(key, s16(getScreenWidth() - 480) / 2 + offset, 18, 0, 0x10, 0xf006)
+
+				Renderer.resetViewport(0xf007)
+			}
+
+			// Render the border
+			Renderer.drawSprite("level_preview_border_left", 0, 8, 0, 0x00, 0xf008)
+			Renderer.drawSpriteTransformed("level_preview_border_center", getScreenWidth() / 2, 8, 0, 0x00, 0xf008, 0xffffffff, float(getScreenWidth() - 20) / 10.0f, 0.0f, 0.0f, 1.0f)
+			Renderer.drawSprite("level_preview_border_right", getScreenWidth(), 8, 0, 0x00, 0xf008)
+		}
+
+		// Title text
+		Renderer.drawText(TITLE_FONT, anchorX, 12, "ACT SELECT", 0xffffffff, 5, 0, 0xf010, false, true)
+
+		// Character preview
+		{
+			s16 px = max(anchorX - 125, 52)		// Move to the right in 4:3
+			Renderer.drawSprite("charselectionbox", px + 3, 159, 0, 0x00, 0xf002)
+			Renderer.drawSprite(ActSelect.GetCharacterCombinationSprite(levelselect.characters), px, 156, 0, 0x00, 0xf004)
+		}
+
+		// Render menu texts
+		constant array<s16> TEXT_LINE_Y = { 121, 143, 165, 203 }
+		for (u32 entryIndex = 0; entryIndex < 4; ++entryIndex)
+		{
+			bool isSelected = (entryIndex == selectedEntry)
+			u32 color = isSelected ? 0xffff00ff : 0xffffffe8
+
+			bool canGoLeft = false
+			bool canGoRight = false
+
+			string text
+			if (entryIndex == 0)
+			{
+				text = ActSelect.GetZoneName(selectedZone)
+				canGoLeft = (selectedZone > 0)
+				canGoRight = (selectedZone < ActSelect.GetNumZones() - 1)
+			}
+			else if (entryIndex == 1)
+			{
+				if (ActSelect.GetNumActs(selectedZone) == 1)
+					text = "Single Act"
+				else
+					text = stringformat("Act %d", selectedAct + 1)
+				canGoLeft = (selectedZone > 0 || selectedAct > 0)
+				canGoRight = (selectedZone < ActSelect.GetNumZones() - 1 || selectedAct < ActSelect.GetNumActs(selectedZone) - 1)
+			}
+			else if (entryIndex == 2)
+			{
+				text = ActSelect.GetCharacterCombinationName(levelselect.characters)
+				canGoLeft = (levelselect.characters > 0)
+				canGoRight = (levelselect.characters < ActSelect.GetNumCharacterCombinations() - 1)
+			}
+			else
+			{
+				text = "Back"
+			}
+
+			s16 px = anchorX
+			s16 py = TEXT_LINE_Y[entryIndex]
+
+			s16 arrowAnimOffset = 0
+			if (isSelected)
+			{
+				float seconds = global.framecounter / 60.0f
+				arrowAnimOffset = Math.roundToInt(seconds * 6.0f) % 6
+				arrowAnimOffset = (arrowAnimOffset > 3) ? (6 - arrowAnimOffset) : arrowAnimOffset
+			}
+
+			if (canGoLeft)
+				Renderer.drawText(MENU_FONT, px - 50 - arrowAnimOffset, py, "<", color, 5, 0, 0xf000, false, true)
+			if (canGoRight)
+				Renderer.drawText(MENU_FONT, px + 110 + arrowAnimOffset, py, ">", color, 5, 0, 0xf000, false, true)
+
+			Renderer.drawText(MENU_FONT, px + 29, py, text, color, 5, 0, 0xf000, false, true)
+		}
+
+		waitForNextFrame()
+
+		// Handle key repeat
+		s8 currentInput = -1
+		{
+			if (Input.buttonPressed(BUTTON_UP))
+				currentInput = BUTTON_UP
+			else if (Input.buttonPressed(BUTTON_DOWN))
+				currentInput = BUTTON_DOWN
+			else if (Input.buttonPressed(BUTTON_LEFT))
+				currentInput = BUTTON_LEFT
+			else if (Input.buttonPressed(BUTTON_RIGHT))
+				currentInput = BUTTON_RIGHT
+			else if (lastPressedInput >= 0 && Input.buttonDown(lastPressedInput))
+				currentInput = lastPressedInput
+
+			lastPressedInput = currentInput
+
+			if (currentInput == -1)
+			{
+				// No input at all, so reset key repeat
+				keyRepeatTimer = KEY_REPEAT_TIMEOUT
+			}
+			else if (Input.buttonPressed(currentInput))
+			{
+				// Input pressed for the first frame now
+				keyRepeatTimer = KEY_REPEAT_TIMEOUT
+			}
+			else
+			{
+				// Input held down
+				keyRepeatTimer -= deltaSeconds
+				if (keyRepeatTimer <= 0.001f)
+					keyRepeatTimer = KEY_REPEAT_DELAY
+				else
+					currentInput = -1
+			}
+		}
+
+		s8 entryChange = (currentInput == BUTTON_UP) ? -1 : (currentInput == BUTTON_DOWN) ? 1 : 0
+		if (entryChange != 0)
+		{
+			Audio.playAudio(0x5b)
+			selectedEntry = (selectedEntry + 4 + entryChange) % 4
+		}
+
+		s8 optionChange = (currentInput == BUTTON_LEFT) ? -1 : (currentInput == BUTTON_RIGHT) ? 1 : 0
+		if (optionChange != 0)
+		{
+			u8 oldZone = selectedZone
+			u8 oldAct = selectedAct
+			u16 oldCharacters = levelselect.characters
+
+			if (selectedEntry == 0)
+			{
+				selectedZone = clamp(s16(selectedZone) + optionChange, 0, ActSelect.GetNumZones() - 1)
+				selectedAct = clamp(selectedAct, 0, ActSelect.GetNumActs(selectedZone) - 1)
+			}
+			else if (selectedEntry == 1)
+			{
+				if (optionChange < 0)
+				{
+					if (selectedAct > 0)
+					{
+						--selectedAct
+					}
+					else if (selectedZone > 0)
+					{
+						--selectedZone
+						selectedAct = ActSelect.GetNumActs(selectedZone) - 1
+					}
+				}
+				else
+				{
+					if (selectedAct < ActSelect.GetNumActs(selectedZone) - 1)
+					{
+						++selectedAct
+					}
+					else if (selectedZone < ActSelect.GetNumZones() - 1)
+					{
+						++selectedZone
+						selectedAct = 0
+					}
+				}
+			}
+			else if (selectedEntry == 2)
+			{
+				levelselect.characters = clamp(s16(levelselect.characters) + optionChange, 0, ActSelect.GetNumCharacterCombinations() - 1)
+			}
+
+			if (selectedZone != oldZone || selectedAct != oldAct)
+			{
+				Audio.playAudio(0x5b)
+				previewAnimationDelay = 0.0f
+				previewAnimationPosition = 0.0f
+				previewImage = 0
+			}
+			else if (levelselect.characters != oldCharacters)
+			{
+				Audio.playAudio(0x5b)
+			}
+		}
+
+		if (Input.buttonPressed(BUTTON_START))
+		{
+			result = (selectedEntry == 3) ? RESULT_GO_BACK : RESULT_START_GAME
+		}
+		else if (Input.buttonPressed(BUTTON_B) || Input.buttonPressed(BUTTON_BACK))
+		{
+			result = 2
+		}
+	}
+
+	if (result == RESULT_START_GAME)
+	{
+		// Start game now
+		global.zone_act = ActSelect.TranslateZoneAct(selectedZone, selectedAct)
+		Audio.playAudio(0xaf)
+
+		EntryFunctions.sharedInit()
+		System.setupCallFrame("GameModeControlLoop", "@EntryPoint")
+		System.setupCallFrame("LevelSelect.startGame")
+	}
+	else if (result == RESULT_GO_BACK)
+	{
+		// TODO: Go back
+		// TODO: Fix music behavior when going back
+		Audio.playAudio(0xad)
+	}
+}
