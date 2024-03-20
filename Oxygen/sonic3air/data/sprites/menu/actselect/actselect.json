@@ -1,0 +1,7 @@
+{
+	"charselectionbox": { "File": "charselectionbox.png", "Rect": "0,0,80,88", "Center": "40,44" },
+
+	"level_preview_border_left":   { "File": "level_preview_border.png", "Rect":  "0,0,10,100", "Center": "0,0" },
+	"level_preview_border_center": { "File": "level_preview_border.png", "Rect": "10,0,10,100", "Center": "5,0" },
+	"level_preview_border_right":  { "File": "level_preview_border.png", "Rect": "20,0,10,100", "Center": "10,0" }
+}

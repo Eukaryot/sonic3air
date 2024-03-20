@@ -270,7 +270,7 @@ void ActSelectMenu::render()
 
 	// Show character selection
 	{
-		drawer.drawRect(Recti(anchorX - 162, 115, 80, 88), global::mCharSelectionBox, Color(1.0f, 1.0f, 1.0f, alpha));
+		drawer.drawSprite(Vec2i(anchorX - 122, 159), rmx::getMurmur2_64("charselectionbox"), Color(1.0f, 1.0f, 1.0f, alpha));
 
 		static const uint64 charSpriteKey[5] =
 		{

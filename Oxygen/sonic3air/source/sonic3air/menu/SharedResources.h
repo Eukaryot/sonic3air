@@ -41,13 +41,11 @@ namespace global
 	extern DrawerTexture mDataSelectBackground;
 	extern DrawerTexture mDataSelectAltBackground;
 	extern DrawerTexture mLevelSelectBackground;
-	extern DrawerTexture mPreviewBorder;
 	extern DrawerTexture mOptionsTopBar;
-	extern DrawerTexture mCharSelectionBox;
 	extern DrawerTexture mAchievementsFrame;
 	extern DrawerTexture mTimeAttackResultsBG;
 
-	extern std::map<ZoneActPreviewKey, DrawerTexture> mZoneActPreview;
+	extern std::map<ZoneActPreviewKey, uint64> mZoneActPreviewSpriteKeys;
 	extern std::map<uint32, DrawerTexture> mAchievementImage;
 	extern std::map<uint32, DrawerTexture> mSecretImage;
 
