@@ -43,6 +43,12 @@ function void loadupDataSelect()
 }
 
 
+function void EntryFunctions.actSelectMenu()
+{
+	ActSelect.Menu(1)	// 1 for normal fade-in
+}
+
+
 function void EntryFunctions.actSelect()
 {
 	EntryFunctions.sharedInit()

@@ -38,12 +38,14 @@ private:
 		SHOW,
 		FADE_TO_TITLESCREEN,
 		FADE_TO_DATASELECT,
+		FADE_TO_ACTSELECT,
 		FADE_TO_SUBMENU,
 		FADE_TO_EXIT
 	};
 
 private:
 	void triggerStartNormalGame();
+	void triggerStartActSelect();
 	void startNormalGame();
 	void openActSelectMenu();
 	void openTimeAttack();

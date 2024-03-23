@@ -12,6 +12,12 @@
 // Act Select Screen (new menu for S3AIR)                //
 //-------------------------------------------------------//
 
+#if STANDALONE
+
+// Note for modding:
+//  Don't try to overload the constant array definitions - their names and structure may change in the future.
+//  Instead, overload the functions like "ActSelect.GetNumZones", "ActSelect.GetZoneName", etc.
+
 constant array<string> ActSelect.ZONES =
 {
 	"Angel Island Zone",
@@ -27,7 +33,7 @@ constant array<string> ActSelect.ZONES =
 	"Hidden Palace Zone",
 	"Sky Sanctuary Zone",
 	"Death Egg Zone",
-	"Doomsday Zone"			// TODO: DDZ must respect the unlocked secret flag
+	"Doomsday Zone"		// This is left out in "ActSelect.GetNumZones" if the respective secret is not unlocked
 }
 
 constant array<u8> ActSelect.ACTS_PER_ZONE =
@@ -68,7 +74,10 @@ constant array<u8> ActSelect.ZONE_INTERNAL_IDS =
 
 function u8 ActSelect.GetNumZones()
 {
-	return ActSelect.ZONES.length()
+	u8 numZones = ActSelect.ZONES.length()
+	if (!Game.isSecretUnlocked(SECRET_DOOMSDAY_ZONE))
+		--numZones
+	return numZones
 }
 
 function string ActSelect.GetZoneName(u8 zoneNumber)
@@ -93,7 +102,7 @@ constant array<string> ActSelect.CHARACTER_COMBINATION_NAME =
 	"Sonic",
 	"Tails",
 	"Knuckles",
-	"Knuckles & Tails"		// TODO: "Knuckles & Tails" must respect the unlocked secret flag
+	"Knuckles & Tails"		// This is left out in "ActSelect.GetNumCharacterCombinations" if the respective secret is not unlocked
 }
 
 constant array<string> ActSelect.CHARACTER_COMBINATION_SPRITE =
@@ -107,7 +116,10 @@ constant array<string> ActSelect.CHARACTER_COMBINATION_SPRITE =
 
 function u8 ActSelect.GetNumCharacterCombinations()
 {
-	return ActSelect.CHARACTER_COMBINATION_NAME.length()
+	u8 numCharacterCombinations = ActSelect.CHARACTER_COMBINATION_NAME.length()
+	if (!Game.isSecretUnlocked(SECRET_KNUX_AND_TAILS))
+		--numCharacterCombinations
+	return numCharacterCombinations
 }
 
 function string ActSelect.GetCharacterCombinationName(u8 index)
@@ -136,8 +148,6 @@ function void ActSelect.Menu(u8 fadeInMethod)
 	constant string MENU_FONT = "oxyfont_regular:gradient:outline(0x000000ff,1,false):shadow(1,1,0.5f,0.8f)"
 	constant string TITLE_FONT = "sonic3_fontC:gradient:outline(0x000000ff,1,false):shadow(1,1,0.5f,1.0f)"
 
-	// TODO: Add a proper fade-in, depending on fadeInMethod
-
 	// Load palette for the background
 	{
 		copyMemory(0xfffffc00, 0x39d262, 0x20)
@@ -153,7 +163,9 @@ function void ActSelect.Menu(u8 fadeInMethod)
 		}
 	}
 
-	// TODO: Make these persistent, or somehow semi-persistent (only persist during application run-time)?
+	playMusic(MUSIC_DATASELECT)
+
+	// TODO: Maybe make these persistent, or somehow semi-persistent (only persist during application run-time)?
 	u8 selectedEntry = 0
 	u8 selectedZone = 0			// Using the order of zones as shown to the player, not the internal zone IDs
 	u8 selectedAct = 0			// Starting at 0 for Act 1
@@ -162,6 +174,7 @@ function void ActSelect.Menu(u8 fadeInMethod)
 	u8 previewImage = 0
 	float previewAnimationDelay = 0.0f
 	float previewAnimationPosition = 0.0f
+	u32 frameCounter = 0
 
 	constant float KEY_REPEAT_TIMEOUT = 0.4f
 	constant float KEY_REPEAT_DELAY   = 0.125f
@@ -179,6 +192,32 @@ function void ActSelect.Menu(u8 fadeInMethod)
 
 		s16 anchorX = getScreenWidth() / 2
 		float deltaSeconds = 1.0f / 60.0f
+		++frameCounter
+
+		if (fadeInMethod == 1 && frameCounter <= 0x18)
+		{
+			// Fade from black
+			u16 blendFactorR = clamp(s32(frameCounter - 0x10) * 0x20, 0, 0x100)
+			u16 blendFactorG = clamp(s32(frameCounter - 0x08) * 0x20, 0, 0x100)
+			u16 blendFactorB = clamp(    frameCounter         * 0x20, 0, 0x100)
+
+			for (u32 i = 0; i < 0x20; ++i)
+			{
+				u32 color = unpackColor(u16[0xfffffc00 + i * 2])
+				u32 r = (( color        & 0xff) * blendFactorR) >> 8
+				u32 g = (((color >> 8)  & 0xff) * blendFactorG) >> 8
+				u32 b = (((color >> 16) & 0xff) * blendFactorB) >> 8
+				color = r + (g << 8) + (b << 16)
+
+				u16[0xfffffc80 + i * 2] = packColor(color)
+				Renderer.setPaletteColor(i, color)
+			}
+
+			globalComponentTintColorR = blendFactorR
+			globalComponentTintColorG = blendFactorG
+			globalComponentTintColorB = blendFactorB
+		}
+		// fadeInMethod == 2 may be used later for a transition that makes content move in, like in the C++ version of this menu
 
 		// Background
 		{
@@ -419,15 +458,20 @@ function void ActSelect.Menu(u8 fadeInMethod)
 		// Start game now
 		global.zone_act = ActSelect.TranslateZoneAct(selectedZone, selectedAct)
 		Audio.playAudio(0xaf)
-
-		EntryFunctions.sharedInit()
-		System.setupCallFrame("GameModeControlLoop", "@EntryPoint")
-		System.setupCallFrame("LevelSelect.startGame")
+		System.setupCallFrame("EntryFunctions.actSelect")
 	}
 	else if (result == RESULT_GO_BACK)
 	{
-		// TODO: Go back
-		// TODO: Fix music behavior when going back
-		Audio.playAudio(0xad)
+		playSound(0xad)
+
+		u32 backupA0 = A0
+		FadeOutScreenBlocking()
+		A0 = backupA0
+
+		// Do not fade out music in this case, Data Select music is meant to keep playing
+		Game.returnToMainMenu()
+		yieldExecution()
 	}
 }
+
+#endif

@@ -55,6 +55,7 @@ public:
 
 	void startIntoTitleScreen();
 	void startIntoDataSelect();
+	void startIntoActSelect();
 	void startIntoLevel(Mode mode, uint32 submode, uint16 zoneAndAct, uint8 characters);
 	void restartLevel();
 	void restartAtCheckpoint();

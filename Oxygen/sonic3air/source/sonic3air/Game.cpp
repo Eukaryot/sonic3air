@@ -341,6 +341,16 @@ void Game::startIntoDataSelect()
 	startIntoGameInternal();
 }
 
+void Game::startIntoActSelect()
+{
+	mMode = Mode::ACT_SELECT;
+
+	Simulation& simulation = Application::instance().getSimulation();
+	simulation.resetIntoGame("EntryFunctions.actSelectMenu");
+
+	startIntoGameInternal();
+}
+
 void Game::startIntoLevel(Mode mode, uint32 submode, uint16 zoneAndAct, uint8 characters)
 {
 	mMode = mode;
