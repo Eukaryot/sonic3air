@@ -19,8 +19,6 @@ public:
 	typedef std::list<LoadCallbackType> LoadCallbackList;
 	static LoadCallbackList mStaticLoadCallbacks;
 
-	static const constexpr int MAX_FRAME_LENGTH = 4096;		// Maximum length of an audio frame in samples -- this is the length of all audio frames, except the last
-
 public:
 	AudioBuffer();
 	~AudioBuffer();
@@ -54,11 +52,16 @@ public:
 	void unlock();
 
 private:
+	static const constexpr int MAX_FRAME_LENGTH = 4096;		// Maximum length of an audio frame in samples -- this is the length of all audio frames, except the last
+
 	struct AudioFrame
 	{
 		short* mBuffer = nullptr;				// Holds all audio data
 		short* mData[2] = { nullptr, nullptr };	// Pointers into the buffer, one for each channel
 		int mLength = 0;						// Length in samples
+
+		explicit AudioFrame(int channels);
+		~AudioFrame();
 	};
 
 private:
