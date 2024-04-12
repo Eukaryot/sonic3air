@@ -62,12 +62,9 @@ Application::Application() :
 
 Application::~Application()
 {
-	delete mGameApp;
-	delete mGameView;
 	delete mGameLoader;
 	delete mSaveStateMenu;
 	delete mSimulation;
-	delete mTouchControlsOverlay;
 }
 
 void Application::initialize()
@@ -114,11 +111,9 @@ void Application::deinitialize()
 	RMX_LOG_INFO("");
 	RMX_LOG_INFO("--- SHUTDOWN ---");
 
-	// Remove all children, as they must not get deleted automatically (which would be the case if they stay added as children)
-	while (!mChildren.empty())
-	{
-		removeChild(*mChildren.begin());
-	}
+	// Destroy game app here already, instead of using the auto-deletion of children
+	deleteChild(mGameApp);
+	mGameApp = nullptr;
 
 	EngineMain::getDelegate().shutdownGame();
 

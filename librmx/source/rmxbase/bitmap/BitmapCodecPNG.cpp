@@ -318,7 +318,7 @@ bool BitmapCodecPNG::decode(Bitmap& bitmap, InputStream& stream, Bitmap::LoadRes
 				// 24-bit RGB
 				case 2:
 					for (int i = 0; i < width; ++i)
-						dst[i] = 0xff000000 + (*(uint32*)(&src[i*3]) & 0x00ffffff);
+						dst[i] = 0xff000000 + (readUint32LE(&src[i*3]) & 0x00ffffff);
 					break;
 
 				// Palette image

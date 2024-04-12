@@ -157,6 +157,11 @@ namespace
 }
 
 
+FontCollection::~FontCollection()
+{
+	clear();
+}
+
 Font* FontCollection::getFontByKey(uint64 keyHash)
 {
 	// Try to find in map
@@ -204,13 +209,17 @@ bool FontCollection::registerManagedFont(Font& font, std::string_view key)
 	return true;
 }
 
-void FontCollection::reloadAll()
+void FontCollection::clear()
 {
-	// Load main game fonts
 	mCollectedFonts.clear();
 	mFontsByKeyHash.clear();
 	mFontPool.clear();
+}
 
+void FontCollection::reloadAll()
+{
+	// Load main game fonts
+	clear();
 	loadDefinitionsFromPath(L"data/font/", nullptr);
 
 	collectFromMods();
@@ -339,6 +348,7 @@ void FontCollection::updateLoadedFonts()
 		// If loading failed for all definitions, remove the collected font instance
 		if (collectedFont.mLoadedDefinitionIndex == -1 && collectedFont.mManagedFonts.size() <= 1)
 		{
+			delete &collectedFont;
 			keysToRemove.push_back(key);
 		}
 	}

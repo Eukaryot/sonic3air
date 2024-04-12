@@ -47,6 +47,7 @@ namespace lemon
 
 	protected:
 		inline Variable(Type type) : mType(type) {}
+		virtual ~Variable() {}
 
 	private:
 		Type mType;

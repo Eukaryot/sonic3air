@@ -31,6 +31,7 @@ SoundEmulation::SoundEmulation() :
 SoundEmulation::~SoundEmulation()
 {
 	delete &mInternal;
+	shutdown();
 }
 
 bool SoundEmulation::init(int samplerate, double framerate)
