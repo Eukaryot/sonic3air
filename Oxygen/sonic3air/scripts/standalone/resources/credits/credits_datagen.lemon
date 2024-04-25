@@ -185,6 +185,12 @@ function u32 CreditsDataGenerator.build(u8 creditsIndex)
 		CreditsDataGenerator.addLine(line+2, 0, "HEYJOEWAY")
 		line += 0x10
 
+		CreditsDataGenerator.addLine(line,   1, "PSVITA PORT")
+		CreditsDataGenerator.addLine(line+2, 0, "GLEENTWINE")
+		CreditsDataGenerator.addLine(line+3, 0, "RINNEGATAMANTE")
+		CreditsDataGenerator.addLine(line+4, 0, "MDASHK")
+		line += 0x12
+
 		CreditsDataGenerator.addLine(line,   1, "ADDITIONAL CREDITS")
 		CreditsDataGenerator.addLine(line+2, 0, "CARJEM GENERATIONS")
 		CreditsDataGenerator.addLine(line+3, 0, "MASATO NAKAMURA")
@@ -213,7 +219,7 @@ function u32 CreditsDataGenerator.build(u8 creditsIndex)
 		// Note: If changing the number of lines in the credits, make sure to also adjust "u32 lines" in "fn05b514()"
 
 		// Some spaces, then signal end
-		line = 0x68		// This is chosen to match timing
+		line = 0x79		// This is chosen to match timing
 		CreditsDataGenerator.addLine(line, 0x10, 0, "   ")
 		CreditsDataGenerator.addSignal(0xfff4)
 	}

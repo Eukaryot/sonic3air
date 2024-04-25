@@ -28,7 +28,12 @@ namespace rmx
 	uint8* OneTimeAllocPool::allocateMemory(size_t bytes)
 	{
 		// Always round up to a multiple of 8 bytes, to ensure correct memory alignment on 64-bit machines (avoiding SIGBUS fault on ARM)
+	#if !defined(PLATFORM_VITA)
 		bytes = ((bytes + 7) & ~(size_t)0x07);
+	#else
+		// Let's use 4 bytes for the PSVITA
+		bytes = ((bytes + 3) & ~(size_t)0x03);
+	#endif
 		if (bytes > mRemainingSize)
 		{
 			RMX_CHECK(bytes <= mPageSize, "Too large memory allocation of " << bytes << " bytes", return nullptr);

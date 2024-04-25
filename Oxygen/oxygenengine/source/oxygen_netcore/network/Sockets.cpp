@@ -33,6 +33,10 @@
 
 #endif
 
+#ifdef __vita__
+	#define SOMAXCONN 4096
+#endif
+
 
 void Sockets::startupSockets()
 {
@@ -60,7 +64,7 @@ void Sockets::shutdownSockets()
 
 bool Sockets::resolveToIP(const std::string& hostName, std::string& outIP)
 {
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) || defined(__vita__)
 	// Just return the input
 	outIP = hostName;
 	return true;

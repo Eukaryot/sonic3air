@@ -11,7 +11,7 @@
 
 namespace rmx
 {
-#if defined(__arm__)
+#if defined(__arm__) && !defined(__vita__)
 
 	// Do not access memory directly, but byte-wise to avoid "SIGBUS illegal alignment" issues (this can happen e.g. in Android Release builds)
 

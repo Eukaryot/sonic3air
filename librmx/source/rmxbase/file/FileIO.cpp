@@ -40,7 +40,7 @@
 	#include <dirent.h>
 	#include <sys/stat.h>
 
-#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_SWITCH) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_SWITCH) || defined(PLATFORM_IOS) || defined(PLATFORM_VITA)
 	// This requires Android NDK 22
 	#include <filesystem>
 	namespace std_filesystem = std::filesystem;
@@ -413,6 +413,13 @@ namespace rmx
 	{
 		if (path.empty())
 			return path;
+
+	#ifdef PLATFORM_VITA
+		// Assume that the path is always normal when it begins with ux0:/data
+		const WString t(path);
+		if (t.startsWith(L"ux0:/data/") || t.startsWith(L"ux0:data/"))
+			return path;
+	#endif
 
 		// Split the path into a list of directory / file names
 		std::wstring_view names[32];

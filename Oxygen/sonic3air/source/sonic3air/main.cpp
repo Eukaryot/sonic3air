@@ -13,6 +13,51 @@
 
 #include "oxygen/platform/PlatformFunctions.h"
 
+#if defined(PLATFORM_VITA)
+	#include <vitasdk.h>
+	#include <vitaGL.h>
+	#include "platform/vita/trophies.h"
+
+	int init_msg_dialog(const char* msg)
+	{
+		SceMsgDialogUserMessageParam msg_param;
+		memset(&msg_param, 0, sizeof(msg_param));
+		msg_param.buttonType = SCE_MSG_DIALOG_BUTTON_TYPE_OK;
+		msg_param.msg = (SceChar8 *)msg;
+
+		SceMsgDialogParam param;
+		sceMsgDialogParamInit(&param);
+		_sceCommonDialogSetMagicNumber(&param.commonParam);
+		param.mode = SCE_MSG_DIALOG_MODE_USER_MSG;
+		param.userMsgParam = &msg_param;
+
+		return sceMsgDialogInit(&param);
+	}
+
+	void warning(const char* msg)
+	{
+		init_msg_dialog(msg);
+
+		while (sceMsgDialogGetStatus() != SCE_COMMON_DIALOG_STATUS_FINISHED) {
+			vglSwapBuffers(GL_TRUE);
+		}
+		sceMsgDialogTerm();
+	}
+
+	void fatal_error(const char* msg)
+	{
+		vglInit(0);
+		warning(msg);
+		sceKernelExitProcess(0);
+		while (1);
+	}
+
+	int file_exists(const char* path)
+	{
+		SceIoStat stat;
+		return sceIoGetstat(path, &stat) >= 0;
+	}
+#endif
 
 // HJW: I know it's sloppy to put this here... it'll get moved afterwards
 // Building with my env (msys2,gcc) requires this stub for some reason
@@ -32,11 +77,20 @@ extern "C"
 }
 #endif
 
+#if defined(PLATFORM_VITA)
+extern "C"
+{
+	// Any value highter than 324 MB will make the game either boot without sound or just crash the PSVITA due to lack of physical RAM
+	int _newlib_heap_size_user = 324 * 1024 * 1024;
+	unsigned int sceUserMainThreadStackSize = 4 * 1024 * 1024;	
+}
+#endif
 
 int main(int argc, char** argv)
 {
 	EngineMain::earlySetup();
 
+#if !defined(PLATFORM_VITA)
 	// Read command line arguments
 	ArgumentsReader arguments;
 	arguments.read(argc, argv);
@@ -50,6 +104,32 @@ int main(int argc, char** argv)
 
 	// Make sure we're in the correct working directory
 	PlatformFunctions::changeWorkingDirectory(arguments.mExecutableCallPath);
+#else
+	scePowerSetArmClockFrequency(444);
+	scePowerSetBusClockFrequency(222);
+	scePowerSetGpuClockFrequency(222);
+	scePowerSetGpuXbarClockFrequency(166);
+
+	// Check for libshacccg.suprx existence
+	if (!file_exists("ur0:/data/libshacccg.suprx") && !file_exists("ur0:/data/external/libshacccg.suprx"))
+		fatal_error("Error: libshacccg.suprx is not installed.");
+
+	vglInitExtended(0, 960, 544, 12 * 1024 * 1024, SCE_GXM_MULTISAMPLE_NONE);
+
+	// Initing trophy system
+	SceIoStat st;
+	int r = trophies_init();
+	if (r < 0 && sceIoGetstat("ux0:data/sonic3air/trophies.chk", &st) < 0) {
+		FILE *f = fopen("ux0:data/sonic3air/trophies.chk", "w");
+		fclose(f);
+		warning("This game features unlockable trophies but NoTrpDrm is not installed. If you want to be able to unlock trophies, please install it.");
+	}
+
+	argc = 0;
+
+	PlatformFunctions::changeWorkingDirectory(L"ux0:/data/sonic3air");
+	ArgumentsReader arguments;
+#endif
 
 #if defined(PLATFORM_WINDOWS)
 	// Check if the user has an old version of "audioremaster.bin", and remove it if that the case
@@ -58,7 +138,7 @@ int main(int argc, char** argv)
 		FTX::FileSystem->removeFile(L"data/audioremaster.bin");
 #endif
 
-#if !defined(PLATFORM_ANDROID)
+#if !defined(PLATFORM_ANDROID) && !defined(PLATFORM_VITA)
 	if (arguments.mPack)
 	{
 		PackageBuilder::performPacking();

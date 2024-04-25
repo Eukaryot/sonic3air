@@ -74,7 +74,7 @@ namespace rmx
 		const uint64* data64 = (const uint64_t*)data;
 		const uint64* end = data64 + (bytes / 8);
 
-	#if defined(__arm__)
+	#if defined(__arm__) || defined(__vita__)
 		const bool isAligned64 = ((size_t)data & 7) == 0;
 		if (!isAligned64)
 		{

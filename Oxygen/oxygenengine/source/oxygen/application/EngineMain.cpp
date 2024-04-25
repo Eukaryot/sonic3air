@@ -92,12 +92,14 @@ EngineMain::~EngineMain()
 
 void EngineMain::execute(int argc, char** argv)
 {
+#if !defined(PLATFORM_VITA)
 	// Setup arguments
 	mArguments.reserve(argc);
 	for (int i = 0; i < argc; ++i)
 	{
 		mArguments.emplace_back(argv[i]);
 	}
+#endif
 
 	// Startup the Oxygen engine part that is independent from the application / project
 	if (startupEngine())
@@ -228,7 +230,7 @@ bool EngineMain::startupEngine()
 		return false;
 
 	std::wstring argumentProjectPath;
-#ifndef PLATFORM_ANDROID
+#if !defined(PLATFORM_ANDROID) && !defined(PLATFORM_VITA)
 	// Parse arguments
 	for (size_t i = 1; i < mArguments.size(); ++i)
 	{
@@ -372,7 +374,7 @@ void EngineMain::initDirectories()
 	const EngineDelegateInterface::AppMetaData& appMetaData = mDelegate.getAppMetaData();
 	Configuration& config = Configuration::instance();
 
-#if !defined(PLATFORM_ANDROID)
+#if !defined(PLATFORM_ANDROID) && !defined(PLATFORM_VITA)
 	config.mExePath = *String(mArguments[0]).toWString();
 #endif
 
@@ -383,6 +385,9 @@ void EngineMain::initDirectories()
 		// TODO: Use internal storage path as a fallback?
 		WString storagePath = String(SDL_AndroidGetExternalStoragePath()).toWString();
 		config.mAppDataPath = *(storagePath + L'/');
+	#elif defined(PLATFORM_VITA)
+		// Vita
+		config.mAppDataPath = L"ux0:data/sonic3air/savedata/";
 	#elif !defined(PLATFORM_IOS)
 		// Choose app data path
 		{
@@ -489,7 +494,7 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 	if (config.mRenderMethod > Configuration::getHighestSupportedRenderMethod())
 		config.mRenderMethod = Configuration::getHighestSupportedRenderMethod();
 
-#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_VITA)
 	// Use fullscreen, with no borders please
 	//  -> Note that this doesn't work for the web version, if running in mobile browsers - we rely on a window with fixed size (see config.json) there
 	config.mWindowMode = Configuration::WindowMode::EXCLUSIVE_FULLSCREEN;

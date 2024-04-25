@@ -17,6 +17,11 @@
 	#pragma comment(lib, "minizip.lib")
 #endif
 
+#if defined(PLATFORM_VITA)
+	#include <zlib.h>
+	#include <mz_compat.h>
+#endif
+
 #include "unzip.h"
 
 
@@ -402,7 +407,11 @@ const ZipFileProvider::ContainedFile* ZipFileProvider::readFile(const std::wstri
 		return containedFile;
 	}
 
+#if defined(PLATFORM_VITA)
+	int result = unzLocateFile(mInternal.mZipFile, *WString(fileEntry.mPath + fileEntry.mFilename).toString(), (unzFileNameComparer)1);
+#else
 	int result = unzLocateFile(mInternal.mZipFile, *WString(fileEntry.mPath + fileEntry.mFilename).toString(), 1);
+#endif
 	if (result != UNZ_OK)
 		return nullptr;
 

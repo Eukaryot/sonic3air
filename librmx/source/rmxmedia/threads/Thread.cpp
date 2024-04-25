@@ -67,7 +67,11 @@ namespace rmx
 	{
 		if (!mIsThreadRunning)
 		{
+		#if !defined(PLATFORM_VITA)
 			mSDLThread = SDL_CreateThread(ThreadBase::runThreadStatic, mName.c_str(), this);
+		#else
+			mSDLThread = SDL_CreateThreadWithStackSize(ThreadBase::runThreadStatic, mName.c_str(), 4 * 1024 * 1024, this);
+		#endif
 		}
 	}
 

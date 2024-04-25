@@ -232,12 +232,14 @@ namespace softwaredrawer
 			int k = 0;
 			if constexpr (sizeof(void*) == 8)
 			{
+			#if !defined(PLATFORM_VITA)
 				// On 64-bit architectures: Process 2 pixels at once
 				for (; k < numPixels; k += 2)
 				{
 					const uint64 colors = *(uint64*)&src[k];
 					*(uint64*)&dst[k] = ((colors & 0x00ff000000ff0000ull) >> 16) | (colors & 0xff00ff00ff00ff00ull) | ((colors & 0x000000ff000000ffull) << 16);
 				}
+			#endif
 			}
 			// Process single pixels
 			for (; k < numPixels; ++k)

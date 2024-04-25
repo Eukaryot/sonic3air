@@ -922,7 +922,7 @@ void InputManager::setControllerLEDsForPlayer(int playerIndex, const Color& colo
 {
 #if SDL_VERSION_ATLEAST(2, 0, 14)
 	// TODO: Remove some of these exclusions where possible
-	#if !defined(PLATFORM_WEB) && !defined(PLATFORM_SWITCH) && !(defined(PLATFORM_WINDOWS) && defined(__GNUC__))
+	#if !defined(PLATFORM_WEB) && !defined(PLATFORM_SWITCH) && !defined(PLATFORM_VITA) && !(defined(PLATFORM_WINDOWS) && defined(__GNUC__))
 		for (size_t i = 0; i < mGamepads.size(); ++i)
 		{
 			if (mGamepads[i].mAssignedPlayer == playerIndex && nullptr != mGamepads[i].mSDLGameController)

@@ -22,6 +22,12 @@
 
 #include "unzip.h"
 
+#ifdef PLATFORM_VITA
+	#include <cstring>
+	#include <cstdio>
+	#include <cstdlib>
+#endif
+
 
 namespace
 {
@@ -154,8 +160,26 @@ bool FileHelper::loadBitmap(Bitmap& bitmap, const std::wstring& filename, bool s
 	bool FileHelper::loadShader(Shader& shader, const std::wstring& filename, const std::string& techname, const std::string& additionalDefines)
 	{
 		std::vector<uint8> content;
+	#ifndef PLATFORM_VITA
 		if (!FTX::FileSystem->readFile(filename, content))
 			return false;
+	#else
+		std::string filename_str = WString(filename).toStdString();
+		char realp[512] = {0};
+		size_t sz;
+		sprintf(realp, "ux0:data/sonic3air/%s", filename_str.c_str());
+		FILE* f = fopen(realp, "rb");
+		fseek(f, 0, SEEK_END);
+		sz = ftell(f);
+		fseek(f, 0, SEEK_SET);
+
+		uint8* buffer = (uint8*)malloc(sz);
+		fread(buffer, 1, sz, f);
+		fclose(f);
+
+		content.assign(buffer, buffer + sz);
+		free(buffer);
+	#endif
 
 		if (shader.load(content, techname, additionalDefines))
 		{

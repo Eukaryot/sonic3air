@@ -105,7 +105,10 @@ void OpenGLRenderer::initialize()
 		mRenderPaletteSpriteShader[k].initialize(k == 1);
 		mRenderComponentSpriteShader[k].initialize(k == 1);
 	}
+
+#if !defined(PLATFORM_VITA)
 	mDebugDrawPlaneShader.initialize();
+#endif
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth(0.0f);		// Corresponds to -1.0f inside the depth range [-1.0f, 1.0f]
