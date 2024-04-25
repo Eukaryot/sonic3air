@@ -35,7 +35,10 @@ For information on how to build for different platforms, find the readme files i
 * Linux:   "_cmake"
 * Android: "_android"
 * Web:     "_emscripten"
-* Switch:  "_make"
+* Switch:  "_make" (unmaintained)
+
+Additional platform ports:
+* Vita: See https://github.com/v-atamanenko/sonic3air
 
 
 ## External dependencies
@@ -62,6 +65,9 @@ Source code contributions by:
 * Heyjoeway
 * Carjem Generations
 * Ultracoolguy
+* gl33ntwine
+* Rinnegatamante
+* MDashK
 
 Remastered soundtrack by:
 * G Spindash
