@@ -299,8 +299,10 @@ function void fn01a75c()
 	objA0.velocity.y += 0x18
 	if (objA0.velocity.y >= 0)
 	{
-		D0.u8 = (global.framecounter + D7.u8) & 0x07
-		if (D0.u8 == 0)
+		// For standalone, perform these checks in each frame, not just every 8th frame (which probably was originally done for performance)
+	#if !STANDALONE
+		if (((global.framecounter + D7.u8) & 7) == 0)
+	#endif
 		{
 			if (objA0.render_flags & render_flag.VISIBLE)
 			{
@@ -361,8 +363,10 @@ function void fn01a7e8()
 	objA0.velocity.y += 0x18
 	if (objA0.velocity.y >= 0)
 	{
-		D0.u8 = (global.framecounter + D7.u8) & 0x07
-		if (D0.u8 == 0)
+		// For standalone, perform these checks in each frame, not just every 8th frame (which probably was originally done for performance)
+	#if !STANDALONE
+		if (((global.framecounter + D7.u8) & 7) == 0)
+	#endif
 		{
 			if (objA0.render_flags & render_flag.VISIBLE)
 			{
