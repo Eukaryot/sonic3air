@@ -406,11 +406,11 @@ bool GameMenuEntries::changeSelectedIndex(int change, bool loop)
 	const int originalIndex = mSelectedEntryIndex;
 	if (change < 0)
 	{
-		mSelectedEntryIndex = getPreviousInteractableIndex(mSelectedEntryIndex, loop);
+		mSelectedEntryIndex = (int)getPreviousInteractableIndex(mSelectedEntryIndex, loop);
 	}
 	else if (change > 0)
 	{
-		mSelectedEntryIndex = getNextInteractableIndex(mSelectedEntryIndex, loop);
+		mSelectedEntryIndex = (int)getNextInteractableIndex(mSelectedEntryIndex, loop);
 	}
 	return (mSelectedEntryIndex != originalIndex);
 }
