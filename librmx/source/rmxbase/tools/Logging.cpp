@@ -67,6 +67,21 @@ namespace rmx
 	void StdCoutLogger::log(LogLevel logLevel, const std::string& string)
 	{
 	#if !defined(PLATFORM_VITA)		
+	#if defined(PLATFORM_WINDOWS)
+		// Use different color in console output on Windows
+		const HANDLE handle = ::GetStdHandle(STD_OUTPUT_HANDLE);
+		const constexpr WORD defaultColor = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
+		WORD color;
+		switch (logLevel)
+		{
+			case LogLevel::TRACE:	color = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY;	break;	// Cyan
+			case LogLevel::WARNING:	color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;	break;	// Yellow
+			case LogLevel::ERROR:	color = FOREGROUND_RED | FOREGROUND_INTENSITY;						break;	// Red
+			default:				color = defaultColor;												break;	// Gray
+		}
+		SetConsoleTextAttribute(handle, color);
+	#endif
+
 		// Write to std::cout
 		if (mAddTimestamp)
 		{
@@ -82,6 +97,7 @@ namespace rmx
 		{
 			OutputDebugString((string + "\r\n").c_str());
 		}
+		SetConsoleTextAttribute(handle, defaultColor);
 	#elif defined(PLATFORM_ANDROID)
 		{
 			__android_log_print(ANDROID_LOG_INFO, "rmx", "%s", string.c_str());
