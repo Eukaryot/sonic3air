@@ -62,6 +62,7 @@ namespace lemon
 
 		// Constant arrays
 		mConstantArrays.clear();
+		mNumGlobalConstantArrays = 0;
 
 		// Defines
 		for (Define* define : mDefines)

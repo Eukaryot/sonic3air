@@ -141,12 +141,18 @@ bool LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsL
 				text += "Caused in module " + module.getModuleName() + ".";
 			else
 				text += "Caused in file '" + WString(error.mFilename).toStdString() + "', line " + std::to_string(error.mError.mLineNumber) + ", of module '" + module.getModuleName() + "'.";
-			RMX_ERROR(text, );
+
+			// Don't show an assert break message box again during debugging, because LEMON_DEBUG_BREAK already brought one up
+			if (!rmx::ErrorHandling::isDebuggerAttached())
+			{
+				RMX_ERROR(text, );
+			}
 			return false;
 		}
 	}
 	catch (...)
 	{
+		RMX_ERROR("Script compilation failed due to an unhandled exception", );
 		return false;
 	}
 
@@ -222,7 +228,6 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 
 					// If there are no script functions at all, we consider that a failure
 					scriptsLoaded = scriptsLoaded && !mInternal.mScriptModule.getScriptFunctions().empty();
-					RMX_CHECK(scriptsLoaded, "Failed to compile scripts from source at '" << filename << "'", );
 
 					if (scriptsLoaded && !config.mCompiledScriptSavePath.empty())
 					{
