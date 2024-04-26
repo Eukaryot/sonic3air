@@ -839,6 +839,7 @@ function void checkGroundCollisionAtX(u16 px)
 //# address-hook(0x00f994) end(0x00f9b6)
 function void fn00f994()
 {
+	// Used by spilled ring
 	D3.u16 = objA0.position.x.u16
 	D2.u16 = objA0.position.y.u16 + objA0.hitbox_extends.y
 	u8[0xfffff768] = 0
@@ -1170,9 +1171,8 @@ function void fn00fdec()
 	}
 	D3.u16 = objA0.position.x.u16 ^ 0x0f
 	D2.u16 = objA0.position.y.u16 - objA0.hitbox_extends.y
-	A4 = 0xfffff768
-	u8[A4] = 0
-	A3 = 0xffff0000 + 0xfff0
+	u8[0xfffff768] = 0
+	A3 = -0x10
 	D6.u16 = 0x0400
 	D5.u8 = u8[A0 + 0x47]
 	CheckStaticCollisionHorizontal()
