@@ -9,7 +9,7 @@
 #include "rmxmedia.h"
 
 
-Font::CodecList Font::mCodecs;
+rmx::FontCodecList rmx::FontCodecList::mCodecs;
 
 
 int FontKey::compare(const FontKey& other) const
@@ -470,7 +470,7 @@ FontSource* Font::getFontSource()
 	{
 		mFontSourceDirty = false;
 		RMX_ASSERT(nullptr == mFontSource, "Font source is expected to be a null pointer");
-		for (IFontSourceFactory* factory : Font::mCodecs.mList)
+		for (IFontSourceFactory* factory : rmx::FontCodecList::mCodecs.mList)
 		{
 			mFontSource = factory->construct(mKey);
 			if (nullptr != mFontSource)

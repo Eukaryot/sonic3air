@@ -9,7 +9,8 @@
 #include "rmxbase.h"
 
 
-Bitmap::CodecList Bitmap::mCodecs;
+rmx::BitmapCodecList rmx::BitmapCodecList::mCodecs;
+
 
 Bitmap::Bitmap()
 {
@@ -258,7 +259,7 @@ void Bitmap::setPixel(int x, int y, float red, float green, float blue, float al
 bool Bitmap::decode(InputStream& stream, Bitmap::LoadResult& outResult, const char* format)
 {
 	// Load bitmap from memory
-	for (IBitmapCodec* codec : mCodecs.mList)
+	for (rmx::IBitmapCodec* codec : rmx::BitmapCodecList::mCodecs.mList)
 	{
 		if (nullptr != format && !codec->canDecode(format))
 			continue;
@@ -274,7 +275,7 @@ bool Bitmap::decode(InputStream& stream, Bitmap::LoadResult& outResult, const ch
 
 bool Bitmap::encode(OutputStream& stream, const char* format) const
 {
-	for (IBitmapCodec* codec : mCodecs.mList)
+	for (rmx::IBitmapCodec* codec : rmx::BitmapCodecList::mCodecs.mList)
 	{
 		if (!codec->canEncode(format))
 			continue;

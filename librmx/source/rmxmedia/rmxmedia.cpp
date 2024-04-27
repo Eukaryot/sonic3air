@@ -41,8 +41,8 @@ void rmxmedia::initialize()
 	}
 
 	// Initialize font factories
-	Font::mCodecs.add<FontSourceStdFactory>();
-	Font::mCodecs.add<FontSourceBitmapFactory>();
+	rmx::FontCodecList::mCodecs.add<FontSourceStdFactory>();
+	rmx::FontCodecList::mCodecs.add<FontSourceBitmapFactory>();
 }
 
 void rmxmedia::getBuildInfo(String& info)

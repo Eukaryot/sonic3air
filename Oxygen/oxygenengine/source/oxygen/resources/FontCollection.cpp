@@ -211,6 +211,15 @@ bool FontCollection::registerManagedFont(Font& font, std::string_view key)
 
 void FontCollection::clear()
 {
+	for (auto& [key, collectedFont] : mCollectedFonts)
+	{
+		for (Font* font : collectedFont.mManagedFonts)
+		{
+			font->injectFontSource(nullptr);
+		}
+		delete collectedFont.mFontSource;
+	}
+
 	mCollectedFonts.clear();
 	mFontsByKeyHash.clear();
 	mFontPool.clear();

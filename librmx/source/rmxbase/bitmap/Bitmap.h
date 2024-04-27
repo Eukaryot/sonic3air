@@ -143,12 +143,36 @@ private:
 	uint32* mData = nullptr;
 	int mWidth = 0;
 	int mHeight = 0;
-
-public:
-	struct API_EXPORT CodecList
-	{
-		std::vector<class IBitmapCodec*> mList;
-		template<class CLASS> void add()  { mList.push_back(new CLASS()); }
-	};
-	static CodecList mCodecs;
 };
+
+
+namespace rmx
+{
+	class API_EXPORT IBitmapCodec
+	{
+	public:
+		virtual bool canDecode(const String& format) const  { return false; }
+		virtual bool canEncode(const String& format) const  { return false; }
+		virtual bool decode(Bitmap& bitmap, InputStream& stream, Bitmap::LoadResult& outResult)  { return false; }
+		virtual bool encode(const Bitmap& bitmap, OutputStream& stream)  { return false; }
+	};
+
+	class API_EXPORT BitmapCodecList
+	{
+	public:
+		std::vector<IBitmapCodec*> mList;
+
+	public:
+		~BitmapCodecList()
+		{
+			for (IBitmapCodec* codec : mList)
+				delete codec;
+			mList.clear();
+		}
+
+		template<class CLASS> void add()  { mList.push_back(new CLASS()); }
+
+	public:
+		static BitmapCodecList mCodecs;
+	};
+}

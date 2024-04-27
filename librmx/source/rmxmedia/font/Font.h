@@ -137,16 +137,7 @@ private:
 	float mAdvance = 0.0f;
 	std::map<uint32, CharacterInfo> mCharacterMap;
 	uint32 mChangeCounter = 0;			// This is meant for classes like OpenGLFontOutput, so that it knows when to invalidate its caching
-
-public:
-	struct API_EXPORT CodecList
-	{
-		std::vector<class IFontSourceFactory*> mList;
-		template<class CLASS> void add() { mList.push_back(new CLASS()); }
-	};
-	static CodecList mCodecs;
 };
-
 
 
 class IFontSourceFactory
@@ -166,3 +157,26 @@ class FontSourceBitmapFactory : public IFontSourceFactory
 public:
 	virtual FontSource* construct(const FontSourceKey& key) override;
 };
+
+
+namespace rmx
+{
+	class API_EXPORT FontCodecList
+	{
+	public:
+		std::vector<IFontSourceFactory*> mList;
+
+	public:
+		~FontCodecList()
+		{
+			for (IFontSourceFactory* codec : mList)
+				delete codec;
+			mList.clear();
+		}
+
+		template<class CLASS> void add()  { mList.push_back(new CLASS()); }
+
+	public:
+		static FontCodecList mCodecs;
+	};
+}
