@@ -91,6 +91,28 @@ namespace lemon
 		return (it == mFunctionsByName.end()) ? EMPTY_FUNCTIONS : it->second;
 	}
 
+	const Function* GlobalsLookup::getFunctionByNameAndSignature(uint64 nameHash, uint32 signatureHash, bool* outAnyFound) const
+	{
+		const std::vector<Function*>& candidateFunctions = getFunctionsByName(nameHash);
+		if (candidateFunctions.empty())
+		{
+			if (nullptr != outAnyFound)
+				*outAnyFound = false;
+		}
+		else
+		{
+			if (nullptr != outAnyFound)
+				*outAnyFound = true;
+
+			for (const Function* func : candidateFunctions)
+			{
+				if (func->getSignatureHash() == signatureHash)
+					return func;
+			}
+		}
+		return nullptr;
+	}
+
 	const std::vector<Function*>& GlobalsLookup::getMethodsByName(uint64 contextNameHash) const
 	{
 		static const std::vector<Function*> EMPTY_FUNCTIONS;

@@ -165,33 +165,83 @@ bool LemonScriptRuntime::callUpdateHook(bool postUpdate)
 
 bool LemonScriptRuntime::callAddressHook(uint32 address)
 {
-	const lemon::RuntimeFunction** runtimeFunctionPtr = mInternal.mAddressHookLookup.find(address);
-	if (nullptr != runtimeFunctionPtr)
+	switch (address >> 28)
 	{
-		mInternal.mRuntime.callRuntimeFunction(**runtimeFunctionPtr);
-	}
-	else
-	{
-		// Get the hook from the program first
-		const LemonScriptProgram::Hook* hook = mProgram.checkForAddressHook(address);
-		if (nullptr == hook)
-			return false;
+		case 0:
+		{
+			// Address hook
+			const lemon::RuntimeFunction** runtimeFunctionPtr = mInternal.mAddressHookLookup.find(address);
+			if (nullptr != runtimeFunctionPtr)
+			{
+				mInternal.mRuntime.callRuntimeFunction(**runtimeFunctionPtr);
+			}
+			else
+			{
+				// Get the hook from the program first
+				const LemonScriptProgram::Hook* hook = mProgram.checkForAddressHook(address);
+				if (nullptr == hook)
+					return false;
 
-		// Try to get the respective runtime function
-		RMX_ASSERT(nullptr != hook->mFunction, "Invalid address hook function");
-		const lemon::RuntimeFunction* runtimeFunction = mInternal.mRuntime.getRuntimeFunction(*hook->mFunction);
-		if (nullptr != runtimeFunction)
-		{
-			mInternal.mAddressHookLookup.add(address, runtimeFunction);
-			mInternal.mRuntime.callRuntimeFunction(*runtimeFunction);
+				// Try to get the respective runtime function
+				RMX_ASSERT(nullptr != hook->mFunction, "Invalid address hook function");
+				const lemon::RuntimeFunction* runtimeFunction = mInternal.mRuntime.getRuntimeFunction(*hook->mFunction);
+				if (nullptr != runtimeFunction)
+				{
+					mInternal.mAddressHookLookup.add(address, runtimeFunction);
+					mInternal.mRuntime.callRuntimeFunction(*runtimeFunction);
+				}
+				else
+				{
+					RMX_ASSERT(false, "Unable to get runtime function for address hook at " << rmx::hexString(hook->mAddress, 8));
+					mInternal.mRuntime.callFunction(*hook->mFunction);
+				}
+			}
+			return true;
 		}
-		else
+
+		case 1:
 		{
-			RMX_ASSERT(false, "Unable to get runtime function for address hook at " << rmx::hexString(hook->mAddress, 8));
-			mInternal.mRuntime.callFunction(*hook->mFunction);
+			// Callable function address (via "makeCallable")
+			// TODO: Optimize this by using a direct lookup from address to RuntimeFunction
+			const lemon::Function* function = mInternal.mRuntime.getProgram().resolveCallableFunctionAddress(address);
+			if (nullptr == function)
+				return false;
+
+			switch (function->getType())
+			{
+				case lemon::Function::Type::SCRIPT:
+				{
+					const lemon::RuntimeFunction* runtimeFunction = mInternal.mRuntime.getRuntimeFunction(*static_cast<const lemon::ScriptFunction*>(function));
+					if (nullptr != runtimeFunction)
+					{
+						mInternal.mRuntime.callRuntimeFunction(*runtimeFunction);
+						return true;
+					}
+					else
+					{
+						RMX_ASSERT(false, "Unable to get runtime function for callable address " << rmx::hexString(address, 8));
+						mInternal.mRuntime.callFunction(*function);
+					}
+					break;
+				}
+
+				case lemon::Function::Type::NATIVE:
+				{
+					mInternal.mRuntime.callFunction(*function);
+					return true;
+				}
+			}
+			break;
+		}
+
+		default:
+		{
+			// All others are invalid
+			RMX_ASSERT(false, "Invalid function address in call: " << rmx::hexString(address, 8));
+			break;
 		}
 	}
-	return true;
+	return false;
 }
 
 void LemonScriptRuntime::callFunction(const lemon::ScriptFunction& function)

@@ -56,6 +56,8 @@ namespace lemon
 		NativeFunction& addNativeFunction(FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, BitFlagSet<Function::Flag> flags = BitFlagSet<Function::Flag>());
 		NativeFunction& addNativeMethod(FlyweightString context, FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, BitFlagSet<Function::Flag> flags = BitFlagSet<Function::Flag>());
 
+		uint32 addOrFindCallableFunctionAddress(const Function& function);
+
 		// Variables
 		inline const std::vector<Variable*>& getGlobalVariables() const  { return mGlobalVariables; }
 		GlobalVariable& addGlobalVariable(FlyweightString name, const DataTypeDefinition* dataType);
@@ -106,6 +108,9 @@ namespace lemon
 		std::vector<ScriptFunction*> mScriptFunctions;
 		ObjectPool<ScriptFunction, 64> mScriptFunctionPool;
 		ObjectPool<NativeFunction, 32> mNativeFunctionPool;
+
+		// Callable function addresses
+		std::unordered_map<uint32, uint64> mCallableFunctions;
 
 		// Variables
 		uint32 mFirstVariableID = 0;

@@ -73,7 +73,7 @@ namespace lemon
 		mGlobalsLookup(globalsLookup),
 		mCompileOptions(compileOptions),
 		mLineNumberTranslation(lineNumberTranslation),
-		mTokenProcessing(globalsLookup, compileOptions),
+		mTokenProcessing(globalsLookup, module, compileOptions),
 		mFunctionNodes(functionNodes)
 	{
 	}

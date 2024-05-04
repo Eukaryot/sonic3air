@@ -52,6 +52,9 @@ namespace lemon
 		mNativeFunctionPool.clear();
 		mScriptFunctionPool.clear();
 
+		// Callable functions
+		mCallableFunctions.clear();
+
 		// Variables
 		for (Variable* var : mGlobalVariables)
 			delete var;
@@ -308,6 +311,22 @@ namespace lemon
 
 		addFunctionInternal(func);
 		return func;
+	}
+
+	uint32 Module::addOrFindCallableFunctionAddress(const Function& function)
+	{
+		const uint64 nameHash = function.getName().getHash();
+		const uint32 address = ((uint32)nameHash & 0x0fffffff) | 0x10000000;	// Value 1 in the uppermost 4 bits tells us that this is referring to a function
+		uint64& ref = mCallableFunctions[address];
+		if (ref == 0)
+		{
+			ref = nameHash;
+		}
+		else
+		{
+			RMX_ASSERT(ref == nameHash, "Conflict: Function '" << function.getName() << "' uses the same callable address " << rmx::hexString(address, 8) << " as a different function");
+		}
+		return address;
 	}
 
 	void Module::addFunctionInternal(Function& func)

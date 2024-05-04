@@ -12,6 +12,7 @@
 #include "lemon/compiler/TokenTypes.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/GlobalsLookup.h"
+#include "lemon/program/Module.h"
 #include "lemon/runtime/BuiltInFunctions.h"
 #include "lemon/runtime/OpcodeExecUtils.h"
 #include "lemon/runtime/Runtime.h"
@@ -117,8 +118,9 @@ namespace lemon
 	}
 
 
-	TokenProcessing::TokenProcessing(GlobalsLookup& globalsLookup, const CompileOptions& compileOptions) :
+	TokenProcessing::TokenProcessing(GlobalsLookup& globalsLookup, Module& module, const CompileOptions& compileOptions) :
 		mGlobalsLookup(globalsLookup),
+		mModule(module),
 		mCompileOptions(compileOptions),
 		mTypeCasting(compileOptions)
 	{
@@ -484,6 +486,7 @@ namespace lemon
 		// Resolve occurrences of "addressof" that refer to functions
 		//  -> These need to be resolved before processing the child tokens, because the function name as a sole identifier would cause a syntax error
 		resolveAddressOfFunctions(tokens);
+		resolveMakeCallable(tokens);
 
 		// Go through the child token lists
 		for (size_t i = 0; i < tokens.size(); ++i)
@@ -1191,6 +1194,42 @@ namespace lemon
 		return false;
 	}
 
+	void TokenProcessing::resolveMakeCallable(TokenList& tokens)
+	{
+		for (size_t i = 0; i + 1 < tokens.size(); ++i)
+		{
+			if (isKeyword(tokens[i], Keyword::MAKECALLABLE))
+			{
+				CHECK_ERROR(isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS), "makeCallable must be followed by parentheses", mLineNumber);
+				const TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
+				if (content.size() == 1 && content[0].isA<IdentifierToken>())
+				{
+					IdentifierToken& identifierToken = content[0].as<IdentifierToken>();
+
+					bool anyFound = false;
+					const Function* function = mGlobalsLookup.getFunctionByNameAndSignature(identifierToken.mName.getHash(), Function::getVoidSignatureHash(), &anyFound);
+					if (nullptr == function)
+					{
+						if (anyFound)
+							CHECK_ERROR(false, "Function '" << identifierToken.mName.getString() << "' in makeCallable must have no parameters and no return value", mLineNumber)
+						else
+							CHECK_ERROR(false, "Function '" << identifierToken.mName.getString() << "' in makeCallable is unknown", mLineNumber);
+					}
+
+					// Check module for existing registration, and add there if not
+					const uint32 address = mModule.addOrFindCallableFunctionAddress(*function);
+
+					// Replace makeCallable and the parenthesis with the callable address as a constant
+					ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
+					constantToken.mValue.set(address);
+					constantToken.mDataType = &PredefinedDataTypes::UINT_32;
+					tokens.erase(i+1);
+					break;
+				}
+			}
+		}
+	}
+
 	void TokenProcessing::resolveAddressOfFunctions(TokenList& tokens)
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
@@ -1203,32 +1242,29 @@ namespace lemon
 				{
 					IdentifierToken& identifierToken = content[0].as<IdentifierToken>();
 					const std::vector<Function*>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
-					if (!candidateFunctions.empty())
+					CHECK_ERROR(!candidateFunctions.empty(), "Unknown function '" << identifierToken.mName.getString() << "' in addressof", mLineNumber);
+
+					uint32 address = 0;
+					for (const Function* function : candidateFunctions)
 					{
-						uint32 address = 0;
-						for (const Function* function : candidateFunctions)
+						if (function->getType() == Function::Type::SCRIPT)
 						{
-							if (function->getType() == Function::Type::SCRIPT)
+							const std::vector<uint32>& addressHooks = static_cast<const ScriptFunction*>(function)->getAddressHooks();
+							if (!addressHooks.empty())
 							{
-								const std::vector<uint32>& addressHooks = static_cast<const ScriptFunction*>(function)->getAddressHooks();
-								if (!addressHooks.empty())
-								{
-									address = addressHooks[0];
-									break;
-								}
+								address = addressHooks[0];
+								break;
 							}
 						}
-						CHECK_ERROR(address != 0, "No address hook found for function '" << identifierToken.mName.getString() << "'", mLineNumber);
-
-						// Replace addressof and the parenthesis with the actual address as a constant
-						ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
-						constantToken.mValue.set(address);
-						constantToken.mDataType = &PredefinedDataTypes::UINT_32;
-						tokens.erase(i+1);
-						break;
 					}
+					CHECK_ERROR(address != 0, "No address hook found for function '" << identifierToken.mName.getString() << "'", mLineNumber);
 
-					CHECK_ERROR(false, "Address of identifier '" << identifierToken.mName.getString() << "' could not be determined", mLineNumber);
+					// Replace addressof and the parenthesis with the actual address as a constant
+					ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
+					constantToken.mValue.set(address);
+					constantToken.mDataType = &PredefinedDataTypes::UINT_32;
+					tokens.erase(i+1);
+					break;
 				}
 			}
 		}

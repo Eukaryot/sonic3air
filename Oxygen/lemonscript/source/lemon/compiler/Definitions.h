@@ -47,7 +47,8 @@ namespace lemon
 		ELSE,
 		WHILE,
 		FOR,
-		ADDRESSOF
+		ADDRESSOF,
+		MAKECALLABLE
 	};
 
 }

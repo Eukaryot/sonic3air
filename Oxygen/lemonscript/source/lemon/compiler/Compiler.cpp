@@ -43,7 +43,7 @@ namespace lemon
 		mModule(module),
 		mGlobalsLookup(globalsLookup),
 		mCompileOptions(compileOptions),
-		mTokenProcessing(globalsLookup, compileOptions),
+		mTokenProcessing(globalsLookup, module, compileOptions),
 		mPreprocessor(compileOptions, mTokenProcessing)
 	{
 	}

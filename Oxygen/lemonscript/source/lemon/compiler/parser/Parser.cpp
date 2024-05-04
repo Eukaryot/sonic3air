@@ -36,21 +36,22 @@ namespace lemon
 
 		static const std::map<uint64, Keyword> keywordLookup =
 		{
-			{ rmx::getMurmur2_64(String("function")),	Keyword::FUNCTION },
-			{ rmx::getMurmur2_64(String("global")),		Keyword::GLOBAL },
-			{ rmx::getMurmur2_64(String("constant")),	Keyword::CONSTANT },
-			{ rmx::getMurmur2_64(String("define")),		Keyword::DEFINE },
-			{ rmx::getMurmur2_64(String("declare")),	Keyword::DECLARE },
-			{ rmx::getMurmur2_64(String("return")),		Keyword::RETURN },
-			{ rmx::getMurmur2_64(String("call")),		Keyword::CALL },
-			{ rmx::getMurmur2_64(String("jump")),		Keyword::JUMP },
-			{ rmx::getMurmur2_64(String("break")),		Keyword::BREAK },
-			{ rmx::getMurmur2_64(String("continue")),	Keyword::CONTINUE },
-			{ rmx::getMurmur2_64(String("if")),			Keyword::IF },
-			{ rmx::getMurmur2_64(String("else")),		Keyword::ELSE },
-			{ rmx::getMurmur2_64(String("while")),		Keyword::WHILE },
-			{ rmx::getMurmur2_64(String("for")),		Keyword::FOR },
-			{ rmx::getMurmur2_64(String("addressof")),	Keyword::ADDRESSOF }
+			{ rmx::getMurmur2_64(String("function")),	  Keyword::FUNCTION },
+			{ rmx::getMurmur2_64(String("global")),		  Keyword::GLOBAL },
+			{ rmx::getMurmur2_64(String("constant")),	  Keyword::CONSTANT },
+			{ rmx::getMurmur2_64(String("define")),		  Keyword::DEFINE },
+			{ rmx::getMurmur2_64(String("declare")),	  Keyword::DECLARE },
+			{ rmx::getMurmur2_64(String("return")),		  Keyword::RETURN },
+			{ rmx::getMurmur2_64(String("call")),		  Keyword::CALL },
+			{ rmx::getMurmur2_64(String("jump")),		  Keyword::JUMP },
+			{ rmx::getMurmur2_64(String("break")),		  Keyword::BREAK },
+			{ rmx::getMurmur2_64(String("continue")),	  Keyword::CONTINUE },
+			{ rmx::getMurmur2_64(String("if")),			  Keyword::IF },
+			{ rmx::getMurmur2_64(String("else")),		  Keyword::ELSE },
+			{ rmx::getMurmur2_64(String("while")),		  Keyword::WHILE },
+			{ rmx::getMurmur2_64(String("for")),		  Keyword::FOR },
+			{ rmx::getMurmur2_64(String("addressof")),	  Keyword::ADDRESSOF },
+			{ rmx::getMurmur2_64(String("makeCallable")), Keyword::MAKECALLABLE }
 		};
 
 		static const std::vector<const char*> reservedKeywords =
