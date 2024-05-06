@@ -61,6 +61,7 @@ namespace rmx
 		bool mResizeable = true;		// Window mode only: Resizable window
 		bool mBorderless = false;		// Window mode only: Hide window frame / borderless window
 		bool mVSync = true;				// Use vertical sync
+		int mDisplayIndex = 0;			// Display index
 		bool mHideCursor = false;		// Show or hide mouse cursor
 		int mMultisampling = 0;			// Multisampling setting, usually 0 to disable
 		bool mAutoClearScreen = true;	// Automatically clear screen before rendering

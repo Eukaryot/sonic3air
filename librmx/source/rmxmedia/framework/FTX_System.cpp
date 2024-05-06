@@ -290,8 +290,8 @@ namespace rmx
 				flags |= SDL_WINDOW_RESIZABLE;
 		}
 
-		int startX = SDL_WINDOWPOS_UNDEFINED;
-		int startY = SDL_WINDOWPOS_UNDEFINED;
+		int startX = SDL_WINDOWPOS_CENTERED_DISPLAY(videoconfig.mDisplayIndex);
+		int startY = SDL_WINDOWPOS_CENTERED_DISPLAY(videoconfig.mDisplayIndex);
 		if (videoconfig.mPositioning)
 		{
 			startX = videoconfig.mStartPos.x;
@@ -379,7 +379,7 @@ namespace rmx
 		mInitialized = true;
 
 	#ifdef PLATFORM_WINDOWS
-		// Symbol setzen (Windows)
+		// Set icon (Windows)
 		if (mVideoConfig.mIconResource != 0)
 		{
 			HICON hIcon = LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(mVideoConfig.mIconResource));
