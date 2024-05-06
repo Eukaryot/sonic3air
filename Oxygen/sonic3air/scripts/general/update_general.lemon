@@ -131,7 +131,7 @@ function void updateGameObjectLoop()
 		D0 = u32[A0]
 		if (D0 != 0)
 		{
-			assert((D0 & 1) == 0 && D0 < 0x400000, "Invalid update routine address")	// Must be valid address in ROM
+			assert(isValidUpdateAddress(D0), "Invalid update routine address")
 			A1 = D0
 			call A1
 		}

@@ -1202,30 +1202,28 @@ namespace lemon
 			{
 				CHECK_ERROR(isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS), "makeCallable must be followed by parentheses", mLineNumber);
 				const TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
-				if (content.size() == 1 && content[0].isA<IdentifierToken>())
+				CHECK_ERROR(content.size() == 1 && content[0].isA<IdentifierToken>(), "makeCallable parameter must be a function name", mLineNumber);
+				IdentifierToken& identifierToken = content[0].as<IdentifierToken>();
+
+				bool anyFound = false;
+				const Function* function = mGlobalsLookup.getFunctionByNameAndSignature(identifierToken.mName.getHash(), Function::getVoidSignatureHash(), &anyFound);
+				if (nullptr == function)
 				{
-					IdentifierToken& identifierToken = content[0].as<IdentifierToken>();
-
-					bool anyFound = false;
-					const Function* function = mGlobalsLookup.getFunctionByNameAndSignature(identifierToken.mName.getHash(), Function::getVoidSignatureHash(), &anyFound);
-					if (nullptr == function)
-					{
-						if (anyFound)
-							CHECK_ERROR(false, "Function '" << identifierToken.mName.getString() << "' in makeCallable must have no parameters and no return value", mLineNumber)
-						else
-							CHECK_ERROR(false, "Function '" << identifierToken.mName.getString() << "' in makeCallable is unknown", mLineNumber);
-					}
-
-					// Check module for existing registration, and add there if not
-					const uint32 address = mModule.addOrFindCallableFunctionAddress(*function);
-
-					// Replace makeCallable and the parenthesis with the callable address as a constant
-					ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
-					constantToken.mValue.set(address);
-					constantToken.mDataType = &PredefinedDataTypes::UINT_32;
-					tokens.erase(i+1);
-					break;
+					if (anyFound)
+						CHECK_ERROR(false, "Function '" << identifierToken.mName.getString() << "' in makeCallable must have no parameters and no return value", mLineNumber)
+					else
+						CHECK_ERROR(false, "Function '" << identifierToken.mName.getString() << "' in makeCallable is unknown", mLineNumber);
 				}
+
+				// Check module for existing registration, and add there if not
+				const uint32 address = mModule.addOrFindCallableFunctionAddress(*function);
+
+				// Replace makeCallable and the parenthesis with the callable address as a constant
+				ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
+				constantToken.mValue.set(address);
+				constantToken.mDataType = &PredefinedDataTypes::UINT_32;
+				tokens.erase(i+1);
+				break;
 			}
 		}
 	}

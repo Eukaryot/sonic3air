@@ -769,3 +769,21 @@ function void Input.setControllerRumbleByAddress(u32 playerUpdateAddress, float 
 	Input.setControllerRumble(playerIndex, lowFrequencyRumble, highFrequencyRumble, milliseconds)
 #endif
 }
+
+
+
+//-------------------------------------------------------//
+// Misc                                                  //
+//-------------------------------------------------------//
+
+function bool isValidUpdateAddress(u32 address)
+{
+	// Must be either a valid address in ROM
+	if (address < 0x400000)
+	{
+		return (address & 1) == 0
+	}
+
+	// Or a callable function address
+	return ((D0 >> 28) == 1)
+}
