@@ -112,8 +112,11 @@ void Application::deinitialize()
 	RMX_LOG_INFO("--- SHUTDOWN ---");
 
 	// Destroy game app here already, instead of using the auto-deletion of children
-	deleteChild(mGameApp);
-	mGameApp = nullptr;
+	if (nullptr != mGameApp)
+	{
+		deleteChild(mGameApp);
+		mGameApp = nullptr;
+	}
 
 	EngineMain::getDelegate().shutdownGame();
 
