@@ -220,6 +220,11 @@ namespace
 		}
 	}
 
+	void System_removePersistentData(lemon::StringRef key)
+	{
+		PersistentData::instance().removeKey(key.getHash());
+	}
+
 	bool System_callFunctionByName(lemon::StringRef functionName)
 	{
 		if (!functionName.isValid())
@@ -908,6 +913,9 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 		builder.addNativeFunction("System.savePersistentData", lemon::wrap(&System_savePersistentData), defaultFlags)
 			.setParameters("sourceAddress", "key", "bytes");
+
+		builder.addNativeFunction("System.removePersistentData", lemon::wrap(&System_removePersistentData), defaultFlags)
+			.setParameters("key");
 
 
 		// System

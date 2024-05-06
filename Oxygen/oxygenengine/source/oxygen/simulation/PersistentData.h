@@ -20,6 +20,7 @@ public:
 
 	const std::vector<uint8>& getData(uint64 keyHash) const;
 	void setData(std::string_view key, const std::vector<uint8>& data);
+	void removeKey(uint64 keyHash);
 
 private:
 	bool serialize(VectorBinarySerializer& serializer);

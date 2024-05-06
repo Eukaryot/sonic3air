@@ -85,6 +85,16 @@ void PersistentData::setData(std::string_view key, const std::vector<uint8>& dat
 	}
 }
 
+void PersistentData::removeKey(uint64 keyHash)
+{
+	const auto it = mEntries.find(keyHash);
+	if (it != mEntries.end())
+	{
+		mEntries.erase(it);
+		saveToFile();
+	}
+}
+
 bool PersistentData::serialize(VectorBinarySerializer& serializer)
 {
 	// Identifier
