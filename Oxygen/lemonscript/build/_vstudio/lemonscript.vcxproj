@@ -93,6 +93,7 @@
     <ClInclude Include="..\..\source\lemon\program\FunctionWrapper.h" />
     <ClInclude Include="..\..\source\lemon\program\GlobalsLookup.h" />
     <ClInclude Include="..\..\source\lemon\program\Module.h" />
+    <ClInclude Include="..\..\source\lemon\program\ModuleBindingsBuilder.h" />
     <ClInclude Include="..\..\source\lemon\program\ModuleSerializer.h" />
     <ClInclude Include="..\..\source\lemon\program\Opcode.h" />
     <ClInclude Include="..\..\source\lemon\program\OpcodeHelper.h" />

@@ -147,9 +147,9 @@ declare function u32 string:length()
 declare function bool string:isEmpty()
 declare function u8 string:getCharacter(u32 index)
 declare function string string:getSubString(u32 index, u32 length)
-declare function bool string:startsWith(string)
-declare function bool string:endsWith(string)
-declare function s16 string:find(string)
+declare function bool string:startsWith(string substring)
+declare function bool string:endsWith(string substring)
+declare function s16 string:find(string substring)
 
 
 
