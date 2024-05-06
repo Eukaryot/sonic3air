@@ -141,7 +141,9 @@ namespace lemon
 				{
 					case DataTypeDefinition::Class::INTEGER:
 					{
-						content << rmx::hexString(constant->getValue().get<uint64>());
+						const uint64 value = constant->getValue().get<uint64>();
+						const int minDigits = constant->getDataType()->getBytes() * 2;
+						content << rmx::hexString(value, minDigits);
 						break;
 					}
 

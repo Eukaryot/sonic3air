@@ -155,6 +155,17 @@ declare function s16 string:find(string)
 
 // === Module 'OxygenCore' ===
 
+// Constants
+
+declare constant u8 BlendMode.OPAQUE = 0x00
+declare constant u8 BlendMode.ALPHA = 0x01
+declare constant u8 BlendMode.ADDITIVE = 0x03
+declare constant u8 BlendMode.SUBTRACTIVE = 0x04
+declare constant u8 BlendMode.MULTIPLICATIVE = 0x05
+declare constant u8 BlendMode.MINIMUM = 0x06
+declare constant u8 BlendMode.MAXIMUM = 0x07
+
+
 // Regular functions
 
 declare function void assert(u8, string)
