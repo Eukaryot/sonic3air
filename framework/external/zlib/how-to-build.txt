@@ -14,4 +14,6 @@ Alternative: Manual build
 
 
 Fixes to apply after updating
-	- There's a whole bunch of changes for minizip required, especially for Android and Web builds - see manual changes after last update
+	- In "zlib\contrib\minizip\ioapi.c":
+		- Add include "#include <stdio.h>"
+		- Append " || defined(ANDROID) || defined(__EMSCRIPTEN__)" in line 17 (or line 19 with the include above)
