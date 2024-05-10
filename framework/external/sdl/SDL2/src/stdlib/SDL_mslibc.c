@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -44,7 +44,9 @@ __declspec(selectany) int _fltused = 1;
 extern void *memcpy(void* dst, const void* src, size_t len);
 #pragma intrinsic(memcpy)
 
+#if !defined(__clang__)
 #pragma function(memcpy)
+#endif
 void *
 memcpy(void *dst, const void *src, size_t len)
 {
@@ -54,7 +56,9 @@ memcpy(void *dst, const void *src, size_t len)
 extern void *memset(void* dst, int c, size_t len);
 #pragma intrinsic(memset)
 
+#if !defined(__clang__)
 #pragma function(memset)
+#endif
 void *
 memset(void *dst, int c, size_t len)
 {
@@ -118,6 +122,12 @@ localexit:
 
 void
 _ftol2_sse()
+{
+    _ftol();
+}
+
+void
+_ftol2()
 {
     _ftol();
 }

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -916,7 +916,7 @@ D3D11_CreateWindowSizeDependentResources(SDL_Renderer * renderer)
 #if defined(__WINRT__)
     SDL_GetWindowSize(renderer->window, &w, &h);
 #else
-    WIN_GetDrawableSize(renderer->window, &w, &h);
+    SDL_GetWindowSizeInPixels(renderer->window, &w, &h);
 #endif
     data->rotation = D3D11_GetCurrentRotation();
     /* SDL_Log("%s: windowSize={%d,%d}, orientation=%d\n", __FUNCTION__, w, h, (int)data->rotation); */
@@ -1062,7 +1062,7 @@ D3D11_WindowEvent(SDL_Renderer * renderer, const SDL_WindowEvent *event)
 static int
 D3D11_GetOutputSize(SDL_Renderer * renderer, int *w, int *h)
 {
-    WIN_GetDrawableSize(renderer->window, w, h);
+    SDL_GetWindowSizeInPixels(renderer->window, w, h);
     return 0;
 }
 #endif
@@ -2288,7 +2288,7 @@ done:
     return status;
 }
 
-static void
+static int
 D3D11_RenderPresent(SDL_Renderer * renderer)
 {
     D3D11_RenderData *data = (D3D11_RenderData *) renderer->driverdata;
@@ -2334,7 +2334,7 @@ D3D11_RenderPresent(SDL_Renderer * renderer)
          *
          * TODO, WinRT: consider throwing an exception if D3D11_RenderPresent fails, especially if there is a way to salvage debug info from users' machines
          */
-        if ( result == DXGI_ERROR_DEVICE_REMOVED ) {
+        if (result == DXGI_ERROR_DEVICE_REMOVED) {
             D3D11_HandleDeviceLost(renderer);
         } else if (result == DXGI_ERROR_INVALID_CALL) {
             /* We probably went through a fullscreen <-> windowed transition */
@@ -2342,7 +2342,9 @@ D3D11_RenderPresent(SDL_Renderer * renderer)
         } else {
             WIN_SetErrorFromHRESULT(SDL_COMPOSE_ERROR("IDXGISwapChain::Present"), result);
         }
+        return -1;
     }
+    return 0;
 }
 
 #if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP

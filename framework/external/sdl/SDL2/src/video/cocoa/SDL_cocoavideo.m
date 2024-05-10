@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,6 +32,7 @@
 #include "SDL_cocoashape.h"
 #include "SDL_cocoavulkan.h"
 #include "SDL_cocoametalview.h"
+#include "SDL_cocoaopengles.h"
 
 @implementation SDL_VideoData
 
@@ -100,6 +101,7 @@ Cocoa_CreateDevice(void)
     device->SetWindowMinimumSize = Cocoa_SetWindowMinimumSize;
     device->SetWindowMaximumSize = Cocoa_SetWindowMaximumSize;
     device->SetWindowOpacity = Cocoa_SetWindowOpacity;
+    device->GetWindowSizeInPixels = Cocoa_GetWindowSizeInPixels;
     device->ShowWindow = Cocoa_ShowWindow;
     device->HideWindow = Cocoa_HideWindow;
     device->RaiseWindow = Cocoa_RaiseWindow;
@@ -133,7 +135,6 @@ Cocoa_CreateDevice(void)
     device->GL_UnloadLibrary = Cocoa_GL_UnloadLibrary;
     device->GL_CreateContext = Cocoa_GL_CreateContext;
     device->GL_MakeCurrent = Cocoa_GL_MakeCurrent;
-    device->GL_GetDrawableSize = Cocoa_GL_GetDrawableSize;
     device->GL_SetSwapInterval = Cocoa_GL_SetSwapInterval;
     device->GL_GetSwapInterval = Cocoa_GL_GetSwapInterval;
     device->GL_SwapWindow = Cocoa_GL_SwapWindow;

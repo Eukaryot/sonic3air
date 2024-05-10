@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -75,6 +75,7 @@
 #undef HAVE_STRING_H
 #undef HAVE_SYS_TYPES_H
 #undef HAVE_WCHAR_H
+#undef HAVE_LINUX_INPUT_H
 #undef HAVE_PTHREAD_NP_H
 #undef HAVE_LIBUNWIND_H
 
@@ -142,6 +143,7 @@
 #undef HAVE_STRCASECMP
 #undef HAVE__STRNICMP
 #undef HAVE_STRNCASECMP
+#undef HAVE_STRCASESTR
 #undef HAVE_SSCANF
 #undef HAVE_VSSCANF
 #undef HAVE_SNPRINTF
@@ -297,7 +299,6 @@
 #undef SDL_AUDIO_DRIVER_NETBSD
 #undef SDL_AUDIO_DRIVER_OPENSLES
 #undef SDL_AUDIO_DRIVER_OSS
-#undef SDL_AUDIO_DRIVER_OSS_SOUNDCARD_H
 #undef SDL_AUDIO_DRIVER_PAUDIO
 #undef SDL_AUDIO_DRIVER_PIPEWIRE
 #undef SDL_AUDIO_DRIVER_PIPEWIRE_DYNAMIC

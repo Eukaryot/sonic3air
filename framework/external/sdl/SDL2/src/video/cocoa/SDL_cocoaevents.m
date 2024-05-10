@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -333,6 +333,7 @@ GetApplicationName(void)
 static bool
 LoadMainMenuNibIfAvailable(void)
 {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
     NSDictionary *infoDict;
     NSString *mainNibFileName;
     bool success = false;
@@ -350,6 +351,9 @@ LoadMainMenuNibIfAvailable(void)
     }
     
     return success;
+#else
+    return false;
+#endif
 }
 
 static void

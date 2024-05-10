@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -133,10 +133,13 @@ using namespace XInputOnGameInput;
 #ifndef BATTERY_DEVTYPE_GAMEPAD
 #define BATTERY_DEVTYPE_GAMEPAD         0x00
 #endif
+
+#ifndef BATTERY_TYPE_DISCONNECTED
+#define BATTERY_TYPE_DISCONNECTED       0x00
+#endif
 #ifndef BATTERY_TYPE_WIRED
 #define BATTERY_TYPE_WIRED              0x01
 #endif
-
 #ifndef BATTERY_TYPE_UNKNOWN
 #define BATTERY_TYPE_UNKNOWN            0xFF
 #endif

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -189,14 +189,14 @@ SDL_WasapiDeviceEventHandler::OnEnumerationCompleted(DeviceWatcher^ sender, Plat
 void
 SDL_WasapiDeviceEventHandler::OnDefaultRenderDeviceChanged(Platform::Object^ sender, DefaultAudioRenderDeviceChangedEventArgs^ args)
 {
-    SDL_assert(this->iscapture);
+    SDL_assert(!this->iscapture);
     SDL_AtomicAdd(&SDL_IMMDevice_DefaultPlaybackGeneration, 1);
 }
 
 void
 SDL_WasapiDeviceEventHandler::OnDefaultCaptureDeviceChanged(Platform::Object^ sender, DefaultAudioCaptureDeviceChangedEventArgs^ args)
 {
-    SDL_assert(!this->iscapture);
+    SDL_assert(this->iscapture);
     SDL_AtomicAdd(&SDL_IMMDevice_DefaultCaptureGeneration, 1);
 }
 

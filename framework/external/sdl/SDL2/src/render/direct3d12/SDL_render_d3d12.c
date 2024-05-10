@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -235,7 +235,7 @@ typedef struct
 
 /* Define D3D GUIDs here so we don't have to include uuid.lib. */
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-const-variable"
 #endif
@@ -260,7 +260,7 @@ static const GUID SDL_IID_ID3D12PipelineState = { 0x765a30f3, 0xf624, 0x4c6f, { 
 static const GUID SDL_IID_ID3D12Heap = { 0x6b3b2502, 0x6e51, 0x45b3, { 0x90, 0xee, 0x98, 0x84, 0x26, 0x5e, 0x8d, 0xf3 } };
 static const GUID SDL_IID_ID3D12InfoQueue = { 0x0742a90b, 0xc387, 0x483f, { 0xb9, 0x46, 0x30, 0xa7, 0xe4, 0xe6, 0x14, 0x58 } };
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
 
@@ -516,7 +516,7 @@ D3D12_DestroyRenderer(SDL_Renderer * renderer)
 static int
 D3D12_GetOutputSize(SDL_Renderer *renderer, int *w, int *h)
 {
-    WIN_GetDrawableSize(renderer->window, w, h);
+    SDL_GetWindowSizeInPixels(renderer->window, w, h);
     return 0;
 }
 
@@ -723,13 +723,9 @@ D3D12_CreateDeviceResources(SDL_Renderer* renderer)
     PFN_CREATE_DXGI_FACTORY CreateDXGIFactoryFunc;
     PFN_D3D12_CREATE_DEVICE D3D12CreateDeviceFunc;
 #endif
-#ifndef __GDK__
-    HMODULE kernel32;
     typedef HANDLE(WINAPI* PFN_CREATE_EVENT_EX)(LPSECURITY_ATTRIBUTES lpEventAttributes, LPCWSTR lpName, DWORD dwFlags, DWORD dwDesiredAccess);
     PFN_CREATE_EVENT_EX CreateEventExFunc;
-#else
-#define CreateEventExFunc CreateEventEx
-#endif
+
     D3D12_RenderData* data = (D3D12_RenderData*)renderer->driverdata;
     ID3D12Device* d3dDevice = NULL;
     HRESULT result = S_OK;
@@ -758,20 +754,22 @@ D3D12_CreateDeviceResources(SDL_Renderer* renderer)
     /* See if we need debug interfaces */
     createDebug = SDL_GetHintBoolean(SDL_HINT_RENDER_DIRECT3D11_DEBUG, SDL_FALSE);
 
-#ifndef __GDK__
+#ifdef __GDK__
+    CreateEventExFunc = CreateEventExW;
+#else
     /* CreateEventEx() arrived in Vista, so we need to load it with GetProcAddress for XP. */
-    kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
-    if (!kernel32) {
-        result = E_FAIL;
-        goto done;
+    {
+        HMODULE kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+        CreateEventExFunc = NULL;
+        if (kernel32) {
+            CreateEventExFunc = (PFN_CREATE_EVENT_EX) GetProcAddress(kernel32, "CreateEventExW");
+        }
     }
-
-    CreateEventExFunc = (PFN_CREATE_EVENT_EX) GetProcAddress(kernel32, "CreateEventExW");
+#endif
     if (!CreateEventExFunc) {
         result = E_FAIL;
         goto done;
     }
-#endif
 
 #if !defined(__XBOXONE__) && !defined(__XBOXSERIES__)
     data->hDXGIMod = SDL_LoadObject("dxgi.dll");
@@ -1298,7 +1296,7 @@ D3D12_CreateWindowSizeDependentResources(SDL_Renderer * renderer)
     /* The width and height of the swap chain must be based on the display's
      * non-rotated size.
      */
-    WIN_GetDrawableSize(renderer->window, &w, &h);
+    SDL_GetWindowSizeInPixels(renderer->window, &w, &h);
     data->rotation = D3D12_GetCurrentRotation();
     if (D3D12_IsDisplayRotated90Degrees(data->rotation)) {
         int tmp = w;
@@ -2943,7 +2941,7 @@ done:
     return status;
 }
 
-static void
+static int
 D3D12_RenderPresent(SDL_Renderer * renderer)
 {
     D3D12_RenderData *data = (D3D12_RenderData *) renderer->driverdata;
@@ -2993,6 +2991,7 @@ D3D12_RenderPresent(SDL_Renderer * renderer)
         } else {
             WIN_SetErrorFromHRESULT(SDL_COMPOSE_ERROR("IDXGISwapChain::Present"), result);
         }
+        return -1;
     } else {
         /* Wait for the GPU and move to the next frame */
         result = D3D_CALL(data->commandQueue, Signal, data->fence, data->fenceValue);
@@ -3024,6 +3023,7 @@ D3D12_RenderPresent(SDL_Renderer * renderer)
 #if defined(__XBOXONE__) || defined(__XBOXSERIES__)
         D3D12_XBOX_StartFrame(data->d3dDevice, &data->frameToken);
 #endif
+        return 0;
     }
 }
 

@@ -683,6 +683,7 @@ SDL_LIBS
 SDL_CFLAGS
 bin_prefix_relpath
 cmake_prefix_relpath
+SDL_VENDOR_INFO
 INSTALL_SDL2_CONFIG
 LIBUSB_LIBS
 LIBUSB_CFLAGS
@@ -707,6 +708,8 @@ DECOR_LIBS
 DECOR_CFLAGS
 FUSIONSOUND_LIBS
 FUSIONSOUND_CFLAGS
+SNDIO_LIBS
+SNDIO_CFLAGS
 ARTSCONFIG
 PULSEAUDIO_LIBS
 PULSEAUDIO_CFLAGS
@@ -840,6 +843,7 @@ enable_largefile
 enable_assertions
 enable_dependency_tracking
 enable_libc
+enable_system_iconv
 enable_gcc_atomics
 enable_atomic
 enable_audio
@@ -899,6 +903,7 @@ enable_libsamplerate
 enable_libsamplerate_shared
 enable_arm_simd
 enable_arm_neon
+enable_werror
 enable_video_wayland
 enable_video_wayland_qt_touch
 enable_wayland_shared
@@ -950,6 +955,7 @@ enable_foregrounding_signal
 enable_joystick_virtual
 enable_render_d3d
 enable_sdl2_config
+enable_vendor_info
 '
       ac_precious_vars='build_alias
 host_alias
@@ -976,6 +982,8 @@ PIPEWIRE_CFLAGS
 PIPEWIRE_LIBS
 PULSEAUDIO_CFLAGS
 PULSEAUDIO_LIBS
+SNDIO_CFLAGS
+SNDIO_LIBS
 FUSIONSOUND_CFLAGS
 FUSIONSOUND_LIBS
 DECOR_CFLAGS
@@ -1631,6 +1639,8 @@ Optional Features:
   --enable-dependency-tracking
                           Use gcc -MMD -MT dependency tracking [default=yes]
   --enable-libc           Use the system C library [default=yes]
+  --enable-system-iconv   Use iconv() from system-installed libraries
+                          [default=yes]
   --enable-gcc-atomics    Use gcc builtin atomics [default=yes]
   --enable-atomic         Enable the atomic operations subsystem [default=yes]
   --enable-audio          Enable the audio subsystem [default=yes]
@@ -1696,6 +1706,7 @@ Optional Features:
                           dynamically load libsamplerate [default=yes]
   --enable-arm-simd       use SIMD assembly blitters on ARM [default=no]
   --enable-arm-neon       use NEON assembly blitters on ARM [default=no]
+  --enable-werror         treat warnings as errors [default=no]
   --enable-video-wayland  use Wayland video driver [default=yes]
   --enable-video-wayland-qt-touch
                           QtWayland server support for Wayland video driver
@@ -1706,7 +1717,7 @@ Optional Features:
   --enable-libdecor-shared
                           dynamically load libdecor [default=yes]
   --enable-video-rpi      use Raspberry Pi 2/3 video driver [default=yes]
-  --enable-video-x11      use X11 video driver [default=yes]
+  --enable-video-x11      use X11 video driver [default=maybe]
   --enable-x11-shared     dynamically load X11 support [default=maybe]
   --enable-video-x11-xcursor
                           enable X11 Xcursor support [default=yes]
@@ -1734,7 +1745,7 @@ Optional Features:
   --enable-kmsdrm-shared  dynamically load kmsdrm support [default=yes]
   --enable-video-dummy    use dummy video driver [default=yes]
   --enable-video-offscreen
-                          use offscreen video driver [default=no]
+                          use offscreen video driver [default=yes]
   --enable-video-opengl   include OpenGL support [default=yes]
   --enable-video-opengles include OpenGL ES support [default=yes]
   --enable-video-opengles1
@@ -1772,6 +1783,8 @@ Optional Features:
                           enable virtual joystick APIs [default=yes]
   --enable-render-d3d     enable the Direct3D render driver [default=yes]
   --enable-sdl2-config    Install sdl2-config [default=yes]
+  --enable-vendor-info=STRING
+                          Add vendor info to SDL_REVISION
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1821,6 +1834,9 @@ Some influential environment variables:
               C compiler flags for PULSEAUDIO, overriding pkg-config
   PULSEAUDIO_LIBS
               linker flags for PULSEAUDIO, overriding pkg-config
+  SNDIO_CFLAGS
+              C compiler flags for SNDIO, overriding pkg-config
+  SNDIO_LIBS  linker flags for SNDIO, overriding pkg-config
   FUSIONSOUND_CFLAGS
               C compiler flags for FUSIONSOUND, overriding pkg-config
   FUSIONSOUND_LIBS
@@ -3437,8 +3453,8 @@ orig_CFLAGS="$CFLAGS"
 
 # See docs/release_checklist.md
 SDL_MAJOR_VERSION=2
-SDL_MINOR_VERSION=24
-SDL_MICRO_VERSION=2
+SDL_MINOR_VERSION=26
+SDL_MICRO_VERSION=5
 SDL_VERSION=$SDL_MAJOR_VERSION.$SDL_MINOR_VERSION.$SDL_MICRO_VERSION
 
 SDL_BINARY_AGE=`expr $SDL_MINOR_VERSION \* 100 + $SDL_MICRO_VERSION`
@@ -18677,6 +18693,16 @@ else $as_nop
   enable_libc=yes
 fi
 
+
+# Check whether --enable-system-iconv was given.
+if test ${enable_system_iconv+y}
+then :
+  enableval=$enable_system_iconv;
+else $as_nop
+  enable_system_iconv=yes
+fi
+
+
 if test x$enable_libc = xyes; then
 
 printf "%s\n" "#define HAVE_LIBC 1" >>confdefs.h
@@ -18789,6 +18815,12 @@ ac_fn_c_check_header_compile "$LINENO" "signal.h" "ac_cv_header_signal_h" "$ac_i
 if test "x$ac_cv_header_signal_h" = xyes
 then :
   printf "%s\n" "#define HAVE_SIGNAL_H 1" >>confdefs.h
+
+fi
+ac_fn_c_check_header_compile "$LINENO" "linux/input.h" "ac_cv_header_linux_input_h" "$ac_includes_default"
+if test "x$ac_cv_header_linux_input_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_LINUX_INPUT_H 1" >>confdefs.h
 
 fi
 
@@ -19504,6 +19536,12 @@ then :
   printf "%s\n" "#define HAVE_STRNCASECMP 1" >>confdefs.h
 
 fi
+ac_fn_c_check_func "$LINENO" "strcasestr" "ac_cv_func_strcasestr"
+if test "x$ac_cv_func_strcasestr" = xyes
+then :
+  printf "%s\n" "#define HAVE_STRCASESTR 1" >>confdefs.h
+
+fi
 ac_fn_c_check_func "$LINENO" "vsscanf" "ac_cv_func_vsscanf"
 if test "x$ac_cv_func_vsscanf" = xyes
 then :
@@ -19884,7 +19922,8 @@ then :
 fi
 
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for iconv_open in -liconv" >&5
+    if test x$enable_system_iconv = xyes; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for iconv_open in -liconv" >&5
 printf %s "checking for iconv_open in -liconv... " >&6; }
 if test ${ac_cv_lib_iconv_iconv_open+y}
 then :
@@ -19924,13 +19963,14 @@ then :
   LIBS="$LIBS -liconv"; EXTRA_LDFLAGS="$EXTRA_LDFLAGS -liconv"
 fi
 
-    ac_fn_c_check_func "$LINENO" "iconv" "ac_cv_func_iconv"
+        ac_fn_c_check_func "$LINENO" "iconv" "ac_cv_func_iconv"
 if test "x$ac_cv_func_iconv" = xyes
 then :
   printf "%s\n" "#define HAVE_ICONV 1" >>confdefs.h
 
 fi
 
+    fi
 
     ac_fn_c_check_member "$LINENO" "struct sigaction" "sa_sigaction" "ac_cv_member_struct_sigaction_sa_sigaction" "#include <signal.h>
 "
@@ -20977,16 +21017,8 @@ else $as_nop
   enable_oss=maybe
 fi
 
-
-    # OpenBSD "has" OSS, but it's not really for app use. They want you to
-    #  use sndio instead. So on there, we default to disabled. You can force
-    #  it on if you really want, though.
     if test x$enable_oss = xmaybe; then
         enable_oss=yes
-        case "$host" in
-            *-*-openbsd*)
-                enable_oss=no;;
-        esac
     fi
 
     if test x$enable_audio = xyes -a x$enable_oss = xyes; then
@@ -21015,33 +21047,6 @@ then :
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
         fi
-        if test x$have_oss != xyes; then
-            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-              #include <soundcard.h>
-
-int
-main (void)
-{
-
-              int arg = SNDCTL_DSP_SETFRAGMENT;
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-
-            have_oss=yes
-
-printf "%s\n" "#define SDL_AUDIO_DRIVER_OSS_SOUNDCARD_H 1" >>confdefs.h
-
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-        fi
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $have_oss" >&5
 printf "%s\n" "$have_oss" >&6; }
         if test x$have_oss = xyes; then
@@ -21054,7 +21059,7 @@ printf "%s\n" "#define SDL_AUDIO_DRIVER_OSS 1" >>confdefs.h
 
             # We may need to link with ossaudio emulation library
             case "$host" in
-                *-*-openbsd*|*-*-netbsd*)
+                *-*-netbsd*)
                     EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lossaudio";;
             esac
         fi
@@ -22319,66 +22324,79 @@ else $as_nop
 fi
 
     if test x$enable_audio = xyes -a x$enable_sndio = xyes; then
-        ac_fn_c_check_header_compile "$LINENO" "sndio.h" "ac_cv_header_sndio_h" "$ac_includes_default"
-if test "x$ac_cv_header_sndio_h" = xyes
-then :
-  have_sndio_hdr=yes
-fi
 
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for sio_open in -lsndio" >&5
-printf %s "checking for sio_open in -lsndio... " >&6; }
-if test ${ac_cv_lib_sndio_sio_open+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lsndio  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
+pkg_failed=no
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for sndio" >&5
+printf %s "checking for sndio... " >&6; }
 
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char sio_open ();
-int
-main (void)
-{
-return sio_open ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_sndio_sio_open=yes
-else $as_nop
-  ac_cv_lib_sndio_sio_open=no
+if test -n "$SNDIO_CFLAGS"; then
+    pkg_cv_SNDIO_CFLAGS="$SNDIO_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"sndio\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "sndio") 2>&5
+  ac_status=$?
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_SNDIO_CFLAGS=`$PKG_CONFIG --cflags "sndio" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
 fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
+ else
+    pkg_failed=untried
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_sndio_sio_open" >&5
-printf "%s\n" "$ac_cv_lib_sndio_sio_open" >&6; }
-if test "x$ac_cv_lib_sndio_sio_open" = xyes
-then :
-  have_sndio_lib=yes
+if test -n "$SNDIO_LIBS"; then
+    pkg_cv_SNDIO_LIBS="$SNDIO_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"sndio\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "sndio") 2>&5
+  ac_status=$?
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_SNDIO_LIBS=`$PKG_CONFIG --libs "sndio" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
 fi
 
 
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for sndio audio support" >&5
-printf %s "checking for sndio audio support... " >&6; }
-        have_sndio=no
 
-        if test x$have_sndio_hdr = xyes -a x$have_sndio_lib = xyes; then
-            have_sndio=yes
-            SNDIO_LIBS="-lsndio"
+if test $pkg_failed = yes; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        SNDIO_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "sndio" 2>&1`
+        else
+	        SNDIO_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "sndio" 2>&1`
         fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$SNDIO_PKG_ERRORS" >&5
 
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $have_sndio" >&5
-printf "%s\n" "$have_sndio" >&6; }
+	audio_sndio=no
+elif test $pkg_failed = untried; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+	audio_sndio=no
+else
+	SNDIO_CFLAGS=$pkg_cv_SNDIO_CFLAGS
+	SNDIO_LIBS=$pkg_cv_SNDIO_LIBS
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+	audio_sndio=yes
+fi
 
-        if test x$have_sndio = xyes; then
+        if test x$audio_sndio = xyes; then
             # Check whether --enable-sndio-shared was given.
 if test ${enable_sndio_shared+y}
 then :
@@ -22917,6 +22935,86 @@ printf "%s\n" "$have_gcc_preferred_stack_boundary" >&6; }
     fi
 }
 
+CheckWerror()
+{
+    # Check whether --enable-werror was given.
+if test ${enable_werror+y}
+then :
+  enableval=$enable_werror; enable_werror=$enableval
+else $as_nop
+  enable_werror=no
+fi
+
+    if test x$enable_werror = xyes; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for GCC -Werror option" >&5
+printf %s "checking for GCC -Werror option... " >&6; }
+        have_gcc_werror=no
+
+        save_CFLAGS="$CFLAGS"
+        CFLAGS="$save_CFLAGS -Werror"
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        int x = 0;
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  have_gcc_werror=yes
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $have_gcc_werror" >&5
+printf "%s\n" "$have_gcc_werror" >&6; }
+        CFLAGS="$save_CFLAGS"
+
+        if test x$have_gcc_werror = xyes; then
+            EXTRA_CFLAGS="$EXTRA_CFLAGS -Werror"
+        fi
+    fi
+}
+
+CheckNoErrorDeprecatedDeclarationsWerror()
+{
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for GCC -Wno-error=deprecated-declarations option" >&5
+printf %s "checking for GCC -Wno-error=deprecated-declarations option... " >&6; }
+    have_gcc_no_werror_deprecated_declarations=no
+
+    save_CFLAGS="$CFLAGS"
+    CFLAGS="$save_CFLAGS -Wno-error=deprecated-declarations"
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    int x = 0;
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  have_gcc_no_werror_deprecated_declarations=yes
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $have_gcc_werror" >&5
+printf "%s\n" "$have_gcc_werror" >&6; }
+    CFLAGS="$save_CFLAGS"
+
+    if test x$have_gcc_no_werror_deprecated_declarations = xyes; then
+        EXTRA_CFLAGS="$EXTRA_CFLAGS -Wno-error=deprecated-declarations"
+    fi
+}
+
 CheckDeclarationAfterStatement()
 {
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for GCC -Wdeclaration-after-statement option" >&5
@@ -23443,8 +23541,15 @@ if test ${enable_video_x11+y}
 then :
   enableval=$enable_video_x11;
 else $as_nop
-  enable_video_x11=yes
+
+    enable_video_x11=yes
+    case "$host" in
+        *-*-darwin*|*-ios-*)
+            enable_video_x11=no
+            ;;
+    esac
 fi
+
 
     if test x$enable_video = xyes -a x$enable_video_x11 = xyes; then
         case "$host" in
@@ -25489,7 +25594,7 @@ if test ${enable_video_offscreen+y}
 then :
   enableval=$enable_video_offscreen;
 else $as_nop
-  enable_video_offscreen=no
+  enable_video_offscreen=yes
 fi
 
     if test x$enable_video_offscreen = xyes; then
@@ -26689,7 +26794,7 @@ fi
             ;;
         *-*-openbsd*)
             pthread_cflags="-D_REENTRANT"
-            pthread_lib="-pthread"
+            pthread_lib="-lpthread"
             ;;
         *-*-solaris2.9)
             # From Solaris 9+, posix4's preferred name is rt.
@@ -28273,6 +28378,7 @@ printf "%s\n" "#define SDL_VIDEO_DRIVER_ANDROID 1" >>confdefs.h
                 ;;
         esac
         CheckVisibilityHidden
+        CheckWerror
         CheckDeclarationAfterStatement
         CheckDummyVideo
         CheckOffscreenVideo
@@ -28398,15 +28504,17 @@ printf "%s\n" "#define SDL_AUDIO_DRIVER_AAUDIO 1" >>confdefs.h
         if test x$enable_joystick = xyes; then
           case $ARCH in
             linux)
+                if test "x$ac_cv_header_linux_input_h" = xyes; then
 
 printf "%s\n" "#define SDL_JOYSTICK_LINUX 1" >>confdefs.h
 
-                SOURCES="$SOURCES $srcdir/src/joystick/linux/*.c"
-                SOURCES="$SOURCES $srcdir/src/joystick/steam/*.c"
-                have_joystick=yes
+                    SOURCES="$SOURCES $srcdir/src/joystick/linux/*.c"
+                    SOURCES="$SOURCES $srcdir/src/joystick/steam/*.c"
+                    have_joystick=yes
+                fi
             ;;
             freebsd)
-                if test x$use_input_events = xyes; then
+                if test x$use_input_events = xyes -a x$ac_cv_header_linux_input_h = xyes; then
 
 printf "%s\n" "#define SDL_JOYSTICK_LINUX 1" >>confdefs.h
 
@@ -28522,6 +28630,7 @@ printf "%s\n" "#define SDL_TIMER_UNIX 1" >>confdefs.h
         # Set up other core UNIX files
         SOURCES="$SOURCES $srcdir/src/core/linux/SDL_evdev_capabilities.c"
         SOURCES="$SOURCES $srcdir/src/core/linux/SDL_threadprio.c"
+        SOURCES="$SOURCES $srcdir/src/core/linux/SDL_sandbox.c"
         SOURCES="$SOURCES $srcdir/src/core/unix/*.c"
         ;;
     *-*-cygwin* | *-*-mingw*)
@@ -28539,6 +28648,7 @@ printf "%s\n" "#define SDL_TIMER_UNIX 1" >>confdefs.h
             have_loadso=yes
         fi
         CheckGDwarf4
+        CheckWerror
         CheckDeclarationAfterStatement
         CheckDummyVideo
         CheckOffscreenVideo
@@ -28862,6 +28972,8 @@ printf "%s\n" "#define SDL_FILESYSTEM_HAIKU 1" >>confdefs.h
         ARCH=ios
 
         CheckVisibilityHidden
+        CheckWerror
+        CheckNoErrorDeprecatedDeclarationsWerror
         CheckDeclarationAfterStatement
         CheckDummyVideo
         CheckOffscreenVideo
@@ -28967,7 +29079,11 @@ printf "%s\n" "#define SDL_VIDEO_RENDER_OGL_ES2 1" >>confdefs.h
         SOURCES="$SOURCES $srcdir/src/video/uikit/*.m"
         SUMMARY_video="${SUMMARY_video} uikit"
         have_video=yes
-        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lm -liconv -lobjc"
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lm"
+        if test x$enable_system_iconv = xyes; then
+            EXTRA_LDFLAGS="$EXTRA_LDFLAGS -liconv"
+        fi
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lobjc"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,AVFoundation"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,AudioToolbox"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,CoreAudio"
@@ -28995,6 +29111,8 @@ printf "%s\n" "#define SDL_VIDEO_RENDER_OGL_ES2 1" >>confdefs.h
 
         CheckObjectiveCARC
         CheckVisibilityHidden
+        CheckWerror
+        CheckNoErrorDeprecatedDeclarationsWerror
         CheckDeclarationAfterStatement
         CheckDummyVideo
         CheckOffscreenVideo
@@ -29140,6 +29258,7 @@ printf "%s\n" "#define SDL_AUDIO_DRIVER_EMSCRIPTEN 1" >>confdefs.h
         fi
 
         CheckVisibilityHidden
+        CheckWerror
         CheckDeclarationAfterStatement
         CheckDummyVideo
         CheckOffscreenVideo
@@ -29199,6 +29318,7 @@ printf "%s\n" "#define SDL_TIMER_UNIX 1" >>confdefs.h
     *-*-riscos*)
         ARCH=riscos
         CheckVisibilityHidden
+        CheckWerror
         CheckDeclarationAfterStatement
         CheckDummyVideo
         CheckOffscreenVideo
@@ -29255,6 +29375,7 @@ printf "%s\n" "#define SDL_TIMER_UNIX 1" >>confdefs.h
         enable_static=no # disable static builds
         EXTRA_CFLAGS="$EXTRA_CFLAGS -DBUILD_SDL -DOS2EMX_PLAIN_CHAR"
         CheckOS2
+        CheckWerror
         CheckDeclarationAfterStatement
         CheckDummyVideo
         CheckDiskAudio
@@ -29263,8 +29384,10 @@ printf "%s\n" "#define SDL_TIMER_UNIX 1" >>confdefs.h
 
         # Set up the core platform files
         SOURCES="$SOURCES $srcdir/src/core/os2/*.c"
-        if test x$ac_cv_func_iconv != xyes -o x$ac_cv_header_iconv_h != xyes; then
-            SOURCES="$SOURCES $srcdir/src/core/os2/geniconv/*.c"
+        if test x$enable_system_iconv = xyes; then
+            if test x$ac_cv_func_iconv != xyes -o x$ac_cv_header_iconv_h != xyes; then
+                SOURCES="$SOURCES $srcdir/src/core/os2/geniconv/*.c"
+            fi
         fi
         # Use the Unix locale APIs.
         if test x$enable_locale = xyes; then
@@ -29364,6 +29487,21 @@ else
 printf "%s\n" "no" >&6; }
 fi
 INSTALL_SDL2_CONFIG=$enable_sdl2_config
+
+
+# Check whether --enable-vendor-info was given.
+if test ${enable_vendor_info+y}
+then :
+  enableval=$enable_vendor_info; enable_vendor_info="$enableval"
+else $as_nop
+  enable_vendor_info=
+fi
+
+if test "$enable_vendor_info" = no
+then :
+  enable_vendor_info=
+fi
+SDL_VENDOR_INFO=$enable_vendor_info
 
 
 # Verify that we have all the platform specific files we need

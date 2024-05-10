@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -167,14 +167,11 @@ static void PS2_JoystickSetDevicePlayerIndex(int device_index, int player_index)
 }
 
 /* Function to return the stable GUID for a plugged in device */
-static SDL_JoystickGUID PS2_JoystickGetDeviceGUID( int device_index )
+static SDL_JoystickGUID PS2_JoystickGetDeviceGUID(int device_index)
 {
-    SDL_JoystickGUID guid;
-    /* the GUID is just the first 16 chars of the name for now */
+    /* the GUID is just the name for now */
     const char *name = PS2_JoystickGetDeviceName(device_index);
-    SDL_zero(guid);
-    SDL_memcpy(&guid, name, SDL_min(sizeof(guid), SDL_strlen(name)));
-    return guid;
+    return SDL_CreateJoystickGUIDForName(name);
 }
 
 /* Function to get the current instance id of the joystick located at device_index */
@@ -278,7 +275,7 @@ static void PS2_JoystickUpdate(SDL_Joystick *joystick)
     struct JoyInfo *info = &joyInfo[index];
     int state = padGetState(info->port, info->slot);
 
-    if (state != PAD_STATE_DISCONN || state != PAD_STATE_EXECCMD || state != PAD_STATE_ERROR) {
+    if (state != PAD_STATE_DISCONN && state != PAD_STATE_EXECCMD && state != PAD_STATE_ERROR) {
         int ret = padRead(info->port, info->slot, &buttons); /* port, slot, buttons */
         if (ret != 0) {
             /* Buttons */

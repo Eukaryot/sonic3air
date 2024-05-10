@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -78,6 +78,16 @@
 
 #include <windows.h>
 #include <basetyps.h>   /* for REFIID with broken mingw.org headers */
+
+/* Older Visual C++ headers don't have the Win64-compatible typedefs... */
+#if defined(_MSC_VER) && (_MSC_VER <= 1200)
+#ifndef DWORD_PTR
+#define DWORD_PTR DWORD
+#endif
+#ifndef LONG_PTR
+#define LONG_PTR LONG
+#endif
+#endif
 
 #include "SDL_rect.h"
 

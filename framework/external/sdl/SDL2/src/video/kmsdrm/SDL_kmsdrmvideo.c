@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -236,7 +236,7 @@ KMSDRM_CreateDevice(void)
 
     devindex = get_driindex();
     if (devindex < 0) {
-        SDL_SetError("devindex (%d) must be between 0 and 99.", devindex);
+        SDL_SetError("devindex (%d) must not be negative.", devindex);
         return NULL;
     }
 
@@ -308,8 +308,8 @@ KMSDRM_CreateDevice(void)
     return device;
 
 cleanup:
-    if (device)
-        SDL_free(device);
+    SDL_free(device);
+
     if (viddata)
         SDL_free(viddata);
     return NULL;
@@ -534,11 +534,140 @@ KMSDRM_DeinitDisplays (_THIS) {
     }
 }
 
+static uint32_t
+KMSDRM_CrtcGetPropId(uint32_t drm_fd,
+                         drmModeObjectPropertiesPtr props,
+                         char const* name)
+{
+    uint32_t i, prop_id = 0;
+
+    for (i = 0; !prop_id && i < props->count_props; ++i) {
+        drmModePropertyPtr drm_prop =
+                     KMSDRM_drmModeGetProperty(drm_fd, props->props[i]);
+
+        if (!drm_prop)
+            continue;
+
+        if (strcmp(drm_prop->name, name) == 0)
+            prop_id = drm_prop->prop_id;
+
+        KMSDRM_drmModeFreeProperty(drm_prop);
+   }
+
+    return prop_id;
+}
+
+static SDL_bool KMSDRM_VrrPropId(uint32_t drm_fd, uint32_t crtc_id, uint32_t *vrr_prop_id) {
+    drmModeObjectPropertiesPtr drm_props;
+
+    drm_props = KMSDRM_drmModeObjectGetProperties(drm_fd,
+                                           crtc_id,
+                                           DRM_MODE_OBJECT_CRTC);
+
+    if (!drm_props)
+        return SDL_FALSE;
+
+    *vrr_prop_id = KMSDRM_CrtcGetPropId(drm_fd,
+                                       drm_props,
+                                       "VRR_ENABLED");
+
+    KMSDRM_drmModeFreeObjectProperties(drm_props);
+
+    return SDL_TRUE;
+}
+
+static SDL_bool 
+KMSDRM_ConnectorCheckVrrCapable(uint32_t drm_fd,
+                         uint32_t output_id,
+                         char const* name)
+{
+    uint32_t i;
+    SDL_bool found = SDL_FALSE;
+    uint64_t prop_value = 0;
+
+
+    drmModeObjectPropertiesPtr props = KMSDRM_drmModeObjectGetProperties(drm_fd,
+                                       output_id,
+                                       DRM_MODE_OBJECT_CONNECTOR);
+
+    if(!props)
+        return SDL_FALSE;
+
+    for (i = 0; !found && i < props->count_props; ++i) {
+        drmModePropertyPtr drm_prop = KMSDRM_drmModeGetProperty(drm_fd, props->props[i]);
+
+        if (!drm_prop)
+            continue;
+
+        if (strcasecmp(drm_prop->name, name) == 0) {
+            prop_value = props->prop_values[i];
+            found = SDL_TRUE;
+        }
+
+        KMSDRM_drmModeFreeProperty(drm_prop);
+    }
+    if(found)
+        return prop_value ? SDL_TRUE: SDL_FALSE;
+
+    return SDL_FALSE;
+}
+
+void
+KMSDRM_CrtcSetVrr(uint32_t drm_fd, uint32_t crtc_id, SDL_bool enabled)
+{
+    uint32_t vrr_prop_id;
+    if (!KMSDRM_VrrPropId(drm_fd, crtc_id, &vrr_prop_id)) 
+        return;
+
+    KMSDRM_drmModeObjectSetProperty(drm_fd,
+                             crtc_id,
+                             DRM_MODE_OBJECT_CRTC,
+                             vrr_prop_id,
+                             enabled);
+}
+
+static SDL_bool 
+KMSDRM_CrtcGetVrr(uint32_t drm_fd, uint32_t crtc_id)
+{
+    uint32_t object_prop_id, vrr_prop_id;
+    drmModeObjectPropertiesPtr props;
+    SDL_bool object_prop_value;
+    int i;
+
+    if (!KMSDRM_VrrPropId(drm_fd, crtc_id, &vrr_prop_id)) 
+        return SDL_FALSE;
+
+
+    props = KMSDRM_drmModeObjectGetProperties(drm_fd,
+                                       crtc_id,
+                                       DRM_MODE_OBJECT_CRTC);
+
+    if(!props)
+        return SDL_FALSE;
+
+    for (i = 0; i < props->count_props; ++i) {
+        drmModePropertyPtr drm_prop = KMSDRM_drmModeGetProperty(drm_fd, props->props[i]);
+
+        if (!drm_prop)
+            continue;
+
+        object_prop_id = drm_prop->prop_id;
+        object_prop_value = props->prop_values[i] ? SDL_TRUE : SDL_FALSE;
+
+        KMSDRM_drmModeFreeProperty(drm_prop);
+
+        if (object_prop_id == vrr_prop_id) {
+            return object_prop_value;
+        }
+    }
+    return SDL_FALSE;
+}
+
 /* Gets a DRM connector, builds an SDL_Display with it, and adds it to the
    list of SDL Displays in _this->displays[]  */
 static void
-KMSDRM_AddDisplay (_THIS, drmModeConnector *connector, drmModeRes *resources) {
-
+KMSDRM_AddDisplay (_THIS, drmModeConnector *connector, drmModeRes *resources)
+{
     SDL_VideoData *viddata = ((SDL_VideoData *)_this->driverdata);
     SDL_DisplayData *dispdata = NULL;
     SDL_VideoDisplay display = {0};
@@ -641,14 +770,37 @@ KMSDRM_AddDisplay (_THIS, drmModeConnector *connector, drmModeRes *resources) {
         drmModeModeInfo *mode = &connector->modes[i];
 
         if (!SDL_memcmp(mode, &crtc->mode, sizeof(crtc->mode))) {
-          mode_index = i;
-          break;
+            mode_index = i;
+            break;
         }
     }
 
     if (mode_index == -1) {
-      ret = SDL_SetError("Failed to find index of mode attached to the CRTC.");
-      goto cleanup;
+        int current_area, largest_area = 0;
+
+        /* Find the preferred mode or the highest resolution mode */
+        for (i = 0; i < connector->count_modes; i++) {
+            drmModeModeInfo *mode = &connector->modes[i];
+
+            if (mode->type & DRM_MODE_TYPE_PREFERRED) {
+                mode_index = i;
+                break;
+            }
+
+            current_area = mode->hdisplay * mode->vdisplay;
+            if (current_area > largest_area) {
+                mode_index = i;
+                largest_area = current_area;
+            }
+        }
+        if (mode_index != -1) {
+            crtc->mode = connector->modes[mode_index];
+        }
+    }
+
+    if (mode_index == -1) {
+        ret = SDL_SetError("Failed to find index of mode attached to the CRTC.");
+        goto cleanup;
     }
 
     /*********************************************/
@@ -674,6 +826,14 @@ KMSDRM_AddDisplay (_THIS, drmModeConnector *connector, drmModeRes *resources) {
     /* Store the connector and crtc for this display. */
     dispdata->connector = connector;
     dispdata->crtc = crtc;
+
+    /* save previous vrr state */
+    dispdata->saved_vrr = KMSDRM_CrtcGetVrr(viddata->drm_fd, crtc->crtc_id);
+    /* try to enable vrr */
+    if(KMSDRM_ConnectorCheckVrrCapable(viddata->drm_fd, connector->connector_id, "VRR_CAPABLE")) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_VIDEO, "Enabling VRR");
+        KMSDRM_CrtcSetVrr(viddata->drm_fd, crtc->crtc_id, SDL_TRUE);
+    }
 
     /*****************************************/
     /* Part 2: setup the SDL_Display itself. */
@@ -1178,6 +1338,9 @@ KMSDRM_DestroyWindow(_THIS, SDL_Window *window)
         return;
     }
 
+    /* restore vrr state */
+    KMSDRM_CrtcSetVrr(windata->viddata->drm_fd, dispdata->crtc->crtc_id, dispdata->saved_vrr);
+
     viddata = windata->viddata;
 
     if ( !is_vulkan && viddata->gbm_init) {
@@ -1293,28 +1456,34 @@ KMSDRM_CreateWindow(_THIS, SDL_Window * window)
             }
         }
 
-	/* Manually load the GL library. KMSDRM_EGL_LoadLibrary() has already
-	   been called by SDL_CreateWindow() but we don't do anything there,
-	   out KMSDRM_EGL_LoadLibrary() is a dummy precisely to be able to load it here.
-	   If we let SDL_CreateWindow() load the lib, it would be loaded
-	   before we call KMSDRM_GBMInit(), causing all GLES programs to fail. */
-	if (!_this->egl_data) {
-	    egl_display = (NativeDisplayType)((SDL_VideoData *)_this->driverdata)->gbm_dev;
-	    if (SDL_EGL_LoadLibrary(_this, NULL, egl_display, EGL_PLATFORM_GBM_MESA)) {
-                return (SDL_SetError("Can't load EGL/GL library on window creation."));
-	    }
+        /* Manually load the GL library. KMSDRM_EGL_LoadLibrary() has already
+           been called by SDL_CreateWindow() but we don't do anything there,
+           our KMSDRM_EGL_LoadLibrary() is a dummy precisely to be able to load it here.
+           If we let SDL_CreateWindow() load the lib, it would be loaded
+           before we call KMSDRM_GBMInit(), causing all GLES programs to fail. */
+        if (!_this->egl_data) {
+            egl_display = (NativeDisplayType)((SDL_VideoData *)_this->driverdata)->gbm_dev;
+            if (SDL_EGL_LoadLibrary(_this, NULL, egl_display, EGL_PLATFORM_GBM_MESA) < 0) {
+                /* Try again with OpenGL ES 2.0 */
+                _this->gl_config.profile_mask = SDL_GL_CONTEXT_PROFILE_ES;
+                _this->gl_config.major_version = 2;
+                _this->gl_config.minor_version = 0;
+                if (SDL_EGL_LoadLibrary(_this, NULL, egl_display, EGL_PLATFORM_GBM_MESA) < 0) {
+                    return (SDL_SetError("Can't load EGL/GL library on window creation."));
+                }
+            }
 
-	    _this->gl_config.driver_loaded = 1;
+            _this->gl_config.driver_loaded = 1;
 
-	}
+        }
 
-	/* Create the cursor BO for the display of this window,
-	   now that we know this is not a VK window. */
-	KMSDRM_CreateCursorBO(display);
+        /* Create the cursor BO for the display of this window,
+           now that we know this is not a VK window. */
+        KMSDRM_CreateCursorBO(display);
 
-	/* Create and set the default cursor for the display
+        /* Create and set the default cursor for the display
            of this window, now that we know this is not a VK window. */
-	KMSDRM_InitMouse(_this, display);
+        KMSDRM_InitMouse(_this, display);
 
         /* The FULLSCREEN flags are cut out from window->flags at this point,
            so we can't know if a window is fullscreen or not, hence all windows

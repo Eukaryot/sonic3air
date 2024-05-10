@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -40,13 +40,6 @@
 #endif
 
 #include "SDL_shaders_d3d.h"
-
-#ifdef __WATCOMC__
-/* FIXME: Remove this once https://github.com/open-watcom/open-watcom-v2/pull/868 is merged */
-#define D3DBLENDOP_REVSUBTRACT 3
-/* FIXME: Remove this once https://github.com/open-watcom/open-watcom-v2/pull/869 is merged */
-#define D3DERR_UNSUPPORTEDCOLOROPERATION MAKE_D3DHRESULT( 2073 )
-#endif
 
 typedef struct
 {
@@ -308,7 +301,7 @@ D3D_ActivateRenderer(SDL_Renderer * renderer)
         int w, h;
         Uint32 window_flags = SDL_GetWindowFlags(window);
 
-        WIN_GetDrawableSize(window, &w, &h);
+        SDL_GetWindowSizeInPixels(window, &w, &h);
         data->pparams.BackBufferWidth = w;
         data->pparams.BackBufferHeight = h;
         if (window_flags & SDL_WINDOW_FULLSCREEN && (window_flags & SDL_WINDOW_FULLSCREEN_DESKTOP) != SDL_WINDOW_FULLSCREEN_DESKTOP) {
@@ -357,7 +350,7 @@ D3D_WindowEvent(SDL_Renderer * renderer, const SDL_WindowEvent *event)
 static int
 D3D_GetOutputSize(SDL_Renderer * renderer, int *w, int *h)
 {
-    WIN_GetDrawableSize(renderer->window, w, h);
+    SDL_GetWindowSizeInPixels(renderer->window, w, h);
     return 0;
 }
 
@@ -1384,7 +1377,7 @@ D3D_RenderReadPixels(SDL_Renderer * renderer, const SDL_Rect * rect,
     return status;
 }
 
-static void
+static int
 D3D_RenderPresent(SDL_Renderer * renderer)
 {
     D3D_RenderData *data = (D3D_RenderData *) renderer->driverdata;
@@ -1398,15 +1391,16 @@ D3D_RenderPresent(SDL_Renderer * renderer)
     result = IDirect3DDevice9_TestCooperativeLevel(data->device);
     if (result == D3DERR_DEVICELOST) {
         /* We'll reset later */
-        return;
+        return -1;
     }
     if (result == D3DERR_DEVICENOTRESET) {
         D3D_Reset(renderer);
     }
     result = IDirect3DDevice9_Present(data->device, NULL, NULL, NULL, NULL);
     if (FAILED(result)) {
-        D3D_SetError("Present()", result);
+        return D3D_SetError("Present()", result);
     }
+    return 0;
 }
 
 static void
@@ -1653,7 +1647,7 @@ D3D_CreateRenderer(SDL_Window * window, Uint32 flags)
     SDL_GetWindowWMInfo(window, &windowinfo);
 
     window_flags = SDL_GetWindowFlags(window);
-    WIN_GetDrawableSize(window, &w, &h);
+    SDL_GetWindowSizeInPixels(window, &w, &h);
     SDL_GetWindowDisplayMode(window, &fullscreen_mode);
 
     SDL_zero(pparams);

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -66,6 +66,11 @@
         str = [aString UTF8String];
     }
 
+    /* We're likely sending the composed text, so we reset the IME status. */
+    if ([self hasMarkedText]) {
+        [self unmarkText];
+    }
+
     SDL_SendKeyboardText(str);
 }
 
@@ -114,7 +119,7 @@
                         (int) selectedRange.location, (int) selectedRange.length);
 
     DEBUG_IME(@"setMarkedText: %@, (%d, %d)", _markedText,
-          selRange.location, selRange.length);
+          selectedRange.location, selectedRange.length);
 }
 
 - (void)unmarkText
@@ -177,209 +182,59 @@
 
 @end
 
-
-/* This is a helper function for HandleModifierSide. This
- * function reverts back to behavior before the distinction between
- * sides was made.
- */
-static void
-HandleNonDeviceModifier(unsigned int device_independent_mask,
-                        unsigned int oldMods,
-                        unsigned int newMods,
-                        SDL_Scancode scancode)
+static bool IsModifierKeyPressed(unsigned int flags,
+                                 unsigned int target_mask,
+                                 unsigned int other_mask,
+                                 unsigned int either_mask)
 {
-    unsigned int oldMask, newMask;
+    bool target_pressed = (flags & target_mask) != 0;
+    bool other_pressed = (flags & other_mask) != 0;
+    bool either_pressed = (flags & either_mask) != 0;
 
-    /* Isolate just the bits we care about in the depedent bits so we can
-     * figure out what changed
-     */
-    oldMask = oldMods & device_independent_mask;
-    newMask = newMods & device_independent_mask;
+    if (either_pressed != (target_pressed || other_pressed))
+        return either_pressed;
 
-    if (oldMask && oldMask != newMask) {
-        SDL_SendKeyboardKey(SDL_RELEASED, scancode);
-    } else if (newMask && oldMask != newMask) {
-        SDL_SendKeyboardKey(SDL_PRESSED, scancode);
-    }
+    return target_pressed;
 }
 
-/* This is a helper function for HandleModifierSide.
- * This function sets the actual SDL_PrivateKeyboard event.
- */
 static void
-HandleModifierOneSide(unsigned int oldMods, unsigned int newMods,
-                      SDL_Scancode scancode,
-                      unsigned int sided_device_dependent_mask)
+HandleModifiers(_THIS, SDL_Scancode code, unsigned int modifierFlags)
 {
-    unsigned int old_dep_mask, new_dep_mask;
+    bool pressed = false;
 
-    /* Isolate just the bits we care about in the depedent bits so we can
-     * figure out what changed
-     */
-    old_dep_mask = oldMods & sided_device_dependent_mask;
-    new_dep_mask = newMods & sided_device_dependent_mask;
-
-    /* We now know that this side bit flipped. But we don't know if
-     * it went pressed to released or released to pressed, so we must
-     * find out which it is.
-     */
-    if (new_dep_mask && old_dep_mask != new_dep_mask) {
-        SDL_SendKeyboardKey(SDL_PRESSED, scancode);
+    if (code == SDL_SCANCODE_LSHIFT) {
+        pressed = IsModifierKeyPressed(modifierFlags, NX_DEVICELSHIFTKEYMASK,
+                                       NX_DEVICERSHIFTKEYMASK, NX_SHIFTMASK);
+    } else if (code == SDL_SCANCODE_LCTRL) {
+        pressed = IsModifierKeyPressed(modifierFlags, NX_DEVICELCTLKEYMASK,
+                                       NX_DEVICERCTLKEYMASK, NX_CONTROLMASK);
+    } else if (code == SDL_SCANCODE_LALT) {
+        pressed = IsModifierKeyPressed(modifierFlags, NX_DEVICELALTKEYMASK,
+                                       NX_DEVICERALTKEYMASK, NX_ALTERNATEMASK);
+    } else if (code == SDL_SCANCODE_LGUI) {
+        pressed = IsModifierKeyPressed(modifierFlags, NX_DEVICELCMDKEYMASK,
+                                       NX_DEVICERCMDKEYMASK, NX_COMMANDMASK);
+    } else if (code == SDL_SCANCODE_RSHIFT) {
+        pressed = IsModifierKeyPressed(modifierFlags, NX_DEVICERSHIFTKEYMASK,
+                                       NX_DEVICELSHIFTKEYMASK, NX_SHIFTMASK);
+    } else if (code == SDL_SCANCODE_RCTRL) {
+        pressed = IsModifierKeyPressed(modifierFlags, NX_DEVICERCTLKEYMASK,
+                                       NX_DEVICELCTLKEYMASK, NX_CONTROLMASK);
+    } else if (code == SDL_SCANCODE_RALT) {
+        pressed = IsModifierKeyPressed(modifierFlags, NX_DEVICERALTKEYMASK,
+                                       NX_DEVICELALTKEYMASK, NX_ALTERNATEMASK);
+    } else if (code == SDL_SCANCODE_RGUI) {
+        pressed = IsModifierKeyPressed(modifierFlags, NX_DEVICERCMDKEYMASK,
+                                       NX_DEVICELCMDKEYMASK, NX_COMMANDMASK);
     } else {
-        SDL_SendKeyboardKey(SDL_RELEASED, scancode);
-    }
-}
-
-/* This is a helper function for DoSidedModifiers.
- * This function will figure out if the modifier key is the left or right side,
- * e.g. left-shift vs right-shift.
- */
-static void
-HandleModifierSide(int device_independent_mask,
-                   unsigned int oldMods, unsigned int newMods,
-                   SDL_Scancode left_scancode,
-                   SDL_Scancode right_scancode,
-                   unsigned int left_device_dependent_mask,
-                   unsigned int right_device_dependent_mask)
-{
-    unsigned int device_dependent_mask = (left_device_dependent_mask |
-                                         right_device_dependent_mask);
-    unsigned int diff_mod;
-
-    /* On the basis that the device independent mask is set, but there are
-     * no device dependent flags set, we'll assume that we can't detect this
-     * keyboard and revert to the unsided behavior.
-     */
-    if ((device_dependent_mask & newMods) == 0) {
-        /* Revert to the old behavior */
-        HandleNonDeviceModifier(device_independent_mask, oldMods, newMods, left_scancode);
         return;
     }
 
-    /* XOR the previous state against the new state to see if there's a change */
-    diff_mod = (device_dependent_mask & oldMods) ^
-               (device_dependent_mask & newMods);
-    if (diff_mod) {
-        /* A change in state was found. Isolate the left and right bits
-         * to handle them separately just in case the values can simulataneously
-         * change or if the bits don't both exist.
-         */
-        if (left_device_dependent_mask & diff_mod) {
-            HandleModifierOneSide(oldMods, newMods, left_scancode, left_device_dependent_mask);
-        }
-        if (right_device_dependent_mask & diff_mod) {
-            HandleModifierOneSide(oldMods, newMods, right_scancode, right_device_dependent_mask);
-        }
+    if (pressed) {
+        SDL_SendKeyboardKey(SDL_PRESSED, code);
+    } else {
+        SDL_SendKeyboardKey(SDL_RELEASED, code);
     }
-}
-
-/* This is a helper function for DoSidedModifiers.
- * This function will release a key press in the case that
- * it is clear that the modifier has been released (i.e. one side
- * can't still be down).
- */
-static void
-ReleaseModifierSide(unsigned int device_independent_mask,
-                    unsigned int oldMods, unsigned int newMods,
-                    SDL_Scancode left_scancode,
-                    SDL_Scancode right_scancode,
-                    unsigned int left_device_dependent_mask,
-                    unsigned int right_device_dependent_mask)
-{
-    unsigned int device_dependent_mask = (left_device_dependent_mask |
-                                          right_device_dependent_mask);
-
-    /* On the basis that the device independent mask is set, but there are
-     * no device dependent flags set, we'll assume that we can't detect this
-     * keyboard and revert to the unsided behavior.
-     */
-    if ((device_dependent_mask & oldMods) == 0) {
-        /* In this case, we can't detect the keyboard, so use the left side
-         * to represent both, and release it.
-         */
-        SDL_SendKeyboardKey(SDL_RELEASED, left_scancode);
-        return;
-    }
-
-    /*
-     * This could have been done in an if-else case because at this point,
-     * we know that all keys have been released when calling this function.
-     * But I'm being paranoid so I want to handle each separately,
-     * so I hope this doesn't cause other problems.
-     */
-    if ( left_device_dependent_mask & oldMods ) {
-        SDL_SendKeyboardKey(SDL_RELEASED, left_scancode);
-    }
-    if ( right_device_dependent_mask & oldMods ) {
-        SDL_SendKeyboardKey(SDL_RELEASED, right_scancode);
-    }
-}
-
-/* This function will handle the modifier keys and also determine the
- * correct side of the key.
- */
-static void
-DoSidedModifiers(unsigned short scancode,
-                 unsigned int oldMods, unsigned int newMods)
-{
-    /* Set up arrays for the key syms for the left and right side. */
-    const SDL_Scancode left_mapping[]  = {
-        SDL_SCANCODE_LSHIFT,
-        SDL_SCANCODE_LCTRL,
-        SDL_SCANCODE_LALT,
-        SDL_SCANCODE_LGUI
-    };
-    const SDL_Scancode right_mapping[] = {
-        SDL_SCANCODE_RSHIFT,
-        SDL_SCANCODE_RCTRL,
-        SDL_SCANCODE_RALT,
-        SDL_SCANCODE_RGUI
-    };
-    /* Set up arrays for the device dependent masks with indices that
-     * correspond to the _mapping arrays
-     */
-    const unsigned int left_device_mapping[]  = { NX_DEVICELSHIFTKEYMASK, NX_DEVICELCTLKEYMASK, NX_DEVICELALTKEYMASK, NX_DEVICELCMDKEYMASK };
-    const unsigned int right_device_mapping[] = { NX_DEVICERSHIFTKEYMASK, NX_DEVICERCTLKEYMASK, NX_DEVICERALTKEYMASK, NX_DEVICERCMDKEYMASK };
-
-    unsigned int i, bit;
-
-    /* Iterate through the bits, testing each against the old modifiers */
-    for (i = 0, bit = NSEventModifierFlagShift; bit <= NSEventModifierFlagCommand; bit <<= 1, ++i) {
-        unsigned int oldMask, newMask;
-
-        oldMask = oldMods & bit;
-        newMask = newMods & bit;
-
-        /* If the bit is set, we must always examine it because the left
-         * and right side keys may alternate or both may be pressed.
-         */
-        if (newMask) {
-            HandleModifierSide(bit, oldMods, newMods,
-                               left_mapping[i], right_mapping[i],
-                               left_device_mapping[i], right_device_mapping[i]);
-        }
-        /* If the state changed from pressed to unpressed, we must examine
-            * the device dependent bits to release the correct keys.
-            */
-        else if (oldMask && oldMask != newMask) {
-            ReleaseModifierSide(bit, oldMods, newMods,
-                              left_mapping[i], right_mapping[i],
-                              left_device_mapping[i], right_device_mapping[i]);
-        }
-    }
-}
-
-static void
-HandleModifiers(_THIS, unsigned short scancode, unsigned int modifierFlags)
-{
-    SDL_VideoData *data = (__bridge SDL_VideoData *) _this->driverdata;
-
-    if (modifierFlags == data.modifierFlags) {
-        return;
-    }
-
-    DoSidedModifiers(scancode, data.modifierFlags, modifierFlags);
-    data.modifierFlags = modifierFlags;
 }
 
 static void
@@ -558,9 +413,9 @@ Cocoa_HandleKeyEvent(_THIS, NSEvent *event)
         }
 
         SDL_SendKeyboardKey(SDL_PRESSED, code);
-#if 1
+#ifdef DEBUG_SCANCODES
         if (code == SDL_SCANCODE_UNKNOWN) {
-            fprintf(stderr, "The key you just pressed is not recognized by SDL. To help get this fixed, report this to the SDL forums/mailing list <https://discourse.libsdl.org/> or to Christian Walther <cwalther@gmx.ch>. Mac virtual key code is %d.\n", scancode);
+            SDL_Log("The key you just pressed is not recognized by SDL. To help get this fixed, report this to the SDL forums/mailing list <https://discourse.libsdl.org/> or to Christian Walther <cwalther@gmx.ch>. Mac virtual key code is %d.\n", scancode);
         }
 #endif
         if (SDL_EventState(SDL_TEXTINPUT, SDL_QUERY)) {
@@ -579,8 +434,7 @@ Cocoa_HandleKeyEvent(_THIS, NSEvent *event)
         SDL_SendKeyboardKey(SDL_RELEASED, code);
         break;
     case NSEventTypeFlagsChanged:
-        /* FIXME CW 2007-08-14: check if this whole mess that takes up half of this file is really necessary */
-        HandleModifiers(_this, scancode, (unsigned int)[event modifierFlags]);
+        HandleModifiers(_this, code, (unsigned int)[event modifierFlags]);
         break;
     default: /* just to avoid compiler warnings */
         break;

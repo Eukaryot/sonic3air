@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -42,8 +42,7 @@ SDL_GDKGetTaskQueue(XTaskQueueHandle * outTaskQueue)
             &GDK_GlobalTaskQueue
             );
         if (FAILED(hr)) {
-            SDL_SetError("[GDK] Could not create global task queue");
-            return -1;
+            return SDL_SetError("[GDK] Could not create global task queue");
         }
 
         /* The initial call gets the non-duplicated handle so they can clean it up */
@@ -51,8 +50,7 @@ SDL_GDKGetTaskQueue(XTaskQueueHandle * outTaskQueue)
     } else {
         /* Duplicate the global task queue handle into outTaskQueue */
         if (FAILED(XTaskQueueDuplicateHandle(GDK_GlobalTaskQueue, outTaskQueue))) {
-            SDL_SetError("[GDK] Unable to acquire global task queue");
-            return -1;
+            return SDL_SetError("[GDK] Unable to acquire global task queue");
         }
     }
 

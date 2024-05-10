@@ -59,26 +59,16 @@ endmacro()
 # - n/a
 macro(CheckOSS)
   if(SDL_OSS)
-    set(OSS_HEADER_FILE "sys/soundcard.h")
     check_c_source_compiles("
         #include <sys/soundcard.h>
-        int main(int argc, char **argv) { int arg = SNDCTL_DSP_SETFRAGMENT; return 0; }" OSS_FOUND)
-    if(NOT OSS_FOUND)
-      set(OSS_HEADER_FILE "soundcard.h")
-      check_c_source_compiles("
-          #include <soundcard.h>
-          int main(int argc, char **argv) { int arg = SNDCTL_DSP_SETFRAGMENT; return 0; }" OSS_FOUND)
-    endif()
+        int main(int argc, char **argv) { int arg = SNDCTL_DSP_SETFRAGMENT; return 0; }" HAVE_OSS_SYS_SOUNDCARD_H)
 
-    if(OSS_FOUND)
+    if(HAVE_OSS_SYS_SOUNDCARD_H)
       set(HAVE_OSS TRUE)
       file(GLOB OSS_SOURCES ${SDL2_SOURCE_DIR}/src/audio/dsp/*.c)
-      if(OSS_HEADER_FILE STREQUAL "soundcard.h")
-        set(SDL_AUDIO_DRIVER_OSS_SOUNDCARD_H 1)
-      endif()
       set(SDL_AUDIO_DRIVER_OSS 1)
       list(APPEND SOURCE_FILES ${OSS_SOURCES})
-      if(NETBSD OR OPENBSD)
+      if(NETBSD)
         list(APPEND EXTRA_LIBS ossaudio)
       endif()
       set(HAVE_SDL_AUDIO TRUE)
@@ -298,20 +288,19 @@ macro(CheckNAS)
 endmacro()
 
 # Requires:
-# - n/a
+# - PkgCheckModules
 # Optional:
 # - SDL_SNDIO_SHARED opt
 # - HAVE_SDL_LOADSO opt
 macro(CheckSNDIO)
   if(SDL_SNDIO)
-    # TODO: set include paths properly, so the sndio headers are found
-    check_include_file(sndio.h HAVE_SNDIO_H)
-    find_library(D_SNDIO_LIB sndio)
-    if(HAVE_SNDIO_H AND D_SNDIO_LIB)
+    pkg_check_modules(PKG_SNDIO sndio)
+    if(PKG_SNDIO_FOUND)
       set(HAVE_SNDIO TRUE)
       file(GLOB SNDIO_SOURCES ${SDL2_SOURCE_DIR}/src/audio/sndio/*.c)
       list(APPEND SOURCE_FILES ${SNDIO_SOURCES})
       set(SDL_AUDIO_DRIVER_SNDIO 1)
+      list(APPEND EXTRA_CFLAGS ${PKG_SNDIO_CFLAGS})
       if(SDL_SNDIO_SHARED AND NOT HAVE_SDL_LOADSO)
         message_warn("You must have SDL_LoadObject() support for dynamic sndio loading")
       endif()
@@ -320,7 +309,7 @@ macro(CheckSNDIO)
         set(SDL_AUDIO_DRIVER_SNDIO_DYNAMIC "\"${SNDIO_LIB_SONAME}\"")
         set(HAVE_SNDIO_SHARED TRUE)
       else()
-        list(APPEND EXTRA_LIBS ${D_SNDIO_LIB})
+        list(APPEND EXTRA_LIBS ${PKG_SNDIO_LDFLAGS})
       endif()
       set(HAVE_SDL_AUDIO TRUE)
     endif()
@@ -411,6 +400,7 @@ endmacro()
 # - SDL_X11_SHARED opt
 # - HAVE_SDL_LOADSO opt
 macro(CheckX11)
+  cmake_push_check_state(RESET)
   if(SDL_X11)
     foreach(_LIB X11 Xext Xcursor Xi Xfixes Xrandr Xrender Xss)
         FindLibraryAndSONAME("${_LIB}")
@@ -433,6 +423,7 @@ macro(CheckX11)
 
     if(X_INCLUDEDIR)
       list(APPEND EXTRA_CFLAGS "-I${X_INCLUDEDIR}")
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${X_INCLUDEDIR})
     endif()
 
     find_file(HAVE_XCURSOR_H NAMES "X11/Xcursor/Xcursor.h" HINTS "${X_INCLUDEDIR}")
@@ -462,13 +453,13 @@ macro(CheckX11)
         set(SDL_X11_SHARED OFF)
       endif()
 
-      check_symbol_exists(shmat "sys/shm.h" HAVE_SHMAT)
-      if(NOT HAVE_SHMAT)
-        check_library_exists(ipc shmat "" HAVE_SHMAT)
-        if(HAVE_SHMAT)
+      check_symbol_exists(shmat "sys/shm.h" HAVE_SHMAT_IN_LIBC)
+      if(NOT HAVE_SHMAT_IN_LIBC)
+        check_library_exists(ipc shmat "" HAVE_SHMAT_IN_LIBIPC)
+        if(HAVE_SHMAT_IN_LIBIPC)
           list(APPEND EXTRA_LIBS ipc)
         endif()
-        if(NOT HAVE_SHMAT)
+        if(NOT HAVE_SHMAT_IN_LIBIPC)
           list(APPEND EXTRA_CFLAGS "-DNO_SHARED_MEMORY")
         endif()
       endif()
@@ -608,6 +599,7 @@ macro(CheckX11)
     # Prevent Mesa from including X11 headers
     list(APPEND EXTRA_CFLAGS "-DMESA_EGL_NO_X11_HEADERS -DEGL_NO_X11")
   endif()
+  cmake_pop_check_state()
 endmacro()
 
 macro(WaylandProtocolGen _SCANNER _CODE_MODE _XML _PROTL)
@@ -916,7 +908,7 @@ macro(CheckPTHREAD)
       set(PTHREAD_LDFLAGS "-lpthread")
     elseif(OPENBSD)
       set(PTHREAD_CFLAGS "-D_REENTRANT")
-      set(PTHREAD_LDFLAGS "-pthread")
+      set(PTHREAD_LDFLAGS "-lpthread")
     elseif(SOLARIS)
       set(PTHREAD_CFLAGS "-D_REENTRANT")
       set(PTHREAD_LDFLAGS "-pthread -lposix4")
@@ -957,7 +949,6 @@ macro(CheckPTHREAD)
       list(APPEND SDL_CFLAGS ${PTHREAD_CFLAGS})
 
       check_c_source_compiles("
-        #define _GNU_SOURCE 1
         #include <pthread.h>
         int main(int argc, char **argv) {
           pthread_mutexattr_t attr;
@@ -968,7 +959,6 @@ macro(CheckPTHREAD)
         set(SDL_THREAD_PTHREAD_RECURSIVE_MUTEX 1)
       else()
         check_c_source_compiles("
-            #define _GNU_SOURCE 1
             #include <pthread.h>
             int main(int argc, char **argv) {
               pthread_mutexattr_t attr;
@@ -999,10 +989,13 @@ macro(CheckPTHREAD)
       check_include_files("pthread_np.h" HAVE_PTHREAD_NP_H)
       if (HAVE_PTHREAD_H)
         check_c_source_compiles("
-            #define _GNU_SOURCE 1
             #include <pthread.h>
             int main(int argc, char **argv) {
-              pthread_setname_np(pthread_self(), \"\");
+              #ifdef __APPLE__
+              pthread_setname_np(\"\");
+              #else
+              pthread_setname_np(pthread_self(),\"\");
+              #endif
               return 0;
             }" HAVE_PTHREAD_SETNAME_NP)
         if (HAVE_PTHREAD_NP_H)

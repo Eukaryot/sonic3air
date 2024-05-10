@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -134,12 +134,9 @@ static void PSP_JoystickSetDevicePlayerIndex(int device_index, int player_index)
 
 static SDL_JoystickGUID PSP_JoystickGetDeviceGUID(int device_index)
 {
-    SDL_JoystickGUID guid;
-    /* the GUID is just the first 16 chars of the name for now */
+    /* the GUID is just the name for now */
     const char *name = PSP_JoystickGetDeviceName(device_index);
-    SDL_zero(guid);
-    SDL_memcpy(&guid, name, SDL_min(sizeof(guid), SDL_strlen(name)));
-    return guid;
+    return SDL_CreateJoystickGUIDForName(name);
 }
 
 /* Function to perform the mapping from device index to the instance id for this index */

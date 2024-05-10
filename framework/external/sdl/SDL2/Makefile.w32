@@ -1,10 +1,12 @@
 # Open Watcom makefile to build SDL2.dll for Win32
 # wmake -f Makefile.w32
+#
+# To error out upon warnings: wmake -f Makefile.w32 ENABLE_WERROR=1
 
 LIBNAME = SDL2
 MAJOR_VERSION = 2
-MINOR_VERSION = 24
-MICRO_VERSION = 2
+MINOR_VERSION = 26
+MICRO_VERSION = 5
 VERSION = $(MAJOR_VERSION).$(MINOR_VERSION).$(MICRO_VERSION)
 
 LIBHOME = .
@@ -26,8 +28,13 @@ LIBS = user32.lib gdi32.lib winmm.lib imm32.lib ole32.lib oleaut32.lib shell32.l
 CFLAGS = -bt=nt -d0 -q -bm -5s -fp5 -fpi87 -sg -oeatxhn -ei
 # max warnings:
 CFLAGS+= -wx
+!ifeq ENABLE_WERROR 1
+CFLAGS+= -we
+!endif
 # newer OpenWatcom versions enable W303 by default
 CFLAGS+= -wcd=303
+# new vulkan headers result in lots of W202 warnings
+CFLAGS+= -wcd=202
 # the include paths :
 CFLAGS+= $(INCPATH)
 CFLAGS_STATIC=$(CFLAGS)
@@ -66,7 +73,7 @@ SRCS+= SDL_systimer.c
 SRCS+= SDL_sysloadso.c
 SRCS+= SDL_sysfilesystem.c
 SRCS+= SDL_syshaptic.c SDL_sysjoystick.c SDL_virtualjoystick.c
-SRCS+= SDL_hidapijoystick.c SDL_hidapi_rumble.c SDL_hidapi_combined.c SDL_hidapi_gamecube.c SDL_hidapi_luna.c SDL_hidapi_ps4.c SDL_hidapi_ps5.c SDL_hidapi_shield.c SDL_hidapi_stadia.c SDL_hidapi_switch.c SDL_hidapi_xbox360.c SDL_hidapi_xbox360w.c SDL_hidapi_xboxone.c SDL_hidapi_steam.c
+SRCS+= SDL_hidapijoystick.c SDL_hidapi_rumble.c SDL_hidapi_combined.c SDL_hidapi_gamecube.c SDL_hidapi_luna.c SDL_hidapi_ps3.c SDL_hidapi_ps4.c SDL_hidapi_ps5.c SDL_hidapi_shield.c SDL_hidapi_stadia.c SDL_hidapi_switch.c SDL_hidapi_wii.c SDL_hidapi_xbox360.c SDL_hidapi_xbox360w.c SDL_hidapi_xboxone.c SDL_hidapi_steam.c
 SRCS+= SDL_dummyaudio.c SDL_diskaudio.c
 SRCS+= SDL_nullvideo.c SDL_nullframebuffer.c SDL_nullevents.c
 SRCS+= SDL_dummysensor.c

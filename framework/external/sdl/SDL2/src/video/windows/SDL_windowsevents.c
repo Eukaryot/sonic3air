@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -428,9 +428,13 @@ WIN_UpdateFocus(SDL_Window *window, SDL_bool expect_focus)
 
         /* In relative mode we are guaranteed to have mouse focus if we have keyboard focus */
         if (!SDL_GetMouse()->relative_mode) {
+            SDL_Point point;
             GetCursorPos(&cursorPos);
             ScreenToClient(hwnd, &cursorPos);
-            SDL_SendMouseMotion(window, 0, 0, cursorPos.x, cursorPos.y);
+            point.x = cursorPos.x;
+            point.y = cursorPos.y;
+            WIN_ClientPointToSDL(data->window, &point.x, &point.y);
+            SDL_SendMouseMotion(window, 0, 0, point.x, point.y);
         }
 
         WIN_CheckAsyncMouseRelease(data);
@@ -909,17 +913,21 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             if (SDL_GetMouseFocus() == data->window && !SDL_GetMouse()->relative_mode && !IsIconic(hwnd)) {
                 SDL_Mouse *mouse;
                 POINT cursorPos;
+                SDL_Point point;
                 GetCursorPos(&cursorPos);
                 ScreenToClient(hwnd, &cursorPos);
+                point.x = cursorPos.x;
+                point.y = cursorPos.y;
+                WIN_ClientPointToSDL(data->window, &point.x, &point.y);
                 mouse = SDL_GetMouse();
                 if (!mouse->was_touch_mouse_events) { /* we're not a touch handler causing a mouse leave? */
-                    SDL_SendMouseMotion(data->window, 0, 0, cursorPos.x, cursorPos.y);
+                    SDL_SendMouseMotion(data->window, 0, 0, point.x, point.y);
                 } else { /* touch handling? */
                     mouse->was_touch_mouse_events = SDL_FALSE; /* not anymore */
                     if (mouse->touch_mouse_events) { /* convert touch to mouse events */
-                        SDL_SendMouseMotion(data->window, SDL_TOUCH_MOUSEID, 0, cursorPos.x, cursorPos.y);
+                        SDL_SendMouseMotion(data->window, SDL_TOUCH_MOUSEID, 0, point.x, point.y);
                     } else { /* normal handling */
-                        SDL_SendMouseMotion(data->window, 0, 0, cursorPos.x, cursorPos.y);
+                        SDL_SendMouseMotion(data->window, 0, 0, point.x, point.y);
                     }
                }
             }
@@ -1263,7 +1271,15 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         /* We'll do our own drawing, prevent flicker */
     case WM_ERASEBKGND:
+        if (!data->videodata->cleared)
         {
+            RECT client_rect;
+            HBRUSH brush;
+            data->videodata->cleared = SDL_TRUE;
+            GetClientRect(hwnd, &client_rect);
+            brush = CreateSolidBrush(0);
+            FillRect(GetDC(hwnd), &client_rect, brush);
+            DeleteObject(brush);
         }
         return (1);
 
@@ -1301,8 +1317,7 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 RECT rect;
                 float x, y;
 
-                if (!GetClientRect(hwnd, &rect) ||
-                    (rect.right == rect.left && rect.bottom == rect.top)) {
+                if (!GetClientRect(hwnd, &rect) || IsRectEmpty(&rect)) {
                     if (inputs) {
                         SDL_small_free(inputs, isstack);
                     }
@@ -1632,6 +1647,13 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             return 0;
         }
         break;
+
+    case WM_SETTINGCHANGE:
+        if (wParam == SPI_SETMOUSE || wParam == SPI_SETMOUSESPEED) {
+            WIN_UpdateMouseSystemScale();
+        }
+        break;
+
 #endif /*!defined(__XBOXONE__) && !defined(__XBOXSERIES__)*/
     }
 
@@ -1676,13 +1698,17 @@ static void WIN_UpdateMouseCapture()
         SDL_WindowData *data = (SDL_WindowData *) focusWindow->driverdata;
 
         if (!data->mouse_tracked) {
-            POINT pt;
+            POINT cursorPos;
 
-            if (GetCursorPos(&pt) && ScreenToClient(data->hwnd, &pt)) {
+            if (GetCursorPos(&cursorPos) && ScreenToClient(data->hwnd, &cursorPos)) {
                 SDL_bool swapButtons = GetSystemMetrics(SM_SWAPBUTTON) != 0;
                 SDL_MouseID mouseID = SDL_GetMouse()->mouseID;
+                SDL_Point point;
+                point.x = cursorPos.x;
+                point.y = cursorPos.y;
+                WIN_ClientPointToSDL(data->window, &point.x, &point.y);
 
-                SDL_SendMouseMotion(data->window, mouseID, 0, (int)pt.x, (int)pt.y);
+                SDL_SendMouseMotion(data->window, mouseID, 0, point.x, point.y);
                 SDL_SendMouseButton(data->window, mouseID, GetAsyncKeyState(VK_LBUTTON) & 0x8000 ? SDL_PRESSED : SDL_RELEASED, !swapButtons ? SDL_BUTTON_LEFT : SDL_BUTTON_RIGHT);
                 SDL_SendMouseButton(data->window, mouseID, GetAsyncKeyState(VK_RBUTTON) & 0x8000 ? SDL_PRESSED : SDL_RELEASED, !swapButtons ? SDL_BUTTON_RIGHT : SDL_BUTTON_LEFT);
                 SDL_SendMouseButton(data->window, mouseID, GetAsyncKeyState(VK_MBUTTON) & 0x8000 ? SDL_PRESSED : SDL_RELEASED, SDL_BUTTON_MIDDLE);

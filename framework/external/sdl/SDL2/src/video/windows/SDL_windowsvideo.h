@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -394,6 +394,7 @@ typedef struct SDL_VideoData
 #endif /*!defined(__XBOXONE__) && !defined(__XBOXSERIES__)*/
 
     SDL_bool dpi_scaling_enabled;
+    SDL_bool cleared;
 
  #ifndef SDL_DISABLE_WINDOWS_IME
     SDL_bool ime_com_initialized;

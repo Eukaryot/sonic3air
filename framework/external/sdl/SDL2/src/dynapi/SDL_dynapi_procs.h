@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -967,3 +967,12 @@ SDL_DYNAPI_PROC(int,SDL_GetPointDisplayIndex,(const SDL_Point *a),(a),return)
 SDL_DYNAPI_PROC(int,SDL_GetRectDisplayIndex,(const SDL_Rect *a),(a),return)
 SDL_DYNAPI_PROC(SDL_bool,SDL_ResetHint,(const char *a),(a),return)
 SDL_DYNAPI_PROC(Uint16,SDL_crc16,(Uint16 a, const void *b, size_t c),(a,b,c),return)
+SDL_DYNAPI_PROC(void,SDL_GetWindowSizeInPixels,(SDL_Window *a, int *b, int *c),(a,b,c),)
+SDL_DYNAPI_PROC(void,SDL_GetJoystickGUIDInfo,(SDL_JoystickGUID a, Uint16 *b, Uint16 *c, Uint16 *d, Uint16 *e),(a,b,c,d,e),)
+SDL_DYNAPI_PROC(int,SDL_SetPrimarySelectionText,(const char *a),(a),return)
+SDL_DYNAPI_PROC(char*,SDL_GetPrimarySelectionText,(void),(),return)
+SDL_DYNAPI_PROC(SDL_bool,SDL_HasPrimarySelectionText,(void),(),return)
+SDL_DYNAPI_PROC(int,SDL_GameControllerGetSensorDataWithTimestamp,(SDL_GameController *a, SDL_SensorType b, Uint64 *c, float *d, int e),(a,b,c,d,e),return)
+SDL_DYNAPI_PROC(int,SDL_SensorGetDataWithTimestamp,(SDL_Sensor *a, Uint64 *b, float *c, int d),(a,b,c,d),return)
+SDL_DYNAPI_PROC(void,SDL_ResetHints,(void),(),)
+SDL_DYNAPI_PROC(char*,SDL_strcasestr,(const char *a, const char *b),(a,b),return)

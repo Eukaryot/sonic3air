@@ -28,8 +28,35 @@
  */
 
 #include "../../SDL_internal.h"
-#include "SDL_thread.h"
+#include "../../thread/SDL_systhread.h"
+#include "SDL_hints.h"
 #include "SDL_mutex.h"
+#include "SDL_thread.h"
+
+#ifdef realloc
+#undef realloc
+#endif
+#define realloc	SDL_realloc
+#ifdef snprintf
+#undef snprintf
+#endif
+#define snprintf SDL_snprintf
+#ifdef strdup
+#undef strdup
+#endif
+#define strdup  SDL_strdup
+#ifdef strncpy
+#undef strncpy
+#endif
+#define strncpy SDL_strlcpy
+#ifdef tolower
+#undef tolower
+#endif
+#define tolower SDL_tolower
+#ifdef wcsncpy
+#undef wcsncpy
+#endif
+#define wcsncpy SDL_wcslcpy
 
 #ifndef HAVE_WCSDUP
 #ifdef HAVE__WCSDUP
@@ -51,7 +78,10 @@ static wchar_t *_dupwcs(const wchar_t *src)
 #endif /* HAVE_WCSDUP */
 
 #include <libusb.h>
+#ifndef _WIN32
+#define HAVE_SETLOCALE
 #include <locale.h> /* setlocale */
+#endif
 
 #include "../hidapi/hidapi.h"
 
@@ -173,6 +203,10 @@ struct hid_device_ {
 	int transfer_loop_finished;
 	struct libusb_transfer *transfer;
 
+	/* Quirks */
+	int skip_output_report_id;
+	int no_output_reports_on_intr_ep;
+
 	/* List of received input reports. */
 	struct input_report *input_reports;
 };
@@ -288,7 +322,7 @@ static int get_usage(uint8_t *report_descriptor, size_t size,
 				/* Can't ever happen since size_code is & 0x3 */
 				data_len = 0;
 				break;
-			};
+			}
 			key_size = 1;
 		}
 
@@ -595,16 +629,18 @@ static char *make_path(libusb_device *dev, int interface_number)
 int HID_API_EXPORT hid_init(void)
 {
 	if (!usb_context) {
-		const char *locale;
-
 		/* Init Libusb */
 		if (libusb_init(&usb_context))
 			return -1;
 
+#ifdef HAVE_SETLOCALE
 		/* Set the locale if it's not set. */
-		locale = setlocale(LC_CTYPE, NULL);
-		if (!locale)
-			setlocale(LC_CTYPE, "");
+		{
+			const char *locale = setlocale(LC_CTYPE, NULL);
+			if (!locale)
+				setlocale(LC_CTYPE, "");
+		}
+#endif
 	}
 
 	return 0;
@@ -726,6 +762,7 @@ struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id, 
 
 	struct hid_device_info *root = NULL; /* return object */
 	struct hid_device_info *cur_dev = NULL;
+	const char *hint = SDL_GetHint(SDL_HINT_HIDAPI_IGNORE_DEVICES);
 
 	if(hid_init() < 0)
 		return NULL;
@@ -743,10 +780,21 @@ struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id, 
 		unsigned short dev_vid = desc.idVendor;
 		unsigned short dev_pid = desc.idProduct;
 
+		/* See if there are any devices we should skip in enumeration */
+		if (hint) {
+			char vendor_match[16], product_match[16];
+			SDL_snprintf(vendor_match, sizeof(vendor_match), "0x%.4x/0x0000", dev_vid);
+			SDL_snprintf(product_match, sizeof(product_match), "0x%.4x/0x%.4x", dev_vid, dev_pid);
+			if (SDL_strcasestr(hint, vendor_match) || SDL_strcasestr(hint, product_match)) {
+				continue;
+			}
+		}
+
 		res = libusb_get_active_config_descriptor(dev, &conf_desc);
 		if (res < 0)
 			libusb_get_config_descriptor(dev, 0, &conf_desc);
 		if (conf_desc) {
+
 			for (j = 0; j < conf_desc->bNumInterfaces; j++) {
 				const struct libusb_interface *intf = &conf_desc->interface[j];
 				for (k = 0; k < intf->num_altsetting; k++) {
@@ -1093,7 +1141,7 @@ static int SDLCALL read_thread(void *param)
 static void init_xbox360(libusb_device_handle *device_handle, unsigned short idVendor, unsigned short idProduct, struct libusb_config_descriptor *conf_desc)
 {
 	if ((idVendor == 0x05ac && idProduct == 0x055b) /* Gamesir-G3w */ ||
-	    (idVendor == 0x0f0d && idProduct == 0x00dc) /* HORIPAD */) {
+	    idVendor == 0x0f0d /* Hori Xbox controllers */) {
 		unsigned char data[20];
 
 		/* The HORIPAD FPS for Nintendo Switch requires this to enable input reports.
@@ -1146,6 +1194,19 @@ static void init_xboxone(libusb_device_handle *device_handle, unsigned short idV
 				}
 			}
 		}
+	}
+}
+
+static void calculate_device_quirks(hid_device *dev, unsigned short idVendor, unsigned short idProduct)
+{
+	static const int VENDOR_SONY = 0x054c;
+	static const int PRODUCT_PS3_CONTROLLER = 0x0268;
+	static const int PRODUCT_NAVIGATION_CONTROLLER = 0x042f;
+
+	if (idVendor == VENDOR_SONY &&
+	    (idProduct == PRODUCT_PS3_CONTROLLER || idProduct == PRODUCT_NAVIGATION_CONTROLLER)) {
+		dev->skip_output_report_id = 1;
+		dev->no_output_reports_on_intr_ep = 1;
 	}
 }
 
@@ -1274,7 +1335,9 @@ hid_device * HID_API_EXPORT hid_open_path(const char *path, int bExclusive)
 							}
 						}
 
-						dev->thread = SDL_CreateThread(read_thread, NULL, dev);
+						calculate_device_quirks(dev, desc.idVendor, desc.idProduct);
+
+						dev->thread = SDL_CreateThreadInternal(read_thread, "libusb", 0, dev);
 
 						/* Wait here for the read thread to be initialized. */
 						SDL_WaitThreadBarrier(&dev->barrier);
@@ -1306,11 +1369,11 @@ int HID_API_EXPORT hid_write(hid_device *dev, const unsigned char *data, size_t 
 {
 	int res;
 
-	if (dev->output_endpoint <= 0) {
+	if (dev->output_endpoint <= 0 || dev->no_output_reports_on_intr_ep) {
 		int report_number = data[0];
 		int skipped_report_id = 0;
 
-		if (report_number == 0x0) {
+		if (report_number == 0x0 || dev->skip_output_report_id) {
 			data++;
 			length--;
 			skipped_report_id = 1;
@@ -1753,13 +1816,15 @@ static struct lang_map_entry lang_map[] = {
 
 uint16_t get_usb_code_for_current_locale(void)
 {
-	char *locale;
+	char *locale = NULL;
 	char search_string[64];
 	char *ptr;
 	struct lang_map_entry *lang;
 
 	/* Get the current locale. */
+#ifdef HAVE_SETLOCALE
 	locale = setlocale(0, NULL);
+#endif
 	if (!locale)
 		return 0x0;
 

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -601,9 +601,12 @@ SDL_ConvertPixels_ARGB8888_to_YUV(int width, int height, const void *src, int sr
             Uint8 *plane_interleaved_uv;
             Uint32 y_stride, uv_stride, y_skip, uv_skip;
 
-            GetYUVPlanes(width, height, dst_format, dst, dst_pitch,
-                         (const Uint8 **)&plane_y, (const Uint8 **)&plane_u, (const Uint8 **)&plane_v,
-                         &y_stride, &uv_stride);
+            if (GetYUVPlanes(width, height, dst_format, dst, dst_pitch,
+                             (const Uint8 **)&plane_y, (const Uint8 **)&plane_u, (const Uint8 **)&plane_v,
+                             &y_stride, &uv_stride) != 0) {
+                return -1;
+            }
+
             plane_interleaved_uv = (plane_y + height * y_stride);
             y_skip = (y_stride - width);
 

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -34,6 +34,7 @@
 
 #include "SDL_windowsvideo.h"
 #include "SDL_windowswindow.h"
+#include "SDL_windowsshape.h"
 #include "SDL_hints.h"
 #include "SDL_timer.h"
 
@@ -738,15 +739,22 @@ WIN_GetWindowBordersSize(_THIS, SDL_Window * window, int *top, int *left, int *b
 
     /* rcClient stores the size of the inner window, while rcWindow stores the outer size relative to the top-left
      * screen position; so the top/left values of rcClient are always {0,0} and bottom/right are {height,width} */
-    GetClientRect(hwnd, &rcClient);
-    GetWindowRect(hwnd, &rcWindow);
+    if (!GetClientRect(hwnd, &rcClient)) {
+        return SDL_SetError("GetClientRect() failed, error %08X", (unsigned int)GetLastError());
+    }
+
+    if (!GetWindowRect(hwnd, &rcWindow)) {
+        return SDL_SetError("GetWindowRect() failed, error %08X", (unsigned int)GetLastError());
+    }
 
     /* convert the top/left values to make them relative to
      * the window; they will end up being slightly negative */
     ptDiff.y = rcWindow.top;
     ptDiff.x = rcWindow.left;
 
-    ScreenToClient(hwnd, &ptDiff);
+    if (!ScreenToClient(hwnd, &ptDiff)) {
+        return SDL_SetError("ScreenToClient() failed, error %08X", (unsigned int)GetLastError());
+    }
 
     rcWindow.top  = ptDiff.y;
     rcWindow.left = ptDiff.x;
@@ -756,7 +764,9 @@ WIN_GetWindowBordersSize(_THIS, SDL_Window * window, int *top, int *left, int *b
     ptDiff.y = rcWindow.bottom;
     ptDiff.x = rcWindow.right;
 
-    ScreenToClient(hwnd, &ptDiff);
+    if (!ScreenToClient(hwnd, &ptDiff)) {
+        return SDL_SetError("ScreenToClient() failed, error %08X", (unsigned int)GetLastError());
+    }
 
     rcWindow.bottom = ptDiff.y;
     rcWindow.right  = ptDiff.x;
@@ -771,6 +781,22 @@ WIN_GetWindowBordersSize(_THIS, SDL_Window * window, int *top, int *left, int *b
 
     return 0;
 #endif /*!defined(__XBOXONE__) && !defined(__XBOXSERIES__)*/
+}
+
+void
+WIN_GetWindowSizeInPixels(_THIS, SDL_Window * window, int *w, int *h)
+{
+    const SDL_WindowData *data = ((SDL_WindowData *)window->driverdata);
+    HWND hwnd = data->hwnd;
+    RECT rect;
+
+    if (GetClientRect(hwnd, &rect) && !IsRectEmpty(&rect)) {
+        *w = rect.right;
+        *h = rect.bottom;
+    } else {
+        *w = window->w;
+        *h = window->h;
+    }
 }
 
 void
@@ -1152,6 +1178,18 @@ WIN_SetWindowKeyboardGrab(_THIS, SDL_Window * window, SDL_bool grabbed)
 void
 WIN_DestroyWindow(_THIS, SDL_Window * window)
 {
+    if (window->shaper) {
+        SDL_ShapeData *shapedata = (SDL_ShapeData *) window->shaper->driverdata;
+        if (shapedata) {
+            if (shapedata->mask_tree) {
+                SDL_FreeShapeTree(&shapedata->mask_tree);
+            }
+            SDL_free(shapedata);
+        }
+        SDL_free(window->shaper);
+        window->shaper = NULL;
+    }
+
     CleanupWindowData(_this, window);
 }
 
@@ -1287,15 +1325,17 @@ WIN_UpdateClipCursor(SDL_Window *window)
         (window->flags & SDL_WINDOW_INPUT_FOCUS)) {
         if (mouse->relative_mode && !mouse->relative_mode_warp && data->mouse_relative_mode_center) {
             if (GetWindowRect(data->hwnd, &rect)) {
+                /* WIN_WarpCursor() jitters by +1, and remote desktop warp wobble is +/- 1 */
+                LONG remote_desktop_adjustment = GetSystemMetrics(SM_REMOTESESSION) ? 2 : 0;
                 LONG cx, cy;
 
                 cx = (rect.left + rect.right) / 2;
                 cy = (rect.top + rect.bottom) / 2;
 
                 /* Make an absurdly small clip rect */
-                rect.left = cx - 1;
-                rect.right = cx + 1;
-                rect.top = cy - 1;
+                rect.left = cx - remote_desktop_adjustment;
+                rect.right = cx + 1 + remote_desktop_adjustment;
+                rect.top = cy;
                 rect.bottom = cy + 1;
 
                 if (SDL_memcmp(&rect, &clipped_rect, sizeof(rect)) != 0) {
@@ -1400,31 +1440,6 @@ WIN_SetWindowOpacity(_THIS, SDL_Window * window, float opacity)
 
     return 0;
 #endif /*!defined(__XBOXONE__) && !defined(__XBOXSERIES__)*/
-}
-
-/**
- * Returns the drawable size in pixels (GetClientRect).
- */
-void
-WIN_GetDrawableSize(const SDL_Window *window, int *w, int *h)
-{
-    HWND hwnd;
-    RECT rect;
-
-    if (!window || !(window->driverdata)) {
-        *w = 0;
-        *h = 0;
-        return;
-    }
-
-    hwnd = ((SDL_WindowData *)window->driverdata)->hwnd;
-    if (GetClientRect(hwnd, &rect)) {
-        *w = rect.right;
-        *h = rect.bottom;
-    } else {
-        *w = 0;
-        *h = 0;
-    }
 }
 
 /**

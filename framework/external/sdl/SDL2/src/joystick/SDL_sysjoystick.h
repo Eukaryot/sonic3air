@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -64,10 +64,13 @@ typedef struct _SDL_JoystickSensorInfo
     SDL_bool enabled;
     float rate;
     float data[3];      /* If this needs to expand, update SDL_ControllerSensorEvent */
+    Uint64 timestamp_us;
 } SDL_JoystickSensorInfo;
 
 struct _SDL_Joystick
 {
+    const void *magic;
+
     SDL_JoystickID instance_id; /* Device instance, monotonically increasing from 0 */
     char *name;                 /* Joystick name - system dependent */
     char *path;                 /* Joystick path - system dependent */
@@ -100,6 +103,7 @@ struct _SDL_Joystick
     Uint16 low_frequency_rumble;
     Uint16 high_frequency_rumble;
     Uint32 rumble_expiration;
+    Uint32 rumble_resend;
 
     Uint16 left_trigger_rumble;
     Uint16 right_trigger_rumble;
@@ -125,9 +129,10 @@ struct _SDL_Joystick
 };
 
 /* Device bus definitions */
-#define SDL_HARDWARE_BUS_VIRTUAL    0x00
+#define SDL_HARDWARE_BUS_UNKNOWN    0x00
 #define SDL_HARDWARE_BUS_USB        0x03
 #define SDL_HARDWARE_BUS_BLUETOOTH  0x05
+#define SDL_HARDWARE_BUS_VIRTUAL    0xFF
 
 /* Joystick capability flags for GetCapabilities() */
 #define SDL_JOYCAP_LED              0x01
@@ -213,6 +218,10 @@ typedef struct _SDL_JoystickDriver
 /* Windows and Mac OSX has a limit of MAX_DWORD / 1000, Linux kernel has a limit of 0xFFFF */
 #define SDL_MAX_RUMBLE_DURATION_MS  0xFFFF
 
+/* Dualshock4 only rumbles for about 5 seconds max, resend rumble command every 2 seconds 
+ * to make long rumble work. */
+#define SDL_RUMBLE_RESEND_MS  2000
+
 #define SDL_LED_MIN_REPEAT_MS  5000
 
 /* The available joystick drivers */
@@ -234,6 +243,7 @@ extern SDL_JoystickDriver SDL_OS2_JoystickDriver;
 extern SDL_JoystickDriver SDL_PS2_JoystickDriver;
 extern SDL_JoystickDriver SDL_PSP_JoystickDriver;
 extern SDL_JoystickDriver SDL_VITA_JoystickDriver;
+extern SDL_JoystickDriver SDL_N3DS_JoystickDriver;
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus

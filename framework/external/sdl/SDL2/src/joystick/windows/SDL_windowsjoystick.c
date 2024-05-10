@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -429,7 +429,12 @@ SDL_StopJoystickThread(void)
     SDL_CondBroadcast(s_condJoystickThread); /* signal the joystick thread to quit */
     SDL_UnlockMutex(s_mutexJoyStickEnum);
     PostThreadMessage(SDL_GetThreadID(s_joystickThread), WM_QUIT, 0, 0);
+
+    /* Unlock joysticks while the joystick thread finishes processing messages */
+    SDL_AssertJoysticksLocked();
+    SDL_UnlockJoysticks();
     SDL_WaitThread(s_joystickThread, NULL); /* wait for it to bugger off */
+    SDL_LockJoysticks();
 
     SDL_DestroyCond(s_condJoystickThread);
     s_condJoystickThread = NULL;
@@ -517,7 +522,6 @@ WINDOWS_JoystickGetCount(void)
 static void
 WINDOWS_JoystickDetect(void)
 {
-    int device_index = 0;
     JoyStick_DeviceData *pCurList = NULL;
 
     /* only enum the devices if the joystick thread told us something changed */
@@ -565,7 +569,7 @@ WINDOWS_JoystickDetect(void)
         pCurList = pListNext;
     }
 
-    for (device_index = 0, pCurList = SYS_Joystick; pCurList; ++device_index, pCurList = pCurList->pNext) {
+    for (pCurList = SYS_Joystick; pCurList; pCurList = pCurList->pNext) {
         if (pCurList->send_add_event) {
             if (pCurList->bXInputDevice) {
 #if SDL_HAPTIC_XINPUT

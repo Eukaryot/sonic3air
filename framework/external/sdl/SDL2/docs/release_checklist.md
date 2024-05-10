@@ -14,9 +14,9 @@ mechanical work.
 
     * `./build-scripts/update-version.sh 2 EVEN 0`
 
-* Regenerate `configure`
-
 * Do the release
+
+* Update the website file include/header.inc.php to reflect the new version
 
 ## New bugfix release
 
@@ -28,9 +28,9 @@ mechanical work.
 
     * `./build-scripts/update-version.sh 2 Y Z+1`
 
-* Regenerate `configure`
-
 * Do the release
+
+* Update the website file include/header.inc.php to reflect the new version
 
 ## After a feature release
 
@@ -45,7 +45,5 @@ mechanical work.
 * Bump version number from 2.Y.Z to 2.Y.(Z+1) (Y is odd)
 
     * `./build-scripts/update-version.sh 2 Y Z+1`
-
-* Regenerate `configure`
 
 * Do the release
