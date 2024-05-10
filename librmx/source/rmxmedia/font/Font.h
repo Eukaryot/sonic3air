@@ -143,6 +143,7 @@ private:
 class IFontSourceFactory
 {
 public:
+	virtual ~IFontSourceFactory() {}
 	virtual FontSource* construct(const FontSourceKey& key) = 0;
 };
 
