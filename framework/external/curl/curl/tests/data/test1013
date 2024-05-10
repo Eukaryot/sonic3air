@@ -16,14 +16,14 @@ curl-config
 <server>
 none
 </server>
- <name>
+<name>
 Compare curl --version with curl-config --protocols
- </name>
- <command>
+</name>
+<command>
 --version
 </command>
 <postcheck>
-%SRCDIR/libtest/test%TESTNUMBER.pl ../curl-config log/stdout%TESTNUMBER protocols
+%SRCDIR/libtest/test%TESTNUMBER.pl ../curl-config %LOGDIR/stdout%TESTNUMBER protocols
 </postcheck>
 </client>
 

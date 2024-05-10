@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -61,7 +61,7 @@ UNITTEST_START
     "pkcs11:foobar",          "pkcs11:foobar",      NULL,
     "PKCS11:foobar",          "PKCS11:foobar",      NULL,
     "PkCs11:foobar",          "PkCs11:foobar",      NULL,
-#ifdef WIN32
+#ifdef _WIN32
     "c:\\foo:bar:baz",        "c:\\foo",            "bar:baz",
     "c:\\foo\\:bar:baz",      "c:\\foo:bar",        "baz",
     "c:\\foo\\\\:bar:baz",    "c:\\foo\\",          "bar:baz",

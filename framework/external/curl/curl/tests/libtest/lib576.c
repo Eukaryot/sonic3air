@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -30,11 +30,6 @@ struct chunk_data {
   int remains;
   int print_content;
 };
-
-static
-long chunk_bgn(const struct curl_fileinfo *finfo, void *ptr, int remains);
-static
-long chunk_end(void *ptr);
 
 static
 long chunk_bgn(const struct curl_fileinfo *finfo, void *ptr, int remains)
@@ -76,8 +71,8 @@ long chunk_bgn(const struct curl_fileinfo *finfo, void *ptr, int remains)
   }
   if(finfo->filetype == CURLFILETYPE_FILE) {
     ch_d->print_content = 1;
-    printf("Content:\n-----------------------"
-           "--------------------------------------\n");
+    printf("Content:\n"
+      "-------------------------------------------------------------\n");
   }
   if(strcmp(finfo->filename, "someothertext.txt") == 0) {
     printf("# THIS CONTENT WAS SKIPPED IN CHUNK_BGN CALLBACK #\n");

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -22,16 +22,13 @@
  *
  ***************************************************************************/
 #include "tool_setup.h"
-#if defined(HAVE_STRCASECMP) && defined(HAVE_STRINGS_H)
-#include <strings.h>
-#endif
 #define ENABLE_CURLX_PRINTF
 /* use our own printf() functions */
 #include "curlx.h"
 
-#include "tool_panykey.h"
 #include "tool_help.h"
 #include "tool_libinfo.h"
+#include "tool_util.h"
 #include "tool_version.h"
 
 #include "memdebug.h" /* keep this as LAST include */
@@ -76,44 +73,11 @@ static const struct category_descriptors categories[] = {
   {NULL, NULL, CURLHELP_HIDDEN}
 };
 
-extern const struct helptxt helptext[];
-
-struct feat {
-  const char *name;
-  int bitmask;
-};
-
-static const struct feat feats[] = {
-  {"AsynchDNS",      CURL_VERSION_ASYNCHDNS},
-  {"Debug",          CURL_VERSION_DEBUG},
-  {"TrackMemory",    CURL_VERSION_CURLDEBUG},
-  {"IDN",            CURL_VERSION_IDN},
-  {"IPv6",           CURL_VERSION_IPV6},
-  {"Largefile",      CURL_VERSION_LARGEFILE},
-  {"Unicode",        CURL_VERSION_UNICODE},
-  {"SSPI",           CURL_VERSION_SSPI},
-  {"GSS-API",        CURL_VERSION_GSSAPI},
-  {"Kerberos",       CURL_VERSION_KERBEROS5},
-  {"SPNEGO",         CURL_VERSION_SPNEGO},
-  {"NTLM",           CURL_VERSION_NTLM},
-  {"NTLM_WB",        CURL_VERSION_NTLM_WB},
-  {"SSL",            CURL_VERSION_SSL},
-  {"libz",           CURL_VERSION_LIBZ},
-  {"brotli",         CURL_VERSION_BROTLI},
-  {"zstd",           CURL_VERSION_ZSTD},
-  {"CharConv",       CURL_VERSION_CONV},
-  {"TLS-SRP",        CURL_VERSION_TLSAUTH_SRP},
-  {"HTTP2",          CURL_VERSION_HTTP2},
-  {"HTTP3",          CURL_VERSION_HTTP3},
-  {"UnixSockets",    CURL_VERSION_UNIX_SOCKETS},
-  {"HTTPS-proxy",    CURL_VERSION_HTTPS_PROXY},
-  {"MultiSSL",       CURL_VERSION_MULTI_SSL},
-  {"PSL",            CURL_VERSION_PSL},
-  {"alt-svc",        CURL_VERSION_ALTSVC},
-  {"HSTS",           CURL_VERSION_HSTS},
-  {"gsasl",          CURL_VERSION_GSASL},
-  {"threadsafe",     CURL_VERSION_THREADSAFE},
-};
+#ifdef _WIN32
+#define BORDER 78
+#else
+#define BORDER 79
+#endif
 
 static void print_category(curlhelp_t category)
 {
@@ -132,12 +96,21 @@ static void print_category(curlhelp_t category)
     if(len > longdesc)
       longdesc = len;
   }
-  if(longopt + longdesc > 80)
-    longopt = 80 - longdesc;
-
+  if(longopt + longdesc >= BORDER) {
+    longdesc -= 3;
+    longopt = BORDER -1 - longdesc;
+  }
   for(i = 0; helptext[i].opt; ++i)
     if(helptext[i].categories & category) {
-      printf(" %-*s %s\n", (int)longopt, helptext[i].opt, helptext[i].desc);
+      int opt = (int)longopt;
+      size_t desclen = strlen(helptext[i].desc);
+      if(opt + desclen >= (BORDER -1)) {
+        if(desclen < (BORDER -1))
+          opt = (BORDER -2) - (int)desclen;
+        else
+          opt = 0;
+      }
+      printf(" %-*s  %s\n", opt, helptext[i].opt, helptext[i].desc);
     }
 }
 
@@ -190,26 +163,21 @@ void tool_help(char *category)
   free(category);
 }
 
-static int
-featcomp(const void *p1, const void *p2)
+static bool is_debug(void)
 {
-  /* The arguments to this function are "pointers to pointers to char", but
-     the comparison arguments are "pointers to char", hence the following cast
-     plus dereference */
-#ifdef HAVE_STRCASECMP
-  return strcasecmp(* (char * const *) p1, * (char * const *) p2);
-#elif defined(HAVE_STRCMPI)
-  return strcmpi(* (char * const *) p1, * (char * const *) p2);
-#elif defined(HAVE_STRICMP)
-  return stricmp(* (char * const *) p1, * (char * const *) p2);
-#else
-  return strcmp(* (char * const *) p1, * (char * const *) p2);
-#endif
+  const char *const *builtin;
+  for(builtin = feature_names; *builtin; ++builtin)
+    if(curl_strequal("debug", *builtin))
+      return TRUE;
+  return FALSE;
 }
 
 void tool_version_info(void)
 {
-  const char *const *proto;
+  const char *const *builtin;
+  if(is_debug())
+    fprintf(tool_stderr, "WARNING: this libcurl is Debug-enabled, "
+            "do not use in production\n\n");
 
   printf(CURL_ID "%s\n", curl_version());
 #ifdef CURL_PATCHSTAMP
@@ -218,25 +186,38 @@ void tool_version_info(void)
 #else
   printf("Release-Date: %s\n", LIBCURL_TIMESTAMP);
 #endif
-  if(curlinfo->protocols) {
-    printf("Protocols: ");
-    for(proto = curlinfo->protocols; *proto; ++proto) {
-      printf("%s ", *proto);
+  if(built_in_protos[0]) {
+    const char *insert = NULL;
+    /* we have ipfs and ipns support if libcurl has http support */
+    for(builtin = built_in_protos; *builtin; ++builtin) {
+      if(insert) {
+        /* update insertion so ipfs will be printed in alphabetical order */
+        if(strcmp(*builtin, "ipfs") < 0)
+          insert = *builtin;
+        else
+          break;
+      }
+      else if(!strcmp(*builtin, "http")) {
+        insert = *builtin;
+      }
+    }
+    printf("Protocols:");
+    for(builtin = built_in_protos; *builtin; ++builtin) {
+      /* Special case: do not list rtmp?* protocols.
+         They may only appear together with "rtmp" */
+      if(!curl_strnequal(*builtin, "rtmp", 4) || !builtin[0][4])
+        printf(" %s", *builtin);
+      if(insert && insert == *builtin) {
+        printf(" ipfs ipns");
+        insert = NULL;
+      }
     }
     puts(""); /* newline */
   }
-  if(curlinfo->features) {
-    char *featp[ sizeof(feats) / sizeof(feats[0]) + 1];
-    size_t numfeat = 0;
-    unsigned int i;
+  if(feature_names[0]) {
     printf("Features:");
-    for(i = 0; i < sizeof(feats)/sizeof(feats[0]); i++) {
-      if(curlinfo->features & feats[i].bitmask)
-        featp[numfeat++] = (char *)feats[i].name;
-    }
-    qsort(&featp[0], numfeat, sizeof(char *), featcomp);
-    for(i = 0; i< numfeat; i++)
-      printf(" %s", featp[i]);
+    for(builtin = feature_names; *builtin; ++builtin)
+      printf(" %s", *builtin);
     puts(""); /* newline */
   }
   if(strcmp(CURL_VERSION, curlinfo->version)) {

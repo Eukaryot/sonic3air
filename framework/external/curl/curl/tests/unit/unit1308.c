@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -21,6 +21,7 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
+#define CURL_DISABLE_DEPRECATION  /* Testing the form api */
 #include "curlcheck.h"
 
 #include <curl/curl.h>
@@ -73,7 +74,7 @@ UNITTEST_START
 
   fail_unless(rc == 0, "curl_formget returned error");
 
-  fail_unless(total_size == 488, "curl_formget got wrong size back");
+  fail_unless(total_size == 518, "curl_formget got wrong size back");
 
   curl_formfree(post);
 
@@ -82,7 +83,7 @@ UNITTEST_START
 
   rc = curl_formadd(&post, &last,
                     CURLFORM_PTRNAME, "name of file field",
-                    CURLFORM_FILE, "log/test-1308",
+                    CURLFORM_FILE, arg,
                     CURLFORM_FILENAME, "custom named file",
                     CURLFORM_END);
 
@@ -90,7 +91,7 @@ UNITTEST_START
 
   rc = curl_formget(post, &total_size, print_httppost_callback);
   fail_unless(rc == 0, "curl_formget returned error");
-  fail_unless(total_size == 851, "curl_formget got wrong size back");
+  fail_unless(total_size == 899, "curl_formget got wrong size back");
 
   curl_formfree(post);
 

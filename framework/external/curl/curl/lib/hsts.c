@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2020 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -39,7 +39,8 @@
 #include "parsedate.h"
 #include "fopen.h"
 #include "rename.h"
-#include "strtoofft.h"
+#include "share.h"
+#include "strdup.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -57,7 +58,7 @@
 /* to play well with debug builds, we can *set* a fixed time this will
    return */
 time_t deltatime; /* allow for "adjustments" for unit test purposes */
-static time_t debugtime(void *unused)
+static time_t hsts_debugtime(void *unused)
 {
   char *timestr = getenv("CURL_TIME");
   (void)unused;
@@ -70,12 +71,13 @@ static time_t debugtime(void *unused)
   }
   return time(NULL);
 }
-#define time(x) debugtime(x)
+#undef time
+#define time(x) hsts_debugtime(x)
 #endif
 
 struct hsts *Curl_hsts_init(void)
 {
-  struct hsts *h = calloc(sizeof(struct hsts), 1);
+  struct hsts *h = calloc(1, sizeof(struct hsts));
   if(h) {
     Curl_llist_init(&h->list, NULL);
   }
@@ -107,7 +109,7 @@ void Curl_hsts_cleanup(struct hsts **hp)
 
 static struct stsentry *hsts_entry(void)
 {
-  return calloc(sizeof(struct stsentry), 1);
+  return calloc(1, sizeof(struct stsentry));
 }
 
 static CURLcode hsts_create(struct hsts *h,
@@ -115,27 +117,31 @@ static CURLcode hsts_create(struct hsts *h,
                             bool subdomains,
                             curl_off_t expires)
 {
-  struct stsentry *sts = hsts_entry();
-  char *duphost;
   size_t hlen;
-  if(!sts)
-    return CURLE_OUT_OF_MEMORY;
+  DEBUGASSERT(h);
+  DEBUGASSERT(hostname);
 
-  duphost = strdup(hostname);
-  if(!duphost) {
-    free(sts);
-    return CURLE_OUT_OF_MEMORY;
+  hlen = strlen(hostname);
+  if(hlen && (hostname[hlen - 1] == '.'))
+    /* strip off any trailing dot */
+    --hlen;
+  if(hlen) {
+    char *duphost;
+    struct stsentry *sts = hsts_entry();
+    if(!sts)
+      return CURLE_OUT_OF_MEMORY;
+
+    duphost = Curl_memdup0(hostname, hlen);
+    if(!duphost) {
+      free(sts);
+      return CURLE_OUT_OF_MEMORY;
+    }
+
+    sts->host = duphost;
+    sts->expires = expires;
+    sts->includeSubDomains = subdomains;
+    Curl_llist_insert_next(&h->list, h->list.tail, sts, &sts->node);
   }
-
-  hlen = strlen(duphost);
-  if(duphost[hlen - 1] == '.')
-    /* strip off trailing any dot */
-    duphost[--hlen] = 0;
-
-  sts->host = duphost;
-  sts->expires = expires;
-  sts->includeSubDomains = subdomains;
-  Curl_llist_insert_next(&h->list, h->list.tail, sts, &sts->node);
   return CURLE_OK;
 }
 
@@ -156,9 +162,9 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
     return CURLE_OK;
 
   do {
-    while(*p && ISSPACE(*p))
+    while(*p && ISBLANK(*p))
       p++;
-    if(Curl_strncasecompare("max-age=", p, 8)) {
+    if(strncasecompare("max-age=", p, 8)) {
       bool quoted = FALSE;
       CURLofft offt;
       char *endp;
@@ -167,7 +173,7 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
         return CURLE_BAD_FUNCTION_ARGUMENT;
 
       p += 8;
-      while(*p && ISSPACE(*p))
+      while(*p && ISBLANK(*p))
         p++;
       if(*p == '\"') {
         p++;
@@ -187,7 +193,7 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
       }
       gotma = TRUE;
     }
-    else if(Curl_strncasecompare("includesubdomains", p, 17)) {
+    else if(strncasecompare("includesubdomains", p, 17)) {
       if(gotinc)
         return CURLE_BAD_FUNCTION_ARGUMENT;
       subdomains = TRUE;
@@ -200,11 +206,11 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
         p++;
     }
 
-    while(*p && ISSPACE(*p))
+    while(*p && ISBLANK(*p))
       p++;
     if(*p == ';')
       p++;
-  } while (*p);
+  } while(*p);
 
   if(!gotma)
     /* max-age is mandatory */
@@ -278,11 +284,11 @@ struct stsentry *Curl_hsts(struct hsts *h, const char *hostname,
         if(ntail < hlen) {
           size_t offs = hlen - ntail;
           if((hostname[offs-1] == '.') &&
-             Curl_strncasecompare(&hostname[offs], sts->host, ntail))
+             strncasecompare(&hostname[offs], sts->host, ntail))
             return sts;
         }
       }
-      if(Curl_strcasecompare(hostname, sts->host))
+      if(strcasecompare(hostname, sts->host))
         return sts;
     }
   }
@@ -390,7 +396,7 @@ CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
       unlink(tempstore);
   }
   free(tempstore);
-  skipsave:
+skipsave:
   if(data->set.hsts_write) {
     /* if there's a write callback */
     struct curl_index i; /* count */
@@ -426,14 +432,23 @@ static CURLcode hsts_add(struct hsts *h, char *line)
   if(2 == rc) {
     time_t expires = strcmp(date, UNLIMITED) ? Curl_getdate_capped(date) :
       TIME_T_MAX;
-    CURLcode result;
+    CURLcode result = CURLE_OK;
     char *p = host;
     bool subdomain = FALSE;
+    struct stsentry *e;
     if(p[0] == '.') {
       p++;
       subdomain = TRUE;
     }
-    result = hsts_create(h, p, subdomain, expires);
+    /* only add it if not already present */
+    e = Curl_hsts(h, p, subdomain);
+    if(!e)
+      result = hsts_create(h, p, subdomain, expires);
+    else {
+      /* the same host name, use the largest expire time */
+      if(expires > e->expires)
+        e->expires = expires;
+    }
     if(result)
       return result;
   }
@@ -463,6 +478,7 @@ static CURLcode hsts_pull(struct Curl_easy *data, struct hsts *h)
       if(sc == CURLSTS_OK) {
         time_t expires;
         CURLcode result;
+        DEBUGASSERT(e.name[0]);
         if(!e.name[0])
           /* bail out if no name was stored */
           return CURLE_BAD_FUNCTION_ARGUMENT;
@@ -495,7 +511,6 @@ static CURLcode hsts_pull(struct Curl_easy *data, struct hsts *h)
 static CURLcode hsts_load(struct hsts *h, const char *file)
 {
   CURLcode result = CURLE_OK;
-  char *line = NULL;
   FILE *fp;
 
   /* we need a private copy of the file name so that the hsts cache file
@@ -507,11 +522,10 @@ static CURLcode hsts_load(struct hsts *h, const char *file)
 
   fp = fopen(file, FOPEN_READTEXT);
   if(fp) {
-    line = malloc(MAX_HSTS_LINE);
-    if(!line)
-      goto fail;
-    while(Curl_get_line(line, MAX_HSTS_LINE, fp)) {
-      char *lineptr = line;
+    struct dynbuf buf;
+    Curl_dyn_init(&buf, MAX_HSTS_LINE);
+    while(Curl_get_line(&buf, fp)) {
+      char *lineptr = Curl_dyn_ptr(&buf);
       while(*lineptr && ISBLANK(*lineptr))
         lineptr++;
       if(*lineptr == '#')
@@ -520,15 +534,10 @@ static CURLcode hsts_load(struct hsts *h, const char *file)
 
       hsts_add(h, lineptr);
     }
-    free(line); /* free the line buffer */
+    Curl_dyn_free(&buf); /* free the line buffer */
     fclose(fp);
   }
   return result;
-
-  fail:
-  Curl_safefree(h->filename);
-  fclose(fp);
-  return CURLE_OUT_OF_MEMORY;
 }
 
 /*
@@ -550,6 +559,20 @@ CURLcode Curl_hsts_loadcb(struct Curl_easy *data, struct hsts *h)
   if(h)
     return hsts_pull(data, h);
   return CURLE_OK;
+}
+
+void Curl_hsts_loadfiles(struct Curl_easy *data)
+{
+  struct curl_slist *l = data->state.hstslist;
+  if(l) {
+    Curl_share_lock(data, CURL_LOCK_DATA_HSTS, CURL_LOCK_ACCESS_SINGLE);
+
+    while(l) {
+      (void)Curl_hsts_loadfile(data, data->hsts, l->data);
+      l = l->next;
+    }
+    Curl_share_unlock(data, CURL_LOCK_DATA_HSTS);
+  }
 }
 
 #endif /* CURL_DISABLE_HTTP || CURL_DISABLE_HSTS */

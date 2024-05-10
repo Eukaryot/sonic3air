@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -22,8 +22,7 @@
  *
  ***************************************************************************/
 /* <DESC>
- * An example demonstrating how an application can pass in a custom
- * socket to libcurl to use. This example also handles the connect itself.
+ * Pass in a custom socket for libcurl to use.
  * </DESC>
  */
 #include <stdio.h>
@@ -31,10 +30,8 @@
 #include <stdlib.h>
 #include <curl/curl.h>
 
-#ifdef WIN32
-#include <windows.h>
+#ifdef _WIN32
 #include <winsock2.h>
-#include <ws2tcpip.h>
 #define close closesocket
 #else
 #include <sys/types.h>        /*  socket types              */
@@ -97,7 +94,7 @@ int main(void)
   struct sockaddr_in servaddr;  /*  socket address structure  */
   curl_socket_t sockfd;
 
-#ifdef WIN32
+#ifdef _WIN32
   WSADATA wsaData;
   int initwsa = WSAStartup(MAKEWORD(2, 2), &wsaData);
   if(initwsa) {
@@ -109,8 +106,8 @@ int main(void)
   curl = curl_easy_init();
   if(curl) {
     /*
-     * Note that libcurl will internally think that you connect to the host
-     * and port that you specify in the URL option.
+     * Note that libcurl internally thinks that you connect to the host and
+     * port that you specify in the URL option.
      */
     curl_easy_setopt(curl, CURLOPT_URL, "http://99.99.99.99:9999");
 
@@ -169,7 +166,7 @@ int main(void)
     }
   }
 
-#ifdef WIN32
+#ifdef _WIN32
   WSACleanup();
 #endif
   return 0;

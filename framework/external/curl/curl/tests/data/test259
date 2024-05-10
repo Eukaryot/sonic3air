@@ -52,18 +52,19 @@ ok
 http
 </server>
 <features>
+Mime
 !SSPI
 crypto
 proxy
 </features>
- <name>
+<name>
 HTTP POST multipart with Expect: header using proxy anyauth (Digest)
- </name>
- <command>
--x http://%HOSTIP:%HTTPPORT http://remotehost:54321/we/want/%TESTNUMBER -F name=daniel -F tool=curl -F file=@log/test%TESTNUMBER.txt -U uuuser:pppassword --proxy-anyauth -H "Expect: 100-continue"
+</name>
+<command>
+-x http://%HOSTIP:%HTTPPORT http://remotehost:54321/we/want/%TESTNUMBER -F name=daniel -F tool=curl -F file=@%LOGDIR/test%TESTNUMBER.txt -U uuuser:pppassword --proxy-anyauth -H "Expect: 100-continue"
 </command>
 # We create this file before the command is invoked!
-<file name="log/test%TESTNUMBER.txt">
+<file name="%LOGDIR/test%TESTNUMBER.txt">
 foo-
 This is a moo-
 bar
@@ -82,7 +83,7 @@ User-Agent: curl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 Expect: 100-continue
-Content-Length: 409
+Content-Length: 433
 Content-Type: multipart/form-data; boundary=----------------------------7c633d5c27ce
 
 ------------------------------7c633d5c27ce
@@ -109,7 +110,7 @@ User-Agent: curl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
 Expect: 100-continue
-Content-Length: 409
+Content-Length: 433
 Content-Type: multipart/form-data; boundary=----------------------------7c633d5c27ce
 
 ------------------------------7c633d5c27ce

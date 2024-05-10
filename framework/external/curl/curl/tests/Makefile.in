@@ -21,7 +21,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -113,14 +113,13 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compile_check_sizeof.m4 \
-	$(top_srcdir)/m4/curl-amissl.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/curl-amissl.m4 \
 	$(top_srcdir)/m4/curl-bearssl.m4 \
 	$(top_srcdir)/m4/curl-compilers.m4 \
 	$(top_srcdir)/m4/curl-confopts.m4 \
 	$(top_srcdir)/m4/curl-functions.m4 \
 	$(top_srcdir)/m4/curl-gnutls.m4 \
-	$(top_srcdir)/m4/curl-mbedtls.m4 $(top_srcdir)/m4/curl-nss.m4 \
+	$(top_srcdir)/m4/curl-mbedtls.m4 \
 	$(top_srcdir)/m4/curl-openssl.m4 \
 	$(top_srcdir)/m4/curl-override.m4 \
 	$(top_srcdir)/m4/curl-reentrant.m4 \
@@ -145,7 +144,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/lib/curl_config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = config
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -199,7 +198,7 @@ am__define_uniq_tagged_files = \
   unique=`for i in $$list; do \
     if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
   done | $(am__uniquify_input)`
-am__DIST_COMMON = $(srcdir)/Makefile.in README.md
+am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.in README.md
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
   dir0=`pwd`; \
@@ -229,6 +228,8 @@ am__relativize = \
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
+APACHECTL = @APACHECTL@
+APXS = @APXS@
 AR = @AR@
 AR_FLAGS = @AR_FLAGS@
 AS = @AS@
@@ -237,6 +238,7 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BLANK_AT_MAKETIME = @BLANK_AT_MAKETIME@
+CADDY = @CADDY@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -295,9 +297,12 @@ HAVE_BROTLI = @HAVE_BROTLI@
 HAVE_GNUTLS_SRP = @HAVE_GNUTLS_SRP@
 HAVE_LDAP_SSL = @HAVE_LDAP_SSL@
 HAVE_LIBZ = @HAVE_LIBZ@
+HAVE_OPENSSL_QUIC = @HAVE_OPENSSL_QUIC@
 HAVE_OPENSSL_SRP = @HAVE_OPENSSL_SRP@
 HAVE_PROTO_BSDSOCKET_H = @HAVE_PROTO_BSDSOCKET_H@
 HAVE_ZSTD = @HAVE_ZSTD@
+HTTPD = @HTTPD@
+HTTPD_NGHTTPX = @HTTPD_NGHTTPX@
 IDN_ENABLED = @IDN_ENABLED@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -320,12 +325,9 @@ LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
-MANOPT = @MANOPT@
 MKDIR_P = @MKDIR_P@
 NM = @NM@
 NMEDIT = @NMEDIT@
-NROFF = @NROFF@
-NSS_LIBS = @NSS_LIBS@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 OTOOL = @OTOOL@
@@ -345,6 +347,7 @@ PKGADD_VENDOR = @PKGADD_VENDOR@
 PKGCONFIG = @PKGCONFIG@
 RANDOM_FILE = @RANDOM_FILE@
 RANLIB = @RANLIB@
+RC = @RC@
 REQUIRE_LIB_DEPS = @REQUIRE_LIB_DEPS@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -355,10 +358,12 @@ SSL_LIBS = @SSL_LIBS@
 STRIP = @STRIP@
 SUPPORT_FEATURES = @SUPPORT_FEATURES@
 SUPPORT_PROTOCOLS = @SUPPORT_PROTOCOLS@
+TEST_NGHTTPX = @TEST_NGHTTPX@
 USE_ARES = @USE_ARES@
 USE_BEARSSL = @USE_BEARSSL@
 USE_GNUTLS = @USE_GNUTLS@
 USE_HYPER = @USE_HYPER@
+USE_LIBPSL = @USE_LIBPSL@
 USE_LIBRTMP = @USE_LIBRTMP@
 USE_LIBSSH = @USE_LIBSSH@
 USE_LIBSSH2 = @USE_LIBSSH2@
@@ -367,10 +372,14 @@ USE_MSH3 = @USE_MSH3@
 USE_NGHTTP2 = @USE_NGHTTP2@
 USE_NGHTTP3 = @USE_NGHTTP3@
 USE_NGTCP2 = @USE_NGTCP2@
+USE_NGTCP2_CRYPTO_BORINGSSL = @USE_NGTCP2_CRYPTO_BORINGSSL@
 USE_NGTCP2_CRYPTO_GNUTLS = @USE_NGTCP2_CRYPTO_GNUTLS@
-USE_NGTCP2_CRYPTO_OPENSSL = @USE_NGTCP2_CRYPTO_OPENSSL@
-USE_NSS = @USE_NSS@
+USE_NGTCP2_CRYPTO_QUICTLS = @USE_NGTCP2_CRYPTO_QUICTLS@
+USE_NGTCP2_CRYPTO_WOLFSSL = @USE_NGTCP2_CRYPTO_WOLFSSL@
+USE_NGTCP2_H3 = @USE_NGTCP2_H3@
 USE_OPENLDAP = @USE_OPENLDAP@
+USE_OPENSSL_H3 = @USE_OPENSSL_H3@
+USE_OPENSSL_QUIC = @USE_OPENSSL_QUIC@
 USE_QUICHE = @USE_QUICHE@
 USE_RUSTLS = @USE_RUSTLS@
 USE_SCHANNEL = @USE_SCHANNEL@
@@ -440,18 +449,35 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-HTMLPAGES = testcurl.html runtests.html
-PDFPAGES = testcurl.pdf runtests.pdf
 MANDISTPAGES = runtests.1.dist testcurl.1.dist
-EXTRA_DIST = ftpserver.pl httpserver.pl secureserver.pl runtests.pl           \
- getpart.pm FILEFORMAT.md README.md stunnel.pem memanalyze.pl testcurl.pl     \
- valgrind.pm ftp.pm sshserver.pl sshhelp.pm pathhelp.pm testcurl.1 runtests.1 \
- serverhelp.pm tftpserver.pl rtspserver.pl directories.pm symbol-scan.pl      \
- CMakeLists.txt mem-include-scan.pl valgrind.supp extern-scan.pl              \
- manpage-scan.pl nroff-scan.pl http2-server.pl dictserver.py                  \
- negtelnetserver.py smbserver.py util.py                                      \
- disable-scan.pl manpage-syntax.pl error-codes.pl badsymbols.pl               \
- azure.pm appveyor.pm version-scan.pl options-scan.pl
+
+# scripts used in test cases
+TESTSCRIPTS = \
+ test1119.pl  \
+ test1132.pl  \
+ test1135.pl  \
+ test1139.pl  \
+ test1140.pl  \
+ test1165.pl  \
+ test1167.pl  \
+ test1173.pl  \
+ test1175.pl  \
+ test1177.pl  \
+ test1222.pl  \
+ test1275.pl  \
+ test1276.pl  \
+ test1477.pl  \
+ test1544.pl  \
+ test971.pl
+
+EXTRA_DIST = appveyor.pm azure.pm CMakeLists.txt devtest.pl             \
+ dictserver.py directories.pm FILEFORMAT.md processhelp.pm ftpserver.pl \
+ getpart.pm globalconfig.pm http-server.pl http2-server.pl              \
+ http3-server.pl memanalyze.pl negtelnetserver.py pathhelp.pm README.md \
+ rtspserver.pl runner.pm runtests.1 runtests.pl secureserver.pl         \
+ serverhelp.pm servers.pm smbserver.py sshhelp.pm sshserver.pl          \
+ stunnel.pem testcurl.1 testcurl.pl testutil.pm tftpserver.pl util.py   \
+ valgrind.pm valgrind.supp $(TESTSCRIPTS)
 
 DISTCLEANFILES = configurehelp.pm
 @BUILD_UNITTESTS_FALSE@BUILD_UNIT = 
@@ -462,11 +488,10 @@ DISTCLEANFILES = configurehelp.pm
 @BUILD_UNITTESTS_TRUE@BUILD_UNIT = unit
 @BUILD_UNITTESTS_FALSE@DIST_UNIT = unit
 @BUILD_UNITTESTS_TRUE@DIST_UNIT = 
-SUBDIRS = certs data server libtest $(BUILD_UNIT)
+SUBDIRS = certs data server libtest http $(BUILD_UNIT)
 DIST_SUBDIRS = $(SUBDIRS) $(DIST_UNIT)
 PERLFLAGS = -I$(srcdir)
 CLEANFILES = .http.pid .https.pid .ftp.pid .ftps.pid $(MANDISTPAGES)
-MAN2HTML = roffit $< >$@
 @CROSSCOMPILING_FALSE@TEST = srcdir=$(srcdir) $(PERL) $(PERLFLAGS) $(srcdir)/runtests.pl
 @CROSSCOMPILING_TRUE@TEST = @echo "NOTICE: we can't run the tests when cross-compiling!"
 @CROSSCOMPILING_FALSE@TEST_Q = -a -s
@@ -475,15 +500,15 @@ MAN2HTML = roffit $< >$@
 @CROSSCOMPILING_FALSE@TEST_T = -a -t
 @CROSSCOMPILING_FALSE@TEST_E = -a -e
 
-# !flaky means that it'll skip all tests using the flaky keyword
-@CROSSCOMPILING_FALSE@TEST_NF = -a -p !flaky
+# ~<keyword> means that it will run all tests matching the keyword, but will
+# ignore their results (since these ones are likely to fail for no good reason)
+@CROSSCOMPILING_FALSE@TEST_NF = -a -p ~flaky ~timing-dependent
 
 # special CI target derived from nonflaky with CI-specific flags
-@CROSSCOMPILING_FALSE@TEST_CI = $(TEST_NF) -r -rm
+@CROSSCOMPILING_FALSE@TEST_CI = $(TEST_NF) -rm
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .1 .html .pdf
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -493,9 +518,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu tests/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign tests/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu tests/Makefile
+	  $(AUTOMAKE) --foreign tests/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -513,6 +538,8 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+config: $(top_builddir)/config.status $(srcdir)/config.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -829,20 +856,11 @@ torture-test: perlcheck all
 event-test: perlcheck all
 	$(TEST) $(TEST_E) $(TFLAGS)
 
-.1.html:
-	$(MAN2HTML)
-
-.1.pdf:
-	@(foo=`echo $@ | sed -e 's/\.[0-9]$$//g'`; \
-	groff -Tps -man $< >$$foo.ps; \
-	ps2pdf $$foo.ps $@; \
-	rm $$foo.ps; \
-	echo "converted $< to $@")
-
 checksrc:
-	cd libtest && $(MAKE) checksrc
-	cd unit && $(MAKE) checksrc
-	cd server && $(MAKE) checksrc
+	(cd libtest && $(MAKE) checksrc)
+	(cd unit && $(MAKE) checksrc)
+	(cd server && $(MAKE) checksrc)
+	(cd http && $(MAKE) checksrc)
 
 # for debug builds, we scan the sources on all regular make invokes
 @CURLDEBUG_TRUE@all-local: checksrc

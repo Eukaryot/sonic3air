@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -68,7 +68,7 @@ static const struct testparams params[] = {
   { F_RESUME | F_HTTP416 |          F_CONTENTRANGE | F_IGNOREBODY, CURLE_OK },
   { F_RESUME | F_HTTP416 | F_FAIL |                  F_IGNOREBODY, CURLE_OK },
   { F_RESUME | F_HTTP416 | F_FAIL | F_CONTENTRANGE | F_IGNOREBODY,
-                                                  CURLE_HTTP_RETURNED_ERROR }
+                                                                   CURLE_OK }
 };
 
 static int      hasbody;
@@ -103,7 +103,7 @@ static int onetest(CURL *curl, const char *url, const struct testparams *p,
   hasbody = 0;
   res = curl_easy_perform(curl);
   if(res != p->result) {
-    printf("%d: bad error code (%d): resume=%s, fail=%s, http416=%s, "
+    printf("%zd: bad error code (%d): resume=%s, fail=%s, http416=%s, "
            "content-range=%s, expected=%d\n", num, res,
            (p->flags & F_RESUME)? "yes": "no",
            (p->flags & F_FAIL)? "yes": "no",
@@ -123,13 +123,13 @@ static int onetest(CURL *curl, const char *url, const struct testparams *p,
   }
   return 0;
 
-  test_cleanup:
+test_cleanup:
 
   return 1;
 }
 
 /* for debugging: */
-/*#define SINGLETEST 9*/
+/* #define SINGLETEST 9 */
 
 int test(char *URL)
 {
@@ -164,7 +164,7 @@ int test(char *URL)
   printf("%d\n", status);
   return status;
 
-  test_cleanup:
+test_cleanup:
 
   curl_easy_cleanup(curl);
   curl_global_cleanup();

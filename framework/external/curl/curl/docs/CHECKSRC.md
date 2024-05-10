@@ -12,13 +12,13 @@ check that it adheres to our [Source Code Style guide](CODE_STYLE.md).
 `-W[file]` skip that file and exclude it from being checked. Helpful
 when, for example, one of the files is generated.
 
-`-D[dir]` directory name to prepend to file names when accessing them.
+`-D[dir]` directory name to prepend to filenames when accessing them.
 
 `-h` shows the help output, that also lists all recognized warnings
 
-## What does checksrc warn for?
+## What does `checksrc` warn for?
 
-checksrc does not check and verify the code against the entire style guide.
+`checksrc` does not check and verify the code against the entire style guide.
 The script is an effort to detect the most common mistakes and syntax mistakes
 that contributors make before they get accustomed to our code style. Heck,
 many of us regulars do the mistakes too and this script helps us keep the code
@@ -27,7 +27,7 @@ in shape.
     checksrc.pl -h
 
 Lists how to use the script and it lists all existing warnings it has and
-problems it detects. At the time of this writing, the existing checksrc
+problems it detects. At the time of this writing, the existing `checksrc`
 warnings are:
 
 - `ASSIGNWITHINCONDITION`: Assignment within a conditional expression. The
@@ -41,7 +41,7 @@ warnings are:
    more appropriate `char *name` style. The asterisk should sit right next to
    the name without a space in between.
 
-- `BADCOMMAND`: There's a bad `!checksrc!` instruction in the code. See the
+- `BADCOMMAND`: There is a bad `checksrc` instruction in the code. See the
    **Ignore certain warnings** section below for details.
 
 - `BANNEDFUNC`: A banned function was used. The functions sprintf, vsprintf,
@@ -56,7 +56,7 @@ warnings are:
 
 - `COMMANOSPACE`: a comma without following space
 
-- `COPYRIGHT`: the file is missing a copyright statement!
+- `COPYRIGHT`: the file is missing a copyright statement
 
 - `CPPCOMMENTS`: `//` comment detected, that is not C89 compliant
 
@@ -73,7 +73,7 @@ warnings are:
 - `FOPENMODE`: `fopen()` needs a macro for the mode string, use it
 
 - `INDENTATION`: detected a wrong start column for code. Note that this
-   warning only checks some specific places and will certainly miss many bad
+   warning only checks some specific places and can certainly miss many bad
    indentations.
 
 - `LONGLINE`: A line is longer than 79 columns.
@@ -113,14 +113,14 @@ warnings are:
 
 - `SPACESEMICOLON`: there was a space before semicolon, ` ;`.
 
-- `TABS`: TAB characters are not allowed!
+- `TABS`: TAB characters are not allowed
 
 - `TRAILINGSPACE`: Trailing whitespace on the line
 
 - `TYPEDEFSTRUCT`: we frown upon (most) typedefed structs
 
-- `UNUSEDIGNORE`: a checksrc inlined warning ignore was asked for but not used,
-   that is an ignore that should be removed or changed to get used.
+- `UNUSEDIGNORE`: a `checksrc` inlined warning ignore was asked for but not
+   used, that is an ignore that should be removed or changed to get used.
 
 ### Extended warnings
 
@@ -137,19 +137,20 @@ Currently these are the extended warnings which can be enabled:
 
 - `STRERROR`: use of banned function strerror()
 
+- `STDERR`: use of banned variable `stderr`
+
 ## Ignore certain warnings
 
-Due to the nature of the source code and the flaws of the checksrc tool, there
-is sometimes a need to ignore specific warnings. checksrc allows a few
+Due to the nature of the source code and the flaws of the `checksrc` tool,
+there is sometimes a need to ignore specific warnings. `checksrc` allows a few
 different ways to do this.
 
 ### Inline ignore
 
 You can control what to ignore within a specific source file by providing
-instructions to checksrc in the source code itself. You need a magic marker
-that is `!checksrc!` followed by the instruction. The instruction can ask to
-ignore a specific warning N number of times or you ignore all of them until
-you mark the end of the ignored section.
+instructions to `checksrc` in the source code itself. See examples below. The
+instruction can ask to ignore a specific warning a specific number of times or
+you ignore all of them until you mark the end of the ignored section.
 
 Inline ignores are only done for that single specific source code file.
 
@@ -157,21 +158,21 @@ Example
 
     /* !checksrc! disable LONGLINE all */
 
-This will ignore the warning for overly long lines until it is re-enabled with:
+This ignores the warning for overly long lines until it is re-enabled with:
 
     /* !checksrc! enable LONGLINE */
 
-If the enabling is not performed before the end of the file, it will be enabled
-automatically for the next file.
+If the enabling is not performed before the end of the file, it is enabled
+again automatically for the next file.
 
 You can also opt to ignore just N violations so that if you have a single long
 line you just cannot shorten and is agreed to be fine anyway:
 
     /* !checksrc! disable LONGLINE 1 */
 
-... and the warning for long lines will be enabled again automatically after
-it has ignored that single warning. The number `1` can of course be changed to
-any other integer number. It can be used to make sure only the exact intended
+... and the warning for long lines is enabled again automatically after it has
+ignored that single warning. The number `1` can of course be changed to any
+other integer number. It can be used to make sure only the exact intended
 instances are ignored and nothing extra.
 
 ### Directory wide ignore patterns

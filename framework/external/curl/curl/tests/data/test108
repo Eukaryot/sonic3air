@@ -17,13 +17,13 @@ STOR
 <server>
 ftp
 </server>
- <name>
+<name>
 FTP PORT upload with CWD
- </name>
- <command>
-ftp://%HOSTIP:%FTPPORT/CWD/STOR/RETR/%TESTNUMBER -T log/upload%TESTNUMBER -P -
+</name>
+<command>
+ftp://%HOSTIP:%FTPPORT/CWD/STOR/RETR/%TESTNUMBER -T %LOGDIR/upload%TESTNUMBER -P -
 </command>
-<file name="log/upload%TESTNUMBER">
+<file name="%LOGDIR/upload%TESTNUMBER">
 Moooooooooooo
  upload this
 </file>

@@ -14,11 +14,15 @@ none
 </server>
 <features>
 unittest
+netrc
 </features>
- <name>
+<name>
 netrc parsing unit tests
- </name>
-<file name="log/netrc%TESTNUMBER">
+</name>
+<command>
+%LOGDIR/netrc%TESTNUMBER
+</command>
+<file name="%LOGDIR/netrc%TESTNUMBER">
 machine example.com login admin password passwd
 machine curl.example.com login none password none
 </file>

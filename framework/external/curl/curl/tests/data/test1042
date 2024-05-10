@@ -55,13 +55,13 @@ Content-Type: text/plain
 <server>
 http
 </server>
- <name>
+<name>
 HTTP GET beyond end of entirely-downloaded file, no server resume
- </name>
- <command>
+</name>
+<command>
 http://%HOSTIP:%HTTPPORT/%TESTNUMBER -C 200
 </command>
-<file name="log/curl%TESTNUMBER.out">
+<file name="%LOGDIR/curl%TESTNUMBER.out">
 012345678
 012345678
 012345678

@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -37,6 +37,12 @@ struct Curl_header_store {
 };
 
 /*
+ * Initialize header collecting for a transfer.
+ * Will add a client writer that catches CLIENTWRITE_HEADER writes.
+ */
+CURLcode Curl_headers_init(struct Curl_easy *data);
+
+/*
  * Curl_headers_push() gets passed a full header to store.
  */
 CURLcode Curl_headers_push(struct Curl_easy *data, const char *header,
@@ -48,6 +54,7 @@ CURLcode Curl_headers_push(struct Curl_easy *data, const char *header,
 CURLcode Curl_headers_cleanup(struct Curl_easy *data);
 
 #else
+#define Curl_headers_init(x) CURLE_OK
 #define Curl_headers_push(x,y,z) CURLE_OK
 #define Curl_headers_cleanup(x) Curl_nop_stmt
 #endif

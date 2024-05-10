@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -131,7 +131,7 @@ static void *fire(void *ptr)
 /* test function */
 int test(char *URL)
 {
-  int res;
+  CURLcode res = CURLE_OK;
   CURLSHcode scode = CURLSHE_OK;
   char *url;
   struct Tdata tdata;
@@ -184,8 +184,6 @@ int test(char *URL)
   }
 
 
-  res = 0;
-
   /* start treads */
   for(i = 1; i <= THREADS; i++) {
 
@@ -215,9 +213,9 @@ int test(char *URL)
   test_setopt(curl, CURLOPT_SHARE, share);
 
   printf("PERFORM\n");
-  curl_easy_perform(curl);
+  res = curl_easy_perform(curl);
 
-  /* try to free share, expect to fail because share is in use*/
+  /* try to free share, expect to fail because share is in use */
   printf("try SHARE_CLEANUP...\n");
   scode = curl_share_cleanup(share);
   if(scode == CURLSHE_OK) {

@@ -32,14 +32,14 @@ http
 </server>
 
 # make sure there's no Expect: 100-continue when there's no file to send!
- <name>
+<name>
 HTTP with zero size file PUT
- </name>
- <command>
-http://%HOSTIP:%HTTPPORT/%TESTNUMBER -T log/empty%TESTNUMBER
+</name>
+<command>
+http://%HOSTIP:%HTTPPORT/%TESTNUMBER -T %LOGDIR/empty%TESTNUMBER
 </command>
 # create an empty file
-<file name="log/empty%TESTNUMBER">
+<file name="%LOGDIR/empty%TESTNUMBER">
 </file>
 </client>
 

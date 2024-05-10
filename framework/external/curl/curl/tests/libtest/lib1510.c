@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2013 - 2022, Linus Nielsen Feltzing <linus@haxx.se>
+ * Copyright (C) Linus Nielsen Feltzing <linus@haxx.se>
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -83,6 +83,8 @@ int test(char *URL)
     easy_setopt(curl, CURLOPT_URL, target_url);
 
     res = curl_easy_perform(curl);
+    if(res)
+      goto test_cleanup;
 
     abort_on_test_timeout();
   }

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -39,11 +39,15 @@ int test(char *URL)
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     res = curl_easy_perform(curl);
+    if(res)
+      goto test_cleanup;
 
     fprintf(stderr, "****************************** Do it again\n");
     res = curl_easy_perform(curl);
-    curl_easy_cleanup(curl);
   }
+
+test_cleanup:
+  curl_easy_cleanup(curl);
   curl_global_cleanup();
   return (int)res;
 }

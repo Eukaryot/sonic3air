@@ -1,13 +1,13 @@
 # Parallel transfers
 
-curl 7.66.0 introduces support for doing multiple transfers simultaneously; in
+curl 7.66.0 introduced support for doing multiple transfers simultaneously; in
 parallel.
 
 ## -Z, --parallel
 
-When this command line option is used, curl will perform the transfers given
-to it at the same time. It will do up to `--parallel-max` concurrent
-transfers, with a default value of 50.
+When this command line option is used, curl performs the transfers given to it
+at the same time. It does up to `--parallel-max` concurrent transfers, with a
+default value of 50.
 
 ## Progress meter
 
@@ -27,8 +27,8 @@ completely different than the regular one used for each single transfer.
  o total time all transfers are expected to take (if sizes are known)
  o current time the transfers have spent so far
  o estimated time left (if sizes are known)
- o current transfer speed (the faster of UL/DL speeds measured over the last
-   few seconds)
+ o current transfer speed (the faster of upload/download speeds measured over
+   the last few seconds)
 
 Example:
 
@@ -38,9 +38,9 @@ Example:
 ## Behavior differences
 
 Connections are shared fine between different easy handles, but the
-"authentication contexts" are not. So for example doing HTTP Digest auth with
-one handle for a particular transfer and then continue on with another handle
-that reuses the same connection, the second handle cannot send the necessary
+"authentication contexts" are not. For example doing HTTP Digest auth with one
+handle for a particular transfer and then continue on with another handle that
+reuses the same connection, the second handle cannot send the necessary
 Authorization header at once since the context is only kept in the original
 easy handle.
 
@@ -48,11 +48,3 @@ To fix this, the authorization state could be made possible to share with the
 share API as well, as a context per origin + path (realm?) basically.
 
 Visible in test 153, 1412 and more.
-
-## Feedback
-
-This is early days for parallel transfer support. Keep your eyes open for
-unintended side effects or downright bugs.
-
-Tell us what you think and how you think we could improve this feature!
-

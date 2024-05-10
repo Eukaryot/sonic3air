@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -30,7 +30,7 @@
 
 static CURLcode unit_setup(void)
 {
-  int res = CURLE_OK;
+  CURLcode res = CURLE_OK;
   global_init(CURL_GLOBAL_ALL);
   return res;
 }
@@ -83,8 +83,6 @@ UNITTEST_START
     fail_unless(empty->set.str[i] == NULL,
                 "Curl_free() did not set to NULL");
   }
-
-  Curl_free_request_state(empty);
 
   rc = Curl_close(&empty);
   fail_unless(rc == CURLE_OK, "Curl_close() failed");

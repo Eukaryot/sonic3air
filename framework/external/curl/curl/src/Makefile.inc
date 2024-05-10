@@ -5,7 +5,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -29,28 +29,33 @@
 # CSRC2 = file4.c file5.c file6.c
 # CSOURCES = $(CSRC1) $(CSRC2)
 
-# libcurl has sources that provide functions named curlx_* that aren't part of
-# the official API, but we re-use the code here to avoid duplication.
-CURLX_CFILES = \
-  ../lib/strtoofft.c \
-  ../lib/timediff.c \
-  ../lib/nonblock.c \
-  ../lib/warnless.c \
-  ../lib/curl_ctype.c \
-  ../lib/curl_multibyte.c \
-  ../lib/version_win32.c \
+# libcurl sources to include in curltool lib we use for test binaries
+CURLTOOL_LIBCURL_CFILES = \
+  ../lib/base64.c \
   ../lib/dynbuf.c
 
+# libcurl has sources that provide functions named curlx_* that aren't part of
+# the official API, but we reuse the code here to avoid duplication.
+CURLX_CFILES = \
+  ../lib/base64.c \
+  ../lib/curl_multibyte.c \
+  ../lib/dynbuf.c \
+  ../lib/nonblock.c \
+  ../lib/strtoofft.c \
+  ../lib/timediff.c \
+  ../lib/version_win32.c \
+  ../lib/warnless.c
+
 CURLX_HFILES = \
-  ../lib/curl_setup.h \
-  ../lib/strtoofft.h \
-  ../lib/timediff.h \
-  ../lib/nonblock.h \
-  ../lib/warnless.h \
   ../lib/curl_ctype.h \
   ../lib/curl_multibyte.h \
+  ../lib/curl_setup.h \
+  ../lib/dynbuf.h \
+  ../lib/nonblock.h \
+  ../lib/strtoofft.h \
+  ../lib/timediff.h \
   ../lib/version_win32.h \
-  ../lib/dynbuf.h
+  ../lib/warnless.h
 
 CURL_CFILES = \
   slist_wc.c \
@@ -74,25 +79,27 @@ CURL_CFILES = \
   tool_help.c \
   tool_helpers.c \
   tool_hugehelp.c \
+  tool_ipfs.c \
   tool_libinfo.c \
   tool_listhelp.c \
   tool_main.c \
   tool_msgs.c \
   tool_operate.c \
   tool_operhlp.c \
-  tool_panykey.c \
   tool_paramhlp.c \
   tool_parsecfg.c \
   tool_progress.c \
-  tool_strdup.c \
   tool_setopt.c \
   tool_sleep.c \
+  tool_stderr.c \
+  tool_strdup.c \
   tool_urlglob.c \
   tool_util.c \
   tool_vms.c \
   tool_writeout.c \
   tool_writeout_json.c \
-  tool_xattr.c
+  tool_xattr.c \
+  var.c
 
 CURL_HFILES = \
   slist_wc.h \
@@ -116,12 +123,12 @@ CURL_HFILES = \
   tool_help.h \
   tool_helpers.h \
   tool_hugehelp.h \
+  tool_ipfs.h \
   tool_libinfo.h \
   tool_main.h \
   tool_msgs.h \
   tool_operate.h \
   tool_operhlp.h \
-  tool_panykey.h \
   tool_paramhlp.h \
   tool_parsecfg.h \
   tool_progress.h \
@@ -129,6 +136,7 @@ CURL_HFILES = \
   tool_setopt.h \
   tool_setup.h \
   tool_sleep.h \
+  tool_stderr.h \
   tool_strdup.h \
   tool_urlglob.h \
   tool_util.h \
@@ -136,7 +144,8 @@ CURL_HFILES = \
   tool_vms.h \
   tool_writeout.h \
   tool_writeout_json.h \
-  tool_xattr.h
+  tool_xattr.h \
+  var.h
 
 CURL_RCFILES = curl.rc
 

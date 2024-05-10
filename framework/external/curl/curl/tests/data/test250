@@ -2,6 +2,7 @@
 <info>
 <keywords>
 FTP
+SLOWDOWN
 </keywords>
 </info>
 
@@ -34,10 +35,10 @@ SLOWDOWN
 <server>
 ftp
 </server>
- <name>
+<name>
 FTP dir list PASV with slow response
- </name>
- <command>
+</name>
+<command option="binary-trace">
 ftp://%HOSTIP:%FTPPORT/
 </command>
 </client>

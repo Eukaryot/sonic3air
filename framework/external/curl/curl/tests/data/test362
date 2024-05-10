@@ -12,10 +12,10 @@ STOR
 <server>
 ftp
 </server>
- <name>
+<name>
 FTP resume upload file with nothing to start from
- </name>
-<file name="log/test%TESTNUMBER.txt">
+</name>
+<file name="%LOGDIR/test%TESTNUMBER.txt">
 data
     to
       see
@@ -23,8 +23,8 @@ that FTP
 works
   so does it?
 </file>
- <command>
-ftp://%HOSTIP:%FTPPORT/%TESTNUMBER -T log/test%TESTNUMBER.txt --continue-at -
+<command>
+ftp://%HOSTIP:%FTPPORT/%TESTNUMBER -T %LOGDIR/test%TESTNUMBER.txt --continue-at -
 </command>
 </client>
 

@@ -5,7 +5,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -34,7 +34,7 @@ CC = gcc
 # Compiler flags, -g for debug, -c to make an object file
 CFLAGS = -c -g
 
-# This should point to a directory that holds libcurl, if it isn't
+# This should point to a directory that holds libcurl, if it is not
 # in the system's standard lib dir
 # We also set a -L to include the directory where we have the openssl
 # libraries

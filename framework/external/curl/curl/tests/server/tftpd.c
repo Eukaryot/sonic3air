@@ -15,7 +15,7 @@
  */
 
 /*
- * Copyright (C) 2005 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  * Copyright (c) 1983, Regents of the University of California.
  * All rights reserved.
  *
@@ -55,9 +55,7 @@
 #ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #endif
-#ifdef HAVE_SIGNAL_H
 #include <signal.h>
-#endif
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
@@ -67,11 +65,6 @@
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
-#ifdef HAVE_ARPA_TFTP_H
-#include <arpa/tftp.h>
-#else
-#include "tftp.h"
-#endif
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
 #endif
@@ -80,13 +73,13 @@
 #include <sys/filio.h>
 #endif
 
-#ifdef HAVE_SETJMP_H
 #include <setjmp.h>
-#endif
 
 #ifdef HAVE_PWD_H
 #include <pwd.h>
 #endif
+
+#include <ctype.h>
 
 #define ENABLE_CURLX_PRINTF
 /* make the curlx header define all printf() functions to use the curlx_*
@@ -95,6 +88,7 @@
 #include "getpart.h"
 #include "util.h"
 #include "server_sockaddr.h"
+#include "tftp.h"
 
 /* include memdebug.h last */
 #include "memdebug.h"
@@ -161,7 +155,7 @@ struct bf {
 #define DEFAULT_LOGFILE "log/tftpd.log"
 #endif
 
-#define REQUEST_DUMP  "log/server.input"
+#define REQUEST_DUMP  "server.input"
 
 #define DEFAULT_PORT 8999 /* UDP */
 
@@ -212,7 +206,9 @@ static bool use_ipv6 = FALSE;
 #endif
 static const char *ipv_inuse = "IPv4";
 
-const  char *serverlogfile = DEFAULT_LOGFILE;
+const char *serverlogfile = DEFAULT_LOGFILE;
+static const char *logdir = "log";
+static char loglockfile[256];
 static const char *pidname = ".tftpd.pid";
 static const char *portname = NULL; /* none by default */
 static int serverlogslocked = 0;
@@ -298,7 +294,7 @@ static void timer(int signum)
     }
     if(serverlogslocked) {
       serverlogslocked = 0;
-      clear_advisor_read_lock(SERVERLOGS_LOCK);
+      clear_advisor_read_lock(loglockfile);
     }
     exit(1);
   }
@@ -456,8 +452,8 @@ static ssize_t write_behind(struct testcase *test, int convert)
 
   if(!test->ofile) {
     char outfile[256];
-    msnprintf(outfile, sizeof(outfile), "log/upload.%ld", test->testno);
-#ifdef WIN32
+    msnprintf(outfile, sizeof(outfile), "%s/upload.%ld", logdir, test->testno);
+#ifdef _WIN32
     test->ofile = open(outfile, O_CREAT|O_RDWR|O_BINARY, 0777);
 #else
     test->ofile = open(outfile, O_CREAT|O_RDWR, 0777);
@@ -496,7 +492,7 @@ static ssize_t write_behind(struct testcase *test, int convert)
        putc(c, file); */
     if(1 != write(test->ofile, &c, 1))
       break;
-    skipit:
+skipit:
     prevchar = c;
   }
   return count;
@@ -593,6 +589,11 @@ int main(int argc, char **argv)
       if(argc>arg)
         serverlogfile = argv[arg++];
     }
+    else if(!strcmp("--logdir", argv[arg])) {
+      arg++;
+      if(argc>arg)
+        logdir = argv[arg++];
+    }
     else if(!strcmp("--ipv4", argv[arg])) {
 #ifdef ENABLE_IPV6
       ipv_inuse = "IPv4";
@@ -627,6 +628,7 @@ int main(int argc, char **argv)
       puts("Usage: tftpd [option]\n"
            " --version\n"
            " --logfile [file]\n"
+           " --logdir [directory]\n"
            " --pidfile [file]\n"
            " --portfile [file]\n"
            " --ipv4\n"
@@ -637,7 +639,10 @@ int main(int argc, char **argv)
     }
   }
 
-#ifdef WIN32
+  msnprintf(loglockfile, sizeof(loglockfile), "%s/%s/tftp-%s.lock",
+            logdir, SERVERLOGS_LOCKDIR, ipv_inuse);
+
+#ifdef _WIN32
   win32_init();
   atexit(win32_cleanup);
 #endif
@@ -655,8 +660,7 @@ int main(int argc, char **argv)
 
   if(CURL_SOCKET_BAD == sock) {
     error = SOCKERRNO;
-    logmsg("Error creating socket: (%d) %s",
-           error, strerror(error));
+    logmsg("Error creating socket: (%d) %s", error, sstrerror(error));
     result = 1;
     goto tftpd_cleanup;
   }
@@ -666,7 +670,7 @@ int main(int argc, char **argv)
             (void *)&flag, sizeof(flag))) {
     error = SOCKERRNO;
     logmsg("setsockopt(SO_REUSEADDR) failed with error: (%d) %s",
-           error, strerror(error));
+           error, sstrerror(error));
     result = 1;
     goto tftpd_cleanup;
   }
@@ -691,8 +695,8 @@ int main(int argc, char **argv)
 #endif /* ENABLE_IPV6 */
   if(0 != rc) {
     error = SOCKERRNO;
-    logmsg("Error binding socket on port %hu: (%d) %s",
-           port, error, strerror(error));
+    logmsg("Error binding socket on port %hu: (%d) %s", port, error,
+           sstrerror(error));
     result = 1;
     goto tftpd_cleanup;
   }
@@ -714,7 +718,7 @@ int main(int argc, char **argv)
     if(getsockname(sock, &localaddr.sa, &la_size) < 0) {
       error = SOCKERRNO;
       logmsg("getsockname() failed with error: (%d) %s",
-             error, strerror(error));
+             error, sstrerror(error));
       sclose(sock);
       goto tftpd_cleanup;
     }
@@ -777,7 +781,7 @@ int main(int argc, char **argv)
       break;
     }
 
-    set_advisor_read_lock(SERVERLOGS_LOCK);
+    set_advisor_read_lock(loglockfile);
     serverlogslocked = 1;
 
 #ifdef ENABLE_IPV6
@@ -831,7 +835,7 @@ int main(int argc, char **argv)
 
     if(serverlogslocked) {
       serverlogslocked = 0;
-      clear_advisor_read_lock(SERVERLOGS_LOCK);
+      clear_advisor_read_lock(loglockfile);
     }
 
     logmsg("end of one transfer");
@@ -859,7 +863,7 @@ tftpd_cleanup:
 
   if(serverlogslocked) {
     serverlogslocked = 0;
-    clear_advisor_read_lock(SERVERLOGS_LOCK);
+    clear_advisor_read_lock(loglockfile);
   }
 
   restore_signal_handlers(true);
@@ -893,13 +897,17 @@ static int do_tftp(struct testcase *test, struct tftphdr *tp, ssize_t size)
 #endif
   const char *option = "mode"; /* mode is implicit */
   int toggle = 1;
+  FILE *server;
+  char dumpfile[256];
+
+  msnprintf(dumpfile, sizeof(dumpfile), "%s/%s", logdir, REQUEST_DUMP);
 
   /* Open request dump file. */
-  FILE *server = fopen(REQUEST_DUMP, "ab");
+  server = fopen(dumpfile, "ab");
   if(!server) {
     int error = errno;
     logmsg("fopen() failed with error: %d %s", error, strerror(error));
-    logmsg("Error opening file: %s", REQUEST_DUMP);
+    logmsg("Error opening file: %s", dumpfile);
     return -1;
   }
 
@@ -1002,7 +1010,7 @@ static int parse_servercmd(struct testcase *req)
   FILE *stream;
   int error;
 
-  stream = test2fopen(req->testno);
+  stream = test2fopen(req->testno, logdir);
   if(!stream) {
     error = errno;
     logmsg("fopen() failed with error: %d %s", error, strerror(error));
@@ -1113,7 +1121,7 @@ static int validate_access(struct testcase *test,
 
     (void)parse_servercmd(test);
 
-    stream = test2fopen(testno);
+    stream = test2fopen(testno, logdir);
 
     if(0 != partno)
       msnprintf(partbuf, sizeof(partbuf), "data%ld", partno);
@@ -1121,7 +1129,7 @@ static int validate_access(struct testcase *test,
     if(!stream) {
       int error = errno;
       logmsg("fopen() failed with error: %d %s", error, strerror(error));
-      logmsg("Couldn't open test file for test : %d", testno);
+      logmsg("Couldn't open test file for test: %ld", testno);
       return EACCESS;
     }
     else {
@@ -1184,7 +1192,7 @@ static void sendtftp(struct testcase *test, const struct formats *pf)
       wait_ms(1000*test->writedelay);
     }
 
-    send_data:
+send_data:
     logmsg("write");
     if(swrite(peer, sdp, size + 4) != size + 4) {
       logmsg("write: fail");

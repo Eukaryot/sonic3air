@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -27,6 +27,7 @@
 #include "urldata.h"
 #include "strdup.h"
 #include "strcase.h"
+#include "sendf.h"
 #include "headers.h"
 
 /* The last 3 #include files should be in this order */
@@ -38,14 +39,13 @@
 
 /* Generate the curl_header struct for the user. This function MUST assign all
    struct fields in the output struct. */
-static void copy_header_external(struct Curl_easy *data,
-                                 struct Curl_header_store *hs,
+static void copy_header_external(struct Curl_header_store *hs,
                                  size_t index,
                                  size_t amount,
                                  struct Curl_llist_element *e,
-                                 struct curl_header **hout)
+                                 struct curl_header *hout)
 {
-  struct curl_header *h = *hout = &data->state.headerout;
+  struct curl_header *h = hout;
   h->name = hs->name;
   h->value = hs->value;
   h->amount = amount;
@@ -74,8 +74,8 @@ CURLHcode curl_easy_header(CURL *easy,
   struct Curl_header_store *hs = NULL;
   struct Curl_header_store *pick = NULL;
   if(!name || !hout || !data ||
-     (type > (CURLH_HEADER|CURLH_TRAILER|CURLH_CONNECT|CURLH_1XX)) ||
-     !type || (request < -1))
+     (type > (CURLH_HEADER|CURLH_TRAILER|CURLH_CONNECT|CURLH_1XX|
+              CURLH_PSEUDO)) || !type || (request < -1))
     return CURLHE_BAD_ARGUMENT;
   if(!Curl_llist_count(&data->state.httphdrs))
     return CURLHE_NOHEADERS; /* no headers available */
@@ -118,7 +118,9 @@ CURLHcode curl_easy_header(CURL *easy,
       return CURLHE_MISSING;
   }
   /* this is the name we want */
-  copy_header_external(data, hs, nameindex, amount, e_pick, hout);
+  copy_header_external(hs, nameindex, amount, e_pick,
+                       &data->state.headerout[0]);
+  *hout = &data->state.headerout[0];
   return CURLHE_OK;
 }
 
@@ -132,7 +134,6 @@ struct curl_header *curl_easy_nextheader(CURL *easy,
   struct Curl_llist_element *pick;
   struct Curl_llist_element *e;
   struct Curl_header_store *hs;
-  struct curl_header *hout;
   size_t amount = 0;
   size_t index = 0;
 
@@ -179,12 +180,13 @@ struct curl_header *curl_easy_nextheader(CURL *easy,
       index = amount - 1;
   }
 
-  copy_header_external(data, hs, index, amount, pick, &hout);
-  return hout;
+  copy_header_external(hs, index, amount, pick,
+                       &data->state.headerout[1]);
+  return &data->state.headerout[1];
 }
 
 static CURLcode namevalue(char *header, size_t hlen, unsigned int type,
-                           char **name, char **value)
+                          char **name, char **value)
 {
   char *end = header + hlen - 1; /* point to the last byte */
   DEBUGASSERT(hlen);
@@ -207,7 +209,7 @@ static CURLcode namevalue(char *header, size_t hlen, unsigned int type,
     return CURLE_BAD_FUNCTION_ARGUMENT;
 
   /* skip all leading space letters */
-  while(*header && ISSPACE(*header))
+  while(*header && ISBLANK(*header))
     header++;
 
   *value = header;
@@ -237,7 +239,7 @@ static CURLcode unfold_value(struct Curl_easy *data, const char *value,
     vlen--;
 
   /* save only one leading space */
-  while((vlen > 1) && ISSPACE(value[0]) && ISSPACE(value[1])) {
+  while((vlen > 1) && ISBLANK(value[0]) && ISBLANK(value[1])) {
     vlen--;
     value++;
   }
@@ -259,7 +261,7 @@ static CURLcode unfold_value(struct Curl_easy *data, const char *value,
 
   /* put the data at the end of the previous data, not the newline */
   memcpy(&newhs->value[olen], value, vlen);
-  newhs->value[olen + vlen] = 0; /* zero terminate at newline */
+  newhs->value[olen + vlen] = 0; /* null-terminate at newline */
 
   /* insert this node into the list of headers */
   Curl_llist_insert_next(&data->state.httphdrs, data->state.httphdrs.tail,
@@ -291,17 +293,25 @@ CURLcode Curl_headers_push(struct Curl_easy *data, const char *header,
   if(!end) {
     end = strchr(header, '\n');
     if(!end)
-      return CURLE_BAD_FUNCTION_ARGUMENT;
+      /* neither CR nor LF as terminator is not a valid header */
+      return CURLE_WEIRD_SERVER_REPLY;
   }
-  hlen = end - header + 1;
+  hlen = end - header;
 
   if((header[0] == ' ') || (header[0] == '\t')) {
     if(data->state.prevhead)
       /* line folding, append value to the previous header's value */
       return unfold_value(data, header, hlen);
-    else
-      /* can't unfold without a previous header */
-      return CURLE_BAD_FUNCTION_ARGUMENT;
+    else {
+      /* Can't unfold without a previous header. Instead of erroring, just
+         pass the leading blanks. */
+      while(hlen && ISBLANK(*header)) {
+        header++;
+        hlen--;
+      }
+      if(!hlen)
+        return CURLE_WEIRD_SERVER_REPLY;
+    }
   }
 
   hs = calloc(1, sizeof(*hs) + hlen);
@@ -311,30 +321,83 @@ CURLcode Curl_headers_push(struct Curl_easy *data, const char *header,
   hs->buffer[hlen] = 0; /* nul terminate */
 
   result = namevalue(hs->buffer, hlen, type, &name, &value);
-  if(result)
-    goto fail;
+  if(!result) {
+    hs->name = name;
+    hs->value = value;
+    hs->type = type;
+    hs->request = data->state.requests;
 
-  hs->name = name;
-  hs->value = value;
-  hs->type = type;
-  hs->request = data->state.requests;
-
-  /* insert this node into the list of headers */
-  Curl_llist_insert_next(&data->state.httphdrs, data->state.httphdrs.tail,
-                         hs, &hs->node);
-  data->state.prevhead = hs;
-  return CURLE_OK;
-  fail:
-  free(hs);
+    /* insert this node into the list of headers */
+    Curl_llist_insert_next(&data->state.httphdrs, data->state.httphdrs.tail,
+                           hs, &hs->node);
+    data->state.prevhead = hs;
+  }
+  else
+    free(hs);
   return result;
 }
 
 /*
- * Curl_headers_init(). Init the headers subsystem.
+ * Curl_headers_reset(). Reset the headers subsystem.
  */
-static void headers_init(struct Curl_easy *data)
+static void headers_reset(struct Curl_easy *data)
 {
   Curl_llist_init(&data->state.httphdrs, NULL);
+  data->state.prevhead = NULL;
+}
+
+struct hds_cw_collect_ctx {
+  struct Curl_cwriter super;
+};
+
+static CURLcode hds_cw_collect_write(struct Curl_easy *data,
+                                     struct Curl_cwriter *writer, int type,
+                                     const char *buf, size_t blen)
+{
+  if((type & CLIENTWRITE_HEADER) && !(type & CLIENTWRITE_STATUS)) {
+    unsigned char htype = (unsigned char)
+      (type & CLIENTWRITE_CONNECT ? CURLH_CONNECT :
+       (type & CLIENTWRITE_1XX ? CURLH_1XX :
+        (type & CLIENTWRITE_TRAILER ? CURLH_TRAILER :
+         CURLH_HEADER)));
+    CURLcode result = Curl_headers_push(data, buf, htype);
+    if(result)
+      return result;
+  }
+  return Curl_cwriter_write(data, writer->next, type, buf, blen);
+}
+
+static const struct Curl_cwtype hds_cw_collect = {
+  "hds-collect",
+  NULL,
+  Curl_cwriter_def_init,
+  hds_cw_collect_write,
+  Curl_cwriter_def_close,
+  sizeof(struct hds_cw_collect_ctx)
+};
+
+CURLcode Curl_headers_init(struct Curl_easy *data)
+{
+  struct Curl_cwriter *writer;
+  CURLcode result;
+
+  if(data->conn && (data->conn->handler->protocol & PROTO_FAMILY_HTTP)) {
+    /* avoid installing it twice */
+    if(Curl_cwriter_get_by_name(data, hds_cw_collect.name))
+      return CURLE_OK;
+
+    result = Curl_cwriter_create(&writer, data, &hds_cw_collect,
+                                 CURL_CW_PROTOCOL);
+    if(result)
+      return result;
+
+    result = Curl_cwriter_add(data, writer);
+    if(result) {
+      Curl_cwriter_free(data, writer);
+      return result;
+    }
+  }
+  return CURLE_OK;
 }
 
 /*
@@ -350,7 +413,7 @@ CURLcode Curl_headers_cleanup(struct Curl_easy *data)
     n = e->next;
     free(hs);
   }
-  headers_init(data);
+  headers_reset(data);
   return CURLE_OK;
 }
 

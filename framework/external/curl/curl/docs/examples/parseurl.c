@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -48,7 +48,7 @@ int main(void)
   if(uc)
     goto fail;
 
-  /* extract host name from the parsed URL */
+  /* extract hostname from the parsed URL */
   uc = curl_url_get(h, CURLUPART_HOST, &host, 0);
   if(!uc) {
     printf("Host name: %s\n", host);
@@ -74,7 +74,7 @@ int main(void)
     curl_free(path);
   }
 
-  fail:
-  curl_url_cleanup(h); /* free url handle */
+fail:
+  curl_url_cleanup(h); /* free URL handle */
   return 0;
 }

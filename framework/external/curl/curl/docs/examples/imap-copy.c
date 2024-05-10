@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -23,7 +23,7 @@
  ***************************************************************************/
 
 /* <DESC>
- * IMAP example showing how to copy an email from one folder to another
+ * Copy an email from one IMAP folder to another
  * </DESC>
  */
 
@@ -53,7 +53,7 @@ int main(void)
     /* Set the COPY command specifying the message ID and destination folder */
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "COPY 1 FOLDER");
 
-    /* Note that to perform a move operation you will need to perform the copy,
+    /* Note that to perform a move operation you need to perform the copy,
      * then mark the original mail as Deleted and EXPUNGE or CLOSE. Please see
      * imap-store.c for more information on deleting messages. */
 

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -29,9 +29,7 @@
  * This source file was started based on curl's HTTP test suite server.
  */
 
-#ifdef HAVE_SIGNAL_H
 #include <signal.h>
-#endif
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
@@ -133,11 +131,13 @@ static void storerequest(char *reqbuf, size_t totalsize);
 #endif
 
 const char *serverlogfile = DEFAULT_LOGFILE;
+static const char *logdir = "log";
+static char loglockfile[256];
 
 #define RTSPDVERSION "curl test suite RTSP server/0.1"
 
-#define REQUEST_DUMP  "log/server.input"
-#define RESPONSE_DUMP "log/server.response"
+#define REQUEST_DUMP  "server.input"
+#define RESPONSE_DUMP "server.response"
 
 /* very-big-path support */
 #define MAXDOCNAMELEN 140000
@@ -201,7 +201,7 @@ static const char *doc404_RTSP = "RTSP/1.0 404 Not Found\r\n"
 
 /* Default size to send away fake RTP data */
 #define RTP_DATA_SIZE 12
-static const char *RTP_DATA = "$_1234\n\0asdf";
+static const char *RTP_DATA = "$_1234\n\0Rsdf";
 
 static int ProcessRequest(struct httprequest *req)
 {
@@ -288,7 +288,7 @@ static int ProcessRequest(struct httprequest *req)
                 req->testno, req->partno);
       logmsg("%s", logbuf);
 
-      stream = test2fopen(req->testno);
+      stream = test2fopen(req->testno, logdir);
 
       if(!stream) {
         int error = errno;
@@ -304,6 +304,7 @@ static int ProcessRequest(struct httprequest *req)
 
         int rtp_channel = 0;
         int rtp_size = 0;
+        int rtp_size_err = 0;
         int rtp_partno = -1;
         char *rtp_scratch = NULL;
 
@@ -320,6 +321,7 @@ static int ProcessRequest(struct httprequest *req)
         if(cmdsize) {
           logmsg("Found a reply-servercmd section!");
           do {
+            rtp_size_err = 0;
             if(!strncmp(CMD_AUTH_REQUIRED, ptr, strlen(CMD_AUTH_REQUIRED))) {
               logmsg("instructed to require authorization header");
               req->auth_req = TRUE;
@@ -345,13 +347,15 @@ static int ProcessRequest(struct httprequest *req)
               logmsg("instructed to skip this number of bytes %d", num);
               req->skip = num;
             }
-            else if(3 == sscanf(ptr, "rtp: part %d channel %d size %d",
-                                &rtp_partno, &rtp_channel, &rtp_size)) {
+            else if(3 <= sscanf(ptr,
+                                "rtp: part %d channel %d size %d size_err %d",
+                                &rtp_partno, &rtp_channel, &rtp_size,
+                                &rtp_size_err)) {
 
               if(rtp_partno == req->partno) {
                 int i = 0;
-                logmsg("RTP: part %d channel %d size %d",
-                       rtp_partno, rtp_channel, rtp_size);
+                logmsg("RTP: part %d channel %d size %d size_err %d",
+                       rtp_partno, rtp_channel, rtp_size, rtp_size_err);
 
                 /* Make our scratch buffer enough to fit all the
                  * desired data and one for padding */
@@ -364,7 +368,7 @@ static int ProcessRequest(struct httprequest *req)
                 SET_RTP_PKT_CHN(rtp_scratch, rtp_channel);
 
                 /* Length follows and is a two byte short in network order */
-                SET_RTP_PKT_LEN(rtp_scratch, rtp_size);
+                SET_RTP_PKT_LEN(rtp_scratch, rtp_size + rtp_size_err);
 
                 /* Fill it with junk data */
                 for(i = 0; i < rtp_size; i += RTP_DATA_SIZE) {
@@ -450,10 +454,10 @@ static int ProcessRequest(struct httprequest *req)
 
   /* **** Persistence ****
    *
-   * If the request is a HTTP/1.0 one, we close the connection unconditionally
+   * If the request is an HTTP/1.0 one, we close the connection unconditionally
    * when we're done.
    *
-   * If the request is a HTTP/1.1 one, we MUST check for a "Connection:"
+   * If the request is an HTTP/1.1 one, we MUST check for a "Connection:"
    * header that might say "close". If it does, we close a connection when
    * this request is processed. Otherwise, we keep the connection alive for X
    * seconds.
@@ -600,6 +604,9 @@ static void storerequest(char *reqbuf, size_t totalsize)
   size_t written;
   size_t writeleft;
   FILE *dump;
+  char dumpfile[256];
+
+  msnprintf(dumpfile, sizeof(dumpfile), "%s/%s", logdir, REQUEST_DUMP);
 
   if(!reqbuf)
     return;
@@ -607,12 +614,12 @@ static void storerequest(char *reqbuf, size_t totalsize)
     return;
 
   do {
-    dump = fopen(REQUEST_DUMP, "ab");
+    dump = fopen(dumpfile, "ab");
   } while(!dump && ((error = errno) == EINTR));
   if(!dump) {
     logmsg("Error opening file %s error: %d %s",
-           REQUEST_DUMP, error, strerror(error));
-    logmsg("Failed to write request input to " REQUEST_DUMP);
+           dumpfile, error, strerror(error));
+    logmsg("Failed to write request input to %s", dumpfile);
     return;
   }
 
@@ -627,12 +634,12 @@ static void storerequest(char *reqbuf, size_t totalsize)
   } while((writeleft > 0) && ((error = errno) == EINTR));
 
   if(writeleft == 0)
-    logmsg("Wrote request (%zu bytes) input to " REQUEST_DUMP, totalsize);
+    logmsg("Wrote request (%zu bytes) input to %s", totalsize, dumpfile);
   else if(writeleft > 0) {
     logmsg("Error writing file %s error: %d %s",
-           REQUEST_DUMP, error, strerror(error));
+           dumpfile, error, strerror(error));
     logmsg("Wrote only (%zu bytes) of (%zu bytes) request input to %s",
-           totalsize-writeleft, totalsize, REQUEST_DUMP);
+           totalsize-writeleft, totalsize, dumpfile);
   }
 
 storerequest_cleanup:
@@ -642,7 +649,7 @@ storerequest_cleanup:
   } while(res && ((error = errno) == EINTR));
   if(res)
     logmsg("Error closing file %s error: %d %s",
-           REQUEST_DUMP, error, strerror(error));
+           dumpfile, error, strerror(error));
 }
 
 /* return 0 on success, non-zero on failure */
@@ -708,7 +715,7 @@ static int get_request(curl_socket_t sock, struct httprequest *req)
     }
     else if(got < 0) {
       error = SOCKERRNO;
-      logmsg("recv() returned error: (%d) %s", error, strerror(error));
+      logmsg("recv() returned error: (%d) %s", error, sstrerror(error));
       fail = 1;
     }
     if(fail) {
@@ -771,8 +778,11 @@ static int send_doc(curl_socket_t sock, struct httprequest *req)
   size_t responsesize;
   int error = 0;
   int res;
-
   static char weare[256];
+  char responsedump[256];
+
+  msnprintf(responsedump, sizeof(responsedump), "%s/%s",
+            logdir, RESPONSE_DUMP);
 
   logmsg("Send response number %ld part %ld", req->testno, req->partno);
 
@@ -846,7 +856,7 @@ static int send_doc(curl_socket_t sock, struct httprequest *req)
     count = strlen(buffer);
   }
   else {
-    FILE *stream = test2fopen(req->testno);
+    FILE *stream = test2fopen(req->testno, logdir);
     char partbuf[80]="data";
     if(0 != req->partno)
       msnprintf(partbuf, sizeof(partbuf), "data%ld", req->partno);
@@ -872,7 +882,7 @@ static int send_doc(curl_socket_t sock, struct httprequest *req)
     }
 
     /* re-open the same file again */
-    stream = test2fopen(req->testno);
+    stream = test2fopen(req->testno, logdir);
     if(!stream) {
       error = errno;
       logmsg("fopen() failed with error: %d %s", error, strerror(error));
@@ -912,12 +922,12 @@ static int send_doc(curl_socket_t sock, struct httprequest *req)
   else
     prevbounce = FALSE;
 
-  dump = fopen(RESPONSE_DUMP, "ab");
+  dump = fopen(responsedump, "ab");
   if(!dump) {
     error = errno;
     logmsg("fopen() failed with error: %d %s", error, strerror(error));
-    logmsg("Error opening file: %s", RESPONSE_DUMP);
-    logmsg("couldn't create logfile: " RESPONSE_DUMP);
+    logmsg("Error opening file: %s", responsedump);
+    logmsg("couldn't create logfile: %s", responsedump);
     free(ptr);
     free(cmd);
     return -1;
@@ -974,7 +984,7 @@ static int send_doc(curl_socket_t sock, struct httprequest *req)
   } while(res && ((error = errno) == EINTR));
   if(res)
     logmsg("Error closing file %s error: %d %s",
-           RESPONSE_DUMP, error, strerror(error));
+           responsedump, error, strerror(error));
 
   if(got_exit_signal) {
     free(ptr);
@@ -991,8 +1001,8 @@ static int send_doc(curl_socket_t sock, struct httprequest *req)
     return -1;
   }
 
-  logmsg("Response sent (%zu bytes) and written to " RESPONSE_DUMP,
-         responsesize);
+  logmsg("Response sent (%zu bytes) and written to %s",
+         responsesize, responsedump);
   free(ptr);
 
   if(cmdsize > 0) {
@@ -1087,6 +1097,11 @@ int main(int argc, char *argv[])
       if(argc>arg)
         serverlogfile = argv[arg++];
     }
+    else if(!strcmp("--logdir", argv[arg])) {
+      arg++;
+      if(argc>arg)
+        logdir = argv[arg++];
+    }
     else if(!strcmp("--ipv4", argv[arg])) {
 #ifdef ENABLE_IPV6
       ipv_inuse = "IPv4";
@@ -1121,6 +1136,7 @@ int main(int argc, char *argv[])
       puts("Usage: rtspd [option]\n"
            " --version\n"
            " --logfile [file]\n"
+           " --logdir [directory]\n"
            " --pidfile [file]\n"
            " --portfile [file]\n"
            " --ipv4\n"
@@ -1131,7 +1147,10 @@ int main(int argc, char *argv[])
     }
   }
 
-#ifdef WIN32
+  msnprintf(loglockfile, sizeof(loglockfile), "%s/%s/rtsp-%s.lock",
+            logdir, SERVERLOGS_LOCKDIR, ipv_inuse);
+
+#ifdef _WIN32
   win32_init();
   atexit(win32_cleanup);
 #endif
@@ -1149,8 +1168,7 @@ int main(int argc, char *argv[])
 
   if(CURL_SOCKET_BAD == sock) {
     error = SOCKERRNO;
-    logmsg("Error creating socket: (%d) %s",
-           error, strerror(error));
+    logmsg("Error creating socket: (%d) %s", error, sstrerror(error));
     goto server_cleanup;
   }
 
@@ -1159,7 +1177,7 @@ int main(int argc, char *argv[])
             (void *)&flag, sizeof(flag))) {
     error = SOCKERRNO;
     logmsg("setsockopt(SO_REUSEADDR) failed with error: (%d) %s",
-           error, strerror(error));
+           error, sstrerror(error));
     goto server_cleanup;
   }
 
@@ -1184,7 +1202,7 @@ int main(int argc, char *argv[])
   if(0 != rc) {
     error = SOCKERRNO;
     logmsg("Error binding socket on port %hu: (%d) %s",
-           port, error, strerror(error));
+           port, error, sstrerror(error));
     goto server_cleanup;
   }
 
@@ -1205,7 +1223,7 @@ int main(int argc, char *argv[])
     if(getsockname(sock, &localaddr.sa, &la_size) < 0) {
       error = SOCKERRNO;
       logmsg("getsockname() failed with error: (%d) %s",
-             error, strerror(error));
+             error, sstrerror(error));
       sclose(sock);
       goto server_cleanup;
     }
@@ -1238,7 +1256,7 @@ int main(int argc, char *argv[])
   if(0 != rc) {
     error = SOCKERRNO;
     logmsg("listen() failed with error: (%d) %s",
-           error, strerror(error));
+           error, sstrerror(error));
     goto server_cleanup;
   }
 
@@ -1265,17 +1283,17 @@ int main(int argc, char *argv[])
     if(CURL_SOCKET_BAD == msgsock) {
       error = SOCKERRNO;
       logmsg("MAJOR ERROR: accept() failed with error: (%d) %s",
-             error, strerror(error));
+             error, sstrerror(error));
       break;
     }
 
     /*
-    ** As soon as this server acepts a connection from the test harness it
+    ** As soon as this server accepts a connection from the test harness it
     ** must set the server logs advisor read lock to indicate that server
     ** logs should not be read until this lock is removed by this server.
     */
 
-    set_advisor_read_lock(SERVERLOGS_LOCK);
+    set_advisor_read_lock(loglockfile);
     serverlogslocked = 1;
 
     logmsg("====> Client connect");
@@ -1347,7 +1365,7 @@ int main(int argc, char *argv[])
 
     if(serverlogslocked) {
       serverlogslocked = 0;
-      clear_advisor_read_lock(SERVERLOGS_LOCK);
+      clear_advisor_read_lock(loglockfile);
     }
 
     if(req.testno == DOCNUMBER_QUIT)
@@ -1372,7 +1390,7 @@ server_cleanup:
 
   if(serverlogslocked) {
     serverlogslocked = 0;
-    clear_advisor_read_lock(SERVERLOGS_LOCK);
+    clear_advisor_read_lock(loglockfile);
   }
 
   restore_signal_handlers(false);

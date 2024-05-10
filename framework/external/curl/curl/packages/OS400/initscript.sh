@@ -6,7 +6,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -23,9 +23,9 @@
 #
 ###########################################################################
 
-system ()
+CLcommand()
 {
-    /usr/bin/system "$@" || exit 1
+        /usr/bin/system "${@}" || exit 1
 }
 
 setenv()
@@ -58,44 +58,16 @@ export SCRIPTDIR TOPDIR
 
 #  Extract the SONAME from the library makefile.
 
-SONAME=`sed -e '/^VERSIONINFO=/!d' -e 's/^.* \([0-9]*\):.*$/\1/' -e 'q' \
-                                                < "${TOPDIR}/lib/Makefile.am"`
+SONAME=`sed -e '/^VERSIONCHANGE=/!d;s/^.*=\([0-9]*\).*/\1/'             \
+                                        < "${TOPDIR}/lib/Makefile.soname"`
 export SONAME
 
+#       Get OS/400 configuration parameters.
 
-################################################################################
-#
-#                       Tunable configuration parameters.
-#
-################################################################################
-
-setenv TARGETLIB        'CURL'                  # Target OS/400 program library.
-setenv STATBNDDIR       'CURL_A'                # Static binding directory.
-setenv DYNBNDDIR        'CURL'                  # Dynamic binding directory.
-setenv SRVPGM           "CURL.${SONAME}"        # Service program.
-setenv TGTCCSID         '500'                   # Target CCSID of objects.
-setenv DEBUG            '*ALL'                  # Debug level.
-setenv OPTIMIZE         '10'                    # Optimization level
-setenv OUTPUT           '*NONE'                 # Compilation output option.
-setenv TGTRLS           '*CURRENT'              # Target OS release.
-setenv IFSDIR           '/curl'                 # Installation IFS directory.
-
-#       Define ZLIB availability and locations.
-
-setenv WITH_ZLIB        0                       # Define to 1 to enable.
-setenv ZLIB_INCLUDE     '/zlib/include'         # ZLIB include IFS directory.
-setenv ZLIB_LIB         'ZLIB'                  # ZLIB library.
-setenv ZLIB_BNDDIR      'ZLIB_A'                # ZLIB binding directory.
-
-#       Define LIBSSH2 availability and locations.
-
-setenv WITH_LIBSSH2     0                       # Define to 1 to enable.
-setenv LIBSSH2_INCLUDE  '/libssh2/include'      # LIBSSH2 include IFS directory.
-setenv LIBSSH2_LIB      'LIBSSH2'               # LIBSSH2 library.
-setenv LIBSSH2_BNDDIR   'LIBSSH2_A'             # LIBSSH2 binding directory.
-
-
-################################################################################
+. "${SCRIPTDIR}/config400.default"
+if [ -f "${SCRIPTDIR}/config400.override" ]
+then    . "${SCRIPTDIR}/config400.override"
+fi
 
 #       Need to get the version definitions.
 
@@ -206,17 +178,18 @@ make_module()
         #               putting it in an include file makes it only active
         #               for that include file.
         #       Thus we build a temporary file with the pragma prepended to
-        #               the source file and we compile that themporary file.
+        #               the source file and we compile that temporary file.
 
         echo "#line 1 \"${2}\"" > __tmpsrcf.c
         echo "#pragma convert(819)" >> __tmpsrcf.c
         echo "#line 1" >> __tmpsrcf.c
         cat "${2}" >> __tmpsrcf.c
         CMD="CRTCMOD MODULE(${TARGETLIB}/${1}) SRCSTMF('__tmpsrcf.c')"
-#       CMD="${CMD} SYSIFCOPT(*IFS64IO) OPTION(*INCDIRFIRST *SHOWINC *SHOWSYS)"
-        CMD="${CMD} SYSIFCOPT(*IFS64IO) OPTION(*INCDIRFIRST)"
+        CMD="${CMD} SYSIFCOPT(*IFS64IO *ASYNCSIGNAL)"
+#       CMD="${CMD} OPTION(*INCDIRFIRST *SHOWINC *SHOWSYS)"
+        CMD="${CMD} OPTION(*INCDIRFIRST)"
         CMD="${CMD} LOCALETYPE(*LOCALE) FLAG(10)"
-        CMD="${CMD} INCDIR('/qibm/proddata/qadrt/include'"
+        CMD="${CMD} INCDIR('${QADRTDIR}/include'"
         CMD="${CMD} '${TOPDIR}/include/curl' '${TOPDIR}/include' '${SRCDIR}'"
         CMD="${CMD} '${TOPDIR}/packages/OS400'"
 
@@ -234,21 +207,21 @@ make_module()
         CMD="${CMD} OPTIMIZE(${OPTIMIZE})"
         CMD="${CMD} DBGVIEW(${DEBUG})"
 
-        DEFINES="${3} BUILDING_LIBCURL"
+        DEFINES="${3} 'qadrt_use_inline'"
 
         if [ "${WITH_ZLIB}" != "0" ]
-        then    DEFINES="${DEFINES} HAVE_LIBZ HAVE_ZLIB_H"
+        then    DEFINES="${DEFINES} HAVE_LIBZ"
         fi
 
         if [ "${WITH_LIBSSH2}" != "0" ]
-        then    DEFINES="${DEFINES} USE_LIBSSH2 HAVE_LIBSSH2_H"
+        then    DEFINES="${DEFINES} USE_LIBSSH2"
         fi
 
         if [ "${DEFINES}" ]
         then    CMD="${CMD} DEFINE(${DEFINES})"
         fi
 
-        system "${CMD}"
+        CLcommand "${CMD}"
         rm -f __tmpsrcf.c
         LINK=YES
 }
@@ -268,6 +241,7 @@ db2_name()
                 tr 'a-z-' 'A-Z_'                                        |
                 sed -e 's/\..*//'                                       \
                     -e 's/^CURL_*/C/'                                   \
+                    -e 's/^TOOL_*/T/'                                   \
                     -e 's/^\(.\).*\(.........\)$/\1\2/'
         fi
 }
@@ -285,4 +259,29 @@ versioned_copy()
             -e "s/@LIBCURL_VERSION_NUM@/${LIBCURL_VERSION_NUM}/g"       \
             -e "s/@LIBCURL_TIMESTAMP@/${LIBCURL_TIMESTAMP}/g"           \
                 < "${1}" > "${2}"
+}
+
+
+#       Get definitions from a make file.
+#       The `sed' statement works as follows:
+#       - Join \nl-separated lines.
+#       - Retain only lines that begins with "identifier =".
+#       - Replace @...@ substitutions by shell variable references.
+#       - Turn these lines into shell variable assignments.
+
+get_make_vars()
+
+{
+        eval "`sed -e ': begin'                                         \
+                -e '/\\\\$/{'                                           \
+                -e 'N'                                                  \
+                -e 's/\\\\\\n/ /'                                       \
+                -e 'b begin'                                            \
+                -e '}'                                                  \
+                -e '/^[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=/!d'           \
+                -e 's/@\\([A-Za-z0-9_]*\\)@/${\\1}/g'                   \
+                -e 's/[[:space:]]*=[[:space:]]*/=/'                     \
+                -e 's/=\\(.*[^[:space:]]\\)[[:space:]]*$/=\\"\\1\\"/'   \
+                -e 's/\\\$(\\([^)]*\\))/\${\\1}/g'                      \
+                < \"${1}\"`"
 }

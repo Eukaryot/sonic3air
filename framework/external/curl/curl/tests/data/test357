@@ -10,7 +10,7 @@ Expect
 <reply>
 # 417 means the server didn't like the Expect header
 <data>
-HTTP/1.1 417 OK swsbounce
+HTTP/1.1 417 BAD swsbounce
 Date: Tue, 09 Nov 2010 14:49:00 GMT
 Server: test-server/fake
 Content-Length: 0
@@ -25,7 +25,7 @@ Content-Length: 10
 blablabla
 </data1>
 <datacheck>
-HTTP/1.1 417 OK swsbounce
+HTTP/1.1 417 BAD swsbounce
 Date: Tue, 09 Nov 2010 14:49:00 GMT
 Server: test-server/fake
 Content-Length: 0
@@ -47,22 +47,15 @@ no-expect
 <server>
 http
 </server>
- <name>
+<name>
 HTTP PUT with Expect: 100-continue and 417 response
- </name>
- <command>
-http://%HOSTIP:%HTTPPORT/we/want/%TESTNUMBER -T log/test%TESTNUMBER.txt
+</name>
+<command>
+http://%HOSTIP:%HTTPPORT/we/want/%TESTNUMBER -T %LOGDIR/test%TESTNUMBER.txt --expect100-timeout 99
 </command>
-<file name="log/test%TESTNUMBER.txt">
-Weird
-     file
-         to
-   upload
-for
-   testing
-the
-   PUT
-      feature
+# 1053700 x 'x', large enough to invoke the 100-continue behaviour
+<file name="%LOGDIR/test%TESTNUMBER.txt">
+%repeat[1053700 x x]%
 </file>
 </client>
 
@@ -73,24 +66,16 @@ PUT /we/want/%TESTNUMBER HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 User-Agent: curl/%VERSION
 Accept: */*
-Content-Length: 78
+Content-Length: 1053701
 Expect: 100-continue
 
 PUT /we/want/%TESTNUMBER HTTP/1.1
 Host: %HOSTIP:%HTTPPORT
 User-Agent: curl/%VERSION
 Accept: */*
-Content-Length: 78
+Content-Length: 1053701
 
-Weird
-     file
-         to
-   upload
-for
-   testing
-the
-   PUT
-      feature
+%repeat[1053700 x x]%
 </protocol>
 </verify>
 </testcase>

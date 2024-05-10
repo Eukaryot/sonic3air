@@ -5,7 +5,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -39,7 +39,7 @@ if test "x$OPT_GNUTLS" != xno; then
     addcflags=""
 
     if test "x$OPT_GNUTLS" = "xyes"; then
-      dnl this is with no partiular path given
+      dnl this is with no particular path given
       CURL_CHECK_PKGCONFIG(gnutls)
 
       if test "$PKGCONFIG" != "no" ; then
@@ -104,6 +104,7 @@ if test "x$OPT_GNUTLS" != xno; then
        GNUTLS_ENABLED=1
        USE_GNUTLS="yes"
        ssl_msg="GnuTLS"
+       QUIC_ENABLED=yes
        test gnutls != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
        ],
        [

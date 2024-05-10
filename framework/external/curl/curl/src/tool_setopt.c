@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -33,6 +33,7 @@
 #include "tool_easysrc.h"
 #include "tool_setopt.h"
 #include "tool_msgs.h"
+#include "dynbuf.h"
 
 #include "memdebug.h" /* keep this as LAST include */
 
@@ -90,6 +91,7 @@ const struct NameValue setopt_nv_CURL_HTTP_VERSION[] = {
   NV(CURL_HTTP_VERSION_2_0),
   NV(CURL_HTTP_VERSION_2TLS),
   NV(CURL_HTTP_VERSION_3),
+  NV(CURL_HTTP_VERSION_3ONLY),
   NVEND,
 };
 
@@ -102,6 +104,16 @@ const struct NameValue setopt_nv_CURL_SSLVERSION[] = {
   NV(CURL_SSLVERSION_TLSv1_1),
   NV(CURL_SSLVERSION_TLSv1_2),
   NV(CURL_SSLVERSION_TLSv1_3),
+  NVEND,
+};
+
+const struct NameValue setopt_nv_CURL_SSLVERSION_MAX[] = {
+  NV(CURL_SSLVERSION_MAX_NONE),
+  NV(CURL_SSLVERSION_MAX_DEFAULT),
+  NV(CURL_SSLVERSION_MAX_TLSv1_0),
+  NV(CURL_SSLVERSION_MAX_TLSv1_1),
+  NV(CURL_SSLVERSION_MAX_TLSv1_2),
+  NV(CURL_SSLVERSION_MAX_TLSv1_3),
   NVEND,
 };
 
@@ -142,35 +154,6 @@ const struct NameValue setopt_nv_CURL_NETRC[] = {
   NV(CURL_NETRC_IGNORED),
   NV(CURL_NETRC_OPTIONAL),
   NV(CURL_NETRC_REQUIRED),
-  NVEND,
-};
-
-/* These mappings essentially triplicated - see
- * tool_libinfo.c and tool_paramhlp.c */
-const struct NameValue setopt_nv_CURLPROTO[] = {
-  NV(CURLPROTO_ALL),            /* combination */
-  NV(CURLPROTO_DICT),
-  NV(CURLPROTO_FILE),
-  NV(CURLPROTO_FTP),
-  NV(CURLPROTO_FTPS),
-  NV(CURLPROTO_GOPHER),
-  NV(CURLPROTO_HTTP),
-  NV(CURLPROTO_HTTPS),
-  NV(CURLPROTO_IMAP),
-  NV(CURLPROTO_IMAPS),
-  NV(CURLPROTO_LDAP),
-  NV(CURLPROTO_LDAPS),
-  NV(CURLPROTO_POP3),
-  NV(CURLPROTO_POP3S),
-  NV(CURLPROTO_RTSP),
-  NV(CURLPROTO_SCP),
-  NV(CURLPROTO_SFTP),
-  NV(CURLPROTO_SMB),
-  NV(CURLPROTO_SMBS),
-  NV(CURLPROTO_SMTP),
-  NV(CURLPROTO_SMTPS),
-  NV(CURLPROTO_TELNET),
-  NV(CURLPROTO_TFTP),
   NVEND,
 };
 
@@ -223,7 +206,7 @@ static const struct NameValue setopt_nv_CURLNONZERODEFAULTS[] = {
 
 #define REM0(s) ADD((&easysrc_toohard, s))
 #define REM1(f,a) ADDF((&easysrc_toohard, f,a))
-#define REM2(f,a,b) ADDF((&easysrc_toohard, f,a,b))
+#define REM3(f,a,b,c) ADDF((&easysrc_toohard, f,a,b,c))
 
 /* Escape string to C string syntax.  Return NULL if out of memory.
  * Is this correct for those wacky EBCDIC guys? */
@@ -234,9 +217,11 @@ static const struct NameValue setopt_nv_CURLNONZERODEFAULTS[] = {
 static char *c_escape(const char *str, curl_off_t len)
 {
   const char *s;
-  unsigned char c;
-  char *escaped, *e;
   unsigned int cutoff = 0;
+  CURLcode result;
+  struct curlx_dynbuf escaped;
+
+  curlx_dyn_init(&escaped, 4 * MAX_STRING_LENGTH_OUTPUT + 3);
 
   if(len == ZERO_TERMINATED)
     len = strlen(str);
@@ -247,51 +232,40 @@ static char *c_escape(const char *str, curl_off_t len)
     cutoff = 3;
   }
 
-  /* Allocate space based on worst-case */
-  escaped = malloc(4 * (size_t)len + 1 + cutoff);
-  if(!escaped)
-    return NULL;
+  result = curlx_dyn_addn(&escaped, STRCONST(""));
+  for(s = str; !result && len; s++, len--) {
+    /* escape question marks as well, to prevent generating accidental
+       trigraphs */
+    static const char from[] = "\t\r\n?\"\\";
+    static const char to[] = "\\t\\r\\n\\?\\\"\\\\";
+    const char *p = strchr(from, *s);
 
-  e = escaped;
-  for(s = str; len; s++, len--) {
-    c = *s;
-    if(c == '\n') {
-      strcpy(e, "\\n");
-      e += 2;
+    if(!p && ISPRINT(*s))
+      continue;
+
+    result = curlx_dyn_addn(&escaped, str, s - str);
+    str = s + 1;
+
+    if(!result) {
+      if(p && *p)
+        result = curlx_dyn_addn(&escaped, to + 2 * (p - from), 2);
+      else {
+        result = curlx_dyn_addf(&escaped,
+                                /* Octal escape to avoid >2 digit hex. */
+                                (len > 1 && ISXDIGIT(s[1])) ?
+                                  "\\%03o" : "\\x%02x",
+                                (unsigned int) *(unsigned char *) s);
+      }
     }
-    else if(c == '\r') {
-      strcpy(e, "\\r");
-      e += 2;
-    }
-    else if(c == '\t') {
-      strcpy(e, "\\t");
-      e += 2;
-    }
-    else if(c == '\\') {
-      strcpy(e, "\\\\");
-      e += 2;
-    }
-    else if(c == '"') {
-      strcpy(e, "\\\"");
-      e += 2;
-    }
-    else if(c == '?') {
-      /* escape question marks as well, to prevent generating accidental
-         trigraphs */
-      strcpy(e, "\\?");
-      e += 2;
-    }
-    else if(!isprint(c)) {
-      msnprintf(e, 5, "\\x%02x", (unsigned)c);
-      e += 4;
-    }
-    else
-      *e++ = c;
   }
-  while(cutoff--)
-    *e++ = '.';
-  *e = '\0';
-  return escaped;
+
+  if(!result)
+    result = curlx_dyn_addn(&escaped, str, s - str);
+
+  if(!result)
+    (void) !curlx_dyn_addn(&escaped, "...", cutoff);
+
+  return curlx_dyn_ptr(&escaped);
 }
 
 /* setopt wrapper for enum types */
@@ -326,16 +300,16 @@ CURLcode tool_setopt_enum(CURL *curl, struct GlobalConfig *config,
 
 #ifdef DEBUGBUILD
   if(ret)
-    warnf(config, "option %s returned error (%d)\n", name, (int)ret);
+    warnf(config, "option %s returned error (%d)", name, (int)ret);
 #endif
-  nomem:
+nomem:
   return ret;
 }
 
-/* setopt wrapper for flags */
-CURLcode tool_setopt_flags(CURL *curl, struct GlobalConfig *config,
-                           const char *name, CURLoption tag,
-                           const struct NameValue *nvlist, long lval)
+/* setopt wrapper for CURLOPT_SSLVERSION */
+CURLcode tool_setopt_SSLVERSION(CURL *curl, struct GlobalConfig *config,
+                                const char *name, CURLoption tag,
+                                long lval)
 {
   CURLcode ret = CURLE_OK;
   bool skip = FALSE;
@@ -346,31 +320,33 @@ CURLcode tool_setopt_flags(CURL *curl, struct GlobalConfig *config,
 
   if(config->libcurl && !skip && !ret) {
     /* we only use this for real if --libcurl was used */
-    char preamble[80];          /* should accommodate any symbol name */
-    long rest = lval;           /* bits not handled yet */
     const struct NameValue *nv = NULL;
-    msnprintf(preamble, sizeof(preamble),
-              "curl_easy_setopt(hnd, %s, ", name);
-    for(nv = nvlist; nv->name; nv++) {
-      if((nv->value & ~ rest) == 0) {
-        /* all value flags contained in rest */
-        rest &= ~ nv->value;    /* remove bits handled here */
-        CODE3("%s(long)%s%s",
-              preamble, nv->name, rest ? " |" : ");");
-        if(!rest)
-          break;                /* handled them all */
-        /* replace with all spaces for continuation line */
-        msnprintf(preamble, sizeof(preamble), "%*s", strlen(preamble), "");
-      }
+    const struct NameValue *nv2 = NULL;
+    for(nv = setopt_nv_CURL_SSLVERSION; nv->name; nv++) {
+      if(nv->value == (lval & 0xffff))
+        break; /* found it */
     }
-    /* If any bits have no definition, output an explicit value.
-     * This could happen if new bits are defined and used
-     * but the NameValue list is not updated. */
-    if(rest)
-      CODE2("%s%ldL);", preamble, rest);
+    for(nv2 = setopt_nv_CURL_SSLVERSION_MAX; nv2->name; nv2++) {
+      if(nv2->value == (lval & ~0xffff))
+        break; /* found it */
+    }
+    if(!nv->name) {
+      /* If no definition was found, output an explicit value.
+       * This could happen if new values are defined and used
+       * but the NameValue list is not updated. */
+      CODE2("curl_easy_setopt(hnd, %s, %ldL);", name, lval);
+    }
+    else {
+      CODE3("curl_easy_setopt(hnd, %s, (long)(%s | %s));",
+            name, nv->name, nv2->name);
+    }
   }
 
- nomem:
+#ifdef DEBUGBUILD
+  if(ret)
+    warnf(config, "option %s returned error (%d)", name, (int)ret);
+#endif
+nomem:
   return ret;
 }
 
@@ -403,7 +379,8 @@ CURLcode tool_setopt_bitmask(CURL *curl, struct GlobalConfig *config,
         if(!rest)
           break;                /* handled them all */
         /* replace with all spaces for continuation line */
-        msnprintf(preamble, sizeof(preamble), "%*s", strlen(preamble), "");
+        msnprintf(preamble, sizeof(preamble), "%*s", (int)strlen(preamble),
+                  "");
       }
     }
     /* If any bits have no definition, output an explicit value.
@@ -413,7 +390,7 @@ CURLcode tool_setopt_bitmask(CURL *curl, struct GlobalConfig *config,
       CODE2("%s%luUL);", preamble, rest);
   }
 
- nomem:
+nomem:
   return ret;
 }
 
@@ -439,7 +416,7 @@ static CURLcode libcurl_generate_slist(struct curl_slist *slist, int *slistno)
                                        *slistno, *slistno, escaped);
   }
 
- nomem:
+nomem:
   Curl_safefree(escaped);
   return ret;
 }
@@ -504,7 +481,7 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
   case TOOLMIME_STDIN:
     if(!filename)
       filename = "-";
-    /* FALLTHROUGH */
+    FALLTHROUGH();
   case TOOLMIME_STDINDATA:
     /* Can only be reading stdin in the current context. */
     CODE1("curl_mime_data_cb(part%d, -1, (curl_read_callback) fread, \\",
@@ -622,7 +599,7 @@ CURLcode tool_setopt_slist(CURL *curl, struct GlobalConfig *config,
       CODE2("curl_easy_setopt(hnd, %s, slist%d);", name, i);
   }
 
- nomem:
+nomem:
   return ret;
 }
 
@@ -668,7 +645,7 @@ CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
     /* function pointers are never printable */
     if(tag >= CURLOPTTYPE_FUNCTIONPOINT) {
       if(pval) {
-        value = "functionpointer";
+        value = "function pointer";
         remark = TRUE;
       }
       else
@@ -680,7 +657,7 @@ CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
       escape = TRUE;
     }
     else if(pval) {
-      value = "objectpointer";
+      value = "object pointer";
       remark = TRUE;
     }
     else
@@ -706,7 +683,7 @@ CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
 
     /* blobs are never printable */
     if(pblob) {
-      value = "blobpointer";
+      value = "blob pointer";
       remark = TRUE;
     }
     else
@@ -721,12 +698,12 @@ CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
     /* we only use this for real if --libcurl was used */
 
     if(remark)
-      REM2("%s set to a %s", name, value);
+      REM3("%s was set to a%s %s", name, (*value == 'o' ? "n" : ""), value);
     else {
       if(escape) {
         curl_off_t len = ZERO_TERMINATED;
         if(tag == CURLOPT_POSTFIELDS)
-          len = config->postfieldsize;
+          len = curlx_dyn_len(&config->postdata);
         escaped = c_escape(value, len);
         NULL_CHECK(escaped);
         CODE2("curl_easy_setopt(hnd, %s, \"%s\");", name, escaped);
@@ -736,14 +713,11 @@ CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
     }
   }
 
- nomem:
+nomem:
   Curl_safefree(escaped);
   return ret;
 }
 
 #else /* CURL_DISABLE_LIBCURL_OPTION */
-
-#include "tool_cfgable.h"
-#include "tool_setopt.h"
 
 #endif /* CURL_DISABLE_LIBCURL_OPTION */

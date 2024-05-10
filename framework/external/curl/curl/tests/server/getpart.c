@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -60,7 +60,7 @@ curl_free_callback Curl_cfree = (curl_free_callback)free;
 curl_realloc_callback Curl_crealloc = (curl_realloc_callback)realloc;
 curl_strdup_callback Curl_cstrdup = (curl_strdup_callback)strdup;
 curl_calloc_callback Curl_ccalloc = (curl_calloc_callback)calloc;
-#if defined(WIN32) && defined(UNICODE)
+#if defined(_WIN32) && defined(UNICODE)
 curl_wcsdup_callback Curl_cwcsdup = (curl_wcsdup_callback)_wcsdup;
 #endif
 
@@ -149,7 +149,7 @@ static int readline(char **buffer, size_t *bufsize, size_t *length,
   char *newptr;
 
   if(!*buffer) {
-    *buffer = malloc(128);
+    *buffer = calloc(1, 128);
     if(!*buffer)
       return GPE_OUT_OF_MEMORY;
     *bufsize = 128;
@@ -171,6 +171,7 @@ static int readline(char **buffer, size_t *bufsize, size_t *length,
     newptr = realloc(*buffer, *bufsize * 2);
     if(!newptr)
       return GPE_OUT_OF_MEMORY;
+    memset(&newptr[*bufsize], 0, *bufsize);
     *buffer = newptr;
     *bufsize *= 2;
   }

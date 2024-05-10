@@ -89,14 +89,13 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = tests/certs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compile_check_sizeof.m4 \
-	$(top_srcdir)/m4/curl-amissl.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/curl-amissl.m4 \
 	$(top_srcdir)/m4/curl-bearssl.m4 \
 	$(top_srcdir)/m4/curl-compilers.m4 \
 	$(top_srcdir)/m4/curl-confopts.m4 \
 	$(top_srcdir)/m4/curl-functions.m4 \
 	$(top_srcdir)/m4/curl-gnutls.m4 \
-	$(top_srcdir)/m4/curl-mbedtls.m4 $(top_srcdir)/m4/curl-nss.m4 \
+	$(top_srcdir)/m4/curl-mbedtls.m4 \
 	$(top_srcdir)/m4/curl-openssl.m4 \
 	$(top_srcdir)/m4/curl-override.m4 \
 	$(top_srcdir)/m4/curl-reentrant.m4 \
@@ -206,6 +205,8 @@ am__relativize = \
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
+APACHECTL = @APACHECTL@
+APXS = @APXS@
 AR = @AR@
 AR_FLAGS = @AR_FLAGS@
 AS = @AS@
@@ -214,6 +215,7 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BLANK_AT_MAKETIME = @BLANK_AT_MAKETIME@
+CADDY = @CADDY@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -272,9 +274,12 @@ HAVE_BROTLI = @HAVE_BROTLI@
 HAVE_GNUTLS_SRP = @HAVE_GNUTLS_SRP@
 HAVE_LDAP_SSL = @HAVE_LDAP_SSL@
 HAVE_LIBZ = @HAVE_LIBZ@
+HAVE_OPENSSL_QUIC = @HAVE_OPENSSL_QUIC@
 HAVE_OPENSSL_SRP = @HAVE_OPENSSL_SRP@
 HAVE_PROTO_BSDSOCKET_H = @HAVE_PROTO_BSDSOCKET_H@
 HAVE_ZSTD = @HAVE_ZSTD@
+HTTPD = @HTTPD@
+HTTPD_NGHTTPX = @HTTPD_NGHTTPX@
 IDN_ENABLED = @IDN_ENABLED@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -297,12 +302,9 @@ LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
-MANOPT = @MANOPT@
 MKDIR_P = @MKDIR_P@
 NM = @NM@
 NMEDIT = @NMEDIT@
-NROFF = @NROFF@
-NSS_LIBS = @NSS_LIBS@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 OTOOL = @OTOOL@
@@ -322,6 +324,7 @@ PKGADD_VENDOR = @PKGADD_VENDOR@
 PKGCONFIG = @PKGCONFIG@
 RANDOM_FILE = @RANDOM_FILE@
 RANLIB = @RANLIB@
+RC = @RC@
 REQUIRE_LIB_DEPS = @REQUIRE_LIB_DEPS@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -332,10 +335,12 @@ SSL_LIBS = @SSL_LIBS@
 STRIP = @STRIP@
 SUPPORT_FEATURES = @SUPPORT_FEATURES@
 SUPPORT_PROTOCOLS = @SUPPORT_PROTOCOLS@
+TEST_NGHTTPX = @TEST_NGHTTPX@
 USE_ARES = @USE_ARES@
 USE_BEARSSL = @USE_BEARSSL@
 USE_GNUTLS = @USE_GNUTLS@
 USE_HYPER = @USE_HYPER@
+USE_LIBPSL = @USE_LIBPSL@
 USE_LIBRTMP = @USE_LIBRTMP@
 USE_LIBSSH = @USE_LIBSSH@
 USE_LIBSSH2 = @USE_LIBSSH2@
@@ -344,10 +349,14 @@ USE_MSH3 = @USE_MSH3@
 USE_NGHTTP2 = @USE_NGHTTP2@
 USE_NGHTTP3 = @USE_NGHTTP3@
 USE_NGTCP2 = @USE_NGTCP2@
+USE_NGTCP2_CRYPTO_BORINGSSL = @USE_NGTCP2_CRYPTO_BORINGSSL@
 USE_NGTCP2_CRYPTO_GNUTLS = @USE_NGTCP2_CRYPTO_GNUTLS@
-USE_NGTCP2_CRYPTO_OPENSSL = @USE_NGTCP2_CRYPTO_OPENSSL@
-USE_NSS = @USE_NSS@
+USE_NGTCP2_CRYPTO_QUICTLS = @USE_NGTCP2_CRYPTO_QUICTLS@
+USE_NGTCP2_CRYPTO_WOLFSSL = @USE_NGTCP2_CRYPTO_WOLFSSL@
+USE_NGTCP2_H3 = @USE_NGTCP2_H3@
 USE_OPENLDAP = @USE_OPENLDAP@
+USE_OPENSSL_H3 = @USE_OPENSSL_H3@
+USE_OPENSSL_QUIC = @USE_OPENSSL_QUIC@
 USE_QUICHE = @USE_QUICHE@
 USE_RUSTLS = @USE_RUSTLS@
 USE_SCHANNEL = @USE_SCHANNEL@
@@ -425,7 +434,7 @@ top_srcdir = @top_srcdir@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -448,7 +457,10 @@ CERTCONFIGS = \
   EdelCurlRoot-ca.cnf \
   Server-localhost-sv.prm \
   Server-localhost.nn-sv.prm \
-  Server-localhost0h-sv.prm
+  Server-localhost0h-sv.prm \
+  Server-localhost-firstSAN-sv.prm \
+  Server-localhost-lastSAN-sv.prm \
+  stunnel-sv.prm
 
 GENERATEDCERTS = \
   EdelCurlRoot-ca.cacert \
@@ -500,7 +512,16 @@ GENERATEDCERTS = \
   Server-localhost-lastSAN-sv.key \
   Server-localhost-lastSAN-sv.pem \
   Server-localhost-lastSAN-sv.pub.der \
-  Server-localhost-lastSAN-sv.pub.pem
+  Server-localhost-lastSAN-sv.pub.pem \
+  stunnel-sv.crl \
+  stunnel-sv.crt \
+  stunnel-sv.csr \
+  stunnel-sv.der \
+  stunnel-sv.dhp \
+  stunnel-sv.key \
+  stunnel-sv.pem \
+  stunnel-sv.der \
+  stunnel-sv.pub.pem
 
 SRPFILES = \
   srp-verifier-conf \
@@ -828,7 +849,8 @@ clean-certs:
 
 build-certs: $(srcdir)/EdelCurlRoot-ca.cacert $(srcdir)/Server-localhost-sv.pem \
 	$(srcdir)/Server-localhost.nn-sv.pem $(srcdir)/Server-localhost0h-sv.pem \
-	$(srcdir)/Server-localhost-firstSAN-sv.pem $(srcdir)/Server-localhost-lastSAN-sv.pem
+	$(srcdir)/Server-localhost-firstSAN-sv.pem $(srcdir)/Server-localhost-lastSAN-sv.pem \
+	$(srcdir)/stunnel-sv.pem ../stunnel.pem
 
 $(srcdir)/EdelCurlRoot-ca.cacert:
 	cd $(srcdir); scripts/genroot.sh EdelCurlRoot
@@ -846,7 +868,13 @@ $(srcdir)/Server-localhost-firstSAN-sv.pem: $(srcdir)/EdelCurlRoot-ca.cacert
 	cd $(srcdir); scripts/genserv.sh Server-localhost-firstSAN EdelCurlRoot
 
 $(srcdir)/Server-localhost-lastSAN-sv.pem: $(srcdir)/EdelCurlRoot-ca.cacert
-	cd $(srcdir); scripts/genserv.sh Server-localhost-firstSAN EdelCurlRoot
+	cd $(srcdir); scripts/genserv.sh Server-localhost-lastSAN EdelCurlRoot
+
+$(srcdir)/stunnel-sv.pem: $(srcdir)/EdelCurlRoot-ca.cacert
+	cd $(srcdir); scripts/genserv.sh stunnel EdelCurlRoot
+
+../stunnel.pem: $(srcdir)/stunnel-sv.pem
+	cp $< $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

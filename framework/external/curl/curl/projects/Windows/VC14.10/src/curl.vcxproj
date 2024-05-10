@@ -2655,7 +2655,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\lib\curl_ctype.c" />
+    <ClCompile Include="..\..\..\..\lib\base64.c" />
     <ClCompile Include="..\..\..\..\lib\curl_multibyte.c" />
     <ClCompile Include="..\..\..\..\lib\dynbuf.c" />
     <ClCompile Include="..\..\..\..\lib\nonblock.c" />
@@ -2684,18 +2684,19 @@
     <ClCompile Include="..\..\..\..\src\tool_help.c" />
     <ClCompile Include="..\..\..\..\src\tool_helpers.c" />
     <ClCompile Include="..\..\..\..\src\tool_hugehelp.c" />
+    <ClCompile Include="..\..\..\..\src\tool_ipfs.c" />
     <ClCompile Include="..\..\..\..\src\tool_libinfo.c" />
     <ClCompile Include="..\..\..\..\src\tool_listhelp.c" />
     <ClCompile Include="..\..\..\..\src\tool_main.c" />
     <ClCompile Include="..\..\..\..\src\tool_msgs.c" />
     <ClCompile Include="..\..\..\..\src\tool_operate.c" />
     <ClCompile Include="..\..\..\..\src\tool_operhlp.c" />
-    <ClCompile Include="..\..\..\..\src\tool_panykey.c" />
     <ClCompile Include="..\..\..\..\src\tool_paramhlp.c" />
     <ClCompile Include="..\..\..\..\src\tool_parsecfg.c" />
     <ClCompile Include="..\..\..\..\src\tool_progress.c" />
     <ClCompile Include="..\..\..\..\src\tool_setopt.c" />
     <ClCompile Include="..\..\..\..\src\tool_sleep.c" />
+    <ClCompile Include="..\..\..\..\src\tool_stderr.c" />
     <ClCompile Include="..\..\..\..\src\tool_strdup.c" />
     <ClCompile Include="..\..\..\..\src\tool_urlglob.c" />
     <ClCompile Include="..\..\..\..\src\tool_util.c" />
@@ -2703,6 +2704,7 @@
     <ClCompile Include="..\..\..\..\src\tool_writeout.c" />
     <ClCompile Include="..\..\..\..\src\tool_writeout_json.c" />
     <ClCompile Include="..\..\..\..\src\tool_xattr.c" />
+    <ClCompile Include="..\..\..\..\src\var.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\lib\config-win32.h" />
@@ -2736,12 +2738,12 @@
     <ClInclude Include="..\..\..\..\src\tool_helpers.h" />
     <ClInclude Include="..\..\..\..\src\tool_help.h" />
     <ClInclude Include="..\..\..\..\src\tool_hugehelp.h" />
+    <ClInclude Include="..\..\..\..\src\tool_ipfs.h" />
     <ClInclude Include="..\..\..\..\src\tool_libinfo.h" />
     <ClInclude Include="..\..\..\..\src\tool_main.h" />
     <ClInclude Include="..\..\..\..\src\tool_msgs.h" />
     <ClInclude Include="..\..\..\..\src\tool_operate.h" />
     <ClInclude Include="..\..\..\..\src\tool_operhlp.h" />
-    <ClInclude Include="..\..\..\..\src\tool_panykey.h" />
     <ClInclude Include="..\..\..\..\src\tool_paramhlp.h" />
     <ClInclude Include="..\..\..\..\src\tool_parsecfg.h" />
     <ClInclude Include="..\..\..\..\src\tool_progress.h" />
@@ -2749,6 +2751,7 @@
     <ClInclude Include="..\..\..\..\src\tool_setopt.h" />
     <ClInclude Include="..\..\..\..\src\tool_setup.h" />
     <ClInclude Include="..\..\..\..\src\tool_sleep.h" />
+    <ClInclude Include="..\..\..\..\src\tool_stderr.h" />
     <ClInclude Include="..\..\..\..\src\tool_strdup.h" />
     <ClInclude Include="..\..\..\..\src\tool_urlglob.h" />
     <ClInclude Include="..\..\..\..\src\tool_util.h" />
@@ -2757,6 +2760,7 @@
     <ClInclude Include="..\..\..\..\src\tool_writeout.h" />
     <ClInclude Include="..\..\..\..\src\tool_writeout_json.h" />
     <ClInclude Include="..\..\..\..\src\tool_xattr.h" />
+    <ClInclude Include="..\..\..\..\src\var.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\..\src\curl.rc" />

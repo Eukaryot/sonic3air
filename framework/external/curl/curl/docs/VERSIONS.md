@@ -1,7 +1,7 @@
 Version Numbers and Releases
 ============================
 
- Curl is not only curl. Curl is also libcurl. they are actually individually
+ Curl is not only curl. Curl is also libcurl. They are actually individually
  versioned, but they usually follow each other closely.
 
  The version numbering is always built up using the same system:
@@ -14,11 +14,11 @@ Version Numbers and Releases
 
 ## Bumping numbers
 
- One of these numbers will get bumped in each new release. The numbers to the
- right of a bumped number will be reset to zero.
+ One of these numbers get bumped in each new release. The numbers to the right
+ of a bumped number are reset to zero.
 
- The main version number will get bumped when *really* big, world colliding
- changes are made. The release number is bumped when changes are performed or
+ The main version number is bumped when *really* big, world colliding changes
+ are made. The release number is bumped when changes are performed or
  things/features are added. The patch number is bumped when the changes are
  mere bugfixes.
 
@@ -37,7 +37,7 @@ Version Numbers and Releases
 
  As a service to any application that might want to support new libcurl
  features while still being able to build with older versions, all releases
- have the libcurl version stored in the curl/curlver.h file using a static
+ have the libcurl version stored in the `curl/curlver.h` file using a static
  numbering scheme that can be used for comparison. The version number is
  defined as:
 
@@ -45,10 +45,10 @@ Version Numbers and Releases
 #define LIBCURL_VERSION_NUM 0xXXYYZZ
 ```
 
- Where XX, YY and ZZ are the main version, release and patch numbers in
+ Where `XX`, `YY` and `ZZ` are the main version, release and patch numbers in
  hexadecimal. All three number fields are always represented using two digits
  (eight bits each). 1.2 would appear as "0x010200" while version 9.11.7
- appears as "0x090b07".
+ appears as `0x090b07`.
 
  This 6-digit hexadecimal number is always a greater number in a more recent
  release. It makes comparisons with greater than and less than work.

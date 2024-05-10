@@ -52,12 +52,15 @@ http
 lib%TESTNUMBER
 </tool>
 
- <name>
+<name>
 curl_easy_reset with referer and other strings set
- </name>
- <command>
+</name>
+<command>
 http://%HOSTIP:%HTTPPORT/%TESTNUMBER
 </command>
+<features>
+cookies
+</features>
 </client>
 
 #

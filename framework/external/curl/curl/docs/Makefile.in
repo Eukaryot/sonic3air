@@ -21,7 +21,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -113,14 +113,13 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = docs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compile_check_sizeof.m4 \
-	$(top_srcdir)/m4/curl-amissl.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/curl-amissl.m4 \
 	$(top_srcdir)/m4/curl-bearssl.m4 \
 	$(top_srcdir)/m4/curl-compilers.m4 \
 	$(top_srcdir)/m4/curl-confopts.m4 \
 	$(top_srcdir)/m4/curl-functions.m4 \
 	$(top_srcdir)/m4/curl-gnutls.m4 \
-	$(top_srcdir)/m4/curl-mbedtls.m4 $(top_srcdir)/m4/curl-nss.m4 \
+	$(top_srcdir)/m4/curl-mbedtls.m4 \
 	$(top_srcdir)/m4/curl-openssl.m4 \
 	$(top_srcdir)/m4/curl-override.m4 \
 	$(top_srcdir)/m4/curl-reentrant.m4 \
@@ -205,7 +204,8 @@ am__uninstall_files_from_dir = { \
   }
 man1dir = $(mandir)/man1
 am__installdirs = "$(DESTDIR)$(man1dir)"
-MANS = $(dist_man_MANS) $(man_MANS)
+NROFF = nroff
+MANS = $(man_MANS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -231,8 +231,7 @@ am__define_uniq_tagged_files = \
   unique=`for i in $$list; do \
     if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
   done | $(am__uniquify_input)`
-am__DIST_COMMON = $(dist_man_MANS) $(srcdir)/Makefile.in INSTALL \
-	README.md THANKS TODO
+am__DIST_COMMON = $(srcdir)/Makefile.in INSTALL README.md THANKS TODO
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
   dir0=`pwd`; \
@@ -262,6 +261,8 @@ am__relativize = \
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
+APACHECTL = @APACHECTL@
+APXS = @APXS@
 AR = @AR@
 AR_FLAGS = @AR_FLAGS@
 AS = @AS@
@@ -270,6 +271,7 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BLANK_AT_MAKETIME = @BLANK_AT_MAKETIME@
+CADDY = @CADDY@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -328,9 +330,12 @@ HAVE_BROTLI = @HAVE_BROTLI@
 HAVE_GNUTLS_SRP = @HAVE_GNUTLS_SRP@
 HAVE_LDAP_SSL = @HAVE_LDAP_SSL@
 HAVE_LIBZ = @HAVE_LIBZ@
+HAVE_OPENSSL_QUIC = @HAVE_OPENSSL_QUIC@
 HAVE_OPENSSL_SRP = @HAVE_OPENSSL_SRP@
 HAVE_PROTO_BSDSOCKET_H = @HAVE_PROTO_BSDSOCKET_H@
 HAVE_ZSTD = @HAVE_ZSTD@
+HTTPD = @HTTPD@
+HTTPD_NGHTTPX = @HTTPD_NGHTTPX@
 IDN_ENABLED = @IDN_ENABLED@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -353,12 +358,9 @@ LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
-MANOPT = @MANOPT@
 MKDIR_P = @MKDIR_P@
 NM = @NM@
 NMEDIT = @NMEDIT@
-NROFF = @NROFF@
-NSS_LIBS = @NSS_LIBS@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 OTOOL = @OTOOL@
@@ -378,6 +380,7 @@ PKGADD_VENDOR = @PKGADD_VENDOR@
 PKGCONFIG = @PKGCONFIG@
 RANDOM_FILE = @RANDOM_FILE@
 RANLIB = @RANLIB@
+RC = @RC@
 REQUIRE_LIB_DEPS = @REQUIRE_LIB_DEPS@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -388,10 +391,12 @@ SSL_LIBS = @SSL_LIBS@
 STRIP = @STRIP@
 SUPPORT_FEATURES = @SUPPORT_FEATURES@
 SUPPORT_PROTOCOLS = @SUPPORT_PROTOCOLS@
+TEST_NGHTTPX = @TEST_NGHTTPX@
 USE_ARES = @USE_ARES@
 USE_BEARSSL = @USE_BEARSSL@
 USE_GNUTLS = @USE_GNUTLS@
 USE_HYPER = @USE_HYPER@
+USE_LIBPSL = @USE_LIBPSL@
 USE_LIBRTMP = @USE_LIBRTMP@
 USE_LIBSSH = @USE_LIBSSH@
 USE_LIBSSH2 = @USE_LIBSSH2@
@@ -400,10 +405,14 @@ USE_MSH3 = @USE_MSH3@
 USE_NGHTTP2 = @USE_NGHTTP2@
 USE_NGHTTP3 = @USE_NGHTTP3@
 USE_NGTCP2 = @USE_NGTCP2@
+USE_NGTCP2_CRYPTO_BORINGSSL = @USE_NGTCP2_CRYPTO_BORINGSSL@
 USE_NGTCP2_CRYPTO_GNUTLS = @USE_NGTCP2_CRYPTO_GNUTLS@
-USE_NGTCP2_CRYPTO_OPENSSL = @USE_NGTCP2_CRYPTO_OPENSSL@
-USE_NSS = @USE_NSS@
+USE_NGTCP2_CRYPTO_QUICTLS = @USE_NGTCP2_CRYPTO_QUICTLS@
+USE_NGTCP2_CRYPTO_WOLFSSL = @USE_NGTCP2_CRYPTO_WOLFSSL@
+USE_NGTCP2_H3 = @USE_NGTCP2_H3@
 USE_OPENLDAP = @USE_OPENLDAP@
+USE_OPENSSL_H3 = @USE_OPENSSL_H3@
+USE_OPENSSL_QUIC = @USE_OPENSSL_QUIC@
 USE_QUICHE = @USE_QUICHE@
 USE_RUSTLS = @USE_RUSTLS@
 USE_SCHANNEL = @USE_SCHANNEL@
@@ -475,23 +484,17 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign no-dependencies
 
-# EXTRA_DIST breaks with $(abs_builddir) so build it using this variable
-# but distribute it (using the relative file name) in the next variable
-man_MANS = $(abs_builddir)/curl.1
-noinst_man_MANS = curl.1 mk-ca-bundle.1
-dist_man_MANS = curl-config.1
-GENHTMLPAGES = curl.html curl-config.html mk-ca-bundle.html
-PDFPAGES = curl.pdf curl-config.pdf mk-ca-bundle.pdf
-MANDISTPAGES = curl.1.dist curl-config.1.dist
-HTMLPAGES = $(GENHTMLPAGES)
-
-# Build targets in this file (.) before cmdline-opts to ensure that
-# the curl.1 rule below runs first
-SUBDIRS = . cmdline-opts
-DIST_SUBDIRS = $(SUBDIRS) examples libcurl
-CLEANFILES = $(GENHTMLPAGES) $(PDFPAGES) $(MANDISTPAGES) curl.1
+# if we disable man page building, ignore these
+@BUILD_DOCS_TRUE@MK_CA_DOCS = mk-ca-bundle.1
+@BUILD_DOCS_TRUE@CURLCONF_DOCS = curl-config.1
+man_MANS = curl-config.1
+CURLPAGES = curl-config.md mk-ca-bundle.md
+SUBDIRS = . cmdline-opts libcurl
+DIST_SUBDIRS = $(SUBDIRS) examples
+@BUILD_DOCS_TRUE@CLEANFILES = mk-ca-bundle.1 curl-config.1
 EXTRA_DIST = \
- $(noinst_man_MANS)                             \
+ $(CURLPAGES)                                   \
+ $(CURLCONF_DOCS)                               \
  ALTSVC.md                                      \
  BINDINGS.md                                    \
  BUFREF.md                                      \
@@ -503,10 +506,16 @@ EXTRA_DIST = \
  CODE_OF_CONDUCT.md                             \
  CODE_REVIEW.md                                 \
  CODE_STYLE.md                                  \
+ CLIENT-READERS.md                              \
+ CLIENT-WRITERS.md                              \
+ CONNECTION-FILTERS.md                          \
  CONTRIBUTE.md                                  \
  CURL-DISABLE.md                                \
+ CURLDOWN.md                                    \
  DEPRECATE.md                                   \
+ DISTROS.md                                     \
  DYNBUF.md                                      \
+ EARLY-RELEASE.md                               \
  EXPERIMENTAL.md                                \
  FAQ                                            \
  FEATURES.md                                    \
@@ -519,7 +528,7 @@ EXTRA_DIST = \
  HTTP3.md                                       \
  HYPER.md                                       \
  INSTALL                                        \
- INSTALL.cmake                                  \
+ INSTALL-CMAKE.md                               \
  INSTALL.md                                     \
  INTERNALS.md                                   \
  KNOWN_BUGS                                     \
@@ -532,21 +541,28 @@ EXTRA_DIST = \
  RELEASE-PROCEDURE.md                           \
  RUSTLS.md                                      \
  ROADMAP.md                                     \
- SECURITY-PROCESS.md                            \
+ SECURITY-ADVISORY.md                           \
+ SPONSORS.md                                    \
  SSL-PROBLEMS.md                                \
  SSLCERTS.md                                    \
  THANKS                                         \
  TODO                                           \
  TheArtOfHttpScripting.md                       \
  URL-SYNTAX.md                                  \
- VERSIONS.md
+ VERSIONS.md                                    \
+ VULN-DISCLOSURE-POLICY.md                      \
+ WEBSOCKET.md
 
-MAN2HTML = roffit $< >$@
-SUFFIXES = .1 .html .pdf
+CD2NROFF = $(top_srcdir)/scripts/cd2nroff $< >$@
+CD2 = $(CD2_$(V))
+CD2_0 = @echo "  RENDER " $@;
+CD2_1 = 
+CD2_ = $(CD2_0)
+SUFFIXES = .1 .md
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .1 .html .pdf
+.SUFFIXES: .1 .md
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -582,10 +598,10 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-man1: $(dist_man_MANS) $(man_MANS)
+install-man1: $(man_MANS)
 	@$(NORMAL_INSTALL)
 	@list1=''; \
-	list2='$(dist_man_MANS) $(man_MANS)'; \
+	list2='$(man_MANS)'; \
 	test -n "$(man1dir)" \
 	  && test -n "`echo $$list1$$list2`" \
 	  || exit 0; \
@@ -620,7 +636,7 @@ uninstall-man1:
 	@$(NORMAL_UNINSTALL)
 	@list=''; test -n "$(man1dir)" || exit 0; \
 	files=`{ for i in $$list; do echo "$$i"; done; \
-	l2='$(dist_man_MANS) $(man_MANS)'; for i in $$l2; do echo "$$i"; done | \
+	l2='$(man_MANS)'; for i in $$l2; do echo "$$i"; done | \
 	  sed -n '/\.1[a-z]*$$/p'; \
 	} | sed -e 's,.*/,,;h;s,.*\.,,;s,^[^1][0-9a-z]*$$,1,;x' \
 	      -e 's,\.[0-9a-z]*$$,,;$(transform);G;s,\n,.,'`; \
@@ -831,6 +847,8 @@ dvi: dvi-recursive
 
 dvi-am:
 
+html: html-recursive
+
 html-am:
 
 info: info-recursive
@@ -873,6 +891,8 @@ mostlyclean: mostlyclean-recursive
 
 mostlyclean-am: mostlyclean-generic mostlyclean-libtool
 
+pdf: pdf-recursive
+
 pdf-am:
 
 ps: ps-recursive
@@ -902,34 +922,14 @@ uninstall-man: uninstall-man1
 .PRECIOUS: Makefile
 
 
-# $(abs_builddir) is to disable VPATH when searching for this file, which
-# would otherwise find the copy in $(srcdir) which breaks the $(HUGE)
-# rule in src/Makefile.am in out-of-tree builds that references the file in the
-# build directory.
-#
-# First, seed the used copy of curl.1 with the prebuilt copy (in an out-of-tree
-# build), then run make recursively to rebuild it only if its dependencies
-# have changed.
-$(abs_builddir)/curl.1:
-	if test "$(top_builddir)x" != "$(top_srcdir)x" -a -e "$(srcdir)/curl.1"; then \
-		$(INSTALL_DATA) "$(srcdir)/curl.1" $@; fi
-	cd cmdline-opts && $(MAKE)
+all: $(MK_CA_DOCS)
 
-html: $(HTMLPAGES)
-	cd libcurl && $(MAKE) html
+.md.1:
+	$(CD2)$(CD2NROFF)
 
-pdf: $(PDFPAGES)
-	cd libcurl && $(MAKE) pdf
+curl-config.1: curl-config.md
 
-.1.html:
-	$(MAN2HTML)
-
-.1.pdf:
-	@(foo=`echo $@ | sed -e 's/\.[0-9]$$//g'`; \
-	groff -Tps -man $< >$$foo.ps; \
-	ps2pdf $$foo.ps $@; \
-	rm $$foo.ps; \
-	echo "converted $< to $@")
+mk-ca-bundle.1: mk-ca-bundle.md
 
 distclean:
 	rm -f $(CLEANFILES)

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -23,7 +23,7 @@
  ***************************************************************************/
 
 /* <DESC>
- * IMAP example showing how to retreieve emails from a shared mailed box
+ * Retrieve emails from a shared IMAP mailbox
  * </DESC>
  */
 
@@ -53,7 +53,7 @@ int main(void)
     /* Force PLAIN authentication */
     curl_easy_setopt(curl, CURLOPT_LOGIN_OPTIONS, "AUTH=PLAIN");
 
-    /* This will fetch message 1 from the user's inbox */
+    /* This fetches message 1 from the user's inbox */
     curl_easy_setopt(curl, CURLOPT_URL,
                      "imap://imap.example.com/INBOX/;UID=1");
 

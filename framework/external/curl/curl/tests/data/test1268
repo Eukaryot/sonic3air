@@ -19,18 +19,18 @@ none
 <features>
 unix-sockets
 </features>
- <name>
+<name>
 file name argument looks like a flag
- </name>
- <command>
---stderr log/moo%TESTNUMBER --unix-socket -k hej://moo
+</name>
+<command>
+--stderr %LOGDIR/moo%TESTNUMBER --unix-socket -k hej://moo
 </command>
 </client>
 
 <verify>
-<file name="log/moo%TESTNUMBER" mode="text">
+<file name="%LOGDIR/moo%TESTNUMBER" mode="text">
 Warning: The file name argument '-k' looks like a flag.
-curl: (1) Protocol "hej" not supported or disabled in libcurl
+curl: (1) Protocol "hej" not supported
 </file>
 
 # we expect an error since we provide a weird URL

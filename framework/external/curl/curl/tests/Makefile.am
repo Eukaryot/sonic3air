@@ -5,7 +5,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -22,19 +22,35 @@
 #
 ###########################################################################
 
-HTMLPAGES = testcurl.html runtests.html
-PDFPAGES = testcurl.pdf runtests.pdf
 MANDISTPAGES = runtests.1.dist testcurl.1.dist
 
-EXTRA_DIST = ftpserver.pl httpserver.pl secureserver.pl runtests.pl           \
- getpart.pm FILEFORMAT.md README.md stunnel.pem memanalyze.pl testcurl.pl     \
- valgrind.pm ftp.pm sshserver.pl sshhelp.pm pathhelp.pm testcurl.1 runtests.1 \
- serverhelp.pm tftpserver.pl rtspserver.pl directories.pm symbol-scan.pl      \
- CMakeLists.txt mem-include-scan.pl valgrind.supp extern-scan.pl              \
- manpage-scan.pl nroff-scan.pl http2-server.pl dictserver.py                  \
- negtelnetserver.py smbserver.py util.py                                      \
- disable-scan.pl manpage-syntax.pl error-codes.pl badsymbols.pl               \
- azure.pm appveyor.pm version-scan.pl options-scan.pl
+# scripts used in test cases
+TESTSCRIPTS = \
+ test1119.pl  \
+ test1132.pl  \
+ test1135.pl  \
+ test1139.pl  \
+ test1140.pl  \
+ test1165.pl  \
+ test1167.pl  \
+ test1173.pl  \
+ test1175.pl  \
+ test1177.pl  \
+ test1222.pl  \
+ test1275.pl  \
+ test1276.pl  \
+ test1477.pl  \
+ test1544.pl  \
+ test971.pl
+
+EXTRA_DIST = appveyor.pm azure.pm CMakeLists.txt devtest.pl             \
+ dictserver.py directories.pm FILEFORMAT.md processhelp.pm ftpserver.pl \
+ getpart.pm globalconfig.pm http-server.pl http2-server.pl              \
+ http3-server.pl memanalyze.pl negtelnetserver.py pathhelp.pm README.md \
+ rtspserver.pl runner.pm runtests.1 runtests.pl secureserver.pl         \
+ serverhelp.pm servers.pm smbserver.py sshhelp.pm sshserver.pl          \
+ stunnel.pem testcurl.1 testcurl.pl testutil.pm tftpserver.pl util.py   \
+ valgrind.pm valgrind.supp $(TESTSCRIPTS)
 
 DISTCLEANFILES = configurehelp.pm
 
@@ -49,14 +65,12 @@ BUILD_UNIT =
 DIST_UNIT = unit
 endif
 
-SUBDIRS = certs data server libtest $(BUILD_UNIT)
+SUBDIRS = certs data server libtest http $(BUILD_UNIT)
 DIST_SUBDIRS = $(SUBDIRS) $(DIST_UNIT)
 
 PERLFLAGS = -I$(srcdir)
 
 CLEANFILES = .http.pid .https.pid .ftp.pid .ftps.pid $(MANDISTPAGES)
-
-MAN2HTML= roffit $< >$@
 
 curl:
 	@cd $(top_builddir) && $(MAKE)
@@ -71,11 +85,12 @@ TEST_F = -a -p -r
 TEST_T = -a -t
 TEST_E = -a -e
 
-# !flaky means that it'll skip all tests using the flaky keyword
-TEST_NF = -a -p !flaky
+# ~<keyword> means that it will run all tests matching the keyword, but will
+# ignore their results (since these ones are likely to fail for no good reason)
+TEST_NF = -a -p ~flaky ~timing-dependent
 
 # special CI target derived from nonflaky with CI-specific flags
-TEST_CI = $(TEST_NF) -r -rm
+TEST_CI = $(TEST_NF) -rm
 endif
 
 # make sure that PERL is pointing to an executable
@@ -106,20 +121,11 @@ torture-test: perlcheck all
 event-test: perlcheck all
 	$(TEST) $(TEST_E) $(TFLAGS)
 
-.1.html:
-	$(MAN2HTML)
-
-.1.pdf:
-	@(foo=`echo $@ | sed -e 's/\.[0-9]$$//g'`; \
-	groff -Tps -man $< >$$foo.ps; \
-	ps2pdf $$foo.ps $@; \
-	rm $$foo.ps; \
-	echo "converted $< to $@")
-
 checksrc:
-	cd libtest && $(MAKE) checksrc
-	cd unit && $(MAKE) checksrc
-	cd server && $(MAKE) checksrc
+	(cd libtest && $(MAKE) checksrc)
+	(cd unit && $(MAKE) checksrc)
+	(cd server && $(MAKE) checksrc)
+	(cd http && $(MAKE) checksrc)
 
 if CURLDEBUG
 # for debug builds, we scan the sources on all regular make invokes

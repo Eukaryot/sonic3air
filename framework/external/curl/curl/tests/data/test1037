@@ -27,13 +27,13 @@ REPLY EPSV 500 no such command
 <server>
 ftp
 </server>
- <name>
+<name>
 FTP download resume from end of empty file
- </name>
- <command>
+</name>
+<command>
 ftp://%HOSTIP:%FTPPORT/%TESTNUMBER -C -
 </command>
-<file name="log/curl%TESTNUMBER.out">
+<file name="%LOGDIR/curl%TESTNUMBER.out">
 </file>
 </client>
 

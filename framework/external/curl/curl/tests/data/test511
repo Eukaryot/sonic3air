@@ -24,10 +24,10 @@ ftp
 lib%TESTNUMBER
 </tool>
 
- <name>
+<name>
 FTP with FILETIME and NOBODY but missing file
- </name>
- <command>
+</name>
+<command>
 ftp://%HOSTIP:%FTPPORT/%TESTNUMBER
 </command>
 </client>
@@ -44,6 +44,8 @@ USER anonymous
 PASS ftp@example.com
 PWD
 MDTM %TESTNUMBER
+TYPE I
+SIZE %TESTNUMBER
 QUIT
 </protocol>
 </verify>

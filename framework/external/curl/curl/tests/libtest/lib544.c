@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -63,7 +63,6 @@ int test(char *URL)
   /* Update the original data to detect non-copy. */
   strcpy(teststring, "FAIL");
 
-#ifdef LIB545
   {
     CURL *handle2;
     handle2 = curl_easy_duphandle(curl);
@@ -71,7 +70,6 @@ int test(char *URL)
 
     curl = handle2;
   }
-#endif
 
   /* Now, this is a POST request with binary 0 embedded in POST data. */
   res = curl_easy_perform(curl);

@@ -23,13 +23,13 @@ blablabla
 <server>
 http
 </server>
- <name>
+<name>
 HTTP 1.0 PUT
- </name>
- <command>
-http://%HOSTIP:%HTTPPORT/we/want/%TESTNUMBER -T log/test%TESTNUMBER.txt --http1.0
+</name>
+<command>
+http://%HOSTIP:%HTTPPORT/we/want/%TESTNUMBER -T %LOGDIR/test%TESTNUMBER.txt --http1.0
 </command>
-<file name="log/test%TESTNUMBER.txt">
+<file name="%LOGDIR/test%TESTNUMBER.txt">
 Weird
      file
          to

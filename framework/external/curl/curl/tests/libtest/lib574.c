@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -24,6 +24,8 @@
 #include "test.h"
 
 #include "memdebug.h"
+
+#define TEST_HANG_TIMEOUT (60 * 1000)
 
 static int new_fnmatch(void *ptr,
                        const char *pattern, const char *string)
@@ -54,6 +56,7 @@ int test(char *URL)
   test_setopt(curl, CURLOPT_URL, URL);
   test_setopt(curl, CURLOPT_WILDCARDMATCH, 1L);
   test_setopt(curl, CURLOPT_FNMATCH_FUNCTION, new_fnmatch);
+  test_setopt(curl, CURLOPT_TIMEOUT_MS, (long) TEST_HANG_TIMEOUT);
 
   res = curl_easy_perform(curl);
   if(res) {

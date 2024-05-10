@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -26,13 +26,12 @@
 #include "server_setup.h"
 
 char *data_to_hex(char *data, size_t len);
-void logmsg(const char *msg, ...);
+void logmsg(const char *msg, ...) CURL_PRINTF(1, 2);
 long timediff(struct timeval newer, struct timeval older);
 
 #define TEST_DATA_PATH "%s/data/test%ld"
-#define ALTTEST_DATA_PATH "%s/log/test%ld"
-
-#define SERVERLOGS_LOCK "log/serverlogs.lock"
+#define ALTTEST_DATA_PATH "%s/test%ld"
+#define SERVERLOGS_LOCKDIR "lock"  /* within logdir */
 
 /* global variable, where to find the 'data' dir */
 extern const char *path;
@@ -42,7 +41,7 @@ extern const char *serverlogfile;
 
 extern const char *cmdfile;
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <process.h>
 #include <fcntl.h>
 
@@ -54,10 +53,14 @@ void win32_perror(const char *msg);
 
 void win32_init(void);
 void win32_cleanup(void);
-#endif  /* WIN32 */
+const char *sstrerror(int err);
+#else   /* _WIN32 */
+
+#define sstrerror(e) strerror(e)
+#endif  /* _WIN32 */
 
 /* fopens the test case file */
-FILE *test2fopen(long testno);
+FILE *test2fopen(long testno, const char *logdir);
 
 int wait_ms(int timeout_ms);
 curl_off_t our_getpid(void);
@@ -65,7 +68,6 @@ int write_pidfile(const char *filename);
 int write_portfile(const char *filename, int port);
 void set_advisor_read_lock(const char *filename);
 void clear_advisor_read_lock(const char *filename);
-int strncasecompare(const char *first, const char *second, size_t max);
 
 /* global variable which if set indicates that the program should finish */
 extern volatile int got_exit_signal;
@@ -73,7 +75,7 @@ extern volatile int got_exit_signal;
 /* global variable which if set indicates the first signal handled */
 extern volatile int exit_signal;
 
-#ifdef WIN32
+#ifdef _WIN32
 /* global event which if set indicates that the program should finish */
 extern HANDLE exit_event;
 #endif
@@ -82,6 +84,8 @@ void install_signal_handlers(bool keep_sigalrm);
 void restore_signal_handlers(bool keep_sigalrm);
 
 #ifdef USE_UNIX_SOCKETS
+
+#include <curl/curl.h> /* for curl_socket_t */
 
 #ifdef HAVE_SYS_UN_H
 #include <sys/un.h> /* for sockaddr_un */

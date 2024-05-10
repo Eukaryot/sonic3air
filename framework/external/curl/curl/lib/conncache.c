@@ -5,8 +5,8 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2012 - 2016, Linus Nielsen Feltzing, <linus@haxx.se>
- * Copyright (C) 2012 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Linus Nielsen Feltzing, <linus@haxx.se>
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -45,13 +45,6 @@
 
 #define HASHKEY_SIZE 128
 
-static void conn_llist_dtor(void *user, void *element)
-{
-  struct connectdata *conn = element;
-  (void)user;
-  conn->bundle = NULL;
-}
-
 static CURLcode bundle_create(struct connectbundle **bundlep)
 {
   DEBUGASSERT(*bundlep == NULL);
@@ -62,17 +55,12 @@ static CURLcode bundle_create(struct connectbundle **bundlep)
   (*bundlep)->num_connections = 0;
   (*bundlep)->multiuse = BUNDLE_UNKNOWN;
 
-  Curl_llist_init(&(*bundlep)->conn_list, (Curl_llist_dtor) conn_llist_dtor);
+  Curl_llist_init(&(*bundlep)->conn_list, NULL);
   return CURLE_OK;
 }
 
 static void bundle_destroy(struct connectbundle *bundle)
 {
-  if(!bundle)
-    return;
-
-  Curl_llist_destroy(&bundle->conn_list, NULL);
-
   free(bundle);
 }
 
@@ -119,6 +107,7 @@ int Curl_conncache_init(struct conncache *connc, int size)
   connc->closure_handle = curl_easy_init();
   if(!connc->closure_handle)
     return 1; /* bad */
+  connc->closure_handle->state.internal = true;
 
   Curl_hash_init(&connc->hash, size, Curl_hash_str,
                  Curl_str_key_compare, free_bundle_hash_entry);
@@ -142,7 +131,7 @@ static void hashkey(struct connectdata *conn, char *buf, size_t len)
 #ifndef CURL_DISABLE_PROXY
   if(conn->bits.httpproxy && !conn->bits.tunnel_proxy) {
     hostname = conn->http_proxy.host.name;
-    port = conn->port;
+    port = conn->primary.remote_port;
   }
   else
 #endif
@@ -254,11 +243,11 @@ CURLcode Curl_conncache_add_conn(struct Curl_easy *data)
   conn->connection_id = connc->next_connection_id++;
   connc->num_conn++;
 
-  DEBUGF(infof(data, "Added connection %ld. "
+  DEBUGF(infof(data, "Added connection %" CURL_FORMAT_CURL_OFF_T ". "
                "The cache now contains %zu members",
                conn->connection_id, connc->num_conn));
 
-  unlock:
+unlock:
   CONNCACHE_UNLOCK(data);
 
   return result;
@@ -390,21 +379,24 @@ conncache_find_first_connection(struct conncache *connc)
 bool Curl_conncache_return_conn(struct Curl_easy *data,
                                 struct connectdata *conn)
 {
-  /* data->multi->maxconnects can be negative, deal with it. */
-  size_t maxconnects =
-    (data->multi->maxconnects < 0) ? data->multi->num_easy * 4:
-    data->multi->maxconnects;
+  unsigned int maxconnects = !data->multi->maxconnects ?
+    data->multi->num_easy * 4: data->multi->maxconnects;
   struct connectdata *conn_candidate = NULL;
 
   conn->lastused = Curl_now(); /* it was used up until now */
-  if(maxconnects > 0 &&
-     Curl_conncache_size(data) > maxconnects) {
+  if(maxconnects && Curl_conncache_size(data) > maxconnects) {
     infof(data, "Connection cache is full, closing the oldest one");
 
     conn_candidate = Curl_conncache_extract_oldest(data);
     if(conn_candidate) {
-      /* the winner gets the honour of being disconnected */
-      Curl_disconnect(data, conn_candidate, /* dead_connection */ FALSE);
+      /* Use the closure handle for this disconnect so that anything that
+         happens during the disconnect is not stored and associated with the
+         'data' handle which already just finished a transfer and it is
+         important that details from this (unrelated) disconnect does not
+         taint meta-data in the data handle. */
+      struct conncache *connc = data->state.conn_cache;
+      Curl_disconnect(connc->closure_handle, conn_candidate,
+                      /* dead_connection */ FALSE);
     }
   }
 
@@ -498,7 +490,7 @@ Curl_conncache_extract_oldest(struct Curl_easy *data)
       conn = curr->ptr;
 
       if(!CONN_INUSE(conn) && !conn->bits.close &&
-         !conn->bits.connect_only) {
+         !conn->connect_only) {
         /* Set higher score for the age passed since the connection was used */
         score = Curl_timediff(now, conn->lastused);
 
@@ -528,12 +520,9 @@ Curl_conncache_extract_oldest(struct Curl_easy *data)
 void Curl_conncache_close_all_connections(struct conncache *connc)
 {
   struct connectdata *conn;
-  char buffer[READBUFFER_MIN + 1];
   SIGPIPE_VARIABLE(pipe_st);
   if(!connc->closure_handle)
     return;
-  connc->closure_handle->state.buffer = buffer;
-  connc->closure_handle->set.buffer_size = READBUFFER_MIN;
 
   conn = conncache_find_first_connection(connc);
   while(conn) {
@@ -547,7 +536,6 @@ void Curl_conncache_close_all_connections(struct conncache *connc)
     conn = conncache_find_first_connection(connc);
   }
 
-  connc->closure_handle->state.buffer = NULL;
   sigpipe_ignore(connc->closure_handle, &pipe_st);
 
   Curl_hostcache_clean(connc->closure_handle,

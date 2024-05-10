@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2012 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -30,7 +30,7 @@
 #include "warnless.h"
 #include "memdebug.h"
 
-#define TEST_HANG_TIMEOUT 5 * 1000
+#define TEST_HANG_TIMEOUT 60 * 1000
 #define MAX_EASY_HANDLES 3
 
 static int counter[MAX_EASY_HANDLES];
@@ -50,7 +50,9 @@ static size_t callback(char *ptr, size_t size, size_t nmemb, void *data)
   counter[idx] += (int)(size * nmemb);
 
   /* Get socket being used for this easy handle, otherwise CURL_SOCKET_BAD */
-  code = curl_easy_getinfo(easy[idx], CURLINFO_LASTSOCKET, &longdata);
+  CURL_IGNORE_DEPRECATION(
+    code = curl_easy_getinfo(easy[idx], CURLINFO_LASTSOCKET, &longdata);
+  )
   if(CURLE_OK != code) {
     fprintf(stderr, "%s:%d curl_easy_getinfo() failed, "
             "with code %d (%s)\n",
@@ -116,12 +118,6 @@ int test(char *url)
   }
 
   multi_init(multi);
-
-#ifdef USE_PIPELINING
-  multi_setopt(multi, CURLMOPT_PIPELINING, 1L);
-  multi_setopt(multi, CURLMOPT_MAX_HOST_CONNECTIONS, 5L);
-  multi_setopt(multi, CURLMOPT_MAX_TOTAL_CONNECTIONS, 10L);
-#endif
 
   for(;;) {
     struct timeval interval;
@@ -196,7 +192,12 @@ int test(char *url)
             __FILE__, __LINE__, num_handles, timeout, running);
 
     if(timeout != -1L) {
-      int itimeout = (timeout > (long)INT_MAX) ? INT_MAX : (int)timeout;
+      int itimeout;
+#if LONG_MAX > INT_MAX
+      itimeout = (timeout > (long)INT_MAX) ? INT_MAX : (int)timeout;
+#else
+      itimeout = (int)timeout;
+#endif
       interval.tv_sec = itimeout/1000;
       interval.tv_usec = (itimeout%1000)*1000;
     }

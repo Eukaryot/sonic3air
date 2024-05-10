@@ -28,10 +28,10 @@ Due to the inherent differences between URL parser implementations, it is
 considered a security risk to mix different implementations and assume the
 same behavior!
 
-For example, if you use one parser to check if a URL uses a good host name or
+For example, if you use one parser to check if a URL uses a good hostname or
 the correct auth field, and then pass on that same URL to a *second* parser,
-there will always be a risk it treats the same URL differently. There is no
-right and wrong in URL land, only differences of opinions.
+there is always a risk it treats the same URL differently. There is no right
+and wrong in URL land, only differences of opinions.
 
 libcurl offers a separate API to its URL parser for this reason, among others.
 
@@ -52,11 +52,11 @@ security concerns:
 
 3. Such a URL might use other schemes than you thought of or planned for.
 
-## "RFC3986 plus"
+## "RFC 3986 plus"
 
 curl recognizes a URL syntax that we call "RFC 3986 plus". It is grounded on
-the well established RFC 3986 to make sure previously written command lines and
-curl using scripts will remain working.
+the well established RFC 3986 to make sure previously written command lines
+and curl using scripts remain working.
 
 curl's URL parser allows a few deviations from the spec in order to
 inter-operate better with URLs that appear in the wild.
@@ -92,8 +92,7 @@ curl supports "URLs" that do not start with a scheme. This is not supported by
 any of the specifications. This is a shortcut to entering URLs that was
 supported by browsers early on and has been mimicked by curl.
 
-Based on what the host name starts with, curl will "guess" what protocol to
-use:
+Based on what the hostname starts with, curl "guesses" what protocol to use:
 
  - `ftp.` means FTP
  - `dict.` means DICT
@@ -125,7 +124,7 @@ character or string.
 
 For example, this could look like:
 
-    http://user:password@www.example.com:80/index.hmtl?foo=bar#top
+    http://user:password@www.example.com:80/index.html?foo=bar#top
 
 ## Scheme
 
@@ -147,7 +146,7 @@ schemes:
 
 ## Userinfo
 
-The userinfo field can be used to set user name and password for
+The userinfo field can be used to set username and password for
 authentication purposes in this transfer. The use of this field is discouraged
 since it often means passing around the password in plain text and is thus a
 security risk.
@@ -184,7 +183,7 @@ machine.
 ### IDNA
 
 If curl was built with International Domain Name (IDN) support, it can also
-handle host names using non-ASCII characters.
+handle hostnames using non-ASCII characters.
 
 When built with libidn2, curl uses the IDNA 2008 standard. This is equivalent
 to the WHATWG URL spec, but differs from certain browsers that use IDNA 2003
@@ -197,12 +196,12 @@ of Windows.
 
 ## Port number
 
-If there's a colon after the hostname, that should be followed by the port
+If there is a colon after the hostname, that should be followed by the port
 number to use. 1 - 65535. curl also supports a blank port number field - but
 only if the URL starts with a scheme.
 
-If the port number is not specified in the URL, curl will used a default port
-based on the provide scheme:
+If the port number is not specified in the URL, curl uses a default port
+number based on the provide scheme:
 
 DICT 2628, FTP 21, FTPS 990, GOPHER 70, GOPHERS 70, HTTP 80, HTTPS 443,
 IMAP 132, IMAPS 993, LDAP 369, LDAPS 636, MQTT 1883, POP3 110, POP3S 995,
@@ -216,7 +215,7 @@ SMTP 25, SMTPS 465, TELNET 23, TFTP 69
 The path part of an FTP request specifies the file to retrieve and from which
 directory. If the file part is omitted then libcurl downloads the directory
 listing for the directory specified. If the directory is omitted then the
-directory listing for the root / home directory will be returned.
+directory listing for the root / home directory is returned.
 
 FTP servers typically put the user in its "home directory" after login, which
 then differs between users. To explicitly specify the root directory of an FTP
@@ -231,14 +230,14 @@ to read or write such a path.
 
 curl only allows the hostname part of a FILE URL to be one out of these three
 alternatives: `localhost`, `127.0.0.1` or blank ("", zero characters).
-Anything else will make curl fail to parse the URL.
+Anything else makes curl fail to parse the URL.
 
 ### Windows-specific FILE details
 
 curl accepts that the FILE URL's path starts with a "drive letter". That is a
 single letter `a` to `z` followed by a colon or a pipe character (`|`).
 
-The Windows operating system itself will convert some file accesses to perform
+The Windows operating system itself converts some file accesses to perform
 network accesses over SMB/CIFS, through several different file path patterns.
 This way, a `file://` URL passed to curl *might* be converted into a network
 access inadvertently and unknowingly to curl. This is a Windows feature curl
@@ -259,7 +258,7 @@ A folder list on the user's inbox:
 
     imap://user:password@mail.example.com/INBOX
 
-Select the user's inbox and fetch message with uid = 1:
+Select the user's inbox and fetch message with `uid = 1`:
 
     imap://user:password@mail.example.com/INBOX/;UID=1
 
@@ -289,26 +288,26 @@ subject line:
 
     imap://user:password@mail.example.com/INBOX?SUBJECT%20shadows
 
-Searching via the query part of the URL `?` is a search request for the results
-to be returned as message sequence numbers (MAILINDEX). It is possible to make
-a search request for results to be returned as unique ID numbers (UID) by using
-a custom curl request via `-X`. UID numbers are unique per session (and
-multiple sessions when UIDVALIDITY is the same). For example, if you are
-searching for `"foo bar"` in header+body (TEXT) and you want the matching
-MAILINDEX numbers returned then you could search via URL:
+Searching via the query part of the URL `?` is a search request for the
+results to be returned as message sequence numbers (`MAILINDEX`). It is
+possible to make a search request for results to be returned as unique ID
+numbers (`UID`) by using a custom curl request via `-X`. `UID` numbers are
+unique per session (and multiple sessions when `UIDVALIDITY` is the same). For
+example, if you are searching for `"foo bar"` in header+body (`TEXT`) and you
+want the matching `MAILINDEX` numbers returned then you could search via URL:
 
     imap://user:password@mail.example.com/INBOX?TEXT%20%22foo%20bar%22
 
-.. but if you wanted matching UID numbers you would have to use a custom request:
+If you want matching `UID` numbers you have to use a custom request:
 
     imap://user:password@mail.example.com/INBOX -X "UID SEARCH TEXT \"foo bar\""
 
 For more information about IMAP commands please see RFC 9051. For more
 information about the individual components of an IMAP URL please see RFC 5092.
 
-* Note old curl versions would FETCH by message sequence number when UID was
-specified in the URL. That was a bug fixed in 7.62.0, which added MAILINDEX to
-FETCH by mail sequence number.
+* Note old curl versions would `FETCH` by message sequence number when `UID`
+was specified in the URL. That was a bug fixed in 7.62.0, which added
+`MAILINDEX` to `FETCH` by mail sequence number.
 
 ## LDAP
 
@@ -317,15 +316,15 @@ Name, Attributes, Scope, Filter and Extension for a LDAP search. Each field is
 separated by a question mark and when that field is not required an empty
 string with the question mark separator should be included.
 
-Search for the DN as `My Organization`:
+Search for the `DN` as `My Organization`:
 
     ldap://ldap.example.com/o=My%20Organization
 
-the same search but will only return postalAddress attributes:
+the same search but only return `postalAddress` attributes:
 
     ldap://ldap.example.com/o=My%20Organization?postalAddress
 
-Search for an empty DN and request information about the
+Search for an empty `DN` and request information about the
 `rootDomainNamingContext` attribute for an Active Directory server:
 
     ldap://ldap.example.com/?rootDomainNamingContext
@@ -352,21 +351,24 @@ To specify a path relative to the user's home directory on the server, prepend
 The path part of an SFTP URL specifies the file to retrieve or upload. If the
 path ends with a slash (`/`) then a directory listing is returned instead of a
 file. If the path is omitted entirely then the directory listing for the root
-/ home directory will be returned.
+/ home directory is returned.
 
 ## SMB
 The path part of a SMB request specifies the file to retrieve and from what
 share and directory or the share to upload to and as such, may not be omitted.
-If the user name is embedded in the URL then it must contain the domain name
+If the username is embedded in the URL then it must contain the domain name
 and as such, the backslash must be URL encoded as %2f.
+
+When uploading to SMB, the size of the file needs to be known ahead of time,
+meaning that you can upload a file passed to curl over a pipe like stdin.
 
 curl supports SMB version 1 (only)
 
 ## SMTP
 
-The path part of a SMTP request specifies the host name to present during
-communication with the mail server. If the path is omitted, then libcurl will
-attempt to resolve the local computer's host name. However, this may not
+The path part of a SMTP request specifies the hostname to present during
+communication with the mail server. If the path is omitted, then libcurl
+attempts to resolve the local computer's hostname. However, this may not
 return the fully qualified domain name that is required by some mail servers
 and specifying this path allows you to set an alternative name, such as your
 machine's fully qualified domain name, which you might have obtained from an
@@ -376,13 +378,12 @@ The default smtp port is 25. Some servers use port 587 as an alternative.
 
 ## RTMP
 
-There's no official URL spec for RTMP so libcurl uses the URL syntax supported
+There is no official URL spec for RTMP so libcurl uses the URL syntax supported
 by the underlying librtmp library. It has a syntax where it wants a
 traditional URL, followed by a space and a series of space-separated
 `name=value` pairs.
 
 While space is not typically a "legal" letter, libcurl accepts them. When a
-user wants to pass in a `#` (hash) character it will be treated as a fragment
-and get cut off by libcurl if provided literally. You will instead have to
-escape it by providing it as backslash and its ASCII value in hexadecimal:
-`\23`.
+user wants to pass in a `#` (hash) character it is treated as a fragment and
+it gets cut off by libcurl if provided literally. You have to escape it by
+providing it as backslash and its ASCII value in hexadecimal: `\23`.

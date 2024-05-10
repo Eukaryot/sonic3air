@@ -16,14 +16,14 @@ curl-config
 <server>
 none
 </server>
- <name>
+<name>
 Compare curl --version with curl-config --vernum
- </name>
- <command>
+</name>
+<command>
 --version
 </command>
 <postcheck>
-%SRCDIR/libtest/test1022.pl ../curl-config log/stdout%TESTNUMBER vernum
+%SRCDIR/libtest/test1022.pl ../curl-config %LOGDIR/stdout%TESTNUMBER vernum
 </postcheck>
 </client>
 

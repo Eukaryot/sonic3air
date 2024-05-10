@@ -5,7 +5,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -25,6 +25,12 @@ include(CheckCSourceCompiles)
 
 option(CURL_HIDDEN_SYMBOLS "Set to ON to hide libcurl internal symbols (=hide all symbols that aren't officially external)." ON)
 mark_as_advanced(CURL_HIDDEN_SYMBOLS)
+
+if(WIN32 AND ENABLE_CURLDEBUG)
+  # We need to export internal debug functions (e.g. curl_dbg_*), so disable
+  # symbol hiding for debug builds.
+  set(CURL_HIDDEN_SYMBOLS OFF)
+endif()
 
 if(CURL_HIDDEN_SYMBOLS)
   set(SUPPORTS_SYMBOL_HIDING FALSE)

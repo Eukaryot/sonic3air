@@ -20,11 +20,11 @@ none
 <features>
 http
 </features>
- <name>
+<name>
 attempt connect to non-listening socket
- </name>
- <command>
-%HOSTIP:%NOLISTENPORT
+</name>
+<command>
+--trace-config all %HOSTIP:%NOLISTENPORT
 </command>
 </client>
 

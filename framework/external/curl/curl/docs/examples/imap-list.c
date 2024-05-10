@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -23,7 +23,7 @@
  ***************************************************************************/
 
 /* <DESC>
- * IMAP example to list the folders within a mailbox
+ * List the folders within an IMAP mailbox
  * </DESC>
  */
 
@@ -47,8 +47,8 @@ int main(void)
     curl_easy_setopt(curl, CURLOPT_USERNAME, "user");
     curl_easy_setopt(curl, CURLOPT_PASSWORD, "secret");
 
-    /* This will list the folders within the user's mailbox. If you want to
-     * list the folders within a specific folder, for example the inbox, then
+    /* This lists the folders within the user's mailbox. If you want to list
+     * the folders within a specific folder, for example the inbox, then
      * specify the folder as a path in the URL such as /INBOX */
     curl_easy_setopt(curl, CURLOPT_URL, "imap://imap.example.com");
 

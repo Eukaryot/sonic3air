@@ -5,7 +5,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 2009 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -26,10 +26,12 @@ transform_makefile_inc("Makefile.inc" "${CMAKE_CURRENT_BINARY_DIR}/Makefile.inc.
 include("${CMAKE_CURRENT_BINARY_DIR}/Makefile.inc.cmake")
 
 add_manual_pages(man_MANS)
-
-string(REPLACE ".3" ".html" HTMLPAGES "${man_MANS}")
-string(REPLACE ".3" ".pdf" PDFPAGES "${man_MANS}")
-add_custom_target(opts-html DEPENDS ${HTMLPAGES})
-add_custom_target(opts-pdf DEPENDS ${PDFPAGES})
-add_dependencies(html opts-html)
-add_dependencies(pdf opts-pdf)
+add_custom_target(opts-man DEPENDS ${man_MANS})
+add_dependencies(man opts-man)
+if(NOT CURL_DISABLE_INSTALL)
+  unset(_src)
+  foreach(_f ${man_MANS})
+    list(APPEND _src "${CMAKE_CURRENT_BINARY_DIR}/${_f}")
+  endforeach()
+  install(FILES ${_src} DESTINATION ${CMAKE_INSTALL_MANDIR}/man3)
+endif()

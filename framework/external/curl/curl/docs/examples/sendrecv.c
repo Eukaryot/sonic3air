@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -22,7 +22,7 @@
  *
  ***************************************************************************/
 /* <DESC>
- * An example of curl_easy_send() and curl_easy_recv() usage.
+ * Demonstrate curl_easy_send() and curl_easy_recv() usage.
  * </DESC>
  */
 
@@ -38,12 +38,20 @@ static int wait_on_socket(curl_socket_t sockfd, int for_recv, long timeout_ms)
   int res;
 
   tv.tv_sec = timeout_ms / 1000;
-  tv.tv_usec = (timeout_ms % 1000) * 1000;
+  tv.tv_usec = (int)(timeout_ms % 1000) * 1000;
 
   FD_ZERO(&infd);
   FD_ZERO(&outfd);
   FD_ZERO(&errfd);
 
+/* Avoid this warning with pre-2020 Cygwin/MSYS releases:
+ * warning: conversion to 'long unsigned int' from 'curl_socket_t' {aka 'int'}
+ * may change the sign of the result [-Wsign-conversion]
+ */
+#if defined(__GNUC__) && defined(__CYGWIN__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
   FD_SET(sockfd, &errfd); /* always check for error */
 
   if(for_recv) {
@@ -52,6 +60,9 @@ static int wait_on_socket(curl_socket_t sockfd, int for_recv, long timeout_ms)
   else {
     FD_SET(sockfd, &outfd);
   }
+#if defined(__GNUC__) && defined(__CYGWIN__)
+#pragma GCC diagnostic pop
+#endif
 
   /* select() returns the number of signalled sockets or -1 */
   res = select((int)sockfd + 1, &infd, &outfd, &errfd, &tv);
@@ -89,8 +100,7 @@ int main(void)
       return 1;
     }
 
-    /* Extract the socket from the curl handle - we will need it for
-       waiting. */
+    /* Extract the socket from the curl handle - we need it for waiting. */
     res = curl_easy_getinfo(curl, CURLINFO_ACTIVESOCKET, &sockfd);
 
     if(res != CURLE_OK) {

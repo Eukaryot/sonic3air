@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -36,13 +36,10 @@
 /* curl stuff */
 #include <curl/curl.h>
 
-typedef char bool;
 #define TRUE 1
 
-static
-void dump(const char *text,
-          FILE *stream, unsigned char *ptr, size_t size,
-          bool nohex)
+static void dump(const char *text, FILE *stream, unsigned char *ptr,
+                 size_t size, char nohex)
 {
   size_t i;
   size_t c;
@@ -103,10 +100,7 @@ int my_trace(CURL *handle, curl_infotype type,
   switch(type) {
   case CURLINFO_TEXT:
     fprintf(stderr, "== Info: %s", data);
-    /* FALLTHROUGH */
-  default: /* in case a new one is introduced to shock us */
     return 0;
-
   case CURLINFO_HEADER_OUT:
     text = "=> Send header";
     break;
@@ -119,6 +113,8 @@ int my_trace(CURL *handle, curl_infotype type,
   case CURLINFO_DATA_IN:
     text = "<= Recv data";
     break;
+  default: /* in case a new one is introduced to shock us */
+    return 0;
   }
 
   dump(text, stderr, data, size, TRUE);
@@ -126,7 +122,7 @@ int my_trace(CURL *handle, curl_infotype type,
 }
 
 /*
- * Simply download a HTTP file.
+ * Simply download an HTTP file.
  */
 int main(void)
 {
@@ -137,7 +133,7 @@ int main(void)
 
   http_handle = curl_easy_init();
 
-  /* set the options (I left out a few, you will get the point anyway) */
+  /* set the options (I left out a few, you get the point anyway) */
   curl_easy_setopt(http_handle, CURLOPT_URL, "https://www.example.com/");
 
   curl_easy_setopt(http_handle, CURLOPT_DEBUGFUNCTION, my_trace);

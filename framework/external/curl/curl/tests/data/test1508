@@ -14,17 +14,17 @@ none
 <tool>
 lib%TESTNUMBER
 </tool>
- <name>
+<name>
 Close a multi handle without using it
- </name>
- <command>
+</name>
+<command>
 http://%HOSTIP:%NOLISTENPORT/path/%TESTNUMBER
 </command>
 </client>
 
 # Verify data after the test has been "shot"
 <verify>
-<file name="log/stdout%TESTNUMBER">
+<file name="%LOGDIR/stdout%TESTNUMBER">
 We are done
 </file>
 </verify>

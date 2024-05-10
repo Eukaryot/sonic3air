@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -66,7 +66,7 @@ int main(void)
 
   struct MemoryStruct chunk;
 
-  chunk.memory = malloc(1);  /* will be grown as needed by the realloc above */
+  chunk.memory = malloc(1);  /* grown as needed by the realloc above */
   chunk.size = 0;    /* no data at this point */
 
   curl_global_init(CURL_GLOBAL_ALL);

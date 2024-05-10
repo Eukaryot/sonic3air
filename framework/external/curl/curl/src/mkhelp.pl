@@ -6,7 +6,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -35,53 +35,17 @@ if($ARGV[0] eq "-c") {
     shift @ARGV;
 }
 
-push @out, "                                  _   _ ____  _\n";
-push @out, "  Project                     ___| | | |  _ \\| |\n";
-push @out, "                             / __| | | | |_) | |\n";
-push @out, "                            | (__| |_| |  _ <| |___\n";
-push @out, "                             \\___|\\___/|_| \\_\\_____|\n";
+push @out, "          _   _ ____  _\n";
+push @out, "      ___| | | |  _ \\| |\n";
+push @out, "     / __| | | | |_) | |\n";
+push @out, "    | (__| |_| |  _ <| |___\n";
+push @out, "     \\___|\\___/|_| \\_\\_____|\n";
 
 my $olen=0;
 while (<STDIN>) {
     my $line = $_;
-
-    # this should be removed:
-    $line =~ s/(.|_)//g;
-
-    # remove trailing CR from line. msysgit checks out files as line+CRLF
-    $line =~ s/\r$//;
-
-    if($line =~ /^([ \t]*\n|curl)/i) {
-        # cut off headers and empty lines
-        $wline++; # count number of cut off lines
-        next;
-    }
-
-    my $text = $line;
-    $text =~ s/^\s+//g; # cut off preceding...
-    $text =~ s/\s+$//g; # and trailing whitespaces
-
-    $tlen = length($text);
-
-    if($wline && ($olen == $tlen)) {
-        # if the previous line with contents was exactly as long as
-        # this line, then we ignore the newlines!
-
-        # We do this magic because a header may abort a paragraph at
-        # any line, but we don't want that to be noticed in the output
-        # here
-        $wline=0;
-    }
-    $olen = $tlen;
-
-    if($wline) {
-        # we only make one empty line max
-        $wline = 0;
-        push @out, "\n";
-    }
     push @out, $line;
 }
-push @out, "\n"; # just an extra newline
 
 print <<HEAD
 /*
@@ -150,12 +114,12 @@ static void zfree_func(voidpf opaque, voidpf ptr)
 /* Decompress and send to stdout a gzip-compressed buffer */
 void hugehelp(void)
 {
-  unsigned char* buf;
-  int status,headerlen;
+  unsigned char *buf;
+  int status, headerlen;
   z_stream z;
 
   /* Make sure no gzip options are set */
-  if (hugehelpgz[3] & 0xfe)
+  if(hugehelpgz[3] & 0xfe)
     return;
 
   headerlen = 10;
@@ -165,18 +129,18 @@ void hugehelp(void)
   z.avail_in = (unsigned int)(sizeof(hugehelpgz) - headerlen);
   z.next_in = (unsigned char *)hugehelpgz + headerlen;
 
-  if (inflateInit2(&z, -MAX_WBITS) != Z_OK)
+  if(inflateInit2(&z, -MAX_WBITS) != Z_OK)
     return;
 
   buf = malloc(BUF_SIZE);
-  if (buf) {
+  if(buf) {
     while(1) {
       z.avail_out = BUF_SIZE;
       z.next_out = buf;
       status = inflate(&z, Z_SYNC_FLUSH);
-      if (status == Z_OK || status == Z_STREAM_END) {
+      if(status == Z_OK || status == Z_STREAM_END) {
         fwrite(buf, BUF_SIZE - z.avail_out, 1, stdout);
-        if (status == Z_STREAM_END)
+        if(status == Z_STREAM_END)
           break;
       }
       else
@@ -193,44 +157,43 @@ exit;
 }
 else {
     print <<HEAD
+static const char * const curlman[] = {
+HEAD
+        ;
+}
+
+my $blank;
+for my $n (@out) {
+    chomp $n;
+    $n =~ s/\\/\\\\/g;
+    $n =~ s/\"/\\\"/g;
+
+    if(!$n) {
+        $blank++;
+    }
+    else {
+        $n =~ s/        /\\t/g;
+        printf("  \"%s%s\",\n", $blank?"\\n":"", $n);
+        $blank = 0;
+    }
+}
+
+print <<ENDLINE
+  NULL
+};
 void hugehelp(void)
 {
-   fputs(
-HEAD
-         ;
+  int i = 0;
+  while(curlman[i])
+    puts(curlman[i++]);
 }
-
-$outsize=0;
-for(@out) {
-    chop;
-
-    $new = $_;
-
-    $outsize += length($new)+1; # one for the newline
-
-    $new =~ s/\\/\\\\/g;
-    $new =~ s/\"/\\\"/g;
-
-    # gcc 2.96 claims ISO C89 only is required to support 509 letter strings
-    if($outsize > 500) {
-        # terminate and make another fputs() call here
-        print ", stdout);\n fputs(\n";
-        $outsize=length($new)+1;
-    }
-    printf("\"%s\\n\"\n", $new);
-
-}
-
-print ", stdout) ;\n}\n";
+ENDLINE
+    ;
 
 foot();
 
 sub foot {
-  print <<FOOT
-#else /* !USE_MANUAL */
-/* built-in manual is disabled, blank function */
-#include "tool_hugehelp.h"
-void hugehelp(void) {}
+    print <<FOOT
 #endif /* USE_MANUAL */
 FOOT
   ;

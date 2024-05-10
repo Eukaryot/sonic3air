@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -57,9 +57,7 @@
 
 /* based on sockfilt.c */
 
-#ifdef HAVE_SIGNAL_H
 #include <signal.h>
-#endif
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
@@ -195,8 +193,8 @@ static void getconfig(void)
     logmsg("parse config file");
     while(fgets(buffer, sizeof(buffer), fp)) {
       char key[32];
-      char value[32];
-      if(2 == sscanf(buffer, "%31s %31s", key, value)) {
+      char value[260];
+      if(2 == sscanf(buffer, "%31s %259s", key, value)) {
         if(!strcmp(key, "version")) {
           config.version = byteval(value);
           logmsg("version [%d] set", config.version);
@@ -304,7 +302,7 @@ static curl_socket_t socksconnect(unsigned short connectport,
   if(rc) {
     int error = SOCKERRNO;
     logmsg("Error connecting to %s:%hu: (%d) %s",
-           connectaddr, connectport, error, strerror(error));
+           connectaddr, connectport, error, sstrerror(error));
     return CURL_SOCKET_BAD;
   }
   logmsg("Connected fine to %s:%d", connectaddr, connectport);
@@ -325,7 +323,7 @@ static curl_socket_t socks4(curl_socket_t fd,
     return CURL_SOCKET_BAD;
   }
   if(rc < 9) {
-    logmsg("SOCKS4 connect message too short: %d", rc);
+    logmsg("SOCKS4 connect message too short: %zd", rc);
     return CURL_SOCKET_BAD;
   }
   if(!config.port)
@@ -352,7 +350,7 @@ static curl_socket_t socks4(curl_socket_t fd,
     logmsg("Sending SOCKS4 response failed!");
     return CURL_SOCKET_BAD;
   }
-  logmsg("Sent %d bytes", rc);
+  logmsg("Sent %zd bytes", rc);
   loghex(response, rc);
 
   if(cd == 90)
@@ -367,8 +365,8 @@ static curl_socket_t socks4(curl_socket_t fd,
 
 static curl_socket_t sockit(curl_socket_t fd)
 {
-  unsigned char buffer[256 + 16];
-  unsigned char response[256 + 16];
+  unsigned char buffer[2*256 + 16];
+  unsigned char response[2*256 + 16];
   ssize_t rc;
   unsigned char len;
   unsigned char type;
@@ -381,12 +379,21 @@ static curl_socket_t sockit(curl_socket_t fd)
   getconfig();
 
   rc = recv(fd, (char *)buffer, sizeof(buffer), 0);
+  if(rc <= 0) {
+    logmsg("SOCKS identifier message missing, recv returned %zd", rc);
+    return CURL_SOCKET_BAD;
+  }
 
-  logmsg("READ %d bytes", rc);
+  logmsg("READ %zd bytes", rc);
   loghex(buffer, rc);
 
   if(buffer[SOCKS5_VERSION] == 4)
     return socks4(fd, buffer, rc);
+
+  if(rc < 3) {
+    logmsg("SOCKS5 identifier message too short: %zd", rc);
+    return CURL_SOCKET_BAD;
+  }
 
   if(buffer[SOCKS5_VERSION] != config.version) {
     logmsg("VERSION byte not %d", config.version);
@@ -401,7 +408,7 @@ static curl_socket_t sockit(curl_socket_t fd)
   /* after NMETHODS follows that many bytes listing the methods the client
      says it supports */
   if(rc != (buffer[SOCKS5_NMETHODS] + 2)) {
-    logmsg("Expected %d bytes, got %d", buffer[SOCKS5_NMETHODS] + 2, rc);
+    logmsg("Expected %d bytes, got %zd", buffer[SOCKS5_NMETHODS] + 2, rc);
     return CURL_SOCKET_BAD;
   }
   logmsg("Incoming request deemed fine!");
@@ -414,13 +421,17 @@ static curl_socket_t sockit(curl_socket_t fd)
     logmsg("Sending response failed!");
     return CURL_SOCKET_BAD;
   }
-  logmsg("Sent %d bytes", rc);
+  logmsg("Sent %zd bytes", rc);
   loghex(response, rc);
 
   /* expect the request or auth */
   rc = recv(fd, (char *)buffer, sizeof(buffer), 0);
+  if(rc <= 0) {
+    logmsg("SOCKS5 request or auth message missing, recv returned %zd", rc);
+    return CURL_SOCKET_BAD;
+  }
 
-  logmsg("READ %d bytes", rc);
+  logmsg("READ %zd bytes", rc);
   loghex(buffer, rc);
 
   if(config.responsemethod == 2) {
@@ -435,7 +446,7 @@ static curl_socket_t sockit(curl_socket_t fd)
     unsigned char plen;
     bool login = TRUE;
     if(rc < 5) {
-      logmsg("Too short auth input: %d", rc);
+      logmsg("Too short auth input: %zd", rc);
       return CURL_SOCKET_BAD;
     }
     if(buffer[SOCKS5_VERSION] != 1) {
@@ -444,12 +455,12 @@ static curl_socket_t sockit(curl_socket_t fd)
     }
     ulen = buffer[SOCKS5_ULEN];
     if(rc < 4 + ulen) {
-      logmsg("Too short packet for username: %d", rc);
+      logmsg("Too short packet for username: %zd", rc);
       return CURL_SOCKET_BAD;
     }
     plen = buffer[SOCKS5_ULEN + ulen + 1];
     if(rc < 3 + ulen + plen) {
-      logmsg("Too short packet for ulen %d plen %d: %d", ulen, plen, rc);
+      logmsg("Too short packet for ulen %d plen %d: %zd", ulen, plen, rc);
       return CURL_SOCKET_BAD;
     }
     if((ulen != strlen(config.user)) ||
@@ -467,19 +478,23 @@ static curl_socket_t sockit(curl_socket_t fd)
       logmsg("Sending auth response failed!");
       return CURL_SOCKET_BAD;
     }
-    logmsg("Sent %d bytes", rc);
+    logmsg("Sent %zd bytes", rc);
     loghex(response, rc);
     if(!login)
       return CURL_SOCKET_BAD;
 
     /* expect the request */
     rc = recv(fd, (char *)buffer, sizeof(buffer), 0);
+    if(rc <= 0) {
+      logmsg("SOCKS5 request message missing, recv returned %zd", rc);
+      return CURL_SOCKET_BAD;
+    }
 
-    logmsg("READ %d bytes", rc);
+    logmsg("READ %zd bytes", rc);
     loghex(buffer, rc);
   }
   if(rc < 6) {
-    logmsg("Too short for request: %d", rc);
+    logmsg("Too short for request: %zd", rc);
     return CURL_SOCKET_BAD;
   }
 
@@ -524,7 +539,7 @@ static curl_socket_t sockit(curl_socket_t fd)
     return CURL_SOCKET_BAD;
   }
   if(rc < (4 + len + 2)) {
-    logmsg("Request too short: %d, expected %d", rc, 4 + len + 2);
+    logmsg("Request too short: %zd, expected %d", rc, 4 + len + 2);
     return CURL_SOCKET_BAD;
   }
   logmsg("Received ATYP %d", type);
@@ -605,12 +620,12 @@ static curl_socket_t sockit(curl_socket_t fd)
   memcpy(&response[SOCKS5_BNDADDR + len],
          &buffer[SOCKS5_DSTADDR + len], sizeof(socksport));
 
-  rc = (send)(fd, (char *)response, len + 6, 0);
+  rc = (send)(fd, (char *)response, (size_t)(len + 6), 0);
   if(rc != (len + 6)) {
     logmsg("Sending connect response failed!");
     return CURL_SOCKET_BAD;
   }
-  logmsg("Sent %d bytes", rc);
+  logmsg("Sent %zd bytes", rc);
   loghex(response, rc);
 
   if(!rep)
@@ -739,13 +754,14 @@ static bool incoming(curl_socket_t listenfd)
       curl_socket_t newfd = accept(sockfd, NULL, NULL);
       if(CURL_SOCKET_BAD == newfd) {
         error = SOCKERRNO;
-        logmsg("accept(%d, NULL, NULL) failed with error: (%d) %s",
-               sockfd, error, strerror(error));
+        logmsg("accept(%" CURL_FORMAT_SOCKET_T ", NULL, NULL) "
+               "failed with error: (%d) %s",
+               sockfd, error, sstrerror(error));
       }
       else {
         curl_socket_t remotefd;
-        logmsg("====> Client connect, fd %d. Read config from %s",
-               newfd, configfile);
+        logmsg("====> Client connect, fd %" CURL_FORMAT_SOCKET_T ". "
+               "Read config from %s", newfd, configfile);
         remotefd = sockit(newfd); /* SOCKS until done */
         if(remotefd == CURL_SOCKET_BAD) {
           logmsg("====> Client disconnect");
@@ -810,7 +826,7 @@ static curl_socket_t sockdaemon(curl_socket_t sock,
     if(rc) {
       error = SOCKERRNO;
       logmsg("setsockopt(SO_REUSEADDR) failed with error: (%d) %s",
-             error, strerror(error));
+             error, sstrerror(error));
       if(maxretr) {
         rc = wait_ms(delay);
         if(rc) {
@@ -866,8 +882,14 @@ static curl_socket_t sockdaemon(curl_socket_t sock,
 
   if(rc) {
     error = SOCKERRNO;
-    logmsg("Error binding socket on port %hu: (%d) %s",
-           *listenport, error, strerror(error));
+#ifdef USE_UNIX_SOCKETS
+    if(socket_domain == AF_UNIX)
+      logmsg("Error binding socket on path %s: (%d) %s",
+             unix_socket, error, sstrerror(error));
+    else
+#endif
+      logmsg("Error binding socket on port %hu: (%d) %s",
+             *listenport, error, sstrerror(error));
     sclose(sock);
     return CURL_SOCKET_BAD;
   }
@@ -891,7 +913,7 @@ static curl_socket_t sockdaemon(curl_socket_t sock,
     if(getsockname(sock, &localaddr.sa, &la_size) < 0) {
       error = SOCKERRNO;
       logmsg("getsockname() failed with error: (%d) %s",
-             error, strerror(error));
+             error, sstrerror(error));
       sclose(sock);
       return CURL_SOCKET_BAD;
     }
@@ -922,8 +944,8 @@ static curl_socket_t sockdaemon(curl_socket_t sock,
   rc = listen(sock, 5);
   if(0 != rc) {
     error = SOCKERRNO;
-    logmsg("listen(%d, 5) failed with error: (%d) %s",
-           sock, error, strerror(error));
+    logmsg("listen(%" CURL_FORMAT_SOCKET_T ", 5) failed with error: (%d) %s",
+           sock, error, sstrerror(error));
     sclose(sock);
     return CURL_SOCKET_BAD;
   }
@@ -1017,8 +1039,8 @@ int main(int argc, char *argv[])
         unix_socket = argv[arg];
         if(strlen(unix_socket) >= sizeof(sau.sun_path)) {
           fprintf(stderr,
-                  "socksd: socket path must be shorter than %zu chars\n",
-              sizeof(sau.sun_path));
+                  "socksd: socket path must be shorter than %zu chars: %s\n",
+              sizeof(sau.sun_path), unix_socket);
           return 0;
         }
         socket_domain = AF_UNIX;
@@ -1055,7 +1077,7 @@ int main(int argc, char *argv[])
     }
   }
 
-#ifdef WIN32
+#ifdef _WIN32
   win32_init();
   atexit(win32_cleanup);
 
@@ -1071,7 +1093,7 @@ int main(int argc, char *argv[])
   if(CURL_SOCKET_BAD == sock) {
     error = SOCKERRNO;
     logmsg("Error creating socket: (%d) %s",
-           error, strerror(error));
+           error, sstrerror(error));
     goto socks5_cleanup;
   }
 
@@ -1095,7 +1117,7 @@ int main(int argc, char *argv[])
 
 #ifdef USE_UNIX_SOCKETS
   if(socket_domain == AF_UNIX)
-      logmsg("Listening on unix socket %s", unix_socket);
+    logmsg("Listening on unix socket %s", unix_socket);
   else
 #endif
   logmsg("Listening on port %hu", port);

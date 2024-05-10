@@ -56,18 +56,19 @@ ok
 http
 </server>
 <features>
+Mime
 !SSPI
 crypto
 proxy
 </features>
- <name>
+<name>
 HTTP POST multipart without Expect: header using proxy anyauth (Digest)
- </name>
- <command>
--x http://%HOSTIP:%HTTPPORT http://remotehost:54321/we/want/%TESTNUMBER -F name=daniel -F tool=curl -F file=@log/test%TESTNUMBER.txt -H "Expect:" -U uuuser:pppassword --proxy-anyauth
+</name>
+<command>
+-x http://%HOSTIP:%HTTPPORT http://remotehost:54321/we/want/%TESTNUMBER -F name=daniel -F tool=curl -F file=@%LOGDIR/test%TESTNUMBER.txt -H "Expect:" -U uuuser:pppassword --proxy-anyauth
 </command>
 # We create this file before the command is invoked!
-<file name="log/test%TESTNUMBER.txt">
+<file name="%LOGDIR/test%TESTNUMBER.txt">
 foo-
 This is a moo-
 bar
@@ -85,7 +86,7 @@ Host: remotehost:54321
 User-Agent: curl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
-Content-Length: 409
+Content-Length: 433
 Content-Type: multipart/form-data; boundary=----------------------------7c633d5c27ce
 
 ------------------------------7c633d5c27ce
@@ -111,7 +112,7 @@ Proxy-Authorization: Digest username="uuuser", realm="many secrets", nonce="911"
 User-Agent: curl/%VERSION
 Accept: */*
 Proxy-Connection: Keep-Alive
-Content-Length: 409
+Content-Length: 433
 Content-Type: multipart/form-data; boundary=----------------------------7c633d5c27ce
 
 ------------------------------7c633d5c27ce

@@ -5,7 +5,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -24,14 +24,37 @@
 
 AUTOMAKE_OPTIONS = foreign no-dependencies
 
-MANPAGE = $(top_builddir)/docs/curl.1
+MANPAGE = curl.1
+ASCIIPAGE = curl.txt
+
+man_MANS = $(MANPAGE)
 
 include Makefile.inc
 
-EXTRA_DIST = $(DPAGES) MANPAGE.md gen.pl $(OTHERPAGES) CMakeLists.txt
+EXTRA_DIST = $(DPAGES) MANPAGE.md $(SUPPORT) CMakeLists.txt mainpage.idx
 
-all: $(MANPAGE)
+GEN = $(GN_$(V))
+GN_0 = @echo "  GENERATE" $@;
+GN_1 =
+GN_ = $(GN_0)
 
-$(MANPAGE): $(DPAGES) $(OTHERPAGES) Makefile.inc
-	@echo "generate $(MANPAGE)"
-	@(cd $(srcdir) && @PERL@ ./gen.pl mainpage $(DPAGES)) > $(MANPAGE)
+MANAGEN=$(abs_top_srcdir)/scripts/managen
+
+if BUILD_DOCS
+CLEANFILES = $(MANPAGE) $(ASCIIPAGE)
+
+all: $(MANPAGE) $(ASCIIPAGE)
+
+endif
+
+$(MANPAGE): $(DPAGES) $(SUPPORT) mainpage.idx Makefile.inc $(MANAGEN)
+	$(GEN)(rm -f $(MANPAGE) && (cd $(srcdir) && @PERL@ $(MANAGEN) mainpage $(DPAGES)) > manpage.tmp.$$$$ && mv manpage.tmp.$$$$ $(MANPAGE))
+
+$(ASCIIPAGE): $(DPAGES) $(SUPPORT) mainpage.idx Makefile.inc $(MANAGEN)
+	$(GEN)(rm -f $(ASCIIPAGE) && (cd $(srcdir) && @PERL@ $(MANAGEN) ascii $(DPAGES)) > asciipage.tmp.$$$$ && mv asciipage.tmp.$$$$ $(ASCIIPAGE))
+
+listhelp:
+	$(MANAGEN) listhelp $(DPAGES) > $(top_builddir)/src/tool_listhelp.c
+
+listcats:
+	@$(MANAGEN) listcats $(DPAGES)

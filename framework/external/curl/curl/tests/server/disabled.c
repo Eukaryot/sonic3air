@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -33,14 +33,31 @@
 
 #include "curl_setup.h"
 #include "multihandle.h" /* for ENABLE_WAKEUP */
+#include "tool_xattr.h" /* for USE_XATTR */
+#include "curl_sha512_256.h" /* for CURL_HAVE_SHA512_256 */
 #include <stdio.h>
 
 static const char *disabled[]={
+#ifdef CURL_DISABLE_BINDLOCAL
+  "bindlocal",
+#endif
 #ifdef CURL_DISABLE_COOKIES
   "cookies",
 #endif
-#ifdef CURL_DISABLE_CRYPTO_AUTH
-  "crypto",
+#ifdef CURL_DISABLE_BASIC_AUTH
+  "basic-auth",
+#endif
+#ifdef CURL_DISABLE_BEARER_AUTH
+  "bearer-auth",
+#endif
+#ifdef CURL_DISABLE_DIGEST_AUTH
+  "digest-auth",
+#endif
+#ifdef CURL_DISABLE_NEGOTIATE_AUTH
+  "negotiate-auth",
+#endif
+#ifdef CURL_DISABLE_AWS
+  "aws",
 #endif
 #ifdef CURL_DISABLE_DOH
   "DoH",
@@ -75,12 +92,28 @@ static const char *disabled[]={
 #ifdef CURL_DISABLE_HEADERS_API
   "headers-api",
 #endif
+#ifndef USE_XATTR
+  "xattr",
+#endif
+#ifdef CURL_DISABLE_FORM_API
+  "form-api",
+#endif
+#if (SIZEOF_TIME_T < 5)
+  "large-time",
+#endif
+#ifndef CURL_HAVE_SHA512_256
+  "sha512-256",
+#endif
   NULL
 };
 
-int main(void)
+int main(int argc, char **argv)
 {
   int i;
+
+  (void) argc;
+  (void) argv;
+
   for(i = 0; disabled[i]; i++)
     printf("%s\n", disabled[i]);
 

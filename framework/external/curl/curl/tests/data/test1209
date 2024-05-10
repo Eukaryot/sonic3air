@@ -5,6 +5,8 @@ FTP
 PORT
 RETR
 NODATACONN
+timeout
+FAILURE
 </keywords>
 </info>
 # Server-side
@@ -22,10 +24,10 @@ NODATACONN
 <server>
 ftp
 </server>
- <name>
+<name>
 FTP PORT download, no data conn and no positive preliminary reply
- </name>
- <command>
+</name>
+<command>
 --max-time %FTPTIME2 ftp://%HOSTIP:%FTPPORT/%TESTNUMBER -P -
 </command>
 

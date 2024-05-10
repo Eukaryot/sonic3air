@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -25,17 +25,21 @@
  * HTTP Multipart formpost with file upload and two additional parts.
  * </DESC>
  */
-/* Example code that uploads a file name 'foo' to a remote script that accepts
- * "HTML form based" (as described in RFC1738) uploads using HTTP POST.
+
+/*
+ * Example code that uploads a filename 'foo' to a remote script that accepts
+ * "HTML form based" (as described in RFC 1738) uploads using HTTP POST.
  *
- * The imaginary form we will fill in looks like:
+ * Warning: this example uses the deprecated form api. See "postit2.c"
+ *          for a similar example using the mime api.
+ *
+ * The imaginary form we fill in looks like:
  *
  * <form method="post" enctype="multipart/form-data" action="examplepost.cgi">
  * Enter file: <input type="file" name="sendfile" size="40">
- * Enter file name: <input type="text" name="filename" size="30">
+ * Enter filename: <input type="text" name="filename" size="30">
  * <input type="submit" value="send" name="submit">
  * </form>
- *
  */
 
 #include <stdio.h>
@@ -59,14 +63,14 @@ int main(int argc, char *argv[])
   curl_formadd(&formpost,
                &lastptr,
                CURLFORM_COPYNAME, "sendfile",
-               CURLFORM_FILE, "postit2.c",
+               CURLFORM_FILE, "postit2-formadd.c",
                CURLFORM_END);
 
   /* Fill in the filename field */
   curl_formadd(&formpost,
                &lastptr,
                CURLFORM_COPYNAME, "filename",
-               CURLFORM_COPYCONTENTS, "postit2.c",
+               CURLFORM_COPYCONTENTS, "postit2-formadd.c",
                CURLFORM_END);
 
 
@@ -89,7 +93,7 @@ int main(int argc, char *argv[])
       curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
     curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
 
-    /* Perform the request, res will get the return code */
+    /* Perform the request, res gets the return code */
     res = curl_easy_perform(curl);
     /* Check for errors */
     if(res != CURLE_OK)
