@@ -25,12 +25,20 @@ public:
 private:
 	bool loadLookupData();
 	void performLookupCalculations();
+	void buildSprite(const uint8* lookupDataBase, const String spriteIdentifier[2], int numPureGroundRows, Vec2i screenSize);
+
+private:
+	struct Lookup
+	{
+		std::vector<uint8> mData;
+		bool mIsCompressed = false;
+	};
 
 private:
 	bool mInitializedLookups = false;
-	std::vector<uint8> mStraightIntensityLookup[0x20];
-	std::vector<uint8> mRotationIntensityLookup[0x0f];
-	int mNonOpaquePixelIndent[224] = { 0 };				// Number of pixels from the left (or right) side until reaching the first fully opaque one, for each row
+	Lookup mStraightIntensityLookup[0x20];
+	Lookup mRotationIntensityLookup[0x0f];
+	int mNonOpaquePixelIndent[224] = { 0 };		// Number of pixels from the left (or right) side until reaching the first fully opaque one, for each row
 	int mNumPureSkyRows = 0;
 
 	Vec2i mLastScreenSize;
