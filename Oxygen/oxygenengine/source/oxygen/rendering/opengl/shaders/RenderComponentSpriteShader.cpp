@@ -61,7 +61,7 @@ void RenderComponentSpriteShader::draw(const renderitems::ComponentSpriteInfo& s
 	if (nullptr == texture)
 		return;
 
-	const PaletteManager& paletteManager = resources.mRenderParts.getPaletteManager();
+	const PaletteManager& paletteManager = resources.getRenderParts().getPaletteManager();
 	Vec4f tintColor = spriteInfo.mTintColor;
 	Vec4f addedColor = spriteInfo.mAddedColor;
 	if (spriteInfo.mUseGlobalComponentTint)

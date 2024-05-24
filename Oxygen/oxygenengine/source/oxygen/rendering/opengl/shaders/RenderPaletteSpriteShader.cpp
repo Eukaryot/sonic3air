@@ -48,7 +48,7 @@ void RenderPaletteSpriteShader::refresh(const Vec2i& gameResolution, int waterSu
 	}
 
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, resources.mPaletteTexture.getHandle());
+	glBindTexture(GL_TEXTURE_2D, resources.getMainPaletteTexture().getHandle());
 
 	if (mLastGameResolution != gameResolution || !mInitialized)
 	{

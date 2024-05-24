@@ -55,8 +55,8 @@ void OpenGLRenderResources::initialize()
 {
 	// Palettes
 	{
-		mPaletteBitmap.create(256, Palette::NUM_COLORS / 256 * 2);
-		mPaletteTexture.setup(mPaletteBitmap.getSize(), rmx::OpenGLHelper::FORMAT_RGBA);
+		mMainPalette.mBitmap.create(256, Palette::NUM_COLORS / 256 * 2);
+		mMainPalette.mTexture.setup(mMainPalette.mBitmap.getSize(), rmx::OpenGLHelper::FORMAT_RGBA);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
@@ -90,37 +90,19 @@ void OpenGLRenderResources::refresh()
 
 	// Update palettes
 	{
-		Bitmap& bitmap = mPaletteBitmap;
 		PaletteManager& paletteManager = mRenderParts.getPaletteManager();
-		const uint32* palette0 = paletteManager.getPalette(0).getData();
-		const uint32* palette1 = paletteManager.getPalette(1).getData();
+		Bitmap& bitmap = mMainPalette.mBitmap;
+		Palette& palette0 = paletteManager.getMainPalette(0);
+		Palette& palette1 = paletteManager.getMainPalette(1);
 
-		// First check if there were any changes since the last refresh at all
-		bool primaryPaletteChanged = false;
-		bool secondaryPaletteChanged = false;
-		{
-			const uint64* changeFlags0 = paletteManager.getPalette(0).getChangeFlags();
-			const uint64* changeFlags1 = paletteManager.getPalette(1).getChangeFlags();
-			for (int k = 0; k < Palette::NUM_COLORS / 64; ++k)
-			{
-				// For all changed flags, copy over the respective data
-				if (changeFlags0[k] != 0)
-				{
-					memcpy(bitmap.getPixelPointer((k * 64) % 256, (k * 64) / 256), palette0 + k * 64, 64 * sizeof(uint32));
-					primaryPaletteChanged = true;
-				}
-				if (changeFlags1[k] != 0)
-				{
-					memcpy(bitmap.getPixelPointer((k * 64) % 256, (k * 64) / 256 + 2), palette1 + k * 64, 64 * sizeof(uint32));
-					secondaryPaletteChanged = true;
-				}
-			}
-		}
+		// Update data in palette bitmap if needed
+		const bool primaryPaletteChanged = updatePaletteBitmap(palette0, bitmap, 0);
+		const bool secondaryPaletteChanged = updatePaletteBitmap(palette1, bitmap, 2);
 
 		if (primaryPaletteChanged || secondaryPaletteChanged)
 		{
 			// Upload changes to the GPU
-			glBindTexture(GL_TEXTURE_2D, mPaletteTexture.getHandle());
+			glBindTexture(GL_TEXTURE_2D, mMainPalette.mTexture.getHandle());
 			if (secondaryPaletteChanged)
 			{
 				// Update everything
@@ -133,7 +115,8 @@ void OpenGLRenderResources::refresh()
 			}
 			glBindTexture(GL_TEXTURE_2D, 0);
 
-			paletteManager.resetAllPaletteChangeFlags();
+			palette0.resetAllPaletteChangeFlags();
+			palette1.resetAllPaletteChangeFlags();
 		}
 	}
 
@@ -262,6 +245,12 @@ void OpenGLRenderResources::clearAllCaches()
 	mRenderParts.getPaletteManager().setAllPaletteChangeFlags();
 }
 
+const BufferTexture& OpenGLRenderResources::getPlanePatternsTexture(int planeIndex) const
+{
+	RMX_ASSERT(planeIndex >= 0 && planeIndex < 4, "Invalid plane index " << planeIndex);
+	return mPlanePatternsTexture[planeIndex];
+}
+
 const BufferTexture& OpenGLRenderResources::getHScrollOffsetsTexture(int scrollOffsetsIndex) const
 {
 	if (scrollOffsetsIndex == 0xff)
@@ -278,6 +267,22 @@ const BufferTexture& OpenGLRenderResources::getVScrollOffsetsTexture(int scrollO
 
 	RMX_ASSERT(scrollOffsetsIndex >= 0 && scrollOffsetsIndex < 4, "Invalid scroll offsets index " << scrollOffsetsIndex);
 	return mVScrollOffsetsTexture[scrollOffsetsIndex];
+}
+
+bool OpenGLRenderResources::updatePaletteBitmap(Palette& palette, Bitmap& bitmap, int offsetY)
+{
+	bool anyChange = false;
+	const uint64* changeFlags = palette.getChangeFlags();
+	for (int k = 0; k < Palette::NUM_COLORS / 64; ++k)
+	{
+		// For all changed flags, copy over the respective data
+		if (changeFlags[k] != 0)
+		{
+			memcpy(bitmap.getPixelPointer((k * 64) % 256, (k * 64) / 256) + offsetY, palette.getData() + k * 64, 64 * sizeof(uint32));
+			anyChange = true;
+		}
+	}
+	return anyChange;
 }
 
 #endif

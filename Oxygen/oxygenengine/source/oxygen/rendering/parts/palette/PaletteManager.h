@@ -19,8 +19,8 @@ public:
 public:
 	void preFrameUpdate();
 
-	Palette& getPalette(int paletteIndex);
-	const Palette& getPalette(int paletteIndex) const;
+	Palette& getMainPalette(int paletteIndex);
+	const Palette& getMainPalette(int paletteIndex) const;
 
 	void writePaletteEntry(int paletteIndex, uint16 colorIndex, uint32 color);
 	void writePaletteEntryPacked(int paletteIndex, uint16 colorIndex, uint16 packedColor);
@@ -28,7 +28,7 @@ public:
 	void resetAllPaletteChangeFlags();
 	void setAllPaletteChangeFlags();
 
-	inline Color getBackdropColor() const  { return getPalette(0).getColor(mBackdropColorIndex); }
+	inline Color getBackdropColor() const  { return mMainPalette[0].getColor(mBackdropColorIndex); }
 	inline void setBackdropColorIndex(uint16 paletteIndex)  { mBackdropColorIndex = paletteIndex; }
 
 	void setPaletteSplitPositionY(uint8 py);
@@ -47,7 +47,7 @@ public:
 	int mSplitPositionY = 0xffff;	// Use some large value as default that is definitely larger than any responable screen height
 
 private:
-	Palette mPalette[2];			// [0] = Standard palette, [1] = Underwater palette (in S3AIR)
+	Palette mMainPalette[2];		// [0] = Standard palette, [1] = Underwater palette (in S3AIR)
 	uint16 mBackdropColorIndex = 0;
 
 	bool mUsesGlobalComponentTint = false;

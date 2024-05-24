@@ -41,15 +41,15 @@ void DebugDrawPlaneShader::draw(int planeIndex, RenderParts& renderParts, const 
 		glUniform4iv(mLocPlayfieldSize, 1, *Vec4i(512, 256, 64, 32));
 
 	glActiveTexture(GL_TEXTURE0);
-	resources.mPlanePatternsTexture[planeIndex].bindTexture();
+	resources.getPlanePatternsTexture(planeIndex).bindTexture();
 	glUniform1i(mLocIndexTex, 0);
 
 	glActiveTexture(GL_TEXTURE1);
-	resources.mPatternCacheTexture.bindTexture();
+	resources.getPatternCacheTexture().bindTexture();
 	glUniform1i(mLocPatternCacheTex, 1);
 
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, resources.mPaletteTexture.getHandle());
+	glBindTexture(GL_TEXTURE_2D, resources.getMainPaletteTexture().getHandle());
 	glUniform1i(mLocPaletteTex, 2);
 
 	glUniform1i(mLocHighlightPrio, FTX::keyState(SDLK_LSHIFT) ? 1 : 0);

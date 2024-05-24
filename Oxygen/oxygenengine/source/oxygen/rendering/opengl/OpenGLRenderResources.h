@@ -15,6 +15,7 @@
 #include "oxygen/drawing/opengl/OpenGLTexture.h"
 
 class RenderParts;
+class Palette;
 
 
 class OpenGLRenderResources
@@ -26,15 +27,32 @@ public:
 	void refresh();
 	void clearAllCaches();
 
+	inline RenderParts& getRenderParts() const  { return mRenderParts; }
+
+	inline const OpenGLTexture& getMainPaletteTexture() const  { return mMainPalette.mTexture; }
+
+	inline const BufferTexture& getPatternCacheTexture() const  { return mPatternCacheTexture; }
+
+	const BufferTexture& getPlanePatternsTexture(int planeIndex) const;
+
 	const BufferTexture& getHScrollOffsetsTexture(int scrollOffsetsIndex) const;
 	const BufferTexture& getVScrollOffsetsTexture(int scrollOffsetsIndex) const;
 
-public:
+private:
+	struct PaletteData
+	{
+		Bitmap		  mBitmap;
+		OpenGLTexture mTexture;
+	};
+
+private:
+	bool updatePaletteBitmap(Palette& palette, Bitmap& bitmap, int offsetY);
+
+private:
 	RenderParts& mRenderParts;
 
 	// Palette
-	Bitmap		  mPaletteBitmap;
-	OpenGLTexture mPaletteTexture;
+	PaletteData mMainPalette;
 
 	// Patterns
 	PaletteBitmap mPatternCacheBitmap;

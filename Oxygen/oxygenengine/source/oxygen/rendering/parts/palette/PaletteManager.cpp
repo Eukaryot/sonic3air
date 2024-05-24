@@ -46,14 +46,14 @@ void PaletteManager::preFrameUpdate()
 	mGlobalComponentAddedColor = Color::TRANSPARENT;
 }
 
-Palette& PaletteManager::getPalette(int paletteIndex)
+Palette& PaletteManager::getMainPalette(int paletteIndex)
 {
-	return mPalette[(paletteIndex >= 0 && paletteIndex < 2) ? paletteIndex : 0];
+	return mMainPalette[(paletteIndex >= 0 && paletteIndex < 2) ? paletteIndex : 0];
 }
 
-const Palette& PaletteManager::getPalette(int paletteIndex) const
+const Palette& PaletteManager::getMainPalette(int paletteIndex) const
 {
-	return mPalette[(paletteIndex >= 0 && paletteIndex < 2) ? paletteIndex : 0];
+	return mMainPalette[(paletteIndex >= 0 && paletteIndex < 2) ? paletteIndex : 0];
 }
 
 void PaletteManager::writePaletteEntry(int paletteIndex, uint16 colorIndex, uint32 color)
@@ -61,11 +61,11 @@ void PaletteManager::writePaletteEntry(int paletteIndex, uint16 colorIndex, uint
 	RMX_CHECK(colorIndex < Palette::NUM_COLORS, "Invalid color index " << colorIndex, return);
 	if (paletteIndex == 0)
 	{
-		mPalette[0].setPaletteEntry(colorIndex, color);
+		mMainPalette[0].setPaletteEntry(colorIndex, color);
 	}
 
 	// Secondary palette gets written in both cases
-	mPalette[1].setPaletteEntry(colorIndex, color);
+	mMainPalette[1].setPaletteEntry(colorIndex, color);
 }
 
 void PaletteManager::writePaletteEntryPacked(int paletteIndex, uint16 colorIndex, uint16 packedColor)
@@ -79,13 +79,13 @@ void PaletteManager::writePaletteEntryPacked(int paletteIndex, uint16 colorIndex
 	// Note that extended packed colors can be matched to the original packed colors when not using the lowermost 2 bits of each channel
 	//  -> That also means when using these bits as well, they can even go higher than pure white at 0xff, but they will get clamped at that point
 
-	Palette::PackedPaletteColor& cache = mPalette[paletteIndex].mPackedColorCache[colorIndex];
+	Palette::PackedPaletteColor& cache = mMainPalette[paletteIndex].mPackedColorCache[colorIndex];
 	if (cache.mPackedColor == packedColor && cache.mIsValid)
 	{
 		// Nothing to do... well except if this is the primary palette, then we should still make sure the secondary palette has the same color
 		if (paletteIndex == 0)
 		{
-			mPalette[1].setPaletteEntryPacked(colorIndex, mPalette[0].getEntry(colorIndex), packedColor);
+			mMainPalette[1].setPaletteEntryPacked(colorIndex, mMainPalette[0].getEntry(colorIndex), packedColor);
 		}
 		return;
 	}
@@ -109,23 +109,23 @@ void PaletteManager::writePaletteEntryPacked(int paletteIndex, uint16 colorIndex
 
 	if (paletteIndex == 0)
 	{
-		mPalette[0].setPaletteEntryPacked(colorIndex, color, packedColor);
+		mMainPalette[0].setPaletteEntryPacked(colorIndex, color, packedColor);
 	}
 
 	// Secondary palette gets written in both cases
-	mPalette[1].setPaletteEntryPacked(colorIndex, color, packedColor);
+	mMainPalette[1].setPaletteEntryPacked(colorIndex, color, packedColor);
 }
 
 void PaletteManager::resetAllPaletteChangeFlags()
 {
 	for (int i = 0; i < 2; ++i)
-		mPalette[i].resetAllPaletteChangeFlags();
+		mMainPalette[i].resetAllPaletteChangeFlags();
 }
 
 void PaletteManager::setAllPaletteChangeFlags()
 {
 	for (int i = 0; i < 2; ++i)
-		mPalette[i].setAllPaletteChangeFlags();
+		mMainPalette[i].setAllPaletteChangeFlags();
 }
 
 void PaletteManager::setPaletteSplitPositionY(uint8 py)
@@ -161,8 +161,8 @@ void PaletteManager::serializeSaveState(VectorBinarySerializer& serializer, uint
 {
 	if (formatVersion >= 4)
 	{
-		mPalette[0].serializePalette(serializer);
-		mPalette[1].serializePalette(serializer);
+		mMainPalette[0].serializePalette(serializer);
+		mMainPalette[1].serializePalette(serializer);
 	}
 	else
 	{
@@ -179,7 +179,7 @@ void PaletteManager::serializeSaveState(VectorBinarySerializer& serializer, uint
 		else
 		{
 			for (int i = 0; i < 0x40; ++i)
-				buffer[i] = getPalette(0).getEntryPacked(i, true);
+				buffer[i] = mMainPalette[0].getEntryPacked(i, true);
 			serializer.serialize(buffer, 0x80);
 		}
 	}

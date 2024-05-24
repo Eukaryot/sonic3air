@@ -40,7 +40,7 @@ namespace
 	{
 		const PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
 		Color palette[0x100] = { Color::TRANSPARENT };
-		paletteManager.getPalette(paletteIndex).dumpColors(palette, 0x100);
+		paletteManager.getMainPalette(paletteIndex).dumpColors(palette, 0x100);
 
 		PaletteBitmap bmp;
 		bmp.create(16, 16);
@@ -678,7 +678,7 @@ void GameView::render()
 			{
 				const int px = baseX + 1 + (k & 0x0f) * 5;
 				const int height = (k < 0x40) ? 4 : 2;
-				Color color = paletteManager.getPalette(paletteIndex).getColor(k);
+				Color color = paletteManager.getMainPalette(paletteIndex).getColor(k);
 				color.a = 1.0f;
 				drawer.drawRect(Recti(px, py, 4, height), color);
 

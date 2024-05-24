@@ -88,10 +88,10 @@ void RenderPlaneShader::refresh(const Vec2i& gameResolution, const OpenGLRenderR
 	}
 
 	glActiveTexture(GL_TEXTURE0);
-	resources.mPatternCacheTexture.bindTexture();
+	resources.getPatternCacheTexture().bindTexture();
 
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, resources.mPaletteTexture.getHandle());
+	glBindTexture(GL_TEXTURE_2D, resources.getMainPaletteTexture().getHandle());
 
 	if (mLastGameResolution != gameResolution || !mInitialized)
 	{
@@ -118,7 +118,7 @@ void RenderPlaneShader::draw(const PlaneGeometry& geometry, int waterSurfaceHeig
 	}
 
 	glActiveTexture(GL_TEXTURE2);
-	resources.mPlanePatternsTexture[geometry.mPlaneIndex].bindTexture();
+	resources.getPlanePatternsTexture(geometry.mPlaneIndex).bindTexture();
 
 	if (mHorizontalScrolling)
 	{

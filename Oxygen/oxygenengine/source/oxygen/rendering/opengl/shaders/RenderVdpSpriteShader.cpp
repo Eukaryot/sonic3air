@@ -45,10 +45,10 @@ void RenderVdpSpriteShader::refresh(const Vec2i& gameResolution, int waterSurfac
 	}
 
 	glActiveTexture(GL_TEXTURE0);
-	resources.mPatternCacheTexture.bindTexture();
+	resources.getPatternCacheTexture().bindTexture();
 
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, resources.mPaletteTexture.getHandle());
+	glBindTexture(GL_TEXTURE_2D, resources.getMainPaletteTexture().getHandle());
 
 	if (mLastGameResolution != gameResolution || !mInitialized)
 	{
@@ -67,7 +67,7 @@ void RenderVdpSpriteShader::refresh(const Vec2i& gameResolution, int waterSurfac
 
 void RenderVdpSpriteShader::draw(const renderitems::VdpSpriteInfo& spriteInfo, const OpenGLRenderResources& resources)
 {
-	const PaletteManager& paletteManager = resources.mRenderParts.getPaletteManager();
+	const PaletteManager& paletteManager = resources.getRenderParts().getPaletteManager();
 	Vec4f tintColor = spriteInfo.mTintColor;
 	Vec4f addedColor = spriteInfo.mAddedColor;
 	if (spriteInfo.mUseGlobalComponentTint)
