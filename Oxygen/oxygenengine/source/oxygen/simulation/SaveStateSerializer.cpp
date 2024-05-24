@@ -11,8 +11,8 @@
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/application/video/VideoOut.h"
+#include "oxygen/rendering/parts/palette/PaletteManager.h"
 #include "oxygen/rendering/parts/RenderParts.h"
-#include "oxygen/rendering/parts/PaletteManager.h"
 
 
 namespace

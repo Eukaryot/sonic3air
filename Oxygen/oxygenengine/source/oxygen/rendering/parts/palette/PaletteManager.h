@@ -8,47 +8,7 @@
 
 #pragma once
 
-#include <rmxmedia.h>
-
-
-class Palette
-{
-friend class PaletteManager;
-
-public:
-	static const constexpr size_t NUM_COLORS = 0x200;
-
-public:
-	struct PackedPaletteColor
-	{
-		uint16 mPackedColor = 0;
-		bool mIsValid = false;
-	};
-
-public:
-	inline size_t getSize() const			{ return NUM_COLORS; }
-	inline const uint32* getData() const	{ return mColor; }
-
-	inline uint32 getEntry(int index) const	{ return (index >= 0 && index < (int)getSize()) ? mColor[index] : 0; }
-	inline Color getColor(int index) const	{ return Color::fromABGR32(getEntry(index)); }
-	uint16 getEntryPacked(uint16 colorIndex, bool allowExtendedPacked = false) const;
-
-	inline const uint64* getChangeFlags() const	{ return mChangeFlags; }
-	void resetAllPaletteChangeFlags();
-	void setAllPaletteChangeFlags();
-
-	void invalidatePackedColorCache();
-
-	void setPaletteEntry(uint16 colorIndex, uint32 color);
-	void setPaletteEntryPacked(uint16 colorIndex, uint32 color, uint16 packedColor);
-
-	void dumpColors(Color* outColors, int numColors) const;
-
-private:
-	uint32 mColor[NUM_COLORS] = { 0 };							// Colors in the palette
-	uint64 mChangeFlags[NUM_COLORS/64] = { true };				// One flag per color; only actually used and reset by hardware rendering
-	PackedPaletteColor mPackedColorCache[NUM_COLORS] = { 0 };	// Only used as an optimization
-};
+#include "oxygen/rendering/parts/palette/Palette.h"
 
 
 class PaletteManager
@@ -85,9 +45,6 @@ public:
 
 public:
 	int mSplitPositionY = 0xffff;	// Use some large value as default that is definitely larger than any responable screen height
-
-private:
-	void serializePalette(VectorBinarySerializer& serializer, Palette& palette);
 
 private:
 	Palette mPalette[2];			// [0] = Standard palette, [1] = Underwater palette (in S3AIR)

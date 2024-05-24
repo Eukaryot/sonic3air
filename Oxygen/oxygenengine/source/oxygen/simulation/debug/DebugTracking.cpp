@@ -14,7 +14,7 @@
 #include "oxygen/simulation/LemonScriptRuntime.h"
 #include "oxygen/simulation/Simulation.h"
 #include "oxygen/application/Application.h"
-#include "oxygen/rendering/parts/PaletteManager.h"
+#include "oxygen/rendering/parts/palette/PaletteManager.h"
 
 #include <lemon/program/Function.h>
 #include <lemon/runtime/RuntimeFunction.h>

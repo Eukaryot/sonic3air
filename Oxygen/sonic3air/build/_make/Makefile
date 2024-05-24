@@ -227,7 +227,8 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/RenderPaletteSpriteShader \
 			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/RenderPlaneShader \
 			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/RenderVdpSpriteShader \
-			Oxygen/oxygenengine/source/oxygen/rendering/parts/PaletteManager \
+			Oxygen/oxygenengine/source/oxygen/rendering/parts/palette/PaletteManager \
+			Oxygen/oxygenengine/source/oxygen/rendering/parts/palette/Palette \
 			Oxygen/oxygenengine/source/oxygen/rendering/parts/PatternManager \
 			Oxygen/oxygenengine/source/oxygen/rendering/parts/PlaneManager \
 			Oxygen/oxygenengine/source/oxygen/rendering/parts/RenderItem \

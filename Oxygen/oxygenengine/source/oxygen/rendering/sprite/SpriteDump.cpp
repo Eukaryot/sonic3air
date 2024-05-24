@@ -8,7 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/rendering/sprite/SpriteDump.h"
-#include "oxygen/rendering/parts/PaletteManager.h"
+#include "oxygen/rendering/parts/palette/PaletteManager.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/video/VideoOut.h"

@@ -88,6 +88,9 @@
     <Filter Include="simulation\debug">
       <UniqueIdentifier>{75bf8c7b-7f6c-4f46-8328-a9f4bf832b4c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="rendering\parts\palette">
+      <UniqueIdentifier>{024aa6e6-0643-4877-a939-04441686575c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -110,9 +113,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\RenderResources.cpp">
       <Filter>rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\parts\PaletteManager.cpp">
-      <Filter>rendering\parts</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\parts\PatternManager.cpp">
       <Filter>rendering\parts</Filter>
@@ -427,6 +427,12 @@
     <ClCompile Include="..\..\source\oxygen\rendering\parts\RenderItem.cpp">
       <Filter>rendering\parts</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\palette\Palette.cpp">
+      <Filter>rendering\parts\palette</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\palette\PaletteManager.cpp">
+      <Filter>rendering\parts\palette</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -452,9 +458,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\RenderResources.h">
       <Filter>rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\parts\PaletteManager.h">
-      <Filter>rendering\parts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\parts\PatternManager.h">
       <Filter>rendering\parts</Filter>
@@ -801,6 +804,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderItem.h">
       <Filter>rendering\parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\palette\Palette.h">
+      <Filter>rendering\parts\palette</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\palette\PaletteManager.h">
+      <Filter>rendering\parts\palette</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
