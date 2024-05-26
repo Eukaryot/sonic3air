@@ -206,6 +206,11 @@ bool FontCollection::registerManagedFont(Font& font, std::string_view key)
 		return false;
 
 	registerManagedFontInternal(font, *collectedFont);
+
+	// Add to list of managed fonts as well
+	ManagedFont& managedFont = vectorAdd(mAllManagedFonts);
+	managedFont.mFont = &font;
+	managedFont.mKey = key;
 	return true;
 }
 
@@ -231,7 +236,18 @@ void FontCollection::reloadAll()
 	clear();
 	loadDefinitionsFromPath(L"data/font/", nullptr);
 
+	// Load mod fonts
 	collectFromMods();
+
+	// Re-register managed fonts
+	{
+		std::vector<ManagedFont> managedFonts;
+		managedFonts.swap(mAllManagedFonts);
+		for (const ManagedFont& managedFont : managedFonts)
+		{
+			registerManagedFont(*managedFont.mFont, managedFont.mKey);
+		}
+	}
 }
 
 void FontCollection::collectFromMods()

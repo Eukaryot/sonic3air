@@ -34,6 +34,12 @@ public:
 		std::vector<Font*> mManagedFonts;
 	};
 
+	struct ManagedFont
+	{
+		Font* mFont = nullptr;
+		std::string mKey;
+	};
+
 public:
 	~FontCollection();
 
@@ -55,4 +61,5 @@ private:
 	std::unordered_map<uint64, CollectedFont> mCollectedFonts;	// Includes all the fonts that were loaded from files; using "mKeyHash" as map key
 	std::unordered_map<uint64, Font*> mFontsByKeyHash;			// Includes unmodified collected fonts and run-time created fonts (though not the managed fonts); using the font's key hash as map key
 	ObjectPool<Font> mFontPool;
+	std::vector<ManagedFont> mAllManagedFonts;
 };
