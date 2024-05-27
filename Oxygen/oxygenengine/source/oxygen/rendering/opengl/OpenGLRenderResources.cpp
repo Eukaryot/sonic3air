@@ -278,7 +278,8 @@ bool OpenGLRenderResources::updatePaletteBitmap(Palette& palette, Bitmap& bitmap
 		// For all changed flags, copy over the respective data
 		if (changeFlags[k] != 0)
 		{
-			memcpy(bitmap.getPixelPointer((k * 64) % 256, (k * 64) / 256) + offsetY, palette.getData() + k * 64, 64 * sizeof(uint32));
+			uint32* dst = bitmap.getPixelPointer((k * 64) % 256, (k * 64) / 256 + offsetY);
+			memcpy(dst, palette.getData() + k * 64, 64 * sizeof(uint32));
 			anyChange = true;
 		}
 	}
