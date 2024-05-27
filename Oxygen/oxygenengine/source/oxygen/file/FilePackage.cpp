@@ -11,51 +11,17 @@
 #include "oxygen/helper/Utils.h"
 
 
-bool FilePackage::loadPackage(std::wstring_view packageFilename, std::map<std::wstring, PackedFile>& outPackedFiles, InputStream*& inputStream, bool forceLoadAll, bool showErrors)
+bool FilePackage::loadPackage(std::wstring_view packageFilename, std::map<std::wstring, PackedFile>& outPackedFiles, bool forceLoadAll, bool showErrors)
 {
 	// Try to load the package
-	RMX_ASSERT(nullptr == inputStream, "Input stream was already opened");
-	inputStream = FTX::FileSystem->createInputStream(packageFilename);
+	InputStream* inputStream = FTX::FileSystem->createInputStream(packageFilename);
 	if (nullptr == inputStream)
 		return false;
 
-	std::vector<uint8> content;
-	content.resize(PackageHeader::HEADER_SIZE);
-	if (inputStream->read(&content[0], PackageHeader::HEADER_SIZE) != PackageHeader::HEADER_SIZE)
-		return false;
-
-	VectorBinarySerializer serializer(true, content);
-	PackageHeader header;
-	if (!readPackageHeader(header, serializer))
+	if (!loadPackageInternal(*inputStream, packageFilename, outPackedFiles, showErrors))
 	{
-		if (showErrors)
-		{
-			if (header.mFormatVersion == PackageHeader::CURRENT_FORMAT_VERSION)
-			{
-				RMX_ERROR("Unsupported format version " << header.mFormatVersion << " of file '" << WString(packageFilename).toStdString() << "'", );
-			}
-			else
-			{
-				RMX_ERROR("Invalid signature of file '" << WString(packageFilename).toStdString() << "'", );
-			}
-		}
+		delete inputStream;
 		return false;
-	}
-
-	// Load table of contents
-	content.resize(PackageHeader::HEADER_SIZE + header.mEntryHeaderSize);
-	if (inputStream->read(&content[PackageHeader::HEADER_SIZE], header.mEntryHeaderSize) != header.mEntryHeaderSize)
-		return false;
-
-	// Read entry headers
-	for (size_t i = 0; i < header.mNumEntries; ++i)
-	{
-		std::wstring key;
-		serializer.serialize(key, 1024);
-		PackedFile& packedFile = outPackedFiles[key];
-		packedFile.mPath = key;
-		packedFile.mPositionInFile = serializer.read<uint32>();
-		packedFile.mSizeInFile = serializer.read<uint32>();
 	}
 
 	if (forceLoadAll)
@@ -70,6 +36,8 @@ bool FilePackage::loadPackage(std::wstring_view packageFilename, std::map<std::w
 			pair.second.mLoadedContent = true;
 		}
 	}
+
+	delete inputStream;
 	return true;
 }
 
@@ -116,11 +84,8 @@ void FilePackage::createFilePackage(const std::wstring& packageFilename, const s
 	if (!forceReplace && !comparisonPath.empty())
 	{
 		std::map<std::wstring, PackedFile> existingPackedFiles;
-		InputStream* inputStream = nullptr;
-		if (loadPackage(comparisonPath + packageFilename, existingPackedFiles, inputStream, true, false))
+		if (loadPackage(comparisonPath + packageFilename, existingPackedFiles, true, false))
 		{
-			delete inputStream;
-
 			// Compare
 			bool isEqual = (existingPackedFiles.size() == packedFiles.size());
 			if (isEqual)
@@ -182,6 +147,50 @@ void FilePackage::createFilePackage(const std::wstring& packageFilename, const s
 
 	// Save output file
 	FTX::FileSystem->saveFile(packageFilename, output);
+}
+
+bool FilePackage::loadPackageInternal(InputStream& inputStream, std::wstring_view packageFilename, std::map<std::wstring, PackedFile>& outPackedFiles, bool showErrors)
+{
+	std::vector<uint8> content;
+	content.resize(PackageHeader::HEADER_SIZE);
+	if (inputStream.read(&content[0], PackageHeader::HEADER_SIZE) != PackageHeader::HEADER_SIZE)
+		return false;
+
+	VectorBinarySerializer serializer(true, content);
+	PackageHeader header;
+	if (!readPackageHeader(header, serializer))
+	{
+		if (showErrors)
+		{
+			if (header.mFormatVersion == PackageHeader::CURRENT_FORMAT_VERSION)
+			{
+				RMX_ERROR("Unsupported format version " << header.mFormatVersion << " of file '" << WString(packageFilename).toStdString() << "'", );
+			}
+			else
+			{
+				RMX_ERROR("Invalid signature of file '" << WString(packageFilename).toStdString() << "'", );
+			}
+		}
+		return false;
+	}
+
+	// Load table of contents
+	content.resize(PackageHeader::HEADER_SIZE + header.mEntryHeaderSize);
+	if (inputStream.read(&content[PackageHeader::HEADER_SIZE], header.mEntryHeaderSize) != header.mEntryHeaderSize)
+		return false;
+
+	// Read entry headers
+	for (size_t i = 0; i < header.mNumEntries; ++i)
+	{
+		std::wstring key;
+		serializer.serialize(key, 1024);
+		PackedFile& packedFile = outPackedFiles[key];
+		packedFile.mPath = key;
+		packedFile.mPositionInFile = serializer.read<uint32>();
+		packedFile.mSizeInFile = serializer.read<uint32>();
+	}
+
+	return true;
 }
 
 bool FilePackage::readPackageHeader(PackageHeader& outHeader, VectorBinarySerializer& serializer)
