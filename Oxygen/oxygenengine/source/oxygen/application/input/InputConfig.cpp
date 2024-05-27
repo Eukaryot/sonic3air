@@ -35,7 +35,7 @@ namespace
 			{ "Plus",			SDLK_PLUS },
 			{ "Comma",			SDLK_COMMA },
 			{ "Minus",			SDLK_MINUS },
-			{ "Perios",			SDLK_PERIOD },
+			{ "Period",			SDLK_PERIOD },
 			{ "Slash",			SDLK_SLASH },
 			{ "0",				SDLK_0 },
 			{ "1",				SDLK_1 },
