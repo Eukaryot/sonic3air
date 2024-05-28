@@ -356,8 +356,8 @@ function void fn00730c()
 
 				objA1.state = char.state.GOT_HURT_PANIC
 				objA1.position.y.u16 += s8(u8[A1 + 0x1e] - 0x0e)
-				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 				objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 				objA1.flags2a &= ~(char.flag.ROLLING | char.flag.CONTROL_LOCK)
 				u8[A1 + 0x2b] |= char.bonus.INFINITE_INERTIA
 

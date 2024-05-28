@@ -202,8 +202,8 @@ function void fn0349ba()
 			// Jump off
 			objA1.velocity.x = (objA0.flags2a & 0x01) ? 0x400 : -0x400
 			objA1.velocity.y = -0x600
-			objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 			objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+			objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 			objA1.state = char.state.ROLLING
 			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 

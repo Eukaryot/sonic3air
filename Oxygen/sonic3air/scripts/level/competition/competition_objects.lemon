@@ -805,10 +805,10 @@ function void fn0380f8()
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0300)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0280
-	objA0.box_size.x = 0x08
-	objA0.box_size.y = 0x08
-	objA0.hitbox_extends.x = 0x04
-	objA0.hitbox_extends.y = 0x04
+	objA0.box_size.x = 8
+	objA0.box_size.y = 8
+	objA0.hitbox_extends.x = 4
+	objA0.hitbox_extends.y = 4
 
 	if (objA0.flags2a & 0x01)
 	{

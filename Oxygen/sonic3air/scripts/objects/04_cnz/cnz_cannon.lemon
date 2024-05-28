@@ -152,8 +152,8 @@ function void fn0319f4()
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
 			objA1.groundspeed = 0
-			objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 			objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+			objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 			objA1.state = char.state.ROLLING
 			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 			objA1.flags2a &= ~char.flag.ON_OBJECT

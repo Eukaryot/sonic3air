@@ -230,13 +230,16 @@ function void SpillRings()
 		objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 		objA1.base_state += 2
 		objA1.box_size.x = 8
+	#if STANDALONE
+		objA1.box_size.y = 8
+	#endif
 		objA1.sprite_priority = 0x180
 		objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06bc)
 		objA1.mapping_offset = 0x01a99a
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		objA1.hitbox_extends.y = 8
 		objA1.hitbox_extends.x = 8
+		objA1.hitbox_extends.y = 8
 		objA1.collision_attributes = (collision.flag.ITEM | collision.size.6x6)
 
 		spilled_rings.speed = 0xff

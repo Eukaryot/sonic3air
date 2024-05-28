@@ -53,8 +53,8 @@ function void fn040474()
 				if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0 && u8[A1 + 0x05] < base_state.HURT && u8[A1 + 0x2e] == 0 && objA1.velocity.y >= 0x0800)
 				{
 					objA0.flags2a |= bit
-					objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 					objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+					objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 					objA1.state = char.state.ROLLING
 					objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING | char.flag.ON_OBJECT)
 					objA1.flags2a &= ~char.flag.CONTROL_LOCK

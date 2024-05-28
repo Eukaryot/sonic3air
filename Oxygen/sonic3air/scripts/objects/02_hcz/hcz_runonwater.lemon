@@ -212,8 +212,8 @@ function void fn03857e()
 	else
 	{
 		objA1.velocity.y = -0x680
-		objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 		objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+		objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 		objA1.state = char.state.ROLLING
 		objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 		u8[A1 + 0x40] = 1

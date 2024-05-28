@@ -1017,8 +1017,8 @@ function void Tails.UpdateCarrySonic()
 				}
 
 				objA1.velocity.y = -0x380		// TODO: Should Knuckles have a different jump acceleration here?
-				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 				objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 				objA1.state = char.state.ROLLING
 				objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 				objA1.flags2a &= ~char.flag.CONTROL_LOCK
@@ -3141,8 +3141,8 @@ function void KnucklesPressedJumpInMidAir()
 
 	// Start gliding
 	char.flags &= ~(char.flag.ROLLING | char.flag.CONTROL_LOCK)
-	char.hitbox_extends.y = 10
 	char.hitbox_extends.x = 10
+	char.hitbox_extends.y = 10
 	char.double_jump_state = 1
 	char.velocity.y += 0x200
 	if (char.velocity.y < 0)
@@ -6348,8 +6348,8 @@ function void SonicLandingBubbleBounce()
 	char.flags &= ~char.flag.PUSHING
 	char.jumping = 1
 	char.on_convex_surface = 0
-	char.hitbox_extends.y = char.hitbox.y.ROLLING
 	char.hitbox_extends.x = char.hitbox.x.ROLLING
+	char.hitbox_extends.y = char.hitbox.y.ROLLING
 
 	s8 dy = char.hitbox_extends.y - char.hitbox.default.y
 	char.position.y.u16 += (global.inv_gravity) ? dy : -dy

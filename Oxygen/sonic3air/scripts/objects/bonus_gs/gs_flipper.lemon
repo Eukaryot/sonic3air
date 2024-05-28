@@ -83,8 +83,8 @@ function void fn049cfe()
 				++u8[A3]
 				objA1.state.both = 0x0200		// char.state.ROLLING, char.state.RUNNING
 				u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
-				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 				objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 				objA1.state = char.state.ROLLING
 				if ((u8[A1 + 0x2a] & char.flag.ROLLING) == 0)
 				{

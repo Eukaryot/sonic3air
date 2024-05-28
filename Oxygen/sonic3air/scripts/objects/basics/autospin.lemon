@@ -172,8 +172,8 @@ function void fn01e9b6()
 		return
 
 	objA1.position.y.u16 += 5
-	objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 	objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+	objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 	objA1.state = char.state.ROLLING
 	objA1.flags2a |= char.flag.ROLLING
 	playSound(SFX_ROLL)

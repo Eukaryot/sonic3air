@@ -155,8 +155,8 @@ function void fn03ed6e()
 
 		u8[A1 + 0x2e] &= ~(control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 		u8[A1 + 0x40] = 0x01
-		objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 		objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+		objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 		objA1.state = char.state.ROLLING
 		objA1.flags2a |= char.flag.ROLLING
 		objA1.flags2a &= ~char.flag.CONTROL_LOCK

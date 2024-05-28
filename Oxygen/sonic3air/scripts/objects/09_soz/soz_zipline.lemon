@@ -738,8 +738,8 @@ function void fn04af80()
 				objA1.velocity.y -= 0x380
 				u8[A1 + 0x2a] |= char.flag.IN_AIR
 				u8[A1 + 0x40] = 1
-				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 				objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 				objA1.state = char.state.ROLLING
 				u8[A1 + 0x2a] |= char.flag.ROLLING
 

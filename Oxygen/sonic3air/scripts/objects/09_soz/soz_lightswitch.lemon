@@ -147,8 +147,8 @@ function void fn040f52()
 				}
 
 				objA1.velocity.y = -0x380
-				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 				objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 				objA1.state = char.state.ROLLING
 				u8[A1 + 0x27] = 0
 				objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)

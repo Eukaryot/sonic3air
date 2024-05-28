@@ -17,10 +17,10 @@ function void fn036364()
 	objA0.sprite_attributes = 0x03c6
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
-	objA0.box_size.x = 0x08
-	objA0.box_size.y = 0x08
-	objA0.hitbox_extends.x = 0x04
-	objA0.hitbox_extends.y = 0x08
+	objA0.box_size.x = 8
+	objA0.box_size.y = 8
+	objA0.hitbox_extends.x = 4
+	objA0.hitbox_extends.y = 8
 	u16[A0 + 0x30] = objA0.position.x.u16
 	objA0.value32 = objA0.position.y.u16
 	objA0.value26 = objA0.subtype2c

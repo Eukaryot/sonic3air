@@ -213,8 +213,8 @@ function void fn0338c4()
 
 	u8[A1 + 0x26] = 0
 	u8[A1 + 0x2a] &= ~char.flag.ROLLING
-	objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
 	objA1.hitbox_extends.x = char.hitbox.x.UPRIGHT
+	objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
 	objA1.state.both = char.state.RUNNING2
 	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
@@ -283,8 +283,8 @@ function void fn033ade()
 
 	u8[A1 + 0x26] = 0
 	u8[A1 + 0x2a] &= ~char.flag.ROLLING
-	objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
 	objA1.hitbox_extends.x = char.hitbox.x.UPRIGHT
+	objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
 	objA1.state.both = char.state.RUNNING2
 	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
