@@ -14,6 +14,10 @@
 
 #if STANDALONE
 
+constant string ActSelect.MENU_FONT = "oxyfont_regular:gradient:outline(0x000000ff,1,false):shadow(1,1,0.5f,0.8f)"
+constant string ActSelect.TITLE_FONT = "sonic3_fontC:gradient:outline(0x000000ff,1,false):shadow(1,1,0.5f,1.0f)"
+
+
 // Note for modding:
 //  Don't try to overload the constant array definitions - their names and structure may change in the future.
 //  Instead, overload the functions like "ActSelect.GetNumZones", "ActSelect.GetZoneName", etc.
@@ -143,11 +147,120 @@ function u8 ActSelect.GetNumZonePreviews(u8 zone, u8 act)
 }
 
 
+function void ActSelect.HandleFadeIn(u8 fadeInMethod, u32 frameCounter)
+{
+	if (fadeInMethod == 1 && frameCounter <= 0x18)
+	{
+		// Fade from black
+		u16 blendFactorR = clamp(s32(frameCounter - 0x08) * 0x14, 0, 0x100)
+		u16 blendFactorG = clamp(s32(frameCounter - 0x04) * 0x14, 0, 0x100)
+		u16 blendFactorB = clamp(    frameCounter         * 0x14, 0, 0x100)
+
+		for (u32 i = 0; i < 0x20; ++i)
+		{
+			u32 color = unpackColor(u16[0xfffffc00 + i * 2])
+			u32 r = (( color        & 0xff) * blendFactorR) >> 8
+			u32 g = (((color >> 8)  & 0xff) * blendFactorG) >> 8
+			u32 b = (((color >> 16) & 0xff) * blendFactorB) >> 8
+			color = r + (g << 8) + (b << 16)
+
+			u16[0xfffffc80 + i * 2] = packColor(color)
+			Renderer.setPaletteColor(i, color)
+		}
+
+		globalComponentTintColorR = blendFactorR
+		globalComponentTintColorG = blendFactorG
+		globalComponentTintColorB = blendFactorB
+	}
+	// fadeInMethod == 2 may be used later for a transition that makes content move in, like in the C++ version of this menu
+}
+
+
+function void ActSelect.DrawBackground()
+{
+	// Background
+	SpriteHandle spr = Renderer.addSpriteHandle("bg_dataselect", s16(getScreenWidth() - 512) / 2, 0, 0x5000)
+	spr.setBlendMode(BlendMode.OPAQUE)
+
+	Renderer.enableDefaultPlane(0, false)
+	Renderer.enableDefaultPlane(1, false)
+	Renderer.enableDefaultPlane(2, false)
+	Renderer.enableDefaultPlane(3, false)
+}
+
+
+function void ActSelect.DrawMenu(u8 selectedEntry, u8 selectedZone, u8 selectedAct, s16 anchorX)
+{
+	// Title text
+	Renderer.drawText(ActSelect.TITLE_FONT, anchorX, 12, "ACT SELECT", 0xffffffff, 5, 0, 0xf010, false, true)
+
+	// Character preview
+	{
+		s16 px = max(anchorX - 125, 52)		// Move to the right in 4:3
+		Renderer.drawSprite("charselectionbox", px + 3, 159, 0, 0x00, 0xf002)
+		Renderer.drawSprite(ActSelect.GetCharacterCombinationSprite(levelselect.characters), px, 156, 0, 0x00, 0xf004)
+	}
+
+	// Render menu texts
+	constant array<s16> TEXT_LINE_Y = { 121, 143, 165, 203 }
+	for (u32 entryIndex = 0; entryIndex < 4; ++entryIndex)
+	{
+		bool isSelected = (entryIndex == selectedEntry)
+		u32 color = isSelected ? 0xffff00ff : 0xffffffe8
+
+		bool canGoLeft = false
+		bool canGoRight = false
+
+		string text
+		if (entryIndex == 0)
+		{
+			text = ActSelect.GetZoneName(selectedZone)
+			canGoLeft = (selectedZone > 0)
+			canGoRight = (selectedZone < ActSelect.GetNumZones() - 1)
+		}
+		else if (entryIndex == 1)
+		{
+			if (ActSelect.GetNumActs(selectedZone) == 1)
+				text = "Single Act"
+			else
+				text = stringformat("Act %d", selectedAct + 1)
+			canGoLeft = (selectedZone > 0 || selectedAct > 0)
+			canGoRight = (selectedZone < ActSelect.GetNumZones() - 1 || selectedAct < ActSelect.GetNumActs(selectedZone) - 1)
+		}
+		else if (entryIndex == 2)
+		{
+			text = ActSelect.GetCharacterCombinationName(levelselect.characters)
+			canGoLeft = (levelselect.characters > 0)
+			canGoRight = (levelselect.characters < ActSelect.GetNumCharacterCombinations() - 1)
+		}
+		else
+		{
+			text = "Back"
+		}
+
+		s16 px = anchorX
+		s16 py = TEXT_LINE_Y[entryIndex]
+
+		s16 arrowAnimOffset = 0
+		if (isSelected)
+		{
+			float seconds = global.framecounter / 60.0f
+			arrowAnimOffset = Math.roundToInt(seconds * 6.0f) % 6
+			arrowAnimOffset = (arrowAnimOffset > 3) ? (6 - arrowAnimOffset) : arrowAnimOffset
+		}
+
+		if (canGoLeft)
+			Renderer.drawText(ActSelect.MENU_FONT, px - 50 - arrowAnimOffset, py, "<", color, 5, 0, 0xf000, false, true)
+		if (canGoRight)
+			Renderer.drawText(ActSelect.MENU_FONT, px + 110 + arrowAnimOffset, py, ">", color, 5, 0, 0xf000, false, true)
+
+		Renderer.drawText(ActSelect.MENU_FONT, px + 29, py, text, color, 5, 0, 0xf000, false, true)
+	}	
+}
+
+
 function void ActSelect.Menu(u8 fadeInMethod)
 {
-	constant string MENU_FONT = "oxyfont_regular:gradient:outline(0x000000ff,1,false):shadow(1,1,0.5f,0.8f)"
-	constant string TITLE_FONT = "sonic3_fontC:gradient:outline(0x000000ff,1,false):shadow(1,1,0.5f,1.0f)"
-
 	// Load palette for the background
 	{
 		copyMemory(0xfffffc00, 0x39d262, 0x20)
@@ -194,41 +307,8 @@ function void ActSelect.Menu(u8 fadeInMethod)
 		float deltaSeconds = 1.0f / 60.0f
 		++frameCounter
 
-		if (fadeInMethod == 1 && frameCounter <= 0x18)
-		{
-			// Fade from black
-			u16 blendFactorR = clamp(s32(frameCounter - 0x0a) * 0x14, 0, 0x100)
-			u16 blendFactorG = clamp(s32(frameCounter - 0x04) * 0x14, 0, 0x100)
-			u16 blendFactorB = clamp(    frameCounter         * 0x14, 0, 0x100)
-
-			for (u32 i = 0; i < 0x20; ++i)
-			{
-				u32 color = unpackColor(u16[0xfffffc00 + i * 2])
-				u32 r = (( color        & 0xff) * blendFactorR) >> 8
-				u32 g = (((color >> 8)  & 0xff) * blendFactorG) >> 8
-				u32 b = (((color >> 16) & 0xff) * blendFactorB) >> 8
-				color = r + (g << 8) + (b << 16)
-
-				u16[0xfffffc80 + i * 2] = packColor(color)
-				Renderer.setPaletteColor(i, color)
-			}
-
-			globalComponentTintColorR = blendFactorR
-			globalComponentTintColorG = blendFactorG
-			globalComponentTintColorB = blendFactorB
-		}
-		// fadeInMethod == 2 may be used later for a transition that makes content move in, like in the C++ version of this menu
-
-		// Background
-		{
-			SpriteHandle spr = Renderer.addSpriteHandle("bg_dataselect", s16(getScreenWidth() - 512) / 2, 0, 0x5000)
-			spr.setBlendMode(BlendMode.OPAQUE)
-
-			Renderer.enableDefaultPlane(0, false)
-			Renderer.enableDefaultPlane(1, false)
-			Renderer.enableDefaultPlane(2, false)
-			Renderer.enableDefaultPlane(3, false)
-		}
+		ActSelect.HandleFadeIn(fadeInMethod, frameCounter)
+		ActSelect.DrawBackground()
 
 		// Level preview
 		{
@@ -274,71 +354,7 @@ function void ActSelect.Menu(u8 fadeInMethod)
 			Renderer.drawSprite("level_preview_border_right", getScreenWidth(), 8, 0, 0x00, 0xf008)
 		}
 
-		// Title text
-		Renderer.drawText(TITLE_FONT, anchorX, 12, "ACT SELECT", 0xffffffff, 5, 0, 0xf010, false, true)
-
-		// Character preview
-		{
-			s16 px = max(anchorX - 125, 52)		// Move to the right in 4:3
-			Renderer.drawSprite("charselectionbox", px + 3, 159, 0, 0x00, 0xf002)
-			Renderer.drawSprite(ActSelect.GetCharacterCombinationSprite(levelselect.characters), px, 156, 0, 0x00, 0xf004)
-		}
-
-		// Render menu texts
-		constant array<s16> TEXT_LINE_Y = { 121, 143, 165, 203 }
-		for (u32 entryIndex = 0; entryIndex < 4; ++entryIndex)
-		{
-			bool isSelected = (entryIndex == selectedEntry)
-			u32 color = isSelected ? 0xffff00ff : 0xffffffe8
-
-			bool canGoLeft = false
-			bool canGoRight = false
-
-			string text
-			if (entryIndex == 0)
-			{
-				text = ActSelect.GetZoneName(selectedZone)
-				canGoLeft = (selectedZone > 0)
-				canGoRight = (selectedZone < ActSelect.GetNumZones() - 1)
-			}
-			else if (entryIndex == 1)
-			{
-				if (ActSelect.GetNumActs(selectedZone) == 1)
-					text = "Single Act"
-				else
-					text = stringformat("Act %d", selectedAct + 1)
-				canGoLeft = (selectedZone > 0 || selectedAct > 0)
-				canGoRight = (selectedZone < ActSelect.GetNumZones() - 1 || selectedAct < ActSelect.GetNumActs(selectedZone) - 1)
-			}
-			else if (entryIndex == 2)
-			{
-				text = ActSelect.GetCharacterCombinationName(levelselect.characters)
-				canGoLeft = (levelselect.characters > 0)
-				canGoRight = (levelselect.characters < ActSelect.GetNumCharacterCombinations() - 1)
-			}
-			else
-			{
-				text = "Back"
-			}
-
-			s16 px = anchorX
-			s16 py = TEXT_LINE_Y[entryIndex]
-
-			s16 arrowAnimOffset = 0
-			if (isSelected)
-			{
-				float seconds = global.framecounter / 60.0f
-				arrowAnimOffset = Math.roundToInt(seconds * 6.0f) % 6
-				arrowAnimOffset = (arrowAnimOffset > 3) ? (6 - arrowAnimOffset) : arrowAnimOffset
-			}
-
-			if (canGoLeft)
-				Renderer.drawText(MENU_FONT, px - 50 - arrowAnimOffset, py, "<", color, 5, 0, 0xf000, false, true)
-			if (canGoRight)
-				Renderer.drawText(MENU_FONT, px + 110 + arrowAnimOffset, py, ">", color, 5, 0, 0xf000, false, true)
-
-			Renderer.drawText(MENU_FONT, px + 29, py, text, color, 5, 0, 0xf000, false, true)
-		}
+		ActSelect.DrawMenu(selectedEntry, selectedZone, selectedAct, anchorX)
 
 		waitForNextFrame()
 
