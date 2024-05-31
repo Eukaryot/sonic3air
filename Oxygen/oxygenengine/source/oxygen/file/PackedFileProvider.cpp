@@ -306,7 +306,7 @@ InputStream* PackedFileProvider::createPackedFileInputStream(PackedFile& packedF
 		if (nullptr == baseInputStream)
 		{
 			RMX_ASSERT(false, "Input stream could not be opened");
-			return false;
+			return nullptr;
 		}
 
 		StreamingPackedFileInputStream* inputStream = new StreamingPackedFileInputStream(*this, *baseInputStream, packedFile.mPositionInFile, packedFile.mSizeInFile);
