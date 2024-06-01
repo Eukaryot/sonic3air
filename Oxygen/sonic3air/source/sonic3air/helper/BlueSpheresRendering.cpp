@@ -91,7 +91,7 @@ namespace
 
 		right.set(1.0f, 0.0f, 0.0f);
 
-		up.cross(right, front);
+		up = Vec3f::crossProduct(right, front);
 		up.normalize();
 	}
 

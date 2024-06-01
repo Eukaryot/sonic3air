@@ -46,14 +46,12 @@ namespace math
 			redefine(point0, point1, point2);
 		}
 
-		const Vec3f& getNormal() const	{ return mNormal; }
-		float getDistance() const		{ return mDistance; }
+		inline const Vec3f& getNormal() const	{ return mNormal; }
+		inline float getDistance() const		{ return mDistance; }
 
 		void redefine(const Vec3f& point0, const Vec3f& point1, const Vec3f& point2)
 		{
-			Vec3f edge1 = point1 - point0;
-			Vec3f edge2 = point2 - point0;
-			mNormal.cross(edge1, edge2);
+			mNormal = Vec3f::crossProduct(point1 - point0, point2 - point0);
 			redefine(mNormal.normalized(), point0);
 		}
 
@@ -70,18 +68,16 @@ namespace math
 
 		Side getSide(const Vec3f& point) const
 		{
-			float fDistance = getDistance(point);
-
+			const float fDistance = getDistance(point);
 			if (fDistance < 0.0)
 				return Side::NEGATIVE_SIDE;
-
-			if (fDistance > 0.0)
+			else if (fDistance > 0.0)
 				return Side::POSITIVE_SIDE;
-
-			return Side::NO_SIDE;
+			else
+				return Side::NO_SIDE;
 		}
 
-		float normalise()
+		float normalize()
 		{
 			float fLength = mNormal.length();
 			if (fLength > 0.0f)

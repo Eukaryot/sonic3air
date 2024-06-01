@@ -93,8 +93,7 @@ namespace math
 	bool nearestPointBetweenLines(const Line& line1, const Line& line2, Vec3f* outPoint, float* outT)
 	{
 		// Vector orthogonal to each line, this is also a direction vector along the connection of the closest points
-		Vec3f connectionNormal;
-		connectionNormal.cross(line1.getDirection(), line2.getDirection());
+		Vec3f connectionNormal = Vec3f::crossProduct(line1.getDirection(), line2.getDirection());
 
 		if (connectionNormal.sqrLen() == 0.0f)
 		{
@@ -104,8 +103,7 @@ namespace math
 
 		// Now we construct a plane that contains line2 AND the connection vector.
 		//  This plane will also contain the closest point on line1.
-		Vec3f planeNormal;
-		planeNormal.cross(connectionNormal, line2.getDirection());
+		Vec3f planeNormal = Vec3f::crossProduct(connectionNormal, line2.getDirection());
 		const Plane plane(planeNormal, line2.getOrigin());
 
 		// the resulting point is on the recently constructed plane, and on line1, so we just need to intersect them

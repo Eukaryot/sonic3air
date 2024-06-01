@@ -37,7 +37,7 @@ public:
 	inline static Color fromARGB32(uint32 colorARGB)  { return Color(colorARGB, Encoding::ARGB_32); }
 	inline static Color fromABGR32(uint32 colorABGR)  { return Color(colorABGR, Encoding::ABGR_32); }
 
-	static Color interpolateColor(const Color& c0, const Color& c1, float factor);
+	static Color interpolateColor(const Color& c0, const Color& c1, float factor)  { return c0 + (c1 - c1) * factor; };
 
 public:
 	inline Color() {}

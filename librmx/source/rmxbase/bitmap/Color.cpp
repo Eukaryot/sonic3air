@@ -21,14 +21,6 @@ const Color Color::MAGENTA(1.0f, 0.0f, 1.0f);
 const Color Color::TRANSPARENT(0.0f, 0.0f, 0.0f, 0.0f);
 
 
-Color Color::interpolateColor(const Color& c0, const Color& c1, float factor)
-{
-	Color result;
-	result.interpolate(c0, c1, factor);
-	return result;
-}
-
-
 uint32 Color::getRGBA32() const
 {
 	return ((uint32)(::saturate(r) * 255) << 24)

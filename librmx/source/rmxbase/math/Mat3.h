@@ -297,8 +297,7 @@ public:
 		TYPE dot = gam0.dot(in1);
 		dot = (dot < -1) ? -1 : ((dot > +1) ? +1 : dot);
 		gamma = rad2deg(acos(dot));
-		Vec3<TYPE> tmp;
-		tmp.cross(gam0, in1);
+		Vec3<TYPE> tmp = Vec3<TYPE>::crossProduct(gam0, in1);
 		if (tmp.dot(in2) < 0)
 			gamma = -gamma;
 	}
