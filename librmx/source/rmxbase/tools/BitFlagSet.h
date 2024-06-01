@@ -134,6 +134,8 @@ public:
 		mFlags ^= static_cast<Storage>(flag);
 	}
 
+	inline Storage getValue() const  { return mFlags; }
+
 	inline bool operator==(const BitFlagSet& other) const
 	{
 		return (mFlags == other.mFlags);

@@ -124,7 +124,7 @@ public:
 	{
 		// Dot product
 		TYPE sum = 0;
-		FORi(sum += (source1.data[i] * source1.data[i]));
+		FORi(sum += (source1.data[i] * source2.data[i]));
 		return sum;
 	}
 
