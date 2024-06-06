@@ -24,7 +24,8 @@ namespace opengl
 			P2,			// 2D position
 			P2_C3,		// 2D position, RGB color
 			P2_C4,		// 2D position, RGBA color
-			P2_T2		// 2D position, 2D texcoords
+			P2_T2,		// 2D position, 2D texcoords
+			P3_C3,		// 3D position, RGB color
 						// ...add more as needed
 		};
 
@@ -36,10 +37,10 @@ namespace opengl
 		inline size_t getNumBufferedVertices() const  { return mNumBufferedVertices; }
 		void updateVertexData(const float* vertexData, size_t numVertices);
 
-		void bind();
-		void unbind();
+		void bind() const;
+		void unbind() const;
 
-		void draw(GLenum mode);		// Shortcut for "bind()" + "glDrawArrays(mode, 0, mNumBufferedVertices)"
+		void draw(GLenum mode) const;		// Shortcut for "bind()" + "glDrawArrays(mode, 0, mNumBufferedVertices)"
 
 	private:
 		GLuint mHandle = 0;						// Vertex array object handle

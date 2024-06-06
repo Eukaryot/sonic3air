@@ -74,6 +74,15 @@ namespace opengl
 				break;
 			}
 
+			case Format::P3_C3:
+			{
+				mNumVertexAttributes = 2;
+				mFloatsPerVertex = 6;
+				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (GLsizei)(mFloatsPerVertex * sizeof(float)), (void*)(0 * sizeof(float)));	// Positions
+				glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (GLsizei)(mFloatsPerVertex * sizeof(float)), (void*)(3 * sizeof(float)));	// Colors
+				break;
+			}
+
 			default:
 				RMX_ERROR("Unrecognized or invalid format", );
 				break;
@@ -106,7 +115,7 @@ namespace opengl
 		mNumBufferedVertices = numVertices;
 	}
 
-	void VertexArrayObject::bind()
+	void VertexArrayObject::bind() const
 	{
 		if (mHandle != 0)
 		{
@@ -114,12 +123,12 @@ namespace opengl
 		}
 	}
 
-	void VertexArrayObject::unbind()
+	void VertexArrayObject::unbind() const
 	{
 		glBindVertexArray(0);
 	}
 
-	void VertexArrayObject::draw(GLenum mode)
+	void VertexArrayObject::draw(GLenum mode) const
 	{
 		if (mHandle != 0 && mNumBufferedVertices > 0)
 		{

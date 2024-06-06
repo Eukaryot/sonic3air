@@ -21,6 +21,7 @@ public:
 public:
 	TBox3() {}
 	TBox3(const TBox3& box) : mMin(box.mMin), mMax(box.mMax) {}
+	TBox3(const Vec3<TYPE>& boxMin, const Vec3<TYPE>& boxMax) : mMin(boxMin), mMax(boxMax) {}
 
 	template<typename T> TBox3(const TBox3<T>& box) : mMin(Vec3<TYPE>(box.mMin)), mMax(Vec3<TYPE>(box.mMax)) {}
 
@@ -40,6 +41,16 @@ public:
 	bool contains(const Vec3<TYPE>& vec) const
 	{
 		return contains(vec.x, vec.y, vec.z);
+	}
+
+	void extendToInclude(const Vec3<TYPE>& vec)
+	{
+		mMin.x = std::min(mMin.x, vec.x);
+		mMin.y = std::min(mMin.y, vec.y);
+		mMin.z = std::min(mMin.z, vec.z);
+		mMax.x = std::max(mMax.x, vec.x);
+		mMax.y = std::max(mMax.y, vec.y);
+		mMax.z = std::max(mMax.z, vec.z);
 	}
 
 	void intersect(const TBox3& other)

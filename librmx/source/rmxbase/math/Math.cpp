@@ -11,8 +11,36 @@
 
 namespace math
 {
+	namespace detail
+	{
+		bool rayBoxIntersectionInAxis(float& outMinT, float& outMaxT, float rayStart, float rayDir, float boxMin, float boxMax)
+		{
+			if (rayDir != 0.0f)
+			{
+				outMinT = (boxMin - rayStart) / rayDir;
+				outMaxT = (boxMax - rayStart) / rayDir;
+				if (outMinT > outMaxT)
+					std::swap(outMinT, outMaxT);
+				if (outMaxT < 0.0f)
+					return false;
+				outMinT = std::max(outMinT, 0.0f);
+				return true;
+			}
+			else if (rayStart >= boxMin && rayStart <= boxMax)
+			{
+				outMinT = -FLT_MAX;
+				outMaxT = FLT_MAX;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
 
-	bool intersectRayWithPlane(const Ray& ray, const Plane& plane, Vec3f* outIntersectionPoint, float* outIntersectionT)
+
+	bool intersectRayWithPlane(const Ray& ray, const Plane& plane, Vec3f* outIntersectionPoint, float* outIntersectionT, bool onlyFromFront)
 	{
 		// Distance of ray's origin to plane along plane normal
 		const float distance = plane.getDistance(ray.getOrigin());
@@ -37,6 +65,10 @@ namespace math
 			return false;
 		}
 
+		// Check if plane is hit from front or back side
+		if (onlyFromFront && prox > 0.0f)
+			return false;
+
 		// Calculate offset t along ray where intersection happens
 		const float t = -distance / prox;
 
@@ -54,7 +86,7 @@ namespace math
 		return true;
 	}
 
-	bool intersectLineWithPlane(const Line& line, const Plane& plane, Vec3f* outIntersectionPoint, float* outIntersectionT)
+	bool intersectLineWithPlane(const Line& line, const Plane& plane, Vec3f* outIntersectionPoint, float* outIntersectionT, bool onlyFromFront)
 	{
 		// Distance of line's origin to plane along plane normal
 		const float distance = plane.getDistance(line.getOrigin());
@@ -79,6 +111,10 @@ namespace math
 			return false;
 		}
 
+		// Check if plane is hit from front or back side
+		if (onlyFromFront && prox > 0.0f)
+			return false;
+
 		// Calculate offset t along line where intersection happens
 		const float t = -distance / prox;
 
@@ -87,6 +123,43 @@ namespace math
 			*outIntersectionPoint = line.getPoint(t);
 		if (outIntersectionT)
 			*outIntersectionT = t;
+		return true;
+	}
+
+	bool intersectRayWithBox(const math::Ray& ray, const Box3f& box, float* outIntersectionT0, float* outIntersectionT1)
+	{
+		const Vec3f rayStart = ray.getOrigin();
+		const Vec3f rayDirection = ray.getDirection();
+
+		// Check intersection in x-direction
+		float t0, t1;
+		if (!detail::rayBoxIntersectionInAxis(t0, t1, rayStart.x, rayDirection.x, box.mMin.x, box.mMax.x))
+			return false;
+
+		// Check intersection in y-direction
+		float s0, s1;
+		if (!detail::rayBoxIntersectionInAxis(s0, s1, rayStart.y, rayDirection.y, box.mMin.y, box.mMax.y))
+			return false;
+
+		t0 = std::max(t0, s0);
+		t1 = std::min(t1, s1);
+		if (t1 <= t0)
+			return false;
+
+		// Check intersection in z-direction
+		if (!detail::rayBoxIntersectionInAxis(s0, s1, rayStart.z, rayDirection.z, box.mMin.z, box.mMax.z))
+			return false;
+
+		t0 = std::max(t0, s0);
+		t1 = std::min(t1, s1);
+		if (t1 <= t0)
+			return false;
+
+		// There is an intersection, namely in the interval [t0, t1]
+		if (nullptr != outIntersectionT0)
+			*outIntersectionT0 = t0;
+		if (nullptr != outIntersectionT1)
+			*outIntersectionT1 = t1;
 		return true;
 	}
 
