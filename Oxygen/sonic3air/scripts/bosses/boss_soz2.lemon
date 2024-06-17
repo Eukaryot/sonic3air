@@ -25,10 +25,10 @@ function void fn07764e()
 	u16[0xffffeee0] = objA0.position.y.u16
 	Enemy.DrawDynamicObject()
 
-	#if STANDALONE
-		// Mask out sprites below the ground, but except the leftmost part (because of HUD)
-		Renderer.addSpriteMask(200, 192, getScreenWidth()-200, 32, 0xd000, 1)
-	#endif
+#if STANDALONE
+	// Mask out sprites below the ground, but except the leftmost part (because of HUD)
+	Renderer.addSpriteMask(200, 192, getScreenWidth()-200, 32, 0xd000, 1)
+#endif
 }
 
 

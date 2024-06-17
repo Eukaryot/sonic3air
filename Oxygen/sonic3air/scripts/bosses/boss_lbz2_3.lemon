@@ -1032,7 +1032,7 @@ function void fn074bc0()
 //# address-hook(0x074bd0) end(0x074bd4)
 function void fn074bd0()
 {
-	D0.u8 = 0x9a
+	D0.u8 = (collision.flag.THREAT | collision.size.12x12)
 	fn074ebc(0x074bd8)
 	fn074bd8()
 }

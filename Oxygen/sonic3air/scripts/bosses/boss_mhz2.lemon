@@ -763,9 +763,9 @@ function void fn055732()
 //# address-hook(0x05576a) end(0x055776)
 function void fn05576a()
 {
-	#if STANDALONE
-		objA0.box_size.x = 0x40		// Avoid clipping in standalone (done here so it works with loaded save state as well)
-	#endif
+#if STANDALONE
+	objA0.box_size.x = 0x40		// Avoid clipping in standalone (done here so it works with loaded save state as well)
+#endif
 
 	if (u8[0xffffeed3] == 0)
 	{
@@ -811,9 +811,9 @@ function void fn05577c()
 //# address-hook(0x0557c8) end(0x055812)
 function void fn0557c8()
 {
-	#if STANDALONE
-		objA0.box_size.x = 0x40		// Avoid clipping in standalone (done here so it works with loaded save state as well)
-	#endif
+#if STANDALONE
+	objA0.box_size.x = 0x40		// Avoid clipping in standalone (done here so it works with loaded save state as well)
+#endif
 
 	if (u16[0xffffeedc] == 0 && u8[0xffffeed3] != 0)
 	{

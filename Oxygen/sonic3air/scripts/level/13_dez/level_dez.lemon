@@ -52,11 +52,11 @@ function void InitLevelScrolling.DEZ1()
 //# address-hook(0x059398) end(0x05939c)
 function void UpdateLevelScrolling.DEZ1()
 {
-	#if STANDALONE
-		// Draw our own widescreen version of the background
-		Renderer.enableDefaultPlane(0, false)
-		Renderer.drawCustomSprite("bg_dez1", getScreenExtend() - 40, 0, 0x00, SPRITE_FLAG_FULLY_OPAQUE, 0x1100)
-	#endif
+#if STANDALONE
+	// Draw our own widescreen version of the background
+	Renderer.enableDefaultPlane(0, false)
+	Renderer.drawCustomSprite("bg_dez1", getScreenExtend() - 40, 0, 0x00, SPRITE_FLAG_FULLY_OPAQUE, 0x1100)
+#endif
 
 	call 0x0593a0 + level.scrolling_routine
 }
@@ -253,14 +253,14 @@ function void InitScrolling.DEZ2()
 //# address-hook(0x05951e) end(0x059522)
 function void UpdateLevelScrolling.DEZ2()
 {
-	#if STANDALONE
-		// Draw our own widescreen version of the background
-		Renderer.enableDefaultPlane(0, false)
-		Renderer.drawCustomSprite("bg_dez2", getScreenExtend() - 40, 0, 0, SPRITE_FLAG_FULLY_OPAQUE, 0x1100)	// Draw fully opaque
+#if STANDALONE
+	// Draw our own widescreen version of the background
+	Renderer.enableDefaultPlane(0, false)
+	Renderer.drawCustomSprite("bg_dez2", getScreenExtend() - 40, 0, 0, SPRITE_FLAG_FULLY_OPAQUE, 0x1100)	// Draw fully opaque
 
-		// Change color entry 0x34 from black to dark blue, as that additional color is used by the "bg_dez2" bitmap
-		u16[0xfffffc00 + 0x68] = applyGlobalComponentTint_BGR32(0xff400000)
-	#endif
+	// Change color entry 0x34 from black to dark blue, as that additional color is used by the "bg_dez2" bitmap
+	u16[0xfffffc00 + 0x68] = applyGlobalComponentTint_BGR32(0xff400000)
+#endif
 
 	call 0x059526 + level.scrolling_routine
 }

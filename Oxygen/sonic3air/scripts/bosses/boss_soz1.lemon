@@ -945,10 +945,10 @@ function void FadeInColorUniform()
 {
 	u16 color = u16[A1]
 	u16 target = u16[A2]
-	#if STANDALONE
-		color = makeNormalPackedColor(color)
-		target = makeNormalPackedColor(target)
-	#endif
+#if STANDALONE
+	color = makeNormalPackedColor(color)
+	target = makeNormalPackedColor(target)
+#endif
 	if ((color & 0x0eee) < (target & 0x0eee))
 	{
 		if ((color & (D1 << 8)) < (target & (D1 << 8)))

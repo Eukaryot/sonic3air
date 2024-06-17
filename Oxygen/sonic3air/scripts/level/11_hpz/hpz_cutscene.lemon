@@ -741,10 +741,10 @@ function void fn064a1c()
 //# address-hook(0x064a36) end(0x064a36)
 function void fn064a36()
 {
-	#if STANDALONE
-		// Don't let Knuckles wait there so long
-		objA0.animation.timer = min(objA0.animation.timer, 60)
-	#endif
+#if STANDALONE
+	// Don't let Knuckles wait there so long
+	objA0.animation.timer = min(objA0.animation.timer, 60)
+#endif
 
 	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 }

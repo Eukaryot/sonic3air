@@ -15,10 +15,10 @@
 //# address-hook(0x03da00) end(0x03da22)
 function void MHZLeavesEffect.Update()
 {
-	#if STANDALONE
-		if (debug_mode.state)
-			return
-	#endif
+#if STANDALONE
+	if (debug_mode.state)
+		return
+#endif
 
 	if (u8[0xfffff7c0] < 0x10)
 	{

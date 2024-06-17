@@ -38,10 +38,10 @@ function void fn069ea0()
 	// "spawnChildObjects(0x06ad6e)" replaced by:
 	spawnChildObject(0x06a51e, 0x00, 0, 0)		// Water agitator pole
 
-	#if STANDALONE
-		// There is this one chunk visible with broken palette
-		u8[0xffff8634] = 0xb5
-	#endif
+#if STANDALONE
+	// There is this one chunk visible with broken palette
+	u8[0xffff8634] = 0xb5
+#endif
 }
 
 
@@ -124,7 +124,7 @@ function void fn069faa()
 	objA0.hitbox_extends.y = 0x28
 	objA0.flags38 |= 0x08
 	objA0.velocity.y = 0x0100
-	objA0.countdown_value = 0xdf
+	objA0.countdown_value = 223
 	objA0.countdown_callback = 0x069ff0
 
 	// Spawn rockets
@@ -150,7 +150,7 @@ function void fn069ff0()
 {
 	objA0.base_state = 0x04
 	objA0.velocity.y = 0
-	objA0.countdown_value = 0x3b
+	objA0.countdown_value = 59
 	objA0.countdown_callback = 0x06a010
 }
 
@@ -176,7 +176,7 @@ function void fn06a010()
 function void fn06a02c()
 {
 	objA0.base_state = 0x08
-	objA0.countdown_value = 0x3b
+	objA0.countdown_value = 59
 	objA0.countdown_callback = 0x06a042
 }
 
@@ -287,9 +287,7 @@ function void fn06a110()
 	objA0.base_state = 0x12
 	objA0.flags38 &= ~0x80
 	objA0.position.y.u16 = D0.u16
-	D0.u16 = 0x0180
-	if (s16[A0 + 0x40] < 0)
-		D0.s16 = -D0.s16
+	D0.s16 = (s16[A0 + 0x40] < 0) ? -0x0180 : 0x0180
 	objA0.velocity.x = D0.u16
 	objA0.countdown_value = 0x3f
 	objA0.countdown_callback = 0x06a16c
@@ -341,7 +339,7 @@ function void fn06a1c0()
 {
 	objA0.flags38 |= 0x08
 	objA0.countdown_value = 0x3f
-	objA0.countdown_callback = 0x06a1c0
+	objA0.countdown_callback = 0x06a1c0		// ???
 	objA0.countdown_callback = 0x06a1de
 }
 

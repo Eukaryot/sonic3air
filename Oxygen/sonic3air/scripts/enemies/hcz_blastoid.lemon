@@ -80,22 +80,26 @@ function void fn0879a0()
 //# translated(0x0879a8) end(0x0879da)
 function bool fn0879a8()
 {
+	// Check for collision with either character
 	fn085870()
 	if (_equal())
 	{
 		return false
 	}
 
+	// Check which player to damage
 	fn0857c2()
 	if (_equal())
 	{
 		if (u8[A1 + 0x34] == 0)
 		{
+			// Character is not invulnerable, deal damage to character
 			Enemy.DamageCharacter()
 		}
 		return false
 	}
 
+	// Trigger bridge collapse after badnik is defeated
 	D0.u16 = objA0.subtype2c & 0x0f
 	A3 = 0xfffff7e0
 	u8[A3 + D0.u16] = 0xff

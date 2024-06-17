@@ -132,21 +132,21 @@ function void DynamicRing.UpdateAttraction()
 	objA0.velocity.x += D1.s16
 
 	s16 dy = u16[0xffffb000 + 0x14] - objA0.position.y.u16
-	#if STANDALONE
-		// Consider level wrap for ring collection
-		if (level.vertical_wrap == 0xff00)
+#if STANDALONE
+	// Consider level wrap for ring collection
+	if (level.vertical_wrap == 0xff00)
+	{
+		if (dy > s16(level.height.bitmask) / 2)
 		{
-			if (dy > s16(level.height.bitmask) / 2)
-			{
-				objA0.position.y.u16 += level.height.bitmask
-			}
-			else if (dy < -s16(level.height.bitmask) / 2)
-			{
-				objA0.position.y.u16 -= level.height.bitmask
-			}
-			dy = u16[0xffffb000 + 0x14] - objA0.position.y.u16
+			objA0.position.y.u16 += level.height.bitmask
 		}
-	#endif
+		else if (dy < -s16(level.height.bitmask) / 2)
+		{
+			objA0.position.y.u16 -= level.height.bitmask
+		}
+		dy = u16[0xffffb000 + 0x14] - objA0.position.y.u16
+	}
+#endif
 	if (dy < 0)
 	{
 		D1.s16 = -0x30

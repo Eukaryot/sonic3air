@@ -173,11 +173,11 @@ function void fn0419fa()
 	if (((objA0.flags2a & 0x01) == 0) == sign)
 		return
 
-	#if STANDALONE
-		// Check character's orientation, is he faced away?
-		if (sign != ((u8[A1 + 0x2a] & char.flag.FACING_LEFT) != 0))
-			return
-	#endif
+#if STANDALONE
+	// Check character's orientation, is he faced away?
+	if (sign != ((u8[A1 + 0x2a] & char.flag.FACING_LEFT) != 0))
+		return
+#endif
 
 	if (u16[A0 + 0x36] != 0x80)
 	{

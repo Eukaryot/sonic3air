@@ -87,7 +87,7 @@ define global.active_saveslot	= u32[0xffffe660]	// Pointer to the active save ga
 // Save game slots, 8 slots with 10 bytes each:
 //  -  u8[x + 0x00] = 0x80 for unused slot, 0 if game was not completed yet, 1 if completed without emeralds, 2 if completed with all Chaos Emeralds, 3 if completed with all Super Emeralds
 //  -  u8[x + 0x01] = seems to be unused in original -- S3AIR stores a randomly generated value here, as basis for global.game_random_base
-//  -  u8[x + 0x02] = upper 4 bits for characters (see CHARS_* constants); lower 4 bits for last collected emerald...?
+//  -  u8[x + 0x02] = upper 4 bits for characters (see CHARS_* constants); lower 4 bits for current special stage
 //  -  u8[x + 0x03] = zone number (seems to use the order as presented to the player!)
 //  - u16[x + 0x04] = bitmask of Giant Rings already entered in the current zone
 //  - u16[x + 0x06] = compact representation of emerald collection states (see 0xffffffb2)
@@ -156,7 +156,7 @@ define rings.around.first.state	= u16[0xffffee4a]	// RAM address of dynamic stat
 //  0x0a = SSZ - Sky Sanctuary (0x0a00 for Sonic/Tails, 0x0a01 for Knuckles' End Bosses)
 //  0x0b = DEZ - Death Egg
 //  0x0c = DDZ - Doomsday (0x0c00)
-//  0x0d = Outro for Sonic/Tails (0x0d01)
+//  0x0d = Outro for Sonic/Tails (0x0d01), Angel Island act 1 without Sonic's Intro (0x0d00)
 //  0x16 = Lava Reef Boss for Sonic/Tails (0x1600), Hidden Palace (0x1601)
 //  0x17 = Hidden Palace emerald cave when entered through Giant Ring (0x1701), Death Egg Boss (0x1700)
 //

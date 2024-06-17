@@ -802,12 +802,12 @@ function void fn07ca3a()
 	objA0.update_address = 0x07caaa
 	setupObjectAttributesFull(0x0664ee)
 
-	#if STANDALONE
-		objA0.position.x.u16 += getScreenExtend() * 2
-		objA0.velocity.x = -0xc0
-	#else
-		objA0.velocity.x = -0x80
-	#endif
+#if STANDALONE
+	objA0.position.x.u16 += getScreenExtend() * 2
+	objA0.velocity.x = -0xc0
+#else
+	objA0.velocity.x = -0x80
+#endif
 
 	fn0685e2()
 
@@ -1230,12 +1230,12 @@ function void fn07ce6c()
 function void fn07d11c()
 {
 	D0.u16 = 0x100
-	#if STANDALONE
-		if (getScreenWidth() >= 400)
-		{
-			D0.u16 = getScreenWidth() - 0x50
-		}
-	#endif
+#if STANDALONE
+	if (getScreenWidth() >= 400)
+	{
+		D0.u16 = getScreenWidth() - 0x50
+	}
+#endif
 
 	if (camera.position.x.u16 < D0.u16)
 	{

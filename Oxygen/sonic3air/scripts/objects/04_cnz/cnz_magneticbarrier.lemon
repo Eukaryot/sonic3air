@@ -45,10 +45,10 @@ function void fn031f4c()
 //# address-hook(0x031f62) end(0x031ff2)
 function void fn031f62()
 {
-	#if STANDALONE
-		if (debug_mode.state != 0)
-			return
-	#endif
+#if STANDALONE
+	if (debug_mode.state != 0)
+		return
+#endif
 
 	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
 	if ((objA0.flags2a & 0x01) == 0)

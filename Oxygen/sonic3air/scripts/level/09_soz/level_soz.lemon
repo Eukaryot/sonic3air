@@ -191,11 +191,11 @@ function void fn055b70()
 {
 	// This is called during pyramid rise and boss fight
 
-	#if STANDALONE
-		// In boss area, mask out sprites below the ground (except for the sand pit)
-		Renderer.addSpriteMaskWorld(0x4220, 0x0a00, 0x230, 0x40, 0x9f00, 1)
-		Renderer.addSpriteMaskWorld(0x4200, 0x0a08,  0x20, 0x38, 0x9f00, 1)
-	#endif
+#if STANDALONE
+	// In boss area, mask out sprites below the ground (except for the sand pit)
+	Renderer.addSpriteMaskWorld(0x4220, 0x0a00, 0x230, 0x40, 0x9f00, 1)
+	Renderer.addSpriteMaskWorld(0x4200, 0x0a08,  0x20, 0x38, 0x9f00, 1)
+#endif
 
 	if (u16[0xffffeec6] == 0x55)
 	{
@@ -816,10 +816,7 @@ function void fn05622c()
 	A1 = 0xffff0000 + u16[A3 + 0x1c]
 	A5 = A1 + 0xab
 	A1 += 0x95
-	u8[(A1+=1)-1] = u8[(A5+=1)-1]
-	u8[(A1+=1)-1] = u8[(A5+=1)-1]
-	u8[(A1+=1)-1] = u8[(A5+=1)-1]
-	u8[(A1+=1)-1] = u8[(A5+=1)-1]
+	copyMemory((A1+=4)-4, (A5+=4)-4, 4)
 
 	A1 = 0xffff0000 + u16[A3 + 0x28]
 	A5 = A1 + 0xab

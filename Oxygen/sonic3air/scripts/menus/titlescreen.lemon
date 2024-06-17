@@ -401,14 +401,14 @@ function void TitleScreen()
 	u32[0xffffb206] = 0x00496a		// "& Knuckles" logo append
 	titleintro.frames = 0
 
-	#if STANDALONE
-		global.whiteflash_timeout = 25
-		airHighlightAnimationTimer = 0
+#if STANDALONE
+	global.whiteflash_timeout = 25
+	airHighlightAnimationTimer = 0
 
-		// This is needed for the background to be shown in first frame at all (when VDP sprite rendering seems to be disabled)
-		Renderer.resetSprites()
-		Renderer.drawCustomSprite("bg_title_screen", getScreenExtend() - 40, 0, 0x00, 0, 0x1100)
-	#endif
+	// This is needed for the background to be shown in first frame at all (when VDP sprite rendering seems to be disabled)
+	Renderer.resetSprites()
+	Renderer.drawCustomSprite("bg_title_screen", getScreenExtend() - 40, 0, 0x00, 0, 0x1100)
+#endif
 
 	while (true)
 	{
@@ -491,13 +491,16 @@ function void TitleScreen()
 	++global.demo_number
 	if (global.lock_on_state == 0)
 	{
-		if (global.demo_number == 3)		// Skip Knuckles in MHZ demo
+	#if !STANDALONE
+		if (global.demo_number == 3)	// Skip Knuckles in MHZ demo
 		{
 			global.demo_number = 4
 		}
-		else if (global.demo_number >= 7)	// We've got 7 demos in total
+		else
+	#endif
+		if (global.demo_number >= 7)	// We've got 7 demos in total
 		{
-			global.demo_number = 0
+			global.demo_number = 0		// Play all demos
 		}
 	}
 	else
@@ -521,6 +524,14 @@ function void TitleScreen()
 	}
 	else
 	{
+	#if STANDALONE
+		if (D0.u16 == 0x0700)
+		{
+			// Mushroom Hill rolling demo needs some tweaking
+			fn00552e()
+		}
+	#endif
+
 		// Normal Game rolling demo
 		global.game_mode = 0x08
 	}

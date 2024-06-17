@@ -139,11 +139,11 @@ function void fn067572()
 //# address-hook(0x067594) end(0x0675be)
 function void fn067594()
 {
-	#if STANDALONE
-		objA0.velocity.x -= 0x50
-	#else
-		objA0.velocity.x -= 0x40
-	#endif
+#if STANDALONE
+	objA0.velocity.x -= 0x50
+#else
+	objA0.velocity.x -= 0x40
+#endif
 
 	UpdateMovementSimple()
 	if (objA0.position.y.u16 < 0x0130)

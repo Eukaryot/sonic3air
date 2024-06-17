@@ -646,20 +646,20 @@ function void fn0578f0()
 	UpdateBackgroundTiles.General()
 	WriteScrollOffsets()
 
-	#if STANDALONE
-		if (level.results_done && camera.position.y.u16 <= 0x500)
+#if STANDALONE
+	if (level.results_done && camera.position.y.u16 <= 0x500)
+	{
+		// Overwrite scroll offsets for plane A to move the Death Egg depending on screen width
+		D0.s16 = -s16(camera.foreground.x.u16) + max(0, s16(getScreenExtend() - 40) + 8)
+		for (u8 line = 0; line < getScreenHeight(); ++line)
 		{
-			// Overwrite scroll offsets for plane A to move the Death Egg depending on screen width
-			D0.s16 = -s16(camera.foreground.x.u16) + max(0, s16(getScreenExtend() - 40) + 8)
-			for (u8 line = 0; line < getScreenHeight(); ++line)
-			{
-				u16[0xffffe000 + line * 4] = D0
-			}
-
-			// Also make sure to remove garbage values for plane A
-			VDP.Util.clearPatternRectInVRAM(0xc000, 0xd000, 0x80, 0x48, 0x5c)
+			u16[0xffffe000 + line * 4] = D0
 		}
-	#endif
+
+		// Also make sure to remove garbage values for plane A
+		VDP.Util.clearPatternRectInVRAM(0xc000, 0xd000, 0x80, 0x48, 0x5c)
+	}
+#endif
 
 	UpdateScreenShake()
 
@@ -820,11 +820,11 @@ function void fn0579f0()
 		}
 	}
 
-	#if STANDALONE
-		// Prevent background blur by drawing the background plane at a higher render queue
-		Renderer.enableDefaultPlane(0, false)
-		Renderer.setupPlane(0, 0, getScreenWidth(), getScreenHeight(), 0x00, 0, 0x1800)
-	#endif
+#if STANDALONE
+	// Prevent background blur by drawing the background plane at a higher render queue
+	Renderer.enableDefaultPlane(0, false)
+	Renderer.setupPlane(0, 0, getScreenWidth(), getScreenHeight(), 0x00, 0, 0x1800)
+#endif
 }
 
 

@@ -3869,7 +3869,7 @@ function void Character.checkForWaterSurface()
 	{
 		char.flags &= ~char.flag.UNDERWATER
 
-		if (controlFlag && char.base_state != 0x04)	// That's the "got hurt" state
+		if (controlFlag && char.base_state != base_state.HURT)
 		{
 			if (char.velocity.y >= -0x400)
 			{

@@ -148,14 +148,14 @@ function void BossMecha1.setBossArea()
 	level.bossarea.right = camera.position.x.u16 + getScreenWidth() - 0x20
 	level.bossarea.top   = camera.position.y.u16 + 0x30
 
-	#if STANDALONE
-		if (getScreenWidth() >= 400)
-		{
-			// Reduce move area of the boss, so he does not stand too close to the edge
-			level.bossarea.left += 0x0f
-			level.bossarea.right -= 0x0f
-		}
-	#endif
+#if STANDALONE
+	if (getScreenWidth() >= 400)
+	{
+		// Reduce move area of the boss, so he does not stand too close to the edge
+		level.bossarea.left += 0x0f
+		level.bossarea.right -= 0x0f
+	}
+#endif
 }
 
 

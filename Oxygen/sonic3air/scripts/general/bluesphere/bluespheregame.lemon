@@ -275,6 +275,10 @@ function void fn04cca6()
 		bluespheregame.enable_progress = 0
 		bluespheregame.current_stage = 0
 		bluespheregame.stage_parts.all = 0x00010203
+
+	#if STANDALONE
+		bluespheregame.menu_flags = 1		// Skip "NO WAY" screen entirely in standalone
+	#endif
 	}
 }
 
@@ -1318,7 +1322,7 @@ function void fn04d6b8()
 	{
 		if ((objA0.render_flags & render_flag.FLIP_X) == 0)		// Only consider first of the two objects
 		{
-			if (bluespheregame.menu_selection == 1)
+			if (bluespheregame.menu_selection != 2)
 			{
 				// Back to the main menu
 				playSound(0xad)
@@ -1330,7 +1334,7 @@ function void fn04d6b8()
 				Game.returnToMainMenu()
 				yieldExecution()
 			}
-			else if (bluespheregame.menu_selection == 2)
+			else
 			{
 				fn04d488()
 			}

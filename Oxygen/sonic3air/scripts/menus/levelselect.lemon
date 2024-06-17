@@ -89,9 +89,9 @@ function void LevelSelect.init()
 
 	while (D1.s16 >= 0)
 	{
-		D3.u16 = u16[(A5+=2)-2]
-		A2 = A3 + D3.s16
-		D2 = u8[(A1+=1)-1]		// Get string length
+		D3.u16 = u16[(A5+=2)-2]		// Get relative address in plane map to write to
+		A2 = A3 + D3.s16			// Get absolute address
+		D2 = u8[(A1+=1)-1]			// Get string length
 		D3.u16 = D2.u16
 
 		while (D2.s16 >= 0)
@@ -101,7 +101,7 @@ function void LevelSelect.init()
 			--D2.s16
 		}
 
-		D2.u16 = 0x0d - D3.u16
+		D2.u16 = 0x0d - D3.u16		// Maximum length of string - string length = remaining space length
 		while (D2.s16 >= 0)
 		{
 			// Add empty space after string
@@ -126,7 +126,7 @@ function void LevelSelect.init()
 	copyRectToVRAM(0xffff0000, 0xc000, 0x28, 0x1c)
 
 	// Character select digits
-	D3 = 0
+	D3 = sprite_attribute.PALETTE.LINE0
 	fn007f62()
 
 	global.characters = CHARS_SONIC_AND_TAILS
@@ -134,6 +134,7 @@ function void LevelSelect.init()
 	global.level_started = 0
 	u16[0xfffff7f0] = 0
 
+	// Background animation
 	A2 = 0x0081b0
 	LevelTilesAnim.Default()
 
@@ -205,14 +206,12 @@ function bool LevelSelect.innerUpdate()
 
 	// Foreground scroll offset
 	u16[0xffffe000] = max(s16(getScreenExtend()) - 6, 0)
-#endif
-
-#if !STANDALONE
+#else
 	set_status_register(0x2700)
 #endif
 
 	// White unhighlighted text
-	D3 = 0
+	D3 = sprite_attribute.PALETTE.LINE0
 	fn007f62()
 
 	// Menu controls
@@ -226,6 +225,7 @@ function bool LevelSelect.innerUpdate()
 	set_status_register(0x2300)
 #endif
 
+	// Background animation
 	A2 = 0x0081b0
 	LevelTilesAnim.Default()
 
@@ -249,11 +249,11 @@ function bool LevelSelect.innerUpdate()
 		if (D0.u16 & 0x8000)
 		{
 			// Sound test
-			global.game_mode = 0
+			global.game_mode = 0		// Initialization
 			return true
 		}
 
-		if (D0.u16 != 0x5555)
+		if (D0.u16 != 0x5555)		// 0x5555 was used in Sonic 3 (disc 1) for the inaccessible S&K (disc 2) zones
 		{
 			// Start game
 			lives_counter = 3
@@ -288,7 +288,7 @@ function bool LevelSelect.innerUpdate()
 				if (control.pad1.state & CONTROL_A)
 				{
 					// This is needed to make the special stage selection (incl. 8th stage) work
-					//  -> You need to start a special stage form level select by pressing A + Start
+					//  -> You need to start a special stage from level select by pressing A + Start
 					//  -> Current sound test selection tells the game which stage to start
 					//  -> See "BlueSpheres.getNextOpenStageIndex()" function for more
 					debug_mode.unlocked = 1

@@ -94,8 +94,8 @@ function void EntryFunctions.mainMenuBG()
 
 function void EntryFunctions.sharedInit()
 {
-	#if GAMEAPP
-		// Disabled the muffled underwater sound effect in any case
-		Game.setUnderwaterAudioEffect(0)
-	#endif
+#if GAMEAPP
+	// Disabled the muffled underwater sound effect in any case
+	Game.setUnderwaterAudioEffect(0)
+#endif
 }

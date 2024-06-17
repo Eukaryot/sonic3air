@@ -31,17 +31,17 @@ function void fn0784f0()
 //# address-hook(0x078522) end(0x078522)
 function void fn078522()
 {
-	#if STANDALONE
-		// Copy some background tiles to fill in the rightmost columns
-		// TODO: This is quite hacked in, better do this in the right way
-		for (u16 base = 0xe000; base < 0xf000; base += 0x80)
+#if STANDALONE
+	// Copy some background tiles to fill in the rightmost columns
+	// TODO: This is quite hacked in, better do this in the right way
+	for (u16 base = 0xe000; base < 0xf000; base += 0x80)
+	{
+		for (u16 x = 0; x < 0x20; x += 2)
 		{
-			for (u16 x = 0; x < 0x20; x += 2)
-			{
-				setVRAM(base + 0x40 + x, getVRAM(base + 0x10 + x))
-			}
+			setVRAM(base + 0x40 + x, getVRAM(base + 0x10 + x))
 		}
-	#endif
+	}
+#endif
 
 	CheckForBossStart()
 }

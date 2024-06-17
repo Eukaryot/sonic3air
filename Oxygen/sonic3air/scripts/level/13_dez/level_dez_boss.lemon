@@ -182,14 +182,14 @@ function void InitLevelScrolling.DEZ_Boss()
 //# address-hook(0x05a544) end(0x05a554)
 function void UpdateLevelScrolling.DEZ_Boss()
 {
-	#if STANDALONE
-		// Draw our own widescreen version of the background
-		Renderer.enableDefaultPlane(0, false)
-		Renderer.drawCustomSprite("bg_dez2", getScreenExtend() - 40, 0, 0, SPRITE_FLAG_FULLY_OPAQUE, 0x1100)	// Draw fully opaque
+#if STANDALONE
+	// Draw our own widescreen version of the background
+	Renderer.enableDefaultPlane(0, false)
+	Renderer.drawCustomSprite("bg_dez2", getScreenExtend() - 40, 0, 0, SPRITE_FLAG_FULLY_OPAQUE, 0x1100)	// Draw fully opaque
 
-		// Change color entry 0x34 from black to dark blue, as that additional color is used by the "bg_dez2" bitmap
-		u16[0xfffffc00 + 0x68] = packColorExt(applyGlobalComponentTint_BGR32(0xff200000))
-	#endif
+	// Change color entry 0x34 from black to dark blue, as that additional color is used by the "bg_dez2" bitmap
+	u16[0xfffffc00 + 0x68] = packColorExt(applyGlobalComponentTint_BGR32(0xff200000))
+#endif
 
 	A3 = 0xffff8008
 	D7.u16 = 0xc000

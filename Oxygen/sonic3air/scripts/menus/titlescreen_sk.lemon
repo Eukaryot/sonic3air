@@ -272,7 +272,7 @@ function void TitleScreen_SK()
 	playSound(MUSIC_CTRL_FADEOUT)
 
 #if !STANDALONE
-	global.demo_number = max(global.demo_number, 3)
+	global.demo_number = max(global.demo_number, 3)		// This limits the demos to only the ones in Sonic & Knuckles zones
 #endif
 
 	u16[0xffffef7a] = global.demo_number
@@ -283,7 +283,7 @@ function void TitleScreen_SK()
 	checkpoint.zone_act = D0.u16
 
 	++global.demo_number
-	if (global.demo_number >= 7)
+	if (global.demo_number >= 7)	// We've got 7 demos in total
 	{
 	#if STANDALONE
 		global.demo_number = 0		// Play all demos
@@ -294,6 +294,7 @@ function void TitleScreen_SK()
 
 	if (D0.s16 < 0)
 	{
+		// Blue Spheres rolling demo
 		global.game_mode = 0x34		// Special Stage
 		global.next_bluespheres = 1
 		global.sk_bluespheres = 1
@@ -305,8 +306,11 @@ function void TitleScreen_SK()
 	{
 		if (D0.u16 == 0x0700)
 		{
+			// Mushroom Hill rolling demo needs some tweaking
 			fn00552e()
 		}
+
+		// Normal Game rolling demo
 		global.game_mode = 0x08		// Rolling Demo
 	}
 
@@ -327,6 +331,7 @@ function void TitleScreen_SK()
 //# address-hook(0x00552e) end(0x005586)
 function void fn00552e()
 {
+	// Adjust some spawn-related values for the Mushroom Hill rolling demo
 	checkpoint.x = 0x06f4
 	checkpoint.y = 0x09ec
 	checkpoint.number = 1

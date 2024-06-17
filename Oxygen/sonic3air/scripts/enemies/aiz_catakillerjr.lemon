@@ -56,7 +56,7 @@ function void fn0876ec()
 	objA0.velocity.x = -0x100
 
 	// "spawnIdenticalChildObjects(0x087898)" replaced by:
-	spawnChildObjects(0x08778c, 0, 0, 6)
+	spawnChildObjects(0x08778c, 0, 0, 6)		// Catakiller's body parts
 
 	fn087702()
 }

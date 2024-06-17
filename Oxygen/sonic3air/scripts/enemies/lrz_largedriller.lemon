@@ -216,10 +216,10 @@ function void fn090352()
 	objA0.countdown_value = 0xbf
 	objA0.countdown_callback = 0x090368
 
-	#if STANDALONE
-		// No need to wait that long actually...
-		objA0.countdown_value = 0x0f
-	#endif
+#if STANDALONE
+	// No need to wait that long actually...
+	objA0.countdown_value = 0x0f
+#endif
 }
 
 

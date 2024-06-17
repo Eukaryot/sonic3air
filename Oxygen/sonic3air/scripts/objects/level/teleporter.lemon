@@ -187,16 +187,16 @@ function void fn0456f4()
 	fn045856()
 
 	A1 = 0xffffb000
-	#if STANDALONE
-		// Check if character got hurt right while entering the beam
-		if (u8[A1 + 0x05] == base_state.HURT)
-		{
-			u8[A1 + 0x05] = base_state.NORMAL
-			objA1.velocity.x = 0
-			objA1.velocity.y = 0
-			objA1.groundspeed = 0
-		}
-	#endif
+#if STANDALONE
+	// Check if character got hurt right while entering the beam
+	if (u8[A1 + 0x05] == base_state.HURT)
+	{
+		u8[A1 + 0x05] = base_state.NORMAL
+		objA1.velocity.x = 0
+		objA1.velocity.y = 0
+		objA1.groundspeed = 0
+	}
+#endif
 
 	A2 = 0xffff0000 + u16[A0 + 0x3c]
 	if (s8[A2 + 0x46] >= 0x08)

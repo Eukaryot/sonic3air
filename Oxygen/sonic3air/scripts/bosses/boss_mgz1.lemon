@@ -280,13 +280,13 @@ function void fn0887ca()
 //# address-hook(0x0887da) end(0x0887f0)
 function void fn0887da()
 {
-	#if STANDALONE
-		if (camera.position.x.u16 >= 0x2e00)
-		{
-			UnloadObject()
-			return
-		}
-	#endif
+#if STANDALONE
+	if (camera.position.x.u16 >= 0x2e00)
+	{
+		UnloadObject()
+		return
+	}
+#endif
 
 	++camera.position.x.u16
 	move_area.left = camera.position.x.u16

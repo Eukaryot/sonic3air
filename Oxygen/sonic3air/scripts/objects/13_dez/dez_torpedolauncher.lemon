@@ -21,10 +21,10 @@ function void fn04719a()
 	D0 = u16(objA0.subtype2c) * 4
 	objA0.countdown_value = D0.u16
 	u16[A0 + 0x30] = D0.u16
-	#if STANDALONE
-		// Increase initial fire timer to accomplish for widescreen; some parts get a little unfair otherwise
-		objA0.countdown_value += getScreenExtend() / 4
-	#endif
+#if STANDALONE
+	// Increase initial fire timer to accomplish for widescreen; some parts get a little unfair otherwise
+	objA0.countdown_value += getScreenExtend() / 4
+#endif
 
 	objA0.update_address = 0x0471d6
 	fn0471d6()

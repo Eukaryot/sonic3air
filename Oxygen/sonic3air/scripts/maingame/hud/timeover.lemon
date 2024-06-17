@@ -40,9 +40,9 @@ function void fn02d5c6()
 function void fn02d612()
 {
 	u16 targetPositionX = 0x120
-	#if STANDALONE
-		targetPositionX += getScreenExtend()
-	#endif
+#if STANDALONE
+	targetPositionX += getScreenExtend()
+#endif
 
 	s16 diff = targetPositionX - objA0.position.x.u16
 	if (diff != 0)

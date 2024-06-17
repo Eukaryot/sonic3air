@@ -141,11 +141,12 @@ function void VInt.InnerUpdate()
 	//  - 0x00076e	-> global.frame_state = 0x02	-> Used in SEGA logo
 	//  - 0x0007ba	-> global.frame_state = 0x04	-> Used in title screen
 	//  - 0x0007ea	-> global.frame_state = 0x08	-> Used in main game
-	//  - 0x000978	-> global.frame_state = 0x0c	-> Used during level loading
+	//  - 0x000978	-> global.frame_state = 0x0a, 0x0c	-> Used during level loading
 	//  - 0x0007e0	-> global.frame_state = 0x10	-> Used during game pause
 	//  - 0x000a94	-> global.frame_state = 0x12	-> Used during screen fades
 	//  - 0x000780	-> global.frame_state = 0x14	-> Used in SEGA logo
-	//  - 0x000b5c	-> global.frame_state = 0x16	-> Used in Level Select
+	//  - 0x000b5c	-> global.frame_state = 0x16	-> Used in Level Select, continue screen
+	//  - 0x000aa0	-> global.frame_state = 0x18	-> Used in credits screen in Sonic 3, continue screen in Sonic 3
 	//  - 0x000c00	-> global.frame_state = 0x1a	-> Used in S&K title screen, Blue Spheres mode results screen
 	//  - 0x000c20	-> global.frame_state = 0x1c	-> Used in Blue Spheres special stage
 	//  - 0x000c3e	-> global.frame_state = 0x1e	-> Used in Data Select, Blue Spheres special stage results and Competition Mode menus
@@ -586,6 +587,9 @@ function void fn000c50()
 }
 
 
+
+// Horizontal Interrupts
+
 //# translated(0x000d10) end(0x000dd6)
 function void HInt_000d10()
 {
@@ -658,9 +662,6 @@ function void HInt_000d10()
 	}
 }
 
-
-
-// Horizontal Interrupts
 
 //# translated(0x000dd8) end(0x000e56)
 function void HInt_000dd8()

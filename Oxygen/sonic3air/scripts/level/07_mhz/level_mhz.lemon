@@ -481,12 +481,12 @@ function void fn054dbe()
 function void fn054e86()
 {
 	// This function loads tiles to the right during the MHZ 2 boss auto-scrolling
-	#if STANDALONE
-		// Avoid visual glitches at a screen width of 416 pixels due to leftmost part of the foreground pole getting overwritten
-		// TODO: With this, there is a part of the pole visible after boss defeated
-		if (getScreenWidth() > 400 && camera.foreground.x.u16 >= 0x40b0)
-			return
-	#endif
+#if STANDALONE
+	// Avoid visual glitches at a screen width of 416 pixels due to leftmost part of the foreground pole getting overwritten
+	// TODO: With this, there is a part of the pole visible after boss defeated
+	if (getScreenWidth() > 400 && camera.foreground.x.u16 >= 0x40b0)
+		return
+#endif
 
 	u16[0xffffa804] = camera.foreground.x.u16
 	A4 = 0x0550d2
@@ -1148,16 +1148,16 @@ function void fn0554b8()
 //# address-hook(0x05550c) end(0x05560a)
 function void fn05550c()
 {
-	#if STANDALONE
-		if ((u8[0xffffeed2] | u8[0xffffeed3]) != 0)
-		{
-			// Split plane A (non-prio) so we can assign to upper part a lower render queue,
-			//  which is needed to enable the background blur for that part
-			Renderer.enableDefaultPlane(1, false)
-			Renderer.setupPlane(0, 0, getScreenWidth(), 48, 0x01, 1, 0x1200)
-			Renderer.setupPlane(0, 48, getScreenWidth(), 176, 0x01, 1, 0x2000)
-		}
-	#endif
+#if STANDALONE
+	if ((u8[0xffffeed2] | u8[0xffffeed3]) != 0)
+	{
+		// Split plane A (non-prio) so we can assign to upper part a lower render queue,
+		//  which is needed to enable the background blur for that part
+		Renderer.enableDefaultPlane(1, false)
+		Renderer.setupPlane(0, 0, getScreenWidth(), 48, 0x01, 1, 0x1200)
+		Renderer.setupPlane(0, 48, getScreenWidth(), 176, 0x01, 1, 0x2000)
+	}
+#endif
 
 	WriteScrollOffsets()
 	if (u16[0xffffeec0] == 0x10)
@@ -1297,14 +1297,14 @@ function void fn05560c()
 	newCameraX += isMainCharacter(CHARACTER_KNUCKLES) ? 5 : 4
 
 	bool reachedEnd = (newCameraX >= 0x4280)
-	#if STANDALONE
-		// When fight is over, switch to normal level scrolling a bit earlier than usual
-		// This is tuned for 416 pixel width
-		if (getScreenWidth() > 400 && !reachedEnd && u16[0xffffeec6] != 0)
-		{
-			reachedEnd = (newCameraX >= 0x4260)
-		}
-	#endif
+#if STANDALONE
+	// When fight is over, switch to normal level scrolling a bit earlier than usual
+	// This is tuned for 416 pixel width
+	if (getScreenWidth() > 400 && !reachedEnd && u16[0xffffeec6] != 0)
+	{
+		reachedEnd = (newCameraX >= 0x4260)
+	}
+#endif
 
 	if (!reachedEnd)
 	{

@@ -702,14 +702,14 @@ function void fn071700()
 	D2.u16 += D0.u16
 	objA0.position.x.u16 = level.bossarea.left + D2.u16
 
-	#if STANDALONE
-		if (getScreenWidth() >= 400)
-		{
-			// Spread out slightly, so that right screen border is no dead corner any more
-			//  -> Note: objA0.subtype2c is between 0x00 and 0x0e -- are there 8 snow balls?
-			objA0.position.x.u16 += objA0.subtype2c
-		}
-	#endif
+#if STANDALONE
+	if (getScreenWidth() >= 400)
+	{
+		// Spread out slightly, so that right screen border is no dead corner any more
+		//  -> Note: objA0.subtype2c is between 0x00 and 0x0e -- are there 8 snow balls?
+		objA0.position.x.u16 += objA0.subtype2c
+	}
+#endif
 
 	D0 = (D0 << 16) + (D0 >> 16)
 	D0.u16 = (D0.u16 & 0x07) - 3
