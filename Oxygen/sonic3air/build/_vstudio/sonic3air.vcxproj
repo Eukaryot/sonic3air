@@ -78,6 +78,7 @@
     <ClCompile Include="..\..\source\sonic3air\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\platform\PlatformSpecifics.cpp" />
     <ClCompile Include="..\..\source\sonic3air\resources\DynamicSprites.cpp" />
     <ClCompile Include="..\..\source\sonic3air\scriptimpl\ScriptImplementations.cpp" />
     <ClCompile Include="..\..\source\sonic3air\_nativized\NativizedCode.cpp" />
@@ -129,6 +130,7 @@
     <ClInclude Include="..\..\source\sonic3air\menu\TimeAttackMenu.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\TimeAttackResultsMenu.h" />
     <ClInclude Include="..\..\source\sonic3air\pch.h" />
+    <ClInclude Include="..\..\source\sonic3air\platform\PlatformSpecifics.h" />
     <ClInclude Include="..\..\source\sonic3air\resources\DynamicSprites.h" />
     <ClInclude Include="..\..\source\sonic3air\scriptimpl\ScriptImplementations.h" />
     <ClInclude Include="resource.h" />
