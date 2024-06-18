@@ -142,7 +142,17 @@ namespace rmx
 	#endif
 	}
 
-	void Painter::print(Font& font, const Rectf& rect, const StringReader& text, int alignment, const Color& color)
+	void Painter::print(Font& font, const Vec2i& pos, const StringReader& text, int alignment, const Color& color)
+	{
+		print(font, Recti(pos, Vec2i()), text, alignment, color);
+	}
+
+	void Painter::print(Font& font, const Vec2i& pos, const StringReader& text, const PrintOptions& printOptions)
+	{
+		print(font, Recti(pos, Vec2i()), text, printOptions);
+	}
+
+	void Painter::print(Font& font, const Recti& rect, const StringReader& text, int alignment, const Color& color)
 	{
 		static PrintOptions printOptions;
 		printOptions.mAlignment = alignment;
@@ -150,7 +160,7 @@ namespace rmx
 		print(font, rect, text, printOptions);
 	}
 
-	void Painter::print(Font& font, const Rectf& rect, const StringReader& text, const PrintOptions& printOptions)
+	void Painter::print(Font& font, const Recti& rect, const StringReader& text, const PrintOptions& printOptions)
 	{
 		OpenGLFontOutput& fontOutput = getOpenGLFontOutput(font);
 		const Vec2f pos = font.alignText(rect, text, printOptions.mAlignment);

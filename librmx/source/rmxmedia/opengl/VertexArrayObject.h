@@ -26,6 +26,7 @@ namespace opengl
 			P2_C4,		// 2D position, RGBA color
 			P2_T2,		// 2D position, 2D texcoords
 			P3_C3,		// 3D position, RGB color
+			P3_N3_C3,	// 3D position, normal vector, RGB color
 						// ...add more as needed
 		};
 

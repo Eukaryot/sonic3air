@@ -70,7 +70,7 @@ public:
 	{
 		uint32 mUnicode = 0;
 		const Bitmap* mBitmap = nullptr;
-		Vec2f mPosition;
+		Vec2i mPosition;
 	};
 
 	struct ExtendedTypeInfo
@@ -111,9 +111,9 @@ public:
 	int getWidth(const StringReader& text, int pos = 0, int len = -1);
 	int getLineHeight();
 
-	Vec2f alignText(const Rectf& rect, const StringReader& text, int alignment);
+	Vec2i alignText(const Recti& rect, const StringReader& text, int alignment);
 	void wordWrapText(std::vector<std::wstring>& output, int lineWidth, const StringReader& text, int spacing = 0);
-	void getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringReader& text, int spacing = 0);
+	void getTypeInfos(std::vector<TypeInfo>& output, Vec2i pos, const StringReader& text, int spacing = 0);
 
 	void applyToTypeInfos(std::vector<ExtendedTypeInfo>& outTypeInfos, const std::vector<Font::TypeInfo>& inTypeInfos);
 	CharacterInfo& applyEffects(const Font::TypeInfo& typeInfo);

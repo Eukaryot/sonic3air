@@ -83,6 +83,16 @@ namespace opengl
 				break;
 			}
 
+			case Format::P3_N3_C3:
+			{
+				mNumVertexAttributes = 3;
+				mFloatsPerVertex = 9;
+				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (GLsizei)(mFloatsPerVertex * sizeof(float)), (void*)(0 * sizeof(float)));	// Positions
+				glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE,  (GLsizei)(mFloatsPerVertex * sizeof(float)), (void*)(3 * sizeof(float)));	// Normals
+				glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, (GLsizei)(mFloatsPerVertex * sizeof(float)), (void*)(6 * sizeof(float)));	// Colors
+				break;
+			}
+
 			default:
 				RMX_ERROR("Unrecognized or invalid format", );
 				break;

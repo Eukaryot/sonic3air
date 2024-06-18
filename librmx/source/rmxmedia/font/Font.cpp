@@ -155,9 +155,9 @@ int Font::getLineHeight()
 	return (nullptr == fontSource) ? 0 : fontSource->getLineHeight();
 }
 
-Vec2f Font::alignText(const Rectf& rect, const StringReader& text, int alignment)
+Vec2i Font::alignText(const Recti& rect, const StringReader& text, int alignment)
 {
-	Vec2f result(rect.x, rect.y);
+	Vec2i result(rect.x, rect.y);
 	FontSource* fontSource = getFontSource();
 	if (nullptr == fontSource)
 		return result;
@@ -169,10 +169,10 @@ Vec2f Font::alignText(const Rectf& rect, const StringReader& text, int alignment
 		int align_y = alignment / 3;
 
 		if (align_x > 0)
-			result.x += ((int)rect.width - getWidth(text)) * align_x / 2;
+			result.x += (rect.width - getWidth(text)) * align_x / 2;
 
 		if (align_y > 0)
-			result.y += ((int)rect.height - fontSource->getHeight()) * align_y / 2;
+			result.y += (rect.height - fontSource->getHeight()) * align_y / 2;
 	}
 
 	return result;
@@ -280,13 +280,13 @@ void Font::wordWrapText(std::vector<std::wstring>& output, int maxLineWidth, con
 	}
 }
 
-void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringReader& text, int spacing)
+void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2i pos, const StringReader& text, int spacing)
 {
 	FontSource* fontSource = getFontSource();
 	if (nullptr == fontSource)
 		return;
 
-	const Vec2f originalPosition = pos;
+	const Vec2i originalPosition = pos;
 	output.resize(text.mLength);
 
 	for (size_t k = 0; k < text.mLength; ++k)

@@ -20,7 +20,7 @@ public:
 		uint32 mUnicode = 0;
 		Bitmap mBitmap;
 		int mAdvance = 0;
-		Vec2f mIndent;
+		Vec2i mIndent;
 	};
 
 public:

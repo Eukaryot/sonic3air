@@ -334,8 +334,8 @@ namespace opengldrawer
 			// TODO: This is not particularly precise, as it's not considering the real impact of effects (outlines, shadows, etc.) - instead, we're using a fixed tolerance value
 			{
 				const constexpr int TOLERANCE = 10;
-				Vec2f boundingBoxMin(1e10f, 1e10f);
-				Vec2f boundingBoxMax(-1e10f, -1e10f);
+				Vec2i boundingBoxMin(+0x7fffffff, +0x7fffffff);
+				Vec2i boundingBoxMax(-0x7fffffff, -0x7fffffff);
 				for (const Font::TypeInfo& typeInfo : typeInfos)
 				{
 					if (nullptr != typeInfo.mBitmap)
