@@ -26,7 +26,8 @@ public:
 		COMPONENT_SPRITE,
 		SPRITE_MASK,
 		RECTANGLE,
-		TEXT
+		TEXT,
+		VIEWPORT
 	};
 
 	enum class LifetimeContext : uint8
@@ -148,6 +149,14 @@ namespace renderitems
 		int mSpacing = 0;
 	};
 
+	struct Viewport : public RenderItem
+	{
+		inline Viewport() : RenderItem(Type::VIEWPORT) {}
+		virtual void serialize(VectorBinarySerializer& serializer, uint8 formatVersion) override;
+
+		Vec2i mSize;
+	};
+
 }
 
 
@@ -162,4 +171,5 @@ struct PoolOfRenderItems
 	ObjectPool<renderitems::SpriteMaskInfo>		 mSpriteMasks;
 	ObjectPool<renderitems::Rectangle>			 mRectangles;
 	ObjectPool<renderitems::Text>				 mTexts;
+	ObjectPool<renderitems::Viewport>			 mViewports;
 };

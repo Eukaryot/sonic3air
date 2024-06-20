@@ -549,12 +549,12 @@ namespace
 
 	void Renderer_resetViewport(uint16 renderQueue)
 	{
-		RenderParts::instance().addViewport(Recti(0, 0, VideoOut::instance().getScreenWidth(), VideoOut::instance().getScreenHeight()), renderQueue);
+		RenderParts::instance().getSpriteManager().addViewport(Recti(Vec2i(), VideoOut::instance().getScreenSize()), renderQueue);
 	}
 
 	void Renderer_setViewport(int16 px, int16 py, int16 width, int16 height, uint16 renderQueue)
 	{
-		RenderParts::instance().addViewport(Recti(px, py, width, height), renderQueue);
+		RenderParts::instance().getSpriteManager().addViewport(Recti(px, py, width, height), renderQueue);
 	}
 
 	void Renderer_setGlobalComponentTint(int16 tintR, int16 tintG, int16 tintB, int16 addedR, int16 addedG, int16 addedB)

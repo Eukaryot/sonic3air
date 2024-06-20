@@ -62,6 +62,7 @@ public:
 
 	void addRectangle(const Recti& rect, const Color& color, uint16 renderQueue, Space space, bool useGlobalComponentTint);
 	void addText(std::string_view fontKeyString, uint64 fontKeyHash, const Vec2i& position, std::string_view textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space, bool useGlobalComponentTint);
+	void addViewport(const Recti& rect, uint16 renderQueue);
 
 	uint32 addSpriteHandle(uint64 key, const Vec2i& position, uint16 renderQueue);
 	SpriteHandleData* getSpriteHandleData(uint32 spriteHandle);

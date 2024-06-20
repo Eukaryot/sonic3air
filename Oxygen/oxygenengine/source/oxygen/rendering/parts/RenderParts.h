@@ -19,13 +19,6 @@
 class RenderParts : public SingleInstance<RenderParts>
 {
 public:
-	struct Viewport
-	{
-		Recti mRect;
-		uint16 mRenderQueue = 0;
-	};
-
-public:
 	RenderParts();
 
 	inline PaletteManager&		 getPaletteManager()		{ return mPaletteManager; }
@@ -37,9 +30,6 @@ public:
 
 	inline bool getActiveDisplay() const	   { return mActiveDisplay; }
 	inline void setActiveDisplay(bool enable)  { mActiveDisplay = enable; }
-
-	void addViewport(const Recti& rect, uint16 renderQueue);
-	inline const std::vector<Viewport>& getViewports() const  { return mViewports; }
 
 	void reset();
 	void preFrameUpdate();
@@ -61,6 +51,4 @@ private:
 	SpriteManager		 mSpriteManager;
 
 	bool mActiveDisplay = true;
-
-	std::vector<Viewport> mViewports;
 };

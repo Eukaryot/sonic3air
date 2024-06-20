@@ -269,6 +269,15 @@ void SpriteManager::addText(std::string_view fontKeyString, uint64 fontKeyHash, 
 	mAddedItems.mItems.push_back(&newText);
 }
 
+void SpriteManager::addViewport(const Recti& rect, uint16 renderQueue)
+{
+	renderitems::Viewport& newViewport = mPoolOfRenderItems.mViewports.createObject();
+	newViewport.mPosition = rect.getPos();
+	newViewport.mSize = rect.getSize();
+	newViewport.mRenderQueue = renderQueue;
+	mAddedItems.mItems.push_back(&newViewport);
+}
+
 uint32 SpriteManager::addSpriteHandle(uint64 key, const Vec2i& position, uint16 renderQueue)
 {
 	const uint32 spriteHandle = mNextSpriteHandle;

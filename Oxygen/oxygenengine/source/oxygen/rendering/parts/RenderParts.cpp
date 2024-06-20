@@ -22,17 +22,9 @@ RenderParts::RenderParts() :
 	reset();
 }
 
-void RenderParts::addViewport(const Recti& rect, uint16 renderQueue)
-{
-	Viewport& viewport = vectorAdd(mViewports);
-	viewport.mRect = rect;
-	viewport.mRenderQueue = renderQueue;
-}
-
 void RenderParts::reset()
 {
 	mActiveDisplay = true;
-	mViewports.clear();
 
 	mPlaneManager.reset();
 	mSpriteManager.clear();
@@ -42,7 +34,6 @@ void RenderParts::reset()
 void RenderParts::preFrameUpdate()
 {
 	// TODO: It could make sense to require an explicit script call for these as well, see "Renderer.resetCustomPlaneConfigurations()"
-	mViewports.clear();
 	mPaletteManager.preFrameUpdate();
 	mSpriteManager.preFrameUpdate();
 	mScrollOffsetsManager.preFrameUpdate();
