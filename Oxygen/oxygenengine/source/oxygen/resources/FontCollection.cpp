@@ -172,8 +172,9 @@ Font* FontCollection::getFontByKey(uint64 keyHash)
 Font* FontCollection::createFontByKey(std::string_view key)
 {
 	// First check if the font exists already
+	const uint64 keyHash = rmx::getMurmur2_64(key);
 	{
-		Font* font = getFontByKey(rmx::getMurmur2_64(key));
+		Font* font = getFontByKey(keyHash);
 		if (nullptr != font)
 			return font;
 	}
@@ -195,6 +196,7 @@ Font* FontCollection::createFontByKey(std::string_view key)
 	}
 
 	registerManagedFontInternal(font, *collectedFont);
+	mFontsByKeyHash[keyHash] = &font;
 	return &font;
 }
 
