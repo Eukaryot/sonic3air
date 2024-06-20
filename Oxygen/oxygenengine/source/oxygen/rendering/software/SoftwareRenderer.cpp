@@ -441,9 +441,9 @@ void SoftwareRenderer::renderPlane(const PlaneGeometry& geometry)
 			int endX = maxX;
 			if (scrollNoRepeat)
 			{
-				if (vx < 0)
+				if (vx > 0x0800)
 				{
-					startX -= vx;
+					startX += 0x1000 - vx;
 					vx = 0;
 				}
 				else if (endX > startX + (positionMaskH - vx))
