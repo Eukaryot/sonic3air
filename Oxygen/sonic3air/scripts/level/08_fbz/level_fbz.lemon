@@ -372,7 +372,7 @@ function void fn052636()
 	D1 = 3
 	while (D1.s16 >= 0)
 	{
-		copyMemory((A1+=6)-6, (A5+=6)-6, 6)
+		copyMemory((A1+=6)-6, (A6+=6)-6, 6)
 		A6 += D0.u16
 		A1 += D0.u16
 		--D1.s16
@@ -523,7 +523,7 @@ function void fn052782()
 	D1 = 4
 	while (D1.s16 >= 0)
 	{
-		copyMemory((A1+=18)-18, (A5+=18)-18, 18)
+		copyMemory((A1+=18)-18, (A6+=18)-18, 18)
 		A6 += D0.u16
 		A1 += D0.u16
 		--D1.s16
