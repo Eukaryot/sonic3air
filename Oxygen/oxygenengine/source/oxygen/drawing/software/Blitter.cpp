@@ -253,22 +253,28 @@ BitmapViewMutable<uint32> Blitter::makeTempBitmapAsCopy(const BitmapView<uint8>&
 BitmapViewMutable<uint32> Blitter::makeTempBitmapAsTransformedCopy(Recti outputBoundingBox, const SpriteWrapper& sprite, Vec2i position, const Options& options)
 {
 	BitmapViewMutable<uint32> result = makeTempBitmap(outputBoundingBox.getSize());
+	const Vec2f floatPivot(sprite.mPivot);
 	switch (options.mSamplingMode)
 	{
 		case SamplingMode::POINT:
 		{
 			for (int iy = 0; iy < outputBoundingBox.height; ++iy)
 			{
+				// Transform into sprite-local coordinates
+				const float dx = (float)(outputBoundingBox.x - position.x) + 0.5f;
+				const float dy = (float)(outputBoundingBox.y - position.y + iy) + 0.5f;
+				float localX = dx * options.mInvTransform[0] + dy * options.mInvTransform[1] + floatPivot.x;
+				float localY = dx * options.mInvTransform[2] + dy * options.mInvTransform[3] + floatPivot.y;
+				const float advanceX = options.mInvTransform[0];
+				const float advanceY = options.mInvTransform[2];
+
 				uint32* dst = result.getPixelPointer(0, iy);
 				for (int ix = 0; ix < outputBoundingBox.width; ++ix)
 				{
-					// Transform into sprite-local coordinates
-					const float dx = (float)(outputBoundingBox.x + ix - position.x) + 0.5f;
-					const float dy = (float)(outputBoundingBox.y + iy - position.y) + 0.5f;
-					const int localX = (int)(dx * options.mInvTransform[0] + dy * options.mInvTransform[1]) + sprite.mPivot.x;
-					const int localY = (int)(dx * options.mInvTransform[2] + dy * options.mInvTransform[3]) + sprite.mPivot.y;
-					*dst = BlitterHelper::pointSampling(sprite.mBitmapView, localX, localY);
+					*dst = BlitterHelper::pointSampling(sprite.mBitmapView, (int)localX, (int)localY);
 					++dst;
+					localX += advanceX;
+					localY += advanceY;
 				}
 			}
 			break;
@@ -276,19 +282,23 @@ BitmapViewMutable<uint32> Blitter::makeTempBitmapAsTransformedCopy(Recti outputB
 
 		case SamplingMode::BILINEAR:
 		{
-			const Vec2f floatPivot(sprite.mPivot);
 			for (int iy = 0; iy < outputBoundingBox.height; ++iy)
 			{
+				// Transform into sprite-local coordinates
+				const float dx = (float)(outputBoundingBox.x - position.x) + 0.5f;
+				const float dy = (float)(outputBoundingBox.y - position.y + iy) + 0.5f;
+				float localX = dx * options.mInvTransform[0] + dy * options.mInvTransform[1] + floatPivot.x - 0.5f;
+				float localY = dx * options.mInvTransform[2] + dy * options.mInvTransform[3] + floatPivot.y - 0.5f;
+				const float advanceX = options.mInvTransform[0];
+				const float advanceY = options.mInvTransform[2];
+
 				uint32* dst = result.getPixelPointer(0, iy);
 				for (int ix = 0; ix < outputBoundingBox.width; ++ix)
 				{
-					// Transform into sprite-local coordinates
-					const float dx = (float)(outputBoundingBox.x + ix - position.x) + 0.5f;
-					const float dy = (float)(outputBoundingBox.y + iy - position.y) + 0.5f;
-					const float localX = (dx * options.mInvTransform[0] + dy * options.mInvTransform[1] - 0.5f) + floatPivot.x;
-					const float localY = (dx * options.mInvTransform[2] + dy * options.mInvTransform[3] - 0.5f) + floatPivot.y;
 					*dst = BlitterHelper::bilinearSampling(sprite.mBitmapView, localX, localY);
 					++dst;
+					localX += advanceX;
+					localY += advanceY;
 				}
 			}
 			break;
@@ -300,22 +310,28 @@ BitmapViewMutable<uint32> Blitter::makeTempBitmapAsTransformedCopy(Recti outputB
 BitmapViewMutable<uint32> Blitter::makeTempBitmapAsTransformedCopy(Recti outputBoundingBox, const IndexedSpriteWrapper& sprite, const PaletteWrapper& palette, Vec2i position, const Options& options)
 {
 	BitmapViewMutable<uint32> result = makeTempBitmap(outputBoundingBox.getSize());
+	const Vec2f floatPivot(sprite.mPivot);
 	switch (options.mSamplingMode)
 	{
 		case SamplingMode::POINT:
 		{
 			for (int iy = 0; iy < outputBoundingBox.height; ++iy)
 			{
+				// Transform into sprite-local coordinates
+				const float dx = (float)(outputBoundingBox.x - position.x) + 0.5f;
+				const float dy = (float)(outputBoundingBox.y - position.y + iy) + 0.5f;
+				float localX = dx * options.mInvTransform[0] + dy * options.mInvTransform[1] + floatPivot.x;
+				float localY = dx * options.mInvTransform[2] + dy * options.mInvTransform[3] + floatPivot.y;
+				const float advanceX = options.mInvTransform[0];
+				const float advanceY = options.mInvTransform[2];
+
 				uint32* dst = result.getPixelPointer(0, iy);
 				for (int ix = 0; ix < outputBoundingBox.width; ++ix)
 				{
-					// Transform into sprite-local coordinates
-					const float dx = (float)(outputBoundingBox.x + ix - position.x) + 0.5f;
-					const float dy = (float)(outputBoundingBox.y + iy - position.y) + 0.5f;
-					const int localX = (int)(dx * options.mInvTransform[0] + dy * options.mInvTransform[1]) + sprite.mPivot.x;
-					const int localY = (int)(dx * options.mInvTransform[2] + dy * options.mInvTransform[3]) + sprite.mPivot.y;
-					*dst = BlitterHelper::pointSampling(sprite.mBitmapView, palette, localX, localY);
+					*dst = BlitterHelper::pointSampling(sprite.mBitmapView, palette, (int)localX, (int)localY);
 					++dst;
+					localX += advanceX;
+					localY += advanceY;
 				}
 			}
 			break;
@@ -323,19 +339,23 @@ BitmapViewMutable<uint32> Blitter::makeTempBitmapAsTransformedCopy(Recti outputB
 
 		case SamplingMode::BILINEAR:
 		{
-			const Vec2f floatPivot(sprite.mPivot);
 			for (int iy = 0; iy < outputBoundingBox.height; ++iy)
 			{
+				// Transform into sprite-local coordinates
+				const float dx = (float)(outputBoundingBox.x - position.x) + 0.5f;
+				const float dy = (float)(outputBoundingBox.y - position.y + iy) + 0.5f;
+				float localX = dx * options.mInvTransform[0] + dy * options.mInvTransform[1] + floatPivot.x - 0.5f;
+				float localY = dx * options.mInvTransform[2] + dy * options.mInvTransform[3] + floatPivot.y - 0.5f;
+				const float advanceX = options.mInvTransform[0];
+				const float advanceY = options.mInvTransform[2];
+
 				uint32* dst = result.getPixelPointer(0, iy);
 				for (int ix = 0; ix < outputBoundingBox.width; ++ix)
 				{
-					// Transform into sprite-local coordinates
-					const float dx = (float)(outputBoundingBox.x + ix - position.x) + 0.5f;
-					const float dy = (float)(outputBoundingBox.y + iy - position.y) + 0.5f;
-					const float localX = (dx * options.mInvTransform[0] + dy * options.mInvTransform[1] - 0.5f) + floatPivot.x;
-					const float localY = (dx * options.mInvTransform[2] + dy * options.mInvTransform[3] - 0.5f) + floatPivot.y;
 					*dst = BlitterHelper::bilinearSampling(sprite.mBitmapView, palette, localX, localY);
 					++dst;
+					localX += advanceX;
+					localY += advanceY;
 				}
 			}
 			break;

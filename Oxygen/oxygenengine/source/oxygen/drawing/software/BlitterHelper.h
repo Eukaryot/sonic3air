@@ -328,7 +328,7 @@ struct BlitterHelper
 
 	static inline uint32 pointSampling(const BitmapView<uint32>& bitmap, int px, int py)
 	{
-		if (px >= 0 && px < bitmap.getSize().x && py >= 0 && py < bitmap.getSize().y)
+		if ((unsigned)px < (unsigned)bitmap.getSize().x && (unsigned)py < (unsigned)bitmap.getSize().y)		// Comparing unsigned ints, as this implicitly checks for >= 0 as well
 		{
 			return bitmap.getPixel(px, py);
 		}
@@ -340,7 +340,7 @@ struct BlitterHelper
 
 	static inline uint32 pointSampling(const BitmapView<uint8>& bitmap, const Blitter::PaletteWrapper& palette, int px, int py)
 	{
-		if (px >= 0 && px < bitmap.getSize().x && py >= 0 && py < bitmap.getSize().y)
+		if ((unsigned)px < (unsigned)bitmap.getSize().x && (unsigned)py < (unsigned)bitmap.getSize().y)		// Comparing unsigned ints, as this implicitly checks for >= 0 as well
 		{
 			const uint8 index = bitmap.getPixel(px, py);
 			return (index < palette.mNumEntries) ? palette.mPalette[index] : 0;
