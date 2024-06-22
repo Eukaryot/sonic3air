@@ -24,8 +24,8 @@ namespace
 			if (std::abs(transform[0]) > 0.001f)
 			{
 				const float A = -dy * transform[1] + spriteRect.x;
-				x1 = offset.x + roundToInt((A) / transform[0]);
-				x2 = offset.x + roundToInt((A + spriteRect.width) / transform[0]);
+				x1 = offset.x + (int)((A) / transform[0] + 0.5f);
+				x2 = offset.x + (int)((A + spriteRect.width) / transform[0] + 0.5f);
 			}
 			minX = std::min(x1, x2);
 			maxX = std::max(x1, x2);
@@ -36,8 +36,8 @@ namespace
 			if (std::abs(transform[2]) > 0.001f)
 			{
 				const float A = -dy * transform[3] + spriteRect.y;
-				x1 = offset.x + roundToInt((A) / transform[2]);
-				x2 = offset.x + roundToInt((A + spriteRect.height) / transform[2]);
+				x1 = offset.x + (int)((A) / transform[2] + 0.5f);
+				x2 = offset.x + (int)((A + spriteRect.height) / transform[2] + 0.5f);
 			}
 			const int minX2 = std::min(x1, x2);
 			const int maxX2 = std::max(x1, x2);
@@ -265,8 +265,8 @@ BitmapViewMutable<uint32> Blitter::makeTempBitmapAsTransformedCopy(Recti outputB
 					// Transform into sprite-local coordinates
 					const float dx = (float)(outputBoundingBox.x + ix - position.x) + 0.5f;
 					const float dy = (float)(outputBoundingBox.y + iy - position.y) + 0.5f;
-					const int localX = roundToInt(dx * options.mInvTransform[0] + dy * options.mInvTransform[1] - 0.5f) + sprite.mPivot.x;
-					const int localY = roundToInt(dx * options.mInvTransform[2] + dy * options.mInvTransform[3] - 0.5f) + sprite.mPivot.y;
+					const int localX = (int)(dx * options.mInvTransform[0] + dy * options.mInvTransform[1]) + sprite.mPivot.x;
+					const int localY = (int)(dx * options.mInvTransform[2] + dy * options.mInvTransform[3]) + sprite.mPivot.y;
 					*dst = BlitterHelper::pointSampling(sprite.mBitmapView, localX, localY);
 					++dst;
 				}
@@ -312,8 +312,8 @@ BitmapViewMutable<uint32> Blitter::makeTempBitmapAsTransformedCopy(Recti outputB
 					// Transform into sprite-local coordinates
 					const float dx = (float)(outputBoundingBox.x + ix - position.x) + 0.5f;
 					const float dy = (float)(outputBoundingBox.y + iy - position.y) + 0.5f;
-					const int localX = roundToInt(dx * options.mInvTransform[0] + dy * options.mInvTransform[1] - 0.5f) + sprite.mPivot.x;
-					const int localY = roundToInt(dx * options.mInvTransform[2] + dy * options.mInvTransform[3] - 0.5f) + sprite.mPivot.y;
+					const int localX = (int)(dx * options.mInvTransform[0] + dy * options.mInvTransform[1]) + sprite.mPivot.x;
+					const int localY = (int)(dx * options.mInvTransform[2] + dy * options.mInvTransform[3]) + sprite.mPivot.y;
 					*dst = BlitterHelper::pointSampling(sprite.mBitmapView, palette, localX, localY);
 					++dst;
 				}
@@ -430,10 +430,10 @@ void Blitter::processIntermediateBitmap(BitmapViewMutable<uint32>& bitmap, Optio
 		int mult[4];
 		if (nullptr != options.mTintColor)
 		{
-			mult[0] = clamp(roundToInt(options.mTintColor->r * 0x100), -0x10000, 0x10000);
-			mult[1] = clamp(roundToInt(options.mTintColor->g * 0x100), -0x10000, 0x10000);
-			mult[2] = clamp(roundToInt(options.mTintColor->b * 0x100), -0x10000, 0x10000);
-			mult[3] = clamp(roundToInt(options.mTintColor->a * 0x100), -0x10000, 0x10000);
+			mult[0] = clamp((int)(options.mTintColor->r * 0x100 + 0.5f), -0x10000, 0x10000);
+			mult[1] = clamp((int)(options.mTintColor->g * 0x100 + 0.5f), -0x10000, 0x10000);
+			mult[2] = clamp((int)(options.mTintColor->b * 0x100 + 0.5f), -0x10000, 0x10000);
+			mult[3] = clamp((int)(options.mTintColor->a * 0x100 + 0.5f), -0x10000, 0x10000);
 		}
 		else
 		{
@@ -465,9 +465,9 @@ void Blitter::processIntermediateBitmap(BitmapViewMutable<uint32>& bitmap, Optio
 			//  -> Even though tint color may be unused, so that we're just multiplying by 1, but that's expected to be a quite rare case
 			const int add[3] =
 			{
-				roundToInt(options.mAddedColor->r * 0xff),
-				roundToInt(options.mAddedColor->g * 0xff),
-				roundToInt(options.mAddedColor->b * 0xff)
+				(int)(options.mAddedColor->r * 0xff + 0.5f),
+				(int)(options.mAddedColor->g * 0xff + 0.5f),
+				(int)(options.mAddedColor->b * 0xff + 0.5f)
 			};
 			for (int y = 0; y < bitmap.getSize().y; ++y)
 			{
@@ -487,7 +487,7 @@ void Blitter::processIntermediateBitmap(BitmapViewMutable<uint32>& bitmap, Optio
 		if (nullptr != options.mTintColor && options.mTintColor->a < 1.0f && options.mBlendMode == BlendMode::ONE_BIT)
 		{
 			options.mBlendMode = BlendMode::ALPHA;
-			const uint8 alphaValue = (uint8)roundToInt(options.mTintColor->a * 255.0f);
+			const uint8 alphaValue = (uint8)(options.mTintColor->a * 255.0f + 0.5f);
 			for (int y = 0; y < bitmap.getSize().y; ++y)
 			{
 				uint8* dst = (uint8*)bitmap.getLinePointer(y);
