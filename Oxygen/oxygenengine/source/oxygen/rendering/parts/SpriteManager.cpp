@@ -275,6 +275,7 @@ void SpriteManager::addViewport(const Recti& rect, uint16 renderQueue)
 	newViewport.mPosition = rect.getPos();
 	newViewport.mSize = rect.getSize();
 	newViewport.mRenderQueue = renderQueue;
+	newViewport.mCoordinatesSpace = Space::SCREEN;
 	mAddedItems.mItems.push_back(&newViewport);
 }
 
