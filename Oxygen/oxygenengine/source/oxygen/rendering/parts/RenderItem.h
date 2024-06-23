@@ -66,16 +66,16 @@ namespace renderitems
 	struct SpriteInfo : public RenderItem
 	{
 	public:
-		bool   mPriorityFlag = false;
-		Color  mTintColor = Color::WHITE;
-		Color  mAddedColor = Color::TRANSPARENT;
+		bool  mPriorityFlag = false;
+		Color mTintColor = Color::WHITE;
+		Color mAddedColor = Color::TRANSPARENT;
 		BlendMode mBlendMode = BlendMode::ALPHA;
-		Space  mLogicalSpace = Space::SCREEN;		// The coordinate system used for frame interpolation, can be different from the coordinates space
+		Space mLogicalSpace = Space::SCREEN;		// The coordinate system used for frame interpolation, can be different from the coordinates space
 
-													// Frame interpolation
-		bool   mHasLastPosition = false;
-		Vec2i  mLastPositionChange;
-		Vec2i  mInterpolatedPosition;
+		// Frame interpolation
+		bool  mHasLastPosition = false;
+		Vec2i mLastPositionChange;
+		Vec2i mInterpolatedPosition;
 
 	protected:
 		inline SpriteInfo(Type type) : RenderItem(type) {}
