@@ -336,7 +336,7 @@ function void fn081554()
 	objA0.position.x.u16 = camera.position.x.u16 - 0x20
 	objA0.position.y.u16 = camera.position.y.u16 + 0x20
 
-	copyMemory(0xfffffab0, 0x081602, 0x08)
+	copyMemory(0xfffffab0, 0x081602, 8)
 	level.vertical_wrap = 0
 	move_area.bottom.current = 0x0120
 	move_area.bottom.target = 0x0120

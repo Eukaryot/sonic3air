@@ -172,8 +172,8 @@ function void Boss.ICZ1.GotoState06()
 function void fn071272()
 {
 	A2 = 0xfffffade
-	copyMemory((A2+=8)-8, (A1+=8)-8, 8)
-	u16[A2] = 0
+	copyMemory(A2, A1, 8)
+	u16[A2+8] = 0
 }
 
 
@@ -377,10 +377,10 @@ function void fn0713e8()
 function void fn071420()
 {
 	objA0.update_address = 0x071440
-	A1 = 0x0719fa
+
 	A2 = 0xfffffade
-	copyMemory((A2+=8)-8, (A1+=8)-8, 8)
-	u16[A2] = 0
+	copyMemory(A2, 0x0719fa, 8)
+	u16[A2+8] = 0
 	u32[0xfffffada] = addressof(Object.TriggerUnloading)
 }
 

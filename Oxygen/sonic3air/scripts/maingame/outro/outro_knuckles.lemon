@@ -739,10 +739,9 @@ function void fn05f74e()
 		u8[A1 + 0x2c] = 0x80
 	}
 
-	A1 = 0x07d842
 	A2 = 0xfffffade
-	copyMemory((A2+=8)-8, (A1+=8)-8, 8)
-	u16[A2] = 0
+	copyMemory(A2, 0x07d842, 8)
+	u16[A2+8] = 0
 
 	Kosinski.addToDMAQueue(0x17f738, 0x8380)		// Mecha Sonic effects sprites
 }

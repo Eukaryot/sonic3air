@@ -677,9 +677,7 @@ function void fn06e058()
 				u32[A0 + 0x30] = 0x06e310
 				objA0.countdown_callback = 0x06db20
 
-				A1 = 0x06e43a
-				A2 = 0xfffffade
-				copyMemory((A2+=8)-8, (A1+=8)-8, 8)
+				copyMemory(0xfffffade, 0x06e43a, 8)
 			}
 		}
 

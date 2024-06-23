@@ -1987,8 +1987,7 @@ function void fn05fd16()
 		objA0.animation.frame = D0.u8
 
 		A1 = u32[A0 + 0x30] + D0.u16
-		A2 = 0xfffffc44
-		copyMemory((A2+=6)-6, (A1+=6)-6, 6)
+		copyMemory(0xfffffc44, A1, 6)
 	}
 }
 

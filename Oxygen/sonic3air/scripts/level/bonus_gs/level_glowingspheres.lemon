@@ -253,9 +253,9 @@ function void LevelPaletteUpdate.BonusGS()
 		{
 			level.palettefx.frame_1 = 0
 		}
-		A0 = 0xffff7800 + D0.s16
+		A0 = 0xffff7800 + D0.u16
 		A1 = 0xfffffc70
-		copyMemory((A1+=14)-14, (A0+=14)-14, 14)
+		copyMemory(A1, A0, 14)
 	}
 
 	--level.palettefx.timer_2
@@ -268,11 +268,11 @@ function void LevelPaletteUpdate.BonusGS()
 		{
 			level.palettefx.frame_2 = 0
 		}
-		A0 = 0xffff78fc + D0.s16
+		A0 = 0xffff78fc + D0.u16
 		A1 = 0xfffffc42
-		copyMemory((A1+=10)-10, A0 + 0x50, 10)
-		copyMemory((A1+=10)-10, A0 + 0x28, 10)
-		copyMemory((A1+=10)-10, A0, 10)
+		copyMemory(A1,      A0 + 0x50, 10)
+		copyMemory(A1 + 10, A0 + 0x28, 10)
+		copyMemory(A1 + 20, A0, 10)
 	}
 }
 

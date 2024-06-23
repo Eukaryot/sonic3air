@@ -661,8 +661,7 @@ function void LevelPaletteUpdate.DEZ2()
 			level.palettefx.frame_2 = 0
 
 		A0 = 0x003474 + D0.u16
-		A1 = 0xfffffc50
-		copyMemory((A1+=10)-10, (A0+=10)-10, 10)
+		copyMemory(0xfffffc50, A0, 10)
 	}
 }
 

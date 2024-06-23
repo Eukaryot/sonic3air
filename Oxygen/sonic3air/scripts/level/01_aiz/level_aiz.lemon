@@ -1115,9 +1115,7 @@ function void fn01c46e()
 
 			if (isMainCharacter(CHARACTER_KNUCKLES))
 			{
-				A1 = 0xfffffc70
-				A2 = 0x04fae4
-				copyMemory((A1+=4)-4, (A2+=4)-4, 8)
+				copyMemory(0xfffffc70, 0x04fae4, 8)
 			}
 
 			// Make Tails fly in

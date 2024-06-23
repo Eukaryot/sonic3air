@@ -175,7 +175,7 @@ function void fn0524e8()
 	D0.u16 = u16[A3 - 0x08]
 	for (u8 i = 0; i < 6; ++i)
 	{
-		u32[A1] = u32[A5]
+		copyMemory(A1, A5, 4)
 		A1 += D0.u16
 		A5 += D0.u16
 	}
@@ -184,7 +184,7 @@ function void fn0524e8()
 	D0.u16 = u16[A3 - 0x08]
 	for (u8 i = 0; i < 4; ++i)
 	{
-		copyMemory(A1, A6, 0x06)
+		copyMemory(A1, A6, 6)
 		A1 += D0.u16
 		A6 += D0.u16
 	}
@@ -357,25 +357,21 @@ function void fn052622()
 function void fn052636()
 {
 	A1 = 0xffff0028 + u16[A3 + 0x48]
-	D0.u16 = u16[A3 - 0x08] - 6
-	D1 = 3
-	while (D1.s16 >= 0)
+	D0.u16 = u16[A3 - 0x08]
+	for (u8 k = 0; k < 4; ++k)
 	{
-		copyMemory((A1+=6)-6, (A5+=6)-6, 6)
+		copyMemory(A1, A5, 6)
 		A5 += D0.u16
 		A1 += D0.u16
-		--D1.s16
 	}
 
 	A1 = 0xffff0034 + u16[A3 + 0x48]
-	D0.u16 = u16[A3 - 0x08] - 6
-	D1 = 3
-	while (D1.s16 >= 0)
+	D0.u16 = u16[A3 - 0x08]
+	for (u8 k = 0; k < 4; ++k)
 	{
-		copyMemory((A1+=6)-6, (A6+=6)-6, 6)
+		copyMemory(A1, A6, 6)
 		A6 += D0.u16
 		A1 += D0.u16
-		--D1.s16
 	}
 
 	fn04ed62()
@@ -437,7 +433,7 @@ function void fn052672()
 	D0.u16 = u16[A3 - 0x08]
 	for (u8 i = 0; i < 4; ++i)
 	{
-		copyMemory(A1, A5, 0x08)
+		copyMemory(A1, A5, 8)
 		A1 += D0.u16
 		A5 += D0.u16
 	}
@@ -446,7 +442,7 @@ function void fn052672()
 	D0.u16 = u16[A3 - 0x08]
 	for (u8 i = 0; i < 5; ++i)
 	{
-		copyMemory(A1, A6, 0x12)
+		copyMemory(A1, A6, 18)
 		A1 += D0.u16
 		A6 += D0.u16
 	}
@@ -508,25 +504,21 @@ function void fn05276e()
 function void fn052782()
 {
 	A1 = 0xffff0036 + u16[A3]
-	D0.u16 = u16[A3 - 0x08] - 8
-	D1 = 3
-	while (D1.s16 >= 0)
+	D0.u16 = u16[A3 - 0x08]
+	for (u8 k = 0; k < 4; ++k)
 	{
-		copyMemory((A1+=8)-8, (A5+=8)-8, 8)
+		copyMemory(A1, A5, 8)
 		A5 += D0.u16
 		A1 += D0.u16
-		--D1.s16
 	}
 
 	A1 = 0xffff003e + u16[A3]
-	D0.u16 = u16[A3 - 0x08] - 0x12
-	D1 = 4
-	while (D1.s16 >= 0)
+	D0.u16 = u16[A3 - 0x08]
+	for (u8 k = 0; k < 5; ++k)
 	{
-		copyMemory((A1+=18)-18, (A6+=18)-18, 18)
+		copyMemory(A1, A6, 18)
 		A6 += D0.u16
 		A1 += D0.u16
-		--D1.s16
 	}
 
 	fn04ed62()
@@ -583,7 +575,7 @@ function void fn0527f4()
 	D0.u16 = u16[A3 - 0x08]
 	for (u8 i = 0; i < 3; ++i)
 	{
-		copyMemory(A1, A5, 0x05)
+		copyMemory(A1, A5, 5)
 		A1 += D0.u16
 		A5 += D0.u16
 	}
@@ -616,9 +608,7 @@ function void InitLevelScrolling.FBZ1()
 	if (u16[0xffffb000 + 0x10] < 0x0180)
 	{
 		u8[0xffffeed6] = 0xff
-		A1 = 0x052dd0
-		A5 = 0xfffffce4
-		copyMemory((A5+=16)-16, (A1+=16)-16, 16)
+		copyMemory(0xfffffce4, 0x052dd0, 16)
 
 		fn052a2a()
 		fn04f2f6()
@@ -1386,8 +1376,7 @@ function void fn052cd4()
 //# translated(0x052cd8) end(0x052d0c)
 function void fn052cd8()
 {
-	A5 = 0xfffffc64
-	copyMemory((A5+=16)-16, (A1+=16)-16, 16)
+	copyMemory(0xfffffc64, A1, 16)
 	level.scrolling_routine = D0.u16
 	fn052a2a()
 	fn04f2f6()
@@ -1601,15 +1590,14 @@ function void fn052ede()
 function void fn052eea()
 {
 	A1 = 0xffff001a + u16[A3 + 0x50]
-	D0.u16 = u16[A3 - 0x08] - 0x0e
-	D1 = 3
-	while (D1.s16 >= 0)
+	D0.u16 = u16[A3 - 0x08]
+	for (u8 k = 0; k < 4; ++k)
 	{
-		copyMemory((A1+=14)-14, (A5+=14)-14, 14)
+		copyMemory(A1, A5, 14)
 		A5 += D0.u16
 		A1 += D0.u16
-		--D1.s16
 	}
+
 	fn04ed62()
 }
 
@@ -1672,10 +1660,10 @@ function void fn052f32()
 	A1 = 0x052dd0
 	A5 = 0xfffffc62
 	A6 = 0xfffffce2
-	u16[(A5+=2)-2] = 0x0eee
-	u16[(A6+=2)-2] = 0x0eee
-	copyMemory((A5+=16)-16, A1, 16)
-	copyMemory((A6+=16)-16, (A1+=16)-16, 16)
+	u16[A5] = 0x0eee
+	u16[A6] = 0x0eee
+	copyMemory(A5+2, A1, 16)
+	copyMemory(A6+2, A1, 16)
 }
 
 
@@ -2066,8 +2054,7 @@ function void fn05327a()
 //# address-hook(0x05327e) end(0x0532b2)
 function void fn05327e()
 {
-	A5 = 0xfffffc64
-	copyMemory((A5+=16)-16, (A1+=16)-16, 16)
+	copyMemory(0xfffffc64, A1, 16)
 	level.scrolling_routine = D0.u16
 
 	fn052a2a()
