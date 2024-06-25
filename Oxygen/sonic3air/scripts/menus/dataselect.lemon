@@ -625,6 +625,7 @@ function void fn00d1fa()
 
 	#if STANDALONE
 		playSound(0xad)
+		DataSelect.drawCustomPlanes()	// Required here, otherwise we can have one frame without custom plane setup if returning already during the fade-in
 
 		u32 backupA0 = A0
 		FadeOutScreenBlocking()
