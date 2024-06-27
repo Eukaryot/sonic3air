@@ -1642,7 +1642,18 @@ function void fn01c362()
 	copyMemory(0xffff8000, A0, 0x1000)
 
 #if STANDALONE
-	Standalone.loadRawLevelData("%s_layout", global.zone_act, 0xffff8000)
+	if (!Standalone.loadRawLevelData("%s_layout", global.zone_act, 0xffff8000))
+	{
+		// No raw data was loaded
+
+		// Special handling for Knuckles' version of SSZ
+		if (global.zone_act == 0x0a01)
+		{
+			// Load raw data in any case, incl. for S3 or S&K level layouts
+			//  -> This is done to extend the level slightly, so it works even in ultrawide
+			System.loadExternalRawData("ssz2_layout", 0xffff8000, 0, 0, true, false)
+		}
+	}
 #endif
 }
 
