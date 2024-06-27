@@ -11,11 +11,14 @@
 #include "oxygen_netcore/network/ConnectionManager.h"
 
 
+static const bool USE_IPV6 = false;
+
 #if 1
-	static const std::string SERVER_NAME = "127.0.0.1";
+	static const std::string SERVER_NAME = USE_IPV6 ? "::1" : "127.0.0.1";
 #else
 	static const std::string SERVER_NAME = "gameserver.sonic3air.org";
 #endif
+
 static const uint16 UDP_SERVER_PORT = 21094;	// Only used by test client, for the server see "config.json"
 static const uint16 TCP_SERVER_PORT = 21095;	// Only used by test client, for the server see "config.json"
 

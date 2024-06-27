@@ -129,10 +129,10 @@ public:
 	const SocketAddress& getRemoteAddress();
 	void swapWith(TCPSocket& other);
 
-	bool setupServer(uint16 serverPort);
+	bool setupServer(uint16 serverPort, bool useIPv6 = false);
 	bool acceptConnection(TCPSocket& outSocket);
 
-	bool connectTo(const std::string& serverAddress, uint16 serverPort);
+	bool connectTo(const std::string& serverAddress, uint16 serverPort, bool useIPv6 = false);
 
 	bool sendData(const uint8* data, size_t length);
 	bool sendData(const std::vector<uint8>& data);
@@ -166,8 +166,8 @@ public:
 	bool isValid() const;
 	void close();
 
-	bool bindToPort(uint16 port);
-	bool bindToAnyPort();
+	bool bindToPort(uint16 port, bool useIPv6 = false);
+	bool bindToAnyPort(bool useIPv6 = false);
 
 	bool sendData(const uint8* data, size_t length, const SocketAddress& destinationAddress);
 	bool sendData(const std::vector<uint8>& data, const SocketAddress& destinationAddress);

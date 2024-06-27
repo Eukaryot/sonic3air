@@ -83,9 +83,9 @@ private:
 void TestClient::runClient()
 {
 	// Switch between UDP and TCP usage
-#if 0
+#if 1
 	UDPSocket udpSocket;
-	if (!udpSocket.bindToAnyPort())
+	if (!udpSocket.bindToAnyPort(USE_IPV6))
 		RMX_ERROR("Socket bind to any port failed", return);
 	ConnectionManager connectionManager(&udpSocket, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE);
 #else
