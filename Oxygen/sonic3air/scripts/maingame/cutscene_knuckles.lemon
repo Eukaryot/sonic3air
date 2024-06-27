@@ -279,7 +279,7 @@ function void fn065cac()
 
 	// Manipulate chunks
 	A1 = 0xffff008e + u16[0xffff8048]
-	u16 stride = u16[0xffff8000]
+	u16 stride = level.num_foreground_chunks_x
 	u8[A1]              = 0x14
 	u8[A1 + stride]     = 0x0f
 	u8[A1 + stride * 2] = 0x0f

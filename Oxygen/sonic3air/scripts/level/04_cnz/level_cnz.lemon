@@ -937,14 +937,10 @@ function void fn052086()
 	level.scrolling_routine += 4
 
 	A1 = 0xffff0067 + u16[0xffff8008]
-	D0.u16 = u16[0xffff8000]
-	D1 = 0
-	D2 = 6
-	while (D2.s16 >= 0)
+	for (u8 k = 0; k < 7; ++k)
 	{
 		u8[A1] = 0
-		A1 += D0.u16
-		--D2.s16
+		A1 += level.num_foreground_chunks_x
 	}
 
 	objA0.base_state += 4

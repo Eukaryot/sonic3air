@@ -22,6 +22,10 @@
 //  - from 0xffff8008 on = RAM addresses of chunk data for each line, two words per line
 //     - first word = foreground
 //     - second word = background
+define level.num_foreground_chunks_x = u16[0xffff8000]
+define level.num_background_chunks_x = u16[0xffff8002]
+define level.num_foreground_chunks_y = u16[0xffff8004]
+define level.num_background_chunks_y = u16[0xffff8006]
 
 
 // 0xffffb000 .. 0xffffcfcb

@@ -1932,7 +1932,7 @@ function void fn0530f0()
 		for (u32 k = 0; k < 4; ++k)
 		{
 			zeroMemory(A1, 0x14)
-			A1 += u16[0xffff8000]
+			A1 += level.num_foreground_chunks_x
 		}
 	}
 }
