@@ -387,7 +387,7 @@ function void fn07002a()
 function void fn0700ea()
 {
 	// Robotnik running away
-	if (s8[A0 + 0x04] < 0)
+	if (objA0.render_flags & render_flag.VISIBLE)
 	{
 		Object.animationProgress(0x070419)
 		UpdateMovementStraightSimple()

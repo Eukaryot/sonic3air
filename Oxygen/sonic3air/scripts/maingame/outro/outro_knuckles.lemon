@@ -269,7 +269,7 @@ function void fn05e9c2()
 function void fn05e9e2()
 {
 	UpdateMovementStraightSimple()
-	if (s8[A0 + 0x04] >= 0)
+	if (!(objA0.render_flags & render_flag.VISIBLE))
 	{
 		objA0.update_address = 0x05ea1a
 		objA0.countdown_value = 0x0167

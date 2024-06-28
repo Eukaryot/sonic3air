@@ -145,7 +145,7 @@ function void fn034d92()
 	u16[A0 + 0x24] += 4
 	D0.u16 = (u16[A0 + 0x24] >> 3) & 0x01
 	objA0.animation.sprite = D0.u8
-	if (s8[A0 + 0x04] >= 0)
+	if (!(objA0.render_flags & render_flag.VISIBLE))
 	{
 		objA0.position.x.u16 = 0x7f00
 	}

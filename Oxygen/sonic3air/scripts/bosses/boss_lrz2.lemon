@@ -434,7 +434,7 @@ function void fn079b54()
 	if (checkForMultiReturn())
 		return
 
-	if (u8[0xfffffaa3] == 0 && s8[A0 + 0x04] >= 0)
+	if (u8[0xfffffaa3] == 0 && !(objA0.render_flags & render_flag.VISIBLE))
 	{
 		UnloadObject()
 		return

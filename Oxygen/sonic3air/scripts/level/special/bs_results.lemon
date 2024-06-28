@@ -881,7 +881,7 @@ function void fn02ec1e()
 	}
 	else
 	{
-		if (s8[A0 + 0x04] >= 0)
+		if (!(objA0.render_flags & render_flag.VISIBLE))
 		{
 			A1 = 0xffff0000 + objA0.respawn_entry
 			--u16[A1 + 0x30]

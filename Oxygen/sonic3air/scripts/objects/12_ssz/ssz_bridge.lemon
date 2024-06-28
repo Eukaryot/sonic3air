@@ -321,7 +321,7 @@ function void fn045052()
 //# address-hook(0x04507e) end(0x04509e)
 function void fn04507e()
 {
-	if (s8[A0 + 0x04] >= 0)
+	if (!(objA0.render_flags & render_flag.VISIBLE))
 	{
 		UnloadObject()
 		return

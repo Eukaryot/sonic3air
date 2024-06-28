@@ -173,7 +173,7 @@ function void fn079dea()
 	if (fn079ffe())
 		return
 
-	if (u8[0xfffffaa3] == 0 && s8[A0 + 0x04] >= 0)
+	if (u8[0xfffffaa3] == 0 && !(objA0.render_flags & render_flag.VISIBLE))
 	{
 		fn08594e()
 		Object.TriggerUnloading()

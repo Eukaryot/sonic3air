@@ -29,7 +29,7 @@ function void fn03c7ec()
 //# address-hook(0x03c828) end(0x03c8b0)
 function void fn03c828()
 {
-	if (s8[A0 + 0x04] < 0)
+	if (objA0.render_flags & render_flag.VISIBLE)
 	{
 		--objA0.countdown_value
 		if (objA0.countdown_value < 0)
@@ -97,7 +97,7 @@ function void fn03c8d4()
 		objA0.animation.sprite &= 0x01
 	}
 
-	if (s8[A0 + 0x04] < 0)
+	if (objA0.render_flags & render_flag.VISIBLE)
 	{
 		UpdateMovementStraightSimple()
 		AddAsDynamicObject()

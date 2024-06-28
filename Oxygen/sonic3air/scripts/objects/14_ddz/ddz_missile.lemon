@@ -333,7 +333,7 @@ function void fn082b06()
 		return
 
 	u8 jumpLocation = 0
-	if (s8[A0 + 0x04] < 0 && objA0.subtype2c != 0)
+	if ((objA0.render_flags & render_flag.VISIBLE) && objA0.subtype2c != 0)
 	{
 		D0.u16 = u16[0xfffffaa4]
 		if (D0.u16 != 0)

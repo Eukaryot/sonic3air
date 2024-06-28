@@ -333,7 +333,7 @@ function void fn01fcc8()
 function void fn01fcf2()
 {
 	// Seems to be used only in competition mode
-	if (s8[A0 + 0x04] >= 0)
+	if (!(objA0.render_flags & render_flag.VISIBLE))
 	{
 		u32[A0] = u32[A0 + 0x44]
 		objA0.animation.sprite = 0

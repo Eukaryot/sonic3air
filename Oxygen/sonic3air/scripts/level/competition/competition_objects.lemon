@@ -401,7 +401,7 @@ function void fn023cdc()
 		if (u16[A0 + 0x3a] != 0)
 		{
 			--u16[A0 + 0x3a]
-			if (u16[A0 + 0x3a] == 0 && s8[A0 + 0x04] < 0)
+			if (u16[A0 + 0x3a] == 0 && (objA0.render_flags & render_flag.VISIBLE))
 			{
 				playSound(SFX_SPIKESMOVE)
 			}

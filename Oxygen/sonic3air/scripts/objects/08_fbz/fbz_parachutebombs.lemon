@@ -57,7 +57,7 @@ function void fn03c462()
 //# address-hook(0x03c526) end(0x03c52e)
 function void fn03c526()
 {
-	if (s8[A0 + 0x04] >= 0)
+	if (!(objA0.render_flags & render_flag.VISIBLE))
 	{
 		DrawOrUnloadObject()
 	}

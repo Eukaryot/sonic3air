@@ -561,7 +561,7 @@ function void fn0583a0()
 //# address-hook(0x0583a6) end(0x0583b8)
 function void fn0583a6()
 {
-	if (s8[A0 + 0x04] >= 0)
+	if (!(objA0.render_flags & render_flag.VISIBLE))
 	{
 		UnloadObject()
 		return
@@ -661,19 +661,17 @@ function void fn0583d2()
 //# address-hook(0x0584a2) end(0x0584d6)
 function void fn0584a2()
 {
-	D0.u16 = objA0.sprite_attributes
+	D0.s16 = objA0.sprite_attributes
 	if (D0.s16 < 0)
 	{
 		objA0.sprite_attributes = 0
-		++D0.u16
-		if (D0.u16 == 0)
+		if (D0.s16 == -1)
 		{
 			UnloadObject()
 			return
 		}
 
-		++D0.u16
-		objA0.animation.sprite = (D0.u16 == 0) ? 1 : 2
+		objA0.animation.sprite = (D0.u16 == -2) ? 1 : 2
 	}
 
 	objA0.update_address = 0x0584de
@@ -688,7 +686,7 @@ function void fn0584a2()
 //# address-hook(0x0584de) end(0x0584fc)
 function void fn0584de()
 {
-	if (s8[A0 + 0x04] >= 0)
+	if (!(objA0.render_flags & render_flag.VISIBLE))
 	{
 		UnloadObject()
 		return
