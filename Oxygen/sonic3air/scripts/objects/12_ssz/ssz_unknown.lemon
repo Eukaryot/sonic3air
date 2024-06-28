@@ -37,8 +37,8 @@ function void fn057b76()
 function void fn057b8e()
 {
 	objA0.flags2a |= 0x80
-	D0.u16 = objA0.velocity.y - u16[0xffffee9c]
-	objA0.position.y.u16 = D0.u16
+	objA0.position.y.u16 = objA0.velocity.y - u16[0xffffee9c]
+
 	D1.u16 = objA0.countdown_value
 	A2 = u32[A0 + 0x30]
 	D4.u16 = objA0.position.x.u16

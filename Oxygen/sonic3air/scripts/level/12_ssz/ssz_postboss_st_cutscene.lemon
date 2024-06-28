@@ -110,6 +110,15 @@ function void fn057f3e()
 		if (objA0.countdown_value != 0)
 			return
 
+	#if STANDALONE
+		// Unload these weird collision objects (we don't need them any more), to make more place for the crumbling tower particles
+		for (u32 address = 0xffffb0de; address <= 0xffffca98; address += 0x4a)
+		{
+			if (u32[address] == 0x057b8e)
+				u32[address] = 0
+		}
+	#endif
+
 		if (allocDynamicObjectStd())
 		{
 			objA1.update_address = 0x0583be
