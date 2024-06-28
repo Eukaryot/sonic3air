@@ -305,7 +305,8 @@ void SoftwareRenderer::renderGeometry(const Geometry& geometry)
 		case Geometry::Type::RECT:
 		{
 			const RectGeometry& rg = static_cast<const RectGeometry&>(geometry);
-			mBlitter.blitColor(Blitter::OutputWrapper(mGameScreenTexture.accessBitmap(), rg.mRect), rg.mColor, BlendMode::ALPHA);
+			const Recti rect = Recti::getIntersection(rg.mRect, mCurrentViewport);
+			mBlitter.blitColor(Blitter::OutputWrapper(mGameScreenTexture.accessBitmap(), rect), rg.mColor, BlendMode::ALPHA);
 			break;
 		}
 
@@ -319,7 +320,7 @@ void SoftwareRenderer::renderGeometry(const Geometry& geometry)
 			blitterOptions.mTintColor = &tg.mTintColor;
 			blitterOptions.mAddedColor = &tg.mAddedColor;
 
-			mBlitter.blitSprite(Blitter::OutputWrapper(mGameScreenTexture.accessBitmap()), Blitter::SpriteWrapper(tg.mDrawerTexture.accessBitmap(), Vec2i()), tg.mRect.getPos(), blitterOptions);
+			mBlitter.blitSprite(Blitter::OutputWrapper(mGameScreenTexture.accessBitmap(), mCurrentViewport), Blitter::SpriteWrapper(tg.mDrawerTexture.accessBitmap(), Vec2i()), tg.mRect.getPos(), blitterOptions);
 			break;
 		}
 
@@ -353,6 +354,7 @@ void SoftwareRenderer::renderPlane(const PlaneGeometry& geometry)
 
 	Recti rect(0, 0, mGameResolution.x, mGameResolution.y);
 	rect.intersect(geometry.mActiveRect);
+	rect.intersect(mCurrentViewport);
 	const int minX = rect.x;
 	const int maxX = rect.x + rect.width;
 	const int minY = rect.y;
@@ -605,7 +607,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			const bool useTintColor = (sprite.mTintColor != Color::WHITE || sprite.mAddedColor != Color::TRANSPARENT);
 
 			Recti rect(sprite.mInterpolatedPosition.x, sprite.mInterpolatedPosition.y, sprite.mSize.x * 8, sprite.mSize.y * 8);
-			rect.intersect(mCurrentViewport);
+			rect = Recti::getIntersection(rect, mCurrentViewport);
 
 			const int minX = rect.x;
 			const int maxX = rect.x + rect.width;
