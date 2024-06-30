@@ -433,6 +433,12 @@
     <ClCompile Include="..\..\source\oxygen\rendering\parts\palette\PaletteManager.cpp">
       <Filter>rendering\parts\palette</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\resources\RawDataCollection.cpp">
+      <Filter>resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\resources\PaletteCollection.cpp">
+      <Filter>resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -810,6 +816,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\parts\palette\PaletteManager.h">
       <Filter>rendering\parts\palette</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\resources\RawDataCollection.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\resources\PaletteCollection.h">
+      <Filter>resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

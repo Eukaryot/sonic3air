@@ -14,20 +14,6 @@
 class ResourcesCache : public SingleInstance<ResourcesCache>
 {
 public:
-	struct RawData
-	{
-		std::vector<uint8> mContent;
-		uint32 mRomInjectAddress = 0xffffffff;
-		bool mIsModded = false;
-	};
-
-	struct Palette
-	{
-		std::vector<Color> mColors;
-		bool mIsModded = false;
-	};
-
-public:
 	bool loadRom();
 	bool loadRomFromFile(const std::wstring& filename);
 	bool loadRomFromMemory(const std::vector<uint8>& content);
@@ -35,10 +21,6 @@ public:
 	void loadAllResources();
 
 	inline const std::vector<uint8>& getUnmodifiedRom() const  { return mRom; }
-	const std::vector<const RawData*>& getRawData(uint64 key) const;
-	const Palette* getPalette(uint64 key, uint8 line) const;
-
-	void applyRomInjections(uint8* rom, uint32 romSize) const;
 
 private:
 	bool loadRomFile(const std::wstring& filename);
@@ -49,17 +31,8 @@ private:
 	bool checkRomContent();
 	void saveRomToAppData();
 
-	void loadRawData(const std::wstring& path, bool isModded);
-	void loadPalettes(const std::wstring& path, bool isModded);
-
 private:
 	std::vector<uint8> mRom;	// This is the original, unmodified ROM (i.e. without any raw data injections or ROM writes)
 	const GameProfile::RomInfo* mLoadedRomInfo = nullptr;
 	std::map<const GameProfile::RomInfo*, std::vector<uint8>> mDiffFileCache;
-
-	std::map<uint64, std::vector<const RawData*>> mRawDataMap;
-	std::vector<const RawData*> mRomInjections;
-	ObjectPool<RawData> mRawDataPool;
-
-	std::map<uint64, Palette> mPalettes;
 };

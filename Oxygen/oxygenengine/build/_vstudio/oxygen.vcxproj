@@ -114,7 +114,9 @@
     <ClCompile Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\RenderUtils.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\FontCollection.cpp" />
+    <ClCompile Include="..\..\source\oxygen\resources\PaletteCollection.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\PrintedTextCache.cpp" />
+    <ClCompile Include="..\..\source\oxygen\resources\RawDataCollection.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\ResourcesCache.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\SpriteCache.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.cpp" />
@@ -239,7 +241,9 @@
     <ClInclude Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\utils\RenderUtils.h" />
     <ClInclude Include="..\..\source\oxygen\resources\FontCollection.h" />
+    <ClInclude Include="..\..\source\oxygen\resources\PaletteCollection.h" />
     <ClInclude Include="..\..\source\oxygen\resources\PrintedTextCache.h" />
+    <ClInclude Include="..\..\source\oxygen\resources\RawDataCollection.h" />
     <ClInclude Include="..\..\source\oxygen\resources\ResourcesCache.h" />
     <ClInclude Include="..\..\source\oxygen\resources\SpriteCache.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.h" />

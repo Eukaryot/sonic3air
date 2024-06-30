@@ -9,7 +9,9 @@
 #pragma once
 
 #include <rmxmedia.h>
+#include "oxygen/resources/PaletteCollection.h"
 #include "oxygen/resources/PrintedTextCache.h"
+#include "oxygen/resources/RawDataCollection.h"
 #include "oxygen/resources/SpriteCache.h"
 
 
@@ -19,6 +21,8 @@ public:
 	void loadSpriteCache(bool fullReload = false);
 
 public:
+	PaletteCollection mPaletteCollection;
 	PrintedTextCache mPrintedTextCache;
+	RawDataCollection mRawDataCollection;
 	SpriteCache mSpriteCache;
 };

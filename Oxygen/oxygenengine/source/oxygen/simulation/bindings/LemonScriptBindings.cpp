@@ -24,7 +24,8 @@
 #include "oxygen/application/overlays/DebugSidePanel.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/rendering/parts/RenderParts.h"
-#include "oxygen/resources/ResourcesCache.h"
+#include "oxygen/resources/PaletteCollection.h"
+#include "oxygen/resources/RawDataCollection.h"
 #include "oxygen/resources/SpriteCache.h"
 
 #include <lemon/program/ModuleBindingsBuilder.h>
@@ -282,17 +283,17 @@ namespace
 
 	bool System_hasExternalRawData(lemon::StringRef key)
 	{
-		const std::vector<const ResourcesCache::RawData*>& rawDataVector = ResourcesCache::instance().getRawData(key.getHash());
+		const std::vector<const RawDataCollection::RawData*>& rawDataVector = RawDataCollection::instance().getRawData(key.getHash());
 		return !rawDataVector.empty();
 	}
 
 	uint32 System_loadExternalRawData1(lemon::StringRef key, uint32 targetAddress, uint32 offset, uint32 maxBytes, bool loadOriginalData, bool loadModdedData)
 	{
-		const std::vector<const ResourcesCache::RawData*>& rawDataVector = ResourcesCache::instance().getRawData(key.getHash());
-		const ResourcesCache::RawData* rawData = nullptr;
+		const std::vector<const RawDataCollection::RawData*>& rawDataVector = RawDataCollection::instance().getRawData(key.getHash());
+		const RawDataCollection::RawData* rawData = nullptr;
 		for (int i = (int)rawDataVector.size() - 1; i >= 0; --i)
 		{
-			const ResourcesCache::RawData* candidate = rawDataVector[i];
+			const RawDataCollection::RawData* candidate = rawDataVector[i];
 			const bool allow = (candidate->mIsModded) ? loadModdedData : loadOriginalData;
 			if (allow)
 			{
@@ -314,13 +315,13 @@ namespace
 
 	bool System_hasExternalPaletteData(lemon::StringRef key, uint8 line)
 	{
-		const ResourcesCache::Palette* palette = ResourcesCache::instance().getPalette(key.getHash(), line);
+		const PaletteCollection::Palette* palette = PaletteCollection::instance().getPalette(key.getHash(), line);
 		return (nullptr != palette);
 	}
 
 	uint16 System_loadExternalPaletteData(lemon::StringRef key, uint8 line, uint32 targetAddress, uint8 maxColors)
 	{
-		const ResourcesCache::Palette* palette = ResourcesCache::instance().getPalette(key.getHash(), line);
+		const PaletteCollection::Palette* palette = PaletteCollection::instance().getPalette(key.getHash(), line);
 		if (nullptr == palette)
 			return 0;
 

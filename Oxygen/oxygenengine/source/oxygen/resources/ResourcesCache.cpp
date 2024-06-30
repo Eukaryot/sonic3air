@@ -8,10 +8,10 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/resources/ResourcesCache.h"
+#include "oxygen/resources/PaletteCollection.h"
+#include "oxygen/resources/RawDataCollection.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/modding/ModManager.h"
-#include "oxygen/helper/FileHelper.h"
-#include "oxygen/helper/JsonHelper.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/platform/PlatformFunctions.h"
 
@@ -133,45 +133,8 @@ bool ResourcesCache::loadRomFromMemory(const std::vector<uint8>& content)
 
 void ResourcesCache::loadAllResources()
 {
-	// Load raw data incl. ROM injections
-	mRawDataMap.clear();
-	mRomInjections.clear();
-	mRawDataPool.clear();
-	loadRawData(L"data/rawdata", false);
-	for (const Mod* mod : ModManager::instance().getActiveMods())
-	{
-		loadRawData(mod->mFullPath + L"rawdata", true);
-	}
-
-	// Load palettes
-	mPalettes.clear();
-	loadPalettes(L"data/palettes", false);
-	for (const Mod* mod : ModManager::instance().getActiveMods())
-	{
-		loadPalettes(mod->mFullPath + L"palettes", true);
-	}
-}
-
-const std::vector<const ResourcesCache::RawData*>& ResourcesCache::getRawData(uint64 key) const
-{
-	static const std::vector<const RawData*> EMPTY;
-	const auto it = mRawDataMap.find(key);
-	return (it == mRawDataMap.end()) ? EMPTY : it->second;
-}
-
-const ResourcesCache::Palette* ResourcesCache::getPalette(uint64 key, uint8 line) const
-{
-	return mapFind(mPalettes, key + line);
-}
-
-void ResourcesCache::applyRomInjections(uint8* rom, uint32 romSize) const
-{
-	for (const RawData* rawData : mRomInjections)
-	{
-		RMX_CHECK(rawData->mRomInjectAddress < romSize, "ROM injection at invalid address " << rmx::hexString(rawData->mRomInjectAddress, 6), continue);
-		const uint32 size = std::min((uint32)rawData->mContent.size(), romSize - rawData->mRomInjectAddress);
-		memcpy(&rom[rawData->mRomInjectAddress], &rawData->mContent[0], size);
-	}
+	PaletteCollection::instance().loadPalettes();
+	RawDataCollection::instance().loadRawData();
 }
 
 bool ResourcesCache::loadRomFile(const std::wstring& filename)
@@ -334,90 +297,3 @@ void ResourcesCache::saveRomToAppData()
 	}
 }
 
-void ResourcesCache::loadRawData(const std::wstring& path, bool isModded)
-{
-	// Load raw data from the given path
-	std::vector<rmx::FileIO::FileEntry> fileEntries;
-	fileEntries.reserve(8);
-	FTX::FileSystem->listFilesByMask(path + L"/*.json", true, fileEntries);
-	for (const rmx::FileIO::FileEntry& fileEntry : fileEntries)
-	{
-		const Json::Value root = JsonHelper::loadFile(fileEntry.mPath + fileEntry.mFilename);
-
-		for (auto it = root.begin(); it != root.end(); ++it)
-		{
-			const Json::Value& entryJson = *it;
-			if (!entryJson.isObject())
-				continue;
-
-			RawData* rawData = nullptr;
-			if (entryJson["File"].isString())
-			{
-				const char* filename = entryJson["File"].asCString();
-				const uint64 key = rmx::getMurmur2_64(String(it.key().asCString()));
-				rawData = &mRawDataPool.createObject();
-				rawData->mIsModded = isModded;
-				if (!FTX::FileSystem->readFile(fileEntry.mPath + String(filename).toStdWString(), rawData->mContent))
-				{
-					mRawDataPool.destroyObject(*rawData);
-					continue;
-				}
-				mRawDataMap[key].push_back(rawData);
-			}
-
-			if (nullptr == rawData)
-				continue;
-
-			// Check if it's a ROM injection
-			if (!entryJson["RomInject"].isNull())
-			{
-				rawData->mRomInjectAddress = (uint32)rmx::parseInteger(entryJson["RomInject"].asCString());
-				mRomInjections.emplace_back(rawData);
-			}
-		}
-	}
-}
-
-void ResourcesCache::loadPalettes(const std::wstring& path, bool isModded)
-{
-	// Load palettes from the given path
-	std::vector<rmx::FileIO::FileEntry> fileEntries;
-	fileEntries.reserve(8);
-	FTX::FileSystem->listFilesByMask(path + L"/*.png", true, fileEntries);
-	for (const rmx::FileIO::FileEntry& fileEntry : fileEntries)
-	{
-		if (!FTX::FileSystem->exists(fileEntry.mPath + fileEntry.mFilename))
-			continue;
-
-		std::vector<uint8> content;
-		if (!FTX::FileSystem->readFile(fileEntry.mPath + fileEntry.mFilename, content))
-			continue;
-
-		Bitmap bitmap;
-		if (!bitmap.load(fileEntry.mPath + fileEntry.mFilename))
-		{
-			RMX_ERROR("Failed to load PNG at '" << *WString(fileEntry.mPath + fileEntry.mFilename).toString() << "'", );
-			continue;
-		}
-
-		String name = WString(fileEntry.mFilename).toString();
-		name.remove(name.length() - 4, 4);
-
-		uint64 key = rmx::getMurmur2_64(name);		// Hash is the key of the first palette, the others are enumerated from there
-		const int numLines = std::min(bitmap.getHeight(), 64);
-		const int numColorsPerLine = std::min(bitmap.getWidth(), 64);
-
-		for (int y = 0; y < numLines; ++y)
-		{
-			Palette& palette = mPalettes[key];
-			palette.mIsModded = isModded;
-			palette.mColors.resize(numColorsPerLine);
-
-			for (int x = 0; x < numColorsPerLine; ++x)
-			{
-				palette.mColors[x] = Color::fromABGR32(bitmap.getPixel(x, y));
-			}
-			++key;
-		}
-	}
-}

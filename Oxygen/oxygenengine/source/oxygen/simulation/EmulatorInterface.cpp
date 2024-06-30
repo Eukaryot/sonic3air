@@ -10,6 +10,7 @@
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/GameProfile.h"
+#include "oxygen/resources/RawDataCollection.h"
 #include "oxygen/resources/ResourcesCache.h"
 
 
@@ -136,7 +137,7 @@ void RuntimeMemory::clear()
 
 void RuntimeMemory::applyRomInjections()
 {
-	ResourcesCache::instance().applyRomInjections(mRom, sizeof(mRom));
+	RawDataCollection::instance().applyRomInjections(mRom, sizeof(mRom));
 }
 
 
