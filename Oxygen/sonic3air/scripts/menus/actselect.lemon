@@ -68,7 +68,7 @@ constant array<u8> ActSelect.ZONE_INTERNAL_IDS =
 	0x06,	// Launch Base Zone
 	0x07,	// Mushroom Hill Zone
 	0x04,	// Flying Battery Zone
-	0x08,	// Sandopolis Zone"
+	0x08,	// Sandopolis Zone
 	0x09,	// Lava Reef Zone
 	0x16,	// Hidden Palace Zone
 	0x0a,	// Sky Sanctuary Zone
@@ -96,7 +96,10 @@ function u8 ActSelect.GetNumActs(u8 zoneNumber)
 
 function u16 ActSelect.TranslateZoneAct(u8 zoneNumber, u8 act)
 {
-	return (u16(ActSelect.ZONE_INTERNAL_IDS[zoneNumber]) << 8) + act
+	u16 zone = ActSelect.ZONE_INTERNAL_IDS[zoneNumber]
+	if (zone == 0x16)	// Special handling for HPZ: Enforce return value 0x1601 even though act is 0
+		return 0x1601
+	return (zone << 8) + act
 }
 
 
