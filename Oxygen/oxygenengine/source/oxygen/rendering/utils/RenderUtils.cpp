@@ -188,8 +188,10 @@ void RenderUtils::blitSpritePattern(PaletteBitmap& output, int px, int py, const
 
 void RenderUtils::blitSpritePatterns(PaletteBitmap& output, int px, int py, const std::vector<SinglePattern>& patterns)
 {
-	for (const SinglePattern& pattern : patterns)
+	// Blit the patterns in reverse order (which is relevant in case they're overlapping, like with Tails' run sprites)
+	for (int k = (int)patterns.size() - 1; k >= 0; --k)
 	{
+		const SinglePattern& pattern = patterns[k];
 		RenderUtils::blitSpritePattern(output, px + pattern.mOffsetX, py + pattern.mOffsetY, pattern.mPatternData, pattern.mFlipX, pattern.mFlipY);
 	}
 }
