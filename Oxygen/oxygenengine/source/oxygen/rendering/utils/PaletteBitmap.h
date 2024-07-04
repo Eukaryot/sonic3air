@@ -14,6 +14,9 @@
 class PaletteBitmap
 {
 public:
+	static const Color mUnusedPaletteColor;
+
+public:
 	inline PaletteBitmap() {}
 	PaletteBitmap(const PaletteBitmap& toCopy);
 	~PaletteBitmap();

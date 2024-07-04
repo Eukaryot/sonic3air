@@ -19,6 +19,9 @@
 #include "oxygen/simulation/LemonScriptRuntime.h"
 
 #ifdef DEBUG
+	// Notes on sprite dumping:
+	//  - Sprite dumping will not replace existing files in "___internal/analysis/spritedump", so make sure to first remove what to want to dump again
+	//  - In order to match the image sizes of an old sprite dump again, you might want to temporarily remove the rounding to next multiple of 4, inside "PaletteSprite::createFromSpritePatterns"
 	//#define CREATE_SPRITEDUMP
 #endif
 
@@ -289,7 +292,7 @@ SpriteCache::CacheItem& SpriteCache::setupSpriteFromROM(EmulatorInterface& emula
 		{
 			String categoryKey(0, "%06x_%06x_%06x", romSpriteData.mPatternsBaseAddress, romSpriteData.mTableAddress, romSpriteData.mMappingOffset);
 			getSpriteDump().addSpriteWithTranslation(paletteSprite, *categoryKey, romSpriteData.mAnimationSprite, atex);
-			item.mGotDumped = true;
+			item->mGotDumped = true;
 		}
 	#endif
 	}

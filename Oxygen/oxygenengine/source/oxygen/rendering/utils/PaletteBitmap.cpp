@@ -36,6 +36,9 @@ namespace
 }
 
 
+const Color PaletteBitmap::mUnusedPaletteColor = Color::fromABGR32(0x00660145);
+
+
 PaletteBitmap::PaletteBitmap(const PaletteBitmap& toCopy)
 {
 	copy(toCopy, Recti(0, 0, toCopy.mWidth, toCopy.mHeight));
@@ -155,7 +158,7 @@ void PaletteBitmap::overwriteUnusedPaletteEntries(Color* palette)
 	for (int i = 0; i < 0x100; ++i)
 	{
 		if (!used[i])
-			palette[i] = Color::fromABGR32(0x00660145);
+			palette[i] = mUnusedPaletteColor;
 	}
 }
 
@@ -182,22 +185,22 @@ bool PaletteBitmap::loadBMP(const std::vector<uint8>& bmpContent, Color* outPale
 	}
 
 	// Load palette
-	int pal_size = 0;
+	int palSize = 0;
 	if (bitdepth == 1 || bitdepth == 4 || bitdepth == 8)
 	{
-		pal_size = (header.numColors != 0) ? header.numColors : (1 << bitdepth);
+		palSize = (header.numColors != 0) ? header.numColors : (1 << bitdepth);
 	}
 
 	// Can't load non-palette bitmaps into a PaletteBitmap instance!
-	if (pal_size == 0)
+	if (palSize == 0)
 		return false;
 
 	// Read palette
 	uint32 palette[256];
-	serializer.read(palette, pal_size * 4);
+	serializer.read(palette, palSize * 4);
 	if (nullptr != outPalette)
 	{
-		for (int i = 0; i < pal_size; ++i)
+		for (int i = 0; i < palSize; ++i)
 		{
 			Color color = Color::fromABGR32(palette[i]);
 			outPalette[i].set(color.b, color.g, color.r, 1.0f);
@@ -211,25 +214,29 @@ bool PaletteBitmap::loadBMP(const std::vector<uint8>& bmpContent, Color* outPale
 	}
 
 	// Create data buffer
+	const int expectedSize = ((width * bitdepth + 7) / 8) * height;
+	if ((int)bmpContent.size() - (int)serializer.getReadPosition() < expectedSize)
+		return false;
+
 	create(width, height);
 	const uint8* buffer = &bmpContent[serializer.getReadPosition()];
 
 	// Load image data
 	for (int y = 0; y < height; ++y)
 	{
-		uint8* data_ptr = &mData[(height-y-1)*width];
+		uint8* dataPtr = &mData[(height-y-1)*width];
 		for (int x = 0; x < width; ++x)
 		{
 			switch (bitdepth)
 			{
 				case 1:
-					data_ptr[x] = (buffer[x/8] >> (x & 0x07)) & 0x01;
+					dataPtr[x] = (buffer[x/8] >> (x & 0x07)) & 0x01;
 					break;
 				case 4:
-					data_ptr[x] = (buffer[x/2] >> (4 - (x & 0x01) * 4)) & 0x0f;
+					dataPtr[x] = (buffer[x/2] >> (4 - (x & 0x01) * 4)) & 0x0f;
 					break;
 				case 8:
-					data_ptr[x] = buffer[x];
+					dataPtr[x] = buffer[x];
 					break;
 			}
 		}
