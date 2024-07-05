@@ -25,7 +25,15 @@ namespace rmx
 	{
 	public:
 		virtual ~LoggerBase() {}
+		inline void setLogLevelRange(LogLevel minLogLevel, LogLevel maxLogLevel = LogLevel::ERROR)  { mMinLogLevel = minLogLevel; mMaxLogLevel = maxLogLevel; }
+		void performLogging(LogLevel logLevel, const std::string& string);
+
+	protected:
 		virtual void log(LogLevel logLevel, const std::string& string) = 0;
+
+	private:
+		LogLevel mMinLogLevel = LogLevel::TRACE;
+		LogLevel mMaxLogLevel = LogLevel::ERROR;
 	};
 
 

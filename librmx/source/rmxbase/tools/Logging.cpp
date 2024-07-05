@@ -59,6 +59,15 @@ namespace rmx
 	}
 
 
+	void LoggerBase::performLogging(LogLevel logLevel, const std::string& string)
+	{
+		if (logLevel >= mMinLogLevel && logLevel <= mMaxLogLevel)
+		{
+			log(logLevel, string);
+		}
+	}
+
+
 	StdCoutLogger::StdCoutLogger(bool addTimestamp) :
 		mAddTimestamp(addTimestamp)
 	{
@@ -168,7 +177,7 @@ namespace rmx
 	{
 		for (LoggerBase* logger : mLoggers)
 		{
-			logger->log(logLevel, string);
+			logger->performLogging(logLevel, string);
 		}
 	}
 

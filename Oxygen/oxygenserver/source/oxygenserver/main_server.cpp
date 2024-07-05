@@ -88,9 +88,27 @@ int main(int argc, char** argv)
 	CrashHandler::initializeCrashHandler();
 
 	randomize();
-	rmx::Logging::addLogger(*new rmx::StdCoutLogger(true));
-	rmx::Logging::addLogger(*new rmx::FileLogger(L"log/server.log", true, true));
-	rmx::ErrorHandling::mLogger = &mErrorLogger;
+
+	// Logging
+	{
+		rmx::LoggerBase* logger = new rmx::StdCoutLogger(true);
+		logger->setLogLevelRange(rmx::LogLevel::INFO);
+		rmx::Logging::addLogger(*logger);
+
+		logger = new rmx::FileLogger(L"log/server.log", true, true);
+		logger->setLogLevelRange(rmx::LogLevel::INFO);
+		rmx::Logging::addLogger(*logger);
+
+	#if 0
+		// Trace log, only for debugging
+		logger = new rmx::FileLogger(L"log/trace.log", true, true);
+		logger->setLogLevelRange(rmx::LogLevel::TRACE);
+		rmx::Logging::addLogger(*logger);
+	#endif
+
+		rmx::ErrorHandling::mLogger = &mErrorLogger;
+	}
+
 #ifndef DEBUG
 	// To protect users' privacy, do not log IPs at all on production servers
 	SocketAddress::mPreventIPLogging = true;
