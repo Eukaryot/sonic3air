@@ -269,7 +269,7 @@ function void fn053faa()
 function void fn053fc8()
 {
 	A5 = 0xffff0000 + u16[A3]
-	A5 +=  0x98
+	A5 += 0x98
 	fn23e4ec()
 }
 
@@ -742,15 +742,12 @@ function void fn23e4ec()
 {
 	A1 = 0xffff0000 + u16[A3]
 	A1 += 0x74
-	D0.u16 = u16[A3 - 0x08] - 4
-	D1 = 0x0b
-
-	while (D1.s16 >= 0)
+	D0.u16 = u16[A3 - 0x08]
+	for (u8 k = 0; k < 12; ++k)
 	{
-		u32[(A1+=4)-4] = u32[(A5+=4)-4]
+		copyMemory(A1, A5, 4)
 		A5.u16 += D0.u16
 		A1.u16 += D0.u16
-		--D1.s16
 	}
 }
 
@@ -761,7 +758,7 @@ function void fn23e506()
 	A1 = 0xffff0000 + u16[A3]
 	A1 += 0x42
 	D0.u16 = u16[A3 - 0x08]
-	for (u8 k = 0; k < 12; ++k)
+	for (u8 k = 0; k < 14; ++k)
 	{
 		copyMemory(A1, A5, 10)
 		A5.u16 += D0.u16
