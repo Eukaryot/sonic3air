@@ -31,6 +31,8 @@ public:
 	bool enqueuePacket(ReceivedPacket& receivedPacket, const lowlevel::HighLevelPacket& packet, VectorBinarySerializer& serializer, uint32 uniqueRequestID);
 	bool extractPacket(CacheItem& outExtractionResult);
 
+	inline uint32 getLastExtractedUniquePacketID() const  { return mLastExtractedUniquePacketID; }
+
 private:
 	uint32 mLastExtractedUniquePacketID = 0;
 	std::deque<CacheItem> mQueue;

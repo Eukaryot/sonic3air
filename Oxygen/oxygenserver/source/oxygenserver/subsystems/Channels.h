@@ -38,6 +38,7 @@ public:
 	void destroyChannel(Channel& channel);
 
 	void addPlayerToChannel(Channel& channel, ServerNetConnection& playerConnection);
+	void removePlayerFromAllChannels(ServerNetConnection& playerConnection);
 	void removePlayerFromSingleChannel(Channel& channel, ServerNetConnection& playerConnection);
 
 private:

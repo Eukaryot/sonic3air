@@ -175,6 +175,14 @@ void Channels::addPlayerToChannel(Channel& channel, ServerNetConnection& playerC
 	playerData.mServerNetConnection = &playerConnection;
 }
 
+void Channels::removePlayerFromAllChannels(ServerNetConnection& playerConnection)
+{
+	for (auto it = mAllChannels.begin(); it != mAllChannels.end(); ++it)
+	{
+		removePlayerFromSingleChannel(*it->second, playerConnection);
+	}
+}
+
 void Channels::removePlayerFromSingleChannel(Channel& channel, ServerNetConnection& playerConnection)
 {
 	for (auto it = channel.mPlayers.begin(); it != channel.mPlayers.end(); ++it)

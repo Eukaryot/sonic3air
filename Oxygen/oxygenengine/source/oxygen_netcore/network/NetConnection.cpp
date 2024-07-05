@@ -142,6 +142,11 @@ void NetConnection::disconnect(DisconnectReason disconnectReason)
 	mDisconnectReason = disconnectReason;
 }
 
+bool NetConnection::receivedAnyUniquePacketIDs() const
+{
+	return (mReceivedPacketCache.getLastExtractedUniquePacketID() > 0);
+}
+
 bool NetConnection::sendPacket(highlevel::PacketBase& packet, SendFlags::Flags flags)
 {
 	uint32 unused;

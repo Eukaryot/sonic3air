@@ -8,10 +8,3 @@
 
 #include "oxygenserver/pch.h"
 #include "oxygenserver/server/ServerNetConnection.h"
-
-
-void ServerNetConnection::unregisterPlayer()
-{
-	// TODO: Unregister this player where needed (e.g. in all channels the player is currently added)
-
-}

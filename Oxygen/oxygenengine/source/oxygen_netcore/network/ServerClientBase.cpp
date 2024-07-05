@@ -17,6 +17,7 @@
 namespace
 {
 	static const constexpr VersionRange<uint8> LOWLEVEL_PROTOCOL_VERSION_RANGE { 1, 1 };
+	static const constexpr size_t MAX_NUM_ACTIVE_CONNECTIONS = 1024;	// Not a hard limit, but should be good enough for now
 
 	struct ProtocolVersionChecker
 	{
@@ -164,7 +165,14 @@ void ServerClientBase::handleConnectionStartPacket(ConnectionManager& connection
 			if (connection->isConnectedTo(connection->getLocalConnectionID(), remoteConnectionID, senderKey))
 			{
 				// Resend the AcceptConnectionPacket, as it seems the last one got lost
-				connection->sendAcceptConnectionPacket();
+				//  -> But do this only if this connection did not receive any packets with a unique packet ID yet
+				//  -> This check is added to prevent a situation where a client randomly uses an old connection ID again,
+				//      and the associated old connection on server side did already receive unique packet IDs,
+				//      which leads to the client sending packets with unique packet IDs that the server rejects as duplicates
+				if (!connection->receivedAnyUniquePacketIDs())
+				{
+					connection->sendAcceptConnectionPacket();
+				}
 				return;
 			}
 
@@ -175,7 +183,7 @@ void ServerClientBase::handleConnectionStartPacket(ConnectionManager& connection
 		else
 		{
 			// Check if another connection would reach the limit of concurrent connections
-			if (connectionManager.getNumActiveConnections() + 1 >= 0x100)	// Not a hard limit, but should be good enough for now
+			if (connectionManager.getNumActiveConnections() + 1 >= MAX_NUM_ACTIVE_CONNECTIONS)
 			{
 				lowlevel::ErrorPacket errorPacket(lowlevel::ErrorPacket::ErrorCode::TOO_MANY_CONNECTIONS);
 				connectionManager.sendConnectionlessLowLevelPacket(errorPacket, receivedPacket.mSenderAddress, 0, remoteConnectionID);

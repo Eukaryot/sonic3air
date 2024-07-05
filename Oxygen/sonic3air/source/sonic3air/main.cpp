@@ -84,6 +84,9 @@ int main(int argc, char** argv)
 	}
 #endif
 
+	// Randomization is quite important for server communication
+	randomize();
+
 	try
 	{
 		// Create engine delegate and engine main instance

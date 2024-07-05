@@ -14,11 +14,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testclient", "testclient.vc
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oxygen_netcore", "..\..\..\oxygenengine\build\_vstudio\oxygen_netcore.vcxproj", "{488CD7A3-2B09-43AC-82B2-8D72DEBFBB78}"
+	ProjectSection(ProjectDependencies) = postProject
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8} = {13AFDEC3-A272-4577-8DF5-B6AF731760A8}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "restarter", "restarter.vcxproj", "{9CE1F342-4F28-4ECF-A9D3-F7D6E46222B4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{488CD7A3-2B09-43AC-82B2-8D72DEBFBB78} = {488CD7A3-2B09-43AC-82B2-8D72DEBFBB78}
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "librmx", "librmx", "{776699C0-C8F7-45C2-AB96-F4B558E66D2A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rmxbase", "..\..\..\..\librmx\build\_vstudio\rmxbase.vcxproj", "{13AFDEC3-A272-4577-8DF5-B6AF731760A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,9 +67,20 @@ Global
 		{9CE1F342-4F28-4ECF-A9D3-F7D6E46222B4}.Release|x64.Build.0 = Release|x64
 		{9CE1F342-4F28-4ECF-A9D3-F7D6E46222B4}.Release|x86.ActiveCfg = Release|Win32
 		{9CE1F342-4F28-4ECF-A9D3-F7D6E46222B4}.Release|x86.Build.0 = Release|Win32
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Debug|x64.ActiveCfg = Debug|x64
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Debug|x64.Build.0 = Debug|x64
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Debug|x86.ActiveCfg = Debug|Win32
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Debug|x86.Build.0 = Debug|Win32
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Release|x64.ActiveCfg = Release|x64
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Release|x64.Build.0 = Release|x64
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Release|x86.ActiveCfg = Release|Win32
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8} = {776699C0-C8F7-45C2-AB96-F4B558E66D2A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CDBDD62-9EE2-4769-9B56-174849FCA876}
