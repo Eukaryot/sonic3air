@@ -44,7 +44,7 @@ namespace
 		const float C = x * y;
 		const float D = x * x;
 		return Vec4f(A, B, C, D);
-	};
+	}
 
 	const Vec4f& getBlurKernel(int blurValue)
 	{
@@ -444,6 +444,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 
 				case RenderItem::Type::RECTANGLE:
 				case RenderItem::Type::TEXT:
+				case RenderItem::Type::VIEWPORT:
 				case RenderItem::Type::INVALID:
 					break;
 			}

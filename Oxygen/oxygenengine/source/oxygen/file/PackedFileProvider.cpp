@@ -83,7 +83,7 @@ public:
 	inline const char* getType() const override		{ return "streamingPacked"; }
 
 	inline void setPosition(size_t pos) override	{ pos += mStart; if (mIsValid) mBaseInputStream.setPosition(pos); }
-	inline size_t getPosition() const				{ return mBaseInputStream.getPosition() - mStart; }
+	inline size_t getPosition() const override		{ return mBaseInputStream.getPosition() - mStart; }
 	inline size_t getSize() const override			{ return mIsValid ? mSize : 0; }
 	inline size_t getRemaining() const override		{ return mIsValid ? (mSize - getPosition()) : 0; }
 
