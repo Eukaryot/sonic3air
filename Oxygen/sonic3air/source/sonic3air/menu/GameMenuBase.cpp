@@ -286,6 +286,8 @@ void GameMenuEntries::insertCopy(const GameMenuEntry& toCopy, size_t index)
 
 void GameMenuEntries::insertByReference(GameMenuEntry& entry, size_t index)
 {
+	if (index > mEntries.size())
+		index = mEntries.size();
 	mEntries.insert(mEntries.begin() + index, &entry);
 }
 
