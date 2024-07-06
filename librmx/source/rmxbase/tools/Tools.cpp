@@ -319,4 +319,19 @@ namespace rmx
 		return stringEndsWith<std::wstring_view>(fullString, prefix);
 	}
 
+	std::string getTimestampStringForFilename()
+	{
+		time_t now = time(0);
+		struct tm tstruct;
+		char buf[80];
+	#if defined(PLATFORM_WINDOWS)
+		localtime_s(&tstruct, &now);
+	#else
+		tstruct = *localtime(&now);
+	#endif
+		// Format example: "2022-06-29_11-42-48"
+		std::strftime(buf, sizeof(buf), "%Y-%m-%d_%H-%M-%S", &tstruct);
+		return buf;
+	}
+
 }

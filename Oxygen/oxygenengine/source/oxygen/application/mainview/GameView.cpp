@@ -786,6 +786,11 @@ void GameView::startFadingOut(float fadeTime)
 	setStillImageMode(StillImageMode::NONE);
 }
 
+void GameView::getScreenshot(Bitmap& outBitmap)
+{
+	mFinalGameTexture.writeContentToBitmap(outBitmap);
+}
+
 void GameView::setStillImageMode(StillImageMode mode, float timeout)
 {
 	mStillImage.mMode = mode;

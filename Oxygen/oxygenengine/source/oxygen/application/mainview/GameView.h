@@ -49,6 +49,8 @@ public:
 	void startFadingOut(float fadeTime = 0.25f);
 	inline void setWhiteOverlayAlpha(float alpha)  { mWhiteOverlayAlpha = alpha; }
 
+	void getScreenshot(Bitmap& outBitmap);
+
 	void setStillImageMode(StillImageMode mode, float timeout = 0.0f);
 
 private:

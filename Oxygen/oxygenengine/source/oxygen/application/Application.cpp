@@ -335,12 +335,13 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 					{
 						// Saving a screenshot to disk is meant to be developer-only, as the "getScreenshot" call can crash the application for some users
 						//  (Yes, I had this active for everyone in the early days of S3AIR)
-						if (EngineMain::getDelegate().useDeveloperFeatures())
+						if (EngineMain::getDelegate().useDeveloperFeatures() && nullptr != mGameView)
 						{
+							const std::string filename = "screenshot_" + rmx::getTimestampStringForFilename() + ".bmp";
 							Bitmap bitmap;
-							VideoOut::instance().getScreenshot(bitmap);
-							bitmap.save(L"screenshot.bmp");
-							LogDisplay::instance().setLogDisplay("Screenshot saved in 'screenshot.bmp'");
+							mGameView->getScreenshot(bitmap);
+							bitmap.save(String(filename).toStdWString());
+							LogDisplay::instance().setLogDisplay("Screenshot saved as \"" + filename + "\"");
 						}
 						break;
 					}

@@ -73,4 +73,8 @@ namespace rmx
 	bool endsWith(std::string_view fullString, std::string_view prefix);
 	bool endsWith(std::wstring_view fullString, std::wstring_view prefix);
 
+
+	// Return a string with current date and time, like "2022-06-29_11-42-48"
+	std::string getTimestampStringForFilename();
+
 }

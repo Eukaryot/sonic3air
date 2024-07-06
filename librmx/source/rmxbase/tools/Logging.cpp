@@ -41,21 +41,6 @@ namespace rmx
 			std::strftime(buf, sizeof(buf), "[%Y-%m-%d %T] ", &tstruct);
 			return buf;
 		}
-
-		std::string getFilenameString()
-		{
-			time_t now = time(0);
-			struct tm tstruct;
-			char buf[80];
-		#if defined(PLATFORM_WINDOWS)
-			localtime_s(&tstruct, &now);
-		#else
-			tstruct = *localtime(&now);
-		#endif
-			// Format example: "2022-06-29_11-42-48"
-			std::strftime(buf, sizeof(buf), "%Y-%m-%d_%H-%M-%S", &tstruct);
-			return buf;
-		}
 	}
 
 
@@ -136,7 +121,7 @@ namespace rmx
 			std::wstring name;
 			std::wstring extension;
 			FTX::FileSystem->splitPath(filename, &directory, &name, &extension);
-			name += L"_" + String(detail::getFilenameString()).toStdWString();
+			name += L"_" + String(getTimestampStringForFilename()).toStdWString();
 			if (!directory.empty())
 				directory += L'/';
 			FTX::FileSystem->renameFile(filename, directory + name + L'.' + extension);
