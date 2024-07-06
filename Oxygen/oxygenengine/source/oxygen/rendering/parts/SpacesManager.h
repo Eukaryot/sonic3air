@@ -24,6 +24,15 @@ public:
 	inline const Vec2i& getWorldSpaceOffset() const  { return mWorldSpaceOffset; }
 	inline void setWorldSpaceOffset(const Vec2i& offset)  { mWorldSpaceOffset = offset; }
 
+	void serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion)
+	{
+		if (formatVersion >= 6)
+		{
+			serializer.serializeAs<int32>(mWorldSpaceOffset.x);
+			serializer.serializeAs<int32>(mWorldSpaceOffset.y);
+		}
+	}
+
 private:
 	Vec2i mWorldSpaceOffset;
 };

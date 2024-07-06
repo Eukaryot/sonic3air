@@ -14,6 +14,7 @@
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/PersistentData.h"
 #include "oxygen/simulation/Simulation.h"
+#include "oxygen/simulation/SimulationState.h"
 #include "oxygen/simulation/analyse/ROMDataAnalyser.h"
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
@@ -23,6 +24,7 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/overlays/DebugSidePanel.h"
 #include "oxygen/application/video/VideoOut.h"
+#include "oxygen/helper/RandomNumberGenerator.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/resources/PaletteCollection.h"
 #include "oxygen/resources/RawDataCollection.h"
@@ -267,8 +269,8 @@ namespace
 
 	uint32 System_rand()
 	{
-		RMX_ASSERT(RAND_MAX >= 0x0800, "RAND_MAX not high enough on this platform, adjustments needed");
-		return ((uint32)(rand() & 0x03ff) << 22) + ((uint32)(rand() & 0x07ff) << 11) + (uint32)(rand() & 0x07ff);
+		RandomNumberGenerator& rng = Application::instance().getSimulation().getSimulationState().getRandomNumberGenerator();
+		return (uint32)rng.getRandomUint64();
 	}
 
 	uint32 System_getPlatformFlags()

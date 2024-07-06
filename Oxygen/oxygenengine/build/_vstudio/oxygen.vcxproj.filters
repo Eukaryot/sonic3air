@@ -439,6 +439,12 @@
     <ClCompile Include="..\..\source\oxygen\resources\PaletteCollection.cpp">
       <Filter>resources</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\SimulationState.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\RandomNumberGenerator.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -822,6 +828,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\resources\PaletteCollection.h">
       <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\SimulationState.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\RandomNumberGenerator.h">
+      <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

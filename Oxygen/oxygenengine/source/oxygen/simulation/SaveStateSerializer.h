@@ -12,6 +12,7 @@
 
 class CodeExec;
 class RenderParts;
+class Simulation;
 
 
 class SaveStateSerializer
@@ -25,7 +26,7 @@ public:
 	};
 
 public:
-	SaveStateSerializer(CodeExec& codeExec, RenderParts& renderParts);
+	SaveStateSerializer(Simulation& simulation, RenderParts& renderParts);
 
 	bool loadState(const std::vector<uint8>& input, StateType* outStateType = nullptr);
 	bool loadState(const std::wstring& filename, StateType* outStateType = nullptr);
@@ -38,6 +39,7 @@ private:
 	bool readGensxState(VectorBinarySerializer& serializer);
 
 private:
+	Simulation& mSimulation;
 	CodeExec& mCodeExec;
 	RenderParts& mRenderParts;
 };

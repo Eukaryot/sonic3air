@@ -74,6 +74,7 @@
     <ClCompile Include="..\..\source\oxygen\file\ZipFileProvider.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\HighResolutionTimer.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Profiling.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\RandomNumberGenerator.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\TextInputHandler.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Transform2D.cpp" />
     <ClCompile Include="..\..\source\oxygen\pch.cpp">
@@ -132,6 +133,7 @@
     <ClCompile Include="..\..\source\oxygen\simulation\PersistentData.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\SaveStateSerializer.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\Simulation.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\SimulationState.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\sound\blip_buf.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\sound\sn76489.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\sound\SoundDriver.cpp" />
@@ -197,6 +199,7 @@
     <ClInclude Include="..\..\source\oxygen\helper\DrawerHelper.h" />
     <ClInclude Include="..\..\source\oxygen\helper\HighResolutionTimer.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Profiling.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\RandomNumberGenerator.h" />
     <ClInclude Include="..\..\source\oxygen\helper\TextInputHandler.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Transform2D.h" />
     <ClInclude Include="..\..\source\oxygen\pch.h" />
@@ -261,6 +264,7 @@
     <ClInclude Include="..\..\source\oxygen\simulation\RuntimeEnvironment.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\SaveStateSerializer.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\Simulation.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\SimulationState.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\sound\blip_buf.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\sound\sn76489.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\sound\SoundChipWrite.h" />

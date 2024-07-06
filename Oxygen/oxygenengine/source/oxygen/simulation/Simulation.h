@@ -14,6 +14,7 @@ class CodeExec;
 class GameRecorder;
 class InputRecorder;
 class ROMDataAnalyser;
+class SimulationState;
 
 
 class Simulation
@@ -31,6 +32,7 @@ public:
 	inline void setRunning(bool running)  { mIsRunning = running; }
 
 	CodeExec& getCodeExec()				  { return mCodeExec; }
+	SimulationState& getSimulationState() { return mSimulationState; }
 	ROMDataAnalyser* getROMDataAnalyser() { return mROMDataAnalyser; }
 	EmulatorInterface& getEmulatorInterface();
 
@@ -69,6 +71,7 @@ public:
 
 private:
 	CodeExec& mCodeExec;
+	SimulationState& mSimulationState;
 	GameRecorder& mGameRecorder;
 	InputRecorder& mInputRecorder;
 	ROMDataAnalyser* mROMDataAnalyser = nullptr;

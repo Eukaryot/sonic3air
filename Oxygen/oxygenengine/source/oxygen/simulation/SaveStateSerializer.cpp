@@ -10,6 +10,8 @@
 #include "oxygen/simulation/SaveStateSerializer.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
+#include "oxygen/simulation/Simulation.h"
+#include "oxygen/simulation/SimulationState.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/rendering/parts/palette/PaletteManager.h"
 #include "oxygen/rendering/parts/RenderParts.h"
@@ -22,12 +24,14 @@ namespace
 	//  - 3: Using shared memory access flags
 	//  - 4: Added more rendering data (scroll offsets, sprites, etc.)
 	//  - 5: Added data for ROM based sprites
-	static const constexpr uint8 OXYGEN_SAVESTATE_FORMATVERSION = 5;
+	//  - 6: Added spaces manager serialization
+	static const constexpr uint8 OXYGEN_SAVESTATE_FORMATVERSION = 6;
 }
 
 
-SaveStateSerializer::SaveStateSerializer(CodeExec& codeExec, RenderParts& renderParts) :
-	mCodeExec(codeExec),
+SaveStateSerializer::SaveStateSerializer(Simulation& simulation, RenderParts& renderParts) :
+	mSimulation(simulation),
+	mCodeExec(simulation.getCodeExec()),
 	mRenderParts(renderParts)
 {
 }
@@ -172,16 +176,18 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 		// VSRAM
 		serializer.serialize(emulatorInterface.getVSRam(), 0x80);
 
-		// Other graphics managers
+		// Engine graphics state
 		mRenderParts.getPlaneManager().serializeSaveState(serializer, formatVersion);
 		mRenderParts.getScrollOffsetsManager().serializeSaveState(serializer, formatVersion);
 		mRenderParts.getSpriteManager().serializeSaveState(serializer, formatVersion);
-
-		// TODO: How about overlay manager and spaces manager?
+		mRenderParts.getSpacesManager().serializeSaveState(serializer, formatVersion);
 
 		// Lemon script runtime state
 		if (!mCodeExec.getLemonScriptRuntime().serializeRuntime(serializer))
 			return false;
+
+		// Simulation state
+		mSimulation.getSimulationState().serializeSaveState(serializer, formatVersion);
 	}
 
 	if (serializer.isReading())
