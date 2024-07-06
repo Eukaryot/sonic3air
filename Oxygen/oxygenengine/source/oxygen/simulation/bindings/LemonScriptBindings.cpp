@@ -273,6 +273,27 @@ namespace
 		return (uint32)rng.getRandomUint64();
 	}
 
+	float System_randomFloat()
+	{
+		RandomNumberGenerator& rng = Application::instance().getSimulation().getSimulationState().getRandomNumberGenerator();
+		return (float)(rng.getRandomUint64() % 8388608) / 8388607.0f;	// 8388608 is 2^23
+	}
+
+	int32 System_randRange1(int32 minimum, int32 maximum)
+	{
+		if (minimum < maximum)
+			return minimum + System_rand() % (maximum - minimum + 1);
+		else if (minimum > maximum)
+			return maximum + System_rand() % (minimum - maximum + 1);
+		else
+			return minimum;
+	}
+
+	float System_randRange2(float minimum, float maximum)
+	{
+		return minimum + System_randomFloat() * (maximum - minimum);
+	}
+
 	uint32 System_getPlatformFlags()
 	{
 		return EngineMain::instance().getPlatformFlags();
@@ -938,6 +959,14 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameters("variableName", "value");
 
 		builder.addNativeFunction("System.rand", lemon::wrap(&System_rand), defaultFlags);
+
+		builder.addNativeFunction("System.randomFloat", lemon::wrap(&System_randomFloat), defaultFlags);
+
+		builder.addNativeFunction("System.randRange", lemon::wrap(&System_randRange1), defaultFlags)
+			.setParameters("minimum", "maximum");
+
+		builder.addNativeFunction("System.randRange", lemon::wrap(&System_randRange2), defaultFlags)
+			.setParameters("minimum", "maximum");
 
 		builder.addNativeFunction("System.getPlatformFlags", lemon::wrap(&System_getPlatformFlags), defaultFlags);
 
