@@ -648,7 +648,7 @@ void Bitmap::gaussianBlur(const Bitmap& source, float sigma, int channel)
 		uint8* src;
 		uint8* dst;
 		int swid = 4;
-		if (step == 0)	{ maxz = mWidth;  src = (uint8*)mData;     dst = (uint8*)bmp.mData;             }
+		if (step == 0)	{ maxz = mWidth;  src = (uint8*)mData;     dst = (uint8*)bmp.mData;              }
 				  else	{ maxz = mHeight; src = (uint8*)bmp.mData; dst = (uint8*)mData;  swid *= mWidth; }
 
 		int wxh = mWidth * mHeight;
@@ -763,9 +763,13 @@ void Bitmap::rescale(const Bitmap& source, int wid, int hgt)
 				int w = rescale_x ? y : x;
 				float fz = ((float)z + 0.5f) * ratio - 0.5f;
 				if (fz < 0.0f)
+				{
 					*dst = source.mData[w*mulw];
+				}
 				else if (fz >= (float)(srcsize-1))
+				{
 					*dst = source.mData[(srcsize-1)*mulz+w*mulw];
+				}
 				else
 				{
 					int iz = (int)fz;
@@ -774,8 +778,9 @@ void Bitmap::rescale(const Bitmap& source, int wid, int hgt)
 					uint8* color1 = (uint8*)&source.mData[offset];
 					uint8* color2 = (uint8*)&source.mData[offset+mulz];
 					for (int c = 0; c < 4; ++c)
-						((uint8*)dst)[c] = (uint8)((float)color1[c] * (1.0f - fz)
-											   + (float)color2[c] * fz + 0.5f);
+					{
+						((uint8*)dst)[c] = (uint8)((float)color1[c] * (1.0f - fz) + (float)color2[c] * fz + 0.5f);
+					}
 				}
 				++dst;
 			}
@@ -801,7 +806,7 @@ void Bitmap::rescale(const Bitmap& source, int wid, int hgt)
 				for (int c = 0; c < 4; ++c)
 				{
 					float value = 0.0f;
-					for (int i = i1+1; i < i2; ++i)
+					for (int i = i1 + 1; i < i2; ++i)
 						value += (float)src[i*mulz+c];
 					value += (float)src[i1*mulz+c] * (1.0f - f1);
 					value += (float)src[i2*mulz+c] * f2;
@@ -838,14 +843,14 @@ inline void Bitmap::memcpyBlend(uint32* dst, int dwid, uint32* src, int swid, in
 	{
 		for (int x = 0; x < wid; ++x)
 		{
-			uint8* dst_ptr = (uint8*)(&dst[x+y*dwid]);
-			uint8* src_ptr = (uint8*)(&src[x+y*swid]);
-			float alpha = (float)src_ptr[3] / 255.0f;
-			float alpha_dst = (float)dst_ptr[3] / 255.0f;
+			uint8* dstPtr = (uint8*)(&dst[x+y*dwid]);
+			uint8* srcPtr = (uint8*)(&src[x+y*swid]);
+			float alpha = (float)srcPtr[3] / 255.0f;
+			float alpha_dst = (float)dstPtr[3] / 255.0f;
 			float A = 1.0f - (1.0f - alpha) * (1.0f - alpha_dst);
 			for (int c = 0; c < 3; ++c)
-				dst_ptr[c] = (uint8)(((float)src_ptr[c] * alpha + (float)dst_ptr[c] * alpha_dst * (1.0f - alpha)) / A);
-			dst_ptr[3] = (uint8)(A * 255.0f);
+				dstPtr[c] = (uint8)(((float)srcPtr[c] * alpha + (float)dstPtr[c] * alpha_dst * (1.0f - alpha)) / A);
+			dstPtr[3] = (uint8)(A * 255.0f);
 		}
 	}
 }
@@ -853,146 +858,134 @@ inline void Bitmap::memcpyBlend(uint32* dst, int dwid, uint32* src, int swid, in
 void Bitmap::convert2palette(uint8* output, int colors, uint32* palette)
 {
 	// Convert into a palette-based image
-	memset(palette, 0, colors*4);
-	struct octree_struct
+	memset(palette, 0, colors * sizeof(uint32));
+	struct OctreeNode
 	{
-		int count;
-		int red, green, blue;
-		int index;
-		bool is_leaf;
-		octree_struct* child[8];
+		int mCount = 0;
+		int mRed = 0;
+		int mGreen = 0;
+		int mBlue = 0;
+		int mIndex = -1;
+		bool mIsLeaf = false;
+		OctreeNode* mChild[8] = { nullptr };
 	};
-	octree_struct octree_root;
-	octree_root.count = 0;
-	octree_root.red   = 0;
-	octree_root.green = 0;
-	octree_root.blue  = 0;
-	octree_root.index = -1;
-	octree_root.is_leaf = false;
-	for (int i = 0; i < 8; ++i)
-		octree_root.child[i] = 0;
-	int leaf_count = 0;
+	OctreeNode octreeRoot;
+	int leafCount = 0;
 
 	for (int y = 0; y < mHeight; ++y)
 		for (int x = 0; x < mWidth; ++x)
 		{
-			uint32 color = mData[x+y*mWidth] & 0xffffff;		// Alphakanal ignorieren
-			octree_struct* oct = &octree_root;
+			uint32 color = mData[x+y*mWidth] & 0xffffff;	// Ignore alpha channel
+			OctreeNode* oct = &octreeRoot;
 			for (int j = 0; j < 8; ++j)
 			{
-				int index = ((color >> 7) & 0x1)
-					+ ((color >> 14) & 0x2)
-					+ ((color >> 21) & 0x4);
-				if (oct->child[index])
-					oct = oct->child[index];
+				const int index = ((color >> 7) & 0x01) + ((color >> 14) & 0x02) + ((color >> 21) & 0x04);
+				if (nullptr != oct->mChild[index])
+				{
+					oct = oct->mChild[index];
+				}
 				else
 				{
-					oct->child[index] = new octree_struct;
-					oct = oct->child[index];
-					oct->count = 0;
-					oct->red   = 0;
-					oct->green = 0;
-					oct->blue  = 0;
-					oct->index = -1;
-					oct->is_leaf = false;
-					for (int i = 0; i < 8; ++i)
-						oct->child[i] = 0;
+					oct->mChild[index] = new OctreeNode();
+					oct = oct->mChild[index];
 				}
 				color <<= 1;
 
-				if ((j == 7) && (!oct->count))
+				if ((j == 7) && (oct->mCount == 0))
 				{
-					oct->is_leaf = true;
-					++leaf_count;
+					oct->mIsLeaf = true;
+					++leafCount;
 				}
-				++oct->count;
-				oct->red   += mData[x+y*mWidth] & 0xff;
-				oct->green += (mData[x+y*mWidth] >> 8) & 0xff;
-				oct->blue  += (mData[x+y*mWidth] >> 16) & 0xff;
+				++oct->mCount;
+				oct->mRed   += mData[x+y*mWidth] & 0xff;
+				oct->mGreen += (mData[x+y*mWidth] >> 8) & 0xff;
+				oct->mBlue  += (mData[x+y*mWidth] >> 16) & 0xff;
 			}
 		}
 
 	// Reduce colors
-	octree_struct* stack[64];
-	int stack_size;
-	while (leaf_count > colors)
+	OctreeNode* stack[64];
+	int stackSize;
+	while (leafCount > colors)
 	{
-		octree_struct* min_oct = 0;
-		int min_count = 0x7fffffff;
-		stack[0] = &octree_root;
-		stack_size = 1;
-		while (stack_size)
+		OctreeNode* minNode = 0;
+		int minCount = 0x7fffffff;
+		stack[0] = &octreeRoot;
+		stackSize = 1;
+		while (stackSize)
 		{
-			--stack_size;
-			octree_struct* oct = stack[stack_size];
-			bool all_leaves = true;
+			--stackSize;
+			OctreeNode* oct = stack[stackSize];
+			bool allLeaves = true;
 			for (int i = 0; i < 8; ++i)
-				if (oct->child[i])
-					if (!oct->child[i]->is_leaf)
-					{
-						stack[stack_size] = oct->child[i];
-						++stack_size;
-						all_leaves = false;
-					}
-			if (all_leaves)
-				if (oct->count < min_count)
+			{
+				if (nullptr != oct->mChild[i] && !oct->mChild[i]->mIsLeaf)
 				{
-					min_oct = oct;
-					min_count = oct->count;
+					stack[stackSize] = oct->mChild[i];
+					++stackSize;
+					allLeaves = false;
 				}
+			}
+			if (allLeaves && oct->mCount < minCount)
+			{
+				minNode = oct;
+				minCount = oct->mCount;
+			}
 		}
 
 		for (int i = 0; i < 8; ++i)
-			if (min_oct->child[i])
+		{
+			if (nullptr != minNode->mChild[i])
 			{
-				SAFE_DELETE(min_oct->child[i]);
-				--leaf_count;
+				SAFE_DELETE(minNode->mChild[i]);
+				--leafCount;
 			}
-		min_oct->is_leaf = true;
-		++leaf_count;
+		}
+		minNode->mIsLeaf = true;
+		++leafCount;
 	}
 
 	// Create palette
-	int pal_size = 0;
-	stack[0] = &octree_root;
-	stack_size = 1;
-	while (stack_size)
+	int palSize = 0;
+	stack[0] = &octreeRoot;
+	stackSize = 1;
+	while (stackSize > 0)
 	{
-		--stack_size;
-		octree_struct* oct = stack[stack_size];
-		if (oct->is_leaf)
+		--stackSize;
+		OctreeNode* oct = stack[stackSize];
+		if (oct->mIsLeaf)
 		{
-			palette[pal_size] = (oct->red / oct->count)
-				+ ((oct->green / oct->count) << 8)
-				+ ((oct->blue / oct->count) << 16);
-			oct->index = pal_size;
-			++pal_size;
+			palette[palSize] = (oct->mRed / oct->mCount) + ((oct->mGreen / oct->mCount) << 8) + ((oct->mBlue / oct->mCount) << 16);
+			oct->mIndex = palSize;
+			++palSize;
 			continue;
 		}
 		for (int i = 0; i < 8; ++i)
-			if (oct->child[i])
+		{
+			if (nullptr != oct->mChild[i])
 			{
-				stack[stack_size] = oct->child[i];
-				++stack_size;
+				stack[stackSize] = oct->mChild[i];
+				++stackSize;
 			}
+		}
 	}
 
 	// Convert bitmap data
+	uint32* data = mData;
 	for (int y = 0; y < mHeight; ++y)
 	{
 		for (int x = 0; x < mWidth; ++x)
 		{
-			uint32 color = mData[x+y*mWidth] & 0xffffff;	// Ignore alpha channel
-			octree_struct* oct = &octree_root;
-			while (!oct->is_leaf)
+			uint32 color = (*data) & 0xffffff;	// Ignore alpha channel
+			OctreeNode* oct = &octreeRoot;
+			while (!oct->mIsLeaf)
 			{
-				int index = ((color >> 7) & 0x1)
-					+ ((color >> 14) & 0x2)
-					+ ((color >> 21) & 0x4);
-				oct = oct->child[index];
+				const int index = ((color >> 7) & 0x01) + ((color >> 14) & 0x02) + ((color >> 21) & 0x04);
+				oct = oct->mChild[index];
 				color <<= 1;
 			}
-			output[x+y*mWidth] = (uint8)(oct->index);
+			*data = (uint8)(oct->mIndex);
+			++data;
 		}
 	}
 }

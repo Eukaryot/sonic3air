@@ -140,7 +140,7 @@ private:
 	void convert2palette(uint8* output, int colors, uint32* palette);
 
 private:
-	uint32* mData = nullptr;
+	uint32* mData = nullptr;	// Pixels in ABGR32 format, i.e. each pixel is encoded as 0xAABBGGRR
 	int mWidth = 0;
 	int mHeight = 0;
 };

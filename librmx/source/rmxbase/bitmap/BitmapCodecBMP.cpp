@@ -77,17 +77,17 @@ namespace rmx
 		}
 
 		// Load palette
-		int pal_size = 0;
+		int palSize = 0;
 		if (bitdepth == 1 || bitdepth == 4 || bitdepth == 8)
 		{
-			pal_size = (header.numColors != 0) ? header.numColors : (1 << bitdepth);
+			palSize = (header.numColors != 0) ? header.numColors : (1 << bitdepth);
 		}
 
-		// Read palette
+		// Read and convert palette
 		uint32 palette[256];
-		for (int i = 0; i < pal_size; ++i)
+		stream.read(palette, palSize * sizeof(uint32));
+		for (int i = 0; i < palSize; ++i)
 		{
-			stream >> palette[i];
 			palette[i] = RGBA_to_BGRA(palette[i] | 0xff000000);
 		}
 
@@ -106,29 +106,33 @@ namespace rmx
 		// Load image data
 		for (int y = 0; y < height; ++y)
 		{
-			uint32* data_ptr = &data[(height-y-1)*width];
-			for (int x = 0; x < width; ++x)
+			uint32* dataPtr = &data[(height-y-1)*width];
+			switch (bitdepth)
 			{
-				switch (bitdepth)
-				{
-					case 1:
-						data_ptr[x] = palette[(buffer[x/8] >> (x%8)) & 1];
-						break;
-					case 4:
-						data_ptr[x] = palette[(buffer[x/2] >> ((1-x%2)*4)) & 15];
-						break;
-					case 8:
-						data_ptr[x] = palette[buffer[x]];
-						break;
-					case 24:
-						data_ptr[x] = ((uint32)buffer[x*3]   << 16)
-									+ ((uint32)buffer[x*3+1] <<  8)
-									+ ((uint32)buffer[x*3+2]      ) + 0xff000000;
-						break;
-					case 32:
-						data_ptr[x] = RGBA_to_BGRA(*(uint32*)&buffer[x*4]);
-						break;
-				}
+				case 1:
+					for (int x = 0; x < width; ++x)
+						dataPtr[x] = palette[(buffer[x/8] >> (x%8)) & 0x01];
+					break;
+
+				case 4:
+					for (int x = 0; x < width; ++x)
+						dataPtr[x] = palette[(buffer[x/2] >> ((1-x%2)*4)) & 0x0f];
+					break;
+
+				case 8:
+					for (int x = 0; x < width; ++x)
+						dataPtr[x] = palette[buffer[x]];
+					break;
+
+				case 24:
+					for (int x = 0; x < width; ++x)
+						dataPtr[x] = ((uint32)buffer[x*3] << 16) | ((uint32)buffer[x*3+1] << 8) | ((uint32)buffer[x*3+2]) | 0xff000000;
+					break;
+
+				case 32:
+					for (int x = 0; x < width; ++x)
+						dataPtr[x] = RGBA_to_BGRA(*(uint32*)&buffer[x*4]);
+					break;
 			}
 			buffer += stride;
 		}
@@ -136,17 +140,17 @@ namespace rmx
 		// 32bit-BMP with or without alpha channel?
 		if (bitdepth == 32)
 		{
+			bool noAlpha = true;
 			const int size = width * height;
-
-			bool no_alpha = true;
 			for (int i = 0; i < size; ++i)
+			{
 				if (data[i] >= 0x01000000)
 				{
-					no_alpha = false;
+					noAlpha = false;
 					break;
 				}
-
-			if (no_alpha)
+			}
+			if (noAlpha)
 			{
 				for (int i = 0; i < size; ++i)
 					data[i] |= 0xff000000;

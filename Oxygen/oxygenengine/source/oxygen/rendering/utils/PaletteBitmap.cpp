@@ -202,7 +202,7 @@ bool PaletteBitmap::loadBMP(const std::vector<uint8>& bmpContent, Color* outPale
 	{
 		for (int i = 0; i < palSize; ++i)
 		{
-			Color color = Color::fromABGR32(palette[i]);
+			const Color color = Color::fromABGR32(palette[i]);
 			outPalette[i].set(color.b, color.g, color.r, 1.0f);
 		}
 	}
@@ -225,20 +225,22 @@ bool PaletteBitmap::loadBMP(const std::vector<uint8>& bmpContent, Color* outPale
 	for (int y = 0; y < height; ++y)
 	{
 		uint8* dataPtr = &mData[(height-y-1)*width];
-		for (int x = 0; x < width; ++x)
+		switch (bitdepth)
 		{
-			switch (bitdepth)
-			{
-				case 1:
+			case 1:
+				for (int x = 0; x < width; ++x)
 					dataPtr[x] = (buffer[x/8] >> (x & 0x07)) & 0x01;
-					break;
-				case 4:
+				break;
+
+			case 4:
+				for (int x = 0; x < width; ++x)
 					dataPtr[x] = (buffer[x/2] >> (4 - (x & 0x01) * 4)) & 0x0f;
-					break;
-				case 8:
+				break;
+
+			case 8:
+				for (int x = 0; x < width; ++x)
 					dataPtr[x] = buffer[x];
-					break;
-			}
+				break;
 		}
 		buffer += stride;
 	}

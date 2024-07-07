@@ -670,9 +670,9 @@ namespace rmx
 			// No upsampling needed
 			for (int y = 0; y < limit_y; ++y)
 			{
-				uint8* data_ptr = &data[y*8];
+				uint8* dataPtr = &data[y*8];
 				for (int x = 0; x < limit_x; ++x)
-					img_ptr[x*4] = data_ptr[x];
+					img_ptr[x*4] = dataPtr[x];
 				img_ptr += wid4;
 			}
 		}
@@ -681,13 +681,13 @@ namespace rmx
 			// Upsampling is needed
 			for (int y = 0; y < limit_y; ++y)
 			{
-				uint8* data_ptr = &data[(y / factor_y) * 8];
+				uint8* dataPtr = &data[(y / factor_y) * 8];
 				if (factor_x == 1)
 					for (int x = 0; x < limit_x; ++x)
-						img_ptr[x*4] = data_ptr[x];
+						img_ptr[x*4] = dataPtr[x];
 				else
 					for (int x = 0; x < limit_x; ++x)
-						img_ptr[x*4] = data_ptr[x/2];
+						img_ptr[x*4] = dataPtr[x/2];
 				img_ptr += wid4;
 			}
 		}
