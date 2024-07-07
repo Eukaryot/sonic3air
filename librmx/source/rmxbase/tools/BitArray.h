@@ -15,7 +15,8 @@ template<size_t NUM_BITS>
 class BitArray
 {
 public:
-	static const constexpr size_t NUM_CHUNKS = (NUM_BITS + 63) / 64;
+	static const constexpr size_t BITS_PER_CHUNK = 64;
+	static const constexpr size_t NUM_CHUNKS = (NUM_BITS + BITS_PER_CHUNK - 1) / BITS_PER_CHUNK;
 
 public:
 	void clearAllBits()

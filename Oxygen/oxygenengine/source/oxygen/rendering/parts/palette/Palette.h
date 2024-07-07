@@ -33,7 +33,7 @@ public:
 	inline Color getColor(int index) const	{ return Color::fromABGR32(getEntry(index)); }
 	uint16 getEntryPacked(uint16 colorIndex, bool allowExtendedPacked = false) const;
 
-	inline const uint64* getChangeFlags() const	{ return mChangeFlags; }
+	inline const BitArray<NUM_COLORS>& getChangeFlags() const	{ return mChangeFlags; }
 	void resetAllPaletteChangeFlags();
 	void setAllPaletteChangeFlags();
 
@@ -47,6 +47,6 @@ public:
 
 private:
 	uint32 mColor[NUM_COLORS] = { 0 };							// Colors in the palette
-	uint64 mChangeFlags[NUM_COLORS/64] = { true };				// One flag per color; only actually used and reset by hardware rendering
+	BitArray<NUM_COLORS> mChangeFlags;							// One flag per color; only actually used and reset by hardware rendering
 	PackedPaletteColor mPackedColorCache[NUM_COLORS] = { 0 };	// Only used as an optimization
 };

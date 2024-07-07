@@ -272,14 +272,14 @@ const BufferTexture& OpenGLRenderResources::getVScrollOffsetsTexture(int scrollO
 bool OpenGLRenderResources::updatePaletteBitmap(Palette& palette, Bitmap& bitmap, int offsetY)
 {
 	bool anyChange = false;
-	const uint64* changeFlags = palette.getChangeFlags();
-	for (int k = 0; k < Palette::NUM_COLORS / 64; ++k)
+	const BitArray<Palette::NUM_COLORS>& changeFlags = palette.getChangeFlags();
+	for (int k = 0; k < changeFlags.NUM_CHUNKS; ++k)
 	{
 		// For all changed flags, copy over the respective data
-		if (changeFlags[k] != 0)
+		if (changeFlags.anyBitSetInChunk(k))
 		{
-			uint32* dst = bitmap.getPixelPointer((k * 64) % 256, (k * 64) / 256 + offsetY);
-			memcpy(dst, palette.getData() + k * 64, 64 * sizeof(uint32));
+			uint32* dst = bitmap.getPixelPointer((k * changeFlags.BITS_PER_CHUNK) % 256, (k * changeFlags.BITS_PER_CHUNK) / 256 + offsetY);
+			memcpy(dst, palette.getData() + k * changeFlags.BITS_PER_CHUNK, changeFlags.BITS_PER_CHUNK * sizeof(uint32));
 			anyChange = true;
 		}
 	}

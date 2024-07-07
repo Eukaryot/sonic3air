@@ -32,12 +32,12 @@ uint16 Palette::getEntryPacked(uint16 colorIndex, bool allowExtendedPacked) cons
 
 void Palette::resetAllPaletteChangeFlags()
 {
-	memset(mChangeFlags, 0, sizeof(mChangeFlags));
+	mChangeFlags.clearAllBits();
 }
 
 void Palette::setAllPaletteChangeFlags()
 {
-	memset(mChangeFlags, 0xff, sizeof(mChangeFlags));
+	mChangeFlags.setAllBits();
 }
 
 void Palette::invalidatePackedColorCache()
@@ -51,7 +51,7 @@ void Palette::setPaletteEntry(uint16 colorIndex, uint32 color)
 	if (mColor[colorIndex] != color)
 	{
 		mColor[colorIndex] = color;
-		mChangeFlags[colorIndex / 64] |= (uint64)1 << (colorIndex % 64);
+		mChangeFlags.setBit(colorIndex);
 		mPackedColorCache[colorIndex].mIsValid = false;
 	}
 }
@@ -61,7 +61,7 @@ void Palette::setPaletteEntryPacked(uint16 colorIndex, uint32 color, uint16 pack
 	if (mColor[colorIndex] != color)
 	{
 		mColor[colorIndex] = color;
-		mChangeFlags[colorIndex / 64] |= (uint64)1 << (colorIndex % 64);
+		mChangeFlags.setBit(colorIndex);
 		mPackedColorCache[colorIndex].mPackedColor = packedColor;
 		mPackedColorCache[colorIndex].mIsValid = true;
 	}
