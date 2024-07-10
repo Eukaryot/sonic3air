@@ -345,7 +345,7 @@ function void LoadTileContentInDirX()
 	}
 	u8[0xffffeea4] = ((diff & 0x30) != 0x10) ? 0xff : 0x00
 
-	//debugLog(stringformat("LoadTileContentInDirX (%d lines): posX=0x%04x, posY=0x%04x, lines=0x%02x", u8[0xffffeea4] ? 2 : 1, D0, D1, D6.u16))
+	//debugLog(stringformat("LoadTileContentInDirX (%s): posX=0x%04x, posY=0x%04x, lines=0x%02x", u8[0xffffeea4] ? "2 lines" : "1 line", D0.u16, D1.u16, D6.u16))
 
 	u32 backupD1 = D1
 	u32 backupD6 = D6
@@ -402,7 +402,7 @@ function void fillPlanePatternsX(u16 additionalOffset, u16 tiles)
 		tiles = (u32(0xfffff580) - (A0 + 4)) / 8
 #endif
 
-	u16[A0]   = ((D0.u16 >> 2) & 0x7c) + D7.u16 + additionalOffset
+	u16[A0]   = ((D0.u16 >> 2) & 0x7c) + D7.u16 + additionalOffset	// Target VRAM address
 	u16[A0+2] = (tiles - 1) | 0x8000
 	A0 += 4
 	A1 = A0
@@ -466,7 +466,8 @@ function void UpdateChunkLinePointerX()
 	//  -> Though this is probably a bug, we build our calculation to do exactly that as well
 	u32 chunkAddress = s16[levelLayoutBase + chunkLineOffset]
 	chunkAddress = (chunkAddress & 0xffff0000) | u16(chunkAddress + chunkPosX)	// Applying this only to lower 16 bits is relevant for HPZ background
-	u16 chunkType = u8[chunkAddress]
+	u8 chunkType = u8[chunkAddress]
+
 	A5 = 0xffff0000 + chunkType * 0x80 + tileInsideChunkX * 2
 }
 
@@ -498,7 +499,7 @@ function void LoadTileContentInDirY()
 	}
 	u8[0xffffeea4] = ((diff & 0x30) != 0x10) ? 0xff : 0x00
 
-	//debugLog(stringformat("LoadTileContentInDirY (%d lines): posX=0x%04x, posY=0x%04x, rows=0x%02x", u8[0xffffeea4] ? 2 : 1, D0, D1, D6.u16))
+	//debugLog(stringformat("LoadTileContentInDirY (%s): posX=0x%04x, posY=0x%04x, rows=0x%02x", u8[0xffffeea4] ? "2 lines" : "1 line", D0, D1, D6.u16))
 
 	u32 backupD1 = D1
 	u32 backupD6 = D6
@@ -678,12 +679,16 @@ function void UpdateChunkLinePointerY()
 //# address-hook(0x04ec54) end(0x04ec68)
 function void fn04ec54()
 {
+	u16 tileInsideChunkY = D0.u16 & 0x70
+
 	// Uses cached A4 from recent call of "UpdateChunkLinePointerY()"
 	// Unfortunately the following calculation has to be this complicated, to handle both the following situations:
 	//  - CNZ 1 after mini-boss fight (potential u16 underflow of RAM address)
 	//  - ICZ 1 entering cave (potential u16 overflow of RAM address)
-	u32 address = (A4 & 0xffff0000) + u16(A4.u16 + D1.u16)
-	A5 = 0xffff0000 + u8[address] * 0x80 + (D0.u16 & 0x70)
+	u32 chunkAddress = (A4 & 0xffff0000) + u16(A4.u16 + D1.u16)
+	u8 chunkType = u8[chunkAddress]
+
+	A5 = 0xffff0000 + chunkType * 0x80 + tileInsideChunkY
 }
 
 

@@ -856,19 +856,17 @@ function void fn0516d0()
 //# address-hook(0x0516d2) end(0x051724)
 function void fn0516d2()
 {
-	D0.u16 = u16[0xffffb000 + 0x10]
-	D1.u16 = u16[0xffffb000 + 0x14]
+	u16 px = u16[0xffffb000 + 0x10]
+	u16 py = u16[0xffffb000 + 0x14]
 
 	A1 = 0x23cf7c
-	D2 = 4
-	D3 = 2
-	while (D3.s16 >= 0)
+	for (u8 k = 0; k < 3; ++k)
 	{
-		if (D0.u16 >= u16[A1] && D0.u16 < u16[A1 + 2] && D1.u16 >= u16[A1 + 4] && D1.u16 < u16[A1 + 6])
+		if (px >= u16[A1] && px < u16[A1 + 2] && py >= u16[A1 + 4] && py < u16[A1 + 6])
 		{
-			if (D2.u16 != 4 || (camera.screenshake.state & 0x8000))
+			if (k > 0 || (camera.screenshake.state & 0x8000))
 			{
-				u16[0xffffeed6] = D2.u16
+				u16[0xffffeed6] = 4 + k * 4
 				u16[0xffffeed8] = 0
 				u16[0xffffeeda] = 0
 				u16[0xffffeedc] = u16[A1 + 0x08]
@@ -880,8 +878,6 @@ function void fn0516d2()
 		}
 
 		A1 += 12
-		D2.u16 += 4
-		--D3.s16
 	}
 }
 
