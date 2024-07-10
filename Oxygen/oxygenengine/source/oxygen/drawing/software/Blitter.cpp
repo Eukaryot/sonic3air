@@ -13,6 +13,12 @@
 
 namespace
 {
+	FORCE_INLINE int roundToIntFast(float x)
+	{
+		// Avoiding the std::floor in rmxbase's roundToInt, this is a bit cheaper
+		return (int)(x + ((x >= 0.0f) ? 0.5f : -0.5f));
+	}
+
 	void getTransformedLineRange(int& minX, int& maxX, int iy, int width, Vec2i offset, Recti spriteRect, const float* transform)
 	{
 		// Output pixels to render in the given line
@@ -24,8 +30,8 @@ namespace
 			if (std::abs(transform[0]) > 0.001f)
 			{
 				const float A = -dy * transform[1] + spriteRect.x;
-				x1 = offset.x + (int)((A) / transform[0] + 0.5f);
-				x2 = offset.x + (int)((A + spriteRect.width) / transform[0] + 0.5f);
+				x1 = offset.x + roundToIntFast((A) / transform[0]);
+				x2 = offset.x + roundToIntFast((A + spriteRect.width) / transform[0]);
 			}
 			minX = std::min(x1, x2);
 			maxX = std::max(x1, x2);
@@ -36,8 +42,8 @@ namespace
 			if (std::abs(transform[2]) > 0.001f)
 			{
 				const float A = -dy * transform[3] + spriteRect.y;
-				x1 = offset.x + (int)((A) / transform[2] + 0.5f);
-				x2 = offset.x + (int)((A + spriteRect.height) / transform[2] + 0.5f);
+				x1 = offset.x + roundToIntFast((A) / transform[2]);
+				x2 = offset.x + roundToIntFast((A + spriteRect.height) / transform[2]);
 			}
 			const int minX2 = std::min(x1, x2);
 			const int maxX2 = std::max(x1, x2);
