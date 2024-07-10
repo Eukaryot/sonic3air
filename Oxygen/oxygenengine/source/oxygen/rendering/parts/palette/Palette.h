@@ -19,17 +19,10 @@ public:
 	static const constexpr size_t NUM_COLORS = 0x200;
 
 public:
-	struct PackedPaletteColor
-	{
-		uint16 mPackedColor = 0;
-		bool mIsValid = false;
-	};
+	inline size_t getSize() const				{ return NUM_COLORS; }
+	inline const uint32* getRawColors() const	{ return mColors; }
 
-public:
-	inline size_t getSize() const			{ return NUM_COLORS; }
-	inline const uint32* getData() const	{ return mColor; }
-
-	inline uint32 getEntry(int index) const	{ return (index >= 0 && index < (int)getSize()) ? mColor[index] : 0; }
+	inline uint32 getEntry(int index) const	{ return (index >= 0 && index < (int)getSize()) ? mColors[index] : 0; }
 	inline Color getColor(int index) const	{ return Color::fromABGR32(getEntry(index)); }
 	uint16 getEntryPacked(uint16 colorIndex, bool allowExtendedPacked = false) const;
 
@@ -42,11 +35,18 @@ public:
 	void setPaletteEntry(uint16 colorIndex, uint32 color);
 	void setPaletteEntryPacked(uint16 colorIndex, uint32 color, uint16 packedColor);
 
-	void dumpColors(Color* outColors, int numColors) const;
+	void dumpColors(uint32* outColors, int numColors) const;
 	void serializePalette(VectorBinarySerializer& serializer);
 
 private:
-	uint32 mColor[NUM_COLORS] = { 0 };							// Colors in the palette
+	struct PackedPaletteColor
+	{
+		uint16 mPackedColor = 0;
+		bool mIsValid = false;
+	};
+
+private:
+	uint32 mColors[NUM_COLORS] = { 0 };							// Colors in the palette, using ABGR32 format
 	BitArray<NUM_COLORS> mChangeFlags;							// One flag per color; only actually used and reset by hardware rendering
 	PackedPaletteColor mPackedColorCache[NUM_COLORS] = { 0 };	// Only used as an optimization
 };

@@ -14,7 +14,7 @@
 class PaletteBitmap
 {
 public:
-	static const Color mUnusedPaletteColor;
+	static const uint32 mUnusedPaletteColor;
 
 public:
 	inline PaletteBitmap() {}
@@ -44,10 +44,10 @@ public:
 	void clear(uint8 color);
 
 	void shiftAllIndices(int8 indexShift);
-	void overwriteUnusedPaletteEntries(Color* palette);
+	void overwriteUnusedPaletteEntries(uint32* palette);
 
-	bool loadBMP(const std::vector<uint8>& bmpContent, Color* outPalette = nullptr);
-	bool saveBMP(std::vector<uint8>& bmpContent, const Color* palette);
+	bool loadBMP(const std::vector<uint8>& bmpContent, uint32* outPalette = nullptr);	// Expecting palette colors to use ABGR32 format
+	bool saveBMP(std::vector<uint8>& bmpContent, const uint32* palette);
 
 private:
 	void memcpyRect(uint8* dst, int dwid, uint8* src, int swid, int wid, int hgt);

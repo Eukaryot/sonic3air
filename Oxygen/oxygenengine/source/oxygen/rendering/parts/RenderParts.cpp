@@ -60,11 +60,8 @@ void RenderParts::dumpPatternsContent()
 	PaletteBitmap bmp;
 	mPatternManager.dumpAsPaletteBitmap(bmp);
 
-	Color palette[0x100];
-	mPaletteManager.getMainPalette(0).dumpColors(palette, 0x100);
-
 	std::vector<uint8> content;
-	bmp.saveBMP(content, palette);
+	bmp.saveBMP(content, mPaletteManager.getMainPalette(0).getRawColors());
 	FTX::FileSystem->saveFile("dump.bmp", content.data(), (uint32)content.size());
 }
 
@@ -73,10 +70,7 @@ void RenderParts::dumpPlaneContent(int planeIndex)
 	PaletteBitmap bmp;
 	mPlaneManager.dumpAsPaletteBitmap(bmp, planeIndex);
 
-	Color palette[0x100];
-	mPaletteManager.getMainPalette(0).dumpColors(palette, 0x100);
-
 	std::vector<uint8> content;
-	bmp.saveBMP(content, palette);
+	bmp.saveBMP(content, mPaletteManager.getMainPalette(0).getRawColors());
 	FTX::FileSystem->saveFile("dump.bmp", content.data(), (uint32)content.size());
 }

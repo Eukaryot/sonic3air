@@ -16,7 +16,7 @@ class PaletteCollection : public SingleInstance<PaletteCollection>
 public:
 	struct Palette
 	{
-		std::vector<Color> mColors;
+		std::vector<uint32> mColors = { 0 };	// Colors in the palette, using ABGR32 format
 		bool mIsModded = false;
 	};
 

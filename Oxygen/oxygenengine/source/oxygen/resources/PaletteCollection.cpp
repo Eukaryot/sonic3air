@@ -69,7 +69,7 @@ void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool i
 
 			for (int x = 0; x < numColorsPerLine; ++x)
 			{
-				palette.mColors[x] = Color::fromABGR32(bitmap.getPixel(x, y));
+				palette.mColors[x] = bitmap.getPixel(x, y);
 			}
 			++key;
 		}

@@ -279,7 +279,7 @@ bool OpenGLRenderResources::updatePaletteBitmap(Palette& palette, Bitmap& bitmap
 		if (changeFlags.anyBitSetInChunk(k))
 		{
 			uint32* dst = bitmap.getPixelPointer((k * changeFlags.BITS_PER_CHUNK) % 256, (k * changeFlags.BITS_PER_CHUNK) / 256 + offsetY);
-			memcpy(dst, palette.getData() + k * changeFlags.BITS_PER_CHUNK, changeFlags.BITS_PER_CHUNK * sizeof(uint32));
+			memcpy(dst, palette.getRawColors() + k * changeFlags.BITS_PER_CHUNK, changeFlags.BITS_PER_CHUNK * sizeof(uint32));
 			anyChange = true;
 		}
 	}

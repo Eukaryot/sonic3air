@@ -48,9 +48,9 @@ void Palette::invalidatePackedColorCache()
 
 void Palette::setPaletteEntry(uint16 colorIndex, uint32 color)
 {
-	if (mColor[colorIndex] != color)
+	if (mColors[colorIndex] != color)
 	{
-		mColor[colorIndex] = color;
+		mColors[colorIndex] = color;
 		mChangeFlags.setBit(colorIndex);
 		mPackedColorCache[colorIndex].mIsValid = false;
 	}
@@ -58,28 +58,25 @@ void Palette::setPaletteEntry(uint16 colorIndex, uint32 color)
 
 void Palette::setPaletteEntryPacked(uint16 colorIndex, uint32 color, uint16 packedColor)
 {
-	if (mColor[colorIndex] != color)
+	if (mColors[colorIndex] != color)
 	{
-		mColor[colorIndex] = color;
+		mColors[colorIndex] = color;
 		mChangeFlags.setBit(colorIndex);
 		mPackedColorCache[colorIndex].mPackedColor = packedColor;
 		mPackedColorCache[colorIndex].mIsValid = true;
 	}
 }
 
-void Palette::dumpColors(Color* outColors, int numColors) const
+void Palette::dumpColors(uint32* outColors, int numColors) const
 {
-	for (int i = 0; i < numColors; ++i)
-	{
-		outColors[i] = getColor(i);
-	}
+	memcpy(outColors, mColors, numColors * sizeof(uint32));
 }
 
 void Palette::serializePalette(VectorBinarySerializer& serializer)
 {
 	for (size_t k = 0; k < NUM_COLORS; ++k)
 	{
-		serializer.serialize(mColor[k]);
+		serializer.serialize(mColors[k]);
 
 		if (serializer.isReading())
 		{

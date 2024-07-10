@@ -84,7 +84,7 @@ void SpriteDump::addSprite(const PaletteSprite& paletteSprite, std::string_view 
 	String filename(0, *(WString(Configuration::instance().mAnalysisDir).toString() + "/spritedump/%s/%02x.bmp"), categoryName.data(), spriteNumber);
 	if (!FTX::FileSystem->exists(*filename))
 	{
-		Color palette[0x100];
+		uint32 palette[0x100];
 		VideoOut::instance().getRenderParts().getPaletteManager().getMainPalette(0).dumpColors(palette, 0x100);
 		if (atex != 0)
 		{
@@ -172,15 +172,15 @@ void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 	std::vector<std::pair<PaletteBitmap, const Entry*>> bitmaps;
 	bitmaps.reserve(category.mEntries.size());
 
-	Color outputPalette[0x100];
+	uint32 outputPalette[0x100];
 	for (int k = 0; k < 0xff; ++k)
 		outputPalette[k] = PaletteBitmap::mUnusedPaletteColor;
-	outputPalette[0xff] = Color(0.15f, 0.15f, 0.15f);		// Use a dark gray background
+	outputPalette[0xff] = 0xff262626;
 
 	std::vector<uint8> buffer;
 	Vec2i imgSize;
 	{
-		Color palette[0x100];
+		uint32 palette[0x100];
 		for (const auto& pair : category.mEntries)
 		{
 			const Entry& entry = pair.second;
@@ -204,7 +204,7 @@ void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 				// Add new colors to palette
 				for (int k = 0; k < 0x100; ++k)
 				{
-					if (outputPalette[k].r == PaletteBitmap::mUnusedPaletteColor.r && outputPalette[k].g == PaletteBitmap::mUnusedPaletteColor.g && outputPalette[k].b == PaletteBitmap::mUnusedPaletteColor.b)
+					if ((outputPalette[k] & 0x00ffffff) == (PaletteBitmap::mUnusedPaletteColor & 0x00ffffff))
 						outputPalette[k] = palette[k];
 				}
 			}

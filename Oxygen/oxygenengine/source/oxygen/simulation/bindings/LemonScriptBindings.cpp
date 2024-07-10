@@ -348,12 +348,13 @@ namespace
 		if (nullptr == palette)
 			return 0;
 
-		const std::vector<Color>& colors = palette->mColors;
+		const std::vector<uint32>& colors = palette->mColors;
 		const size_t numColors = std::min<size_t>(colors.size(), maxColors);
-		uint32* targetPointer = (uint32*)getEmulatorInterface().getMemoryPointer(targetAddress, true, (uint32)numColors * 4);
+		uint32* targetPointer = (uint32*)getEmulatorInterface().getMemoryPointer(targetAddress, true, (uint32)numColors * sizeof(uint32));
 		for (size_t i = 0; i < numColors; ++i)
 		{
-			targetPointer[i] = palette->mColors[i].getRGBA32();
+			// Maintain ABGR32 color format despite endianness change by swapping bytes
+			targetPointer[i] = swapBytes32(colors[i]);
 		}
 		return (uint16)numColors;
 	}

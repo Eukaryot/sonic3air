@@ -36,7 +36,7 @@ namespace
 }
 
 
-const Color PaletteBitmap::mUnusedPaletteColor = Color::fromABGR32(0x00660145);
+const uint32 PaletteBitmap::mUnusedPaletteColor = 0x00660145;
 
 
 PaletteBitmap::PaletteBitmap(const PaletteBitmap& toCopy)
@@ -147,7 +147,7 @@ void PaletteBitmap::shiftAllIndices(int8 indexShift)
 	}
 }
 
-void PaletteBitmap::overwriteUnusedPaletteEntries(Color* palette)
+void PaletteBitmap::overwriteUnusedPaletteEntries(uint32* palette)
 {
 	bool used[0x100] = { false };
 	const int pixels = getPixelCount();
@@ -162,7 +162,7 @@ void PaletteBitmap::overwriteUnusedPaletteEntries(Color* palette)
 	}
 }
 
-bool PaletteBitmap::loadBMP(const std::vector<uint8>& bmpContent, Color* outPalette)
+bool PaletteBitmap::loadBMP(const std::vector<uint8>& bmpContent, uint32* outPalette)
 {
 	VectorBinarySerializer serializer(true, bmpContent);
 
@@ -197,14 +197,10 @@ bool PaletteBitmap::loadBMP(const std::vector<uint8>& bmpContent, Color* outPale
 
 	// Read palette
 	uint32 palette[256];
-	serializer.read(palette, palSize * 4);
+	serializer.read(palette, palSize * sizeof(uint32));
 	if (nullptr != outPalette)
 	{
-		for (int i = 0; i < palSize; ++i)
-		{
-			const Color color = Color::fromABGR32(palette[i]);
-			outPalette[i].set(color.b, color.g, color.r, 1.0f);
-		}
+		memcpy(outPalette, palette, palSize * sizeof(uint32));
 	}
 
 	// Skip unrecognized parts of the header
@@ -248,7 +244,7 @@ bool PaletteBitmap::loadBMP(const std::vector<uint8>& bmpContent, Color* outPale
 	return true;
 }
 
-bool PaletteBitmap::saveBMP(std::vector<uint8>& bmpContent, const Color* palette)
+bool PaletteBitmap::saveBMP(std::vector<uint8>& bmpContent, const uint32* palette)
 {
 	VectorBinarySerializer serializer(false, bmpContent);
 	const uint32 stride = (mWidth * 8 + 31) / 32 * 4;
@@ -275,8 +271,7 @@ bool PaletteBitmap::saveBMP(std::vector<uint8>& bmpContent, const Color* palette
 
 	for (int i = 0; i < 256; ++i)
 	{
-		const Color color(palette[i].b, palette[i].g, palette[i].r, 1.0f);
-		serializer.write(color.getABGR32());
+		serializer.write(palette[i]);
 	}
 
 	for (uint32 line = 0; line < mHeight; ++line)

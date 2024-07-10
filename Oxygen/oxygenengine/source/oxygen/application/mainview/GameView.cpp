@@ -39,8 +39,7 @@ namespace
 	bool dumpPaletteAsBMP(int paletteIndex)
 	{
 		const PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
-		Color palette[0x100] = { Color::TRANSPARENT };
-		paletteManager.getMainPalette(paletteIndex).dumpColors(palette, 0x100);
+		const uint32* palette = paletteManager.getMainPalette(paletteIndex).getRawColors();
 
 		PaletteBitmap bmp;
 		bmp.create(16, 16);
