@@ -25793,7 +25793,7 @@ static void exec_a8af14968e469b69(const RuntimeOpcodeContext context)
 	context.writeLocalVariable<uint8>(context.getParameter<uint32>(28), var5.get<uint8>());
 }
 
-// First occurrence: fn23e756, line 957
+// First occurrence: fn23e756, line 954
 static void exec_d6c7173106f3cda9(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint32)*context.getParameter<uint32*>());
@@ -25803,7 +25803,7 @@ static void exec_d6c7173106f3cda9(const RuntimeOpcodeContext context)
 	*context.getParameter<uint32*>(24) = var4.get<uint32>();
 }
 
-// First occurrence: fn0543a2, line 1016
+// First occurrence: fn0543a2, line 1013
 static void exec_4fe649c6e18e823d(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint32)*context.getParameter<uint32*>());
@@ -25817,7 +25817,7 @@ static void exec_4fe649c6e18e823d(const RuntimeOpcodeContext context)
 	context.writeLocalVariable<uint8>(context.getParameter<uint32>(28), var6.get<uint8>());
 }
 
-// First occurrence: fn05455e, line 1202
+// First occurrence: fn05455e, line 1199
 static void exec_7921c9c01f5b5c82(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint16)*context.getParameter<uint16*>());
@@ -25828,7 +25828,7 @@ static void exec_7921c9c01f5b5c82(const RuntimeOpcodeContext context)
 	*context.getParameter<uint16*>(24) = var5.get<uint16>();
 }
 
-// First occurrence: fn05455e, line 1218
+// First occurrence: fn05455e, line 1215
 static void exec_a5abc98d7ee330a0(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint16)swapBytes16(*context.getParameter<uint16*>()));
@@ -25837,7 +25837,7 @@ static void exec_a5abc98d7ee330a0(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, context.getParameter<int64>(16), var2.get<uint16>());
 }
 
-// First occurrence: fn0545c4, line 1346
+// First occurrence: fn0545c4, line 1343
 static void exec_b8ac1748c1626205(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<int64>(0, (uint64)context.getParameter<int64>());
@@ -25848,7 +25848,7 @@ static void exec_b8ac1748c1626205(const RuntimeOpcodeContext context)
 	context.moveValueStack(5);
 }
 
-// First occurrence: UpdateBackground.LBZ2, line 1388
+// First occurrence: UpdateBackground.LBZ2, line 1385
 static void exec_74d48bd4e225c031(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint16)swapBytes16(*context.getParameter<uint16*>()));
@@ -25858,7 +25858,7 @@ static void exec_74d48bd4e225c031(const RuntimeOpcodeContext context)
 	*context.getParameter<uint16*>(24) = var4.get<uint16>();
 }
 
-// First occurrence: UpdateBackground.LBZ2, line 1399
+// First occurrence: UpdateBackground.LBZ2, line 1396
 static void exec_fa8e407e7dcd0965(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint16)*context.getParameter<uint16*>());
@@ -25868,7 +25868,7 @@ static void exec_fa8e407e7dcd0965(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, context.getParameter<int64>(24), var4.get<uint16>());
 }
 
-// First occurrence: UpdateBackground.LBZ2, line 1456
+// First occurrence: UpdateBackground.LBZ2, line 1453
 static void exec_a8b898fdc0d41247(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint32)*context.getParameter<uint32*>());
@@ -25881,7 +25881,7 @@ static void exec_a8b898fdc0d41247(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, var7.get<uint32>(), var6.get<uint16>());
 }
 
-// First occurrence: UpdateBackground.LBZ2, line 1502
+// First occurrence: UpdateBackground.LBZ2, line 1499
 static void exec_f5d2748f19eea332(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint16)context.readLocalVariable<uint16>(context.getParameter<uint32>()));
@@ -25891,7 +25891,7 @@ static void exec_f5d2748f19eea332(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, var3.get<uint32>(), var0.get<uint16>());
 }
 
-// First occurrence: UpdateBackground.LBZ2, line 1602
+// First occurrence: UpdateBackground.LBZ2, line 1599
 static void exec_c8cb8d36adc733ce(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint16)*context.getParameter<uint16*>());
@@ -25900,7 +25900,7 @@ static void exec_c8cb8d36adc733ce(const RuntimeOpcodeContext context)
 	context.moveValueStack(2);
 }
 
-// First occurrence: UpdateBackground.LBZ2, line 1611
+// First occurrence: UpdateBackground.LBZ2, line 1608
 static void exec_2b45345191cf7729(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint32)*context.getParameter<uint32*>());
@@ -25910,7 +25910,7 @@ static void exec_2b45345191cf7729(const RuntimeOpcodeContext context)
 	*context.getParameter<uint16*>(24) = var3.get<uint16>();
 }
 
-// First occurrence: fn054a94, line 1623
+// First occurrence: fn054a94, line 1620
 static void exec_1bf1ae64872f7c19(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint32)swapBytes32(*context.getParameter<uint32*>()));
