@@ -338,18 +338,21 @@ namespace
 
 	bool System_hasExternalPaletteData(lemon::StringRef key, uint8 line)
 	{
-		const PaletteCollection::Palette* palette = PaletteCollection::instance().getPalette(key.getHash(), line);
+		const PaletteBase* palette = PaletteCollection::instance().getPalette(key.getHash(), line);
 		return (nullptr != palette);
 	}
 
 	uint16 System_loadExternalPaletteData(lemon::StringRef key, uint8 line, uint32 targetAddress, uint8 maxColors)
 	{
-		const PaletteCollection::Palette* palette = PaletteCollection::instance().getPalette(key.getHash(), line);
+		const PaletteBase* palette = PaletteCollection::instance().getPalette(key.getHash(), line);
 		if (nullptr == palette)
 			return 0;
 
-		const std::vector<uint32>& colors = palette->mColors;
-		const size_t numColors = std::min<size_t>(colors.size(), maxColors);
+		const size_t numColors = std::min<size_t>(palette->getSize(), maxColors);
+		if (numColors == 0)
+			return 0;
+
+		const uint32* colors = palette->getRawColors();
 		uint32* targetPointer = (uint32*)getEmulatorInterface().getMemoryPointer(targetAddress, true, (uint32)numColors * sizeof(uint32));
 		for (size_t i = 0; i < numColors; ++i)
 		{

@@ -11,7 +11,7 @@
 #include "oxygen/application/modding/ModManager.h"
 
 
-const PaletteCollection::Palette* PaletteCollection::getPalette(uint64 key, uint8 line) const
+const PaletteBase* PaletteCollection::getPalette(uint64 key, uint8 line) const
 {
 	return mapFind(mPalettes, key + line);
 }
@@ -34,6 +34,10 @@ void PaletteCollection::loadPalettes()
 
 void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool isModded)
 {
+	BitFlagSet<PaletteBase::Properties> properties = makeBitFlagSet(PaletteBase::Properties::READ_ONLY);
+	if (isModded)
+		properties.set(PaletteBase::Properties::MODDED);
+
 	// Load palettes from the given path
 	std::vector<rmx::FileIO::FileEntry> fileEntries;
 	fileEntries.reserve(8);
@@ -61,17 +65,11 @@ void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool i
 		const int numLines = std::min(bitmap.getHeight(), 64);
 		const int numColorsPerLine = std::min(bitmap.getWidth(), 64);
 
-		for (int y = 0; y < numLines; ++y)
+		for (int line = 0; line < numLines; ++line)
 		{
-			Palette& palette = mPalettes[key];
-			palette.mIsModded = isModded;
-			palette.mColors.resize(numColorsPerLine);
-
-			for (int x = 0; x < numColorsPerLine; ++x)
-			{
-				palette.mColors[x] = bitmap.getPixel(x, y);
-			}
-			++key;
+			PaletteBase& palette = mPalettes[key + line];
+			palette.initPalette(numColorsPerLine, properties);
+			palette.writeRawColors(bitmap.getPixelPointer(0, line), numColorsPerLine);
 		}
 	}
 }

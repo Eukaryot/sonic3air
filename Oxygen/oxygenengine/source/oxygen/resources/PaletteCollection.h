@@ -8,20 +8,13 @@
 
 #pragma once
 
-#include <rmxbase.h>
+#include "oxygen/rendering/parts/palette/Palette.h"
 
 
 class PaletteCollection : public SingleInstance<PaletteCollection>
 {
 public:
-	struct Palette
-	{
-		std::vector<uint32> mColors = { 0 };	// Colors in the palette, using ABGR32 format
-		bool mIsModded = false;
-	};
-
-public:
-	const Palette* getPalette(uint64 key, uint8 line) const;
+	const PaletteBase* getPalette(uint64 key, uint8 line) const;
 
 	void clear();
 	void loadPalettes();
@@ -30,5 +23,5 @@ private:
 	void loadPalettesInDirectory(const std::wstring& path, bool isModded);
 
 private:
-	std::unordered_map<uint64, Palette> mPalettes;
+	std::unordered_map<uint64, PaletteBase> mPalettes;
 };

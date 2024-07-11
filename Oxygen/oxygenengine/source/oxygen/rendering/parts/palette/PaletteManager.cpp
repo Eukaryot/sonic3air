@@ -38,6 +38,12 @@ Color PaletteManager::unpackColor(uint16 packedColor)
 	return Color::fromABGR32(color);
 }
 
+PaletteManager::PaletteManager()
+{
+	mMainPalette[0].initPalette(MAIN_PALETTE_SIZE, BitFlagSet<PaletteBase::Properties>());
+	mMainPalette[1].initPalette(MAIN_PALETTE_SIZE, BitFlagSet<PaletteBase::Properties>());
+}
+
 void PaletteManager::preFrameUpdate()
 {
 	mSplitPositionY = 0xffff;
@@ -58,7 +64,7 @@ const Palette& PaletteManager::getMainPalette(int paletteIndex) const
 
 void PaletteManager::writePaletteEntry(int paletteIndex, uint16 colorIndex, uint32 color)
 {
-	RMX_CHECK(colorIndex < Palette::NUM_COLORS, "Invalid color index " << colorIndex, return);
+	RMX_CHECK(colorIndex < MAIN_PALETTE_SIZE, "Invalid color index " << colorIndex, return);
 	if (paletteIndex == 0)
 	{
 		mMainPalette[0].setPaletteEntry(colorIndex, color);
@@ -70,7 +76,7 @@ void PaletteManager::writePaletteEntry(int paletteIndex, uint16 colorIndex, uint
 
 void PaletteManager::writePaletteEntryPacked(int paletteIndex, uint16 colorIndex, uint16 packedColor)
 {
-	RMX_CHECK(colorIndex < Palette::NUM_COLORS, "Invalid color index " << colorIndex, return);
+	RMX_CHECK(colorIndex < MAIN_PALETTE_SIZE, "Invalid color index " << colorIndex, return);
 
 	// Differentiate between:
 	//  - Original hardware's packed colors (9-bit): 0000 BBB0 GGG0 RRR0
@@ -116,18 +122,6 @@ void PaletteManager::writePaletteEntryPacked(int paletteIndex, uint16 colorIndex
 	mMainPalette[1].setPaletteEntryPacked(colorIndex, color, packedColor);
 }
 
-void PaletteManager::resetAllPaletteChangeFlags()
-{
-	for (int i = 0; i < 2; ++i)
-		mMainPalette[i].resetAllPaletteChangeFlags();
-}
-
-void PaletteManager::setAllPaletteChangeFlags()
-{
-	for (int i = 0; i < 2; ++i)
-		mMainPalette[i].setAllPaletteChangeFlags();
-}
-
 void PaletteManager::setPaletteSplitPositionY(uint8 py)
 {
 	mSplitPositionY = py;
@@ -161,8 +155,8 @@ void PaletteManager::serializeSaveState(VectorBinarySerializer& serializer, uint
 {
 	if (formatVersion >= 4)
 	{
-		mMainPalette[0].serializePalette(serializer);
-		mMainPalette[1].serializePalette(serializer);
+		mMainPalette[0].serializePalette(serializer, formatVersion);
+		mMainPalette[1].serializePalette(serializer, formatVersion);
 	}
 	else
 	{

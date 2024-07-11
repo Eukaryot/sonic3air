@@ -10,9 +10,36 @@
 #include "oxygen/rendering/parts/palette/Palette.h"
 
 
+void PaletteBase::initPalette(size_t size, BitFlagSet<Properties> properties)
+{
+	mColors.resize(size);
+	mProperties = properties;
+}
+
+void PaletteBase::dumpColors(uint32* outColors, size_t numColors) const
+{
+	numColors = std::min(numColors, getSize());
+	if (numColors > 0)
+		memcpy(outColors, getRawColors(), numColors * sizeof(uint32));
+}
+
+void PaletteBase::writeRawColors(const uint32* colors, size_t numColors)
+{
+	numColors = std::min(numColors, getSize());
+	if (numColors > 0)
+		memcpy(&mColors[0], colors, numColors * sizeof(uint32));
+}
+
+
+void Palette::initPalette(size_t size, BitFlagSet<Properties> properties)
+{
+	PaletteBase::initPalette(size, properties);
+	mPackedColorCache.resize(size);
+}
+
 uint16 Palette::getEntryPacked(uint16 colorIndex, bool allowExtendedPacked) const
 {
-	RMX_CHECK(colorIndex < Palette::NUM_COLORS, "Invalid color index " << colorIndex, return 0);
+	RMX_CHECK(colorIndex < getSize(), "Invalid color index " << colorIndex, return 0);
 	const Color color = getColor(colorIndex);
 	if (allowExtendedPacked)	// For notes on extended packed color format, see "writePaletteEntryPacked"
 	{
@@ -30,20 +57,10 @@ uint16 Palette::getEntryPacked(uint16 colorIndex, bool allowExtendedPacked) cons
 	}
 }
 
-void Palette::resetAllPaletteChangeFlags()
-{
-	mChangeFlags.clearAllBits();
-}
-
-void Palette::setAllPaletteChangeFlags()
-{
-	mChangeFlags.setAllBits();
-}
-
 void Palette::invalidatePackedColorCache()
 {
-	for (size_t k = 0; k < NUM_COLORS; ++k)
-		mPackedColorCache[k].mIsValid = false;
+	for (PackedPaletteColor& packed : mPackedColorCache)
+		packed.mIsValid = false;
 }
 
 void Palette::setPaletteEntry(uint16 colorIndex, uint32 color)
@@ -51,8 +68,8 @@ void Palette::setPaletteEntry(uint16 colorIndex, uint32 color)
 	if (mColors[colorIndex] != color)
 	{
 		mColors[colorIndex] = color;
-		mChangeFlags.setBit(colorIndex);
 		mPackedColorCache[colorIndex].mIsValid = false;
+		increaseChangeCounter();
 	}
 }
 
@@ -61,27 +78,22 @@ void Palette::setPaletteEntryPacked(uint16 colorIndex, uint32 color, uint16 pack
 	if (mColors[colorIndex] != color)
 	{
 		mColors[colorIndex] = color;
-		mChangeFlags.setBit(colorIndex);
 		mPackedColorCache[colorIndex].mPackedColor = packedColor;
 		mPackedColorCache[colorIndex].mIsValid = true;
+		increaseChangeCounter();
 	}
 }
 
-void Palette::dumpColors(uint32* outColors, int numColors) const
+void Palette::serializePalette(VectorBinarySerializer& serializer, uint8 formatVersion)
 {
-	memcpy(outColors, mColors, numColors * sizeof(uint32));
-}
-
-void Palette::serializePalette(VectorBinarySerializer& serializer)
-{
-	for (size_t k = 0; k < NUM_COLORS; ++k)
+	for (uint32& color : mColors)
 	{
-		serializer.serialize(mColors[k]);
+		serializer.serialize(color);
+	}
 
-		if (serializer.isReading())
-		{
-			setAllPaletteChangeFlags();
-			invalidatePackedColorCache();
-		}
+	if (serializer.isReading())
+	{
+		increaseChangeCounter();
+		invalidatePackedColorCache();
 	}
 }

@@ -14,9 +14,14 @@
 class PaletteManager
 {
 public:
+	static const size_t MAIN_PALETTE_SIZE = 512;
+
+public:
 	static Color unpackColor(uint16 packedColor);
 
 public:
+	PaletteManager();
+
 	void preFrameUpdate();
 
 	Palette& getMainPalette(int paletteIndex);
@@ -24,9 +29,6 @@ public:
 
 	void writePaletteEntry(int paletteIndex, uint16 colorIndex, uint32 color);
 	void writePaletteEntryPacked(int paletteIndex, uint16 colorIndex, uint16 packedColor);
-
-	void resetAllPaletteChangeFlags();
-	void setAllPaletteChangeFlags();
 
 	inline Color getBackdropColor() const  { return mMainPalette[0].getColor(mBackdropColorIndex); }
 	inline void setBackdropColorIndex(uint16 paletteIndex)  { mBackdropColorIndex = paletteIndex; }

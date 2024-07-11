@@ -55,7 +55,7 @@ void OpenGLRenderResources::initialize()
 {
 	// Palettes
 	{
-		mMainPalette.mBitmap.create(256, Palette::NUM_COLORS / 256 * 2);
+		mMainPalette.mBitmap.create(256, PaletteManager::MAIN_PALETTE_SIZE / 256 * 2);
 		mMainPalette.mTexture.setup(mMainPalette.mBitmap.getSize(), rmx::OpenGLHelper::FORMAT_RGBA);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
@@ -96,8 +96,8 @@ void OpenGLRenderResources::refresh()
 		Palette& palette1 = paletteManager.getMainPalette(1);
 
 		// Update data in palette bitmap if needed
-		const bool primaryPaletteChanged = updatePaletteBitmap(palette0, bitmap, 0);
-		const bool secondaryPaletteChanged = updatePaletteBitmap(palette1, bitmap, 2);
+		const bool primaryPaletteChanged = updatePaletteBitmap(palette0, bitmap, 0, mMainPalette.mChangeCounters[0]);
+		const bool secondaryPaletteChanged = updatePaletteBitmap(palette1, bitmap, 2, mMainPalette.mChangeCounters[1]);
 
 		if (primaryPaletteChanged || secondaryPaletteChanged)
 		{
@@ -115,8 +115,8 @@ void OpenGLRenderResources::refresh()
 			}
 			glBindTexture(GL_TEXTURE_2D, 0);
 
-			palette0.resetAllPaletteChangeFlags();
-			palette1.resetAllPaletteChangeFlags();
+			palette0.increaseChangeCounter();
+			palette1.increaseChangeCounter();
 		}
 	}
 
@@ -242,7 +242,8 @@ void OpenGLRenderResources::refresh()
 void OpenGLRenderResources::clearAllCaches()
 {
 	mAllPatternsDirty = true;
-	mRenderParts.getPaletteManager().setAllPaletteChangeFlags();
+	for (int k = 0; k < 2; ++k)
+		--mMainPalette.mChangeCounters[k];		// This should suffice to have out-dated change counters again
 }
 
 const BufferTexture& OpenGLRenderResources::getPlanePatternsTexture(int planeIndex) const
@@ -269,21 +270,17 @@ const BufferTexture& OpenGLRenderResources::getVScrollOffsetsTexture(int scrollO
 	return mVScrollOffsetsTexture[scrollOffsetsIndex];
 }
 
-bool OpenGLRenderResources::updatePaletteBitmap(Palette& palette, Bitmap& bitmap, int offsetY)
+bool OpenGLRenderResources::updatePaletteBitmap(Palette& palette, Bitmap& bitmap, int offsetY, uint16& changeCounter)
 {
-	bool anyChange = false;
-	const BitArray<Palette::NUM_COLORS>& changeFlags = palette.getChangeFlags();
-	for (int k = 0; k < changeFlags.NUM_CHUNKS; ++k)
-	{
-		// For all changed flags, copy over the respective data
-		if (changeFlags.anyBitSetInChunk(k))
-		{
-			uint32* dst = bitmap.getPixelPointer((k * changeFlags.BITS_PER_CHUNK) % 256, (k * changeFlags.BITS_PER_CHUNK) / 256 + offsetY);
-			memcpy(dst, palette.getRawColors() + k * changeFlags.BITS_PER_CHUNK, changeFlags.BITS_PER_CHUNK * sizeof(uint32));
-			anyChange = true;
-		}
-	}
-	return anyChange;
+	if (changeCounter == palette.getChangeCounter())
+		return false;
+
+	// Copy over the palette data
+	uint32* dst = bitmap.getPixelPointer(0, offsetY);
+	palette.dumpColors(dst, palette.getSize());
+
+	changeCounter = palette.getChangeCounter();
+	return true;
 }
 
 #endif

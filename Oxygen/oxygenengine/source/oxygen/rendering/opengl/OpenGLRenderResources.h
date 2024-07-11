@@ -43,10 +43,11 @@ private:
 	{
 		Bitmap		  mBitmap;
 		OpenGLTexture mTexture;
+		uint16		  mChangeCounters[2] = { 0 };
 	};
 
 private:
-	bool updatePaletteBitmap(Palette& palette, Bitmap& bitmap, int offsetY);
+	bool updatePaletteBitmap(Palette& palette, Bitmap& bitmap, int offsetY, uint16& changeCounter);
 
 private:
 	RenderParts& mRenderParts;
