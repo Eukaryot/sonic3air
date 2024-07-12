@@ -93,7 +93,7 @@ void OpenGLRenderResources::refresh()
 		}
 
 		// Remove cached data for custom palettes after a few frames
-		for (auto& it = mCustomPalettes.begin(); it != mCustomPalettes.end(); )
+		for (auto it = mCustomPalettes.begin(); it != mCustomPalettes.end(); )
 		{
 			PaletteData& data = it->second;
 			++data.mUnusedFramesCounter;
