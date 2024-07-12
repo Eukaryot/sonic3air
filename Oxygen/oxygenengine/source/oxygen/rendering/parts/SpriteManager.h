@@ -36,6 +36,8 @@ public:
 		float  mRotation = 0.0f;
 		Vec2f  mScale = Vec2f(1.0f, 1.0f);
 		bool   mUseUpscaledSprite = false;			// Only supported for palette sprites
+		uint64 mPrimaryPaletteKey = 0;				// Only supported for palette sprites
+		uint64 mSecondaryPaletteKey = 0;			// Only supported for palette sprites
 		uint16 mAtex = 0;							// Only supported for palette sprites
 		uint64 mSpriteTag = 0;
 		Vec2i  mTaggedSpritePosition;
@@ -117,7 +119,7 @@ private:
 	bool mLoggedLimitWarning = false;
 
 	uint32 mNextSpriteHandle = 1;
-	std::vector<SpriteHandleData> mSpritesHandles;
+	std::vector<SpriteHandleData> mSpriteHandles;
 	std::pair<uint32, SpriteHandleData*> mLatestSpriteHandle;
 
 	struct TaggedSpriteData

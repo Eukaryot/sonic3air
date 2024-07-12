@@ -16,6 +16,7 @@
 
 class RenderParts;
 class Palette;
+class PaletteBase;
 
 
 class OpenGLRenderResources
@@ -30,6 +31,8 @@ public:
 	inline RenderParts& getRenderParts() const  { return mRenderParts; }
 
 	inline const OpenGLTexture& getMainPaletteTexture() const  { return mMainPalette.mTexture; }
+	const OpenGLTexture& getCustomPaletteTexture(const PaletteBase& primaryPalette, const PaletteBase& secondaryPalette);
+	const OpenGLTexture& getPaletteTexture(const PaletteBase* primaryPalette, const PaletteBase* secondaryPalette);
 
 	inline const BufferTexture& getPatternCacheTexture() const  { return mPatternCacheTexture; }
 
@@ -44,16 +47,19 @@ private:
 		Bitmap		  mBitmap;
 		OpenGLTexture mTexture;
 		uint16		  mChangeCounters[2] = { 0 };
+		int			  mUnusedFramesCounter = 0;
 	};
 
 private:
-	bool updatePaletteBitmap(Palette& palette, Bitmap& bitmap, int offsetY, uint16& changeCounter);
+	bool updatePalette(PaletteData& data, const PaletteBase& primaryPalette, const PaletteBase& secondaryPalette);
+	bool updatePaletteBitmap(const PaletteBase& palette, Bitmap& bitmap, int offsetY, uint16& changeCounter);
 
 private:
 	RenderParts& mRenderParts;
 
 	// Palette
 	PaletteData mMainPalette;
+	std::unordered_map<uint64, PaletteData> mCustomPalettes;	// Using a key built from a combination of primary and secondary palette keys
 
 	// Patterns
 	PaletteBitmap mPatternCacheBitmap;

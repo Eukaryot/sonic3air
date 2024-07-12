@@ -18,6 +18,7 @@ class OpenGLTexture final
 public:
 	~OpenGLTexture();
 
+	inline bool isValid() const		{ return mTextureHandle != 0; }
 	inline GLuint getHandle() const	{ return mTextureHandle; }
 	inline Vec2i getSize() const	{ return mSize; }
 

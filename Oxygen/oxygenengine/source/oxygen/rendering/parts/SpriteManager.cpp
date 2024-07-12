@@ -10,6 +10,7 @@
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/rendering/parts/SpriteManager.h"
 #include "oxygen/rendering/parts/PatternManager.h"
+#include "oxygen/resources/PaletteCollection.h"
 #include "oxygen/resources/SpriteCache.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LogDisplay.h"
@@ -286,7 +287,7 @@ uint32 SpriteManager::addSpriteHandle(uint64 key, const Vec2i& position, uint16 
 	if (mNextSpriteHandle == 0)
 		++mNextSpriteHandle;
 
-	SpriteHandleData& data = vectorAdd(mSpritesHandles);
+	SpriteHandleData& data = vectorAdd(mSpriteHandles);
 	data.mHandle = spriteHandle;
 	data.mKey = key;
 	data.mPosition = position;
@@ -307,7 +308,7 @@ SpriteManager::SpriteHandleData* SpriteManager::getSpriteHandleData(uint32 sprit
 	// Otherwise search for the handle
 	//  -> TODO: At least for now, the sprite handles are always in order, so we could do a binary search here
 	SpriteHandleData* data = nullptr;
-	for (auto it = mSpritesHandles.rbegin(); it != mSpritesHandles.rend(); ++it)
+	for (auto it = mSpriteHandles.rbegin(); it != mSpriteHandles.rend(); ++it)
 	{
 		if (it->mHandle == spriteHandle)
 		{
@@ -468,7 +469,9 @@ bool SpriteManager::checkRenderItemLimit()
 
 void SpriteManager::processSpriteHandles()
 {
-	for (const SpriteHandleData& data : mSpritesHandles)
+	PaletteCollection& paletteCollection = PaletteCollection::instance();
+
+	for (const SpriteHandleData& data : mSpriteHandles)
 	{
 		renderitems::CustomSpriteInfoBase* spritePtr = addSpriteByKey(data.mKey);
 		if (nullptr == spritePtr)
@@ -505,7 +508,12 @@ void SpriteManager::processSpriteHandles()
 
 		if (sprite.getType() == RenderItem::Type::PALETTE_SPRITE)
 		{
-			static_cast<renderitems::PaletteSpriteInfo&>(sprite).mAtex = data.mAtex;
+			renderitems::PaletteSpriteInfo& paletteSprite = static_cast<renderitems::PaletteSpriteInfo&>(sprite);
+			if (data.mPrimaryPaletteKey != 0)
+				paletteSprite.mPrimaryPalette = paletteCollection.getPalette(data.mPrimaryPaletteKey, 0);
+			if (data.mSecondaryPaletteKey != 0)
+				paletteSprite.mSecondaryPalette = paletteCollection.getPalette(data.mSecondaryPaletteKey, 0);
+			paletteSprite.mAtex = data.mAtex;
 		}
 
 		if (data.mSpriteTag != 0)
@@ -521,7 +529,7 @@ void SpriteManager::processSpriteHandles()
 			taggedSpriteData.mPosition = data.mTaggedSpritePosition;
 		}
 	}
-	mSpritesHandles.clear();
+	mSpriteHandles.clear();
 }
 
 void SpriteManager::grabAddedItems()

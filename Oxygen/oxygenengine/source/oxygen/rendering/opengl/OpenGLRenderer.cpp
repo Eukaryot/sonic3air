@@ -395,9 +395,9 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
 					const bool useAlphaTest = (spriteInfo.mBlendMode != BlendMode::OPAQUE);
 					RenderPaletteSpriteShader& shader = mRenderPaletteSpriteShader[useAlphaTest ? 1 : 0];
-					if (needsRefresh || mLastUsedRenderPaletteSpriteShader != &shader)
+					if (needsRefresh || mLastUsedRenderPaletteSpriteShader != &shader || shader.needsRefresh(spriteInfo))
 					{
-						shader.refresh(mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mResources);
+						shader.refresh(mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, spriteInfo, mResources);
 						mLastUsedRenderPaletteSpriteShader = &shader;
 					}
 					if (spriteInfo.mSize.x == 0 || spriteInfo.mSize.y == 0)

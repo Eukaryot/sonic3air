@@ -768,6 +768,35 @@ namespace
 		}
 	}
 
+	void SpriteHandle_setPalette(SpriteHandleWrapper spriteHandle, lemon::StringRef key, uint8 line)
+	{
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			const uint64 paletteKey = key.getHash() + line;
+			spriteHandleData->mPrimaryPaletteKey = paletteKey;
+			spriteHandleData->mSecondaryPaletteKey = paletteKey;
+		}
+	}
+
+	void SpriteHandle_setPrimaryPalette(SpriteHandleWrapper spriteHandle, lemon::StringRef key, uint8 line)
+	{
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mPrimaryPaletteKey = key.getHash() + line;
+		}
+	}
+
+	void SpriteHandle_setSecondaryPalette(SpriteHandleWrapper spriteHandle, lemon::StringRef key, uint8 line)
+	{
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mSecondaryPaletteKey = key.getHash() + line;
+		}
+	}
+
 	void SpriteHandle_setPaletteOffset(SpriteHandleWrapper spriteHandle, uint16 paletteOffset)
 	{
 		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
@@ -1194,6 +1223,15 @@ void RendererBindings::registerBindings(lemon::Module& module)
 
 		builder.addNativeMethod("SpriteHandle", "setBlendMode", lemon::wrap(&SpriteHandle_setBlendMode), defaultFlags)
 			.setParameters("this", "blendMode");
+
+		builder.addNativeMethod("SpriteHandle", "setPalette", lemon::wrap(&SpriteHandle_setPalette), defaultFlags)
+			.setParameters("this", "key", "line");
+
+		builder.addNativeMethod("SpriteHandle", "setPrimaryPalette", lemon::wrap(&SpriteHandle_setPrimaryPalette), defaultFlags)
+			.setParameters("this", "key", "line");
+
+		builder.addNativeMethod("SpriteHandle", "setSecondaryPalette", lemon::wrap(&SpriteHandle_setSecondaryPalette), defaultFlags)
+			.setParameters("this", "key", "line");
 
 		builder.addNativeMethod("SpriteHandle", "setPaletteOffset", lemon::wrap(&SpriteHandle_setPaletteOffset), defaultFlags)
 			.setParameters("this", "paletteOffset");

@@ -12,6 +12,8 @@
 #include "oxygen/rendering/parts/SpacesManager.h"
 #include "oxygen/resources/SpriteCache.h"
 
+class PaletteBase;
+
 
 struct RenderItem
 {
@@ -109,6 +111,8 @@ namespace renderitems
 		inline PaletteSpriteInfo() : CustomSpriteInfoBase(Type::PALETTE_SPRITE) {}
 		virtual void serialize(VectorBinarySerializer& serializer, uint8 formatVersion) override;
 
+		const PaletteBase* mPrimaryPalette = nullptr;
+		const PaletteBase* mSecondaryPalette = nullptr;
 		uint16 mAtex = 0;
 	};
 

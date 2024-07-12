@@ -21,8 +21,9 @@ public:
 	};
 
 public:
-	virtual void initPalette(size_t size, BitFlagSet<Properties> properties);
+	virtual void initPalette(uint64 key, size_t size, BitFlagSet<Properties> properties);
 
+	inline uint64 getKey() const				{ return mKey; }
 	inline size_t getSize() const				{ return mColors.size(); }
 	inline const uint32* getRawColors() const	{ return &mColors[0]; }
 
@@ -38,6 +39,7 @@ public:
 	inline BitFlagSet<Properties> getProperties() const  { return mProperties; }
 
 protected:
+	uint64 mKey = 0;
 	std::vector<uint32> mColors;	// Colors in the palette, using ABGR32 format
 	uint16 mChangeCounter = 1;
 	BitFlagSet<Properties> mProperties;
@@ -49,7 +51,7 @@ class Palette : public PaletteBase
 friend class PaletteManager;
 
 public:
-	virtual void initPalette(size_t size, BitFlagSet<Properties> properties) override;
+	virtual void initPalette(uint64 key, size_t size, BitFlagSet<Properties> properties) override;
 
 	uint16 getEntryPacked(uint16 colorIndex, bool allowExtendedPacked = false) const;
 

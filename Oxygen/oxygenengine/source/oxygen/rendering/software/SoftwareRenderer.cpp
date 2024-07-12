@@ -701,13 +701,16 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 				const PaletteSprite& paletteSprite = *static_cast<PaletteSprite*>(spriteInfo.mCacheItem->mSprite);
 				const PaletteBitmap& paletteBitmap = spriteInfo.mUseUpscaledSprite ? paletteSprite.getUpscaledBitmap() : paletteSprite.getBitmap();
 				const Blitter::IndexedSpriteWrapper spriteWrapper(paletteBitmap.getData(), paletteBitmap.getSize(), -paletteSprite.mOffset);
-				const Blitter::PaletteWrapper paletteWrapper(paletteManager.getMainPalette(0).getRawColors() + spriteInfo.mAtex, paletteManager.getMainPalette(0).getSize() - spriteInfo.mAtex);
+
+				const PaletteBase& primaryPalette = (nullptr == spriteInfo.mPrimaryPalette) ? paletteManager.getMainPalette(0) : *spriteInfo.mPrimaryPalette;
+				const Blitter::PaletteWrapper paletteWrapper(primaryPalette.getRawColors() + spriteInfo.mAtex, primaryPalette.getSize() - spriteInfo.mAtex);
 
 				// Handle screen palette split
 				const int splitY = paletteManager.mSplitPositionY;
 				if (splitY < mGameResolution.y)
 				{
-					const Blitter::PaletteWrapper paletteWrapper2(paletteManager.getMainPalette(1).getRawColors() + spriteInfo.mAtex, paletteManager.getMainPalette(1).getSize() - spriteInfo.mAtex);
+					const PaletteBase& secondaryPalette = (nullptr == spriteInfo.mSecondaryPalette) ? paletteManager.getMainPalette(1) : *spriteInfo.mSecondaryPalette;
+					const Blitter::PaletteWrapper paletteWrapper2(secondaryPalette.getRawColors() + spriteInfo.mAtex, secondaryPalette.getSize() - spriteInfo.mAtex);
 
 					Recti targetRect = Recti::getIntersection(mCurrentViewport, Recti(0, 0, mGameResolution.x, splitY));
 					mBlitter.blitIndexed(Blitter::OutputWrapper(gameScreenBitmap, targetRect), spriteWrapper, paletteWrapper, spriteInfo.mInterpolatedPosition, blitterOptions);

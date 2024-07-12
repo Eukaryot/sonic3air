@@ -68,7 +68,7 @@ void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool i
 		for (int line = 0; line < numLines; ++line)
 		{
 			PaletteBase& palette = mPalettes[key + line];
-			palette.initPalette(numColorsPerLine, properties);
+			palette.initPalette(key + line, numColorsPerLine, properties);
 			palette.writeRawColors(bitmap.getPixelPointer(0, line), numColorsPerLine);
 		}
 	}

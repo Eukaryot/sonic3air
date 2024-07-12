@@ -21,13 +21,17 @@ class RenderPaletteSpriteShader : public OpenGLShader
 {
 public:
 	void initialize(bool alphaTest);
-	void refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const OpenGLRenderResources& resources);
+
+	inline bool needsRefresh(const renderitems::PaletteSpriteInfo& spriteInfo) const  { return mLastUsedPrimaryPalette != spriteInfo.mPrimaryPalette || mLastUsedSecondaryPalette != spriteInfo.mSecondaryPalette; }
+	void refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const renderitems::PaletteSpriteInfo& spriteInfo, OpenGLRenderResources& resources);
 	void draw(const renderitems::PaletteSpriteInfo& spriteInfo, OpenGLRenderResources& resources);
 
 private:
 	bool  mInitialized = false;
 	Vec2i mLastGameResolution;
 	int   mLastWaterSurfaceHeight = 0;
+	const PaletteBase* mLastUsedPrimaryPalette = nullptr;
+	const PaletteBase* mLastUsedSecondaryPalette = nullptr;
 
 	Shader mShader;
 	GLuint mLocGameResolution = 0;

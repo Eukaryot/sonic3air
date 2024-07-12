@@ -25,7 +25,7 @@ void RenderPaletteSpriteShader::initialize(bool alphaTest)
 	FileHelper::loadShader(mShader, L"data/shader/render_sprite_palette.shader", alphaTest ? "Standard_AlphaTest" : "Standard", additionalDefines);
 }
 
-void RenderPaletteSpriteShader::refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const OpenGLRenderResources& resources)
+void RenderPaletteSpriteShader::refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const renderitems::PaletteSpriteInfo& spriteInfo, OpenGLRenderResources& resources)
 {
 	mShader.bind();
 
@@ -47,8 +47,15 @@ void RenderPaletteSpriteShader::refresh(const Vec2i& gameResolution, int waterSu
 		glUniform1i(mLocPaletteTex, 1);
 	}
 
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, resources.getMainPaletteTexture().getHandle());
+	// Set palette
+	{
+		const OpenGLTexture& paletteTexture = resources.getPaletteTexture(spriteInfo.mPrimaryPalette, spriteInfo.mSecondaryPalette);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, paletteTexture.getHandle());
+
+		mLastUsedPrimaryPalette = spriteInfo.mPrimaryPalette;
+		mLastUsedSecondaryPalette = spriteInfo.mSecondaryPalette;
+	}
 
 	if (mLastGameResolution != gameResolution || !mInitialized)
 	{
