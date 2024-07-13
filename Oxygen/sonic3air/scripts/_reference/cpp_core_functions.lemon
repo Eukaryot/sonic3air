@@ -220,6 +220,8 @@ declare function void Input.setControllerLEDs(u8 playerIndex, u32 color)
 declare function void yieldExecution()
 declare function u16 getScreenWidth()
 declare function u16 getScreenHeight()
+declare function u16 getScreenCenterX()
+declare function u16 getScreenCenterY()
 declare function u16 getScreenExtend()
 
 declare function u32 Color.fromHSV(float hue, float saturation, float value)

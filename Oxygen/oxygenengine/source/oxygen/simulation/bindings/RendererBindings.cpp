@@ -36,6 +36,16 @@ namespace
 		return (uint16)VideoOut::instance().getScreenHeight();
 	}
 
+	uint16 getScreenCenterX()
+	{
+		return (uint16)VideoOut::instance().getScreenWidth() / 2;
+	}
+
+	uint16 getScreenCenterY()
+	{
+		return (uint16)VideoOut::instance().getScreenHeight() / 2;
+	}
+
 	uint16 getScreenExtend()
 	{
 		return (uint16)(VideoOut::instance().getScreenWidth() - 320) / 2;
@@ -924,6 +934,8 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		// Screen size query
 		builder.addNativeFunction("getScreenWidth", lemon::wrap(&getScreenWidth), defaultFlags);
 		builder.addNativeFunction("getScreenHeight", lemon::wrap(&getScreenHeight), defaultFlags);
+		builder.addNativeFunction("getScreenCenterX", lemon::wrap(&getScreenCenterX), defaultFlags);
+		builder.addNativeFunction("getScreenCenterY", lemon::wrap(&getScreenCenterY), defaultFlags);
 		builder.addNativeFunction("getScreenExtend", lemon::wrap(&getScreenExtend), defaultFlags);
 
 
