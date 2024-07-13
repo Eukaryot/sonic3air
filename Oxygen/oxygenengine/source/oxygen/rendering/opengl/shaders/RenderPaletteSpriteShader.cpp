@@ -82,6 +82,15 @@ void RenderPaletteSpriteShader::draw(const renderitems::PaletteSpriteInfo& sprit
 	if (nullptr == texture)
 		return;
 
+	const PaletteManager& paletteManager = resources.getRenderParts().getPaletteManager();
+	Vec4f tintColor = spriteInfo.mTintColor;
+	Vec4f addedColor = spriteInfo.mAddedColor;
+	if (spriteInfo.mUseGlobalComponentTint)
+	{
+		tintColor *= paletteManager.getGlobalComponentTintColor();
+		addedColor += paletteManager.getGlobalComponentAddedColor();
+	}
+
 	texture->bindTexture();
 
 	glUniform3iv(mLocPosition, 1, *Vec3i(spriteInfo.mInterpolatedPosition.x, spriteInfo.mInterpolatedPosition.y, spriteInfo.mPriorityFlag ? 1 : 0));
@@ -89,8 +98,8 @@ void RenderPaletteSpriteShader::draw(const renderitems::PaletteSpriteInfo& sprit
 	glUniform2iv(mLocSize, 1, *spriteInfo.mSize);
 	glUniform4fv(mLocTransformation, 1, *spriteInfo.mTransformation.mMatrix);
 	glUniform1i (mLocAtex, spriteInfo.mAtex);
-	glUniform4fv(mLocTintColor, 1, spriteInfo.mTintColor.data);
-	glUniform4fv(mLocAddedColor, 1, spriteInfo.mAddedColor.data);
+	glUniform4fv(mLocTintColor, 1, tintColor.data);
+	glUniform4fv(mLocAddedColor, 1, addedColor.data);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }

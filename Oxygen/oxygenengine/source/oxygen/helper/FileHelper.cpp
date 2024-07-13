@@ -95,7 +95,7 @@ namespace
 }
 
 
-bool FileHelper::loadPaletteBitmap(PaletteBitmap& bitmap, const std::wstring& filename, bool showError)
+bool FileHelper::loadPaletteBitmap(PaletteBitmap& bitmap, const std::wstring& filename, std::vector<uint32>* outPalette, bool showError)
 {
 	std::vector<uint8> content;
 	if (!FTX::FileSystem->readFile(filename, content))
@@ -104,7 +104,7 @@ bool FileHelper::loadPaletteBitmap(PaletteBitmap& bitmap, const std::wstring& fi
 		return false;
 	}
 
-	if (!bitmap.loadBMP(content))
+	if (!bitmap.loadBMP(content, outPalette))
 	{
 		RMX_CHECK(!showError, "Failed to load image file '" << *WString(filename).toString() << "': Format not supported", );
 		return false;

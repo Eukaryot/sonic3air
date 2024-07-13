@@ -46,7 +46,7 @@ public:
 	void shiftAllIndices(int8 indexShift);
 	void overwriteUnusedPaletteEntries(uint32* palette);
 
-	bool loadBMP(const std::vector<uint8>& bmpContent, uint32* outPalette = nullptr);	// Expecting palette colors to use ABGR32 format
+	bool loadBMP(const std::vector<uint8>& bmpContent, std::vector<uint32>* outPalette = nullptr);	// Expecting palette colors to use ABGR32 format
 	bool saveBMP(std::vector<uint8>& bmpContent, const uint32* palette);
 
 private:

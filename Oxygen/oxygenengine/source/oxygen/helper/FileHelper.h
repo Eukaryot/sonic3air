@@ -18,7 +18,7 @@ class Shader;
 class FileHelper
 {
 public:
-	static bool loadPaletteBitmap(PaletteBitmap& bitmap, const std::wstring& filename, bool showError = true);
+	static bool loadPaletteBitmap(PaletteBitmap& bitmap, const std::wstring& filename, std::vector<uint32>* outPalette = nullptr, bool showError = true);
 	static bool loadBitmap(Bitmap& bitmap, const std::wstring& filename, bool showError = true);
 	static bool loadTexture(DrawerTexture& texture, const std::wstring& filename, bool showError = true);
 

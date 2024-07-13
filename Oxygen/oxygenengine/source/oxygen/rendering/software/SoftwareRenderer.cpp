@@ -677,7 +677,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			Color tintColor = spriteBase.mTintColor;
 			Color addedColor = spriteBase.mAddedColor;
 			{
-				if (spriteBase.mUseGlobalComponentTint && !isPaletteSprite)
+				if (spriteBase.mUseGlobalComponentTint)
 				{
 					paletteManager.applyGlobalComponentTint(tintColor, addedColor);
 				}

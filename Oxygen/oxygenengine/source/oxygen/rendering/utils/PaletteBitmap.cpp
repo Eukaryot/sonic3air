@@ -33,6 +33,11 @@ namespace
 		uint32 importantColors;
 	};
 	#pragma pack()
+
+	inline uint32 swapRedBlue(uint32 color)
+	{
+		return (color & 0xff00ff00) | ((color & 0x00ff0000) >> 16) | ((color & 0x000000ff) << 16);
+	}
 }
 
 
@@ -162,7 +167,7 @@ void PaletteBitmap::overwriteUnusedPaletteEntries(uint32* palette)
 	}
 }
 
-bool PaletteBitmap::loadBMP(const std::vector<uint8>& bmpContent, uint32* outPalette)
+bool PaletteBitmap::loadBMP(const std::vector<uint8>& bmpContent, std::vector<uint32>* outPalette)
 {
 	VectorBinarySerializer serializer(true, bmpContent);
 
@@ -196,11 +201,19 @@ bool PaletteBitmap::loadBMP(const std::vector<uint8>& bmpContent, uint32* outPal
 		return false;
 
 	// Read palette
-	uint32 palette[256];
-	serializer.read(palette, palSize * sizeof(uint32));
 	if (nullptr != outPalette)
 	{
-		memcpy(outPalette, palette, palSize * sizeof(uint32));
+		std::vector<uint32>& palette = *outPalette;
+		palette.resize(palSize);
+		serializer.read(&palette[0], palSize * sizeof(uint32));
+		for (int i = 0; i < palSize; ++i)
+		{
+			palette[i] = swapRedBlue(palette[i] | 0xff000000);
+		}
+	}
+	else
+	{
+		serializer.skip(palSize * sizeof(uint32));
 	}
 
 	// Skip unrecognized parts of the header

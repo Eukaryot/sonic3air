@@ -18,6 +18,8 @@ class SpriteDump;
 
 class SpriteCache : public SingleInstance<SpriteCache>
 {
+friend class PaletteCollection;	// For direct access to mSpritePalettes
+
 public:
 	enum class ROMSpriteEncoding : uint8
 	{
@@ -90,11 +92,21 @@ public:
 	void dumpSprite(uint64 key, std::string_view categoryKey, uint8 spriteNumber, uint8 atex);
 
 private:
+	struct SpritePalettes
+	{
+		std::unordered_map<uint64, std::vector<uint32>> mPalettes;
+		std::unordered_map<uint64, uint64> mRedirections;
+	};
+
+private:
 	CacheItem& createCacheItem(uint64 key);
 	void loadSpriteDefinitions(const std::wstring& path);
+	void addSpritePalette(uint64 paletteKey, std::vector<uint32>& palette);
 
 private:
 	std::unordered_map<uint64, CacheItem> mCachedSprites;
+	SpritePalettes mSpritePalettes;
+
 	SpriteDump* mSpriteDump = nullptr;
 	uint32 mGlobalChangeCounter = 0;
 };

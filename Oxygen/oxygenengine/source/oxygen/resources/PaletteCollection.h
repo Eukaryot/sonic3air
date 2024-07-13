@@ -21,7 +21,9 @@ public:
 
 private:
 	void loadPalettesInDirectory(const std::wstring& path, bool isModded);
+	void addSpritePalettes();
 
 private:
 	std::unordered_map<uint64, PaletteBase> mPalettes;
+	std::unordered_map<uint64, PaletteBase*> mRedirections;
 };

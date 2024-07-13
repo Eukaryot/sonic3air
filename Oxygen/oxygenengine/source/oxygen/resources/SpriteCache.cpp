@@ -193,6 +193,7 @@ void SpriteCache::clear()
 		delete pair.second.mSprite;
 	}
 	mCachedSprites.clear();
+	mSpritePalettes = SpritePalettes();
 	++mGlobalChangeCounter;
 }
 
@@ -360,10 +361,15 @@ SpriteCache::CacheItem& SpriteCache::createCacheItem(uint64 key)
 
 void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 {
+	struct PaletteSpriteSheet
+	{
+		PaletteBitmap mBitmap;
+		uint64 mFirstSpritePaletteKey = 0;
+	};
 	struct SheetCache
 	{
-		std::map<std::wstring, PaletteBitmap> mPaletteSpriteSheets;
-		std::map<std::wstring, Bitmap> mComponentSpriteSheets;
+		std::map<uint64, PaletteSpriteSheet> mPaletteSpriteSheets;
+		std::map<uint64, Bitmap> mComponentSpriteSheets;
 	};
 	SheetCache sheetCache;
 
@@ -372,6 +378,8 @@ void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 	FTX::FileSystem->listFilesByMask(path + L"/*.json", true, fileEntries);
 	if (fileEntries.empty())
 		return;
+
+	std::vector<uint32> palette;
 
 	++mGlobalChangeCounter;
 	for (const rmx::FileIO::FileEntry& fileEntry : fileEntries)
@@ -444,11 +452,11 @@ void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 			{
 				// Check for overloading
 				{
-					const auto it = mCachedSprites.find(key);
-					if (it != mCachedSprites.end())
+					CacheItem* existingItem = mapFind(mCachedSprites, key);
+					if (nullptr != existingItem)
 					{
 						// This sprite got overloaded e.g. by a mod -- remove the old version
-						SAFE_DELETE(it->second.mSprite);
+						SAFE_DELETE(existingItem->mSprite);
 					}
 				}
 
@@ -461,8 +469,10 @@ void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 				// Palette or RGBA?
 				item.mUsesComponentSprite = WString(filename).endsWith(L".png");
 
-				// Part of a sprite sheet?
-				const bool isPartOfSheet = (rect.width != 0);
+				// If this is part of a sprite sheet, we set the sheet key
+				uint64 sheetKey = 0;
+				if (rect.width != 0)
+					sheetKey = rmx::getMurmur2_64(fullpath);
 
 				bool success = false;
 				if (!item.mUsesComponentSprite)
@@ -471,33 +481,41 @@ void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 					PaletteSprite* sprite = new PaletteSprite();
 					item.mSprite = sprite;
 
-					if (isPartOfSheet)
+					const uint64 paletteKey = rmx::getMurmur2_64("@" + iterator.key().asString());
+
+					if (sheetKey != 0)
 					{
-						PaletteBitmap* bitmap = nullptr;
-						const auto it = sheetCache.mPaletteSpriteSheets.find(fullpath);
-						if (it == sheetCache.mPaletteSpriteSheets.end())
+						// Part of a sprite sheet
+						PaletteSpriteSheet& sheet = sheetCache.mPaletteSpriteSheets[sheetKey];
+						if (sheet.mBitmap.empty())
 						{
-							bitmap = &sheetCache.mPaletteSpriteSheets[fullpath];
-							success = FileHelper::loadPaletteBitmap(*bitmap, fullpath);
+							success = FileHelper::loadPaletteBitmap(sheet.mBitmap, fullpath, &palette);
+							if (success)
+							{
+								sheet.mFirstSpritePaletteKey = paletteKey;
+								addSpritePalette(paletteKey, palette);
+							}
 						}
 						else
 						{
-							bitmap = &it->second;
 							success = true;
+							mSpritePalettes.mRedirections[paletteKey] = sheet.mFirstSpritePaletteKey;
 						}
 
 						if (success)
 						{
-							sprite->createFromBitmap(*bitmap, rect, -center);
+							sprite->createFromBitmap(sheet.mBitmap, rect, -center);
 						}
 					}
 					else
 					{
+						// The sprite is the whole bitmap
 						PaletteBitmap bitmap;
-						success = FileHelper::loadPaletteBitmap(bitmap, fullpath);
+						success = FileHelper::loadPaletteBitmap(bitmap, fullpath, &palette);
 						if (success)
 						{
-							static_cast<PaletteSprite*>(item.mSprite)->createFromBitmap(std::move(bitmap), -center);
+							sprite->createFromBitmap(std::move(bitmap), -center);
+							addSpritePalette(paletteKey, palette);
 						}
 					}
 				}
@@ -507,28 +525,27 @@ void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 					ComponentSprite* sprite = new ComponentSprite();
 					item.mSprite = sprite;
 
-					if (isPartOfSheet)
+					if (sheetKey != 0)
 					{
-						Bitmap* bitmap = nullptr;
-						const auto it = sheetCache.mComponentSpriteSheets.find(fullpath);
-						if (it == sheetCache.mComponentSpriteSheets.end())
+						// Part of a sprite sheet
+						Bitmap& bitmap = sheetCache.mComponentSpriteSheets[sheetKey];
+						if (bitmap.empty())
 						{
-							bitmap = &sheetCache.mComponentSpriteSheets[fullpath];
-							success = FileHelper::loadBitmap(*bitmap, fullpath);
+							success = FileHelper::loadBitmap(bitmap, fullpath);
 						}
 						else
 						{
-							bitmap = &it->second;
 							success = true;
 						}
 
 						if (success)
 						{
-							sprite->accessBitmap().copy(*bitmap, rect);
+							sprite->accessBitmap().copy(bitmap, rect);
 						}
 					}
 					else
 					{
+						// The sprite is the whole bitmap
 						success = FileHelper::loadBitmap(static_cast<ComponentSprite*>(item.mSprite)->accessBitmap(), fullpath);
 					}
 					item.mSprite->mOffset = -center;
@@ -536,4 +553,11 @@ void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 			}
 		}
 	}
+}
+
+void SpriteCache::addSpritePalette(uint64 paletteKey, std::vector<uint32>& palette)
+{
+	// After loading from a BMP, the palette is set to all opaque colors, but we usually need index 0 to be transparent
+	palette[0] &= 0x00ffffff;
+	mSpritePalettes.mPalettes[paletteKey] = palette;
 }

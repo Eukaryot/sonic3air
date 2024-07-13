@@ -180,7 +180,7 @@ void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 	std::vector<uint8> buffer;
 	Vec2i imgSize;
 	{
-		uint32 palette[0x100];
+		std::vector<uint32> palette;
 		for (const auto& pair : category.mEntries)
 		{
 			const Entry& entry = pair.second;
@@ -191,7 +191,7 @@ void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 				// Add bitmap
 				bitmaps.emplace_back(PaletteBitmap(), &entry);
 				PaletteBitmap& bitmap = bitmaps.back().first;
-				if (bitmap.loadBMP(buffer, palette))
+				if (bitmap.loadBMP(buffer, &palette))
 				{
 					imgSize.x = std::max<int>(imgSize.x, bitmap.mWidth);
 					imgSize.y = std::max<int>(imgSize.y, bitmap.mHeight);
@@ -202,7 +202,7 @@ void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 				}
 
 				// Add new colors to palette
-				for (int k = 0; k < 0x100; ++k)
+				for (size_t k = 0; k < palette.size(); ++k)
 				{
 					if ((outputPalette[k] & 0x00ffffff) == (PaletteBitmap::mUnusedPaletteColor & 0x00ffffff))
 						outputPalette[k] = palette[k];

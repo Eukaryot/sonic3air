@@ -8,28 +8,41 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/resources/PaletteCollection.h"
+#include "oxygen/resources/SpriteCache.h"
 #include "oxygen/application/modding/ModManager.h"
 
 
 const PaletteBase* PaletteCollection::getPalette(uint64 key, uint8 line) const
 {
-	return mapFind(mPalettes, key + line);
+	const PaletteBase* palette = mapFind(mPalettes, key + line);
+	if (nullptr != palette)
+		return palette;
+
+	PaletteBase*const* palettePtr = mapFind(mRedirections, key + line);
+	if (nullptr != palettePtr)
+		return *palettePtr;
+
+	return nullptr;
 }
 
 void PaletteCollection::clear()
 {
 	mPalettes.clear();
+	mRedirections.clear();
 }
 
 void PaletteCollection::loadPalettes()
 {
 	// Load or reload palettes
 	clear();
+
 	loadPalettesInDirectory(L"data/palettes", false);
 	for (const Mod* mod : ModManager::instance().getActiveMods())
 	{
 		loadPalettesInDirectory(mod->mFullPath + L"palettes", true);
 	}
+
+	addSpritePalettes();
 }
 
 void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool isModded)
@@ -72,4 +85,39 @@ void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool i
 			palette.writeRawColors(bitmap.getPixelPointer(0, line), numColorsPerLine);
 		}
 	}
+}
+
+void PaletteCollection::addSpritePalettes()
+{
+	SpriteCache::SpritePalettes& spritePalettes = SpriteCache::instance().mSpritePalettes;
+
+	// TODO: The properties flags set here assume that all sprite palettes are modded, but this might not actually be the case
+	const BitFlagSet<PaletteBase::Properties> properties = makeBitFlagSet(PaletteBase::Properties::READ_ONLY, PaletteBase::Properties::MODDED);
+
+	// Copy palettes
+	for (const std::pair<uint64, std::vector<uint32>>& pair : spritePalettes.mPalettes)
+	{
+		const std::vector<uint32>& colors = pair.second;
+		if (colors.empty())
+			continue;
+
+		const uint64 key = pair.first;
+		PaletteBase& palette = mPalettes[key];
+		palette.initPalette(key, colors.size(), properties);
+		palette.writeRawColors(&colors[0], colors.size());
+	}
+
+	// Copy and resolve redirections
+	for (const std::pair<uint64, uint64>& pair : spritePalettes.mRedirections)
+	{
+		PaletteBase* target = mapFind(mPalettes, pair.second);
+		RMX_ASSERT(nullptr != target, "Broken redirection");
+		if (nullptr != target)
+		{
+			mRedirections[pair.first] = target;
+		}
+	}
+
+	// Clear palettes in sprite cache now that we loaded them all
+	spritePalettes = SpriteCache::SpritePalettes();
 }

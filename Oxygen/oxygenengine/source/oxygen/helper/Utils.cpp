@@ -277,7 +277,7 @@ namespace utils
 
 		std::vector<PaletteBitmap> bitmaps;
 		bitmaps.reserve(fc.size());
-		uint32 palette[0x100];
+		std::vector<uint32> palette;
 
 		std::vector<uint8> buffer;
 		Vec2i imgSize;
@@ -289,7 +289,7 @@ namespace utils
 
 			bitmaps.emplace_back();
 			PaletteBitmap& bitmap = bitmaps.back();
-			if ((bitmaps.size() == 1) ? bitmap.loadBMP(buffer, palette) : bitmap.loadBMP(buffer))
+			if ((bitmaps.size() == 1) ? bitmap.loadBMP(buffer, &palette) : bitmap.loadBMP(buffer))
 			{
 				imgSize.x = std::max<int>(imgSize.x, bitmap.mWidth);
 				imgSize.y = std::max<int>(imgSize.y, bitmap.mHeight);
@@ -303,6 +303,7 @@ namespace utils
 		PaletteBitmap output;
 		output.create(imgSize.x * 16, imgSize.y * (((int)bitmaps.size() + 15) / 16));
 		output.clear(0xff);
+		palette.resize(0x100);
 		palette[0xff] = 0xff262626;
 		for (size_t i = 0; i < bitmaps.size(); ++i)
 		{
