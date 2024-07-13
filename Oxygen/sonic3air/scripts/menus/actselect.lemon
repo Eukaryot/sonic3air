@@ -336,8 +336,15 @@ function void ActSelect.Menu(u8 fadeInMethod)
 
 			// Render the preview sprites
 			s16 offset = -Math.roundToInt((1.0f - Math.cos(previewAnimationPosition * PI_FLOAT)) * 40.0f)
-			string key = ActSelect.GetZonePreviewKey(selectedZone, selectedAct, previewImage)
-			Renderer.drawSprite(key, s16(getScreenWidth() - 480) / 2 + offset, 18, 0, 0x10, 0xf004)
+			string key
+			{
+				key = ActSelect.GetZonePreviewKey(selectedZone, selectedAct, previewImage)
+
+				SpriteHandle spr = Renderer.addSpriteHandle(key, s16(getScreenWidth() - 480) / 2 + offset, 18, 0xf004)
+				spr.setPrimaryPalette("@" + key, 0)
+				spr.setFlags(SPRITE_FLAG_FULLY_OPAQUE)
+				spr.setUseGlobalComponentTint(true)
+			}
 
 			if (previewAnimationPosition > 0.0f)
 			{
@@ -346,7 +353,11 @@ function void ActSelect.Menu(u8 fadeInMethod)
 
 				offset += 80
 				key = ActSelect.GetZonePreviewKey(selectedZone, selectedAct, previewImage + 1)
-				Renderer.drawSprite(key, s16(getScreenWidth() - 480) / 2 + offset, 18, 0, 0x10, 0xf006)
+
+				SpriteHandle spr = Renderer.addSpriteHandle(key, s16(getScreenWidth() - 480) / 2 + offset, 18, 0xf006)
+				spr.setPrimaryPalette("@" + key, 0)
+				spr.setFlags(SPRITE_FLAG_FULLY_OPAQUE)
+				spr.setUseGlobalComponentTint(true)
 
 				Renderer.resetViewport(0xf007)
 			}
