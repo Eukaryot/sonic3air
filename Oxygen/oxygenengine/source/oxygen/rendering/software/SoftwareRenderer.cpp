@@ -674,8 +674,8 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 
 			// Build blitter options
 			Blitter::Options blitterOptions;
-			Color tintColor = spriteBase.mTintColor;
-			Color addedColor = spriteBase.mAddedColor;
+			Vec4f tintColor = spriteBase.mTintColor;		// Using Vec4f instead of Color to prevent clamp into [0.0f, 1.0f]
+			Vec4f addedColor = spriteBase.mAddedColor;
 			{
 				if (spriteBase.mUseGlobalComponentTint)
 				{

@@ -134,7 +134,7 @@ void PaletteManager::setGlobalComponentTint(const Vec4f& tintColor, const Vec4f&
 	mGlobalComponentAddedColor = addedColor;
 }
 
-void PaletteManager::applyGlobalComponentTint(Color& color) const
+void PaletteManager::applyGlobalComponentTint(Vec4f& color) const
 {
 	if (mUsesGlobalComponentTint)
 	{
@@ -142,7 +142,7 @@ void PaletteManager::applyGlobalComponentTint(Color& color) const
 	}
 }
 
-void PaletteManager::applyGlobalComponentTint(Color& tintColor, Color& addedColor) const
+void PaletteManager::applyGlobalComponentTint(Vec4f& tintColor, Vec4f& addedColor) const
 {
 	if (mUsesGlobalComponentTint)
 	{

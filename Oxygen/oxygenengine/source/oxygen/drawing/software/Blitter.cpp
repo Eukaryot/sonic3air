@@ -178,12 +178,12 @@ void Blitter::blitRectWithScaling(BitmapViewMutable<uint32>& destBitmap, Recti d
 		if (options.mBlendMode != BlendMode::ALPHA)
 		{
 			// No blending
-			BlitterHelper::blitBitmapWithScaling<false, true>(destBitmap, destRect, sourceBitmap, sourceRect, options.mTintColor->getABGR32());
+			BlitterHelper::blitBitmapWithScaling<false, true>(destBitmap, destRect, sourceBitmap, sourceRect, Color(*options.mTintColor).getABGR32());
 		}
 		else
 		{
 			// Alpha blending
-			BlitterHelper::blitBitmapWithScaling<true, true>(destBitmap, destRect, sourceBitmap, sourceRect, options.mTintColor->getABGR32());
+			BlitterHelper::blitBitmapWithScaling<true, true>(destBitmap, destRect, sourceBitmap, sourceRect, Color(*options.mTintColor).getABGR32());
 		}
 	}
 }
@@ -211,12 +211,12 @@ void Blitter::blitRectWithUVs(BitmapViewMutable<uint32>& destBitmap, Recti destR
 		if (options.mBlendMode != BlendMode::ALPHA)
 		{
 			// No blending
-			BlitterHelper::blitBitmapWithUVs<false, true>(destBitmap, destRect, sourceBitmap, sourceRect, options.mTintColor->getABGR32());
+			BlitterHelper::blitBitmapWithUVs<false, true>(destBitmap, destRect, sourceBitmap, sourceRect, Color(*options.mTintColor).getABGR32());
 		}
 		else
 		{
 			// Alpha blending
-			BlitterHelper::blitBitmapWithUVs<true, true>(destBitmap, destRect, sourceBitmap, sourceRect, options.mTintColor->getABGR32());
+			BlitterHelper::blitBitmapWithUVs<true, true>(destBitmap, destRect, sourceBitmap, sourceRect, Color(*options.mTintColor).getABGR32());
 		}
 	}
 }
