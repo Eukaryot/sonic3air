@@ -21,17 +21,11 @@
 
 void RenderComponentSpriteShader::initialize(bool alphaTest)
 {
-	FileHelper::loadShader(mShader, L"data/shader/render_sprite_component.shader", alphaTest ? "Standard_AlphaTest" : "Standard");
-}
-
-void RenderComponentSpriteShader::refresh(const Vec2i& gameResolution)
-{
-	mShader.bind();
-
-	if (!mInitialized)
+	if (FileHelper::loadShader(mShader, L"data/shader/render_sprite_component.shader", alphaTest ? "Standard_AlphaTest" : "Standard"))
 	{
+		bindShader();
+
 		mLocGameResolution	= mShader.getUniformLocation("GameResolution");
-		mLocSpriteTex		= mShader.getUniformLocation("SpriteTexture");
 		mLocPosition		= mShader.getUniformLocation("Position");
 		mLocPivotOffset		= mShader.getUniformLocation("PivotOffset");
 		mLocSize			= mShader.getUniformLocation("Size");
@@ -39,45 +33,51 @@ void RenderComponentSpriteShader::refresh(const Vec2i& gameResolution)
 		mLocTintColor		= mShader.getUniformLocation("TintColor");
 		mLocAddedColor		= mShader.getUniformLocation("AddedColor");
 
-		glUniform1i(mLocSpriteTex, 0);
+		mShader.setParam("SpriteTexture", 0);
 	}
-
-	if (mLastGameResolution != gameResolution || !mInitialized)
-	{
-		glUniform2iv(mLocGameResolution, 1, *gameResolution);
-		mLastGameResolution = gameResolution;
-	}
-
-	mInitialized = true;
 }
 
-void RenderComponentSpriteShader::draw(const renderitems::ComponentSpriteInfo& spriteInfo, OpenGLRenderResources& resources)
+void RenderComponentSpriteShader::draw(const renderitems::ComponentSpriteInfo& spriteInfo, const Vec2i& gameResolution, OpenGLRenderResources& resources)
 {
 	if (nullptr == spriteInfo.mCacheItem)
 		return;
 
-	glActiveTexture(GL_TEXTURE0);
-	const OpenGLTexture* texture = OpenGLSpriteTextureManager::instance().getComponentSpriteTexture(*spriteInfo.mCacheItem);
-	if (nullptr == texture)
-		return;
+	bindShader();
 
-	const PaletteManager& paletteManager = resources.getRenderParts().getPaletteManager();
-	Vec4f tintColor = spriteInfo.mTintColor;
-	Vec4f addedColor = spriteInfo.mAddedColor;
-	if (spriteInfo.mUseGlobalComponentTint)
+	// Bind textures
 	{
-		tintColor *= paletteManager.getGlobalComponentTintColor();
-		addedColor += paletteManager.getGlobalComponentAddedColor();
+		const OpenGLTexture* texture = OpenGLSpriteTextureManager::instance().getComponentSpriteTexture(*spriteInfo.mCacheItem);
+		if (nullptr == texture)
+			return;
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture->getHandle());
 	}
 
-	glBindTexture(GL_TEXTURE_2D, texture->getHandle());
+	// Update uniforms
+	{
+		const PaletteManager& paletteManager = resources.getRenderParts().getPaletteManager();
+		Vec4f tintColor = spriteInfo.mTintColor;
+		Vec4f addedColor = spriteInfo.mAddedColor;
+		if (spriteInfo.mUseGlobalComponentTint)
+		{
+			tintColor *= paletteManager.getGlobalComponentTintColor();
+			addedColor += paletteManager.getGlobalComponentAddedColor();
+		}
 
-	glUniform3iv(mLocPosition, 1, *Vec3i(spriteInfo.mInterpolatedPosition.x, spriteInfo.mInterpolatedPosition.y, spriteInfo.mPriorityFlag ? 1 : 0));
-	glUniform2iv(mLocPivotOffset, 1, *spriteInfo.mPivotOffset);
-	glUniform2iv(mLocSize, 1, *spriteInfo.mSize);
-	glUniform4fv(mLocTransformation, 1, *spriteInfo.mTransformation.mMatrix);
-	glUniform4fv(mLocTintColor, 1, tintColor.data);
-	glUniform4fv(mLocAddedColor, 1, addedColor.data);
+		if (mLastGameResolution != gameResolution)
+		{
+			glUniform2iv(mLocGameResolution, 1, *gameResolution);
+			mLastGameResolution = gameResolution;
+		}
+
+		glUniform3iv(mLocPosition, 1, *Vec3i(spriteInfo.mInterpolatedPosition.x, spriteInfo.mInterpolatedPosition.y, spriteInfo.mPriorityFlag ? 1 : 0));
+		glUniform2iv(mLocPivotOffset, 1, *spriteInfo.mPivotOffset);
+		glUniform2iv(mLocSize, 1, *spriteInfo.mSize);
+		glUniform4fv(mLocTransformation, 1, *spriteInfo.mTransformation.mMatrix);
+		glUniform4fv(mLocTintColor, 1, tintColor.data);
+		glUniform4fv(mLocAddedColor, 1, addedColor.data);
+	}
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }

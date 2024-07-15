@@ -15,8 +15,19 @@
 
 class OpenGLShader
 {
+public:
+	static void resetLastUsedShader();
+
 protected:
+	bool bindShader();
+
 	static int splitRectY(const Recti& inputRect, int splitY, Recti* outputRects);
+
+protected:
+	static inline OpenGLShader* mLastUsedShader = nullptr;
+
+protected:
+	Shader mShader;
 };
 
 #endif

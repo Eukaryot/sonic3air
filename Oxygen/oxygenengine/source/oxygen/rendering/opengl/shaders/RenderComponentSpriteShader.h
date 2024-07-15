@@ -21,16 +21,12 @@ class RenderComponentSpriteShader : public OpenGLShader
 {
 public:
 	void initialize(bool alphaTest);
-	void refresh(const Vec2i& gameResolution);
-	void draw(const renderitems::ComponentSpriteInfo& spriteInfo, OpenGLRenderResources& resources);
+	void draw(const renderitems::ComponentSpriteInfo& spriteInfo, const Vec2i& gameResolution, OpenGLRenderResources& resources);
 
 private:
-	bool  mInitialized = false;
 	Vec2i mLastGameResolution;
 
-	Shader mShader;
 	GLuint mLocGameResolution = 0;
-	GLuint mLocSpriteTex = 0;
 	GLuint mLocPosition = 0;
 	GLuint mLocPivotOffset = 0;
 	GLuint mLocSize = 0;

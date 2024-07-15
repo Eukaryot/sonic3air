@@ -13,6 +13,21 @@
 #include "oxygen/rendering/opengl/shaders/OpenGLShader.h"
 
 
+void OpenGLShader::resetLastUsedShader()
+{
+	mLastUsedShader = nullptr;
+}
+
+bool OpenGLShader::bindShader()
+{
+	if (mLastUsedShader == this)
+		return false;
+
+	mShader.bind();
+	mLastUsedShader = this;
+	return true;
+}
+
 int OpenGLShader::splitRectY(const Recti& inputRect, int splitY, Recti* outputRects)
 {
 	if (splitY > inputRect.y && splitY < inputRect.y + inputRect.height)

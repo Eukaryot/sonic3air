@@ -191,7 +191,7 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 
 	// Render geometries
 	mLastRenderedGeometryType = Geometry::Type::UNDEFINED;
-	mLastUsedPlaneShader = nullptr;
+	OpenGLShader::resetLastUsedShader();
 	{
 		uint16 lastRenderQueue = 0xffff;
 		for (size_t i = 0; i < geometries.size(); ++i)
@@ -332,6 +332,8 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				}
 			}
 
+			OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);
+
 			// For backmost layer, ignore alpha completely
 			const bool useAlphaTest = (pg.mPlaneIndex != 0 || pg.mPriorityFlag);
 			OpenGLDrawerResources::setBlendMode(BlendMode::ONE_BIT);
@@ -341,14 +343,8 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 															som.getVerticalScrolling() ? RenderPlaneShader::PS_VERTICAL_SCROLLING : RenderPlaneShader::PS_HORIZONTAL_SCROLLING;
 			RenderPlaneShader& shader = mRenderPlaneShader[variation][useAlphaTest ? 1 : 0];
 
-			if (mLastRenderedGeometryType != Geometry::Type::PLANE || mLastUsedPlaneShader != &shader)
-			{
-				shader.refresh(mGameResolution, mResources);
-				mLastRenderedGeometryType = Geometry::Type::PLANE;
-				mLastUsedPlaneShader = &shader;
-			}
-
-			shader.draw(pg, mRenderParts.getPaletteManager().mSplitPositionY, mRenderParts, mResources);
+			shader.draw(pg, mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mRenderParts, mResources);
+			mLastRenderedGeometryType = Geometry::Type::PLANE;
 			break;
 		}
 
@@ -380,33 +376,27 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				{
 					const renderitems::VdpSpriteInfo& spriteInfo = static_cast<const renderitems::VdpSpriteInfo&>(sg.mSpriteInfo);
 					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
+
 					RenderVdpSpriteShader& shader = mRenderVdpSpriteShader;
-					if (needsRefresh)
-					{
-						shader.refresh(mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mResources);
-					}
-					shader.draw(spriteInfo, mResources);
+					shader.draw(spriteInfo, mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mResources);
 					break;
 				}
 
 				case RenderItem::Type::PALETTE_SPRITE:
 				{
 					const renderitems::PaletteSpriteInfo& spriteInfo = static_cast<const renderitems::PaletteSpriteInfo&>(sg.mSpriteInfo);
-					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
-					const bool useAlphaTest = (spriteInfo.mBlendMode != BlendMode::OPAQUE);
-					RenderPaletteSpriteShader& shader = mRenderPaletteSpriteShader[useAlphaTest ? 1 : 0];
-					if (needsRefresh || mLastUsedRenderPaletteSpriteShader != &shader || shader.needsRefresh(spriteInfo))
-					{
-						shader.refresh(mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, spriteInfo, mResources);
-						mLastUsedRenderPaletteSpriteShader = &shader;
-					}
 					if (spriteInfo.mSize.x == 0 || spriteInfo.mSize.y == 0)
 					{
 						// Do not render sprites that you cannot see. Trying to render a sprite with no size
 						// breaks the depth buffer on macOS causing any sprites rendered afterward to not appear.
 						break;
 					}
-					shader.draw(spriteInfo, mResources);
+
+					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
+					const bool useAlphaTest = (spriteInfo.mBlendMode != BlendMode::OPAQUE);
+
+					RenderPaletteSpriteShader& shader = mRenderPaletteSpriteShader[useAlphaTest ? 1 : 0];
+					shader.draw(spriteInfo, mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mResources);
 					break;
 				}
 
@@ -415,13 +405,9 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 					const renderitems::ComponentSpriteInfo& spriteInfo = static_cast<const renderitems::ComponentSpriteInfo&>(sg.mSpriteInfo);
 					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
 					const bool useAlphaTest = (spriteInfo.mBlendMode != BlendMode::OPAQUE);
+
 					RenderComponentSpriteShader& shader = mRenderComponentSpriteShader[useAlphaTest ? 1 : 0];
-					if (needsRefresh || mLastUsedRenderComponentSpriteShader != &shader)
-					{
-						shader.refresh(mGameResolution);
-						mLastUsedRenderComponentSpriteShader = &shader;
-					}
-					shader.draw(spriteInfo, mResources);
+					shader.draw(spriteInfo, mGameResolution, mResources);
 					break;
 				}
 
@@ -439,6 +425,8 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 					shader.setParam("Rect", rectf);
 					shader.setTexture("Texture", mProcessingTexture.getHandle(), GL_TEXTURE_2D);
 					glDrawArrays(GL_TRIANGLES, 0, 6);
+					
+					OpenGLShader::resetLastUsedShader();
 					break;
 				}
 
@@ -475,6 +463,8 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			shader.setParam("Color", Vec4f(rg.mColor.data));
 			shader.setParam("Transform", transform);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
+			
+			OpenGLShader::resetLastUsedShader();
 			break;
 		}
 
@@ -507,6 +497,8 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			shader.setParam("AddedColor", tg.mAddedColor);
 			shader.setTexture("Texture", texture->getTextureHandle(), GL_TEXTURE_2D);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
+			
+			OpenGLShader::resetLastUsedShader();
 			break;
 		}
 
@@ -527,6 +519,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			shader.unbind();
 
 			mLastRenderedGeometryType = Geometry::Type::UNDEFINED;
+			OpenGLShader::resetLastUsedShader();
 			break;
 		}
 

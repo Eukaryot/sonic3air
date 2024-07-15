@@ -21,38 +21,45 @@ void DebugDrawPlaneShader::initialize()
 {
 	if (BufferTexture::supportsBufferTextures())	// Buffer texture support is required for this shader
 	{
-		FileHelper::loadShader(mShader, L"data/shader/debugdraw_plane.shader", "Standard", "USE_BUFFER_TEXTURES");
+		if (FileHelper::loadShader(mShader, L"data/shader/debugdraw_plane.shader", "Standard", "USE_BUFFER_TEXTURES"))
+		{
+			bindShader();
 
-		mLocPlayfieldSize	= mShader.getUniformLocation("PlayfieldSize");
-		mLocIndexTex		= mShader.getUniformLocation("IndexTexture");
-		mLocPatternCacheTex	= mShader.getUniformLocation("PatternCacheTexture");
-		mLocPaletteTex		= mShader.getUniformLocation("PaletteTexture");
-		mLocHighlightPrio	= mShader.getUniformLocation("HighlightPrio");
+			mLocPlayfieldSize = mShader.getUniformLocation("PlayfieldSize");
+			mLocHighlightPrio = mShader.getUniformLocation("HighlightPrio");
+
+			mShader.setParam("IndexTexture", 0);
+			mShader.setParam("PatternCacheTexture", 1);
+			mShader.setParam("PaletteTexture", 2);
+		}
 	}
 }
 
 void DebugDrawPlaneShader::draw(int planeIndex, RenderParts& renderParts, const OpenGLRenderResources& resources)
 {
-	mShader.bind();
+	bindShader();
 
-	if (planeIndex <= PlaneManager::PLANE_A)
-		glUniform4iv(mLocPlayfieldSize, 1, *renderParts.getPlaneManager().getPlayfieldSizeForShaders());
-	else
-		glUniform4iv(mLocPlayfieldSize, 1, *Vec4i(512, 256, 64, 32));
+	// Bind textures
+	{
+		glActiveTexture(GL_TEXTURE0);
+		resources.getPlanePatternsTexture(planeIndex).bindTexture();
 
-	glActiveTexture(GL_TEXTURE0);
-	resources.getPlanePatternsTexture(planeIndex).bindTexture();
-	glUniform1i(mLocIndexTex, 0);
+		glActiveTexture(GL_TEXTURE1);
+		resources.getPatternCacheTexture().bindTexture();
 
-	glActiveTexture(GL_TEXTURE1);
-	resources.getPatternCacheTexture().bindTexture();
-	glUniform1i(mLocPatternCacheTex, 1);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, resources.getMainPaletteTexture().getHandle());
+	}
 
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, resources.getMainPaletteTexture().getHandle());
-	glUniform1i(mLocPaletteTex, 2);
+	// Update uniforms
+	{
+		if (planeIndex <= PlaneManager::PLANE_A)
+			glUniform4iv(mLocPlayfieldSize, 1, *renderParts.getPlaneManager().getPlayfieldSizeForShaders());
+		else
+			glUniform4iv(mLocPlayfieldSize, 1, *Vec4i(512, 256, 64, 32));
 
-	glUniform1i(mLocHighlightPrio, FTX::keyState(SDLK_LSHIFT) ? 1 : 0);
+		glUniform1i(mLocHighlightPrio, FTX::keyState(SDLK_LSHIFT) ? 1 : 0);
+	}
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 

@@ -31,34 +31,25 @@ public:
 
 public:
 	void initialize(Variation variation, bool alphaTest);
-	void initialize(bool horizontalScrolling, bool verticalScrolling, bool noRepeat, bool alphaTest);
-	void refresh(const Vec2i& gameResolution, const OpenGLRenderResources& resources);
-	void draw(const PlaneGeometry& geometry, int waterSurfaceHeight, RenderParts& renderParts, const OpenGLRenderResources& resources);
+	void draw(const PlaneGeometry& geometry, const Vec2i& gameResolution, int waterSurfaceHeight, RenderParts& renderParts, const OpenGLRenderResources& resources);
 
 private:
-	bool  mInitialized = false;
 	bool  mHorizontalScrolling = false;
 	bool  mVerticalScrolling = false;
 	bool  mLastRenderedPlanePriority = false;
 	Recti mLastActiveRect;
 	Vec2i mLastGameResolution;
-	int   mLastPaletteVariant = 0;
+	int   mLastPaletteVariant = -1;
 	Vec4i mLastPlayfieldSize;
 
-	Shader mShader;
 	GLuint mLocActiveRect = 0;
 	GLuint mLocGameResolution = 0;
 	GLuint mLocPriorityFlag = 0;
 	GLuint mLocPaletteOffset = 0;
 	GLuint mLocPlayfieldSize = 0;
-	GLuint mLocPatternCacheTex = 0;
-	GLuint mLocIndexTex = 0;
-	GLuint mLocHScrollOffsetsTex = 0;
-	GLuint mLocVScrollOffsetsTex = 0;
 	GLuint mLocVScrollOffsetBias = 0;
 	GLuint mLocScrollOffsetX = 0;
 	GLuint mLocScrollOffsetY = 0;
-	GLuint mLocPaletteTex = 0;
 };
 
 #endif

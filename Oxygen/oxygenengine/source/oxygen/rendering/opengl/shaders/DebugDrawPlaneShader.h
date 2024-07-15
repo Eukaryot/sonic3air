@@ -23,13 +23,7 @@ public:
 	void draw(int planeIndex, RenderParts& renderParts, const OpenGLRenderResources& resources);
 
 private:
-	bool mInitialized = false;
-
-	Shader mShader;
 	GLuint mLocPlayfieldSize = 0;
-	GLuint mLocIndexTex = 0;
-	GLuint mLocPatternCacheTex = 0;
-	GLuint mLocPaletteTex = 0;
 	GLuint mLocHighlightPrio = 0;
 };
 

@@ -20,55 +20,32 @@
 
 void RenderPlaneShader::initialize(Variation variation, bool alphaTest)
 {
-	switch (variation)
-	{
-		case PS_SIMPLE:				  initialize(false, false, false, alphaTest);  break;	// No scroll offsets used, primarily for window plane
-		case PS_HORIZONTAL_SCROLLING: initialize(true,  false, false, alphaTest);  break;	// Only horizontal scroll offsets used
-		case PS_VERTICAL_SCROLLING:	  initialize(true,  true,  false, alphaTest);  break;	// Horizontal + vertical scroll offsets used
-		case PS_NO_REPEAT:			  initialize(true,  false, true,  alphaTest);  break;	// No repeat for horizontal scroll offsets
-		default:
-			RMX_ASSERT(false, "Unrecognized render plane shader variation " << variation);
-	}
-}
+	mHorizontalScrolling = (variation != PS_SIMPLE);
+	mVerticalScrolling = (variation == PS_VERTICAL_SCROLLING);
+	const bool noRepeat = (variation == PS_NO_REPEAT);
 
-void RenderPlaneShader::initialize(bool horizontalScrolling, bool verticalScrolling, bool noRepeat, bool alphaTest)
-{
-	mHorizontalScrolling = horizontalScrolling;
-	mVerticalScrolling = verticalScrolling;
-
-	std::string techname = noRepeat ? "HorizontalScrollingNoRepeat" : horizontalScrolling ? (verticalScrolling ? "HorizontalVerticalScrolling" : "HorizontalScrolling") : (verticalScrolling ? "VerticalScrolling" : "Standard");
+	const std::string techname = noRepeat ? "HorizontalScrollingNoRepeat" : mHorizontalScrolling ? (mVerticalScrolling ? "HorizontalVerticalScrolling" : "HorizontalScrolling") : (mVerticalScrolling ? "VerticalScrolling" : "Standard");
 	std::string additionalDefines = BufferTexture::supportsBufferTextures() ? "USE_BUFFER_TEXTURES" : "";
 	if (alphaTest)
 		additionalDefines = (additionalDefines.empty() ? std::string() : (additionalDefines + ",")) + "ALPHA_TEST";
-	FileHelper::loadShader(mShader, L"data/shader/render_plane.shader", techname, additionalDefines);
-}
 
-void RenderPlaneShader::refresh(const Vec2i& gameResolution, const OpenGLRenderResources& resources)
-{
-	// No alpha blending needed for planes
-	glBlendFunc(GL_ONE, GL_ZERO);
-
-	mShader.bind();
-
-	if (!mInitialized)
+	if (FileHelper::loadShader(mShader, L"data/shader/render_plane.shader", techname, additionalDefines))
 	{
+		bindShader();
+
 		mLocActiveRect		= mShader.getUniformLocation("ActiveRect");
 		mLocGameResolution	= mShader.getUniformLocation("GameResolution");
 		mLocPriorityFlag	= mShader.getUniformLocation("PriorityFlag");
 		mLocPaletteOffset	= mShader.getUniformLocation("PaletteOffset");
 		mLocPlayfieldSize	= mShader.getUniformLocation("PlayfieldSize");
-		mLocPatternCacheTex	= mShader.getUniformLocation("PatternCacheTexture");
-		mLocIndexTex		= mShader.getUniformLocation("IndexTexture");
-		mLocPaletteTex		= mShader.getUniformLocation("PaletteTexture");
 
-		glUniform1i(mLocPatternCacheTex, 0);
-		glUniform1i(mLocPaletteTex, 1);
-		glUniform1i(mLocIndexTex, 2);
+		mShader.setParam("PatternCacheTexture", 0);
+		mShader.setParam("PaletteTexture", 1);
+		mShader.setParam("IndexTexture", 2);
 
 		if (mHorizontalScrolling)
 		{
-			mLocHScrollOffsetsTex = mShader.getUniformLocation("HScrollOffsetsTexture");
-			glUniform1i(mLocHScrollOffsetsTex, 3);
+			mShader.setParam("HScrollOffsetsTexture", 3);
 		}
 		else
 		{
@@ -77,82 +54,87 @@ void RenderPlaneShader::refresh(const Vec2i& gameResolution, const OpenGLRenderR
 
 		if (mVerticalScrolling)
 		{
-			mLocVScrollOffsetsTex = mShader.getUniformLocation("VScrollOffsetsTexture");
+			mShader.setParam("VScrollOffsetsTexture", 4);
 			mLocVScrollOffsetBias = mShader.getUniformLocation("VScrollOffsetBias");
-			glUniform1i(mLocVScrollOffsetsTex, 4);
 		}
 		else
 		{
 			mLocScrollOffsetY = mShader.getUniformLocation("ScrollOffsetY");
 		}
 	}
-
-	glActiveTexture(GL_TEXTURE0);
-	resources.getPatternCacheTexture().bindTexture();
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, resources.getMainPaletteTexture().getHandle());
-
-	if (mLastGameResolution != gameResolution || !mInitialized)
-	{
-		glUniform2iv(mLocGameResolution, 1, *gameResolution);
-		mLastGameResolution = gameResolution;
-	}
-
-	mInitialized = true;
 }
 
-void RenderPlaneShader::draw(const PlaneGeometry& geometry, int waterSurfaceHeight, RenderParts& renderParts, const OpenGLRenderResources& resources)
+void RenderPlaneShader::draw(const PlaneGeometry& geometry, const Vec2i& gameResolution, int waterSurfaceHeight, RenderParts& renderParts, const OpenGLRenderResources& resources)
 {
-	const Vec4i playfieldSize = (geometry.mPlaneIndex <= PlaneManager::PLANE_A) ? renderParts.getPlaneManager().getPlayfieldSizeForShaders() : Vec4i(512, 256, 64, 32);
-	if (mLastPlayfieldSize != playfieldSize)
-	{
-		glUniform4iv(mLocPlayfieldSize, 1, playfieldSize.data);
-		mLastPlayfieldSize = playfieldSize;
-	}
+	bindShader();
 
-	if (mLastRenderedPlanePriority != geometry.mPriorityFlag)
+	// Bind textures incl. scroll offsets
 	{
-		glUniform1i(mLocPriorityFlag, geometry.mPriorityFlag ? 1 : 0);
-		mLastRenderedPlanePriority = geometry.mPriorityFlag;
-	}
+		glActiveTexture(GL_TEXTURE0);
+		resources.getPatternCacheTexture().bindTexture();
 
-	glActiveTexture(GL_TEXTURE2);
-	resources.getPlanePatternsTexture(geometry.mPlaneIndex).bindTexture();
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, resources.getMainPaletteTexture().getHandle());
 
-	if (mHorizontalScrolling)
-	{
-		glActiveTexture(GL_TEXTURE3);
-		resources.getHScrollOffsetsTexture(geometry.mScrollOffsets).bindTexture();
-	}
-	else
-	{
-		if (geometry.mPlaneIndex == PlaneManager::PLANE_W)		// Special handling required here
+		glActiveTexture(GL_TEXTURE2);
+		resources.getPlanePatternsTexture(geometry.mPlaneIndex).bindTexture();
+
+		if (mHorizontalScrolling)
 		{
-			glUniform1i(mLocScrollOffsetX, renderParts.getScrollOffsetsManager().getPlaneWScrollOffset().x);
+			glActiveTexture(GL_TEXTURE3);
+			resources.getHScrollOffsetsTexture(geometry.mScrollOffsets).bindTexture();
 		}
 		else
 		{
-			glUniform1i(mLocScrollOffsetX, renderParts.getScrollOffsetsManager().getScrollOffsetsH(geometry.mScrollOffsets)[0]);
+			if (geometry.mPlaneIndex == PlaneManager::PLANE_W)		// Special handling required here
+			{
+				glUniform1i(mLocScrollOffsetX, renderParts.getScrollOffsetsManager().getPlaneWScrollOffset().x);
+			}
+			else
+			{
+				glUniform1i(mLocScrollOffsetX, renderParts.getScrollOffsetsManager().getScrollOffsetsH(geometry.mScrollOffsets)[0]);
+			}
 		}
-	}
 
-	if (mVerticalScrolling)
-	{
-		glActiveTexture(GL_TEXTURE4);
-		resources.getVScrollOffsetsTexture(geometry.mScrollOffsets).bindTexture();
-
-		glUniform1i(mLocVScrollOffsetBias, renderParts.getScrollOffsetsManager().getVerticalScrollOffsetBias());
-	}
-	else
-	{
-		if (geometry.mPlaneIndex == PlaneManager::PLANE_W)		// Special handling required here
+		if (mVerticalScrolling)
 		{
-			glUniform1i(mLocScrollOffsetY, renderParts.getScrollOffsetsManager().getPlaneWScrollOffset().y);
+			glActiveTexture(GL_TEXTURE4);
+			resources.getVScrollOffsetsTexture(geometry.mScrollOffsets).bindTexture();
+
+			glUniform1i(mLocVScrollOffsetBias, renderParts.getScrollOffsetsManager().getVerticalScrollOffsetBias());
 		}
 		else
 		{
-			glUniform1i(mLocScrollOffsetY, renderParts.getScrollOffsetsManager().getScrollOffsetsV(geometry.mScrollOffsets)[0]);
+			if (geometry.mPlaneIndex == PlaneManager::PLANE_W)		// Special handling required here
+			{
+				glUniform1i(mLocScrollOffsetY, renderParts.getScrollOffsetsManager().getPlaneWScrollOffset().y);
+			}
+			else
+			{
+				glUniform1i(mLocScrollOffsetY, renderParts.getScrollOffsetsManager().getScrollOffsetsV(geometry.mScrollOffsets)[0]);
+			}
+		}
+	}
+
+	// Update uniforms
+	{
+		if (mLastGameResolution != gameResolution)
+		{
+			glUniform2iv(mLocGameResolution, 1, *gameResolution);
+			mLastGameResolution = gameResolution;
+		}
+
+		const Vec4i playfieldSize = (geometry.mPlaneIndex <= PlaneManager::PLANE_A) ? renderParts.getPlaneManager().getPlayfieldSizeForShaders() : Vec4i(512, 256, 64, 32);
+		if (mLastPlayfieldSize != playfieldSize)
+		{
+			glUniform4iv(mLocPlayfieldSize, 1, playfieldSize.data);
+			mLastPlayfieldSize = playfieldSize;
+		}
+
+		if (mLastRenderedPlanePriority != geometry.mPriorityFlag)
+		{
+			glUniform1i(mLocPriorityFlag, geometry.mPriorityFlag ? 1 : 0);
+			mLastRenderedPlanePriority = geometry.mPriorityFlag;
 		}
 	}
 
@@ -168,7 +150,7 @@ void RenderPlaneShader::draw(const PlaneGeometry& geometry, int waterSurfaceHeig
 		}
 
 		const int paletteVariant = i;
-		if (mLastPaletteVariant != paletteVariant || !mInitialized)
+		if (mLastPaletteVariant != paletteVariant)
 		{
 			const float paletteOffset = (float)paletteVariant / 2.0f;
 			glUniform1f(mLocPaletteOffset, paletteOffset);

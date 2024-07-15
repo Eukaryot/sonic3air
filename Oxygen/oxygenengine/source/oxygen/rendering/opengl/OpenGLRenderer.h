@@ -69,9 +69,6 @@ private:
 
 	// Rendering runtime state
 	Geometry::Type mLastRenderedGeometryType = Geometry::Type::UNDEFINED;
-	RenderPlaneShader* mLastUsedPlaneShader = nullptr;
-	RenderPaletteSpriteShader* mLastUsedRenderPaletteSpriteShader = nullptr;
-	RenderComponentSpriteShader* mLastUsedRenderComponentSpriteShader = nullptr;
 	RenderItem::Type mLastRenderedSpriteType = RenderItem::Type::INVALID;
 	bool mIsRenderingToProcessingBuffer = false;
 };
