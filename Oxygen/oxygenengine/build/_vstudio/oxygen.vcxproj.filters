@@ -894,9 +894,6 @@
     <None Include="..\..\data\shader\simple_rect_colored.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\..\data\shader\simple_rect_depthwrite.shader">
-      <Filter>_shader</Filter>
-    </None>
     <None Include="..\..\data\shader\simple_rect_overdraw.shader">
       <Filter>_shader</Filter>
     </None>
