@@ -53,8 +53,9 @@ public:
 
 	Recti getSpriteRect(uint64 spriteKey) const;	// Return sprite size and pivot offset (usually negative)
 
-	void setRenderTarget(DrawerTexture& texture, const Recti& rect);
 	void setWindowRenderTarget(const Recti& rect);
+	void setRenderTarget(DrawerTexture& texture, const Recti& rect);
+
 	void setBlendMode(BlendMode blendMode);
 	void setSamplingMode(SamplingMode samplingMode);
 	void setWrapMode(TextureWrapMode wrapMode);
@@ -90,6 +91,7 @@ public:
 private:
 	bool onDrawerCreated();
 	void unregisterTexture(DrawerTexture& texture);
+	void addDrawCommand(DrawCommand& drawCommand);
 
 private:
 	DrawerInterface* mActiveDrawer = nullptr;

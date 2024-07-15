@@ -70,36 +70,36 @@ Recti Drawer::getSpriteRect(uint64 spriteKey) const
 	return Recti(item->mSprite->mOffset, item->mSprite->getSize());
 }
 
-void Drawer::setRenderTarget(DrawerTexture& texture, const Recti& rect)
-{
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetRenderTargetDrawCommands.createObject(texture, rect));
-}
-
 void Drawer::setWindowRenderTarget(const Recti& rect)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetWindowRenderTargetDrawCommands.createObject(rect));
+	addDrawCommand(DrawCommand::mFactory.getPool<SetWindowRenderTargetDrawCommand>().createObject(rect));
+}
+
+void Drawer::setRenderTarget(DrawerTexture& texture, const Recti& rect)
+{
+	addDrawCommand(DrawCommand::mFactory.getPool<SetRenderTargetDrawCommand>().createObject(texture, rect));
 }
 
 void Drawer::setBlendMode(BlendMode blendMode)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetBlendModeDrawCommands.createObject(blendMode));
+	addDrawCommand(DrawCommand::mFactory.getPool<SetBlendModeDrawCommand>().createObject(blendMode));
 }
 
 void Drawer::setSamplingMode(SamplingMode samplingMode)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetSamplingModeDrawCommands.createObject(samplingMode));
+	addDrawCommand(DrawCommand::mFactory.getPool<SetSamplingModeDrawCommand>().createObject(samplingMode));
 }
 
 void Drawer::setWrapMode(TextureWrapMode wrapMode)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetWrapModeDrawCommands.createObject(wrapMode));
+	addDrawCommand(DrawCommand::mFactory.getPool<SetWrapModeDrawCommand>().createObject(wrapMode));
 }
 
 void Drawer::drawRect(const Rectf& rect, const Color& color)
 {
 	if (!rect.isEmpty())
 	{
-		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, color));
+		addDrawCommand(DrawCommand::mFactory.getPool<RectDrawCommand>().createObject(rect, color));
 	}
 }
 
@@ -107,7 +107,7 @@ void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture)
 {
 	if (!rect.isEmpty())
 	{
-		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture));
+		addDrawCommand(DrawCommand::mFactory.getPool<RectDrawCommand>().createObject(rect, texture));
 	}
 }
 
@@ -115,7 +115,7 @@ void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture, const Color& ti
 {
 	if (!rect.isEmpty())
 	{
-		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture, tintColor));
+		addDrawCommand(DrawCommand::mFactory.getPool<RectDrawCommand>().createObject(rect, texture, tintColor));
 	}
 }
 
@@ -123,7 +123,7 @@ void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture, const Vec2f& uv
 {
 	if (!rect.isEmpty())
 	{
-		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture, uv0, uv1, tintColor));
+		addDrawCommand(DrawCommand::mFactory.getPool<RectDrawCommand>().createObject(rect, texture, uv0, uv1, tintColor));
 	}
 }
 
@@ -140,30 +140,30 @@ void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture, const Recti& te
 
 void Drawer::drawUpscaledRect(const Rectf& rect, DrawerTexture& texture)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mUpscaledRectDrawCommands.createObject(rect, texture));
+	addDrawCommand(DrawCommand::mFactory.getPool<UpscaledRectDrawCommand>().createObject(rect, texture));
 }
 
 void Drawer::drawSprite(Vec2i position, uint64 spriteKey, const Color& tintColor, Vec2f scale)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSpriteDrawCommands.createObject(position, spriteKey, tintColor, scale));
+	addDrawCommand(DrawCommand::mFactory.getPool<SpriteDrawCommand>().createObject(position, spriteKey, tintColor, scale));
 }
 
 void Drawer::drawSpriteRect(const Recti& rect, uint64 spriteKey, const Color& tintColor)
 {
 	if (!rect.isEmpty())
 	{
-		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSpriteRectDrawCommands.createObject(rect, spriteKey, tintColor));
+		addDrawCommand(DrawCommand::mFactory.getPool<SpriteRectDrawCommand>().createObject(rect, spriteKey, tintColor));
 	}
 }
 
 void Drawer::drawMesh(const std::vector<DrawerMeshVertex>& triangles, DrawerTexture& texture)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mMeshDrawCommands.createObject(triangles, texture));
+	addDrawCommand(DrawCommand::mFactory.getPool<MeshDrawCommand>().createObject(triangles, texture));
 }
 
 void Drawer::drawMesh(const std::vector<DrawerMeshVertex_P2_C4>& triangles)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mMeshVertexColorDrawCommands.createObject(triangles));
+	addDrawCommand(DrawCommand::mFactory.getPool<MeshVertexColorDrawCommand>().createObject(triangles));
 }
 
 void Drawer::drawQuad(const DrawerMeshVertex* quad, DrawerTexture& texture)
@@ -176,65 +176,65 @@ void Drawer::drawQuad(const DrawerMeshVertex* quad, DrawerTexture& texture)
 	triangles[3] = quad[2];
 	triangles[4] = quad[1];
 	triangles[5] = quad[3];
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mMeshDrawCommands.createObject(std::move(triangles), texture));
+	addDrawCommand(DrawCommand::mFactory.getPool<MeshDrawCommand>().createObject(std::move(triangles), texture));
 }
 
 void Drawer::printText(Font& font, const Recti& rect, const String& text, int alignment, Color color)
 {
 	if (!text.empty())
-		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextDrawCommands.createObject(font, rect, text, alignment, color));
+		addDrawCommand(DrawCommand::mFactory.getPool<PrintTextDrawCommand>().createObject(font, rect, text, alignment, color));
 }
 
 void Drawer::printText(Font& font, const Vec2i& position, const String& text, int alignment, Color color)
 {
 	if (!text.empty())
-		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextDrawCommands.createObject(font, Recti(position.x, position.y, 0, 0), text, alignment, color));
+		addDrawCommand(DrawCommand::mFactory.getPool<PrintTextDrawCommand>().createObject(font, Recti(position.x, position.y, 0, 0), text, alignment, color));
 }
 
 void Drawer::printText(Font& font, const Recti& rect, const String& text, const DrawerPrintOptions& printOptions)
 {
 	if (!text.empty())
-		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextDrawCommands.createObject(font, rect, text, printOptions));
+		addDrawCommand(DrawCommand::mFactory.getPool<PrintTextDrawCommand>().createObject(font, rect, text, printOptions));
 }
 
 void Drawer::printText(Font& font, const Vec2i& position, const String& text, const DrawerPrintOptions& printOptions)
 {
 	if (!text.empty())
-		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextDrawCommands.createObject(font, Recti(position.x, position.y, 0, 0), text, printOptions));
+		addDrawCommand(DrawCommand::mFactory.getPool<PrintTextDrawCommand>().createObject(font, Recti(position.x, position.y, 0, 0), text, printOptions));
 }
 
 void Drawer::printText(Font& font, const Recti& rect, const WString& text, int alignment, Color color)
 {
 	if (!text.empty())
-		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextWDrawCommands.createObject(font, rect, text, alignment, color));
+		addDrawCommand(DrawCommand::mFactory.getPool<PrintTextWDrawCommand>().createObject(font, rect, text, alignment, color));
 }
 
 void Drawer::printText(Font& font, const Vec2i& position, const WString& text, int alignment, Color color)
 {
 	if (!text.empty())
-		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextWDrawCommands.createObject(font, Recti(position.x, position.y, 0, 0), text, alignment, color));
+		addDrawCommand(DrawCommand::mFactory.getPool<PrintTextWDrawCommand>().createObject(font, Recti(position.x, position.y, 0, 0), text, alignment, color));
 }
 
 void Drawer::printText(Font& font, const Recti& rect, const WString& text, const DrawerPrintOptions& printOptions)
 {
 	if (!text.empty())
-		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextWDrawCommands.createObject(font, rect, text, printOptions));
+		addDrawCommand(DrawCommand::mFactory.getPool<PrintTextWDrawCommand>().createObject(font, rect, text, printOptions));
 }
 
 void Drawer::printText(Font& font, const Vec2i& position, const WString& text, const DrawerPrintOptions& printOptions)
 {
 	if (!text.empty())
-		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextWDrawCommands.createObject(font, Recti(position.x, position.y, 0, 0), text, printOptions));
+		addDrawCommand(DrawCommand::mFactory.getPool<PrintTextWDrawCommand>().createObject(font, Recti(position.x, position.y, 0, 0), text, printOptions));
 }
 
 void Drawer::pushScissor(const Recti& rect)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPushScissorDrawCommands.createObject(rect));
+	addDrawCommand(DrawCommand::mFactory.getPool<PushScissorDrawCommand>().createObject(rect));
 }
 
 void Drawer::popScissor()
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPopScissorDrawCommands.createObject());
+	addDrawCommand(DrawCommand::mFactory.getPool<PopScissorDrawCommand>().createObject());
 }
 
 void Drawer::setupRenderWindow(SDL_Window* window)
@@ -283,4 +283,9 @@ void Drawer::unregisterTexture(DrawerTexture& texture)
 		mDrawerTextures[index]->mRegisteredIndex = index;
 	}
 	mDrawerTextures.pop_back();
+}
+
+void Drawer::addDrawCommand(DrawCommand& drawCommand)
+{
+	mDrawCollection.addDrawCommand(drawCommand);
 }
