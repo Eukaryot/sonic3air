@@ -24,7 +24,7 @@ void SimpleRectTexturedShader::initialize(bool supportsTintColor, const char* te
 		mLocTransform  = mShader.getUniformLocation("Transform");
 		mLocTintColor  = mShader.getUniformLocation("TintColor");
 		mLocAddedColor = mShader.getUniformLocation("AddedColor");
-		mLocTexture    = mShader.getUniformLocation("Texture");
+		mLocTexture    = mShader.getUniformLocation("MainTexture");
 	}
 }
 
@@ -44,7 +44,7 @@ void SimpleRectTexturedShader::setup(GLuint textureHandle, const Vec4f& transfor
 	bindShader();
 
 	// Bind textures
-	mShader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
+	mShader.setTexture("MainTexture", textureHandle, GL_TEXTURE_2D);
 
 	// Update uniforms
 	glUniform4fv(mLocTransform, 1, transform.data);

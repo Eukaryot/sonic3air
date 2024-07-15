@@ -32,11 +32,11 @@ void main()
 in vec2 uv0;
 out vec4 FragColor;
 
-uniform sampler2D Texture;
+uniform sampler2D MainTexture;
 
 void main()
 {
-	vec4 color = texture(Texture, uv0);
+	vec4 color = texture(MainTexture, uv0);
 	color.a = 1.0;
 	FragColor = color;
 }

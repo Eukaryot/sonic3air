@@ -105,7 +105,7 @@ void main()
 
 ## ----- Fragment -----------------------------------------------------------------
 
-uniform sampler2D Texture;
+uniform sampler2D MainTexture;
 uniform sampler2D LUT;
 uniform vec2 GameResolution;
 
@@ -129,22 +129,22 @@ void main()
 
 	float dx = vTexCoord[0].z;
 	float dy = vTexCoord[0].w;
-	vec3 p1 = texture(Texture, vTexCoord[0].xy).rgb;
-	vec3 p2 = texture(Texture, vTexCoord[0].xy + vec2(dx, dy) * quad).rgb;
-	vec3 p3 = texture(Texture, vTexCoord[0].xy + vec2(dx, 0) * quad).rgb;
-	vec3 p4 = texture(Texture, vTexCoord[0].xy + vec2(0, dy) * quad).rgb;
+	vec3 p1 = texture(MainTexture, vTexCoord[0].xy).rgb;
+	vec3 p2 = texture(MainTexture, vTexCoord[0].xy + vec2(dx, dy) * quad).rgb;
+	vec3 p3 = texture(MainTexture, vTexCoord[0].xy + vec2(dx, 0) * quad).rgb;
+	vec3 p4 = texture(MainTexture, vTexCoord[0].xy + vec2(0, dy) * quad).rgb;
 
-	vec3 w1 = yuv_matrix * texture(Texture, vTexCoord[1].xw).rgb;
-	vec3 w2 = yuv_matrix * texture(Texture, vTexCoord[1].yw).rgb;
-	vec3 w3 = yuv_matrix * texture(Texture, vTexCoord[1].zw).rgb;
+	vec3 w1 = yuv_matrix * texture(MainTexture, vTexCoord[1].xw).rgb;
+	vec3 w2 = yuv_matrix * texture(MainTexture, vTexCoord[1].yw).rgb;
+	vec3 w3 = yuv_matrix * texture(MainTexture, vTexCoord[1].zw).rgb;
 
-	vec3 w4 = yuv_matrix * texture(Texture, vTexCoord[2].xw).rgb;
+	vec3 w4 = yuv_matrix * texture(MainTexture, vTexCoord[2].xw).rgb;
 	vec3 w5 = yuv_matrix * p1;
-	vec3 w6 = yuv_matrix * texture(Texture, vTexCoord[2].zw).rgb;
+	vec3 w6 = yuv_matrix * texture(MainTexture, vTexCoord[2].zw).rgb;
 
-	vec3 w7 = yuv_matrix * texture(Texture, vTexCoord[3].xw).rgb;
-	vec3 w8 = yuv_matrix * texture(Texture, vTexCoord[3].yw).rgb;
-	vec3 w9 = yuv_matrix * texture(Texture, vTexCoord[3].zw).rgb;
+	vec3 w7 = yuv_matrix * texture(MainTexture, vTexCoord[3].xw).rgb;
+	vec3 w8 = yuv_matrix * texture(MainTexture, vTexCoord[3].yw).rgb;
+	vec3 w9 = yuv_matrix * texture(MainTexture, vTexCoord[3].zw).rgb;
 
 	bvec3 pattern[3];
 	pattern[0] = bvec3(diff(w5, w1), diff(w5, w2), diff(w5, w3));

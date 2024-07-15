@@ -129,7 +129,7 @@ void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textur
 	else
 	{
 		firstShader->bind();
-		firstShader->setTexture("Texture", textureHandle, GL_TEXTURE_2D);
+		firstShader->setTexture("MainTexture", textureHandle, GL_TEXTURE_2D);
 		firstShader->setParam("GameResolution", Vec2f(textureResolution));
 
 		// Configuration for soft shader
@@ -178,7 +178,7 @@ void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textur
 		secondShader->bind();
 		secondShader->setParam("GameResolution", Vec2f(textureResolution));
 		secondShader->setParam("OutputSize", Vec2f(rect.width, rect.height));
-		secondShader->setTexture("Texture", mPass0Texture.getHandle(), GL_TEXTURE_2D);
+		secondShader->setTexture("MainTexture", mPass0Texture.getHandle(), GL_TEXTURE_2D);
 		secondShader->setTexture("OrigTexture", textureHandle, GL_TEXTURE_2D);
 	}
 

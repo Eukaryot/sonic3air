@@ -29,21 +29,21 @@ void main()
 in vec2 uv0;
 out vec4 FragColor;
 
-uniform sampler2D Texture;
+uniform sampler2D MainTexture;
 uniform vec2 TexelOffset;
 uniform vec4 Kernel;
 
 void main()
 {
-	vec3 color00 = texture(Texture, uv0 + vec2(-TexelOffset.x, -TexelOffset.y)).rgb;
-	vec3 color01 = texture(Texture, uv0 + vec2(0.0, -TexelOffset.y)).rgb;
-	vec3 color02 = texture(Texture, uv0 + vec2(TexelOffset.x, -TexelOffset.y)).rgb;
-	vec3 color10 = texture(Texture, uv0 + vec2(-TexelOffset.x, 0.0)).rgb;
-	vec3 color11 = texture(Texture, uv0).rgb;
-	vec3 color12 = texture(Texture, uv0 + vec2(TexelOffset.x, 0.0)).rgb;
-	vec3 color20 = texture(Texture, uv0 + vec2(-TexelOffset.x, TexelOffset.y)).rgb;
-	vec3 color21 = texture(Texture, uv0 + vec2(0.0, TexelOffset.y)).rgb;
-	vec3 color22 = texture(Texture, uv0 + vec2(TexelOffset.x, TexelOffset.y)).rgb;
+	vec3 color00 = texture(MainTexture, uv0 + vec2(-TexelOffset.x, -TexelOffset.y)).rgb;
+	vec3 color01 = texture(MainTexture, uv0 + vec2(0.0, -TexelOffset.y)).rgb;
+	vec3 color02 = texture(MainTexture, uv0 + vec2(TexelOffset.x, -TexelOffset.y)).rgb;
+	vec3 color10 = texture(MainTexture, uv0 + vec2(-TexelOffset.x, 0.0)).rgb;
+	vec3 color11 = texture(MainTexture, uv0).rgb;
+	vec3 color12 = texture(MainTexture, uv0 + vec2(TexelOffset.x, 0.0)).rgb;
+	vec3 color20 = texture(MainTexture, uv0 + vec2(-TexelOffset.x, TexelOffset.y)).rgb;
+	vec3 color21 = texture(MainTexture, uv0 + vec2(0.0, TexelOffset.y)).rgb;
+	vec3 color22 = texture(MainTexture, uv0 + vec2(TexelOffset.x, TexelOffset.y)).rgb;
 
 	vec3 color = color00 * Kernel.w + color01 * Kernel.z + color02 * Kernel.w
 			   + color10 * Kernel.y + color11 * Kernel.x + color12 * Kernel.y

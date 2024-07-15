@@ -26,9 +26,7 @@ private:
 	bool mSupportsTintColor = false;
 
 	GLuint mLocTransform;
-	GLuint mLocTexture;
 	GLuint mLocSize;
-	GLuint mLocPaletteTexture;
 	GLuint mLocTintColor;
 	GLuint mLocAddedColor;
 };

@@ -96,7 +96,7 @@ out vec4 FragColor;
 
 uniform vec2 GameResolution;
 uniform vec2 OutputSize;
-uniform sampler2D Texture;
+uniform sampler2D MainTexture;
 uniform sampler2D OrigTexture;
 
 #define SourceSize vec4(GameResolution, 1.0 / GameResolution)
@@ -149,7 +149,7 @@ void main()
 	vec3 F = P( 1., 0.);
 	vec3 H = P( 0., 1.);
 
-	vec4 info = floor(texture(Texture, coord) * 255.0 + 0.5);
+	vec4 info = floor(texture(MainTexture, coord) * 255.0 + 0.5);
 
 	// info Mapping: x|y|
 	//               w|z|

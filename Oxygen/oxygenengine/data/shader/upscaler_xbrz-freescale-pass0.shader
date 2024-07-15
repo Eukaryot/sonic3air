@@ -95,7 +95,7 @@ in vec2 TEX0;
 out vec4 FragColor;
 
 uniform vec2 GameResolution;
-uniform sampler2D Texture;
+uniform sampler2D MainTexture;
 
 #define SourceSize vec4(GameResolution, 1.0 / GameResolution)
 
@@ -127,7 +127,7 @@ bool IsPixEqual(const vec3 pixA, const vec3 pixB)
 #define eq(a,b)  (a == b)
 #define neq(a,b) (a != b)
 
-#define P(x,y) texture(Texture, coord + SourceSize.zw * vec2(x, y)).rgb
+#define P(x,y) texture(MainTexture, coord + SourceSize.zw * vec2(x, y)).rgb
 
 void main()
 {

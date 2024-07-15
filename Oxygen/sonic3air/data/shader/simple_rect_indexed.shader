@@ -36,9 +36,9 @@ in vec2 LocalOffset;
 out vec4 FragColor;
 
 #ifdef USE_BUFFER_TEXTURES
-	uniform isamplerBuffer Texture;
+	uniform isamplerBuffer MainTexture;
 #else
-	uniform sampler2D Texture;
+	uniform sampler2D MainTexture;
 #endif
 uniform sampler2D PaletteTexture;
 #ifdef USE_TINT_COLOR
@@ -66,9 +66,9 @@ void main()
 	int ix = int(LocalOffset.x);
 	int iy = int(LocalOffset.y);
 #ifdef USE_BUFFER_TEXTURES
-	int paletteIndex = texelFetch(Texture, ix + iy * Size.x).x;
+	int paletteIndex = texelFetch(MainTexture, ix + iy * Size.x).x;
 #else
-	int paletteIndex = int(texture(Texture, vec2(((float(ix) + 0.5) / float(Size.x)), (float(iy) + 0.5) / float(Size.y))).x * 256.0);
+	int paletteIndex = int(texture(MainTexture, vec2(((float(ix) + 0.5) / float(Size.x)), (float(iy) + 0.5) / float(Size.y))).x * 256.0);
 #endif
 
 	vec4 color = getPaletteColor(paletteIndex, 0.0);

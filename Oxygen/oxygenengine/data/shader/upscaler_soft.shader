@@ -29,7 +29,7 @@ void main()
 in vec2 uv0;
 out vec4 FragColor;
 
-uniform sampler2D Texture;
+uniform sampler2D MainTexture;
 uniform vec2 GameResolution;
 uniform float PixelFactor;
 #ifdef USE_SCANLINES
@@ -56,7 +56,7 @@ void main()
 	fy = clamp(fy * PixelFactor, -0.5, 0.5);
 	uv.y = (iy + fy) / GameResolution.y;
 
-	vec4 color = texture(Texture, uv);
+	vec4 color = texture(MainTexture, uv);
 #ifdef USE_SCANLINES
 	color.rgb *= colorMultiplier;
 #endif

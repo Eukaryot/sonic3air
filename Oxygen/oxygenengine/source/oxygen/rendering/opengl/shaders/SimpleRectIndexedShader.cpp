@@ -25,13 +25,11 @@ void SimpleRectIndexedShader::initialize(bool supportsTintColor, const char* tec
 		bindShader();
 
 		mLocTransform	   = mShader.getUniformLocation("Transform");
-		mLocTexture		   = mShader.getUniformLocation("Texture");
 		mLocSize		   = mShader.getUniformLocation("Size");
-		mLocPaletteTexture = mShader.getUniformLocation("PaletteTexture");
 		mLocTintColor	   = mShader.getUniformLocation("TintColor");
 		mLocAddedColor	   = mShader.getUniformLocation("AddedColor");
 
-		mShader.setParam("Texture", 0);
+		mShader.setParam("MainTexture", 0);
 		mShader.setParam("PaletteTexture", 1);
 	}
 }

@@ -249,7 +249,7 @@ void OpenGLRenderer::blurGameScreen()
 
 	Shader& shader = mPostFxBlurShader;
 	shader.bind();
-	shader.setTexture("Texture", mProcessingTexture.getHandle(), GL_TEXTURE_2D);
+	shader.setTexture("MainTexture", mProcessingTexture.getHandle(), GL_TEXTURE_2D);
 	shader.setParam("TexelOffset", Vec2f(1.0f / mGameResolution.x, 1.0f / mGameResolution.y));
 	shader.setParam("Kernel", Vec4f(0.8f, 0.08f, 0.02f, 0.005f));	// That's a total of slightly more than one, so the image gets brighter over time
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -425,7 +425,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 					Shader& shader = mSimpleRectOverdrawShader;
 					shader.bind();
 					shader.setParam("Rect", rectf);
-					shader.setTexture("Texture", mProcessingTexture.getHandle(), GL_TEXTURE_2D);
+					shader.setTexture("MainTexture", mProcessingTexture.getHandle(), GL_TEXTURE_2D);
 					glDrawArrays(GL_TRIANGLES, 0, 6);
 					
 					OpenGLShader::resetLastUsedShader();
@@ -492,7 +492,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 
 			Shader& shader = mPostFxBlurShader;
 			shader.bind();
-			shader.setTexture("Texture", mProcessingTexture.getHandle(), GL_TEXTURE_2D);
+			shader.setTexture("MainTexture", mProcessingTexture.getHandle(), GL_TEXTURE_2D);
 			shader.setParam("TexelOffset", Vec2f(1.0f / mGameResolution.x, 1.0f / mGameResolution.y));
 			shader.setParam("Kernel", getBlurKernel(ebg.mBlurValue));
 			glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -528,7 +528,7 @@ void OpenGLRenderer::copyGameScreenToProcessingBuffer()
 
 	Shader& shader = mSimpleCopyScreenShader;
 	shader.bind();
-	shader.setTexture("Texture", mGameScreenTexture.getImplementation<OpenGLDrawerTexture>()->getTextureHandle(), GL_TEXTURE_2D);
+	shader.setTexture("MainTexture", mGameScreenTexture.getImplementation<OpenGLDrawerTexture>()->getTextureHandle(), GL_TEXTURE_2D);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	shader.unbind();

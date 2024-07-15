@@ -39,7 +39,6 @@ public:
 	static void setBlendMode(BlendMode blendMode);
 
 	static const OpenGLTexture& getCustomPaletteTexture(const PaletteBase& primaryPalette, const PaletteBase& secondaryPalette);
-
 };
 
 #endif
