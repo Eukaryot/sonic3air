@@ -720,7 +720,13 @@ void GameView::render()
 	// White overlay (used in Time Attack restart)
 	if (mWhiteOverlayAlpha > 0.0f)
 	{
-		drawer.drawRect(FTX::screenRect(), Color(1.0f, 1.0f, 1.0f, mWhiteOverlayAlpha));
+		drawer.drawRect(gameScreenRect, Color(1.0f, 1.0f, 1.0f, mWhiteOverlayAlpha));
+	}
+
+	// Fade from / to black
+	if (mFadeValue < 1.0f)
+	{
+		drawer.drawRect(gameScreenRect, Color(0.0f, 0.0f, 0.0f, 1.0f - mFadeValue));
 	}
 
 	if (Configuration::instance().mPerformanceDisplay == 1)
@@ -755,12 +761,7 @@ void GameView::render()
 	}
 
 	// Enable alpha again
-	// TODO: Better do the fading inside the game viewport (instead of the full window) for performance reasons -- or apply to "drawUpscaledRect"
 	drawer.setBlendMode(BlendMode::ALPHA);
-	if (mFadeValue < 1.0f)
-	{
-		drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 1.0f - mFadeValue));
-	}
 
 	drawer.performRendering();
 }
