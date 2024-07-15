@@ -13,6 +13,7 @@
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/drawing/opengl/OpenGLTexture.h"
 #include "oxygen/helper/FileHelper.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectColoredShader.h"
 #include "oxygen/rendering/parts/palette/Palette.h"
 
 
@@ -39,7 +40,7 @@ namespace openglresources
 
 	struct Internal
 	{
-		Shader mSimpleRectColoredShader;
+		SimpleRectColoredShader mSimpleRectColoredShader;
 		Shader mSimpleRectVertexColorShader;
 		Shader mSimpleRectTexturedShader[4];		// Enumerated using enum Variant
 		Shader mSimpleRectTexturedUVShader[4];		// Enumerated using enum Variant
@@ -109,7 +110,8 @@ void OpenGLDrawerResources::startup()
 	openglresources::State mState = openglresources::State();
 
 	// Load shaders
-	FileHelper::loadShader(openglresources::mInternal->mSimpleRectColoredShader,     L"data/shader/simple_rect_colored.shader",     "Standard");
+	openglresources::mInternal->mSimpleRectColoredShader.initialize();
+
 	FileHelper::loadShader(openglresources::mInternal->mSimpleRectVertexColorShader, L"data/shader/simple_rect_vertexcolor.shader", "Standard");
 	for (int k = 0; k < 4; ++k)
 	{
@@ -140,7 +142,7 @@ void OpenGLDrawerResources::shutdown()
 	SAFE_DELETE(openglresources::mInternal);
 }
 
-Shader& OpenGLDrawerResources::getSimpleRectColoredShader()
+SimpleRectColoredShader& OpenGLDrawerResources::getSimpleRectColoredShader()
 {
 	return openglresources::mInternal->mSimpleRectColoredShader;
 }

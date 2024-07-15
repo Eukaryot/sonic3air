@@ -16,6 +16,7 @@
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
 #include "oxygen/helper/FileHelper.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectColoredShader.h"
 #include "oxygen/simulation/LogDisplay.h"
 
 
@@ -452,19 +453,8 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			}
 			OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
 
-			Vec4f transform;
-			transform.x = (float)rg.mRect.x / (float)mGameResolution.x * 2.0f - 1.0f;
-			transform.y = (float)rg.mRect.y / (float)mGameResolution.y * 2.0f - 1.0f;
-			transform.z = rg.mRect.width / (float)mGameResolution.x * 2.0f;
-			transform.w = rg.mRect.height / (float)mGameResolution.y * 2.0f;
-
-			Shader& shader = OpenGLDrawerResources::getSimpleRectColoredShader();
-			shader.bind();
-			shader.setParam("Color", Vec4f(rg.mColor.data));
-			shader.setParam("Transform", transform);
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-			
-			OpenGLShader::resetLastUsedShader();
+			SimpleRectColoredShader& shader = OpenGLDrawerResources::getSimpleRectColoredShader();
+			shader.draw(rg.mRect, rg.mColor, mGameResolution);
 			break;
 		}
 
@@ -498,7 +488,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			shader.setTexture("Texture", texture->getTextureHandle(), GL_TEXTURE_2D);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			
-			OpenGLShader::resetLastUsedShader();
+			OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
 			break;
 		}
 
@@ -519,7 +509,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			shader.unbind();
 
 			mLastRenderedGeometryType = Geometry::Type::UNDEFINED;
-			OpenGLShader::resetLastUsedShader();
+			OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
 			break;
 		}
 

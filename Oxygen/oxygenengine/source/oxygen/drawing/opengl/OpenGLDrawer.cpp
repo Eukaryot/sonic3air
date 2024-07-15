@@ -19,6 +19,7 @@
 #include "oxygen/drawing/DrawCommand.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/helper/Logging.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectColoredShader.h"
 #include "oxygen/resources/PaletteCollection.h"
 #include "oxygen/resources/SpriteCollection.h"
 
@@ -265,7 +266,7 @@ namespace opengldrawer
 
 		void drawRect(Recti targetRect, GLuint textureHandle, const Color& color, Vec2f uv0 = Vec2f(0.0f, 0.0f), Vec2f uv1 = Vec2f(1.0f, 1.0f))
 		{
-			const Vec4f rectParam = getTransformOfRectInViewport(targetRect);
+			const Vec4f transform = getTransformOfRectInViewport(targetRect);
 
 			if (textureHandle != 0)
 			{
@@ -275,7 +276,7 @@ namespace opengldrawer
 				{
 					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
 					shader.bind();
-					shader.setParam("Transform", rectParam);
+					shader.setParam("Transform", transform);
 					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
 					if (needsTintColor)
 					{
@@ -289,7 +290,7 @@ namespace opengldrawer
 				{
 					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
 					shader.bind();
-					shader.setParam("Transform", rectParam);
+					shader.setParam("Transform", transform);
 					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
 					if (needsTintColor)
 						shader.setParam("TintColor", color);
@@ -311,12 +312,9 @@ namespace opengldrawer
 			}
 			else
 			{
-				Shader& shader = OpenGLDrawerResources::getSimpleRectColoredShader();
-				shader.bind();
-				shader.setParam("Transform", rectParam);
-				shader.setParam("Color", Vec4f(color.data));
-
-				OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
+				OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
+				SimpleRectColoredShader& shader = OpenGLDrawerResources::getSimpleRectColoredShader();
+				shader.draw(color, transform);
 			}
 		}
 

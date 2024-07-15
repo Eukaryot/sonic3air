@@ -14,6 +14,7 @@
 
 class OpenGLTexture;
 class PaletteBase;
+class SimpleRectColoredShader;
 
 
 class OpenGLDrawerResources final
@@ -22,7 +23,7 @@ public:
 	static void startup();
 	static void shutdown();
 
-	static Shader& getSimpleRectColoredShader();
+	static SimpleRectColoredShader& getSimpleRectColoredShader();
 	static Shader& getSimpleRectVertexColorShader();
 	static Shader& getSimpleRectTexturedShader(bool tint, bool alpha);
 	static Shader& getSimpleRectTexturedUVShader(bool tint, bool alpha);

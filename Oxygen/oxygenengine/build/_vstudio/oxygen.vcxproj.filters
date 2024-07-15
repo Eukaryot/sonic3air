@@ -445,6 +445,9 @@
     <ClCompile Include="..\..\source\oxygen\resources\SpriteCollection.cpp">
       <Filter>resources</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectColoredShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -834,6 +837,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\resources\SpriteCollection.h">
       <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectColoredShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
