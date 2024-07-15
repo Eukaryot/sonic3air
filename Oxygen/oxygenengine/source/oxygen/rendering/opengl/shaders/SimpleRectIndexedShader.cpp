@@ -24,10 +24,10 @@ void SimpleRectIndexedShader::initialize(bool supportsTintColor, const char* tec
 	{
 		bindShader();
 
-		mLocTransform	   = mShader.getUniformLocation("Transform");
-		mLocSize		   = mShader.getUniformLocation("Size");
-		mLocTintColor	   = mShader.getUniformLocation("TintColor");
-		mLocAddedColor	   = mShader.getUniformLocation("AddedColor");
+		mLocTransform  = mShader.getUniformLocation("Transform");
+		mLocSize	   = mShader.getUniformLocation("Size");
+		mLocTintColor  = mShader.getUniformLocation("TintColor");
+		mLocAddedColor = mShader.getUniformLocation("AddedColor");
 
 		mShader.setParam("MainTexture", 0);
 		mShader.setParam("PaletteTexture", 1);
@@ -49,13 +49,13 @@ void SimpleRectIndexedShader::setup(const BufferTexture& texture, const OpenGLTe
 
 	// Update uniforms
 	{
-		glUniform4fv(mLocTransform, 1, transform.data);
-		glUniform2iv(mLocSize, 1, texture.getSize().data);
+		mShader.setParam(mLocTransform, transform);
+		mShader.setParam(mLocSize, texture.getSize());
 
 		if (mSupportsTintColor)
 		{
-			glUniform4fv(mLocTintColor, 1, tintColor.data);
-			glUniform4fv(mLocAddedColor, 1, addedColor.data);
+			mShader.setParam(mLocTintColor, tintColor);
+			mShader.setParam(mLocAddedColor, addedColor);
 		}
 	}
 }

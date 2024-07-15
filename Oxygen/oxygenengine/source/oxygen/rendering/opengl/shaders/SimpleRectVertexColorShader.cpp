@@ -29,7 +29,7 @@ void SimpleRectVertexColorShader::setup(const Vec4f& transform)
 	bindShader();
 
 	// Update uniforms
-	glUniform4fv(mLocTransform, 1, *transform);
+	mShader.setParam(mLocTransform, transform);
 }
 
 #endif

@@ -35,10 +35,13 @@ void SimpleRectTexturedUVShader::setup(GLuint textureHandle, const Vec4f& transf
 	mShader.setTexture("MainTexture", textureHandle, GL_TEXTURE_2D);
 
 	// Update uniforms
-	glUniform4fv(mLocTransform, 1, transform.data);
-	if (mSupportsTintColor)
 	{
-		glUniform4fv(mLocTintColor, 1, tintColor.data);
+		mShader.setParam(mLocTransform, transform);
+
+		if (mSupportsTintColor)
+		{
+			mShader.setParam(mLocTintColor, tintColor);
+		}
 	}
 }
 

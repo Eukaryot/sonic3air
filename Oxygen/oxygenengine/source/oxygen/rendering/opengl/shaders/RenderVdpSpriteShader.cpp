@@ -23,13 +23,13 @@ void RenderVdpSpriteShader::initialize()
 	{
 		bindShader();
 
-		mLocGameResolution	= mShader.getUniformLocation("GameResolution");
-		mLocWaterLevel		= mShader.getUniformLocation("WaterLevel");
-		mLocPosition		= mShader.getUniformLocation("Position");
-		mLocSize			= mShader.getUniformLocation("Size");
-		mLocFirstPattern	= mShader.getUniformLocation("FirstPattern");
-		mLocTintColor		= mShader.getUniformLocation("TintColor");
-		mLocAddedColor		= mShader.getUniformLocation("AddedColor");
+		mLocGameResolution = mShader.getUniformLocation("GameResolution");
+		mLocWaterLevel	   = mShader.getUniformLocation("WaterLevel");
+		mLocPosition	   = mShader.getUniformLocation("Position");
+		mLocSize		   = mShader.getUniformLocation("Size");
+		mLocFirstPattern   = mShader.getUniformLocation("FirstPattern");
+		mLocTintColor	   = mShader.getUniformLocation("TintColor");
+		mLocAddedColor	   = mShader.getUniformLocation("AddedColor");
 
 		mShader.setParam("PatternCacheTexture", 0);
 		mShader.setParam("PaletteTexture", 1);
@@ -53,13 +53,13 @@ void RenderVdpSpriteShader::draw(const renderitems::VdpSpriteInfo& spriteInfo, c
 	{
 		if (mLastGameResolution != gameResolution)
 		{
-			glUniform2iv(mLocGameResolution, 1, *gameResolution);
+			mShader.setParam(mLocGameResolution, gameResolution);
 			mLastGameResolution = gameResolution;
 		}
 
 		if (mLastWaterSurfaceHeight != waterSurfaceHeight)
 		{
-			glUniform1i(mLocWaterLevel, waterSurfaceHeight);
+			mShader.setParam(mLocWaterLevel, waterSurfaceHeight);
 			mLastWaterSurfaceHeight = waterSurfaceHeight;
 		}
 
@@ -68,17 +68,14 @@ void RenderVdpSpriteShader::draw(const renderitems::VdpSpriteInfo& spriteInfo, c
 		Vec4f addedColor = spriteInfo.mAddedColor;
 		if (spriteInfo.mUseGlobalComponentTint)
 		{
-			tintColor *= paletteManager.getGlobalComponentTintColor();
-			addedColor += paletteManager.getGlobalComponentAddedColor();
+			paletteManager.applyGlobalComponentTint(tintColor, addedColor);
 		}
 
-		glUniform3iv(mLocPosition, 1, *Vec3i(spriteInfo.mInterpolatedPosition.x, spriteInfo.mInterpolatedPosition.y, spriteInfo.mPriorityFlag ? 1 : 0));
-		glUniform2iv(mLocSize, 1, *spriteInfo.mSize);
-		glUniform1i(mLocFirstPattern, spriteInfo.mFirstPattern);
-		glUniform4fv(mLocTintColor, 1, tintColor.data);
-		glUniform4fv(mLocAddedColor, 1, addedColor.data);
-		glUniform4fv(mLocTintColor, 1, spriteInfo.mTintColor.data);
-		glUniform4fv(mLocAddedColor, 1, spriteInfo.mAddedColor.data);
+		mShader.setParam(mLocPosition, Vec3i(spriteInfo.mInterpolatedPosition.x, spriteInfo.mInterpolatedPosition.y, spriteInfo.mPriorityFlag ? 1 : 0));
+		mShader.setParam(mLocSize, spriteInfo.mSize);
+		mShader.setParam(mLocFirstPattern, spriteInfo.mFirstPattern);
+		mShader.setParam(mLocTintColor, tintColor);
+		mShader.setParam(mLocAddedColor, addedColor);
 	}
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);

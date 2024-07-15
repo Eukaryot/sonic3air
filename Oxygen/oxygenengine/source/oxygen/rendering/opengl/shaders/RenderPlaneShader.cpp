@@ -87,11 +87,11 @@ void RenderPlaneShader::draw(const PlaneGeometry& geometry, const Vec2i& gameRes
 		{
 			if (geometry.mPlaneIndex == PlaneManager::PLANE_W)		// Special handling required here
 			{
-				glUniform1i(mLocScrollOffsetX, renderParts.getScrollOffsetsManager().getPlaneWScrollOffset().x);
+				mShader.setParam(mLocScrollOffsetX, renderParts.getScrollOffsetsManager().getPlaneWScrollOffset().x);
 			}
 			else
 			{
-				glUniform1i(mLocScrollOffsetX, renderParts.getScrollOffsetsManager().getScrollOffsetsH(geometry.mScrollOffsets)[0]);
+				mShader.setParam(mLocScrollOffsetX, renderParts.getScrollOffsetsManager().getScrollOffsetsH(geometry.mScrollOffsets)[0]);
 			}
 		}
 
@@ -100,17 +100,17 @@ void RenderPlaneShader::draw(const PlaneGeometry& geometry, const Vec2i& gameRes
 			glActiveTexture(GL_TEXTURE4);
 			resources.getVScrollOffsetsTexture(geometry.mScrollOffsets).bindTexture();
 
-			glUniform1i(mLocVScrollOffsetBias, renderParts.getScrollOffsetsManager().getVerticalScrollOffsetBias());
+			mShader.setParam(mLocVScrollOffsetBias, renderParts.getScrollOffsetsManager().getVerticalScrollOffsetBias());
 		}
 		else
 		{
 			if (geometry.mPlaneIndex == PlaneManager::PLANE_W)		// Special handling required here
 			{
-				glUniform1i(mLocScrollOffsetY, renderParts.getScrollOffsetsManager().getPlaneWScrollOffset().y);
+				mShader.setParam(mLocScrollOffsetY, renderParts.getScrollOffsetsManager().getPlaneWScrollOffset().y);
 			}
 			else
 			{
-				glUniform1i(mLocScrollOffsetY, renderParts.getScrollOffsetsManager().getScrollOffsetsV(geometry.mScrollOffsets)[0]);
+				mShader.setParam(mLocScrollOffsetY, renderParts.getScrollOffsetsManager().getScrollOffsetsV(geometry.mScrollOffsets)[0]);
 			}
 		}
 	}
@@ -119,20 +119,20 @@ void RenderPlaneShader::draw(const PlaneGeometry& geometry, const Vec2i& gameRes
 	{
 		if (mLastGameResolution != gameResolution)
 		{
-			glUniform2iv(mLocGameResolution, 1, *gameResolution);
+			mShader.setParam(mLocGameResolution, gameResolution);
 			mLastGameResolution = gameResolution;
 		}
 
 		const Vec4i playfieldSize = (geometry.mPlaneIndex <= PlaneManager::PLANE_A) ? renderParts.getPlaneManager().getPlayfieldSizeForShaders() : Vec4i(512, 256, 64, 32);
 		if (mLastPlayfieldSize != playfieldSize)
 		{
-			glUniform4iv(mLocPlayfieldSize, 1, playfieldSize.data);
+			mShader.setParam(mLocPlayfieldSize, playfieldSize);
 			mLastPlayfieldSize = playfieldSize;
 		}
 
 		if (mLastRenderedPlanePriority != geometry.mPriorityFlag)
 		{
-			glUniform1i(mLocPriorityFlag, geometry.mPriorityFlag ? 1 : 0);
+			mShader.setParam(mLocPriorityFlag, geometry.mPriorityFlag ? 1 : 0);
 			mLastRenderedPlanePriority = geometry.mPriorityFlag;
 		}
 	}
@@ -144,15 +144,14 @@ void RenderPlaneShader::draw(const PlaneGeometry& geometry, const Vec2i& gameRes
 	{
 		if (mLastActiveRect != rects[i])
 		{
-			glUniform4iv(mLocActiveRect, 1, rects[i].mData);
+			mShader.setParam(mLocActiveRect, rects[i]);
 			mLastActiveRect = rects[i];
 		}
 
 		const int paletteVariant = i;
 		if (mLastPaletteVariant != paletteVariant)
 		{
-			const float paletteOffset = (float)paletteVariant / 2.0f;
-			glUniform1f(mLocPaletteOffset, paletteOffset);
+			mShader.setParam(mLocPaletteOffset, (float)paletteVariant / 2.0f);
 			mLastPaletteVariant = paletteVariant;
 		}
 

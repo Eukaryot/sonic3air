@@ -54,11 +54,11 @@ void DebugDrawPlaneShader::draw(int planeIndex, RenderParts& renderParts, const 
 	// Update uniforms
 	{
 		if (planeIndex <= PlaneManager::PLANE_A)
-			glUniform4iv(mLocPlayfieldSize, 1, *renderParts.getPlaneManager().getPlayfieldSizeForShaders());
+			mShader.setParam(mLocPlayfieldSize, renderParts.getPlaneManager().getPlayfieldSizeForShaders());
 		else
-			glUniform4iv(mLocPlayfieldSize, 1, *Vec4i(512, 256, 64, 32));
+			mShader.setParam(mLocPlayfieldSize, Vec4i(512, 256, 64, 32));
 
-		glUniform1i(mLocHighlightPrio, FTX::keyState(SDLK_LSHIFT) ? 1 : 0);
+		mShader.setParam(mLocHighlightPrio, FTX::keyState(SDLK_LSHIFT) ? 1 : 0);
 	}
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);

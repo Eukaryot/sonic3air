@@ -41,8 +41,8 @@ void SimpleRectColoredShader::setup(const Color& color, const Vec4f& transform)
 	bindShader();
 
 	// Update uniforms
-	glUniform4fv(mLocColor, 1, *Vec4f(color));
-	glUniform4fv(mLocTransform, 1, *transform);
+	mShader.setParam(mLocColor, color);
+	mShader.setParam(mLocTransform, transform);
 }
 
 #endif

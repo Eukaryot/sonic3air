@@ -55,76 +55,78 @@ GLuint Shader::getAttribLocation(const char* name) const
 	return glGetAttribLocation(mProgram, name);
 }
 
-void Shader::setParam(const char* name, int param)
+void Shader::setParam(GLuint loc, int param)
 {
-	glUniform1i(getUniformLocation(name), param);
+	glUniform1i(loc, param);
 }
 
-void Shader::setParam(const char* name, const Vec2i& param)
+void Shader::setParam(GLuint loc, const Vec2i& param)
 {
-	glUniform2iv(getUniformLocation(name), 1, *param);
+	glUniform2iv(loc, 1, *param);
 }
 
-void Shader::setParam(const char* name, const Vec3i& param)
+void Shader::setParam(GLuint loc, const Vec3i& param)
 {
-	glUniform3iv(getUniformLocation(name), 1, *param);
+	glUniform3iv(loc, 1, *param);
 }
 
-void Shader::setParam(const char* name, const Vec4i& param)
+void Shader::setParam(GLuint loc, const Vec4i& param)
 {
-	glUniform4iv(getUniformLocation(name), 1, *param);
+	glUniform4iv(loc, 1, *param);
 }
 
-void Shader::setParam(const char* name, float param)
+void Shader::setParam(GLuint loc, const Recti& param)
 {
-	glUniform1f(getUniformLocation(name), param);
+	glUniform4iv(loc, 1, param.mData);
 }
 
-void Shader::setParam(const char* name, const Vec2f& param)
+void Shader::setParam(GLuint loc, float param)
 {
-	glUniform2fv(getUniformLocation(name), 1, *param);
+	glUniform1f(loc, param);
 }
 
-void Shader::setParam(const char* name, const Vec3f& param)
+void Shader::setParam(GLuint loc, const Vec2f& param)
 {
-	glUniform3fv(getUniformLocation(name), 1, *param);
+	glUniform2fv(loc, 1, *param);
 }
 
-void Shader::setParam(const char* name, const Vec4f& param)
+void Shader::setParam(GLuint loc, const Vec3f& param)
 {
-	glUniform4fv(getUniformLocation(name), 1, *param);
+	glUniform3fv(loc, 1, *param);
 }
 
-void Shader::setMatrix(const char* name, const Mat3f& matrix)
+void Shader::setParam(GLuint loc, const Vec4f& param)
 {
-	glUniformMatrix3fv(getUniformLocation(name), 1, true, *matrix);
+	glUniform4fv(loc, 1, *param);
 }
 
-void Shader::setMatrix(const char* name, const Mat4f& matrix)
+void Shader::setParam(GLuint loc, const Rectf& param)
 {
-	glUniformMatrix4fv(getUniformLocation(name), 1, true, *matrix);
+	glUniform4fv(loc, 1, param.mData);
 }
 
-void Shader::setTexture(const char* name, GLuint handle, GLenum target)
+void Shader::setMatrix(GLuint loc, const Mat3f& matrix)
+{
+	glUniformMatrix3fv(loc, 1, true, *matrix);
+}
+
+void Shader::setMatrix(GLuint loc, const Mat4f& matrix)
+{
+	glUniformMatrix4fv(loc, 1, true, *matrix);
+}
+
+void Shader::setTexture(GLuint loc, GLuint handle, GLenum target)
 {
 	int number = mTextureCount;
 	glActiveTexture(GL_TEXTURE0 + number);
 	glBindTexture(target, handle);
-#if defined(PLATFORM_VITA)
-	// In cg shaders, "Texture" is a reserved name so we use "tex" instead
-	if (strcmp(name, "Texture") == 0)
-		glUniform1i(getUniformLocation("tex"), number);
-	else
-		glUniform1i(getUniformLocation(name), number);
-#else
-	glUniform1i(getUniformLocation(name), number);
-#endif
+	glUniform1i(loc, number);
 	++mTextureCount;
 }
 
-void Shader::setTexture(const char* name, const Texture& texture)
+void Shader::setTexture(GLuint loc, const Texture& texture)
 {
-	setTexture(name, texture.getHandle(), texture.getType());
+	setTexture(loc, texture.getHandle(), texture.getType());
 }
 
 void Shader::bind()
@@ -141,9 +143,9 @@ void Shader::bind()
 		{
 			switch (mBlendMode)
 			{
-				case BlendMode::OPAQUE: glBlendFunc(GL_ONE, GL_ZERO);  break;
-				case BlendMode::ALPHA:  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  break;
-				case BlendMode::ADD:    glBlendFunc(GL_ONE, GL_ONE);   break;
+				case BlendMode::OPAQUE:	glBlendFunc(GL_ONE, GL_ZERO);  break;
+				case BlendMode::ALPHA:	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  break;
+				case BlendMode::ADD:	glBlendFunc(GL_ONE, GL_ONE);   break;
 				default:				glBlendFunc(GL_ONE, GL_ZERO);  break;
 			}
 		}

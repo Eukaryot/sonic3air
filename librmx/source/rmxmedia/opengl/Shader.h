@@ -55,20 +55,39 @@ public:
 	GLuint getUniformLocation(const char* name) const;
 	GLuint getAttribLocation(const char* name) const;
 
-	void setParam(const char* name, int param);
-	void setParam(const char* name, const Vec2i& param);
-	void setParam(const char* name, const Vec3i& param);
-	void setParam(const char* name, const Vec4i& param);
-	void setParam(const char* name, float param);
-	void setParam(const char* name, const Vec2f& param);
-	void setParam(const char* name, const Vec3f& param);
-	void setParam(const char* name, const Vec4f& param);
+	void setParam(GLuint loc, int param);
+	void setParam(GLuint loc, const Vec2i& param);
+	void setParam(GLuint loc, const Vec3i& param);
+	void setParam(GLuint loc, const Vec4i& param);
+	void setParam(GLuint loc, const Recti& param);
+	void setParam(GLuint loc, float param);
+	void setParam(GLuint loc, const Vec2f& param);
+	void setParam(GLuint loc, const Vec3f& param);
+	void setParam(GLuint loc, const Vec4f& param);
+	void setParam(GLuint loc, const Rectf& param);
 
-	void setMatrix(const char* name, const Mat3f& matrix);
-	void setMatrix(const char* name, const Mat4f& matrix);
+	void setMatrix(GLuint loc, const Mat3f& matrix);
+	void setMatrix(GLuint loc, const Mat4f& matrix);
 
-	void setTexture(const char* name, GLuint handle, GLenum target);
-	void setTexture(const char* name, const Texture& texture);
+	void setTexture(GLuint loc, GLuint handle, GLenum target);
+	void setTexture(GLuint loc, const Texture& texture);
+
+	inline void setParam(const char* name, int param)			{ setParam(getUniformLocation(name), param); }
+	inline void setParam(const char* name, const Vec2i& param)	{ setParam(getUniformLocation(name), param); }
+	inline void setParam(const char* name, const Vec3i& param)	{ setParam(getUniformLocation(name), param); }
+	inline void setParam(const char* name, const Vec4i& param)	{ setParam(getUniformLocation(name), param); }
+	inline void setParam(const char* name, const Recti& param)	{ setParam(getUniformLocation(name), param); }
+	inline void setParam(const char* name, float param)			{ setParam(getUniformLocation(name), param); }
+	inline void setParam(const char* name, const Vec2f& param)	{ setParam(getUniformLocation(name), param); }
+	inline void setParam(const char* name, const Vec3f& param)	{ setParam(getUniformLocation(name), param); }
+	inline void setParam(const char* name, const Vec4f& param)	{ setParam(getUniformLocation(name), param); }
+	inline void setParam(const char* name, const Rectf& param)	{ setParam(getUniformLocation(name), param); }
+
+	inline void setMatrix(const char* name, const Mat3f& matrix)			{ setMatrix(getUniformLocation(name), matrix); }
+	inline void setMatrix(const char* name, const Mat4f& matrix)			{ setMatrix(getUniformLocation(name), matrix); }
+
+	inline void setTexture(const char* name, GLuint handle, GLenum target)	{ setTexture(getUniformLocation(name), handle, target); }
+	inline void setTexture(const char* name, const Texture& texture)		{ setTexture(getUniformLocation(name), texture); }
 
 	void bind();
 	void unbind();

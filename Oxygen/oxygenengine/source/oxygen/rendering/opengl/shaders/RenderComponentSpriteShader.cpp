@@ -59,22 +59,21 @@ void RenderComponentSpriteShader::draw(const renderitems::ComponentSpriteInfo& s
 		Vec4f addedColor = spriteInfo.mAddedColor;
 		if (spriteInfo.mUseGlobalComponentTint)
 		{
-			tintColor *= paletteManager.getGlobalComponentTintColor();
-			addedColor += paletteManager.getGlobalComponentAddedColor();
+			paletteManager.applyGlobalComponentTint(tintColor, addedColor);
 		}
 
 		if (mLastGameResolution != gameResolution)
 		{
-			glUniform2iv(mLocGameResolution, 1, *gameResolution);
+			mShader.setParam(mLocGameResolution, gameResolution);
 			mLastGameResolution = gameResolution;
 		}
 
-		glUniform3iv(mLocPosition, 1, *Vec3i(spriteInfo.mInterpolatedPosition.x, spriteInfo.mInterpolatedPosition.y, spriteInfo.mPriorityFlag ? 1 : 0));
-		glUniform2iv(mLocPivotOffset, 1, *spriteInfo.mPivotOffset);
-		glUniform2iv(mLocSize, 1, *spriteInfo.mSize);
-		glUniform4fv(mLocTransformation, 1, *spriteInfo.mTransformation.mMatrix);
-		glUniform4fv(mLocTintColor, 1, tintColor.data);
-		glUniform4fv(mLocAddedColor, 1, addedColor.data);
+		mShader.setParam(mLocPosition, Vec3i(spriteInfo.mInterpolatedPosition.x, spriteInfo.mInterpolatedPosition.y, spriteInfo.mPriorityFlag ? 1 : 0));
+		mShader.setParam(mLocPivotOffset, spriteInfo.mPivotOffset);
+		mShader.setParam(mLocSize, spriteInfo.mSize);
+		mShader.setParam(mLocTransformation, spriteInfo.mTransformation.mMatrix);
+		mShader.setParam(mLocTintColor, tintColor);
+		mShader.setParam(mLocAddedColor, addedColor);
 	}
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
