@@ -98,6 +98,10 @@
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPlaneShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderVdpSpriteShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectColoredShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectIndexedShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectTexturedShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectTexturedUVShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectVertexColorShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\palette\Palette.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\palette\PaletteManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\PatternManager.cpp" />
@@ -222,6 +226,10 @@
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPlaneShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderVdpSpriteShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectColoredShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectIndexedShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectTexturedShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectTexturedUVShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectVertexColorShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\palette\Palette.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\palette\PaletteManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\PatternManager.h" />

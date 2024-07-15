@@ -20,6 +20,10 @@
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/opengl/shaders/SimpleRectColoredShader.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectIndexedShader.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectTexturedShader.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectTexturedUVShader.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectVertexColorShader.h"
 #include "oxygen/resources/PaletteCollection.h"
 #include "oxygen/resources/SpriteCollection.h"
 
@@ -173,12 +177,12 @@ namespace opengldrawer
 		{
 			// This transform is the right one to use if vertex positions are normalized inside the given input rectangle
 			//  -> I.e. (0.0f, 0.0f) refers to the rect's upper left corner, and (1.0f, 1.0f) to the lower right corner
-			Vec4f rectParam;
-			rectParam.x = mPixelToViewSpaceTransform.x + (float)inputRect.x * mPixelToViewSpaceTransform.z;
-			rectParam.y = mPixelToViewSpaceTransform.y + (float)inputRect.y * mPixelToViewSpaceTransform.w;
-			rectParam.z = (float)inputRect.width * mPixelToViewSpaceTransform.z;
-			rectParam.w = (float)inputRect.height * mPixelToViewSpaceTransform.w;
-			return rectParam;
+			Vec4f transform;
+			transform.x = mPixelToViewSpaceTransform.x + (float)inputRect.x * mPixelToViewSpaceTransform.z;
+			transform.y = mPixelToViewSpaceTransform.y + (float)inputRect.y * mPixelToViewSpaceTransform.w;
+			transform.z = (float)inputRect.width * mPixelToViewSpaceTransform.z;
+			transform.w = (float)inputRect.height * mPixelToViewSpaceTransform.w;
+			return transform;
 		}
 
 		inline const Vec4f& getPixelToViewSpaceTransform() const  { return mPixelToViewSpaceTransform; }
@@ -267,6 +271,7 @@ namespace opengldrawer
 		void drawRect(Recti targetRect, GLuint textureHandle, const Color& color, Vec2f uv0 = Vec2f(0.0f, 0.0f), Vec2f uv1 = Vec2f(1.0f, 1.0f))
 		{
 			const Vec4f transform = getTransformOfRectInViewport(targetRect);
+			OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
 
 			if (textureHandle != 0)
 			{
@@ -274,26 +279,14 @@ namespace opengldrawer
 
 				if (uv0.x == 0.0f && uv0.y == 0.0f && uv1.x == 1.0f && uv1.y == 1.0f)
 				{
-					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
-					shader.bind();
-					shader.setParam("Transform", transform);
-					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
-					if (needsTintColor)
-					{
-						shader.setParam("TintColor", color);
-						shader.setParam("AddedColor", Color::TRANSPARENT);
-					}
-
+					SimpleRectTexturedShader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
+					shader.setup(textureHandle, transform, color);
 					OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
 				}
 				else
 				{
-					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
-					shader.bind();
-					shader.setParam("Transform", transform);
-					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
-					if (needsTintColor)
-						shader.setParam("TintColor", color);
+					SimpleRectTexturedUVShader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
+					shader.setup(textureHandle, transform, color);
 
 					const float vertexData[] =
 					{
@@ -312,9 +305,9 @@ namespace opengldrawer
 			}
 			else
 			{
-				OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
 				SimpleRectColoredShader& shader = OpenGLDrawerResources::getSimpleRectColoredShader();
-				shader.draw(color, transform);
+				shader.setup(color, transform);
+				OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
 			}
 		}
 
@@ -323,26 +316,12 @@ namespace opengldrawer
 			if (!texture.isValid())
 				return;
 
-			const Vec4f rectParam = getTransformOfRectInViewport(targetRect);
+			const Vec4f transform = getTransformOfRectInViewport(targetRect);
 			const bool needsTintColor = (color != Color::WHITE);
 
-			Shader& shader = OpenGLDrawerResources::getSimpleRectIndexedShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
-			shader.bind();
-			glUniform1i(shader.getUniformLocation("SpriteTexture"), 0);
-			glUniform1i(shader.getUniformLocation("PaletteTexture"), 1);
-			glActiveTexture(GL_TEXTURE0);
-			texture.bindTexture();
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, paletteTexture.getHandle());
-
-			shader.setParam("Transform", rectParam);
-			shader.setParam("Size", texture.getSize());
-			if (needsTintColor)
-			{
-				shader.setParam("TintColor", color);
-				shader.setParam("AddedColor", Color::TRANSPARENT);
-			}
-
+			OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
+			SimpleRectIndexedShader& shader = OpenGLDrawerResources::getSimpleRectIndexedShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
+			shader.setup(texture, paletteTexture, transform, color);
 			OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
 		}
 
@@ -381,14 +360,11 @@ namespace opengldrawer
 			static OpenGLFontOutput::VertexGroups vertexGroups;
 			fontOutput.buildVertexGroups(vertexGroups, typeInfos);
 
-			Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(true, true);
-			shader.bind();
-			shader.setParam("Transform", getPixelToViewSpaceTransform());
-
+			OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
+			SimpleRectTexturedUVShader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(true, true);
 			for (const OpenGLFontOutput::VertexGroup& vertexGroup : vertexGroups.mVertexGroups)
 			{
-				shader.setTexture("Texture", *vertexGroup.mTexture);
-				shader.setParam("TintColor", printOptions.mTintColor);
+				shader.setup(vertexGroup.mTexture->getHandle(), getPixelToViewSpaceTransform(), printOptions.mTintColor);
 
 				static std::vector<float> vertexData;
 				vertexData.resize(vertexGroup.mNumVertices * 4);
@@ -627,11 +603,9 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 				if (nullptr == dc.mTexture)
 					break;
 
-				Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(false, true);
-				shader.bind();
-				const GLuint textureHandle = mInternal.setupTexture(*dc.mTexture);
-				shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
-				shader.setParam("Transform", mInternal.getPixelToViewSpaceTransform());
+				OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
+				SimpleRectTexturedUVShader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(false, true);
+				shader.setup(mInternal.setupTexture(*dc.mTexture), mInternal.getPixelToViewSpaceTransform());
 
 				static std::vector<float> vertexData;
 				vertexData.resize(dc.mTriangles.size() * 4);
@@ -660,9 +634,9 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 				if (dc.mTriangles.empty())
 					break;
 
-				Shader& shader = OpenGLDrawerResources::getSimpleRectVertexColorShader();
-				shader.bind();
-				shader.setParam("Transform", mInternal.getPixelToViewSpaceTransform());
+				OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
+				SimpleRectVertexColorShader& shader = OpenGLDrawerResources::getSimpleRectVertexColorShader();
+				shader.setup(mInternal.getPixelToViewSpaceTransform());
 
 				static std::vector<float> vertexData;
 				vertexData.resize(dc.mTriangles.size() * 6);

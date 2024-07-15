@@ -17,6 +17,7 @@
 #include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/rendering/opengl/shaders/SimpleRectColoredShader.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectTexturedShader.h"
 #include "oxygen/simulation/LogDisplay.h"
 
 
@@ -454,7 +455,8 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
 
 			SimpleRectColoredShader& shader = OpenGLDrawerResources::getSimpleRectColoredShader();
-			shader.draw(rg.mRect, rg.mColor, mGameResolution);
+			shader.setup(rg.mRect, mGameResolution, rg.mColor);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
 			break;
 		}
 
@@ -474,21 +476,9 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			}
 			OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
 
-			Vec4f transform;
-			transform.x = (float)tg.mRect.x / (float)mGameResolution.x * 2.0f - 1.0f;
-			transform.y = (float)tg.mRect.y / (float)mGameResolution.y * 2.0f - 1.0f;
-			transform.z = tg.mRect.width / (float)mGameResolution.x * 2.0f;
-			transform.w = tg.mRect.height / (float)mGameResolution.y * 2.0f;
-
-			Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(true, true);
-			shader.bind();
-			shader.setParam("Transform", transform);
-			shader.setParam("TintColor", tg.mTintColor);
-			shader.setParam("AddedColor", tg.mAddedColor);
-			shader.setTexture("Texture", texture->getTextureHandle(), GL_TEXTURE_2D);
+			SimpleRectTexturedShader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(true, true);
+			shader.setup(tg.mRect, mGameResolution, texture->getTextureHandle(), tg.mTintColor, tg.mAddedColor);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
-			
-			OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
 			break;
 		}
 

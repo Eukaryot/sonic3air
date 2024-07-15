@@ -14,6 +14,7 @@
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/helper/FileHelper.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectTexturedShader.h"
 
 
 void Upscaler::startup()
@@ -46,8 +47,8 @@ void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textur
 	const int scanlines = Configuration::instance().mScanlines;
 
 	// Select upscaler
-	Shader& simpleRectTexturedShader = OpenGLDrawerResources::getSimpleRectTexturedShader(false, false);
-	Shader* upscaleShader = &simpleRectTexturedShader;		// Fallback: Simple rendering
+	SimpleRectTexturedShader& simpleRectTexturedShader = OpenGLDrawerResources::getSimpleRectTexturedShader(false, false);
+	Shader* upscaleShader = &simpleRectTexturedShader.getShader();		// Fallback: Simple rendering
 	Shader* pass0Shader = nullptr;
 	bool filterLinear = false;
 	int lookupTextureIndex = -1;
@@ -63,7 +64,7 @@ void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textur
 		switch (filtering)
 		{
 			case 0:
-				upscaleShader = &simpleRectTexturedShader;
+				upscaleShader = &simpleRectTexturedShader.getShader();
 				break;
 
 			case 1:
@@ -121,15 +122,14 @@ void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textur
 		}
 	}
 
-	firstShader->bind();
-	firstShader->setTexture("Texture", textureHandle, GL_TEXTURE_2D);
-
-	if (firstShader == &simpleRectTexturedShader)
+	if (firstShader == &simpleRectTexturedShader.getShader())
 	{
-		firstShader->setParam("Transform", Vec4f(-1.0f, 1.0f, 2.0f, -2.0f));
+		simpleRectTexturedShader.setup(textureHandle, Vec4f(-1.0f, 1.0f, 2.0f, -2.0f));
 	}
 	else
 	{
+		firstShader->bind();
+		firstShader->setTexture("Texture", textureHandle, GL_TEXTURE_2D);
 		firstShader->setParam("GameResolution", Vec2f(textureResolution));
 
 		// Configuration for soft shader
@@ -187,6 +187,7 @@ void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textur
 	glViewport_Recti(FTX::screenRect());
 
 	secondShader->unbind();
+	OpenGLShader::resetLastUsedShader();
 }
 
 #endif

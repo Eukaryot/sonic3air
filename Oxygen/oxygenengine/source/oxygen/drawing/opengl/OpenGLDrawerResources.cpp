@@ -14,6 +14,10 @@
 #include "oxygen/drawing/opengl/OpenGLTexture.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/rendering/opengl/shaders/SimpleRectColoredShader.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectIndexedShader.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectTexturedShader.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectTexturedUVShader.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectVertexColorShader.h"
 #include "oxygen/rendering/parts/palette/Palette.h"
 
 
@@ -40,12 +44,17 @@ namespace openglresources
 
 	struct Internal
 	{
-		SimpleRectColoredShader mSimpleRectColoredShader;
-		Shader mSimpleRectVertexColorShader;
-		Shader mSimpleRectTexturedShader[4];		// Enumerated using enum Variant
-		Shader mSimpleRectTexturedUVShader[4];		// Enumerated using enum Variant
-		Shader mSimpleRectIndexedShader[4];			// Enumerated using enum Variant
+		// Shaders
+		SimpleRectColoredShader		mSimpleRectColoredShader;
+		SimpleRectVertexColorShader	mSimpleRectVertexColorShader;
+		SimpleRectTexturedShader	mSimpleRectTexturedShader[4];		// Enumerated using enum Variant
+		SimpleRectTexturedUVShader	mSimpleRectTexturedUVShader[4];		// Enumerated using enum Variant
+		SimpleRectIndexedShader		mSimpleRectIndexedShader[4];		// Enumerated using enum Variant
+
+		// Vertex array objects
 		opengl::VertexArrayObject mSimpleQuadVAO;
+
+		// Palettes
 		std::unordered_map<uint64, PaletteData> mCustomPalettes;	// Using a key built from a combination of primary and secondary palette keys
 	};
 	Internal* mInternal = nullptr;
@@ -111,13 +120,14 @@ void OpenGLDrawerResources::startup()
 
 	// Load shaders
 	openglresources::mInternal->mSimpleRectColoredShader.initialize();
+	openglresources::mInternal->mSimpleRectVertexColorShader.initialize();
 
-	FileHelper::loadShader(openglresources::mInternal->mSimpleRectVertexColorShader, L"data/shader/simple_rect_vertexcolor.shader", "Standard");
 	for (int k = 0; k < 4; ++k)
 	{
-		FileHelper::loadShader(openglresources::mInternal->mSimpleRectTexturedShader[k],   L"data/shader/simple_rect_textured.shader",    openglresources::variantString[k]);
-		FileHelper::loadShader(openglresources::mInternal->mSimpleRectTexturedUVShader[k], L"data/shader/simple_rect_textured_uv.shader", openglresources::variantString[k]);
-		FileHelper::loadShader(openglresources::mInternal->mSimpleRectIndexedShader[k],    L"data/shader/simple_rect_indexed.shader",     openglresources::variantString[k]);
+		const bool supportsTintColor = (k >= 2);
+		openglresources::mInternal->mSimpleRectTexturedShader[k].initialize(supportsTintColor, openglresources::variantString[k]);
+		openglresources::mInternal->mSimpleRectTexturedUVShader[k].initialize(supportsTintColor, openglresources::variantString[k]);
+		openglresources::mInternal->mSimpleRectIndexedShader[k].initialize(supportsTintColor, openglresources::variantString[k]);
 	}
 
 	// Setup simple quad VAO, consisting of two triangles
@@ -147,22 +157,22 @@ SimpleRectColoredShader& OpenGLDrawerResources::getSimpleRectColoredShader()
 	return openglresources::mInternal->mSimpleRectColoredShader;
 }
 
-Shader& OpenGLDrawerResources::getSimpleRectVertexColorShader()
+SimpleRectVertexColorShader& OpenGLDrawerResources::getSimpleRectVertexColorShader()
 {
 	return openglresources::mInternal->mSimpleRectVertexColorShader;
 }
 
-Shader& OpenGLDrawerResources::getSimpleRectTexturedShader(bool tint, bool alpha)
+SimpleRectTexturedShader& OpenGLDrawerResources::getSimpleRectTexturedShader(bool tint, bool alpha)
 {
 	return openglresources::mInternal->mSimpleRectTexturedShader[(tint ? 1 : 0) + (alpha ? 2 : 0)];
 }
 
-Shader& OpenGLDrawerResources::getSimpleRectTexturedUVShader(bool tint, bool alpha)
+SimpleRectTexturedUVShader& OpenGLDrawerResources::getSimpleRectTexturedUVShader(bool tint, bool alpha)
 {
 	return openglresources::mInternal->mSimpleRectTexturedUVShader[(tint ? 1 : 0) + (alpha ? 2 : 0)];
 }
 
-Shader& OpenGLDrawerResources::getSimpleRectIndexedShader(bool tint, bool alpha)
+SimpleRectIndexedShader& OpenGLDrawerResources::getSimpleRectIndexedShader(bool tint, bool alpha)
 {
 	return openglresources::mInternal->mSimpleRectIndexedShader[(tint ? 1 : 0) + (alpha ? 2 : 0)];
 }

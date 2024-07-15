@@ -13,16 +13,18 @@
 #include "oxygen/rendering/opengl/shaders/OpenGLShader.h"
 
 
-class SimpleRectColoredShader : public OpenGLShader
+class SimpleRectTexturedUVShader : public OpenGLShader
 {
 public:
-	void initialize();
-	void setup(const Recti& rect, const Vec2i& gameResolution, const Color& color);
-	void setup(const Color& color, const Vec4f& transform);
+	void initialize(bool supportsTintColor, const char* techname);
+	void setup(GLuint textureHandle, const Vec4f& transform, const Color& tintColor = Color::WHITE);
 
 private:
-	GLuint mLocColor;
+	bool mSupportsTintColor = false;
+
 	GLuint mLocTransform;
+	GLuint mLocTintColor;
+	GLuint mLocTexture;
 };
 
 #endif

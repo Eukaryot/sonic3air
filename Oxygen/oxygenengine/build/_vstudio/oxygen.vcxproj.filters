@@ -448,6 +448,18 @@
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectColoredShader.cpp">
       <Filter>rendering\opengl\shaders</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectVertexColorShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectTexturedShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectTexturedUVShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectIndexedShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -839,6 +851,18 @@
       <Filter>resources</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectColoredShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectVertexColorShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectTexturedShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectTexturedUVShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectIndexedShader.h">
       <Filter>rendering\opengl\shaders</Filter>
     </ClInclude>
   </ItemGroup>

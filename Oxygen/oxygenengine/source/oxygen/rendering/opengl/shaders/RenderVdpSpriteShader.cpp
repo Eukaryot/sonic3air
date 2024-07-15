@@ -12,9 +12,7 @@
 
 #include "oxygen/rendering/opengl/shaders/RenderVdpSpriteShader.h"
 #include "oxygen/rendering/opengl/OpenGLRenderResources.h"
-#include "oxygen/rendering/Geometry.h"
 #include "oxygen/rendering/parts/RenderParts.h"
-#include "oxygen/application/Configuration.h"
 #include "oxygen/helper/FileHelper.h"
 
 

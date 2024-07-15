@@ -11,7 +11,6 @@
 #ifdef RMX_WITH_OPENGL_SUPPORT
 
 #include "oxygen/rendering/opengl/shaders/SimpleRectColoredShader.h"
-#include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/helper/FileHelper.h"
 
 
@@ -26,7 +25,7 @@ void SimpleRectColoredShader::initialize()
 	}
 }
 
-void SimpleRectColoredShader::draw(const Recti& rect, const Color& color, const Vec2i& gameResolution)
+void SimpleRectColoredShader::setup(const Recti& rect, const Vec2i& gameResolution, const Color& color)
 {
 	Vec4f transform;
 	transform.x = (float)rect.x / (float)gameResolution.x * 2.0f - 1.0f;
@@ -34,18 +33,16 @@ void SimpleRectColoredShader::draw(const Recti& rect, const Color& color, const 
 	transform.z = rect.width / (float)gameResolution.x * 2.0f;
 	transform.w = rect.height / (float)gameResolution.y * 2.0f;
 
-	draw(color, transform);
+	setup(color, transform);
 }
 
-void SimpleRectColoredShader::draw(const Color& color, const Vec4f& transform)
+void SimpleRectColoredShader::setup(const Color& color, const Vec4f& transform)
 {
 	bindShader();
 
 	// Update uniforms
 	glUniform4fv(mLocColor, 1, *Vec4f(color));
 	glUniform4fv(mLocTransform, 1, *transform);
-
-	OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
 }
 
 #endif

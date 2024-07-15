@@ -13,15 +13,13 @@
 #include "oxygen/rendering/opengl/shaders/OpenGLShader.h"
 
 
-class SimpleRectColoredShader : public OpenGLShader
+class SimpleRectVertexColorShader : public OpenGLShader
 {
 public:
 	void initialize();
-	void setup(const Recti& rect, const Vec2i& gameResolution, const Color& color);
-	void setup(const Color& color, const Vec4f& transform);
+	void setup(const Vec4f& transform);
 
 private:
-	GLuint mLocColor;
 	GLuint mLocTransform;
 };
 

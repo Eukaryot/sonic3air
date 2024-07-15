@@ -15,6 +15,10 @@
 class OpenGLTexture;
 class PaletteBase;
 class SimpleRectColoredShader;
+class SimpleRectVertexColorShader;
+class SimpleRectTexturedShader;
+class SimpleRectTexturedUVShader;
+class SimpleRectIndexedShader;
 
 
 class OpenGLDrawerResources final
@@ -24,10 +28,10 @@ public:
 	static void shutdown();
 
 	static SimpleRectColoredShader& getSimpleRectColoredShader();
-	static Shader& getSimpleRectVertexColorShader();
-	static Shader& getSimpleRectTexturedShader(bool tint, bool alpha);
-	static Shader& getSimpleRectTexturedUVShader(bool tint, bool alpha);
-	static Shader& getSimpleRectIndexedShader(bool tint, bool alpha);
+	static SimpleRectVertexColorShader& getSimpleRectVertexColorShader();
+	static SimpleRectTexturedShader& getSimpleRectTexturedShader(bool tint, bool alpha);
+	static SimpleRectTexturedUVShader& getSimpleRectTexturedUVShader(bool tint, bool alpha);
+	static SimpleRectIndexedShader& getSimpleRectIndexedShader(bool tint, bool alpha);
 
 	static opengl::VertexArrayObject& getSimpleQuadVAO();
 
