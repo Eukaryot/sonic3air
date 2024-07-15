@@ -166,14 +166,15 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 	//  - 0x10 = Fully opaque
 	//  - 0x20 = World space
 	//  - 0x40 = Priority flag
-	//  - 0x80 = Use global tint
+	//  - 0x80 = Ignore global component tint (note this gets set automatically for palette sprites; to draw a palette sprite with global component tint, you need to use a sprite handle)
 
 	renderitems::CustomSpriteInfoBase* spritePtr = addSpriteByKey(key);
 	if (nullptr == spritePtr)
 		return;
 
 	renderitems::CustomSpriteInfoBase& sprite = *spritePtr;
-	if (sprite.getType() == RenderItem::Type::PALETTE_SPRITE)
+	const bool isPaletteSprite = (sprite.getType() == RenderItem::Type::PALETTE_SPRITE);
+	if (isPaletteSprite)
 	{
 		static_cast<renderitems::PaletteSpriteInfo&>(sprite).mAtex = atex;
 	}
@@ -186,7 +187,7 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 	sprite.mPriorityFlag = (flags & 0x40) != 0;
 	sprite.mBlendMode = (flags & 0x10) ? BlendMode::OPAQUE : BlendMode::ALPHA;
 	sprite.mCoordinatesSpace = ((flags & 0x20) != 0) ? Space::WORLD : Space::SCREEN;
-	sprite.mUseGlobalComponentTint = (flags & 0x80) == 0;
+	sprite.mUseGlobalComponentTint = ((flags & 0x80) == 0) && !isPaletteSprite;
 
 	// Flip X / Y
 	const bool flipX = (flags & 0x01) != 0;
@@ -478,12 +479,14 @@ void SpriteManager::processSpriteHandles()
 			continue;
 
 		renderitems::CustomSpriteInfoBase& sprite = *spritePtr;
+		const bool isPaletteSprite = (sprite.getType() == RenderItem::Type::PALETTE_SPRITE);
+
 		sprite.mPosition = data.mPosition;
 		sprite.mRenderQueue = data.mRenderQueue;
 		sprite.mPriorityFlag = data.mPriorityFlag;
 		sprite.mTintColor = data.mTintColor;
 		sprite.mAddedColor = data.mAddedColor;
-		sprite.mUseGlobalComponentTint = data.mUseGlobalComponentTint;
+		sprite.mUseGlobalComponentTint = data.mUseGlobalComponentTint.has_value() ? *data.mUseGlobalComponentTint : !isPaletteSprite;
 		sprite.mBlendMode = data.mBlendMode;
 		sprite.mCoordinatesSpace = data.mCoordinatesSpace;
 		sprite.mUseUpscaledSprite = data.mUseUpscaledSprite;
@@ -506,7 +509,7 @@ void SpriteManager::processSpriteHandles()
 			sprite.mTransformation.flipY();
 		}
 
-		if (sprite.getType() == RenderItem::Type::PALETTE_SPRITE)
+		if (isPaletteSprite)
 		{
 			renderitems::PaletteSpriteInfo& paletteSprite = static_cast<renderitems::PaletteSpriteInfo&>(sprite);
 			if (data.mPrimaryPaletteKey != 0)

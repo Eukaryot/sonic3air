@@ -9,6 +9,7 @@
 #pragma once
 
 #include "oxygen/rendering/parts/RenderItem.h"
+#include <optional>
 
 
 class PatternManager;
@@ -29,7 +30,7 @@ public:
 		bool   mPriorityFlag = false;
 		Color  mTintColor = Color::WHITE;
 		Color  mAddedColor = Color::TRANSPARENT;
-		bool   mUseGlobalComponentTint = true;
+		std::optional<bool> mUseGlobalComponentTint;
 		BlendMode mBlendMode = BlendMode::ALPHA;
 		Space  mCoordinatesSpace = Space::SCREEN;	// The coordinate system that "mPosition" is referring to
 		Transform2D mTransformation;
