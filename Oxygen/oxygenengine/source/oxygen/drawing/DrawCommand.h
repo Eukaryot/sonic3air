@@ -299,24 +299,23 @@ protected:
 class DrawCommandFactory
 {
 public:
-	template<typename T> ObjectPool<T>& getPool()  { return T::NOT_IMPLEMENTED; }
+	ObjectPool<SetWindowRenderTargetDrawCommand> mSetWindowRenderTargetDrawCommands;
+	ObjectPool<SetRenderTargetDrawCommand>		 mSetRenderTargetDrawCommands;
+	ObjectPool<RectDrawCommand>					 mRectDrawCommands;
+	ObjectPool<UpscaledRectDrawCommand>			 mUpscaledRectDrawCommands;
+	ObjectPool<SpriteDrawCommand>				 mSpriteDrawCommands;
+	ObjectPool<SpriteRectDrawCommand>			 mSpriteRectDrawCommands;
+	ObjectPool<MeshDrawCommand>					 mMeshDrawCommands;
+	ObjectPool<MeshVertexColorDrawCommand>		 mMeshVertexColorDrawCommands;
+	ObjectPool<SetBlendModeDrawCommand>			 mSetBlendModeDrawCommands;
+	ObjectPool<SetSamplingModeDrawCommand>		 mSetSamplingModeDrawCommands;
+	ObjectPool<SetWrapModeDrawCommand>			 mSetWrapModeDrawCommands;
+	ObjectPool<PrintTextDrawCommand>			 mPrintTextDrawCommands;
+	ObjectPool<PrintTextWDrawCommand>			 mPrintTextWDrawCommands;
+	ObjectPool<PushScissorDrawCommand>			 mPushScissorDrawCommands;
+	ObjectPool<PopScissorDrawCommand>			 mPopScissorDrawCommands;
 
-	template<> ObjectPool<SetWindowRenderTargetDrawCommand>& getPool<SetWindowRenderTargetDrawCommand>()	{ return mSetWindowRenderTargetDrawCommands; }
-	template<> ObjectPool<SetRenderTargetDrawCommand>&		 getPool<SetRenderTargetDrawCommand>()			{ return mSetRenderTargetDrawCommands; }
-	template<> ObjectPool<RectDrawCommand>&					 getPool<RectDrawCommand>()						{ return mRectDrawCommands; }
-	template<> ObjectPool<UpscaledRectDrawCommand>&			 getPool<UpscaledRectDrawCommand>()				{ return mUpscaledRectDrawCommands; }
-	template<> ObjectPool<SpriteDrawCommand>&				 getPool<SpriteDrawCommand>()					{ return mSpriteDrawCommands; }
-	template<> ObjectPool<SpriteRectDrawCommand>&			 getPool<SpriteRectDrawCommand>()				{ return mSpriteRectDrawCommands; }
-	template<> ObjectPool<MeshDrawCommand>&					 getPool<MeshDrawCommand>()						{ return mMeshDrawCommands; }
-	template<> ObjectPool<MeshVertexColorDrawCommand>&		 getPool<MeshVertexColorDrawCommand>()			{ return mMeshVertexColorDrawCommands; }
-	template<> ObjectPool<SetBlendModeDrawCommand>&			 getPool<SetBlendModeDrawCommand>()				{ return mSetBlendModeDrawCommands; }
-	template<> ObjectPool<SetSamplingModeDrawCommand>&		 getPool<SetSamplingModeDrawCommand>()			{ return mSetSamplingModeDrawCommands; }
-	template<> ObjectPool<SetWrapModeDrawCommand>&			 getPool<SetWrapModeDrawCommand>()				{ return mSetWrapModeDrawCommands; }
-	template<> ObjectPool<PrintTextDrawCommand>&			 getPool<PrintTextDrawCommand>()				{ return mPrintTextDrawCommands; }
-	template<> ObjectPool<PrintTextWDrawCommand>&			 getPool<PrintTextWDrawCommand>()				{ return mPrintTextWDrawCommands; }
-	template<> ObjectPool<PushScissorDrawCommand>&			 getPool<PushScissorDrawCommand>()				{ return mPushScissorDrawCommands; }
-	template<> ObjectPool<PopScissorDrawCommand>&			 getPool<PopScissorDrawCommand>()				{ return mPopScissorDrawCommands; }
-
+public:
 	void destroy(DrawCommand& drawCommand)
 	{
 		switch (drawCommand.getType())
@@ -340,21 +339,4 @@ public:
 				break;	// This should never happen anyways
 		}
 	}
-
-private:
-	ObjectPool<SetWindowRenderTargetDrawCommand> mSetWindowRenderTargetDrawCommands;
-	ObjectPool<SetRenderTargetDrawCommand>		 mSetRenderTargetDrawCommands;
-	ObjectPool<RectDrawCommand>					 mRectDrawCommands;
-	ObjectPool<UpscaledRectDrawCommand>			 mUpscaledRectDrawCommands;
-	ObjectPool<SpriteDrawCommand>				 mSpriteDrawCommands;
-	ObjectPool<SpriteRectDrawCommand>			 mSpriteRectDrawCommands;
-	ObjectPool<MeshDrawCommand>					 mMeshDrawCommands;
-	ObjectPool<MeshVertexColorDrawCommand>		 mMeshVertexColorDrawCommands;
-	ObjectPool<SetBlendModeDrawCommand>			 mSetBlendModeDrawCommands;
-	ObjectPool<SetSamplingModeDrawCommand>		 mSetSamplingModeDrawCommands;
-	ObjectPool<SetWrapModeDrawCommand>			 mSetWrapModeDrawCommands;
-	ObjectPool<PrintTextDrawCommand>			 mPrintTextDrawCommands;
-	ObjectPool<PrintTextWDrawCommand>			 mPrintTextWDrawCommands;
-	ObjectPool<PushScissorDrawCommand>			 mPushScissorDrawCommands;
-	ObjectPool<PopScissorDrawCommand>			 mPopScissorDrawCommands;
 };
