@@ -117,6 +117,7 @@ void SpriteManager::drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint
 	sprite.mAddedColor = addedColor;
 	sprite.mCoordinatesSpace = Space::SCREEN;
 	sprite.mLogicalSpace = mLogicalSpriteSpace;
+	sprite.mUseGlobalComponentTint = false;;
 	mAddedItems.mItems.push_back(&sprite);
 
 	if (EngineMain::getDelegate().useDeveloperFeatures())
@@ -173,8 +174,7 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 		return;
 
 	renderitems::CustomSpriteInfoBase& sprite = *spritePtr;
-	const bool isPaletteSprite = (sprite.getType() == RenderItem::Type::PALETTE_SPRITE);
-	if (isPaletteSprite)
+	if (sprite.getType() == RenderItem::Type::PALETTE_SPRITE)
 	{
 		static_cast<renderitems::PaletteSpriteInfo&>(sprite).mAtex = atex;
 	}
@@ -187,7 +187,7 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 	sprite.mPriorityFlag = (flags & 0x40) != 0;
 	sprite.mBlendMode = (flags & 0x10) ? BlendMode::OPAQUE : BlendMode::ALPHA;
 	sprite.mCoordinatesSpace = ((flags & 0x20) != 0) ? Space::WORLD : Space::SCREEN;
-	sprite.mUseGlobalComponentTint = ((flags & 0x80) == 0) && !isPaletteSprite;
+	sprite.mUseGlobalComponentTint = ((flags & 0x80) == 0) && sprite.mCacheItem->mUsesComponentSprite;
 
 	// Flip X / Y
 	const bool flipX = (flags & 0x01) != 0;
@@ -479,14 +479,13 @@ void SpriteManager::processSpriteHandles()
 			continue;
 
 		renderitems::CustomSpriteInfoBase& sprite = *spritePtr;
-		const bool isPaletteSprite = (sprite.getType() == RenderItem::Type::PALETTE_SPRITE);
 
 		sprite.mPosition = data.mPosition;
 		sprite.mRenderQueue = data.mRenderQueue;
 		sprite.mPriorityFlag = data.mPriorityFlag;
 		sprite.mTintColor = data.mTintColor;
 		sprite.mAddedColor = data.mAddedColor;
-		sprite.mUseGlobalComponentTint = data.mUseGlobalComponentTint.has_value() ? *data.mUseGlobalComponentTint : !isPaletteSprite;
+		sprite.mUseGlobalComponentTint = data.mUseGlobalComponentTint.has_value() ? *data.mUseGlobalComponentTint : sprite.mCacheItem->mUsesComponentSprite;
 		sprite.mBlendMode = data.mBlendMode;
 		sprite.mCoordinatesSpace = data.mCoordinatesSpace;
 		sprite.mUseUpscaledSprite = data.mUseUpscaledSprite;
@@ -509,7 +508,7 @@ void SpriteManager::processSpriteHandles()
 			sprite.mTransformation.flipY();
 		}
 
-		if (isPaletteSprite)
+		if (sprite.getType() == RenderItem::Type::PALETTE_SPRITE)
 		{
 			renderitems::PaletteSpriteInfo& paletteSprite = static_cast<renderitems::PaletteSpriteInfo&>(sprite);
 			if (data.mPrimaryPaletteKey != 0)
@@ -571,6 +570,7 @@ void SpriteManager::collectLegacySprites()
 		renderitems::VdpSpriteInfo& sprite = mPoolOfRenderItems.mVdpSprites.createObject();
 		sprite.mRenderQueue = 0x2100 - numSpritesAdded;
 		sprite.mPriorityFlag = (data[2] & 0x8000) != 0;
+		sprite.mUseGlobalComponentTint = false;
 
 		// Note that for accurate emulation, this would be 0x1ff instead of 0x3ff
 		//  -> But it limits effective maximum sprite x-position to 383 = 0x17f, which is a bit too low for widescreen with e.g. 400px
