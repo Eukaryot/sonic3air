@@ -216,63 +216,40 @@ void SoftwareRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
 	Bitmap& gameScreenBitmap = mGameScreenTexture.accessBitmap();
 	const Vec2i oldSize = gameScreenBitmap.getSize();
 
-	Vec2i bitmapSize;
-	if (debugDrawMode <= PlaneManager::PLANE_A)
-	{
-		bitmapSize = mRenderParts.getPlaneManager().getPlayfieldSizeInPixels();
-	}
-	else
-	{
-		bitmapSize.set(512, 256);
-	}
+	// First render to palette bitmap
+	static PaletteBitmap paletteBitmap;
+	const bool highlightPrioPatterns = (FTX::keyState(SDLK_LSHIFT) != 0);
+	mRenderParts.getPlaneManager().dumpAsPaletteBitmap(paletteBitmap, debugDrawMode, highlightPrioPatterns);
+
+	const Vec2i bitmapSize = paletteBitmap.getSize();
 	mGameScreenTexture.setupAsRenderTarget(bitmapSize.x, bitmapSize.y);
-	gameScreenBitmap.create(bitmapSize.x, bitmapSize.y, 0);
+	gameScreenBitmap.create(bitmapSize);
 
-	mCurrentViewport.set(0, 0, bitmapSize.x, bitmapSize.y);
-	mFullViewport = true;
-
-	// Render to bitmap
+	// Convert from palette bitmap to RGBA
 	{
-		const PlaneManager& planeManager = mRenderParts.getPlaneManager();
-		const PaletteManager& paletteManager = mRenderParts.getPaletteManager();
-		const PatternManager& patternManager = mRenderParts.getPatternManager();
-		const uint32* palettes[2] = { paletteManager.getMainPalette(0).getRawColors(), paletteManager.getMainPalette(1).getRawColors() };
-		const PatternManager::CacheItem* patternCache = patternManager.getPatternCache();
-		const uint16 numPatternsPerLine = (uint16)(bitmapSize.x / 8);
-		const bool highlightPrioPatterns = (FTX::keyState(SDLK_LSHIFT) != 0);
+		const uint32* palette = mRenderParts.getPaletteManager().getMainPalette(0).getRawColors();
+		const uint8* src = paletteBitmap.getData();
+		uint32* dst = gameScreenBitmap.getData();
 
-		for (int y = 0; y < bitmapSize.y; ++y)
+		for (int k = 0; k < paletteBitmap.getPixelCount(); ++k)
 		{
-			uint32* destRGBA = gameScreenBitmap.getPixelPointer(0, y);
-			const uint32* palette = (y < paletteManager.mSplitPositionY) ? palettes[0] : palettes[1];
-
-			for (int x = 0; x < bitmapSize.x; )
+			uint8 index = *src;
+			if (index & 0x80)
 			{
-				const uint16 patternIndex = planeManager.getPatternAtIndex(debugDrawMode, (x / 8) + (y / 8) * numPatternsPerLine);
-				const PatternManager::CacheItem::Pattern& pattern = patternCache[patternIndex & 0x07ff].mFlipVariation[(patternIndex >> 11) & 3];
-				const uint8* srcPatternPixels = &pattern.mPixels[(x & 0x07) + (y & 0x07) * 8];
-				const uint8 atex = (patternIndex >> 9) & 0x30;
-
-				for (int k = 0; k < 8; ++k)
-				{
-					const uint8 colorIndex = srcPatternPixels[k];
-					destRGBA[x+k] = 0xff000000 | palette[colorIndex + atex];
-				}
-
-				const bool lowerBrightness = (highlightPrioPatterns && (patternIndex & 0x8000) == 0);
-				if (lowerBrightness)
-				{
-					for (int k = 0; k < 8; ++k)
-					{
-						destRGBA[x+k] = 0xff000000 | ((destRGBA[x+k] & 0x00fcfcfc) >> 2);
-					}
-				}
-
-				x += 8;
+				*dst = 0xff000000 | ((palette[index & 0x7f] & 0x00fcfcfc) >> 2);
 			}
+			else
+			{
+				*dst = 0xff000000 | palette[index];
+			}
+			++src;
+			++dst;
 		}
 	}
 	mGameScreenTexture.bitmapUpdated();
+
+	mCurrentViewport.set(0, 0, bitmapSize.x, bitmapSize.y);
+	mFullViewport = true;
 
 	drawer.setWindowRenderTarget(FTX::screenRect());
 	drawer.setBlendMode(BlendMode::OPAQUE);

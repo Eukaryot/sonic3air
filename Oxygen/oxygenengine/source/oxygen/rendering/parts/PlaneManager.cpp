@@ -243,18 +243,46 @@ void PlaneManager::setupPlaneW(bool use, uint16 splitY)
 	mPlaneAWSplit = splitY;
 }
 
-void PlaneManager::dumpAsPaletteBitmap(PaletteBitmap& output, int planeIndex) const
+void PlaneManager::dumpAsPaletteBitmap(PaletteBitmap& output, int planeIndex, bool highlightPrioPatterns) const
 {
-	const PatternManager::CacheItem* patternCache = mPatternManager.getPatternCache();
-	output.create(512, 256);
-	for (int y = 0; y < 256; ++y)
+	Vec2i bitmapSize;
+	if (planeIndex <= PLANE_A)
 	{
-		for (int x = 0; x < 512; ++x)
+		bitmapSize = getPlayfieldSizeInPixels();
+	}
+	else
+	{
+		bitmapSize.set(512, 256);
+	}
+	output.create(bitmapSize.x, bitmapSize.y);
+
+	const PatternManager::CacheItem* patternCache = mPatternManager.getPatternCache();
+	const uint16 numPatternsPerLine = (uint16)(bitmapSize.x / 8);
+
+	uint8* dest = output.getData();
+	for (int y = 0; y < bitmapSize.y; ++y)
+	{
+		for (int x = 0; x < bitmapSize.x; x += 8, dest += 8)
 		{
-			const uint16 patternIndex = mPlanePatternsBuffer[planeIndex][(x/8) + (y/8) * 64];
-			uint8 color = patternCache[patternIndex & 0x07ff].mFlipVariation[(patternIndex >> 11) & 3].mPixels[(x%8) + (y%8) * 8];
-			color += (patternIndex >> 9) & 0xf0;
-			output.mData[x+y*512] = color;
+			const uint16 patternIndex = getPatternAtIndex(planeIndex, (x / 8) + (y / 8) * numPatternsPerLine);
+			const PatternManager::CacheItem::Pattern& pattern = patternCache[patternIndex & 0x07ff].mFlipVariation[(patternIndex >> 11) & 3];
+			const uint8* srcPatternPixels = &pattern.mPixels[(x & 0x07) + (y & 0x07) * 8];
+			const uint8 atex = (patternIndex >> 9) & 0x30;
+
+			for (int k = 0; k < 8; ++k)
+			{
+				const uint8 colorIndex = srcPatternPixels[k];
+				dest[k] = colorIndex + atex;
+			}
+
+			const bool lowerBrightness = (highlightPrioPatterns && (patternIndex & 0x8000) == 0);
+			if (lowerBrightness)
+			{
+				for (int k = 0; k < 8; ++k)
+				{
+					dest[k] |= 0x80;
+				}
+			}
 		}
 	}
 }

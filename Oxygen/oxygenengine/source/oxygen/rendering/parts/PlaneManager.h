@@ -66,7 +66,7 @@ public:
 	inline uint16 getPlaneAWSplit() const  { return mPlaneAWSplit; }
 	void setupPlaneW(bool use, uint16 splitY);
 
-	void dumpAsPaletteBitmap(PaletteBitmap& output, int planeIndex) const;
+	void dumpAsPaletteBitmap(PaletteBitmap& output, int planeIndex, bool highlightPrioPatterns = false) const;
 
 	inline bool isDefaultPlaneEnabled(uint8 index) const  { return !mDisabledDefaultPlane[index]; }
 	void setDefaultPlaneEnabled(uint8 index, bool enabled);
