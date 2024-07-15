@@ -12,17 +12,17 @@
 #include "oxygen/resources/PaletteCollection.h"
 #include "oxygen/resources/PrintedTextCache.h"
 #include "oxygen/resources/RawDataCollection.h"
-#include "oxygen/resources/SpriteCache.h"
+#include "oxygen/resources/SpriteCollection.h"
 
 
 class RenderResources : public SingleInstance<RenderResources>
 {
 public:
-	void loadSpriteCache(bool fullReload = false);
+	void loadSprites(bool fullReload = false);
 
 public:
 	PaletteCollection mPaletteCollection;
 	PrintedTextCache mPrintedTextCache;
 	RawDataCollection mRawDataCollection;
-	SpriteCache mSpriteCache;
+	SpriteCollection mSpriteCollection;
 };

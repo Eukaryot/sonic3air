@@ -10,7 +10,7 @@
 #include "sonic3air/resources/DynamicSprites.h"
 #include "sonic3air/ConfigurationImpl.h"
 
-#include "oxygen/resources/SpriteCache.h"
+#include "oxygen/resources/SpriteCollection.h"
 
 
 const uint64 DynamicSprites::INPUT_ICON_BUTTON_UP    = rmx::getMurmur2_64("@input_icon_button_up");
@@ -136,15 +136,15 @@ void DynamicSprites::updateSpriteRedirects()
 	InputManager& inputManager = InputManager::instance();
 	const InputManager::InputType lastInputType = inputManager.getLastInputType();
 	const int gamepadVisualStyle = clamp(ConfigurationImpl::instance().mGamepadVisualStyle, 0, 2);
-	SpriteCache& spriteCache = SpriteCache::instance();
+	SpriteCollection& spriteCollection = SpriteCollection::instance();
 	if (mLastInputType == lastInputType && mLastGamepadVisualStyle == gamepadVisualStyle &&
-		mLastMappingsChangeCounter == inputManager.getMappingsChangeCounter() && mLastSpriteCacheChangeCounter == spriteCache.getGlobalChangeCounter())
+		mLastMappingsChangeCounter == inputManager.getMappingsChangeCounter() && mLastSpriteCollectionChangeCounter == spriteCollection.getGlobalChangeCounter())
 		return;
 
 	mLastInputType = lastInputType;
 	mLastGamepadVisualStyle = gamepadVisualStyle;
 	mLastMappingsChangeCounter = inputManager.getMappingsChangeCounter();
-	mLastSpriteCacheChangeCounter = spriteCache.getGlobalChangeCounter();
+	mLastSpriteCollectionChangeCounter = spriteCollection.getGlobalChangeCounter();
 
 	const InputManager::ControllerScheme& keys = inputManager.getController(0);
 
@@ -152,18 +152,18 @@ void DynamicSprites::updateSpriteRedirects()
 	{
 		case InputManager::InputType::KEYBOARD:
 		{
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_UP,    getKeyboardIconSpriteKey(keys.Up));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  getKeyboardIconSpriteKey(keys.Down));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_LEFT,  getKeyboardIconSpriteKey(keys.Left));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_RIGHT, getKeyboardIconSpriteKey(keys.Right));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     getKeyboardIconSpriteKey(keys.A));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     getKeyboardIconSpriteKey(keys.B));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_X,     getKeyboardIconSpriteKey(keys.X));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_Y,     getKeyboardIconSpriteKey(keys.Y));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, getKeyboardIconSpriteKey(keys.Start));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  getKeyboardIconSpriteKey(keys.Back));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_L,     getKeyboardIconSpriteKey(keys.L));
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_R,     getKeyboardIconSpriteKey(keys.R));
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_UP,    getKeyboardIconSpriteKey(keys.Up));
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_DOWN,  getKeyboardIconSpriteKey(keys.Down));
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_LEFT,  getKeyboardIconSpriteKey(keys.Left));
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_RIGHT, getKeyboardIconSpriteKey(keys.Right));
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_A,     getKeyboardIconSpriteKey(keys.A));
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_B,     getKeyboardIconSpriteKey(keys.B));
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_X,     getKeyboardIconSpriteKey(keys.X));
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_Y,     getKeyboardIconSpriteKey(keys.Y));
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_START, getKeyboardIconSpriteKey(keys.Start));
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_BACK,  getKeyboardIconSpriteKey(keys.Back));
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_L,     getKeyboardIconSpriteKey(keys.L));
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_R,     getKeyboardIconSpriteKey(keys.R));
 			break;
 		}
 
@@ -182,18 +182,18 @@ void DynamicSprites::updateSpriteRedirects()
 			static const uint64 INPUT_ICON_TOUCH_L     = rmx::getMurmur2_64("input_icon_touch_L");
 			static const uint64 INPUT_ICON_TOUCH_R     = rmx::getMurmur2_64("input_icon_touch_R");
 
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_UP,    INPUT_ICON_TOUCH_UP);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  INPUT_ICON_TOUCH_DOWN);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_LEFT,  INPUT_ICON_TOUCH_LEFT);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_RIGHT, INPUT_ICON_TOUCH_RIGHT);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     INPUT_ICON_TOUCH_A);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     INPUT_ICON_TOUCH_B);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_X,     INPUT_ICON_TOUCH_X);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_Y,     INPUT_ICON_TOUCH_Y);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, INPUT_ICON_TOUCH_START);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  INPUT_ICON_TOUCH_BACK);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_L,     INPUT_ICON_TOUCH_L);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_R,     INPUT_ICON_TOUCH_R);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_UP,    INPUT_ICON_TOUCH_UP);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_DOWN,  INPUT_ICON_TOUCH_DOWN);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_LEFT,  INPUT_ICON_TOUCH_LEFT);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_RIGHT, INPUT_ICON_TOUCH_RIGHT);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_A,     INPUT_ICON_TOUCH_A);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_B,     INPUT_ICON_TOUCH_B);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_X,     INPUT_ICON_TOUCH_X);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_Y,     INPUT_ICON_TOUCH_Y);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_START, INPUT_ICON_TOUCH_START);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_BACK,  INPUT_ICON_TOUCH_BACK);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_L,     INPUT_ICON_TOUCH_L);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_R,     INPUT_ICON_TOUCH_R);
 			break;
 		}
 
@@ -201,18 +201,18 @@ void DynamicSprites::updateSpriteRedirects()
 		case InputManager::InputType::GAMEPAD:
 		{
 			const size_t style = clamp(gamepadVisualStyle, 0, 2);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_UP,    GAMEPAD_STYLES[style].mSpriteKeys[0]);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  GAMEPAD_STYLES[style].mSpriteKeys[1]);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_LEFT,  GAMEPAD_STYLES[style].mSpriteKeys[2]);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_RIGHT, GAMEPAD_STYLES[style].mSpriteKeys[3]);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     GAMEPAD_STYLES[style].mSpriteKeys[4]);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     GAMEPAD_STYLES[style].mSpriteKeys[5]);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_X,     GAMEPAD_STYLES[style].mSpriteKeys[6]);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_Y,     GAMEPAD_STYLES[style].mSpriteKeys[7]);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, GAMEPAD_STYLES[style].mSpriteKeys[8]);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  GAMEPAD_STYLES[style].mSpriteKeys[9]);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_L,     GAMEPAD_STYLES[style].mSpriteKeys[10]);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_R,     GAMEPAD_STYLES[style].mSpriteKeys[11]);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_UP,    GAMEPAD_STYLES[style].mSpriteKeys[0]);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_DOWN,  GAMEPAD_STYLES[style].mSpriteKeys[1]);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_LEFT,  GAMEPAD_STYLES[style].mSpriteKeys[2]);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_RIGHT, GAMEPAD_STYLES[style].mSpriteKeys[3]);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_A,     GAMEPAD_STYLES[style].mSpriteKeys[4]);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_B,     GAMEPAD_STYLES[style].mSpriteKeys[5]);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_X,     GAMEPAD_STYLES[style].mSpriteKeys[6]);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_Y,     GAMEPAD_STYLES[style].mSpriteKeys[7]);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_START, GAMEPAD_STYLES[style].mSpriteKeys[8]);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_BACK,  GAMEPAD_STYLES[style].mSpriteKeys[9]);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_L,     GAMEPAD_STYLES[style].mSpriteKeys[10]);
+			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_R,     GAMEPAD_STYLES[style].mSpriteKeys[11]);
 			break;
 		}
 	}

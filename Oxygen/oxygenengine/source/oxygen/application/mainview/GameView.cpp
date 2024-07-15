@@ -300,7 +300,7 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 						{
 							HighResolutionTimer timer;
 							timer.start();
-							RenderResources::instance().loadSpriteCache();
+							RenderResources::instance().loadSprites();
 							ResourcesCache::instance().loadAllResources();
 							FontCollection::instance().reloadAll();
 							setLogDisplay(String(0, "Reloaded resources in %0.2f sec", timer.getSecondsSinceStart()));

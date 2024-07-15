@@ -10,7 +10,7 @@
 
 #include "oxygen/helper/Transform2D.h"
 #include "oxygen/rendering/parts/SpacesManager.h"
-#include "oxygen/resources/SpriteCache.h"
+#include "oxygen/resources/SpriteCollection.h"
 
 class PaletteBase;
 
@@ -99,7 +99,7 @@ namespace renderitems
 		virtual void serialize(VectorBinarySerializer& serializer, uint8 formatVersion) override;
 
 		uint64 mKey = 0;
-		const SpriteCache::CacheItem* mCacheItem = nullptr;
+		const SpriteCollection::Item* mCacheItem = nullptr;
 		Vec2i mSize;
 		Vec2i mPivotOffset;
 		Transform2D mTransformation;

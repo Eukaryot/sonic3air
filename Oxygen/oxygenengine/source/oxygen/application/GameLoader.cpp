@@ -139,7 +139,7 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 
 			// Load sprites
 			RMX_LOG_INFO("Loading sprites");
-			VideoOut::instance().getRenderResources().loadSpriteCache();
+			VideoOut::instance().getRenderResources().loadSprites();
 
 			// Load resources
 			RMX_LOG_INFO("Resource cache loading...");

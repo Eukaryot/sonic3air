@@ -12,7 +12,7 @@
 
 #include "oxygen/application/Configuration.h"
 #include "oxygen/rendering/utils/PaletteBitmap.h"
-#include "oxygen/resources/SpriteCache.h"
+#include "oxygen/resources/SpriteCollection.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 
 //#define OUTPUT_FOG_BITMAPS
@@ -153,10 +153,10 @@ void BlueSpheresRendering::startup()
 
 void BlueSpheresRendering::createSprites(Vec2i screenSize)
 {
-	SpriteCache& spriteCache = SpriteCache::instance();
+	SpriteCollection& spriteCollection = SpriteCollection::instance();
 
 	// Update sprites only if needed
-	if (mLastScreenSize == screenSize && mLastSpriteCacheChangeCounter == spriteCache.getGlobalChangeCounter())
+	if (mLastScreenSize == screenSize && mLastSpriteCollectionChangeCounter == spriteCollection.getGlobalChangeCounter())
 		return;
 
 	// Perform calculations that only need to be done once
@@ -214,7 +214,7 @@ void BlueSpheresRendering::createSprites(Vec2i screenSize)
 		}
 	}
 
-	mLastSpriteCacheChangeCounter = spriteCache.getGlobalChangeCounter();
+	mLastSpriteCollectionChangeCounter = spriteCollection.getGlobalChangeCounter();
 }
 
 void BlueSpheresRendering::writeVisibleSpheresData(uint32 targetAddress, uint32 sourceAddress, uint16 px, uint16 py, uint8 rotation, EmulatorInterface& emulatorInterface)
@@ -580,12 +580,13 @@ void BlueSpheresRendering::buildSprite(const uint8* lookupDataBase, const String
 	const int indentX = (screenSize.x - maxX) / 2;
 	const int offsetX = (LOOKUP_WIDTH - maxX) / 2;
 
-	SpriteCache::CacheItem* items[2];
+	SpriteCollection& spriteCollection = SpriteCollection::instance();
+	SpriteCollection::Item* items[2];
 	PaletteBitmap* bitmaps[2];
 	for (int k = 0; k < 2; ++k)
 	{
 		const uint64 spriteKey = rmx::getMurmur2_64(spriteIdentifier[k]);
-		SpriteCache::CacheItem& item = SpriteCache::instance().getOrCreatePaletteSprite(spriteKey);
+		SpriteCollection::Item& item = spriteCollection.getOrCreatePaletteSprite(spriteKey);
 	#ifdef DEBUG
 		item.mSourceInfo.mSourceIdentifier = *spriteIdentifier[k];
 	#endif

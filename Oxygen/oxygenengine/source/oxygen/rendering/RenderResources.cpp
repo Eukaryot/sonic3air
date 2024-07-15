@@ -10,9 +10,9 @@
 #include "oxygen/rendering/RenderResources.h"
 
 
-void RenderResources::loadSpriteCache(bool fullReload)
+void RenderResources::loadSprites(bool fullReload)
 {
 	if (fullReload)
-		mSpriteCache.clear();
-	mSpriteCache.loadAllSpriteDefinitions();
+		mSpriteCollection.clear();
+	mSpriteCollection.loadAllSpriteDefinitions();
 }

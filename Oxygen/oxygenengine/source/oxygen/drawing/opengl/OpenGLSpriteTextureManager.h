@@ -12,14 +12,14 @@
 
 #include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
 #include "oxygen/rendering/utils/BufferTexture.h"
-#include "oxygen/resources/SpriteCache.h"
+#include "oxygen/resources/SpriteCollection.h"
 
 
 class OpenGLSpriteTextureManager : public SingleInstance<OpenGLSpriteTextureManager>
 {
 public:
-	BufferTexture* getPaletteSpriteTexture(const SpriteCache::CacheItem& cacheItem, bool useUpscaledSprite);
-	OpenGLTexture* getComponentSpriteTexture(const SpriteCache::CacheItem& cacheItem);
+	BufferTexture* getPaletteSpriteTexture(const SpriteCollection::Item& cacheItem, bool useUpscaledSprite);
+	OpenGLTexture* getComponentSpriteTexture(const SpriteCollection::Item& cacheItem);
 
 private:
 	template<typename T> struct ChangeCounted

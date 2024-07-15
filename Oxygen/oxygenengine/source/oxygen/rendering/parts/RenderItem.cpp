@@ -68,23 +68,23 @@ void renderitems::CustomSpriteInfoBase::serialize(VectorBinarySerializer& serial
 			bool isROMBased = serializer.read<bool>();
 			if (isROMBased && nullptr == mCacheItem)
 			{
-				SpriteCache::ROMSpriteData romSpriteData;
+				SpriteCollection::ROMSpriteData romSpriteData;
 				romSpriteData.serialize(serializer);
-				mCacheItem = &SpriteCache::instance().setupSpriteFromROM(EmulatorInterface::instance(), romSpriteData, 0x00);
+				mCacheItem = &SpriteCollection::instance().setupSpriteFromROM(EmulatorInterface::instance(), romSpriteData, 0x00);
 			}
 			else
 			{
-				mCacheItem = SpriteCache::instance().getSprite(mKey);
+				mCacheItem = SpriteCollection::instance().getSprite(mKey);
 			}
 		}
 		else
 		{
-			const bool isROMBased = (nullptr != mCacheItem && mCacheItem->mSourceInfo.mType == SpriteCache::SourceInfo::Type::ROM_DATA);
+			const bool isROMBased = (nullptr != mCacheItem && mCacheItem->mSourceInfo.mType == SpriteCollection::SourceInfo::Type::ROM_DATA);
 			serializer.write(isROMBased);
 			if (isROMBased)
 			{
 				// TODO: Avoid the const_cast here
-				const_cast<SpriteCache::ROMSpriteData&>(mCacheItem->mSourceInfo.mROMSpriteData).serialize(serializer);
+				const_cast<SpriteCollection::ROMSpriteData&>(mCacheItem->mSourceInfo.mROMSpriteData).serialize(serializer);
 			}
 		}
 	}
@@ -92,7 +92,7 @@ void renderitems::CustomSpriteInfoBase::serialize(VectorBinarySerializer& serial
 	{
 		if (serializer.isReading())
 		{
-			mCacheItem = SpriteCache::instance().getSprite(mKey);
+			mCacheItem = SpriteCollection::instance().getSprite(mKey);
 		}
 	}
 }

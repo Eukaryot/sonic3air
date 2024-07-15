@@ -15,7 +15,7 @@
 #include "oxygen/drawing/DrawCommand.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/helper/Logging.h"
-#include "oxygen/resources/SpriteCache.h"
+#include "oxygen/resources/SpriteCollection.h"
 
 
 namespace softwaredrawer
@@ -510,7 +510,7 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 			case DrawCommand::Type::SPRITE:
 			{
 				SpriteDrawCommand& sc = drawCommand->as<SpriteDrawCommand>();
-				const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(sc.mSpriteKey);
+				const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(sc.mSpriteKey);
 				if (nullptr == item)
 					break;
 				if (!item->mUsesComponentSprite)
@@ -537,7 +537,7 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 			case DrawCommand::Type::SPRITE_RECT:
 			{
 				SpriteRectDrawCommand& sc = drawCommand->as<SpriteRectDrawCommand>();
-				const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(sc.mSpriteKey);
+				const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(sc.mSpriteKey);
 				if (nullptr == item)
 					break;
 				if (!item->mUsesComponentSprite)

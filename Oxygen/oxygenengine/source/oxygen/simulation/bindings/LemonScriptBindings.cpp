@@ -28,7 +28,6 @@
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/resources/PaletteCollection.h"
 #include "oxygen/resources/RawDataCollection.h"
-#include "oxygen/resources/SpriteCache.h"
 
 #include <lemon/program/ModuleBindingsBuilder.h>
 #include <lemon/runtime/Runtime.h>

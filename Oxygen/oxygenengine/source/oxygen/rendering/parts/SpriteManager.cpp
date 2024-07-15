@@ -11,7 +11,7 @@
 #include "oxygen/rendering/parts/SpriteManager.h"
 #include "oxygen/rendering/parts/PatternManager.h"
 #include "oxygen/resources/PaletteCollection.h"
-#include "oxygen/resources/SpriteCache.h"
+#include "oxygen/resources/SpriteCollection.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LogDisplay.h"
 
@@ -398,7 +398,7 @@ SpriteManager::ItemSet& SpriteManager::getItemsByContext(RenderItem::LifetimeCon
 
 renderitems::CustomSpriteInfoBase* SpriteManager::addSpriteByKey(uint64 key)
 {
-	const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(key);
+	const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
 	if (nullptr != item)
 	{
 		if (checkRenderItemLimit())

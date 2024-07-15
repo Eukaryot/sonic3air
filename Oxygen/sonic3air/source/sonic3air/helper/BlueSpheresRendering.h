@@ -42,5 +42,5 @@ private:
 	int mNumPureSkyRows = 0;
 
 	Vec2i mLastScreenSize;
-	uint32 mLastSpriteCacheChangeCounter = 0;
+	uint32 mLastSpriteCollectionChangeCounter = 0;
 };

@@ -8,7 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/resources/PaletteCollection.h"
-#include "oxygen/resources/SpriteCache.h"
+#include "oxygen/resources/SpriteCollection.h"
 #include "oxygen/application/modding/ModManager.h"
 
 
@@ -89,7 +89,7 @@ void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool i
 
 void PaletteCollection::addSpritePalettes()
 {
-	SpriteCache::SpritePalettes& spritePalettes = SpriteCache::instance().mSpritePalettes;
+	SpriteCollection::SpritePalettes& spritePalettes = SpriteCollection::instance().mSpritePalettes;
 
 	// TODO: The properties flags set here assume that all sprite palettes are modded, but this might not actually be the case
 	const BitFlagSet<PaletteBase::Properties> properties = makeBitFlagSet(PaletteBase::Properties::READ_ONLY, PaletteBase::Properties::MODDED);
@@ -119,5 +119,5 @@ void PaletteCollection::addSpritePalettes()
 	}
 
 	// Clear palettes in sprite cache now that we loaded them all
-	spritePalettes = SpriteCache::SpritePalettes();
+	spritePalettes = SpriteCollection::SpritePalettes();
 }

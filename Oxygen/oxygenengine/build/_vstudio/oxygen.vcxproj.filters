@@ -223,9 +223,6 @@
     <ClCompile Include="..\..\source\oxygen\rendering\utils\Kosinski.cpp">
       <Filter>rendering\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\resources\SpriteCache.cpp">
-      <Filter>resources</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\resources\ResourcesCache.cpp">
       <Filter>resources</Filter>
     </ClCompile>
@@ -445,6 +442,9 @@
     <ClCompile Include="..\..\source\oxygen\helper\RandomNumberGenerator.cpp">
       <Filter>helper</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\resources\SpriteCollection.cpp">
+      <Filter>resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -588,9 +588,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\audio\AudioOutBase.h">
       <Filter>application\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\resources\SpriteCache.h">
-      <Filter>resources</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\resources\ResourcesCache.h">
       <Filter>resources</Filter>
@@ -834,6 +831,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\helper\RandomNumberGenerator.h">
       <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\resources\SpriteCollection.h">
+      <Filter>resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

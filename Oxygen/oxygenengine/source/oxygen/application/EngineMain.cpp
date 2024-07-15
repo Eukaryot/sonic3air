@@ -115,7 +115,7 @@ void EngineMain::execute(int argc, char** argv)
 void EngineMain::onActiveModsChanged()
 {
 	// Update sprites
-	RenderResources::instance().loadSpriteCache(true);
+	RenderResources::instance().loadSprites(true);
 
 	// Update the resource cache -> palettes, raw data
 	ResourcesCache::instance().loadAllResources();

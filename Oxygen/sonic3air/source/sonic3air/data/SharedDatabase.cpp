@@ -10,7 +10,7 @@
 #include "sonic3air/data/SharedDatabase.h"
 
 #include "oxygen/application/Configuration.h"
-#include "oxygen/resources/SpriteCache.h"
+#include "oxygen/resources/SpriteCollection.h"
 
 
 bool SharedDatabase::mIsInitialized = false;
@@ -148,7 +148,7 @@ uint64 SharedDatabase::setupCharacterSprite(EmulatorInterface& emulatorInterface
 	}
 	else
 	{
-		SpriteCache::ROMSpriteData romSpriteData;
+		SpriteCollection::ROMSpriteData romSpriteData;
 		switch (character)
 		{
 			default:
@@ -172,20 +172,20 @@ uint64 SharedDatabase::setupCharacterSprite(EmulatorInterface& emulatorInterface
 		}
 
 		romSpriteData.mAnimationSprite = (uint8)animationSprite;
-		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::CHARACTER;
-		return SpriteCache::instance().setupSpriteFromROM(emulatorInterface, romSpriteData, 0x00).mKey;
+		romSpriteData.mEncoding = SpriteCollection::ROMSpriteEncoding::CHARACTER;
+		return SpriteCollection::instance().setupSpriteFromROM(emulatorInterface, romSpriteData, 0x00).mKey;
 	}
 }
 
 uint64 SharedDatabase::setupTailsTailsSprite(EmulatorInterface& emulatorInterface, uint8 animationSprite)
 {
-	SpriteCache::ROMSpriteData romSpriteData;
+	SpriteCollection::ROMSpriteData romSpriteData;
 	romSpriteData.mPatternsBaseAddress = 0x336620;
 	romSpriteData.mTableAddress = 0x344d74;
 	romSpriteData.mMappingOffset = 0x344bb8;
 	romSpriteData.mAnimationSprite = animationSprite;
-	romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::CHARACTER;
-	return SpriteCache::instance().setupSpriteFromROM(emulatorInterface, romSpriteData, 0x00).mKey;
+	romSpriteData.mEncoding = SpriteCollection::ROMSpriteEncoding::CHARACTER;
+	return SpriteCollection::instance().setupSpriteFromROM(emulatorInterface, romSpriteData, 0x00).mKey;
 }
 
 uint8 SharedDatabase::getTailsTailsAnimationSprite(uint8 characterAnimationSprite, uint32 globalTime)

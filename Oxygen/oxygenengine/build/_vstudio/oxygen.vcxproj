@@ -119,7 +119,7 @@
     <ClCompile Include="..\..\source\oxygen\resources\PrintedTextCache.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\RawDataCollection.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\ResourcesCache.cpp" />
-    <ClCompile Include="..\..\source\oxygen\resources\SpriteCache.cpp" />
+    <ClCompile Include="..\..\source\oxygen\resources\SpriteCollection.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\bindings\LemonScriptBindings.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\bindings\RendererBindings.cpp" />
@@ -248,7 +248,7 @@
     <ClInclude Include="..\..\source\oxygen\resources\PrintedTextCache.h" />
     <ClInclude Include="..\..\source\oxygen\resources\RawDataCollection.h" />
     <ClInclude Include="..\..\source\oxygen\resources\ResourcesCache.h" />
-    <ClInclude Include="..\..\source\oxygen\resources\SpriteCache.h" />
+    <ClInclude Include="..\..\source\oxygen\resources\SpriteCollection.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\bindings\LemonScriptBindings.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\bindings\RendererBindings.h" />

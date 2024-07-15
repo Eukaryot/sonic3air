@@ -12,7 +12,7 @@
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/rendering/utils/RenderUtils.h"
-#include "oxygen/resources/SpriteCache.h"
+#include "oxygen/resources/SpriteCollection.h"
 
 
 namespace
@@ -219,7 +219,7 @@ void TouchControlsOverlay::render()
 
 			const bool pressed = (nullptr == visualElement.mControl) ? false : visualElement.mControl->isPressed();
 			const uint64 spriteKey = visualElement.mSpriteKeys[pressed ? 1 : 0];
-			const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(spriteKey);
+			const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(spriteKey);
 			if (nullptr == item)
 				continue;
 

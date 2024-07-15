@@ -7,7 +7,7 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/resources/SpriteCache.h"
+#include "oxygen/resources/SpriteCollection.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/modding/ModManager.h"
@@ -29,11 +29,11 @@
 namespace
 {
 
-	void decodeROMSpriteData(EmulatorInterface& emulatorInterface, std::vector<RenderUtils::PatternPixelContent>& patternBuffer, uint32 patternsBaseAddress, uint32 patternAddress, SpriteCache::ROMSpriteEncoding encoding)
+	void decodeROMSpriteData(EmulatorInterface& emulatorInterface, std::vector<RenderUtils::PatternPixelContent>& patternBuffer, uint32 patternsBaseAddress, uint32 patternAddress, SpriteCollection::ROMSpriteEncoding encoding)
 	{
 		switch (encoding)
 		{
-			case SpriteCache::ROMSpriteEncoding::NONE:
+			case SpriteCollection::ROMSpriteEncoding::NONE:
 			{
 				// Uncompressed / unpacked data
 				const uint16 numPatterns = patternAddress;
@@ -41,7 +41,7 @@ namespace
 				break;
 			}
 
-			case SpriteCache::ROMSpriteEncoding::CHARACTER:
+			case SpriteCollection::ROMSpriteEncoding::CHARACTER:
 			{
 				// Variant for character sprites
 				int numSprites = emulatorInterface.readMemory16(patternAddress);
@@ -60,7 +60,7 @@ namespace
 				break;
 			}
 
-			case SpriteCache::ROMSpriteEncoding::OBJECT:
+			case SpriteCollection::ROMSpriteEncoding::OBJECT:
 			{
 				// Variant for other object sprites
 				int numSprites = emulatorInterface.readMemory16(patternAddress) + 1;
@@ -79,7 +79,7 @@ namespace
 				break;
 			}
 
-			case SpriteCache::ROMSpriteEncoding::KOSINSKI:
+			case SpriteCollection::ROMSpriteEncoding::KOSINSKI:
 			{
 				// Using Kosinski compressed data
 				uint8 buffer[0x1000];
@@ -110,7 +110,7 @@ namespace
 		}
 	}
 
-	void createPaletteSpriteFromROM(EmulatorInterface& emulatorInterface, PaletteSprite& paletteSprite, uint32 patternsBaseAddress, uint32 patternAddress, uint32 mappingAddress, SpriteCache::ROMSpriteEncoding encoding, int16 indexOffset)
+	void createPaletteSpriteFromROM(EmulatorInterface& emulatorInterface, PaletteSprite& paletteSprite, uint32 patternsBaseAddress, uint32 patternAddress, uint32 mappingAddress, SpriteCollection::ROMSpriteEncoding encoding, int16 indexOffset)
 	{
 		// Fill sprite pattern buffer
 		static std::vector<RenderUtils::PatternPixelContent> patternBuffer;
@@ -137,9 +137,9 @@ namespace
 		paletteSprite.createFromSpritePatterns(patterns);
 	}
 
-	void createPaletteSpriteFromROM(EmulatorInterface& emulatorInterface, PaletteSprite& paletteSprite, uint32 patternsBaseAddress, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, SpriteCache::ROMSpriteEncoding encoding, int16 indexOffset)
+	void createPaletteSpriteFromROM(EmulatorInterface& emulatorInterface, PaletteSprite& paletteSprite, uint32 patternsBaseAddress, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, SpriteCollection::ROMSpriteEncoding encoding, int16 indexOffset)
 	{
-		const uint32 patternAddress = (encoding == SpriteCache::ROMSpriteEncoding::NONE || encoding == SpriteCache::ROMSpriteEncoding::KOSINSKI) ? tableAddress : (tableAddress + emulatorInterface.readMemory16(tableAddress + animationSprite * 2));
+		const uint32 patternAddress = (encoding == SpriteCollection::ROMSpriteEncoding::NONE || encoding == SpriteCollection::ROMSpriteEncoding::KOSINSKI) ? tableAddress : (tableAddress + emulatorInterface.readMemory16(tableAddress + animationSprite * 2));
 		const uint32 mappingAddress = mappingOffset + emulatorInterface.readMemory16(mappingOffset + animationSprite * 2);
 
 		createPaletteSpriteFromROM(emulatorInterface, paletteSprite, patternsBaseAddress, patternAddress, mappingAddress, encoding, indexOffset);
@@ -154,7 +154,7 @@ namespace
 
 
 
-void SpriteCache::ROMSpriteData::serialize(VectorBinarySerializer& serializer)
+void SpriteCollection::ROMSpriteData::serialize(VectorBinarySerializer& serializer)
 {
 	serializer.serialize(mPatternsBaseAddress);
 	serializer.serialize(mTableAddress);
@@ -164,17 +164,17 @@ void SpriteCache::ROMSpriteData::serialize(VectorBinarySerializer& serializer)
 	serializer.serialize(mIndexOffset);
 }
 
-uint64 SpriteCache::ROMSpriteData::getKey() const
+uint64 SpriteCollection::ROMSpriteData::getKey() const
 {
 	return (((uint64)mPatternsBaseAddress) << 42) ^ (((uint64)mTableAddress) << 25) ^ (((uint64)mMappingOffset) << 8) ^ (uint64)mAnimationSprite;
 }
 
 
-SpriteCache::SpriteCache()
+SpriteCollection::SpriteCollection()
 {
 }
 
-SpriteCache::~SpriteCache()
+SpriteCollection::~SpriteCollection()
 {
 	clear();
 
@@ -185,19 +185,19 @@ SpriteCache::~SpriteCache()
 	}
 }
 
-void SpriteCache::clear()
+void SpriteCollection::clear()
 {
 	// Delete the sprite instances
-	for (auto& pair : mCachedSprites)
+	for (auto& pair : mSpriteItems)
 	{
 		delete pair.second.mSprite;
 	}
-	mCachedSprites.clear();
+	mSpriteItems.clear();
 	mSpritePalettes = SpritePalettes();
 	++mGlobalChangeCounter;
 }
 
-void SpriteCache::loadAllSpriteDefinitions()
+void SpriteCollection::loadAllSpriteDefinitions()
 {
 	// Load or reload from all mods
 	loadSpriteDefinitions(L"data/sprites");
@@ -207,14 +207,14 @@ void SpriteCache::loadAllSpriteDefinitions()
 	}
 }
 
-bool SpriteCache::hasSprite(uint64 key) const
+bool SpriteCollection::hasSprite(uint64 key) const
 {
-	return (mCachedSprites.count(key) != 0);
+	return (mSpriteItems.count(key) != 0);
 }
 
-const SpriteCache::CacheItem* SpriteCache::getSprite(uint64 key)
+const SpriteCollection::Item* SpriteCollection::getSprite(uint64 key)
 {
-	CacheItem* item = mapFind(mCachedSprites, key);
+	Item* item = mapFind(mSpriteItems, key);
 	if (nullptr != item)
 	{
 		// Resolve redirect
@@ -243,42 +243,42 @@ const SpriteCache::CacheItem* SpriteCache::getSprite(uint64 key)
 	}
 }
 
-SpriteCache::CacheItem& SpriteCache::getOrCreatePaletteSprite(uint64 key)
+SpriteCollection::Item& SpriteCollection::getOrCreatePaletteSprite(uint64 key)
 {
-	CacheItem* item = mapFind(mCachedSprites, key);
+	Item* item = mapFind(mSpriteItems, key);
 	if (nullptr != item)
 	{
 		RMX_CHECK(!item->mUsesComponentSprite, "Sprite is not a palette sprite", );
 	}
 	else
 	{
-		item = &createCacheItem(key);
+		item = &createItem(key);
 		item->mSprite = new PaletteSprite();
 		item->mUsesComponentSprite = false;
 	}
 	return *item;
 }
 
-SpriteCache::CacheItem& SpriteCache::getOrCreateComponentSprite(uint64 key)
+SpriteCollection::Item& SpriteCollection::getOrCreateComponentSprite(uint64 key)
 {
-	CacheItem* item = mapFind(mCachedSprites, key);
+	Item* item = mapFind(mSpriteItems, key);
 	if (nullptr != item)
 	{
 		RMX_CHECK(item->mUsesComponentSprite, "Sprite is not a component sprite", );
 	}
 	else
 	{
-		item = &createCacheItem(key);
+		item = &createItem(key);
 		item->mSprite = new ComponentSprite();
 		item->mUsesComponentSprite = true;
 	}
 	return *item;
 }
 
-SpriteCache::CacheItem& SpriteCache::setupSpriteFromROM(EmulatorInterface& emulatorInterface, const ROMSpriteData& romSpriteData, uint8 atex)
+SpriteCollection::Item& SpriteCollection::setupSpriteFromROM(EmulatorInterface& emulatorInterface, const ROMSpriteData& romSpriteData, uint8 atex)
 {
 	const uint64 key = romSpriteData.getKey();
-	CacheItem* item = mapFind(mCachedSprites, key);
+	Item* item = mapFind(mSpriteItems, key);
 	if (nullptr == item)
 	{
 		item = &getOrCreatePaletteSprite(key);
@@ -300,28 +300,28 @@ SpriteCache::CacheItem& SpriteCache::setupSpriteFromROM(EmulatorInterface& emula
 	return *item;
 }
 
-void SpriteCache::clearRedirect(uint64 sourceKey)
+void SpriteCollection::clearRedirect(uint64 sourceKey)
 {
-	CacheItem* source = mapFind(mCachedSprites, sourceKey);
+	Item* source = mapFind(mSpriteItems, sourceKey);
 	if (nullptr != source)
 	{
 		source->mRedirect = nullptr;
 	}
 }
 
-void SpriteCache::setupRedirect(uint64 sourceKey, uint64 targetKey)
+void SpriteCollection::setupRedirect(uint64 sourceKey, uint64 targetKey)
 {
-	CacheItem* source = mapFind(mCachedSprites, sourceKey);
+	Item* source = mapFind(mSpriteItems, sourceKey);
 	if (nullptr == source)
 	{
-		source = &createCacheItem(sourceKey);
+		source = &createItem(sourceKey);
 	}
 
-	CacheItem* target = mapFind(mCachedSprites, targetKey);
+	Item* target = mapFind(mSpriteItems, targetKey);
 	source->mRedirect = target;
 }
 
-SpriteDump& SpriteCache::getSpriteDump()
+SpriteDump& SpriteCollection::getSpriteDump()
 {
 	if (nullptr == mSpriteDump)
 	{
@@ -331,9 +331,9 @@ SpriteDump& SpriteCache::getSpriteDump()
 	return *mSpriteDump;
 }
 
-void SpriteCache::dumpSprite(uint64 key, std::string_view categoryKey, uint8 spriteNumber, uint8 atex)
+void SpriteCollection::dumpSprite(uint64 key, std::string_view categoryKey, uint8 spriteNumber, uint8 atex)
 {
-	CacheItem* item = mapFind(mCachedSprites, key);
+	Item* item = mapFind(mSpriteItems, key);
 	if (nullptr != item && !item->mGotDumped)
 	{
 		if (!item->mUsesComponentSprite)
@@ -349,9 +349,9 @@ void SpriteCache::dumpSprite(uint64 key, std::string_view categoryKey, uint8 spr
 	}
 }
 
-SpriteCache::CacheItem& SpriteCache::createCacheItem(uint64 key)
+SpriteCollection::Item& SpriteCollection::createItem(uint64 key)
 {
-	CacheItem& item = mCachedSprites[key];
+	Item& item = mSpriteItems[key];
 	item.mKey = key;
 	item.mSprite = nullptr;
 	item.mUsesComponentSprite = false;
@@ -359,7 +359,7 @@ SpriteCache::CacheItem& SpriteCache::createCacheItem(uint64 key)
 	return item;
 }
 
-void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
+void SpriteCollection::loadSpriteDefinitions(const std::wstring& path)
 {
 	struct PaletteSpriteSheet
 	{
@@ -452,7 +452,7 @@ void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 			{
 				// Check for overloading
 				{
-					CacheItem* existingItem = mapFind(mCachedSprites, key);
+					Item* existingItem = mapFind(mSpriteItems, key);
 					if (nullptr != existingItem)
 					{
 						// This sprite got overloaded e.g. by a mod -- remove the old version
@@ -460,7 +460,7 @@ void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 					}
 				}
 
-				CacheItem& item = createCacheItem(key);
+				Item& item = createItem(key);
 			#ifdef DEBUG
 				item.mSourceInfo.mSourceIdentifier = *identifier;
 			#endif
@@ -555,7 +555,7 @@ void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 	}
 }
 
-void SpriteCache::addSpritePalette(uint64 paletteKey, std::vector<uint32>& palette)
+void SpriteCollection::addSpritePalette(uint64 paletteKey, std::vector<uint32>& palette)
 {
 	// After loading from a BMP, the palette is set to all opaque colors, but we usually need index 0 to be transparent
 	palette[0] &= 0x00ffffff;

@@ -16,7 +16,7 @@ class EmulatorInterface;
 class SpriteDump;
 
 
-class SpriteCache : public SingleInstance<SpriteCache>
+class SpriteCollection : public SingleInstance<SpriteCollection>
 {
 friend class PaletteCollection;	// For direct access to mSpritePalettes
 
@@ -58,30 +58,30 @@ public:
 	#endif
 	};
 
-	struct CacheItem
+	struct Item
 	{
 		uint64 mKey = 0;
 		bool mUsesComponentSprite = false;
 		SpriteBase* mSprite = nullptr;
 		uint32 mChangeCounter = 0;
-		CacheItem* mRedirect = nullptr;
+		Item* mRedirect = nullptr;
 		SourceInfo mSourceInfo;
 		bool mGotDumped = false;
 	};
 
 public:
-	SpriteCache();
-	~SpriteCache();
+	SpriteCollection();
+	~SpriteCollection();
 
 	void clear();
 	void loadAllSpriteDefinitions();
 
 	bool hasSprite(uint64 key) const;
-	const CacheItem* getSprite(uint64 key);
-	CacheItem& getOrCreatePaletteSprite(uint64 key);
-	CacheItem& getOrCreateComponentSprite(uint64 key);
+	const Item* getSprite(uint64 key);
+	Item& getOrCreatePaletteSprite(uint64 key);
+	Item& getOrCreateComponentSprite(uint64 key);
 
-	SpriteCache::CacheItem& setupSpriteFromROM(EmulatorInterface& emulatorInterface, const ROMSpriteData& romSpriteData, uint8 atex);
+	Item& setupSpriteFromROM(EmulatorInterface& emulatorInterface, const ROMSpriteData& romSpriteData, uint8 atex);
 
 	void clearRedirect(uint64 sourceKey);
 	void setupRedirect(uint64 sourceKey, uint64 targetKey);
@@ -99,12 +99,12 @@ private:
 	};
 
 private:
-	CacheItem& createCacheItem(uint64 key);
+	Item& createItem(uint64 key);
 	void loadSpriteDefinitions(const std::wstring& path);
 	void addSpritePalette(uint64 paletteKey, std::vector<uint32>& palette);
 
 private:
-	std::unordered_map<uint64, CacheItem> mCachedSprites;
+	std::unordered_map<uint64, Item> mSpriteItems;
 	SpritePalettes mSpritePalettes;
 
 	SpriteDump* mSpriteDump = nullptr;

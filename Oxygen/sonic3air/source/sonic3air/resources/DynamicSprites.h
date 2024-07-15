@@ -45,5 +45,5 @@ private:
 	InputManager::InputType mLastInputType = InputManager::InputType::NONE;
 	int mLastGamepadVisualStyle = 0;
 	uint32 mLastMappingsChangeCounter = 0;
-	uint32 mLastSpriteCacheChangeCounter = 0;
+	uint32 mLastSpriteCollectionChangeCounter = 0;
 };

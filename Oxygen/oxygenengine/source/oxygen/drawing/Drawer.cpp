@@ -10,7 +10,7 @@
 #include "oxygen/drawing/Drawer.h"
 #include "oxygen/drawing/DrawerInterface.h"
 #include "oxygen/drawing/DrawerTexture.h"
-#include "oxygen/resources/SpriteCache.h"
+#include "oxygen/resources/SpriteCollection.h"
 
 
 Drawer::Drawer()
@@ -63,7 +63,7 @@ void Drawer::createTexture(DrawerTexture& outTexture)
 
 Recti Drawer::getSpriteRect(uint64 spriteKey) const
 {
-	const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(spriteKey);
+	const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(spriteKey);
 	if (nullptr == item || nullptr == item->mSprite)
 		return Recti();
 

@@ -13,7 +13,7 @@
 #include "oxygen/drawing/opengl/OpenGLSpriteTextureManager.h"
 
 
-BufferTexture* OpenGLSpriteTextureManager::getPaletteSpriteTexture(const SpriteCache::CacheItem& cacheItem, bool useUpscaledSprite)
+BufferTexture* OpenGLSpriteTextureManager::getPaletteSpriteTexture(const SpriteCollection::Item& cacheItem, bool useUpscaledSprite)
 {
 	RMX_CHECK(!cacheItem.mUsesComponentSprite, "Sprite is not a palette sprite", RMX_REACT_THROW);
 	const PaletteSprite& sprite = *static_cast<PaletteSprite*>(cacheItem.mSprite);
@@ -29,7 +29,7 @@ BufferTexture* OpenGLSpriteTextureManager::getPaletteSpriteTexture(const SpriteC
 	return &texture.mTexture;
 }
 
-OpenGLTexture* OpenGLSpriteTextureManager::getComponentSpriteTexture(const SpriteCache::CacheItem& cacheItem)
+OpenGLTexture* OpenGLSpriteTextureManager::getComponentSpriteTexture(const SpriteCollection::Item& cacheItem)
 {
 	RMX_CHECK(cacheItem.mUsesComponentSprite, "Sprite is not a component sprite", RMX_REACT_THROW);
 	ChangeCounted<OpenGLTexture>& texture = mComponentSpriteTextures[cacheItem.mKey];
