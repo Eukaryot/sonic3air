@@ -21,8 +21,8 @@ public:
 	void setup(const Color& color, const Vec4f& transform);
 
 private:
-	GLuint mLocColor;
-	GLuint mLocTransform;
+	GLuint mLocColor = 0;
+	GLuint mLocTransform = 0;
 };
 
 #endif

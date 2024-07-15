@@ -552,20 +552,12 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 					if (nullptr == texture)
 						break;
 
-					const OpenGLTexture* paletteTexture = nullptr;
-					if (!item->mUsesComponentSprite)
-					{
-						const PaletteBase* palette = PaletteCollection::instance().getPalette(sc.mPaletteKey, 0);
-						if (nullptr == palette)
-							break;
+					const PaletteBase* palette = PaletteCollection::instance().getPalette(sc.mPaletteKey, 0);
+					if (nullptr == palette)
+						break;
 						
-						paletteTexture = &OpenGLDrawerResources::getCustomPaletteTexture(*palette, *palette);
-					}
-
-					texture->bindTexture();
-					mInternal.applySamplingMode();
-
-					mInternal.drawIndexed(targetRect, *texture, *paletteTexture, sc.mTintColor);
+					const OpenGLTexture& paletteTexture = OpenGLDrawerResources::getCustomPaletteTexture(*palette, *palette);
+					mInternal.drawIndexed(targetRect, *texture, paletteTexture, sc.mTintColor);
 				}
 				break;
 			}

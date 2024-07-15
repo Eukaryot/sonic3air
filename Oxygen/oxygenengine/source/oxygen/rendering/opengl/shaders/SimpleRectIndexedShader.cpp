@@ -20,14 +20,20 @@
 void SimpleRectIndexedShader::initialize(bool supportsTintColor, const char* techname)
 {
 	mSupportsTintColor = supportsTintColor;
-	if (FileHelper::loadShader(mShader, L"data/shader/simple_rect_indexed.shader", techname))
+
+	const std::string additionalDefines = BufferTexture::supportsBufferTextures() ? "USE_BUFFER_TEXTURES" : "";
+	if (FileHelper::loadShader(mShader, L"data/shader/simple_rect_indexed.shader", techname, additionalDefines))
 	{
 		bindShader();
 
-		mLocTransform  = mShader.getUniformLocation("Transform");
-		mLocSize	   = mShader.getUniformLocation("Size");
-		mLocTintColor  = mShader.getUniformLocation("TintColor");
-		mLocAddedColor = mShader.getUniformLocation("AddedColor");
+		mLocTransform = mShader.getUniformLocation("Transform");
+		mLocSize	  = mShader.getUniformLocation("Size");
+
+		if (mSupportsTintColor)
+		{
+			mLocTintColor  = mShader.getUniformLocation("TintColor");
+			mLocAddedColor = mShader.getUniformLocation("AddedColor");
+		}
 
 		mShader.setParam("MainTexture", 0);
 		mShader.setParam("PaletteTexture", 1);

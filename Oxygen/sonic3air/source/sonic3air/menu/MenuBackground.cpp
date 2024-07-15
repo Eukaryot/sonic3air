@@ -264,6 +264,7 @@ void MenuBackground::render()
 
 	if (mPreviewVisibility > 0.0f)
 	{
+		drawer.setBlendMode(BlendMode::OPAQUE);
 		for (int i = 0; i < 2; ++i)
 		{
 			const PreviewImage& img = mPreviewImage[i];
@@ -279,6 +280,7 @@ void MenuBackground::render()
 			drawer.popScissor();
 		}
 
+		drawer.setBlendMode(BlendMode::ALPHA);
 		drawer.drawSprite(Vec2i(0, 8), rmx::getMurmur2_64("level_preview_border_left"), Color(1.0f, 1.0f, 1.0f, mPreviewVisibility));
 		drawer.drawSpriteRect(Recti(10, 8, (int)mRect.width - 20, 100), rmx::getMurmur2_64("level_preview_border_center"), Color(1.0f, 1.0f, 1.0f, mPreviewVisibility));
 		drawer.drawSprite(Vec2i((int)mRect.width, 8), rmx::getMurmur2_64("level_preview_border_right"), Color(1.0f, 1.0f, 1.0f, mPreviewVisibility));

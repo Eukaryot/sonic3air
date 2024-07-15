@@ -22,8 +22,12 @@ void SimpleRectTexturedUVShader::initialize(bool supportsTintColor, const char* 
 		bindShader();
 
 		mLocTransform = mShader.getUniformLocation("Transform");
-		mLocTintColor = mShader.getUniformLocation("TintColor");
 		mLocTexture   = mShader.getUniformLocation("MainTexture");
+
+		if (mSupportsTintColor)
+		{
+			mLocTintColor = mShader.getUniformLocation("TintColor");
+		}
 	}
 }
 

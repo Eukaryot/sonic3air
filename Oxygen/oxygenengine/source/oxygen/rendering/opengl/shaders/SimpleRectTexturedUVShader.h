@@ -22,9 +22,9 @@ public:
 private:
 	bool mSupportsTintColor = false;
 
-	GLuint mLocTransform;
-	GLuint mLocTintColor;
-	GLuint mLocTexture;
+	GLuint mLocTransform = 0;
+	GLuint mLocTexture = 0;
+	GLuint mLocTintColor = 0;
 };
 
 #endif

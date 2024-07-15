@@ -21,10 +21,14 @@ void SimpleRectTexturedShader::initialize(bool supportsTintColor, const char* te
 	{
 		bindShader();
 
-		mLocTransform  = mShader.getUniformLocation("Transform");
-		mLocTintColor  = mShader.getUniformLocation("TintColor");
-		mLocAddedColor = mShader.getUniformLocation("AddedColor");
-		mLocTexture    = mShader.getUniformLocation("MainTexture");
+		mLocTransform = mShader.getUniformLocation("Transform");
+		mLocTexture   = mShader.getUniformLocation("MainTexture");
+
+		if (mSupportsTintColor)
+		{
+			mLocTintColor  = mShader.getUniformLocation("TintColor");
+			mLocAddedColor = mShader.getUniformLocation("AddedColor");
+		}
 	}
 }
 

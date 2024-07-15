@@ -124,10 +124,10 @@ void OpenGLDrawerResources::startup()
 
 	for (int k = 0; k < 4; ++k)
 	{
-		const bool supportsTintColor = (k >= 2);
-		openglresources::mInternal->mSimpleRectTexturedShader[k].initialize(supportsTintColor, openglresources::variantString[k]);
+		const bool supportsTintColor = (k % 2) == 1;
+		openglresources::mInternal->mSimpleRectTexturedShader[k]  .initialize(supportsTintColor, openglresources::variantString[k]);
 		openglresources::mInternal->mSimpleRectTexturedUVShader[k].initialize(supportsTintColor, openglresources::variantString[k]);
-		openglresources::mInternal->mSimpleRectIndexedShader[k].initialize(supportsTintColor, openglresources::variantString[k]);
+		openglresources::mInternal->mSimpleRectIndexedShader[k]   .initialize(supportsTintColor, openglresources::variantString[k]);
 	}
 
 	// Setup simple quad VAO, consisting of two triangles

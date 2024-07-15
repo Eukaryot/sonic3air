@@ -20,7 +20,7 @@ public:
 	void setup(const Vec4f& transform);
 
 private:
-	GLuint mLocTransform;
+	GLuint mLocTransform = 0;
 };
 
 #endif

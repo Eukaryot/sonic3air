@@ -47,7 +47,24 @@ bool Shader::compile(const String& vsSource, const String& fsSource, const std::
 
 GLuint Shader::getUniformLocation(const char* name) const
 {
-	return glGetUniformLocation(mProgram, name);
+	const GLuint loc = glGetUniformLocation(mProgram, name);
+	RMX_ASSERT(loc != 0xffffffff, "Could not resolve uniform name " << name);
+
+	// Just for debugging uniforms if needed
+/*
+	GLint count = 0;
+	glGetObjectParameterivARB(mProgram, GL_OBJECT_ACTIVE_UNIFORMS_ARB, &count);
+	for (GLint k = 0; k < count; ++k)
+	{
+		GLchar buffer[32];
+		GLsizei length = 0;
+		GLint size = 0;
+		GLenum type;
+		glGetActiveUniform(mProgram, k, 32, &length, &size, &type, buffer);
+		_asm nop;
+	}
+*/
+	return loc;
 }
 
 GLuint Shader::getAttribLocation(const char* name) const

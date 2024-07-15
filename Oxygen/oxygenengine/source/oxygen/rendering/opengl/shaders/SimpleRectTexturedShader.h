@@ -25,10 +25,10 @@ public:
 private:
 	bool mSupportsTintColor = false;
 
-	GLuint mLocTransform;
-	GLuint mLocTintColor;
-	GLuint mLocAddedColor;
-	GLuint mLocTexture;
+	GLuint mLocTransform = 0;
+	GLuint mLocTintColor = 0;
+	GLuint mLocAddedColor = 0;
+	GLuint mLocTexture = 0;
 };
 
 #endif
