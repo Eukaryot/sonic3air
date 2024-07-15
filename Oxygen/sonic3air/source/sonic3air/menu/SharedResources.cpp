@@ -42,7 +42,6 @@ namespace global
 	DrawerTexture mAchievementsFrame;
 	DrawerTexture mTimeAttackResultsBG;
 
-	std::map<ZoneActPreviewKey, uint64> mZoneActPreviewSpriteKeys;
 	std::map<uint32, DrawerTexture> mAchievementImage;
 	std::map<uint32, DrawerTexture> mSecretImage;
 
@@ -121,26 +120,6 @@ namespace global
 		FileHelper::loadTexture(mOptionsTopBar, L"data/images/menu/options_topbar_bg.png");
 		FileHelper::loadTexture(mAchievementsFrame, L"data/images/menu/achievements_frame.png");
 		FileHelper::loadTexture(mTimeAttackResultsBG, L"data/images/menu/timeattack_results_screen.png");
-
-		const std::vector<SharedDatabase::Zone>& zones = SharedDatabase::getAllZones();
-		for (const SharedDatabase::Zone& zone : zones)
-		{
-			const uint8 acts = std::max(zone.mActsNormal, zone.mActsTimeAttack);
-			if (acts == 0)
-				continue;
-
-			ZoneActPreviewKey key;
-			key.mZone = zone.mInternalIndex;
-			for (uint8 act = 0; act < acts; ++act)
-			{
-				key.mAct = act;
-				for (uint8 image = 0; image < 2; ++image)
-				{
-					key.mImage = image;
-					mZoneActPreviewSpriteKeys[key] = rmx::getMurmur2_64(String(0, "%s_act%d%c", zone.mShortName.substr(0, 6).c_str(), act + 1, 'a' + image));
-				}
-			}
-		}
 
 		for (const SharedDatabase::Achievement& achievement : SharedDatabase::getAchievements())
 		{

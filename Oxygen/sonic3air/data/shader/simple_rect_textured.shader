@@ -39,7 +39,7 @@ void main()
 {
 	vec4 color = texture(Texture, uv0);
 #ifdef USE_TINT_COLOR
-	color = color * TintColor + AddedColor;
+	color = vec4(AddedColor.rgb, 0.0) + color * TintColor;
 #endif
 #ifdef ALPHA_TEST
 	if (color.a < 0.01)

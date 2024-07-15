@@ -891,5 +891,8 @@
     <None Include="..\..\data\shader\upscaler_xbrz-freescale-pass1.shader">
       <Filter>_shader</Filter>
     </None>
+    <None Include="..\..\data\shader\simple_rect_indexed.shader">
+      <Filter>_shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

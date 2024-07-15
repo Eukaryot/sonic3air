@@ -60,7 +60,7 @@ uniform vec4 AddedColor;
 void main()
 {
 	vec4 color = texture(SpriteTexture, uv0.xy);
-	color = color * TintColor + AddedColor;
+	color = vec4(AddedColor.rgb, 0.0) + color * TintColor;
 #ifdef ALPHA_TEST
 	if (color.a < 0.01)
 		discard;

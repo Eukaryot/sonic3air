@@ -12,6 +12,9 @@
 
 #include <rmxmedia.h>
 
+class OpenGLTexture;
+class PaletteBase;
+
 
 class OpenGLDrawerResources final
 {
@@ -23,11 +26,15 @@ public:
 	static Shader& getSimpleRectVertexColorShader();
 	static Shader& getSimpleRectTexturedShader(bool tint, bool alpha);
 	static Shader& getSimpleRectTexturedUVShader(bool tint, bool alpha);
+	static Shader& getSimpleRectIndexedShader(bool tint, bool alpha);
 
 	static opengl::VertexArrayObject& getSimpleQuadVAO();
 
 	static BlendMode getBlendMode();
 	static void setBlendMode(BlendMode blendMode);
+
+	static const OpenGLTexture& getCustomPaletteTexture(const PaletteBase& primaryPalette, const PaletteBase& secondaryPalette);
+
 };
 
 #endif

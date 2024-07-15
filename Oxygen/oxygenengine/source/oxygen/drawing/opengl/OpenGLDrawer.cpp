@@ -19,6 +19,7 @@
 #include "oxygen/drawing/DrawCommand.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/helper/Logging.h"
+#include "oxygen/resources/PaletteCollection.h"
 #include "oxygen/resources/SpriteCollection.h"
 
 
@@ -319,6 +320,34 @@ namespace opengldrawer
 			}
 		}
 
+		void drawIndexed(Recti targetRect, BufferTexture& texture, const OpenGLTexture& paletteTexture, const Color& color)
+		{
+			if (!texture.isValid())
+				return;
+
+			const Vec4f rectParam = getTransformOfRectInViewport(targetRect);
+			const bool needsTintColor = (color != Color::WHITE);
+
+			Shader& shader = OpenGLDrawerResources::getSimpleRectIndexedShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
+			shader.bind();
+			glUniform1i(shader.getUniformLocation("SpriteTexture"), 0);
+			glUniform1i(shader.getUniformLocation("PaletteTexture"), 1);
+			glActiveTexture(GL_TEXTURE0);
+			texture.bindTexture();
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, paletteTexture.getHandle());
+
+			shader.setParam("Transform", rectParam);
+			shader.setParam("Size", texture.getSize());
+			if (needsTintColor)
+			{
+				shader.setParam("TintColor", color);
+				shader.setParam("AddedColor", Color::TRANSPARENT);
+			}
+
+			OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
+		}
+
 		void printText(Font& font, const StringReader& text, const Recti& rect, const DrawerPrintOptions& printOptions)
 		{
 			OpenGLFontOutput& fontOutput = getOpenGLFontOutput(font);
@@ -517,16 +546,10 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 				const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(sc.mSpriteKey);
 				if (nullptr == item)
 					break;
-				if (!item->mUsesComponentSprite)
-					break;
 
-				OpenGLTexture* texture = mInternal.mSpriteTextureManager.getComponentSpriteTexture(*item);
-				if (nullptr == texture)
-					break;
-
-				ComponentSprite& sprite = *static_cast<ComponentSprite*>(item->mSprite);
+				SpriteBase& sprite = *item->mSprite;
 				Vec2i offset = sprite.mOffset;
-				Vec2i size = sprite.getBitmap().getSize();
+				Vec2i size = sprite.getSize();
 				if (sc.mScale.x != 1.0f || sc.mScale.y != 1.0f)
 				{
 					offset.x = roundToInt((float)offset.x * sc.mScale.x);
@@ -536,12 +559,40 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 				}
 				const Recti targetRect(sc.mPosition + offset, size);
 
-				// TODO: Cache sampling mode for the texture?
-				//  -> That requires the sprite texture manager to store (more high level) OpenGLDrawerTexture instead of OpenGLTexture instances
-				glBindTexture(GL_TEXTURE_2D, texture->getHandle());
-				mInternal.applySamplingMode();
+				if (item->mUsesComponentSprite)
+				{
+					const OpenGLTexture* texture = mInternal.mSpriteTextureManager.getComponentSpriteTexture(*item);
+					if (nullptr == texture)
+						break;
 
-				mInternal.drawRect(targetRect, texture->getHandle(), sc.mTintColor);
+					// TODO: Cache sampling mode for the texture?
+					//  -> That requires the sprite texture manager to store (more high level) OpenGLDrawerTexture instead of OpenGLTexture instances
+					glBindTexture(GL_TEXTURE_2D, texture->getHandle());
+					mInternal.applySamplingMode();
+
+					mInternal.drawRect(targetRect, texture->getHandle(), sc.mTintColor);
+				}
+				else
+				{
+					BufferTexture* texture = mInternal.mSpriteTextureManager.getPaletteSpriteTexture(*item, false);
+					if (nullptr == texture)
+						break;
+
+					const OpenGLTexture* paletteTexture = nullptr;
+					if (!item->mUsesComponentSprite)
+					{
+						const PaletteBase* palette = PaletteCollection::instance().getPalette(sc.mPaletteKey, 0);
+						if (nullptr == palette)
+							break;
+						
+						paletteTexture = &OpenGLDrawerResources::getCustomPaletteTexture(*palette, *palette);
+					}
+
+					texture->bindTexture();
+					mInternal.applySamplingMode();
+
+					mInternal.drawIndexed(targetRect, *texture, *paletteTexture, sc.mTintColor);
+				}
 				break;
 			}
 

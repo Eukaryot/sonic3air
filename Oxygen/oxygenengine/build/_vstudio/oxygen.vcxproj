@@ -282,6 +282,7 @@
     <None Include="..\..\data\shader\simple_copy_screen.shader" />
     <None Include="..\..\data\shader\simple_rect_colored.shader" />
     <None Include="..\..\data\shader\simple_rect_depthwrite.shader" />
+    <None Include="..\..\data\shader\simple_rect_indexed.shader" />
     <None Include="..\..\data\shader\simple_rect_overdraw.shader" />
     <None Include="..\..\data\shader\simple_rect_textured.shader" />
     <None Include="..\..\data\shader\simple_rect_textured_uv.shader" />

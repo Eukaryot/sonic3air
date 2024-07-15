@@ -36,6 +36,7 @@ public:
 	inline bool isValid() const				{ return mTexBuffer != (GLuint)~0; }
 	inline GLuint getTextureHandle() const	{ return mTextureHandle; }
 	inline GLuint getBufferHandle() const	{ return mTexBuffer; }
+	inline Vec2i getSize() const			{ return mSize; }
 
 	void bindBuffer() const;
 	static void unbindBuffer();
@@ -48,6 +49,7 @@ private:
 	GLuint mTextureHandle = 0;
 	GLuint mTexBuffer = (GLuint)~0;
 	PixelFormat mPixelFormat = PixelFormat::UINT_8;
+	Vec2i mSize;
 };
 
 #endif

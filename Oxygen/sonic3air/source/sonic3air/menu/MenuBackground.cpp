@@ -104,6 +104,34 @@ MenuBackground::~MenuBackground()
 
 void MenuBackground::initialize()
 {
+	// On first initialize, build the preview sprite keys
+	if (mPreviewSprites.empty())
+	{
+		const std::vector<SharedDatabase::Zone>& zones = SharedDatabase::getAllZones();
+		for (const SharedDatabase::Zone& zone : zones)
+		{
+			const uint8 acts = std::max(zone.mActsNormal, zone.mActsTimeAttack);
+			if (acts == 0)
+				continue;
+
+			PreviewKey key;
+			key.mZone = zone.mInternalIndex;
+			for (uint8 act = 0; act < acts; ++act)
+			{
+				key.mAct = act;
+				for (uint8 image = 0; image < 2; ++image)
+				{
+					key.mImage = image;
+					const String spriteName(0, "%s_act%d%c", zone.mShortName.substr(0, 6).c_str(), act + 1, 'a' + image);
+
+					PreviewSprite& previewSprite = mPreviewSprites[key];
+					previewSprite.mSpriteKey = rmx::getMurmur2_64(spriteName);
+					previewSprite.mPaletteKey = rmx::getMurmur2_64(String("@") + spriteName);
+				}
+			}
+		}
+	}
+
 	mLightLayer.setPosition(1.0f);
 	mBlueLayer.setPosition(1.0f);
 	mAlterLayer.setPosition(0.0f);
@@ -239,7 +267,7 @@ void MenuBackground::render()
 		for (int i = 0; i < 2; ++i)
 		{
 			const PreviewImage& img = mPreviewImage[i];
-			if (img.mSpriteKey == 0)
+			if (nullptr == img.mPreviewSprite)
 				continue;
 
 			const int maxOffset = std::min(480 - (int)mRect.width, 80);
@@ -247,7 +275,7 @@ void MenuBackground::render()
 			const int visibleWidth = roundToInt(mRect.width * img.mVisibility);
 
 			drawer.pushScissor(Recti((int)mRect.width - visibleWidth, 0, visibleWidth, (int)mRect.height));
-			drawer.drawSprite(Vec2i(px, 18), img.mSpriteKey, Color(1.0f, 1.0f, 1.0f, mPreviewVisibility));
+			drawer.drawSprite(Vec2i(px, 18), img.mPreviewSprite->mSpriteKey, img.mPreviewSprite->mPaletteKey, Color(1.0f, 1.0f, 1.0f, mPreviewVisibility));
 			drawer.popScissor();
 		}
 
@@ -333,11 +361,11 @@ void MenuBackground::setPreviewZoneAndAct(uint8 zone, uint8 act, bool forceReset
 	mPreviewKey.mAct = act;
 	mPreviewKey.mImage = 0;
 
-	mPreviewImage[0].mSpriteKey = global::mZoneActPreviewSpriteKeys[mPreviewKey];
+	mPreviewImage[0].mPreviewSprite = &mPreviewSprites[mPreviewKey];
 	mPreviewImage[0].mSubIndex = 0;
 	mPreviewImage[0].mOffset = 0.5f;
 	mPreviewImage[0].mVisibility = 1.0f;
-	mPreviewImage[1].mSpriteKey = 0;
+	mPreviewImage[1].mPreviewSprite = nullptr;
 
 	mCurrentTime = 0.0f;
 	updatePreview(0.0f);
@@ -513,17 +541,17 @@ void MenuBackground::updatePreview(float timeElapsed)
 			mPreviewImage[0] = mPreviewImage[1];
 			mPreviewImage[0].mOffset = 0.5f;
 			mPreviewImage[0].mVisibility = 1.0f;
-			mPreviewImage[1].mSpriteKey = 0;
+			mPreviewImage[1].mPreviewSprite = nullptr;
 			mCurrentTime -= TOTAL_TIME;
 		}
 
 		if (mCurrentTime >= MOVE_TIME)
 		{
 			// Transition animation
-			if (mPreviewImage[1].mSpriteKey == 0)
+			if (nullptr == mPreviewImage[1].mPreviewSprite)
 			{
 				mPreviewKey.mImage = (mPreviewImage[0].mSubIndex + 1) % 2;
-				mPreviewImage[1].mSpriteKey = global::mZoneActPreviewSpriteKeys[mPreviewKey];
+				mPreviewImage[1].mPreviewSprite = &mPreviewSprites[mPreviewKey];
 				mPreviewImage[1].mSubIndex = mPreviewKey.mImage;
 			}
 

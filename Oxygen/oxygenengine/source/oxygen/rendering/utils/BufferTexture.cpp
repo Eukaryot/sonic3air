@@ -114,6 +114,8 @@ void BufferTexture::bindTexture() const
 
 void BufferTexture::bufferData(const void* data, int width, int height)
 {
+	mSize.set(width, height);
+
 #if defined(SUPPORTS_BUFFER_TEXTURES)
 	const int bytesPerPixel = (mPixelFormat == PixelFormat::UINT_8) ? 1 : 2;
 	glBindBuffer(GL_TEXTURE_BUFFER, mTexBuffer);

@@ -58,6 +58,21 @@ public:
 	void setGameStartedMenu();
 
 private:
+	struct PreviewKey
+	{
+		uint8 mZone = 0;
+		uint8 mAct = 0;
+		uint8 mImage = 0;
+		inline bool operator<(const PreviewKey& other) const  { return (mZone != other.mZone) ? (mZone < other.mZone) : (mAct != other.mAct) ? (mAct < other.mAct) : (mImage < other.mImage); }
+	};
+
+	struct PreviewSprite
+	{
+		uint64 mSpriteKey = 0;
+		uint64 mPaletteKey = 0;
+	};
+
+private:
 	void openMenu(GameMenuBase& menu);
 	void skipTransition();
 	void updateTransition(float timeElapsed);
@@ -81,13 +96,14 @@ private:
 	// Background
 	struct PreviewImage
 	{
-		uint64 mSpriteKey = 0;
+		const PreviewSprite* mPreviewSprite = nullptr;
 		int mSubIndex = 0;
 		float mOffset = 0.0f;
 		float mVisibility = 0.0f;
 	};
 	PreviewImage mPreviewImage[2];
-	global::ZoneActPreviewKey mPreviewKey;
+	PreviewKey mPreviewKey;
+	std::map<PreviewKey, PreviewSprite> mPreviewSprites;
 
 	float mCurrentTime = 0.0f;
 	float mAnimationTimer = 0.0f;	// In seconds; loops back to zero after 1 minute

@@ -11,7 +11,9 @@
 #ifdef RMX_WITH_OPENGL_SUPPORT
 
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
+#include "oxygen/drawing/opengl/OpenGLTexture.h"
 #include "oxygen/helper/FileHelper.h"
+#include "oxygen/rendering/parts/palette/Palette.h"
 
 
 namespace openglresources
@@ -25,13 +27,25 @@ namespace openglresources
 	};
 	const char* variantString[4] = { "Standard", "TintColor", "Standard_AlphaTest", "TintColor_AlphaTest" };
 
+	static const Vec2i PALETTE_TEXTURE_SIZE = Vec2i(256, 4);
+
+	struct PaletteData
+	{
+		Bitmap		  mBitmap;
+		OpenGLTexture mTexture;
+		uint16		  mChangeCounters[2] = { 0 };
+		int			  mUnusedFramesCounter = 0;
+	};
+
 	struct Internal
 	{
 		Shader mSimpleRectColoredShader;
 		Shader mSimpleRectVertexColorShader;
 		Shader mSimpleRectTexturedShader[4];		// Enumerated using enum Variant
 		Shader mSimpleRectTexturedUVShader[4];		// Enumerated using enum Variant
+		Shader mSimpleRectIndexedShader[4];			// Enumerated using enum Variant
 		opengl::VertexArrayObject mSimpleQuadVAO;
+		std::unordered_map<uint64, PaletteData> mCustomPalettes;	// Using a key built from a combination of primary and secondary palette keys
 	};
 	Internal* mInternal = nullptr;
 
@@ -40,6 +54,49 @@ namespace openglresources
 		BlendMode mBlendMode = BlendMode::OPAQUE;
 	};
 	State mState;
+
+
+	// TODO: The whole palette code was copied from OpenGLRenderResources - this should definitely be refactored!
+
+	bool updatePaletteBitmap(const PaletteBase& palette, Bitmap& bitmap, int offsetY, uint16& changeCounter)
+	{
+		if (changeCounter == palette.getChangeCounter())
+			return false;
+
+		// Copy over the palette data
+		uint32* dst = bitmap.getPixelPointer(0, offsetY);
+		palette.dumpColors(dst, palette.getSize());
+
+		changeCounter = palette.getChangeCounter();
+		return true;
+	}
+
+	bool updatePalette(PaletteData& data, const PaletteBase& primaryPalette, const PaletteBase& secondaryPalette)
+	{
+		data.mUnusedFramesCounter = 0;
+
+		const bool primaryPaletteChanged = updatePaletteBitmap(primaryPalette, data.mBitmap, 0, data.mChangeCounters[0]);
+		const bool secondaryPaletteChanged = updatePaletteBitmap(secondaryPalette, data.mBitmap, 2, data.mChangeCounters[1]);
+		if (!primaryPaletteChanged && !secondaryPaletteChanged)
+			return false;
+
+		if (!data.mTexture.isValid())
+			data.mTexture.setup(data.mBitmap.getSize(), rmx::OpenGLHelper::FORMAT_RGBA);
+
+		// Upload changes to the GPU
+		glBindTexture(GL_TEXTURE_2D, data.mTexture.getHandle());
+		if (secondaryPaletteChanged)
+		{
+			// Update everything
+			glTexImage2D(GL_TEXTURE_2D, 0, rmx::OpenGLHelper::FORMAT_RGBA, data.mBitmap.getWidth(), data.mBitmap.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, data.mBitmap.getData());
+		}
+		else
+		{
+			// Update only the primary palette
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 2, GL_RGBA, GL_UNSIGNED_BYTE, data.mBitmap.getData());
+		}
+		return true;
+	}
 }
 
 
@@ -52,12 +109,13 @@ void OpenGLDrawerResources::startup()
 	openglresources::State mState = openglresources::State();
 
 	// Load shaders
-	FileHelper::loadShader(openglresources::mInternal->mSimpleRectColoredShader, L"data/shader/simple_rect_colored.shader", "Standard");
+	FileHelper::loadShader(openglresources::mInternal->mSimpleRectColoredShader,     L"data/shader/simple_rect_colored.shader",     "Standard");
 	FileHelper::loadShader(openglresources::mInternal->mSimpleRectVertexColorShader, L"data/shader/simple_rect_vertexcolor.shader", "Standard");
 	for (int k = 0; k < 4; ++k)
 	{
-		FileHelper::loadShader(openglresources::mInternal->mSimpleRectTexturedShader[k], L"data/shader/simple_rect_textured.shader", openglresources::variantString[k]);
+		FileHelper::loadShader(openglresources::mInternal->mSimpleRectTexturedShader[k],   L"data/shader/simple_rect_textured.shader",    openglresources::variantString[k]);
 		FileHelper::loadShader(openglresources::mInternal->mSimpleRectTexturedUVShader[k], L"data/shader/simple_rect_textured_uv.shader", openglresources::variantString[k]);
+		FileHelper::loadShader(openglresources::mInternal->mSimpleRectIndexedShader[k],    L"data/shader/simple_rect_indexed.shader",     openglresources::variantString[k]);
 	}
 
 	// Setup simple quad VAO, consisting of two triangles
@@ -100,6 +158,11 @@ Shader& OpenGLDrawerResources::getSimpleRectTexturedShader(bool tint, bool alpha
 Shader& OpenGLDrawerResources::getSimpleRectTexturedUVShader(bool tint, bool alpha)
 {
 	return openglresources::mInternal->mSimpleRectTexturedUVShader[(tint ? 1 : 0) + (alpha ? 2 : 0)];
+}
+
+Shader& OpenGLDrawerResources::getSimpleRectIndexedShader(bool tint, bool alpha)
+{
+	return openglresources::mInternal->mSimpleRectIndexedShader[(tint ? 1 : 0) + (alpha ? 2 : 0)];
 }
 
 opengl::VertexArrayObject& OpenGLDrawerResources::getSimpleQuadVAO()
@@ -177,6 +240,18 @@ void OpenGLDrawerResources::setBlendMode(BlendMode blendMode)
 			break;
 		}
 	}
+}
+
+const OpenGLTexture& OpenGLDrawerResources::getCustomPaletteTexture(const PaletteBase& primaryPalette, const PaletteBase& secondaryPalette)
+{
+	const uint64 combinedKey = primaryPalette.getKey() ^ (secondaryPalette.getKey() << 32) ^ (secondaryPalette.getKey() >> 32);
+	openglresources::PaletteData& data = openglresources::mInternal->mCustomPalettes[combinedKey];
+
+	if (data.mBitmap.getSize() != openglresources::PALETTE_TEXTURE_SIZE)
+		data.mBitmap.create(openglresources::PALETTE_TEXTURE_SIZE);	// The shader expects this exact texture size, no matter how many colors are actually used
+
+	openglresources::updatePalette(data, primaryPalette, secondaryPalette);
+	return data.mTexture;
 }
 
 #endif

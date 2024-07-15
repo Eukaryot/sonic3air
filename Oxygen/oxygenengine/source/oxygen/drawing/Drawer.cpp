@@ -145,7 +145,12 @@ void Drawer::drawUpscaledRect(const Rectf& rect, DrawerTexture& texture)
 
 void Drawer::drawSprite(Vec2i position, uint64 spriteKey, const Color& tintColor, Vec2f scale)
 {
-	addDrawCommand(DrawCommand::mFactory.getPool<SpriteDrawCommand>().createObject(position, spriteKey, tintColor, scale));
+	addDrawCommand(DrawCommand::mFactory.getPool<SpriteDrawCommand>().createObject(position, spriteKey, 0, tintColor, scale));
+}
+
+void Drawer::drawSprite(Vec2i position, uint64 spriteKey, uint64 paletteKey, const Color& tintColor, Vec2f scale)
+{
+	addDrawCommand(DrawCommand::mFactory.getPool<SpriteDrawCommand>().createObject(position, spriteKey, paletteKey, tintColor, scale));
 }
 
 void Drawer::drawSpriteRect(const Recti& rect, uint64 spriteKey, const Color& tintColor)
