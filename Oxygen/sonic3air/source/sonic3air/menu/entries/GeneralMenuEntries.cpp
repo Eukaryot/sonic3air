@@ -35,17 +35,17 @@ void InputFieldMenuEntry::textinput(const rmx::TextInputEvent& ev)
 void InputFieldMenuEntry::renderEntry(RenderContext& renderContext)
 {
 	const Recti textRect(renderContext.mCurrentPosition, Vec2i(200, 11));
+	Drawer& drawer = *renderContext.mDrawer;
 	Font& font = global::mOxyfontSmall;
 	const int cursorOffset = font.getWidth(mTextInputHandler.getText(), 0, (int)mTextInputHandler.getCursorPosition());
 
 	if (renderContext.mIsSelected)
 	{
-		renderContext.mDrawer->printText(font, textRect, std::wstring_view(mTextInputHandler.getText()).substr(0, mTextInputHandler.getCursorPosition()));
-		renderContext.mDrawer->printText(font, textRect + Vec2i(cursorOffset+4, 0), std::wstring_view(mTextInputHandler.getText()).substr(mTextInputHandler.getCursorPosition()));
+		drawer.printText(font, textRect, std::wstring_view(mTextInputHandler.getText()).substr(0, mTextInputHandler.getCursorPosition()));
+		drawer.printText(font, textRect + Vec2i(cursorOffset+2, 0), std::wstring_view(mTextInputHandler.getText()).substr(mTextInputHandler.getCursorPosition()));
 		if (std::fmod(FTX::getTime(), 1.0f) < 0.6f)
 		{
-			renderContext.mDrawer->drawRect(Recti(textRect.x + cursorOffset, textRect.y - 2, 3, textRect.height), Color::BLACK);
-			renderContext.mDrawer->drawRect(Recti(textRect.x + cursorOffset + 1, textRect.y - 1, 1, textRect.height - 2), Color::WHITE);
+			drawer.printText(font, textRect + Vec2i(cursorOffset-2, font.getLineHeight()-2), "^", 1, Color(1.0f, 1.0f, 0.0f));
 		}
 
 		if (mTextInputHandler.getMarkedRangeStart().has_value())
@@ -62,12 +62,12 @@ void InputFieldMenuEntry::renderEntry(RenderContext& renderContext)
 				rect.x += 3;
 				rect.width += 1;
 			}
-			renderContext.mDrawer->drawRect(rect, Color(1.0f, 1.0f, 0.0f, 0.6f));
+			drawer.drawRect(rect, Color(1.0f, 1.0f, 0.0f, 0.6f));
 		}
 	}
 	else
 	{
-		renderContext.mDrawer->printText(font, textRect, mTextInputHandler.getText());
+		drawer.printText(font, textRect, mTextInputHandler.getText());
 	}
 
 	renderContext.mCurrentPosition.y += 14;
