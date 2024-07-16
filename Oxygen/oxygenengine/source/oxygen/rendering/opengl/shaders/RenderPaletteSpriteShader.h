@@ -26,8 +26,6 @@ public:
 private:
 	Vec2i mLastGameResolution;
 	int   mLastWaterSurfaceHeight = -1;
-	const PaletteBase* mLastUsedPrimaryPalette = nullptr;
-	const PaletteBase* mLastUsedSecondaryPalette = nullptr;
 
 	GLuint mLocGameResolution = 0;
 	GLuint mLocWaterLevel = 0;

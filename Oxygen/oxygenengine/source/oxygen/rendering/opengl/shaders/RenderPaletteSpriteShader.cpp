@@ -52,18 +52,14 @@ void RenderPaletteSpriteShader::draw(const renderitems::PaletteSpriteInfo& sprit
 		if (nullptr == texture)
 			return;
 
+		// Note that this call can internally bind a texture as well, which can mess with previous texture bindings - so we do this before the bindings below
+		const OpenGLTexture& paletteTexture = resources.getPaletteTexture(spriteInfo.mPrimaryPalette, spriteInfo.mSecondaryPalette);
+
 		glActiveTexture(GL_TEXTURE0);
 		texture->bindTexture();
 
-		if (mLastUsedPrimaryPalette != spriteInfo.mPrimaryPalette || mLastUsedSecondaryPalette != spriteInfo.mSecondaryPalette)
-		{
-			const OpenGLTexture& paletteTexture = resources.getPaletteTexture(spriteInfo.mPrimaryPalette, spriteInfo.mSecondaryPalette);
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, paletteTexture.getHandle());
-
-			mLastUsedPrimaryPalette = spriteInfo.mPrimaryPalette;
-			mLastUsedSecondaryPalette = spriteInfo.mSecondaryPalette;
-		}
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, paletteTexture.getHandle());
 	}
 
 	// Update uniforms
