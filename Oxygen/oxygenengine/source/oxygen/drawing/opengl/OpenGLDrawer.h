@@ -12,6 +12,7 @@
 
 #include "oxygen/drawing/DrawerInterface.h"
 
+class OpenGLDrawerResources;
 namespace opengldrawer
 {
 	struct Internal;
@@ -27,11 +28,15 @@ public:
 	inline Drawer::Type getType() override  { return Drawer::Type::OPENGL; }
 	bool wasSetupSuccessful() override;
 
+	void updateDrawer(float deltaSeconds) override;
+
 	void createTexture(DrawerTexture& outTexture) override;
 	void refreshTexture(DrawerTexture& texture) override;
 	void setupRenderWindow(SDL_Window* window) override;
 	void performRendering(const DrawCollection& drawCollection) override;
 	void presentScreen() override;
+
+	OpenGLDrawerResources& getResources();
 
 private:
 	opengldrawer::Internal& mInternal;

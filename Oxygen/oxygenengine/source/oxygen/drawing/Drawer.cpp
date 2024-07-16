@@ -71,6 +71,12 @@ void Drawer::shutdown()
 	destroyDrawer();
 }
 
+void Drawer::updateDrawer(float deltaSeconds)
+{
+	if (nullptr != mActiveDrawer)
+		mActiveDrawer->updateDrawer(deltaSeconds);
+}
+
 void Drawer::createTexture(DrawerTexture& outTexture)
 {
 	RMX_ASSERT(nullptr != mActiveDrawer, "No active drawer instance created");

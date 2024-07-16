@@ -12,16 +12,22 @@
 
 #include "oxygen/drawing/opengl/OpenGLTexture.h"
 
+class OpenGLDrawerResources;
+
 
 class Upscaler
 {
 public:
+	explicit Upscaler(OpenGLDrawerResources& resources) : mResources(resources) {}
+
 	void startup();
 	void shutdown();
 
 	void renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textureResolution);
 
 private:
+	OpenGLDrawerResources& mResources;
+
 	Shader mUpscalerSoftShader;
 	Shader mUpscalerSoftShaderScanlines;
 	Shader mUpscalerXBRZMultipassShader[2];

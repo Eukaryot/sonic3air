@@ -12,17 +12,17 @@
 
 #include "oxygen/rendering/utils/PaletteBitmap.h"
 #include "oxygen/rendering/utils/BufferTexture.h"
-#include "oxygen/drawing/opengl/OpenGLTexture.h"
+#include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 
-class RenderParts;
 class Palette;
 class PaletteBase;
+class RenderParts;
 
 
 class OpenGLRenderResources
 {
 public:
-	OpenGLRenderResources(RenderParts& renderParts);
+	OpenGLRenderResources(RenderParts& renderParts, OpenGLDrawerResources& drawerResources);
 
 	void initialize();
 	void refresh();
@@ -31,7 +31,6 @@ public:
 	inline RenderParts& getRenderParts() const  { return mRenderParts; }
 
 	inline const OpenGLTexture& getMainPaletteTexture() const  { return mMainPalette.mTexture; }
-	const OpenGLTexture& getCustomPaletteTexture(const PaletteBase& primaryPalette, const PaletteBase& secondaryPalette);
 	const OpenGLTexture& getPaletteTexture(const PaletteBase* primaryPalette, const PaletteBase* secondaryPalette);
 
 	inline const BufferTexture& getPatternCacheTexture() const  { return mPatternCacheTexture; }
@@ -42,24 +41,11 @@ public:
 	const BufferTexture& getVScrollOffsetsTexture(int scrollOffsetsIndex) const;
 
 private:
-	struct PaletteData
-	{
-		Bitmap		  mBitmap;
-		OpenGLTexture mTexture;
-		uint16		  mChangeCounters[2] = { 0 };
-		int			  mUnusedFramesCounter = 0;
-	};
-
-private:
-	bool updatePalette(PaletteData& data, const PaletteBase& primaryPalette, const PaletteBase& secondaryPalette);
-	bool updatePaletteBitmap(const PaletteBase& palette, Bitmap& bitmap, int offsetY, uint16& changeCounter);
-
-private:
 	RenderParts& mRenderParts;
+	OpenGLDrawerResources& mDrawerResources;
 
 	// Palette
-	PaletteData mMainPalette;
-	std::unordered_map<uint64, PaletteData> mCustomPalettes;	// Using a key built from a combination of primary and secondary palette keys
+	OpenGLDrawerResources::PaletteData mMainPalette;
 
 	// Patterns
 	PaletteBitmap mPatternCacheBitmap;

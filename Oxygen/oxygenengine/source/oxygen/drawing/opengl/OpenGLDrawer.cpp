@@ -63,13 +63,13 @@ namespace opengldrawer
 	#endif
 	}
 
-	bool applyShaderBlendMode(Shader::BlendMode blendMode)
+	bool applyShaderBlendMode(Shader::BlendMode blendMode, OpenGLDrawerResources* resources)
 	{
 		switch (blendMode)
 		{
-			case Shader::BlendMode::OPAQUE:		OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);		return true;
-			case Shader::BlendMode::ALPHA:		OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);		return true;
-			case Shader::BlendMode::ADD:		OpenGLDrawerResources::setBlendMode(BlendMode::ADDITIVE);	return true;
+			case Shader::BlendMode::OPAQUE:		resources->setBlendMode(BlendMode::OPAQUE);		return true;
+			case Shader::BlendMode::ALPHA:		resources->setBlendMode(BlendMode::ALPHA);		return true;
+			case Shader::BlendMode::ADD:		resources->setBlendMode(BlendMode::ADDITIVE);	return true;
 			case Shader::BlendMode::UNDEFINED:	break;
 		}
 		return false;
@@ -111,7 +111,8 @@ namespace opengldrawer
 	struct Internal
 	{
 	public:
-		Internal()
+		Internal() :
+			mUpscaler(mResources)
 		{
 		#if defined(RMX_USE_GLEW)
 			// GLEW initialization
@@ -135,7 +136,7 @@ namespace opengldrawer
 			Shader::mShaderSourcePostProcessCallback = std::bind(&opengldrawer::performShaderSourcePostProcessing, std::placeholders::_1, std::placeholders::_2);
 
 			// Also register callback for blend mode changes by shaders
-			Shader::mShaderApplyBlendModeCallback = std::bind(&opengldrawer::applyShaderBlendMode, std::placeholders::_1);
+			Shader::mShaderApplyBlendModeCallback = std::bind(&opengldrawer::applyShaderBlendMode, std::placeholders::_1, &mResources);
 
 		#ifdef USE_OPENGL_MESSAGE_CALLBACK
 			// Register OpenGL message callback for debugging
@@ -143,13 +144,13 @@ namespace opengldrawer
 			glDebugMessageCallback(openGLMessageCallback, 0);
 		#endif
 
-			// Setup OpenGL defaults
-			RMX_LOG_INFO("Setting OpenGL defaults...");
-			setBlendMode(BlendMode::OPAQUE);
-
 			// Startup OpenGL drawer resources, including quad VAO and some basic shaders
 			RMX_LOG_INFO("OpenGL drawer resources startup");
-			OpenGLDrawerResources::startup();
+			mResources.startup();
+
+			// Setup OpenGL defaults
+			RMX_LOG_INFO("Setting OpenGL defaults...");
+			mResources.setBlendMode(BlendMode::OPAQUE);
 
 			// Startup upscaler
 			RMX_LOG_INFO("Upscaler startup");
@@ -163,7 +164,7 @@ namespace opengldrawer
 			if (mSetupSuccessful)
 			{
 				mUpscaler.shutdown();
-				OpenGLDrawerResources::shutdown();
+				mResources.shutdown();
 			}
 		}
 
@@ -190,16 +191,6 @@ namespace opengldrawer
 		bool mayRenderAnything() const
 		{
 			return !mInvalidScissorRegion;
-		}
-
-		BlendMode getBlendMode()
-		{
-			return OpenGLDrawerResources::getBlendMode();
-		}
-
-		void setBlendMode(BlendMode blendMode)
-		{
-			OpenGLDrawerResources::setBlendMode(blendMode);
 		}
 
 		void applySamplingMode()
@@ -279,13 +270,13 @@ namespace opengldrawer
 
 				if (uv0.x == 0.0f && uv0.y == 0.0f && uv1.x == 1.0f && uv1.y == 1.0f)
 				{
-					SimpleRectTexturedShader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
+					SimpleRectTexturedShader& shader = mResources.getSimpleRectTexturedShader(needsTintColor, mResources.getBlendMode() == BlendMode::ALPHA);
 					shader.setup(textureHandle, transform, color);
-					OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
+					mResources.getSimpleQuadVAO().draw(GL_TRIANGLES);
 				}
 				else
 				{
-					SimpleRectTexturedUVShader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
+					SimpleRectTexturedUVShader& shader = mResources.getSimpleRectTexturedUVShader(needsTintColor, mResources.getBlendMode() == BlendMode::ALPHA);
 					shader.setup(textureHandle, transform, color);
 
 					const float vertexData[] =
@@ -305,9 +296,9 @@ namespace opengldrawer
 			}
 			else
 			{
-				SimpleRectColoredShader& shader = OpenGLDrawerResources::getSimpleRectColoredShader();
+				SimpleRectColoredShader& shader = mResources.getSimpleRectColoredShader();
 				shader.setup(color, transform);
-				OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
+				mResources.getSimpleQuadVAO().draw(GL_TRIANGLES);
 			}
 		}
 
@@ -320,9 +311,9 @@ namespace opengldrawer
 			const bool needsTintColor = (color != Color::WHITE);
 
 			OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
-			SimpleRectIndexedShader& shader = OpenGLDrawerResources::getSimpleRectIndexedShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
+			SimpleRectIndexedShader& shader = mResources.getSimpleRectIndexedShader(needsTintColor, mResources.getBlendMode() == BlendMode::ALPHA);
 			shader.setup(texture, paletteTexture, transform, color);
-			OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
+			mResources.getSimpleQuadVAO().draw(GL_TRIANGLES);
 		}
 
 		void printText(Font& font, const StringReader& text, const Recti& rect, const DrawerPrintOptions& printOptions)
@@ -361,7 +352,7 @@ namespace opengldrawer
 			fontOutput.buildVertexGroups(vertexGroups, typeInfos);
 
 			OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
-			SimpleRectTexturedUVShader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(true, true);
+			SimpleRectTexturedUVShader& shader = mResources.getSimpleRectTexturedUVShader(true, true);
 			for (const OpenGLFontOutput::VertexGroup& vertexGroup : vertexGroups.mVertexGroups)
 			{
 				shader.setup(vertexGroup.mTexture->getHandle(), getPixelToViewSpaceTransform(), printOptions.mTintColor);
@@ -387,6 +378,8 @@ namespace opengldrawer
 	public:
 		bool mSetupSuccessful = false;
 		SDL_Window* mOutputWindow = nullptr;
+
+		OpenGLDrawerResources mResources;
 		Upscaler mUpscaler;
 		OpenGLSpriteTextureManager mSpriteTextureManager;
 
@@ -421,6 +414,11 @@ OpenGLDrawer::~OpenGLDrawer()
 bool OpenGLDrawer::wasSetupSuccessful()
 {
 	return mInternal.mSetupSuccessful;
+}
+
+void OpenGLDrawer::updateDrawer(float deltaSeconds)
+{
+	mInternal.mResources.refresh(deltaSeconds);
 }
 
 void OpenGLDrawer::createTexture(DrawerTexture& outTexture)
@@ -556,7 +554,7 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 					if (nullptr == palette)
 						break;
 						
-					const OpenGLTexture& paletteTexture = OpenGLDrawerResources::getCustomPaletteTexture(*palette, *palette);
+					const OpenGLTexture& paletteTexture = mInternal.mResources.getCustomPaletteTexture(*palette, *palette);
 					mInternal.drawIndexed(targetRect, *texture, paletteTexture, sc.mTintColor);
 				}
 				break;
@@ -596,7 +594,7 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 					break;
 
 				OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
-				SimpleRectTexturedUVShader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(false, true);
+				SimpleRectTexturedUVShader& shader = mInternal.mResources.getSimpleRectTexturedUVShader(false, true);
 				shader.setup(mInternal.setupTexture(*dc.mTexture), mInternal.getPixelToViewSpaceTransform());
 
 				static std::vector<float> vertexData;
@@ -627,7 +625,7 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 					break;
 
 				OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
-				SimpleRectVertexColorShader& shader = OpenGLDrawerResources::getSimpleRectVertexColorShader();
+				SimpleRectVertexColorShader& shader = mInternal.mResources.getSimpleRectVertexColorShader();
 				shader.setup(mInternal.getPixelToViewSpaceTransform());
 
 				static std::vector<float> vertexData;
@@ -653,7 +651,7 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 			case DrawCommand::Type::SET_BLEND_MODE:
 			{
 				SetBlendModeDrawCommand& dc = drawCommand->as<SetBlendModeDrawCommand>();
-				mInternal.setBlendMode(dc.mBlendMode);
+				mInternal.mResources.setBlendMode(dc.mBlendMode);
 				break;
 			}
 
@@ -734,6 +732,11 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 void OpenGLDrawer::presentScreen()
 {
 	SDL_GL_SwapWindow(mInternal.mOutputWindow);
+}
+
+OpenGLDrawerResources& OpenGLDrawer::getResources()
+{
+	return mInternal.mResources;
 }
 
 #endif

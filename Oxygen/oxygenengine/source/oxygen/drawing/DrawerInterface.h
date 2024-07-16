@@ -22,6 +22,8 @@ public:
 	virtual Drawer::Type getType() = 0;
 	virtual bool wasSetupSuccessful()  { return true; }
 
+	virtual void updateDrawer(float deltaSeconds) {}
+
 	virtual void createTexture(DrawerTexture& outTexture) = 0;
 	virtual void refreshTexture(DrawerTexture& texture) = 0;
 	virtual void setupRenderWindow(SDL_Window* window) = 0;

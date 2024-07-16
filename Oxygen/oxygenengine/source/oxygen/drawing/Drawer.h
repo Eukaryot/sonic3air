@@ -46,6 +46,7 @@ public:
 	void destroyDrawer();
 
 	void shutdown();
+	void updateDrawer(float deltaSeconds);
 
 	inline DrawerInterface* getActiveDrawer() const  { return mActiveDrawer; }
 

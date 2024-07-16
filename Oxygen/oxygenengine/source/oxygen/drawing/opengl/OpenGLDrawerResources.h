@@ -10,10 +10,9 @@
 
 #ifdef RMX_WITH_OPENGL_SUPPORT
 
-#include <rmxmedia.h>
+#include "oxygen/rendering/parts/palette/Palette.h"
+#include "oxygen/drawing/opengl/OpenGLTexture.h"
 
-class OpenGLTexture;
-class PaletteBase;
 class SimpleRectColoredShader;
 class SimpleRectVertexColorShader;
 class SimpleRectTexturedShader;
@@ -23,22 +22,60 @@ class SimpleRectIndexedShader;
 
 class OpenGLDrawerResources final
 {
+friend class OpenGLRenderResources;		// For access to updatePalette
+
 public:
-	static void startup();
-	static void shutdown();
+	OpenGLDrawerResources();
+	~OpenGLDrawerResources();
 
-	static SimpleRectColoredShader& getSimpleRectColoredShader();
-	static SimpleRectVertexColorShader& getSimpleRectVertexColorShader();
-	static SimpleRectTexturedShader& getSimpleRectTexturedShader(bool tint, bool alpha);
-	static SimpleRectTexturedUVShader& getSimpleRectTexturedUVShader(bool tint, bool alpha);
-	static SimpleRectIndexedShader& getSimpleRectIndexedShader(bool tint, bool alpha);
+	void startup();
+	void shutdown();
 
-	static opengl::VertexArrayObject& getSimpleQuadVAO();
+	void clearAllCaches();
+	void refresh(float deltaSeconds);
 
-	static BlendMode getBlendMode();
-	static void setBlendMode(BlendMode blendMode);
+	inline BlendMode getBlendMode() const  { return mState.mBlendMode; }
+	void setBlendMode(BlendMode blendMode);
 
-	static const OpenGLTexture& getCustomPaletteTexture(const PaletteBase& primaryPalette, const PaletteBase& secondaryPalette);
+	SimpleRectColoredShader& getSimpleRectColoredShader();
+	SimpleRectVertexColorShader& getSimpleRectVertexColorShader();
+	SimpleRectTexturedShader& getSimpleRectTexturedShader(bool tint, bool alpha);
+	SimpleRectTexturedUVShader& getSimpleRectTexturedUVShader(bool tint, bool alpha);
+	SimpleRectIndexedShader& getSimpleRectIndexedShader(bool tint, bool alpha);
+
+	opengl::VertexArrayObject& getSimpleQuadVAO();
+
+	const OpenGLTexture& getCustomPaletteTexture(const PaletteBase& primaryPalette, const PaletteBase& secondaryPalette);
+	const Vec2i& getPaletteTextureSize() const;
+
+private:
+	struct State
+	{
+		BlendMode mBlendMode = BlendMode::OPAQUE;
+	};
+
+	struct PaletteData
+	{
+		Bitmap		  mBitmap;
+		OpenGLTexture mTexture;
+		uint16		  mChangeCounters[2] = { 0 };
+		float		  mSecondsSinceLastUse = 0.0f;
+	};
+
+private:
+	bool updatePalette(PaletteData& data, const PaletteBase& primaryPalette, const PaletteBase& secondaryPalette);
+	bool updatePaletteBitmap(const PaletteBase& palette, Bitmap& bitmap, int offsetY, uint16& changeCounter);
+
+private:
+	State mState;
+
+	// Internal (shaders etc.)
+	struct Internal;
+	Internal& mInternal;
+
+	// Paletteb cache
+	std::unordered_map<uint64, PaletteData> mCustomPalettes;	// Using a key built from a combination of primary and secondary palette keys
+	float mSecondsSinceLastPaletteCleanup = 0.0f;
 };
 
 #endif

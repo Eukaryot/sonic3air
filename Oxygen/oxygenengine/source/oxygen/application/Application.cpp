@@ -435,6 +435,9 @@ void Application::update(float timeElapsed)
 		}
 	}
 
+	// Update drawer
+	EngineMain::instance().getDrawer().updateDrawer(timeElapsed);
+
 	// Update input
 	InputManager::instance().updateInput(timeElapsed);
 

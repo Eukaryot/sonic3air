@@ -21,6 +21,8 @@
 #include "oxygen/rendering/parts/SpriteManager.h"
 #include "oxygen/drawing/opengl/OpenGLTexture.h"
 
+class OpenGLDrawerResources;
+
 
 class OpenGLRenderer : public Renderer
 {
@@ -47,7 +49,8 @@ private:
 	void copyGameScreenToProcessingBuffer();
 
 private:
-	OpenGLRenderResources mResources;
+	OpenGLDrawerResources& mDrawerResources;
+	OpenGLRenderResources mRenderResources;
 
 	Vec2i mGameResolution;
 

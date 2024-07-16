@@ -47,7 +47,7 @@ void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textur
 	const int scanlines = Configuration::instance().mScanlines;
 
 	// Select upscaler
-	SimpleRectTexturedShader& simpleRectTexturedShader = OpenGLDrawerResources::getSimpleRectTexturedShader(false, false);
+	SimpleRectTexturedShader& simpleRectTexturedShader = mResources.getSimpleRectTexturedShader(false, false);
 	Shader* upscaleShader = &simpleRectTexturedShader.getShader();		// Fallback: Simple rendering
 	Shader* pass0Shader = nullptr;
 	bool filterLinear = false;
@@ -154,9 +154,9 @@ void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textur
 	}
 
 	// Disable blending (though it shouldn't be necessary, as upscaling shaders usually do this already)
-	OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);
+	mResources.setBlendMode(BlendMode::OPAQUE);
 
-	opengl::VertexArrayObject& vao = OpenGLDrawerResources::getSimpleQuadVAO();
+	opengl::VertexArrayObject& vao = mResources.getSimpleQuadVAO();
 	vao.bind();
 
 	if (isMultiPass)

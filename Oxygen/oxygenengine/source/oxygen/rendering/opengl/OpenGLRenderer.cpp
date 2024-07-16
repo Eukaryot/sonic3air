@@ -13,6 +13,7 @@
 #include "oxygen/rendering/opengl/OpenGLRenderer.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/application/Configuration.h"
+#include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
 #include "oxygen/helper/FileHelper.h"
@@ -23,6 +24,14 @@
 
 namespace
 {
+	OpenGLDrawerResources& getDrawerResources()
+	{
+		DrawerInterface* drawer = EngineMain::instance().getDrawer().getActiveDrawer();
+		RMX_ASSERT(nullptr != drawer, "Set active drawer set");
+		RMX_ASSERT(drawer->getType() == Drawer::Type::OPENGL, "Expected OpenGL drawer");
+		return static_cast<OpenGLDrawer*>(drawer)->getResources();
+	}
+
 	Vec4f calculateBlurKernel(float x)
 	{
 		// Calculate 3x3 blur kernel, represented by only 4 values A, B, C, D
@@ -65,7 +74,8 @@ namespace
 
 OpenGLRenderer::OpenGLRenderer(RenderParts& renderParts, DrawerTexture& outputTexture) :
 	Renderer(RENDERER_TYPE_ID, renderParts, outputTexture),
-	mResources(renderParts)
+	mDrawerResources(getDrawerResources()),
+	mRenderResources(renderParts, mDrawerResources)
 {
 }
 
@@ -73,7 +83,7 @@ void OpenGLRenderer::initialize()
 {
 	mGameResolution = Configuration::instance().mGameScreen;
 
-	mResources.initialize();
+	mRenderResources.initialize();
 
 	mGameScreenDepth.create(rmx::OpenGLHelper::FORMAT_DEPTH, mGameResolution.x, mGameResolution.y);
 
@@ -120,7 +130,8 @@ void OpenGLRenderer::initialize()
 void OpenGLRenderer::reset()
 {
 	clearFullscreenBuffers(mGameScreenBuffer, mProcessingBuffer);
-	mResources.clearAllCaches();
+	mRenderResources.clearAllCaches();
+	mDrawerResources.clearAllCaches();
 }
 
 void OpenGLRenderer::setGameResolution(const Vec2i& gameResolution)
@@ -162,7 +173,7 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 	}
 
 	// We'll use the same quad vertex data over and over again during rendering, so just bind it once
-	OpenGLDrawerResources::getSimpleQuadVAO().bind();
+	mDrawerResources.getSimpleQuadVAO().bind();
 
 	// Check if background blur needed
 	mIsRenderingToProcessingBuffer = false;
@@ -212,7 +223,7 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 
 	// Disable depth test for UI
 	glDisable(GL_DEPTH_TEST);
-	OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
+	mDrawerResources.setBlendMode(BlendMode::ALPHA);
 
 	// Unbind shader
 	glUseProgram(0);
@@ -236,7 +247,7 @@ void OpenGLRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
 		glViewport_Recti(RenderUtils::getLetterBoxRect(rect, 2.0f));
 	}
 
-	mDebugDrawPlaneShader.draw(debugDrawMode, mRenderParts, mResources);
+	mDebugDrawPlaneShader.draw(debugDrawMode, mRenderParts, mRenderResources);
 	glViewport_Recti(FTX::screenRect());
 }
 
@@ -305,7 +316,7 @@ void OpenGLRenderer::clearFullscreenBuffers(Framebuffer& buffer1, Framebuffer& b
 
 void OpenGLRenderer::internalRefresh()
 {
-	mResources.refresh();
+	mRenderResources.refresh();
 }
 
 void OpenGLRenderer::renderGeometry(const Geometry& geometry)
@@ -334,18 +345,18 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				}
 			}
 
-			OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);
+			mDrawerResources.setBlendMode(BlendMode::OPAQUE);
 
 			// For backmost layer, ignore alpha completely
 			const bool useAlphaTest = (pg.mPlaneIndex != 0 || pg.mPriorityFlag);
-			OpenGLDrawerResources::setBlendMode(BlendMode::ONE_BIT);
+			mDrawerResources.setBlendMode(BlendMode::ONE_BIT);
 			ScrollOffsetsManager& som = mRenderParts.getScrollOffsetsManager();
 			const RenderPlaneShader::Variation variation = (pg.mPlaneIndex == PlaneManager::PLANE_W) ? RenderPlaneShader::PS_SIMPLE :
 															som.getHorizontalScrollNoRepeat(pg.mScrollOffsets) ? RenderPlaneShader::PS_NO_REPEAT :
 															som.getVerticalScrolling() ? RenderPlaneShader::PS_VERTICAL_SCROLLING : RenderPlaneShader::PS_HORIZONTAL_SCROLLING;
 			RenderPlaneShader& shader = mRenderPlaneShader[variation][useAlphaTest ? 1 : 0];
 
-			shader.draw(pg, mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mRenderParts, mResources);
+			shader.draw(pg, mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mRenderParts, mRenderResources);
 			mLastRenderedGeometryType = Geometry::Type::PLANE;
 			break;
 		}
@@ -377,10 +388,10 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				case RenderItem::Type::VDP_SPRITE:
 				{
 					const renderitems::VdpSpriteInfo& spriteInfo = static_cast<const renderitems::VdpSpriteInfo&>(sg.mSpriteInfo);
-					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
+					mDrawerResources.setBlendMode(spriteInfo.mBlendMode);
 
 					RenderVdpSpriteShader& shader = mRenderVdpSpriteShader;
-					shader.draw(spriteInfo, mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mResources);
+					shader.draw(spriteInfo, mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mRenderResources);
 					break;
 				}
 
@@ -394,22 +405,22 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 						break;
 					}
 
-					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
+					mDrawerResources.setBlendMode(spriteInfo.mBlendMode);
 					const bool useAlphaTest = (spriteInfo.mBlendMode != BlendMode::OPAQUE);
 
 					RenderPaletteSpriteShader& shader = mRenderPaletteSpriteShader[useAlphaTest ? 1 : 0];
-					shader.draw(spriteInfo, mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mResources);
+					shader.draw(spriteInfo, mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mRenderResources);
 					break;
 				}
 
 				case RenderItem::Type::COMPONENT_SPRITE:
 				{
 					const renderitems::ComponentSpriteInfo& spriteInfo = static_cast<const renderitems::ComponentSpriteInfo&>(sg.mSpriteInfo);
-					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
+					mDrawerResources.setBlendMode(spriteInfo.mBlendMode);
 					const bool useAlphaTest = (spriteInfo.mBlendMode != BlendMode::OPAQUE);
 
 					RenderComponentSpriteShader& shader = mRenderComponentSpriteShader[useAlphaTest ? 1 : 0];
-					shader.draw(spriteInfo, mGameResolution, mResources);
+					shader.draw(spriteInfo, mGameResolution, mRenderResources);
 					break;
 				}
 
@@ -421,7 +432,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 									  (float)mask.mSize.x / (float)mGameResolution.x,
 									  (float)mask.mSize.y / (float)mGameResolution.y);
 
-					OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);
+					mDrawerResources.setBlendMode(BlendMode::OPAQUE);
 					Shader& shader = mSimpleRectOverdrawShader;
 					shader.bind();
 					shader.setParam("Rect", rectf);
@@ -452,9 +463,9 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				glDisable(GL_DEPTH_TEST);
 				mLastRenderedGeometryType = Geometry::Type::RECT;
 			}
-			OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
+			mDrawerResources.setBlendMode(BlendMode::ALPHA);
 
-			SimpleRectColoredShader& shader = OpenGLDrawerResources::getSimpleRectColoredShader();
+			SimpleRectColoredShader& shader = mDrawerResources.getSimpleRectColoredShader();
 			shader.setup(rg.mRect, mGameResolution, rg.mColor);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			break;
@@ -474,9 +485,9 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				glDisable(GL_DEPTH_TEST);
 				mLastRenderedGeometryType = Geometry::Type::TEXTURED_RECT;
 			}
-			OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
+			mDrawerResources.setBlendMode(BlendMode::ALPHA);
 
-			SimpleRectTexturedShader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(true, true);
+			SimpleRectTexturedShader& shader = mDrawerResources.getSimpleRectTexturedShader(true, true);
 			shader.setup(tg.mRect, mGameResolution, texture->getTextureHandle(), tg.mTintColor, tg.mAddedColor);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			break;
@@ -488,7 +499,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 
 			mIsRenderingToProcessingBuffer = false;
 			glBindFramebuffer(GL_FRAMEBUFFER, mGameScreenBuffer.getHandle());
-			OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);
+			mDrawerResources.setBlendMode(BlendMode::OPAQUE);
 
 			Shader& shader = mPostFxBlurShader;
 			shader.bind();

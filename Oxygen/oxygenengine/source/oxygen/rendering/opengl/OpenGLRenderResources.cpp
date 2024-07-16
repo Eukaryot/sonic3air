@@ -12,12 +12,11 @@
 
 #include "oxygen/rendering/opengl/OpenGLRenderResources.h"
 #include "oxygen/rendering/parts/RenderParts.h"
+#include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 
 
 namespace
 {
-	static const Vec2i PALETTE_TEXTURE_SIZE = Vec2i(256, PaletteManager::MAIN_PALETTE_SIZE / 256 * 2);
-
 	void writeToBufferIfNeeded(int firstPattern, int lastPattern, const PaletteBitmap& bitmap)
 	{
 	#if !defined(RMX_USE_GLES2)
@@ -47,8 +46,9 @@ namespace
 }
 
 
-OpenGLRenderResources::OpenGLRenderResources(RenderParts& renderParts) :
-	mRenderParts(renderParts)
+OpenGLRenderResources::OpenGLRenderResources(RenderParts& renderParts, OpenGLDrawerResources& drawerResources) :
+	mRenderParts(renderParts),
+	mDrawerResources(drawerResources)
 {
 	clearAllCaches();
 }
@@ -56,7 +56,7 @@ OpenGLRenderResources::OpenGLRenderResources(RenderParts& renderParts) :
 void OpenGLRenderResources::initialize()
 {
 	// Main palette
-	mMainPalette.mBitmap.create(PALETTE_TEXTURE_SIZE);
+	mMainPalette.mBitmap.create(mDrawerResources.getPaletteTextureSize());
 
 	// Patterns
 	mPatternCacheBitmap.create(0x40, 0x800);
@@ -87,20 +87,9 @@ void OpenGLRenderResources::refresh()
 	// Update palettes
 	{
 		PaletteManager& paletteManager = mRenderParts.getPaletteManager();
-		if (updatePalette(mMainPalette, paletteManager.getMainPalette(0), paletteManager.getMainPalette(1)))
+		if (mDrawerResources.updatePalette(mMainPalette, paletteManager.getMainPalette(0), paletteManager.getMainPalette(1)))
 		{
 			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-
-		// Remove cached data for custom palettes after a few frames
-		for (auto it = mCustomPalettes.begin(); it != mCustomPalettes.end(); )
-		{
-			PaletteData& data = it->second;
-			++data.mUnusedFramesCounter;
-			if (data.mUnusedFramesCounter >= 3)
-				it = mCustomPalettes.erase(it);
-			else
-				++it;
 		}
 	}
 
@@ -230,19 +219,6 @@ void OpenGLRenderResources::clearAllCaches()
 	// Palettes
 	for (int k = 0; k < 2; ++k)
 		--mMainPalette.mChangeCounters[k];		// This should suffice to have out-dated change counters again
-	mCustomPalettes.clear();
-}
-
-const OpenGLTexture& OpenGLRenderResources::getCustomPaletteTexture(const PaletteBase& primaryPalette, const PaletteBase& secondaryPalette)
-{
-	const uint64 combinedKey = primaryPalette.getKey() ^ (secondaryPalette.getKey() << 32) ^ (secondaryPalette.getKey() >> 32);
-	PaletteData& data = mCustomPalettes[combinedKey];
-
-	if (data.mBitmap.getSize() != PALETTE_TEXTURE_SIZE)
-		data.mBitmap.create(PALETTE_TEXTURE_SIZE);	// The shader expects this exact texture size, no matter how many colors are actually used
-
-	updatePalette(data, primaryPalette, secondaryPalette);
-	return data.mTexture;
 }
 
 const OpenGLTexture& OpenGLRenderResources::getPaletteTexture(const PaletteBase* primaryPalette, const PaletteBase* secondaryPalette)
@@ -257,7 +233,7 @@ const OpenGLTexture& OpenGLRenderResources::getPaletteTexture(const PaletteBase*
 			primaryPalette = &mRenderParts.getPaletteManager().getMainPalette(0);
 		if (nullptr == secondaryPalette)
 			secondaryPalette = &mRenderParts.getPaletteManager().getMainPalette(1);
-		return getCustomPaletteTexture(*primaryPalette, *secondaryPalette);
+		return mDrawerResources.getCustomPaletteTexture(*primaryPalette, *secondaryPalette);
 	}
 }
 
@@ -283,46 +259,6 @@ const BufferTexture& OpenGLRenderResources::getVScrollOffsetsTexture(int scrollO
 
 	RMX_ASSERT(scrollOffsetsIndex >= 0 && scrollOffsetsIndex < 4, "Invalid scroll offsets index " << scrollOffsetsIndex);
 	return mVScrollOffsetsTexture[scrollOffsetsIndex];
-}
-
-bool OpenGLRenderResources::updatePalette(PaletteData& data, const PaletteBase& primaryPalette, const PaletteBase& secondaryPalette)
-{
-	data.mUnusedFramesCounter = 0;
-
-	const bool primaryPaletteChanged = updatePaletteBitmap(primaryPalette, data.mBitmap, 0, data.mChangeCounters[0]);
-	const bool secondaryPaletteChanged = updatePaletteBitmap(secondaryPalette, data.mBitmap, 2, data.mChangeCounters[1]);
-	if (!primaryPaletteChanged && !secondaryPaletteChanged)
-		return false;
-
-	if (!data.mTexture.isValid())
-		data.mTexture.setup(data.mBitmap.getSize(), rmx::OpenGLHelper::FORMAT_RGBA);
-
-	// Upload changes to the GPU
-	glBindTexture(GL_TEXTURE_2D, data.mTexture.getHandle());
-	if (secondaryPaletteChanged)
-	{
-		// Update everything
-		glTexImage2D(GL_TEXTURE_2D, 0, rmx::OpenGLHelper::FORMAT_RGBA, data.mBitmap.getWidth(), data.mBitmap.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, data.mBitmap.getData());
-	}
-	else
-	{
-		// Update only the primary palette
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 2, GL_RGBA, GL_UNSIGNED_BYTE, data.mBitmap.getData());
-	}
-	return true;
-}
-
-bool OpenGLRenderResources::updatePaletteBitmap(const PaletteBase& palette, Bitmap& bitmap, int offsetY, uint16& changeCounter)
-{
-	if (changeCounter == palette.getChangeCounter())
-		return false;
-
-	// Copy over the palette data
-	uint32* dst = bitmap.getPixelPointer(0, offsetY);
-	palette.dumpColors(dst, palette.getSize());
-
-	changeCounter = palette.getChangeCounter();
-	return true;
 }
 
 #endif
