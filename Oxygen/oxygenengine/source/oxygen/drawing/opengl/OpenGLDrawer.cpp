@@ -262,8 +262,6 @@ namespace opengldrawer
 		void drawRect(Recti targetRect, GLuint textureHandle, const Color& color, Vec2f uv0 = Vec2f(0.0f, 0.0f), Vec2f uv1 = Vec2f(1.0f, 1.0f))
 		{
 			const Vec4f transform = getTransformOfRectInViewport(targetRect);
-			OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
-
 			if (textureHandle != 0)
 			{
 				const bool needsTintColor = (color != Color::WHITE);
@@ -351,7 +349,6 @@ namespace opengldrawer
 			static OpenGLFontOutput::VertexGroups vertexGroups;
 			fontOutput.buildVertexGroups(vertexGroups, typeInfos);
 
-			OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
 			SimpleRectTexturedUVShader& shader = mResources.getSimpleRectTexturedUVShader(true, true);
 			for (const OpenGLFontOutput::VertexGroup& vertexGroup : vertexGroups.mVertexGroups)
 			{
@@ -593,7 +590,6 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 				if (nullptr == dc.mTexture)
 					break;
 
-				OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
 				SimpleRectTexturedUVShader& shader = mInternal.mResources.getSimpleRectTexturedUVShader(false, true);
 				shader.setup(mInternal.setupTexture(*dc.mTexture), mInternal.getPixelToViewSpaceTransform());
 
@@ -624,7 +620,6 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 				if (dc.mTriangles.empty())
 					break;
 
-				OpenGLShader::resetLastUsedShader();	// Needed as long as not all shaders are implemented using the OpenGLShader base class
 				SimpleRectVertexColorShader& shader = mInternal.mResources.getSimpleRectVertexColorShader();
 				shader.setup(mInternal.getPixelToViewSpaceTransform());
 

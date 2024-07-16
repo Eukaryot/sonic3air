@@ -53,6 +53,7 @@ void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textur
 	bool filterLinear = false;
 	int lookupTextureIndex = -1;
 
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureHandle);
 	if (scanlines > 0 && filtering < 3)
 	{

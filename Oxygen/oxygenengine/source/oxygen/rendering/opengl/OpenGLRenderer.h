@@ -13,11 +13,6 @@
 #include "oxygen/rendering/Renderer.h"
 #include "oxygen/rendering/Geometry.h"
 #include "oxygen/rendering/opengl/OpenGLRenderResources.h"
-#include "oxygen/rendering/opengl/shaders/DebugDrawPlaneShader.h"
-#include "oxygen/rendering/opengl/shaders/RenderPlaneShader.h"
-#include "oxygen/rendering/opengl/shaders/RenderVdpSpriteShader.h"
-#include "oxygen/rendering/opengl/shaders/RenderPaletteSpriteShader.h"
-#include "oxygen/rendering/opengl/shaders/RenderComponentSpriteShader.h"
 #include "oxygen/rendering/parts/SpriteManager.h"
 #include "oxygen/drawing/opengl/OpenGLTexture.h"
 
@@ -31,6 +26,7 @@ public:
 
 public:
 	OpenGLRenderer(RenderParts& renderParts, DrawerTexture& outputTexture);
+	~OpenGLRenderer();
 
 	virtual void initialize() override;
 	virtual void reset() override;
@@ -52,6 +48,9 @@ private:
 	OpenGLDrawerResources& mDrawerResources;
 	OpenGLRenderResources mRenderResources;
 
+	struct Internal;
+	Internal& mInternal;
+
 	Vec2i mGameResolution;
 
 	// Buffers & textures
@@ -59,16 +58,6 @@ private:
 	Renderbuffer  mGameScreenDepth;
 	Framebuffer   mProcessingBuffer;
 	OpenGLTexture mProcessingTexture;
-
-	// Shaders
-	Shader						mSimpleCopyScreenShader;
-	Shader						mSimpleRectOverdrawShader;
-	Shader						mPostFxBlurShader;
-	RenderPlaneShader			mRenderPlaneShader[RenderPlaneShader::_NUM_VARIATIONS][2];	// Using RenderPlaneShader::Variation enumeration, and alpha test off/on for second index
-	RenderVdpSpriteShader		mRenderVdpSpriteShader;
-	RenderPaletteSpriteShader	mRenderPaletteSpriteShader[2];		// Two variations: With or without alpha test
-	RenderComponentSpriteShader mRenderComponentSpriteShader[2];
-	DebugDrawPlaneShader		mDebugDrawPlaneShader;
 
 	// Rendering runtime state
 	Geometry::Type mLastRenderedGeometryType = Geometry::Type::UNDEFINED;

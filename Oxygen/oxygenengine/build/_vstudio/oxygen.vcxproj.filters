@@ -460,6 +460,15 @@
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectIndexedShader.cpp">
       <Filter>rendering\opengl\shaders</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\PostFXBlurShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectOverdrawShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleCopyScreenShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -863,6 +872,15 @@
       <Filter>rendering\opengl\shaders</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectIndexedShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\PostFXBlurShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectOverdrawShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleCopyScreenShader.h">
       <Filter>rendering\opengl\shaders</Filter>
     </ClInclude>
   </ItemGroup>
