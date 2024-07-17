@@ -284,7 +284,7 @@ bool PaletteBitmap::saveBMP(std::vector<uint8>& bmpContent, const uint32* palett
 
 	for (int i = 0; i < 256; ++i)
 	{
-		serializer.write(swapRedBlue(palette[i]));
+		serializer.write(swapRedBlue(palette[i]) & 0x00ffffff);
 	}
 
 	for (uint32 line = 0; line < mHeight; ++line)
