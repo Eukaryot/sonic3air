@@ -151,7 +151,7 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 
 			// Load persistent data
 			RMX_LOG_INFO("Persistent data loading...");
-			PersistentData::instance().loadFromFile(Configuration::instance().mPersistentDataFilename);
+			PersistentData::instance().loadFromBasePath(Configuration::instance().mPersistentDataBasePath);
 
 			// Load audio definitions
 			EngineMain::instance().getAudioOut().handleGameLoaded();

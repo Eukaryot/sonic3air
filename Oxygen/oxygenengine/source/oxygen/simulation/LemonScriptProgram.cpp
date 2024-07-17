@@ -23,6 +23,14 @@
 #include <lemon/utility/PragmaSplitter.h>
 
 
+struct ModuleAppendedInfo : public lemon::Module::AppendedInfo
+{
+	inline explicit ModuleAppendedInfo(const Mod* mod) : mMod(mod) {}
+
+	const Mod* mMod = nullptr;
+};
+
+
 struct LemonScriptProgram::Internal
 {
 	lemon::Module mLemonCoreModule;
@@ -283,7 +291,7 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 				}
 
 				// Create and compile module
-				lemon::Module* module = new lemon::Module(mod->mUniqueID);
+				lemon::Module* module = new lemon::Module(mod->mUniqueID, new ModuleAppendedInfo(mod));
 				const std::wstring mainScriptFilename = mod->mFullPath + L"scripts/main.lemon";
 				const bool success = loadScriptModule(*module, globalsLookup, mainScriptFilename);
 				if (success)
@@ -481,6 +489,12 @@ std::string_view LemonScriptProgram::getFunctionNameByHash(uint64 hash) const
 lemon::Variable* LemonScriptProgram::getGlobalVariableByHash(uint64 hash) const
 {
 	return mInternal.mProgram.getGlobalVariableByName(hash);
+}
+
+const Mod* LemonScriptProgram::getModByModule(const lemon::Module& module) const
+{
+	const ModuleAppendedInfo* appendedInfo = static_cast<ModuleAppendedInfo*>(module.getAppendedInfo());
+	return (nullptr != appendedInfo) ? appendedInfo->mMod : nullptr;
 }
 
 void LemonScriptProgram::resolveLocation(uint32 functionId, uint32 programCounter, std::string& scriptFilename, uint32& lineNumber) const

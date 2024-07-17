@@ -20,82 +20,189 @@ namespace
 
 void PersistentData::clear()
 {
-	mEntries.clear();
+	mFiles.clear();
 }
 
-bool PersistentData::loadFromFile(const std::wstring& filename)
+void PersistentData::loadFromBasePath(const std::wstring& basePath)
 {
-	mFilename = filename;
 	clear();
 
-	std::vector<uint8> content;
-	if (!FTX::FileSystem->readFile(filename, content))
-		return false;
+	mBasePath = basePath;
+	FTX::FileSystem->normalizePath(mBasePath, true);
 
-	VectorBinarySerializer serializer(true, content);
-	return serialize(serializer);
+	if (!FTX::FileSystem->exists(mBasePath))
+	{
+		// First time setup: Create the directory and migrate previous "persistentdata.bin"
+		initialSetup();
+		return;
+	}
+
+	std::vector<rmx::FileIO::FileEntry> fileEntries;
+	FTX::FileSystem->listFilesByMask(mBasePath + L"*.bin", true, fileEntries);
+
+	std::vector<uint8> content;
+	for (const rmx::FileIO::FileEntry& entry : fileEntries)
+	{
+		content.clear();
+		if (!FTX::FileSystem->readFile(entry.mPath + entry.mFilename, content))
+			continue;
+
+		// Remove base path and the file extension
+		std::wstring path = entry.mPath + entry.mFilename;
+		RMX_ASSERT(rmx::startsWith(path, mBasePath), "Unexpected start of path");
+		RMX_ASSERT(rmx::endsWith(path, L".bin"), "Unexpected ending of path");
+		path.erase(0, mBasePath.length());
+		path.erase(path.length() - 4, 4);
+
+		const std::string filePath = WString(path).toStdString();
+		const uint64 hash = rmx::getMurmur2_64(filePath);
+
+		File& file = mFiles[hash];
+		file.mFilePath = filePath;
+
+		VectorBinarySerializer serializer(true, content);
+		if (!serializeFile(file, serializer))
+		{
+			mFiles.erase(hash);
+			continue;
+		}
+	}
 }
 
-bool PersistentData::saveToFile()
-{
-	if (mFilename.empty())
-		return false;
-
-	std::vector<uint8> content;
-	VectorBinarySerializer serializer(false, content);
-	if (!serialize(serializer))
-		return false;
-
-	return FTX::FileSystem->saveFile(mFilename, content);
-}
-
-const std::vector<uint8>& PersistentData::getData(uint64 keyHash) const
+const std::vector<uint8>& PersistentData::getData(uint64 filePathHash, uint64 keyHash) const
 {
 	static const std::vector<uint8> EMPTY;
-	const auto it = mEntries.find(keyHash);
-	return (it == mEntries.end()) ? EMPTY : it->second.mData;
+
+	const File* file = mapFind(mFiles, filePathHash);
+	if (nullptr == file)
+		return EMPTY;
+
+	const Entry* entry = findEntry(*file, keyHash);
+	if (nullptr == entry)
+		return EMPTY;
+
+	return entry->mData;
 }
 
-void PersistentData::setData(std::string_view key, const std::vector<uint8>& data)
+void PersistentData::setData(std::string_view filePath, std::string_view key, const std::vector<uint8>& data)
 {
-	const uint64 keyHash = rmx::getMurmur2_64(key);
-	const auto it = mEntries.find(keyHash);
-	if (it == mEntries.end())
+	const uint64 filePathHash = rmx::getMurmur2_64(filePath);
+	File* file = mapFind(mFiles, filePathHash);
+	if (nullptr == file)
 	{
-		Entry& entry = mEntries[keyHash];
-		entry.mKey = key;
-		entry.mData = data;
-		saveToFile();
+		file = &mFiles[filePathHash];
+		file->mFilePath = filePath;
+	}
+
+	const uint64 keyHash = rmx::getMurmur2_64(key);
+	Entry* entry = findEntry(*file, keyHash);
+	if (nullptr == entry)
+	{
+		// Create new entry
+		entry = &vectorAdd(file->mEntries);
+		entry->mKey = key;
+		entry->mKeyHash = keyHash;
+		entry->mData = data;
+		saveFile(*file);
 	}
 	else
 	{
 		// Check for changes
-		bool anyChange = (it->second.mData.size() != data.size());
-		if (!anyChange)
-		{
-			anyChange = (memcmp(&it->second.mData[0], &data[0], data.size()) != 0);
-		}
-
+		const bool anyChange = (entry->mData.size() != data.size()) || (memcmp(&entry->mData[0], &data[0], data.size()) != 0);
 		if (anyChange)
 		{
-			// Intentionally overwriting the whole data, not just parts of it
-			it->second.mData = data;
-			saveToFile();
+			entry->mData = data;
+			saveFile(*file);
 		}
 	}
 }
 
-void PersistentData::removeKey(uint64 keyHash)
+void PersistentData::removeKey(uint64 filePathHash, uint64 keyHash)
 {
-	const auto it = mEntries.find(keyHash);
-	if (it != mEntries.end())
+	File* file = mapFind(mFiles, filePathHash);
+	if (nullptr == file)
+		return;
+
+	if (removeEntry(*file, keyHash))
 	{
-		mEntries.erase(it);
-		saveToFile();
+		if (file->mEntries.empty())
+		{
+			removeFile(*file);
+		}
+		else
+		{
+			saveFile(*file);
+		}
 	}
 }
 
-bool PersistentData::serialize(VectorBinarySerializer& serializer)
+void PersistentData::initialSetup()
+{
+	FTX::FileSystem->createDirectory(mBasePath);
+
+	std::vector<uint8> content;
+	if (FTX::FileSystem->readFile(mBasePath + L"../persistentdata.bin", content))
+	{
+		const std::string filePath = "persistentdata";
+		const uint64 hash = rmx::getMurmur2_64(filePath);
+
+		File& file = mFiles[hash];
+		file.mFilePath = filePath;
+
+		VectorBinarySerializer serializer(true, content);
+		serializeFile(file, serializer);
+
+		// Save new file in its new location
+		saveFile(file);
+
+		// Rename the old file
+		FTX::FileSystem->renameFile(mBasePath + L"../persistentdata.bin", mBasePath + L"../persistentdata.bin.backup");
+	}
+}
+
+PersistentData::Entry* PersistentData::findEntry(File& file, uint64 keyHash)
+{
+	const auto it = std::find_if(file.mEntries.begin(), file.mEntries.end(), [&](const Entry& entry) { return entry.mKeyHash == keyHash; } );
+	return (it != file.mEntries.end()) ? &*it : nullptr;
+}
+
+const PersistentData::Entry* PersistentData::findEntry(const File& file, uint64 keyHash) const
+{
+	const auto it = std::find_if(file.mEntries.begin(), file.mEntries.end(), [&](const Entry& entry) { return entry.mKeyHash == keyHash; } );
+	return (it != file.mEntries.end()) ? &*it : nullptr;
+}
+
+bool PersistentData::removeEntry(File& file, uint64 keyHash)
+{
+	const auto it = std::find_if(file.mEntries.begin(), file.mEntries.end(), [&](const Entry& entry) { return entry.mKeyHash == keyHash; } );
+	if (it == file.mEntries.end())
+		return false;
+
+	file.mEntries.erase(it);
+	return true;
+}
+
+std::wstring PersistentData::getFullFilePath(const File& file) const
+{
+	return mBasePath + String(file.mFilePath).toStdWString() + L".bin";
+}
+
+bool PersistentData::removeFile(File& file)
+{
+	return FTX::FileSystem->removeFile(getFullFilePath(file));
+}
+
+bool PersistentData::saveFile(File& file)
+{
+	std::vector<uint8> content;
+	VectorBinarySerializer serializer(false, content);
+	if (!serializeFile(file, serializer))
+		return false;
+
+	return FTX::FileSystem->saveFile(getFullFilePath(file), content);
+}
+
+bool PersistentData::serializeFile(File& file, VectorBinarySerializer& serializer)
 {
 	// Identifier
 	if (serializer.isReading())
@@ -120,29 +227,22 @@ bool PersistentData::serialize(VectorBinarySerializer& serializer)
 	}
 
 	// Data entries
+	serializer.serializeArraySize(file.mEntries, 0xffffffff);
 	if (serializer.isReading())
 	{
-		const size_t count = (size_t)serializer.read<uint32>();
-		std::string key;
-		for (size_t i = 0; i < count; ++i)
+		for (Entry& entry : file.mEntries)
 		{
-			serializer.serialize(key);
-			const uint64 keyHash = rmx::getMurmur2_64(key);
-			Entry& entry = mEntries[keyHash];
-			entry.mKey = key;
-			const size_t size = (size_t)serializer.read<uint32>();
-			entry.mData.resize(size);
-			serializer.read(&entry.mData[0], size);
+			serializer.serialize(entry.mKey);
+			entry.mKeyHash = rmx::getMurmur2_64(entry.mKey);
+			serializer.readData(entry.mData);
 		}
 	}
 	else
 	{
-		serializer.writeAs<uint32>(mEntries.size());
-		for (const auto& pair : mEntries)
+		for (const Entry& entry : file.mEntries)
 		{
-			serializer.write(pair.second.mKey);
-			serializer.writeAs<uint32>(pair.second.mData.size());
-			serializer.write(&pair.second.mData[0], pair.second.mData.size());
+			serializer.write(entry.mKey);
+			serializer.writeData(entry.mData);
 		}
 	}
 

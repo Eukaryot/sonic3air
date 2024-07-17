@@ -132,7 +132,7 @@ public:
 	std::wstring mSaveStatesDir;
 	std::wstring mSaveStatesDirLocal;
 	std::wstring mAnalysisDir;
-	std::wstring mPersistentDataFilename;
+	std::wstring mPersistentDataBasePath;
 
 	// General
 	bool   mFailSafeMode = false;

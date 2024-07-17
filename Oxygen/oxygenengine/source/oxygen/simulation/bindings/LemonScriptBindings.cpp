@@ -11,6 +11,7 @@
 #include "oxygen/simulation/bindings/RendererBindings.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
+#include "oxygen/simulation/LemonScriptProgram.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/PersistentData.h"
 #include "oxygen/simulation/Simulation.h"
@@ -39,6 +40,8 @@
 
 namespace
 {
+	static lemon::FlyweightString FLYWEIGHTSTRING_PERSISTENTDATA("persistentdata");
+
 	namespace detail
 	{
 		uint32 loadData(EmulatorInterface& emulatorInterface, uint32 targetAddress, const std::vector<uint8>& data, uint32 offset, uint32 maxBytes)
@@ -64,6 +67,23 @@ namespace
 
 			memcpy(dst, &data[offset], bytes);
 			return bytes;
+		}
+
+		const Mod* getModForCurrentFunction()
+		{
+			CodeExec* codeExec = CodeExec::getActiveInstance();
+			if (nullptr == codeExec)
+				return nullptr;
+
+			const lemon::ControlFlow* controlFlow = lemon::Runtime::getActiveControlFlow();
+			if (nullptr == controlFlow)
+				return nullptr;
+
+			const lemon::ScriptFunction* scriptFunction = controlFlow->getCurrentFunction();
+			if (nullptr == scriptFunction)
+				return nullptr;
+
+			return codeExec->getLemonScriptProgram().getModByModule(scriptFunction->getModule());
 		}
 	}
 
@@ -200,14 +220,31 @@ namespace
 	}
 
 
-	uint32 System_loadPersistentData(uint32 targetAddress, lemon::StringRef key, uint32 maxBytes)
+	uint32 System_loadPersistentData(uint32 targetAddress, uint32 bytes, lemon::StringRef file, lemon::StringRef key, bool localFile)
 	{
-		const std::vector<uint8>& data = PersistentData::instance().getData(key.getHash());
-		return detail::loadData(getEmulatorInterface(), targetAddress, data, 0, maxBytes);
+		if (!key.isValid() || key.isEmpty() || !file.isValid())
+			return 0;
+		if (file.isEmpty())
+			file = lemon::StringRef(FLYWEIGHTSTRING_PERSISTENTDATA);
+
+		uint64 fileHash;
+		const Mod* mod = localFile ? detail::getModForCurrentFunction() : nullptr;
+		if (nullptr != mod)
+			fileHash = rmx::getMurmur2_64(mod->mUniqueID + "/" + std::string(file.getString()));
+		else
+			fileHash = file.getHash();
+
+		const std::vector<uint8>& data = PersistentData::instance().getData(fileHash, key.getHash());
+		return detail::loadData(getEmulatorInterface(), targetAddress, data, 0, bytes);
 	}
 
-	void System_savePersistentData(uint32 sourceAddress, lemon::StringRef key, uint32 bytes)
+	void System_savePersistentData(uint32 sourceAddress, uint32 bytes, lemon::StringRef file, lemon::StringRef key, bool localFile)
 	{
+		if (!key.isValid() || key.isEmpty() || !file.isValid())
+			return;
+		if (file.isEmpty())
+			file = lemon::StringRef(FLYWEIGHTSTRING_PERSISTENTDATA);
+
 		const uint8* src = getEmulatorInterface().getMemoryPointer(sourceAddress, false, bytes);
 		if (nullptr == src)
 			return;
@@ -216,15 +253,33 @@ namespace
 		std::vector<uint8> data;
 		data.resize(size);
 		memcpy(&data[0], src, size);
-		if (key.isValid())
+
+		const Mod* mod = localFile ? detail::getModForCurrentFunction() : nullptr;
+		if (nullptr != mod)
 		{
-			PersistentData::instance().setData(key.getString(), data);
+			PersistentData::instance().setData(mod->mUniqueID + "/" + std::string(file.getString()), key.getString(), data);
+		}
+		else
+		{
+			PersistentData::instance().setData(file.getString(), key.getString(), data);
 		}
 	}
 
-	void System_removePersistentData(lemon::StringRef key)
+	void System_removePersistentData(lemon::StringRef file, lemon::StringRef key, bool localFile)
 	{
-		PersistentData::instance().removeKey(key.getHash());
+		if (!key.isValid() || key.isEmpty() || !file.isValid())
+			return;
+		if (file.isEmpty())
+			file = lemon::StringRef(FLYWEIGHTSTRING_PERSISTENTDATA);
+
+		uint64 fileHash;
+		const Mod* mod = localFile ? detail::getModForCurrentFunction() : nullptr;
+		if (nullptr != mod)
+			fileHash = rmx::getMurmur2_64(mod->mUniqueID + "/" + std::string(file.getString()));
+		else
+			fileHash = file.getHash();
+
+		PersistentData::instance().removeKey(fileHash, key.getHash());
 	}
 
 	bool System_callFunctionByName(lemon::StringRef functionName)
@@ -936,13 +991,13 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 		// Persistent data
 		builder.addNativeFunction("System.loadPersistentData", lemon::wrap(&System_loadPersistentData), defaultFlags)
-			.setParameters("targetAddress", "key", "bytes");
+			.setParameters("targetAddress", "bytes", "file", "key", "localFile");
 
 		builder.addNativeFunction("System.savePersistentData", lemon::wrap(&System_savePersistentData), defaultFlags)
-			.setParameters("sourceAddress", "key", "bytes");
+			.setParameters("sourceAddress", "bytes", "file", "key", "localFile");
 
 		builder.addNativeFunction("System.removePersistentData", lemon::wrap(&System_removePersistentData), defaultFlags)
-			.setParameters("key");
+			.setParameters("file", "key", "localFile");
 
 
 		// System

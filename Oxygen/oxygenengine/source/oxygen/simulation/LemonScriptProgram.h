@@ -13,6 +13,7 @@
 #include <lemon/utility/FlyweightString.h>
 
 
+class Mod;
 namespace lemon
 {
 	class Function;
@@ -89,6 +90,8 @@ public:
 	std::string_view getFunctionNameByHash(uint64 hash) const;
 	lemon::Variable* getGlobalVariableByHash(uint64 hash) const;
 	const std::vector<GlobalDefine>& getGlobalDefines() const  { return mGlobalDefines; }
+
+	const Mod* getModByModule(const lemon::Module& module) const;
 
 	void resolveLocation(uint32 functionId, uint32 programCounter, std::string& scriptFilename, uint32& lineNumber) const;
 

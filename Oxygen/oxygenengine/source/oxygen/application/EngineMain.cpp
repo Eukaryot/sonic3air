@@ -429,7 +429,7 @@ void EngineMain::initDirectories()
 	}
 
 	config.mSaveStatesDirLocal = config.mAppDataPath + L"savestates/";
-	config.mPersistentDataFilename = config.mAppDataPath + L"persistentdata.bin";
+	config.mPersistentDataBasePath = config.mAppDataPath + L"storage/";
 }
 
 bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)

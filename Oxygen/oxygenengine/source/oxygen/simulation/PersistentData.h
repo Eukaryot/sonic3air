@@ -15,22 +15,39 @@ class PersistentData : public SingleInstance<PersistentData>
 {
 public:
 	void clear();
-	bool loadFromFile(const std::wstring& filename);
-	bool saveToFile();
+	void loadFromBasePath(const std::wstring& basePath);
 
-	const std::vector<uint8>& getData(uint64 keyHash) const;
-	void setData(std::string_view key, const std::vector<uint8>& data);
-	void removeKey(uint64 keyHash);
-
-private:
-	bool serialize(VectorBinarySerializer& serializer);
+	const std::vector<uint8>& getData(uint64 filePathHash, uint64 keyHash) const;
+	void setData(std::string_view filePath, std::string_view key, const std::vector<uint8>& data);
+	void removeKey(uint64 filePathHash, uint64 keyHash);
 
 private:
-	std::wstring mFilename;
 	struct Entry
 	{
 		std::string mKey;
+		uint64 mKeyHash = 0;
 		std::vector<uint8> mData;
 	};
-	std::map<uint64, Entry> mEntries;
+
+	struct File
+	{
+		std::string mFilePath;
+		std::vector<Entry> mEntries;
+	};
+
+private:
+	void initialSetup();
+
+	Entry* findEntry(File& file, uint64 keyHash);
+	const Entry* findEntry(const File& file, uint64 keyHash) const;
+	bool removeEntry(File& file, uint64 keyHash);
+
+	std::wstring getFullFilePath(const File& file) const;
+	bool removeFile(File& file);
+	bool saveFile(File& file);
+	bool serializeFile(File& file, VectorBinarySerializer& serializer);
+
+private:
+	std::wstring mBasePath;
+	std::unordered_map<uint64, File> mFiles;
 };

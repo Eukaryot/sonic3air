@@ -137,7 +137,7 @@ function void fn04c97e()
 
 #if STANDALONE
 	// Try to load progress from persistent data
-	System.loadPersistentData(0xffffffa6, "SRAM_BlueSphereProgress", 4)
+	loadAndMigratePersistentData(0xffffffa6, 4, "s3air_bluesphere", "SRAM_BlueSphereProgress", false)
 
 	// Switch to the correct seed for this stage
 	BlueSphere.setGeneratedStage(bluespheregame.current_stage)
@@ -1051,7 +1051,7 @@ function void fn04d488()
 
 	#if STANDALONE
 		// Save progress
-		System.savePersistentData(0xffffffa6, "SRAM_BlueSphereProgress", 4)
+		System.savePersistentData(0xffffffa6, 4, "s3air_bluesphere", "SRAM_BlueSphereProgress", false)
 	#endif
 
 		A2 = 0xfffffc00
@@ -1626,7 +1626,7 @@ function void BlueSphereGame.advanceStages(u8 numStages)
 
 #if STANDALONE
 	// Save progress
-	System.savePersistentData(0xffffffa6, "SRAM_BlueSphereProgress", 4)
+	System.savePersistentData(0xffffffa6, 4, "s3air_bluesphere", "SRAM_BlueSphereProgress", false)
 #endif
 }
 
