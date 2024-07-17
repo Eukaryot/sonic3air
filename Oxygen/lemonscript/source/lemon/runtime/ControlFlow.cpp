@@ -71,4 +71,13 @@ namespace lemon
 		}
 	}
 
+	const ScriptFunction* ControlFlow::getCurrentFunction() const
+	{
+		if (mCallStack.empty())
+			return nullptr;
+
+		const RuntimeFunction* runtimeFunction = mCallStack.back().mRuntimeFunction;
+		return (nullptr != runtimeFunction) ? runtimeFunction->mFunction : nullptr;
+	}
+
 }

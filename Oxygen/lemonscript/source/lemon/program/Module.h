@@ -30,11 +30,19 @@ namespace lemon
 	friend class ModuleSerializer;
 
 	public:
-		explicit Module(const std::string& name);
+		struct AppendedInfo
+		{
+			virtual ~AppendedInfo() {}
+		};
+
+	public:
+		explicit Module(const std::string& name, AppendedInfo* appendedInfo = nullptr);
 		~Module();
 
-		inline const std::string& getModuleName() const { return mModuleName; }
-		inline uint64 getModuleId() const { return mModuleId; }
+		inline const std::string& getModuleName() const  { return mModuleName; }
+		inline uint64 getModuleId() const  { return mModuleId; }
+
+		inline AppendedInfo* getAppendedInfo() const  { return mAppendedInfo; }
 
 		void clear();
 
@@ -98,6 +106,8 @@ namespace lemon
 	private:
 		std::string mModuleName;
 		uint64 mModuleId = 0;
+
+		AppendedInfo* mAppendedInfo = nullptr;
 
 		// Preprocessor definitions
 		std::vector<Constant*> mPreprocessorDefinitions;	// Re-using the Constant class here, and also mConstantPool

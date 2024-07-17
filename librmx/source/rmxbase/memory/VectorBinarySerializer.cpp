@@ -239,26 +239,36 @@ void VectorBinarySerializer::serialize(WString& value)
 
 void VectorBinarySerializer::serializeData(std::vector<uint8>& data, size_t bytesLimit)
 {
-	if (isReading())
+	if (mReading)
 	{
-		const size_t numBytes = readSize(bytesLimit);
-		if (numBytes == 0)
-		{
-			data.clear();
-		}
-		else
-		{
-			data.resize(numBytes);
-			serialize(&data[0], data.size());
-		}
+		readData(data, bytesLimit);
 	}
 	else
 	{
-		writeSize(data.size(), bytesLimit);
-		if (!data.empty())
-		{
-			serialize(&data[0], data.size());
-		}
+		writeData(data, bytesLimit);
+	}
+}
+
+void VectorBinarySerializer::readData(std::vector<uint8>& data, size_t bytesLimit)
+{
+	const size_t numBytes = readSize(bytesLimit);
+	if (numBytes == 0)
+	{
+		data.clear();
+	}
+	else
+	{
+		data.resize(numBytes);
+		read(&data[0], data.size());
+	}
+}
+
+void VectorBinarySerializer::writeData(const std::vector<uint8>& data, size_t bytesLimit)
+{
+	writeSize(data.size(), bytesLimit);
+	if (!data.empty())
+	{
+		write(&data[0], data.size());
 	}
 }
 

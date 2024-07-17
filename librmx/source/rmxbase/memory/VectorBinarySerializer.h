@@ -54,6 +54,8 @@ public:
 
 	// Warning: the "bytesLimit" value must stay consistent between serialization and deserialization
 	void serializeData(std::vector<uint8>& data, size_t bytesLimit = 0xffffffff);
+	void readData(std::vector<uint8>& data, size_t bytesLimit = 0xffffffff);
+	void writeData(const std::vector<uint8>& data, size_t bytesLimit = 0xffffffff);
 
 	template <typename T>
 	void serializeArraySize(std::vector<T>& value, uint32 arraySizeLimit = 0xffff)

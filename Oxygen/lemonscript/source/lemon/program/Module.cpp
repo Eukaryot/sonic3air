@@ -22,9 +22,10 @@ namespace lemon
 	}
 
 
-	Module::Module(const std::string& name) :
+	Module::Module(const std::string& name, AppendedInfo* appendedInfo) :
 		mModuleName(name),
-		mModuleId(rmx::getMurmur2_64(name) & 0xffffffffffff0000ull)
+		mModuleId(rmx::getMurmur2_64(name) & 0xffffffffffff0000ull),
+		mAppendedInfo(appendedInfo)
 	{
 		static_assert((size_t)Opcode::Type::_NUM_TYPES == 36);	// Otherwise DEFAULT_OPCODE_BASETYPES needs to get updated
 	}
@@ -32,6 +33,7 @@ namespace lemon
 	Module::~Module()
 	{
 		clear();
+		delete mAppendedInfo;
 	}
 
 	void Module::clear()

@@ -58,6 +58,7 @@ namespace lemon
 
 		void getCallStack(std::vector<ControlFlow::Location>& outLocations) const;
 		void getLastStepLocation(Location& outLocation) const;
+		const ScriptFunction* getCurrentFunction() const;
 
 		inline size_t getValueStackSize() const  { return mValueStackPtr - mValueStackStart; }
 
