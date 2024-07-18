@@ -100,15 +100,15 @@ void ActSelectMenu::setBaseState(BaseState baseState)
 void ActSelectMenu::onFadeIn()
 {
 	// Update DDZ
-	mZoneEntry->getOptionByValue(0x0c00)->mVisible = PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE);
-	mActEntry->getOptionByValue(0x0c00)->mVisible = PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE);
+	mZoneEntry->getOptionByValue(0x0c00)->mVisible = PlayerProgress::instance().mUnlocks.isSecretUnlocked(SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE);
+	mActEntry->getOptionByValue(0x0c00)->mVisible = PlayerProgress::instance().mUnlocks.isSecretUnlocked(SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE);
 
 	mState = State::APPEAR;
 
 	mMenuBackground->showPreview(true);
 	mMenuBackground->startTransition(MenuBackground::Target::LIGHT);
 
-	if (PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_KNUX_AND_TAILS))
+	if (PlayerProgress::instance().mUnlocks.isSecretUnlocked(SharedDatabase::Secret::SECRET_KNUX_AND_TAILS))
 	{
 		if (mCharacterEntry->mOptions.size() < 5)
 		{

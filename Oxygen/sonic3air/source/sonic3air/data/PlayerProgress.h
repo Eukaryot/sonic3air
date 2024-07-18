@@ -13,36 +13,52 @@
 
 namespace detail
 {
-	struct PlayerProgressData
+	struct PlayerAchievementsData
 	{
 	public:
-		uint32 mFinishedZoneAct = 0;	// Bitmask, one bit per zone / act combination (e.g. bit 7 for CNZ 2)
-		uint32 mFinishedZoneActByCharacter[3];
-		uint32 mUnlockedSecrets = 0;	// Bitmask, see SharedDatabase::Secret::Type enum for bit indices
 		std::map<uint32, uint32> mAchievementStates;
 
 	public:
-		PlayerProgressData();
-
 		uint32 getAchievementState(uint32 id) const;
+
+		bool isEqual(const PlayerAchievementsData& other) const;
+		void serializeAchievements(VectorBinarySerializer& serializer);
+	};
+
+	struct PlayerUnlocksData
+	{
+	public:
+		uint32 mUnlockedSecrets = 0;	// Bitmask, see SharedDatabase::Secret::Type enum for bit indices
+		uint32 mFinishedZoneAct = 0;	// Bitmask, one bit per zone / act combination (e.g. bit 7 for CNZ 2)
+		uint32 mFinishedZoneActByCharacter[3] = { 0 };
+
+	public:
 		bool isSecretUnlocked(uint32 id) const;
 		void setSecretUnlocked(uint32 id);
 
-	protected:
-		bool isEqual(const PlayerProgressData& other) const;
+		bool isEqual(const PlayerUnlocksData& other) const;
+		void serializeSecrets(VectorBinarySerializer& serializer);
+		void serializeFinishedZoneActs(VectorBinarySerializer& serializer);
 	};
 }
 
 
-class PlayerProgress : public detail::PlayerProgressData, public SingleInstance<PlayerProgress>
+class PlayerProgress : public SingleInstance<PlayerProgress>
 {
 public:
+	// Current progress
+	detail::PlayerAchievementsData mAchievements;
+	detail::PlayerUnlocksData mUnlocks;
+
+public:
 	bool load();
-	bool save(bool force = false);
+	void save(bool force = false);
 
 private:
-	bool serialize(VectorBinarySerializer& serializer);
+	bool loadLegacy(VectorBinarySerializer& serializer);
 
 private:
-	PlayerProgressData mWrittenInFile;
+	// Progress read from file
+	detail::PlayerAchievementsData mSavedAchievements;
+	detail::PlayerUnlocksData mSavedUnlocks;
 };

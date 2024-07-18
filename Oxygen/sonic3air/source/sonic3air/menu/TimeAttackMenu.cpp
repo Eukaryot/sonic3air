@@ -137,7 +137,7 @@ void TimeAttackMenu::initialize()
 	RMX_CHECK(nullptr != option, "Option for Max Control not found", );
 	if (nullptr != option)
 	{
-		option->mVisible = PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_SUPER_PEELOUT);
+		option->mVisible = PlayerProgress::instance().mUnlocks.isSecretUnlocked(SharedDatabase::Secret::SECRET_SUPER_PEELOUT);
 	}
 }
 

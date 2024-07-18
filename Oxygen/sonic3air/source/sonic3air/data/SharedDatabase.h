@@ -159,7 +159,7 @@ public:
 		std::string mDescription;
 		std::string mHint;
 		std::string mImage;
-		int32 mValue = 0;	// Temporary value used by scripts for whetever they need to store
+		int32 mValue = 0;	// Temporary value used by scripts for whatever they need to store
 	};
 
 	struct Secret

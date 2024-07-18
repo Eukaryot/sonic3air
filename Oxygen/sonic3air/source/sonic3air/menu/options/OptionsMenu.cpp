@@ -46,7 +46,7 @@ namespace
 		{
 			if (mHideInGame && enteredFromIngame)
 				return false;
-			if (mDependsOnSecret && !PlayerProgress::instance().isSecretUnlocked(mSecret))
+			if (mDependsOnSecret && !PlayerProgress::instance().mUnlocks.isSecretUnlocked(mSecret))
 				return false;
 			return true;
 		}

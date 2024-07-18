@@ -98,7 +98,7 @@ void ExtrasMenu::onFadeIn()
 	mAchievementsCompleted = 0;
 	for (const SharedDatabase::Achievement& achievement : SharedDatabase::getAchievements())
 	{
-		if (PlayerProgress::instance().getAchievementState(achievement.mType) != 0)
+		if (PlayerProgress::instance().mAchievements.getAchievementState(achievement.mType) != 0)
 			++mAchievementsCompleted;
 	}
 
@@ -117,7 +117,7 @@ void ExtrasMenu::onFadeIn()
 				secret.mType == SharedDatabase::Secret::SECRET_BLUE_SPHERE ||
 				secret.mType == SharedDatabase::Secret::SECRET_LEVELSELECT)
 			{
-				if (PlayerProgress::instance().isSecretUnlocked(secret.mType))
+				if (PlayerProgress::instance().mUnlocks.isSecretUnlocked(secret.mType))
 				{
 					entries.addEntry(secret.mName, secret.mType);
 				}
@@ -138,7 +138,7 @@ void ExtrasMenu::onFadeIn()
 				continue;
 			if (!secret.mSerialized)	// Excludes the Competition Mode secret, which is not a secret at all actually
 				continue;
-			if (secret.mHiddenUntilUnlocked && !PlayerProgress::instance().isSecretUnlocked(secret.mType))
+			if (secret.mHiddenUntilUnlocked && !PlayerProgress::instance().mUnlocks.isSecretUnlocked(secret.mType))
 				continue;
 
 			entries.addEntry(secret.mName, secret.mType);
@@ -156,7 +156,7 @@ void ExtrasMenu::onFadeIn()
 		{
 			for (const SharedDatabase::Achievement& achievement : SharedDatabase::getAchievements())
 			{
-				const bool isComplete = (PlayerProgress::instance().getAchievementState(achievement.mType) != 0);
+				const bool isComplete = (PlayerProgress::instance().mAchievements.getAchievementState(achievement.mType) != 0);
 				if (isComplete == (pass == 1))
 				{
 					entries.addEntry(achievement.mName, achievement.mType);
@@ -257,7 +257,7 @@ void ExtrasMenu::update(float timeElapsed)
 				Tab& tab = mTabs[mActiveTab];
 				const GameMenuEntry& selectedEntry = tab.mMenuEntries.selected();
 				if (mActiveTab == 0 &&
-					PlayerProgress::instance().isSecretUnlocked(selectedEntry.mData) &&
+					PlayerProgress::instance().mUnlocks.isSecretUnlocked(selectedEntry.mData) &&
 					(selectedEntry.mData == SharedDatabase::Secret::SECRET_COMPETITION_MODE ||
 					 selectedEntry.mData == SharedDatabase::Secret::SECRET_BLUE_SPHERE ||
 					 selectedEntry.mData == SharedDatabase::Secret::SECRET_LEVELSELECT))
@@ -305,7 +305,7 @@ void ExtrasMenu::update(float timeElapsed)
 			if (mState == State::FADE_TO_GAME && mActiveTab == 0)
 			{
 				const GameMenuEntry& selectedEntry = mTabs[mActiveTab].mMenuEntries.selected();
-				if (PlayerProgress::instance().isSecretUnlocked(selectedEntry.mData))
+				if (PlayerProgress::instance().mUnlocks.isSecretUnlocked(selectedEntry.mData))
 				{
 					switch (selectedEntry.mData)
 					{
@@ -433,7 +433,7 @@ void ExtrasMenu::render()
 
 				const SharedDatabase::Secret* secret = SharedDatabase::getSecret(entry.mData);
 				RMX_ASSERT(nullptr != secret, "Invalid secret ID");
-				const bool isUnlocked = PlayerProgress::instance().isSecretUnlocked(entry.mData);
+				const bool isUnlocked = PlayerProgress::instance().mUnlocks.isSecretUnlocked(entry.mData);
 
 				py += 8;
 				const int localStartY = py;
@@ -493,7 +493,7 @@ void ExtrasMenu::render()
 				// Achievements
 				const SharedDatabase::Achievement* achievement = SharedDatabase::getAchievement(entry.mData);
 				RMX_ASSERT(nullptr != achievement, "Invalid achievement ID");
-				const bool isComplete = (PlayerProgress::instance().getAchievementState(entry.mData) != 0);
+				const bool isComplete = (PlayerProgress::instance().mAchievements.getAchievementState(entry.mData) != 0);
 
 				const int newSection = isComplete ? 2 : 1;
 				if (section != newSection)

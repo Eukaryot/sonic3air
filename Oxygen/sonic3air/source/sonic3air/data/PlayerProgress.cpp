@@ -12,35 +12,53 @@
 #include "sonic3air/version.inc"
 
 #include "oxygen/application/Configuration.h"
-
-
-namespace
-{
-	const uint16 FORMAT_VERSION = 0x0101;		// General player progress file format version
-	const uint32 GAME_VERSION   = BUILD_NUMBER;	// Game build, just to have the information
-}
+#include "oxygen/simulation/PersistentData.h"
 
 
 namespace detail
 {
-	PlayerProgressData::PlayerProgressData()
+	uint32 PlayerAchievementsData::getAchievementState(uint32 id) const
 	{
-		for (int i = 0; i < 3; ++i)
-			mFinishedZoneActByCharacter[i] = 0;
+		const uint32* state = mapFind(mAchievementStates, id);
+		return (nullptr == state) ? 0 : *state;
 	}
 
-	uint32 PlayerProgressData::getAchievementState(uint32 id) const
+	bool PlayerAchievementsData::isEqual(const PlayerAchievementsData& other) const
 	{
-		const auto it = mAchievementStates.find(id);
-		return (it == mAchievementStates.end()) ? 0 : it->second;
+		return (mAchievementStates == other.mAchievementStates);
 	}
 
-	bool PlayerProgressData::isSecretUnlocked(uint32 id) const
+	void PlayerAchievementsData::serializeAchievements(VectorBinarySerializer& serializer)
+	{
+		if (serializer.isReading())
+		{
+			mAchievementStates.clear();
+			const uint32 count = serializer.read<uint32>();
+			for (uint32 i = 0; i < count; ++i)
+			{
+				const uint32 id = serializer.read<uint32>();
+				const uint32 state = serializer.read<uint32>();
+				mAchievementStates[id] = state;
+			}
+		}
+		else
+		{
+			serializer.writeAs<uint32>(mAchievementStates.size());
+			for (const auto pair : mAchievementStates)
+			{
+				serializer.write(pair.first);
+				serializer.write(pair.second);
+			}
+		}
+	}
+
+
+	bool PlayerUnlocksData::isSecretUnlocked(uint32 id) const
 	{
 		return (id < 0x20) ? ((mUnlockedSecrets & (1 << id)) != 0) : true;
 	}
 
-	void PlayerProgressData::setSecretUnlocked(uint32 id)
+	void PlayerUnlocksData::setSecretUnlocked(uint32 id)
 	{
 		if (id < 0x20)
 		{
@@ -48,8 +66,11 @@ namespace detail
 		}
 	}
 
-	bool PlayerProgressData::isEqual(const PlayerProgressData& other) const
+	bool PlayerUnlocksData::isEqual(const PlayerUnlocksData& other) const
 	{
+		if (mUnlockedSecrets != other.mUnlockedSecrets)
+			return false;
+
 		if (mFinishedZoneAct != other.mFinishedZoneAct)
 			return false;
 
@@ -58,52 +79,116 @@ namespace detail
 			if (mFinishedZoneActByCharacter[i] != other.mFinishedZoneActByCharacter[i])
 				return false;
 		}
-
-		if (mUnlockedSecrets != other.mUnlockedSecrets)
-			return false;
-
-		if (mAchievementStates != other.mAchievementStates)
-			return false;
-
 		return true;
+	}
+
+	void PlayerUnlocksData::serializeSecrets(VectorBinarySerializer& serializer)
+	{
+		serializer & mUnlockedSecrets;
+	}
+
+	void PlayerUnlocksData::serializeFinishedZoneActs(VectorBinarySerializer& serializer)
+	{
+		serializer & mFinishedZoneAct;
+		for (int i = 0; i < 3; ++i)
+			serializer & mFinishedZoneActByCharacter[i];
 	}
 }
 
 
 bool PlayerProgress::load()
 {
-	std::vector<uint8> buffer;
-	if (!FTX::FileSystem->readFile(Configuration::instance().mAppDataPath + L"playerprogress.bin", buffer))
-		return false;
+	// Prefer loading from persistent data
+	PersistentData& persistentData = PersistentData::instance();
 
-	VectorBinarySerializer serializer(true, buffer);
-	if (!serialize(serializer))
-		return false;
+	const std::vector<uint8>& achievementsData = persistentData.getData(rmx::getMurmur2_64("s3air_achievements"), rmx::getMurmur2_64("Achievements"));
+	const std::vector<uint8>& secretsData = persistentData.getData(rmx::getMurmur2_64("s3air_unlocks"), rmx::getMurmur2_64("Secrets"));
+	const std::vector<uint8>& finishedZoneActsData = persistentData.getData(rmx::getMurmur2_64("s3air_unlocks"), rmx::getMurmur2_64("FinishedZoneActs"));
 
-	mWrittenInFile = *this;
+	if (!achievementsData.empty() || !secretsData.empty() || !finishedZoneActsData.empty())
+	{
+		if (!achievementsData.empty())
+		{
+			VectorBinarySerializer serializer(true, achievementsData);
+			mAchievements.serializeAchievements(serializer);
+		}
+
+		if (!secretsData.empty())
+		{
+			VectorBinarySerializer serializer(true, secretsData);
+			mUnlocks.serializeSecrets(serializer);
+		}
+
+		if (!finishedZoneActsData.empty())
+		{
+			VectorBinarySerializer serializer(true, finishedZoneActsData);
+			mUnlocks.serializeFinishedZoneActs(serializer);
+		}
+	}
+	else
+	{
+		// Try to load from old "playerprogress.bin"
+		std::vector<uint8> buffer;
+		if (!FTX::FileSystem->readFile(Configuration::instance().mAppDataPath + L"playerprogress.bin", buffer))
+			return false;
+
+		VectorBinarySerializer serializer(true, buffer);
+		if (!loadLegacy(serializer))
+			return false;
+
+		// Save immediately
+		save(true);
+
+		// Rename the old file
+		FTX::FileSystem->renameFile(Configuration::instance().mAppDataPath + L"playerprogress.bin", Configuration::instance().mAppDataPath + L"playerprogress.bin.backup");
+	}
+
+	mSavedAchievements = mAchievements;
+	mSavedUnlocks = mUnlocks;
 	return true;
 }
 
-bool PlayerProgress::save(bool force)
+void PlayerProgress::save(bool force)
 {
-	// Check for changes
-	if (!force && isEqual(mWrittenInFile))
-		return true;
+	PersistentData& persistentData = PersistentData::instance();
 
-	std::vector<uint8> buffer;
-	VectorBinarySerializer serializer(false, buffer);
-	if (!serialize(serializer))
-		return false;
+	// Achievements
+	if (force || mAchievements.isEqual(mSavedAchievements))
+	{
+		std::vector<uint8> buffer;
+		VectorBinarySerializer serializer(false, buffer);
+		mAchievements.serializeAchievements(serializer);
+		persistentData.setData("s3air_achievements", "Achievements", buffer);
 
-	if (!FTX::FileSystem->saveFile(Configuration::instance().mAppDataPath + L"playerprogress.bin", buffer))
-		return false;
+		mSavedAchievements = mAchievements;
+	}
 
-	mWrittenInFile = *this;
-	return true;
+	// Unlocks
+	if (force || mUnlocks.isEqual(mSavedUnlocks))
+	{
+		std::vector<uint8> buffer;
+		{
+			VectorBinarySerializer serializer(false, buffer);
+			mUnlocks.serializeSecrets(serializer);
+			persistentData.setData("s3air_unlocks", "Secrets", buffer);
+		}
+
+		buffer.clear();
+		{
+			VectorBinarySerializer serializer(false, buffer);
+			mAchievements.serializeAchievements(serializer);
+			persistentData.setData("s3air_unlocks", "FinishedZoneActs", buffer);
+		}
+
+		mSavedUnlocks = mUnlocks;
+	}
 }
 
-bool PlayerProgress::serialize(VectorBinarySerializer& serializer)
+bool PlayerProgress::loadLegacy(VectorBinarySerializer& serializer)
 {
+	const uint16 FORMAT_VERSION = 0x0101;		// General player progress file format version
+	const uint32 GAME_VERSION   = BUILD_NUMBER;	// Game build, just to have the information
+
 	// Identifier
 	char identifier[9] = "S3AIRPGR";
 	serializer.serialize(identifier, 8);
@@ -126,37 +211,16 @@ bool PlayerProgress::serialize(VectorBinarySerializer& serializer)
 	uint32 gameVersion = GAME_VERSION;
 	serializer & gameVersion;
 
-	// Actual player progress data
-	serializer & mFinishedZoneAct;
-	for (int i = 0; i < 3; ++i)
-		serializer & mFinishedZoneActByCharacter[i];
+	// Zone & acts progress
+	mUnlocks.serializeFinishedZoneActs(serializer);
 
 	// Secrets
-	serializer & mUnlockedSecrets;
+	mUnlocks.serializeSecrets(serializer);
 
 	// Achievements
 	if (formatVersion >= 0x0101)
 	{
-		if (serializer.isReading())
-		{
-			mAchievementStates.clear();
-			const uint32 count = serializer.read<uint32>();
-			for (uint32 i = 0; i < count; ++i)
-			{
-				const uint32 id = serializer.read<uint32>();
-				const uint32 state = serializer.read<uint32>();
-				mAchievementStates[id] = state;
-			}
-		}
-		else
-		{
-			serializer.writeAs<uint32>(mAchievementStates.size());
-			for (const auto pair : mAchievementStates)
-			{
-				serializer.write(pair.first);
-				serializer.write(pair.second);
-			}
-		}
+		mAchievements.serializeAchievements(serializer);
 	}
 
 	return true;

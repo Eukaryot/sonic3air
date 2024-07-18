@@ -304,7 +304,7 @@ void Game::checkForUnlockedSecrets()
 	uint32 achievementsCompleted = 0;
 	for (const SharedDatabase::Achievement& achievement : SharedDatabase::getAchievements())
 	{
-		if (mPlayerProgress.getAchievementState(achievement.mType) > 0)
+		if (mPlayerProgress.mAchievements.getAchievementState(achievement.mType) > 0)
 		{
 			++achievementsCompleted;
 		}
@@ -312,10 +312,10 @@ void Game::checkForUnlockedSecrets()
 
 	for (const SharedDatabase::Secret& secret : SharedDatabase::getSecrets())
 	{
-		if (secret.mUnlockedByAchievements && !mPlayerProgress.isSecretUnlocked(secret.mType) && achievementsCompleted >= secret.mRequiredAchievements)
+		if (secret.mUnlockedByAchievements && !mPlayerProgress.mUnlocks.isSecretUnlocked(secret.mType) && achievementsCompleted >= secret.mRequiredAchievements)
 		{
 			// Unlock secret now
-			mPlayerProgress.setSecretUnlocked(secret.mType);
+			mPlayerProgress.mUnlocks.setSecretUnlocked(secret.mType);
 			GameApp::instance().showUnlockedWindow(SecretUnlockedWindow::EntryType::SECRET, "Secret unlocked!", secret.mName);
 		}
 	}
@@ -906,7 +906,7 @@ void Game::setAchievementValue(uint32 achievementId, int32 value)
 
 bool Game::isAchievementComplete(uint32 achievementId)
 {
-	return (mPlayerProgress.getAchievementState(achievementId) != 0);
+	return (mPlayerProgress.mAchievements.getAchievementState(achievementId) != 0);
 }
 
 void Game::setAchievementComplete(uint32 achievementId)
@@ -916,9 +916,9 @@ void Game::setAchievementComplete(uint32 achievementId)
 	if (hasDebugModeActive && !EngineMain::getDelegate().useDeveloperFeatures())
 		return;
 
-	if (mPlayerProgress.getAchievementState(achievementId) == 0)
+	if (mPlayerProgress.mAchievements.getAchievementState(achievementId) == 0)
 	{
-		mPlayerProgress.mAchievementStates[achievementId] = 1;
+		mPlayerProgress.mAchievements.mAchievementStates[achievementId] = 1;
 		SharedDatabase::Achievement* achievement = SharedDatabase::getAchievement(achievementId);
 		if (nullptr != achievement)
 		{
@@ -936,7 +936,7 @@ void Game::setAchievementComplete(uint32 achievementId)
 
 bool Game::isSecretUnlocked(uint32 secretId)
 {
-	return mPlayerProgress.isSecretUnlocked(secretId);
+	return mPlayerProgress.mUnlocks.isSecretUnlocked(secretId);
 }
 
 void Game::setSecretUnlocked(uint32 secretId)
@@ -944,9 +944,9 @@ void Game::setSecretUnlocked(uint32 secretId)
 	SharedDatabase::Secret* secret = SharedDatabase::getSecret(secretId);
 	RMX_CHECK(nullptr != secret, "Secret with ID " << secretId << " not found", return);
 
-	if (!mPlayerProgress.isSecretUnlocked(secretId))
+	if (!mPlayerProgress.mUnlocks.isSecretUnlocked(secretId))
 	{
-		mPlayerProgress.setSecretUnlocked(secretId);
+		mPlayerProgress.mUnlocks.setSecretUnlocked(secretId);
 		const char* text = (secret->mType == SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE) ? "Unlocked in Act Select" : "Found hidden secret!";
 		GameApp::instance().showUnlockedWindow(SecretUnlockedWindow::EntryType::SECRET, text, secret->mName);
 		mPlayerProgress.save();
@@ -980,8 +980,8 @@ void Game::onZoneActCompleted(uint16 zoneAndAct)
 	const uint32 bitValue = (1 << bitNumber);
 	const uint8 character = clamp(mLastCharacters, 1, 3) - 1;
 
-	mPlayerProgress.mFinishedZoneAct |= bitValue;
-	mPlayerProgress.mFinishedZoneActByCharacter[character] |= bitValue;
+	mPlayerProgress.mUnlocks.mFinishedZoneAct |= bitValue;
+	mPlayerProgress.mUnlocks.mFinishedZoneActByCharacter[character] |= bitValue;
 	mPlayerProgress.save();
 }
 
