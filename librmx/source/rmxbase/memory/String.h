@@ -106,6 +106,7 @@ public:
 
 	bool equal(const StringTemplate& str) const;
 	int compare(const StringTemplate& str) const;
+	int compare(const CHAR* str) const;
 
 	int countChar(CHAR ch) const;
 	int findChar(CHAR ch, int pos, int dir) const;
@@ -183,6 +184,13 @@ public:
 	CLASS operator+(unsigned int value) const	{ CLASS result(*this); result.addInt(value);    return result; }
 	CLASS operator+(float value) const			{ CLASS result(*this); result.addFloat(value);  return result; }
 	CLASS operator+(double value) const			{ CLASS result(*this); result.addDouble(value); return result; }
+
+	inline bool operator==(const CHAR* str) const	{ return compare(str) == 0; }
+	inline bool operator!=(const CHAR* str) const	{ return compare(str) != 0; }
+	inline bool operator<=(const CHAR* str) const	{ return compare(str) <= 0; }
+	inline bool operator>=(const CHAR* str) const	{ return compare(str) >= 0; }
+	inline bool operator<(const CHAR* str) const	{ return compare(str) < 0; }
+	inline bool operator>(const CHAR* str) const	{ return compare(str) > 0; }
 
 	inline bool operator==(const CLASS& str) const	{ return equal(str); }
 	inline bool operator!=(const CLASS& str) const	{ return !equal(str); }

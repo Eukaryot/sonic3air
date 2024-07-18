@@ -544,6 +544,21 @@ TEMPLATE int STRING::compare(const STRING& str) const
 	return 0;
 }
 
+TEMPLATE int STRING::compare(const CHAR* str) const
+{
+	// Compare two strings
+	for (size_t i = 0; i <= mLength; ++i)
+	{
+		if (mData[i] < str[i])
+			return -1;
+		if (mData[i] > str[i])
+			return +1;
+		if (mData[i] == 0)	// Just in case there's a \0 somewhere inside the string
+			return 0;
+	}
+	return 0;
+}
+
 TEMPLATE int STRING::countChar(CHAR ch) const
 {
 	// Count occurences of a character
