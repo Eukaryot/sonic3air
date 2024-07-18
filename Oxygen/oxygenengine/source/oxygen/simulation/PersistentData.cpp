@@ -90,6 +90,14 @@ void PersistentData::setData(std::string_view filePath, std::string_view key, co
 	File* file = mapFind(mFiles, filePathHash);
 	if (nullptr == file)
 	{
+		// Sanity checks
+		{
+			std::wstring path = String(filePath).toStdWString();
+			RMX_CHECK(rmx::FileIO::isValidFileName(path), "Persistent data file path '" << filePath << "' contains illegal characters for file names (like \" < > : | ? * )", return);
+			rmx::FileIO::normalizePath(path, false);
+			RMX_CHECK(!rmx::startsWith(path, L".."), "Persistent data file path '" << filePath << "' must not point outside the persistent data directory", return);
+		}
+
 		file = &mFiles[filePathHash];
 		file->mFilePath = filePath;
 	}

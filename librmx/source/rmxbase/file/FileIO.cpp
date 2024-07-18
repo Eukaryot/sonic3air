@@ -218,6 +218,25 @@ namespace rmx
 				}
 			}
 		}
+
+		struct FileNameCharacterValidityLookup
+		{
+			FileNameCharacterValidityLookup()
+			{
+				for (int k = 32; k < 128; ++k)		// Exclude non-printable ASCII characters
+					mIsCharacterValid.setBit(k);
+				const std::wstring invalidCharacters = L"\"<>:|?*";		// Technically not all of these characters are problematic on all platforms, but we treat them all as illegal to avoid cross-platform issues
+				for (wchar_t ch : invalidCharacters)
+					mIsCharacterValid.clearBit(ch);
+			}
+
+			bool isValid(wchar_t ch) const  { return ch >= 128 || mIsCharacterValid.isBitSet(ch); }
+
+			BitArray<128> mIsCharacterValid;
+		};
+
+		static FileNameCharacterValidityLookup mFileNameCharacterValidityLookup;
+
 	}
 
 
@@ -522,6 +541,29 @@ namespace rmx
 		{
 			// No change, so input path is fine as result
 			return path;
+		}
+	}
+
+	bool FileIO::isValidFileName(std::wstring_view filename)
+	{
+		for (wchar_t ch : filename)
+		{
+			if (!mFileNameCharacterValidityLookup.isValid(ch))
+				return false;
+		}
+		return true;
+	}
+
+	void FileIO::sanitizeFileName(std::wstring& filename)
+	{
+		// Replace all characters that are not valid in a file name
+		//  -> Note that this does not replace slashes (though it converts backslashes to forward slashes)
+		for (wchar_t& ch : filename)
+		{
+			if (!mFileNameCharacterValidityLookup.isValid(ch))
+				ch = L'_';
+			else if (ch == L'\\')
+				ch = L'/';
 		}
 	}
 

@@ -357,6 +357,12 @@ bool ZipFileProvider::scanZipFile(const std::wstring& zipFilename)
 			std::wstring name;
 			std::wstring extension;
 			rmx::FileIO::splitPath(localPath, &localBasePath, &name, &extension);
+			rmx::FileIO::normalizePath(localBasePath, false);	// Using parameter isDirectory = false so that no slash gets added here
+			if (rmx::startsWith(localBasePath, L".."))
+			{
+				RMX_ERROR("Local path '" << WString(localPath).toStdString() << "' inside zip file '" << WString(zipFilename).toStdString() << "' contains a path pointing outside of the zip directory", );
+				continue;
+			}
 			localName = extension.empty() ? name : (name + L'.' + extension);
 		}
 

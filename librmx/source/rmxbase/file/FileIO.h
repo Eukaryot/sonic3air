@@ -45,6 +45,9 @@ namespace rmx
 		static void normalizePath(std::wstring& path, bool isDirectory);
 		static std::wstring_view normalizePath(std::wstring_view path, std::wstring& tempBuffer, bool isDirectory);
 
+		static bool isValidFileName(std::wstring_view filename);
+		static void sanitizeFileName(std::wstring& filename);
+
 		static std::wstring getCurrentDirectory();
 		static void setCurrentDirectory(std::wstring_view path);
 
