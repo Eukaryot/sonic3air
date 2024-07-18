@@ -17,6 +17,8 @@ public:
 	void clear();
 	void loadFromBasePath(const std::wstring& basePath);
 
+	void updatePersistentData();
+
 	const std::vector<uint8>& getData(uint64 filePathHash, uint64 keyHash) const;
 	void setData(std::string_view filePath, std::string_view key, const std::vector<uint8>& data);
 	void removeKey(uint64 filePathHash, uint64 keyHash);
@@ -50,4 +52,5 @@ private:
 private:
 	std::wstring mBasePath;
 	std::unordered_map<uint64, File> mFiles;
+	std::unordered_set<uint64> mPendingFileSaves;
 };

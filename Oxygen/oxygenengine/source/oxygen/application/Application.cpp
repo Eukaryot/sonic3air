@@ -32,6 +32,7 @@
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/LogDisplay.h"
+#include "oxygen/simulation/PersistentData.h"
 #include "oxygen/simulation/Simulation.h"
 
 
@@ -496,6 +497,9 @@ void Application::update(float timeElapsed)
 		if (mMouseHideTimer >= MOUSE_HIDE_TIME)
 			SDL_ShowCursor(0);
 	}
+
+	// Update persistent data
+	PersistentData::instance().updatePersistentData();
 
 	if (mIsVeryFirstFrameForLogging)
 	{

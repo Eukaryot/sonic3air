@@ -230,6 +230,8 @@ public:
 	WString toWString() const;
 	std::string toStdString() const;
 	std::wstring toStdWString() const;
+
+	operator const std::string_view() const  { return std::string_view(mData, mLength); }
 };
 
 
@@ -258,6 +260,8 @@ public:
 	String toUTF8() const;
 	std::string toStdString() const;
 	std::wstring toStdWString() const;
+
+	operator const std::wstring_view() const  { return std::wstring_view(mData, mLength); }
 
 	void fromUTF8(const char* str, size_t length);
 	void fromUTF8(const String& str);

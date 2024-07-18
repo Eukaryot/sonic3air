@@ -69,6 +69,20 @@ void PersistentData::loadFromBasePath(const std::wstring& basePath)
 	}
 }
 
+void PersistentData::updatePersistentData()
+{
+	// Save files
+	for (uint64 filePathHash : mPendingFileSaves)
+	{
+		File* file = mapFind(mFiles, filePathHash);
+		if (nullptr != file)
+		{
+			saveFile(*file);
+		}
+	}
+	mPendingFileSaves.clear();
+}
+
 const std::vector<uint8>& PersistentData::getData(uint64 filePathHash, uint64 keyHash) const
 {
 	static const std::vector<uint8> EMPTY;
@@ -92,10 +106,9 @@ void PersistentData::setData(std::string_view filePath, std::string_view key, co
 	{
 		// Sanity checks
 		{
-			std::wstring path = String(filePath).toStdWString();
+			const WString path = String(filePath).toWString();
 			RMX_CHECK(rmx::FileIO::isValidFileName(path), "Persistent data file path '" << filePath << "' contains illegal characters for file names (like \" < > : | ? * )", return);
-			rmx::FileIO::normalizePath(path, false);
-			RMX_CHECK(!rmx::startsWith(path, L".."), "Persistent data file path '" << filePath << "' must not point outside the persistent data directory", return);
+			RMX_CHECK(path.findString(L"..") == -1, "Persistent data file path '" << filePath << "' must not contain \"..\"", return);
 		}
 
 		file = &mFiles[filePathHash];
@@ -111,18 +124,19 @@ void PersistentData::setData(std::string_view filePath, std::string_view key, co
 		entry->mKey = key;
 		entry->mKeyHash = keyHash;
 		entry->mData = data;
-		saveFile(*file);
+		mPendingFileSaves.insert(filePathHash);
 	}
 	else
 	{
 		// Check for changes
 		const bool anyChange = (entry->mData.size() != data.size()) || (memcmp(&entry->mData[0], &data[0], data.size()) != 0);
-		if (anyChange)
-		{
-			entry->mData = data;
-			saveFile(*file);
-		}
+		if (!anyChange)
+			return;
+		entry->mData = data;
 	}
+
+	// Don't save file immediately, but wait until the end of frame (call to "PersistentData::updatePersistentData"), as there might be multiple writes in the same frame
+	mPendingFileSaves.insert(filePathHash);
 }
 
 void PersistentData::removeKey(uint64 filePathHash, uint64 keyHash)
@@ -136,10 +150,11 @@ void PersistentData::removeKey(uint64 filePathHash, uint64 keyHash)
 		if (file->mEntries.empty())
 		{
 			removeFile(*file);
+			mPendingFileSaves.erase(filePathHash);
 		}
 		else
 		{
-			saveFile(*file);
+			mPendingFileSaves.insert(filePathHash);
 		}
 	}
 }
@@ -160,7 +175,7 @@ void PersistentData::initialSetup()
 		VectorBinarySerializer serializer(true, content);
 		serializeFile(file, serializer);
 
-		// Save new file in its new location
+		// Save new file immediately in its new location
 		saveFile(file);
 
 		// Rename the old file
