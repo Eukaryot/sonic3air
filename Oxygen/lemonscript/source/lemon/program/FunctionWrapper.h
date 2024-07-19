@@ -20,6 +20,10 @@ namespace lemon
 	{
 		const DataTypeDefinition* mType = nullptr;
 		AnyBaseValue mValue;
+
+		void pushToStack(ControlFlow& controlFlow) const;
+		void popFromStack(ControlFlow& controlFlow);
+		void readFromStack(ControlFlow& controlFlow);
 	};
 
 

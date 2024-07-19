@@ -13,6 +13,28 @@
 
 namespace lemon
 {
+
+	void AnyTypeWrapper::pushToStack(ControlFlow& controlFlow) const
+	{
+		controlFlow.pushValueStack(mValue);
+		controlFlow.pushValueStack(mType->getID());
+	}
+
+	void AnyTypeWrapper::popFromStack(ControlFlow& controlFlow)
+	{
+		const uint16 dataTypeId = controlFlow.popValueStack<uint16>();
+		mType = controlFlow.getProgram().getDataTypeByID(dataTypeId);
+		mValue = controlFlow.popValueStack<AnyBaseValue>();
+	}
+
+	void AnyTypeWrapper::readFromStack(ControlFlow& controlFlow)
+	{
+		const uint16 dataTypeId = controlFlow.readValueStack<uint16>(-1);
+		mType = controlFlow.getProgram().getDataTypeByID(dataTypeId);
+		mValue = controlFlow.readValueStack<AnyBaseValue>(-2);
+	}
+
+
 	namespace traits
 	{
 		template<> const DataTypeDefinition* getDataType<void>()			{ return &PredefinedDataTypes::VOID; }
@@ -51,18 +73,16 @@ namespace lemon
 		template<>
 		void pushStackGeneric(AnyTypeWrapper value, const NativeFunction::Context context)
 		{
-			context.mControlFlow.pushValueStack(value.mValue);
-			context.mControlFlow.pushValueStack(value.mType->getID());
+			value.pushToStack(context.mControlFlow);
 		};
 
 		template<>
 		AnyTypeWrapper popStackGeneric(const NativeFunction::Context context)
 		{
 			AnyTypeWrapper result;
-			const uint16 dataTypeId = context.mControlFlow.popValueStack<uint16>();
-			result.mType = context.mControlFlow.getProgram().getDataTypeByID(dataTypeId);
-			result.mValue = context.mControlFlow.popValueStack<AnyBaseValue>();
+			result.popFromStack(context.mControlFlow);
 			return result;
 		}
 	}
+
 }

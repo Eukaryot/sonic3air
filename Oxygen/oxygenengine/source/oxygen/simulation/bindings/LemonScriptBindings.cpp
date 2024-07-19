@@ -31,6 +31,7 @@
 #include "oxygen/resources/RawDataCollection.h"
 
 #include <lemon/program/ModuleBindingsBuilder.h>
+#include <lemon/program/Program.h>
 #include <lemon/runtime/Runtime.h>
 
 #include <rmxmedia.h>
@@ -427,12 +428,6 @@ namespace
 			LemonScriptBindings::mDebugNotificationInterface->onScriptLog(*String(0, "%04d", lineNumber), valueString);
 	}
 
-	void logSetter(int64 value, bool decimal)
-	{
-		const std::string valueString = decimal ? *String(0, "%d", value) : *String(0, "%08x", value);
-		debugLogInternal(valueString);
-	}
-
 	template<typename T>
 	void debugLogIntSigned(T value)
 	{
@@ -524,6 +519,22 @@ namespace
 
 			default:
 				break;
+		}
+	}
+
+	void logSetter(lemon::ControlFlow& controlFlow, bool decimal)
+	{
+		lemon::AnyTypeWrapper wrapper;
+		wrapper.readFromStack(controlFlow);
+
+		if (decimal && wrapper.mType->getClass() == lemon::DataTypeDefinition::Class::INTEGER)
+		{
+			const std::string valueString = *String(0, "%d", wrapper.mValue);
+			debugLogInternal(valueString);
+		}
+		else
+		{
+			debugLog(wrapper);
 		}
 	}
 
@@ -743,16 +754,17 @@ namespace
 	}
 
 
-	uint64 debugKeyGetter(int index)
+	void debugKeyGetter(lemon::ControlFlow& controlFlow, int index)
 	{
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
 			const int key = index + '0';
-			return (FTX::keyState(key) && FTX::keyChange(key) && !FTX::keyState(SDLK_LALT) && !FTX::keyState(SDLK_RALT)) ? 1 : 0;
+			const bool result = (FTX::keyState(key) && FTX::keyChange(key) && !FTX::keyState(SDLK_LALT) && !FTX::keyState(SDLK_RALT));
+			controlFlow.pushValueStack<uint8>(result ? 1 : 0);
 		}
 		else
 		{
-			return 0;
+			controlFlow.pushValueStack<uint8>(0);
 		}
 	}
 
@@ -1143,11 +1155,11 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 	{
 		// Debug log output
 		{
-			lemon::UserDefinedVariable& var = module.addUserDefinedVariable("Log", &lemon::PredefinedDataTypes::UINT_32);
+			lemon::UserDefinedVariable& var = module.addUserDefinedVariable("Log", &lemon::PredefinedDataTypes::ANY);
 			var.mSetter = std::bind(logSetter, std::placeholders::_1, false);
 		}
 		{
-			lemon::UserDefinedVariable& var = module.addUserDefinedVariable("LogDec", &lemon::PredefinedDataTypes::UINT_32);
+			lemon::UserDefinedVariable& var = module.addUserDefinedVariable("LogDec", &lemon::PredefinedDataTypes::ANY);
 			var.mSetter = std::bind(logSetter, std::placeholders::_1, true);
 		}
 
@@ -1167,7 +1179,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		for (int i = 0; i < 10; ++i)
 		{
 			lemon::UserDefinedVariable& var = module.addUserDefinedVariable("Key" + std::to_string(i), &lemon::PredefinedDataTypes::UINT_8);
-			var.mGetter = std::bind(debugKeyGetter, i);
+			var.mGetter = std::bind(debugKeyGetter, std::placeholders::_1, i);
 		}
 
 

@@ -69,11 +69,10 @@ namespace lemon
 
 		static void exec_OPT_SET_VARIABLE_VALUE_USER_DISCARD(const RuntimeOpcodeContext context)
 		{
-			--context.mControlFlow->mValueStackPtr;
-			const int64 value = *context.mControlFlow->mValueStackPtr;
 			const uint32 variableId = context.getParameter<uint32>();
-			GlobalVariable& variable = static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableByID(variableId));
-			variable.setValue(value);
+			UserDefinedVariable& variable = static_cast<UserDefinedVariable&>(context.mControlFlow->getProgram().getGlobalVariableByID(variableId));
+			variable.mSetter(*context.mControlFlow);	// This is supposed to read the value to set from the value stack (but also leave it there)
+			--context.mControlFlow->mValueStackPtr;
 		}
 
 		template<typename T>

@@ -31,7 +31,8 @@ namespace lemon
 			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8),
 			BinaryOperatorSignature(&PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT),
 			BinaryOperatorSignature(&PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE),
-			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING)	// TODO: Strings need their own binary operations (and only few of them make actual sense...)
+			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING),	// TODO: Strings need their own binary operations (and only few of them make actual sense...)
+			BinaryOperatorSignature(&PredefinedDataTypes::ANY,	   &PredefinedDataTypes::ANY,	  &PredefinedDataTypes::ANY)
 		};
 		static const std::vector<BinaryOperatorSignature> signaturesComparison =
 		{

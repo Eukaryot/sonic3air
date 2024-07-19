@@ -103,17 +103,20 @@ namespace lemon
 }
 
 
-void logValue(int64 value)
+void logValue(ControlFlow& controlFlow)
 {
+	const int64 value = controlFlow.readValueStack<int64>(-1);		// Read the value, but don't remove it from stack
 	std::cout << rmx::hexString(value, 8) << std::endl;
 }
 
-void logValueStr(int64 key)
+void logValueStr(ControlFlow& controlFlow)
 {
+	const uint64 key = controlFlow.readValueStack<uint64>(-1);		// Read the value, but don't remove it from stack
+
 	Runtime* runtime = Runtime::getActiveRuntime();
 	RMX_CHECK(nullptr != runtime, "No lemon script runtime active", return);
 
-	const FlyweightString* storedString = runtime->resolveStringByKey((uint64)key);
+	const FlyweightString* storedString = runtime->resolveStringByKey(key);
 	RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
 
 	std::cout << storedString->getString() << std::endl;
@@ -163,14 +166,14 @@ void logFloat(float value)
 uint32 valueD0 = 0;
 uint32 valueA0 = 0;
 
-uint32 getterD0()
+void getterD0(ControlFlow& controlFlow)
 {
-	return valueD0;
+	controlFlow.pushValueStack(valueD0);
 }
 
-void setterD0(int64 value)
+void setterD0(ControlFlow& controlFlow)
 {
-	valueD0 = (uint32)value;
+	valueD0 = controlFlow.readValueStack<uint32>(-1);	// Read the value, but don't remove it from stack
 }
 
 int64* accessA0()

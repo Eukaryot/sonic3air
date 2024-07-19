@@ -16,6 +16,7 @@
 
 namespace lemon
 {
+	class ControlFlow;
 	class Environment;
 
 
@@ -35,9 +36,6 @@ namespace lemon
 		};
 
 	public:
-		virtual int64 getValue() const = 0;
-		virtual void setValue(int64 value) = 0;
-
 		inline Type getType() const							 { return mType; }
 		inline FlyweightString getName() const				 { return mName; }
 		inline uint32 getID() const							 { return mID; }
@@ -64,9 +62,7 @@ namespace lemon
 	public:
 		inline LocalVariable() : Variable(Type::LOCAL) {}
 
-		// Do not use these for variables, instead look it up in the current state's variables stack
-		int64 getValue() const override		 { return 0; }
-		void setValue(int64 value) override  {}
+		// Local variables get accessed via the current state's variables stack
 	};
 
 
@@ -75,9 +71,7 @@ namespace lemon
 	public:
 		inline GlobalVariable() : Variable(Type::GLOBAL) {}
 
-		// Do not use these for variables, instead look it up in the runtime's global variables list
-		int64 getValue() const override		 { return 0; }
-		void setValue(int64 value) override  {}
+		// Global variables get accessed via the runtime's global variables list
 
 	public:
 		int64 mInitialValue = 0;
@@ -89,12 +83,11 @@ namespace lemon
 	public:
 		inline UserDefinedVariable() : Variable(Type::USER) {}
 
-		int64 getValue() const override		 { return (mGetter) ? mGetter() : 0; }
-		void setValue(int64 value) override  { if (mSetter) mSetter(value); }
-
 	public:
-		std::function<int64()> mGetter;
-		std::function<void(int64)> mSetter;
+		// User defined variables get accessed using their getter and setter methods
+		//  -> Note that these need to read from / write to the value stack, using the given runtime opcode context
+		std::function<void(ControlFlow&)> mGetter;
+		std::function<void(ControlFlow&)> mSetter;
 	};
 
 
@@ -103,11 +96,8 @@ namespace lemon
 	public:
 		inline ExternalVariable() : Variable(Type::EXTERNAL) {}
 
-		// Do not use these for variables, instead directly access the pointer with the right data type
-		int64 getValue() const override		 { return 0; }
-		void setValue(int64 value) override  {}
-
 	public:
+		// External variables get accessed directly via the accessor the pointer, using the right data type
 		std::function<int64*()> mAccessor;
 	};
 
