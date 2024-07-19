@@ -29,7 +29,7 @@ namespace lemon
 	class CompilerFrontend
 	{
 	public:
-		CompilerFrontend(Module& module, GlobalsLookup& globalsLookup, CompileOptions& compileOptions, const LineNumberTranslation& lineNumberTranslation, std::vector<FunctionNode*>& functionNodes);
+		CompilerFrontend(Module& module, GlobalsLookup& globalsLookup, CompileOptions& compileOptions, const LineNumberTranslation& lineNumberTranslation, TokenProcessing& tokenProcessing, std::vector<FunctionNode*>& functionNodes);
 
 		void runCompilerFrontend(BlockNode& outRootNode, const std::vector<std::string_view>& lines);
 
@@ -96,7 +96,7 @@ namespace lemon
 		GlobalsLookup& mGlobalsLookup;
 		const LineNumberTranslation& mLineNumberTranslation;
 		CompileOptions& mCompileOptions;
-		TokenProcessing mTokenProcessing;
+		TokenProcessing& mTokenProcessing;
 		std::vector<FunctionNode*>& mFunctionNodes;
 	};
 

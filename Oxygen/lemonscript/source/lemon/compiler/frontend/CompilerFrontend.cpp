@@ -68,12 +68,12 @@ namespace lemon
 	};
 
 
-	CompilerFrontend::CompilerFrontend(Module& module, GlobalsLookup& globalsLookup, CompileOptions& compileOptions, const LineNumberTranslation& lineNumberTranslation, std::vector<FunctionNode*>& functionNodes) :
+	CompilerFrontend::CompilerFrontend(Module& module, GlobalsLookup& globalsLookup, CompileOptions& compileOptions, const LineNumberTranslation& lineNumberTranslation, TokenProcessing& tokenProcessing, std::vector<FunctionNode*>& functionNodes) :
 		mModule(module),
 		mGlobalsLookup(globalsLookup),
 		mCompileOptions(compileOptions),
 		mLineNumberTranslation(lineNumberTranslation),
-		mTokenProcessing(globalsLookup, module, compileOptions),
+		mTokenProcessing(tokenProcessing),
 		mFunctionNodes(functionNodes)
 	{
 	}

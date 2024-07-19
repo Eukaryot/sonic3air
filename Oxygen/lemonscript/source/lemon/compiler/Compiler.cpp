@@ -111,7 +111,7 @@ namespace lemon
 			std::vector<FunctionNode*> functionNodes;
 
 			// Frontend part: Convert input text lines into a syntax tree like structure (built of nodes and tokens)
-			CompilerFrontend frontend(mModule, mGlobalsLookup, mCompileOptions, mLineNumberTranslation, functionNodes);
+			CompilerFrontend frontend(mModule, mGlobalsLookup, mCompileOptions, mLineNumberTranslation, mTokenProcessing, functionNodes);
 			frontend.runCompilerFrontend(rootNode, lines);
 
 			// Optional translation
