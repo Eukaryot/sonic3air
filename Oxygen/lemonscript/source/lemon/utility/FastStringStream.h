@@ -40,7 +40,7 @@ namespace lemon::detail
 			addString(str.data(), (int)str.length());
 		}
 
-		void addDecimal(int64 value, int minDigits)
+		void addDecimal(int64 value, int minDigits = 0)
 		{
 			if (value < 0)
 			{
@@ -104,6 +104,20 @@ namespace lemon::detail
 				mBuffer[mLength] = (hexValue <= 9) ? ('0' + (char)hexValue) : ('a' + (char)(hexValue - 10));
 				++mLength;
 			}
+		}
+
+		void addFloat(float value)
+		{
+			std::stringstream str;
+			str << value;
+			addString(str.str());
+		}
+
+		void addDouble(double value)
+		{
+			std::stringstream str;
+			str << value;
+			addString(str.str());
 		}
 
 	public:

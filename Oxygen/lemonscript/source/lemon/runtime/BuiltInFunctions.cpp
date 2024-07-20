@@ -8,10 +8,10 @@
 
 #include "lemon/pch.h"
 #include "lemon/runtime/BuiltInFunctions.h"
-#include "lemon/runtime/FastStringStream.h"
 #include "lemon/program/FunctionWrapper.h"
 #include "lemon/program/Module.h"
 #include "lemon/program/Program.h"
+#include "lemon/utility/FastStringStream.h"
 
 
 namespace lemon

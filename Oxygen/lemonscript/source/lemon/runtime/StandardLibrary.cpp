@@ -9,9 +9,10 @@
 #include "lemon/pch.h"
 #include "lemon/runtime/StandardLibrary.h"
 #include "lemon/runtime/BuiltInFunctions.h"
-#include "lemon/runtime/FastStringStream.h"
 #include "lemon/program/ModuleBindingsBuilder.h"
 #include "lemon/program/Program.h"
+#include "lemon/utility/FastStringStream.h"
+#include "lemon/utility/StringFormatter.h"
 
 
 namespace lemon
@@ -108,119 +109,15 @@ namespace lemon
 		template<typename T> T Math_invlerp(T a, T b, T value)			{ return (a == b) ? 0.0f : (value - a) / (b - a); }
 		template<typename T> float Math_invlerp_int(T a, T b, T value)	{ return (a == b) ? 0.0f : (float)(value - a) / (float)(b - a); }
 
-		StringRef stringformat(StringRef format, int argv, uint64* args)
+		StringRef stringformat(StringRef format, int numArguments, const uint64* args)
 		{
 			Runtime* runtime = Runtime::getActiveRuntime();
 			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
 			RMX_CHECK(format.isValid(), "Unable to resolve format string", return StringRef());
 
-			std::string_view formatString = format.getString();
-			const int length = (int)formatString.length();
-			const char* fmtPtr = formatString.data();
-			const char* fmtEnd = fmtPtr + length;
-
 			static detail::FastStringStream result;
 			result.clear();
-
-			for (; fmtPtr < fmtEnd; ++fmtPtr)
-			{
-				if (argv <= 0)
-				{
-					// Warning: This means that additional '%' characters won't be processed at all, which also means that escaped ones won't be reduces to a single one
-					//  -> There's scripts that rely on this exact behavior, so don't ever change that!
-					result.addString(fmtPtr, (int)(fmtEnd - fmtPtr));
-					break;
-				}
-
-				// Continue until getting a '%' character
-				{
-					const char* fmtStart = fmtPtr;
-					while (fmtPtr != fmtEnd && *fmtPtr != '%')
-					{
-						++fmtPtr;
-					}
-					if (fmtPtr != fmtStart)
-					{
-						result.addString(fmtStart, (int)(fmtPtr - fmtStart));
-					}
-					if (fmtPtr == fmtEnd)
-						break;
-				}
-
-				const int remaining = (int)(fmtEnd - fmtPtr);
-				if (remaining >= 2)
-				{
-					char numberOutputCharacter = 0;
-					int minDigits = 0;
-					int charsRead = 0;
-
-					if (fmtPtr[1] == '%')
-					{
-						result.addChar('%');
-						charsRead = 1;
-					}
-					else if (fmtPtr[1] == 's')
-					{
-						// String argument
-						const FlyweightString* argStoredString = runtime->resolveStringByKey(args[0]);
-						if (nullptr == argStoredString)
-							result.addString("<?>", 3);
-						else
-							result.addString(argStoredString->getString());
-						++args;
-						--argv;
-						charsRead = 1;
-					}
-					else if (fmtPtr[1] == 'd' || fmtPtr[1] == 'b' || fmtPtr[1] == 'x')
-					{
-						// Integer argument
-						numberOutputCharacter = fmtPtr[1];
-						charsRead = 1;
-					}
-					else if (remaining >= 4 && fmtPtr[1] == '0' && (fmtPtr[2] >= '1' && fmtPtr[2] <= '9') && (fmtPtr[3] == 'd' || fmtPtr[3] == 'b' || fmtPtr[3] == 'x'))
-					{
-						// Integer argument with minimum number of digits (9 or less)
-						numberOutputCharacter = fmtPtr[3];
-						minDigits = (int)(fmtPtr[2] - '0');
-						charsRead = 3;
-					}
-					else if (remaining >= 5 && fmtPtr[1] == '0' && (fmtPtr[2] >= '1' && fmtPtr[2] <= '9') && (fmtPtr[3] >= '0' && fmtPtr[3] <= '9') && (fmtPtr[4] == 'd' || fmtPtr[4] == 'b' || fmtPtr[4] == 'x'))
-					{
-						// Integer argument with minimum number of digits (10 or more)
-						numberOutputCharacter = fmtPtr[4];
-						minDigits = (int)(fmtPtr[2] - '0') * 10 + (int)(fmtPtr[3] - '0');
-						charsRead = 4;
-					}
-					else
-					{
-						result.addChar('%');
-					}
-
-					if (numberOutputCharacter != 0)
-					{
-						if (numberOutputCharacter == 'd')
-						{
-							result.addDecimal(args[0], minDigits);
-						}
-						else if (numberOutputCharacter == 'b')
-						{
-							result.addBinary(args[0], minDigits);
-						}
-						else if (numberOutputCharacter == 'x')
-						{
-							result.addHex(args[0], minDigits);
-						}
-						++args;
-						--argv;
-					}
-
-					fmtPtr += charsRead;
-				}
-				else
-				{
-					result.addChar('%');
-				}
-			}
+			StringFormatter::buildFormattedString_Legacy(result, format.getString(), numArguments, args);
 
 			return StringRef(runtime->addString(std::string_view(result.mBuffer, result.mLength)));
 		}
@@ -270,6 +167,66 @@ namespace lemon
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 };
 			return stringformat(format, 8, args);
+		}
+
+		StringRef string_build(StringRef format, size_t numArguments, const AnyTypeWrapper* args)
+		{
+			Runtime* runtime = Runtime::getActiveRuntime();
+			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			RMX_CHECK(format.isValid(), "Unable to resolve format string", return StringRef());
+
+			static detail::FastStringStream result;
+			result.clear();
+			StringFormatter::buildFormattedString(result, format.getString(), numArguments, args);
+
+			return StringRef(runtime->addString(std::string_view(result.mBuffer, result.mLength)));
+		}
+
+		StringRef string_build1(StringRef format, AnyTypeWrapper arg1)
+		{
+			return string_build(format, 1, &arg1);
+		}
+
+		StringRef string_build2(StringRef format, AnyTypeWrapper arg1, AnyTypeWrapper arg2)
+		{
+			AnyTypeWrapper args[] = { arg1, arg2 };
+			return string_build(format, 2, args);
+		}
+
+		StringRef string_build3(StringRef format, AnyTypeWrapper arg1, AnyTypeWrapper arg2, AnyTypeWrapper arg3)
+		{
+			AnyTypeWrapper args[] = { arg1, arg2, arg3 };
+			return string_build(format, 3, args);
+		}
+
+		StringRef string_build4(StringRef format, AnyTypeWrapper arg1, AnyTypeWrapper arg2, AnyTypeWrapper arg3, AnyTypeWrapper arg4)
+		{
+			AnyTypeWrapper args[] = { arg1, arg2, arg3, arg4 };
+			return string_build(format, 4, args);
+		}
+
+		StringRef string_build5(StringRef format, AnyTypeWrapper arg1, AnyTypeWrapper arg2, AnyTypeWrapper arg3, AnyTypeWrapper arg4, AnyTypeWrapper arg5)
+		{
+			AnyTypeWrapper args[] = { arg1, arg2, arg3, arg4, arg5 };
+			return string_build(format, 5, args);
+		}
+
+		StringRef string_build6(StringRef format, AnyTypeWrapper arg1, AnyTypeWrapper arg2, AnyTypeWrapper arg3, AnyTypeWrapper arg4, AnyTypeWrapper arg5, AnyTypeWrapper arg6)
+		{
+			AnyTypeWrapper args[] = { arg1, arg2, arg3, arg4, arg5, arg6 };
+			return string_build(format, 6, args);
+		}
+
+		StringRef string_build7(StringRef format, AnyTypeWrapper arg1, AnyTypeWrapper arg2, AnyTypeWrapper arg3, AnyTypeWrapper arg4, AnyTypeWrapper arg5, AnyTypeWrapper arg6, AnyTypeWrapper arg7)
+		{
+			AnyTypeWrapper args[] = { arg1, arg2, arg3, arg4, arg5, arg6, arg7 };
+			return string_build(format, 7, args);
+		}
+
+		StringRef string_build8(StringRef format, AnyTypeWrapper arg1, AnyTypeWrapper arg2, AnyTypeWrapper arg3, AnyTypeWrapper arg4, AnyTypeWrapper arg5, AnyTypeWrapper arg6, AnyTypeWrapper arg7, AnyTypeWrapper arg8)
+		{
+			AnyTypeWrapper args[] = { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 };
+			return string_build(format, 8, args);
 		}
 
 		uint32 string_length(StringRef str)
@@ -548,6 +505,30 @@ namespace lemon
 			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5", "arg6", "arg7");
 
 		builder.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat8), defaultFlags)
+			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5", "arg6", "arg7", "arg8");
+
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build1), defaultFlags)
+			.setParameters("format", "arg1");
+
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build2), defaultFlags)
+			.setParameters("format", "arg1", "arg2");
+
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build3), defaultFlags)
+			.setParameters("format", "arg1", "arg2", "arg3");
+
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build4), defaultFlags)
+			.setParameters("format", "arg1", "arg2", "arg3", "arg4");
+
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build5), defaultFlags)
+			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5");
+
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build6), defaultFlags)
+			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5", "arg6");
+
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build7), defaultFlags)
+			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5", "arg6", "arg7");
+
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build8), defaultFlags)
 			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5", "arg6", "arg7", "arg8");
 
 		builder.addNativeFunction("strlen", lemon::wrap(&functions::string_length), defaultFlags)

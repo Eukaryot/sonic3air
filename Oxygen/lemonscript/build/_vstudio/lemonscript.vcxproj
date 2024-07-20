@@ -61,6 +61,7 @@
     <ClCompile Include="..\..\source\lemon\translator\Translator.cpp" />
     <ClCompile Include="..\..\source\lemon\utility\FlyweightString.cpp" />
     <ClCompile Include="..\..\source\lemon\utility\PragmaSplitter.cpp" />
+    <ClCompile Include="..\..\source\lemon\utility\StringFormatter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\backend\FunctionCompiler.h" />
@@ -103,7 +104,6 @@
     <ClInclude Include="..\..\source\lemon\program\Variable.h" />
     <ClInclude Include="..\..\source\lemon\runtime\BuiltInFunctions.h" />
     <ClInclude Include="..\..\source\lemon\runtime\ControlFlow.h" />
-    <ClInclude Include="..\..\source\lemon\runtime\FastStringStream.h" />
     <ClInclude Include="..\..\source\lemon\runtime\OpcodeExecUtils.h" />
     <ClInclude Include="..\..\source\lemon\runtime\OpcodeProcessor.h" />
     <ClInclude Include="..\..\source\lemon\runtime\provider\DefaultOpcodeProvider.h" />
@@ -119,9 +119,11 @@
     <ClInclude Include="..\..\source\lemon\translator\SourceCodeWriter.h" />
     <ClInclude Include="..\..\source\lemon\translator\Translator.h" />
     <ClInclude Include="..\..\source\lemon\utility\AnyBaseValue.h" />
+    <ClInclude Include="..\..\source\lemon\utility\FastStringStream.h" />
     <ClInclude Include="..\..\source\lemon\utility\FlyweightString.h" />
     <ClInclude Include="..\..\source\lemon\utility\PragmaSplitter.h" />
     <ClInclude Include="..\..\source\lemon\utility\QuickDataHasher.h" />
+    <ClInclude Include="..\..\source\lemon\utility\StringFormatter.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="lemonscript.natvis" />
