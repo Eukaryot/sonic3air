@@ -11,7 +11,6 @@
 #include <rmxbase.h>
 
 class EmulatorInterface;
-class PaletteBitmap;
 
 
 class BlueSpheresRendering

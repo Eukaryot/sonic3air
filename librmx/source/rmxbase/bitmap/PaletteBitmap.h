@@ -1,5 +1,5 @@
 /*
-*	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
+*	rmx Library
 *	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
@@ -8,14 +8,9 @@
 
 #pragma once
 
-#include <rmxbase.h>
 
-
-class PaletteBitmap
+class API_EXPORT PaletteBitmap
 {
-public:
-	static const uint32 mUnusedPaletteColor;
-
 public:
 	inline PaletteBitmap() {}
 	PaletteBitmap(const PaletteBitmap& toCopy);
@@ -44,7 +39,7 @@ public:
 	void clear(uint8 color);
 
 	void shiftAllIndices(int8 indexShift);
-	void overwriteUnusedPaletteEntries(uint32* palette);
+	void overwriteUnusedPaletteEntries(uint32* palette, uint32 unusedPaletteColor);
 
 	bool loadBMP(const std::vector<uint8>& bmpContent, std::vector<uint32>* outPalette = nullptr);	// Expecting palette colors to use ABGR32 format
 	bool saveBMP(std::vector<uint8>& bmpContent, const uint32* palette);

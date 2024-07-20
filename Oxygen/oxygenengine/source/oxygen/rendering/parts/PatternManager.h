@@ -10,8 +10,6 @@
 
 #include <rmxbase.h>
 
-class PaletteBitmap;
-
 
 class PatternManager
 {

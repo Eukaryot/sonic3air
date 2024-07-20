@@ -12,7 +12,6 @@
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/drawing/DrawerTexture.h"
-#include "oxygen/rendering/utils/PaletteBitmap.h"
 
 
 // Other platforms than Windows with Visual C++ need to the zlib library dependency into their build separately

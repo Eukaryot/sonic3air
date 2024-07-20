@@ -8,9 +8,10 @@
 
 #pragma once
 
+#include <rmxbase.h>
 
 class PatternManager;
-class PaletteBitmap;
+
 
 class PlaneManager
 {

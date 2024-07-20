@@ -14,7 +14,6 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/JsonHelper.h"
-#include "oxygen/rendering/utils/PaletteBitmap.h"
 #include "oxygen/resources/FontCollection.h"
 
 

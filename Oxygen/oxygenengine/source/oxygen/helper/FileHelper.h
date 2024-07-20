@@ -10,7 +10,6 @@
 
 #include <rmxbase.h>
 
-class PaletteBitmap;
 class DrawerTexture;
 class Shader;
 

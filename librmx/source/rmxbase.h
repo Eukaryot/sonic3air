@@ -71,6 +71,7 @@
 #include "rmxbase/memory/ZlibDeflate.h"
 #include "rmxbase/bitmap/Color.h"
 #include "rmxbase/bitmap/BitmapCodecs.h"
+#include "rmxbase/bitmap/PaletteBitmap.h"
 #include "rmxbase/bitmap/BitmapView.h"
 #include "rmxbase/tools/Logging.h"
 

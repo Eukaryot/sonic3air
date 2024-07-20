@@ -11,7 +11,6 @@
 #include "sonic3air/data/SharedDatabase.h"
 
 #include "oxygen/application/Configuration.h"
-#include "oxygen/rendering/utils/PaletteBitmap.h"
 #include "oxygen/resources/SpriteCollection.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 

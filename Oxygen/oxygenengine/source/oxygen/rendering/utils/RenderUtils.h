@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "oxygen/rendering/utils/PaletteBitmap.h"
+#include <rmxbase.h>
 
 
 class RenderUtils

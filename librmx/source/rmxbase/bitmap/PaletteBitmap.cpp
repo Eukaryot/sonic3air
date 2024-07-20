@@ -1,13 +1,12 @@
 /*
-*	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
+*	rmx Library
 *	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
-#include "oxygen/pch.h"
-#include "oxygen/rendering/utils/PaletteBitmap.h"
+#include "rmxbase.h"
 
 
 namespace
@@ -39,9 +38,6 @@ namespace
 		return (color & 0xff00ff00) | ((color & 0x00ff0000) >> 16) | ((color & 0x000000ff) << 16);
 	}
 }
-
-
-const uint32 PaletteBitmap::mUnusedPaletteColor = 0x00660145;
 
 
 PaletteBitmap::PaletteBitmap(const PaletteBitmap& toCopy)
@@ -152,7 +148,7 @@ void PaletteBitmap::shiftAllIndices(int8 indexShift)
 	}
 }
 
-void PaletteBitmap::overwriteUnusedPaletteEntries(uint32* palette)
+void PaletteBitmap::overwriteUnusedPaletteEntries(uint32* palette, uint32 unusedPaletteColor)
 {
 	bool used[0x100] = { false };
 	const int pixels = getPixelCount();
@@ -163,7 +159,7 @@ void PaletteBitmap::overwriteUnusedPaletteEntries(uint32* palette)
 	for (int i = 0; i < 0x100; ++i)
 	{
 		if (!used[i])
-			palette[i] = mUnusedPaletteColor;
+			palette[i] = unusedPaletteColor;
 	}
 }
 

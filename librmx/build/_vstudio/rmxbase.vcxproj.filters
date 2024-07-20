@@ -217,6 +217,9 @@
     <ClInclude Include="..\..\source\rmxbase\base\StdHelpers.h">
       <Filter>base</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\bitmap\PaletteBitmap.h">
+      <Filter>bitmap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\rmxbase\rmxbase.cpp" />
@@ -315,6 +318,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\rmxbase\memory\UTF8Conversion.cpp">
       <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\bitmap\PaletteBitmap.cpp">
+      <Filter>bitmap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

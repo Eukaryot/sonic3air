@@ -9,7 +9,6 @@
 #pragma once
 
 #include "oxygen/rendering/sprite/SpriteBase.h"
-#include "oxygen/rendering/utils/PaletteBitmap.h"
 #include "oxygen/rendering/utils/RenderUtils.h"
 
 

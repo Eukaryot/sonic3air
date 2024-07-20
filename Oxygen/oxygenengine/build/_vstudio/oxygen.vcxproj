@@ -120,7 +120,6 @@
     <ClCompile Include="..\..\source\oxygen\rendering\sprite\SpriteDump.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\BufferTexture.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\Kosinski.cpp" />
-    <ClCompile Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\RenderUtils.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\FontCollection.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\PaletteCollection.cpp" />
@@ -257,7 +256,6 @@
     <ClInclude Include="..\..\source\oxygen\rendering\sprite\SpriteDump.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\utils\BufferTexture.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\utils\Kosinski.h" />
-    <ClInclude Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\utils\RenderUtils.h" />
     <ClInclude Include="..\..\source\oxygen\resources\FontCollection.h" />
     <ClInclude Include="..\..\source\oxygen\resources\PaletteCollection.h" />

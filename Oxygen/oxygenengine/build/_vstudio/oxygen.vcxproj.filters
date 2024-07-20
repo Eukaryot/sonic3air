@@ -132,9 +132,6 @@
     <ClCompile Include="..\..\source\oxygen\rendering\utils\BufferTexture.cpp">
       <Filter>rendering\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.cpp">
-      <Filter>rendering\utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\utils\RenderUtils.cpp">
       <Filter>rendering\utils</Filter>
     </ClCompile>
@@ -511,9 +508,6 @@
       <Filter>rendering\parts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\utils\BufferTexture.h">
-      <Filter>rendering\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.h">
       <Filter>rendering\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\utils\RenderUtils.h">

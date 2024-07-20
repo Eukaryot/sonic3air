@@ -11,7 +11,6 @@
 #include "oxygen/rendering/Renderer.h"
 #include "oxygen/drawing/software/Blitter.h"
 
-class PaletteBitmap;
 class PlaneGeometry;
 class SpriteGeometry;
 namespace detail

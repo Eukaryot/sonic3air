@@ -10,7 +10,6 @@
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/rendering/parts/PlaneManager.h"
 #include "oxygen/rendering/parts/PatternManager.h"
-#include "oxygen/rendering/utils/PaletteBitmap.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 
 

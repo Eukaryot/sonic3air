@@ -15,6 +15,12 @@
 #include "oxygen/helper/JsonHelper.h"
 
 
+namespace
+{
+	static const uint32 UNUSED_PALETTE_COLOR = 0x00660145;
+}
+
+
 void SpriteDump::load()
 {
 	// Open file
@@ -93,7 +99,7 @@ void SpriteDump::addSprite(const PaletteSprite& paletteSprite, std::string_view 
 		}
 
 		PaletteBitmap copy = paletteSprite.getBitmap();
-		copy.overwriteUnusedPaletteEntries(palette);
+		copy.overwriteUnusedPaletteEntries(palette, UNUSED_PALETTE_COLOR);
 
 		std::vector<uint8> content;
 		copy.saveBMP(content, palette);
@@ -174,7 +180,7 @@ void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 
 	uint32 outputPalette[0x100];
 	for (int k = 0; k < 0xff; ++k)
-		outputPalette[k] = PaletteBitmap::mUnusedPaletteColor;
+		outputPalette[k] = UNUSED_PALETTE_COLOR;
 	outputPalette[0xff] = 0xff262626;
 
 	std::vector<uint8> buffer;
@@ -204,7 +210,7 @@ void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 				// Add new colors to palette
 				for (size_t k = 0; k < palette.size(); ++k)
 				{
-					if ((outputPalette[k] & 0x00ffffff) == (PaletteBitmap::mUnusedPaletteColor & 0x00ffffff))
+					if ((outputPalette[k] & 0x00ffffff) == (UNUSED_PALETTE_COLOR & 0x00ffffff))
 						outputPalette[k] = palette[k];
 				}
 			}
