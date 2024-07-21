@@ -77,6 +77,8 @@ public:
 	inline uint32* getData()				{ return mData; }
 	inline const uint32* getData() const	{ return mData; }
 
+	inline bool isValidPosition(int x, int y) const  { return (uint32)x < (uint32)mWidth && (uint32)y < (uint32)mHeight; }	// Unsigned comparison essentially implies that x and y are >= 0
+
 	// Pixel access
 	inline uint32 getPixel(int x, int y) const				 { return mData[x + y * mWidth]; }
 	inline uint32 getPixel(Vec2i pos) const					 { return mData[pos.x + pos.y * mWidth]; }
@@ -98,8 +100,8 @@ public:
 
 	void setPixel(int x, int y, uint32 color);
 	void setPixel(int x, int y, float red, float green, float blue, float alpha = 1.0f);
-	inline void setPixel(Vec2i pos, uint32 color)											{ return setPixel(pos.x, pos.y, color); }
-	inline void setPixel(Vec2i pos, float red, float green, float blue, float alpha = 1.0f)	{ return setPixel(pos.x, pos.y, red, green, blue, alpha); }
+	inline void setPixel(Vec2i pos, uint32 color)											{ setPixel(pos.x, pos.y, color); }
+	inline void setPixel(Vec2i pos, float red, float green, float blue, float alpha = 1.0f)	{ setPixel(pos.x, pos.y, red, green, blue, alpha); }
 
 	bool decode(InputStream& stream, LoadResult& outResult, const char* format = nullptr);
 	bool encode(OutputStream& stream, const char* format) const;

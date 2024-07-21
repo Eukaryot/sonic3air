@@ -291,8 +291,8 @@ namespace utils
 			PaletteBitmap& bitmap = bitmaps.back();
 			if ((bitmaps.size() == 1) ? bitmap.loadBMP(buffer, &palette) : bitmap.loadBMP(buffer))
 			{
-				imgSize.x = std::max<int>(imgSize.x, bitmap.mWidth);
-				imgSize.y = std::max<int>(imgSize.y, bitmap.mHeight);
+				imgSize.x = std::max<int>(imgSize.x, bitmap.getWidth());
+				imgSize.y = std::max<int>(imgSize.y, bitmap.getHeight());
 			}
 			else
 			{
@@ -307,7 +307,9 @@ namespace utils
 		palette[0xff] = 0xff262626;
 		for (size_t i = 0; i < bitmaps.size(); ++i)
 		{
-			output.copyRect(bitmaps[i], Recti(0, 0, bitmaps[i].mWidth, bitmaps[i].mHeight), Vec2i(imgSize.x * ((int)i % 16) + (imgSize.x - bitmaps[i].mWidth) / 2, imgSize.y * ((int)i / 16) + (imgSize.y - bitmaps[i].mHeight) / 2));
+			const int destX = imgSize.x * ((int)i % 16) + (imgSize.x - bitmaps[i].getWidth()) / 2;
+			const int destY = imgSize.y * ((int)i / 16) + (imgSize.y - bitmaps[i].getHeight()) / 2;
+			output.copyRect(bitmaps[i], Recti(Vec2i(), bitmaps[i].getSize()), Vec2i(destX, destY));
 		}
 
 		buffer.clear();

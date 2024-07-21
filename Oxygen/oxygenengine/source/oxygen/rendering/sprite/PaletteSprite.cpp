@@ -21,36 +21,36 @@ namespace
 
 	void applyPalette(Bitmap& output, int& outputReservedSize, const PaletteBitmap& input, const uint32* palette)
 	{
-		output.createReusingMemory(input.mWidth, input.mHeight, outputReservedSize);
+		output.createReusingMemory(input.getSize(), outputReservedSize);
 		for (int i = 0; i < output.getPixelCount(); ++i)
 		{
-			output.getData()[i] = palette[input.mData[i]];
+			output.getData()[i] = palette[input[i]];
 		}
 	}
 
 	void applyScale3x(PaletteBitmap& output, const PaletteBitmap& input)
 	{
 		// Based on https://en.wikipedia.org/wiki/Pixel-art_scaling_algorithms#Scale3%C3%97/AdvMAME3%C3%97_and_ScaleFX
-		output.create(input.mWidth * 3, input.mHeight * 3);
-		for (uint32 y = 0; y < input.mHeight; ++y)
+		output.create(input.getSize() * 3);
+		for (uint32 y = 0; y < (uint32)input.getHeight(); ++y)
 		{
 			const uint32 y0 = std::max<uint32>(y, 1) - 1;
 			const uint32 y1 = y;
-			const uint32 y2 = std::min<uint32>(y + 1, input.mHeight - 1);
+			const uint32 y2 = std::min<uint32>(y + 1, input.getHeight() - 1);
 
-			const uint8* inputLine0 = &input.mData[y0 * input.mWidth];
-			const uint8* inputLine1 = &input.mData[y1 * input.mWidth];
-			const uint8* inputLine2 = &input.mData[y2 * input.mWidth];
+			const uint8* inputLine0 = &input[y0 * input.getWidth()];
+			const uint8* inputLine1 = &input[y1 * input.getWidth()];
+			const uint8* inputLine2 = &input[y2 * input.getWidth()];
 
-			uint8* outputLine0 = &output.mData[(y * 3) * output.mWidth];
-			uint8* outputLine1 = &output.mData[(y * 3 + 1) * output.mWidth];
-			uint8* outputLine2 = &output.mData[(y * 3 + 2) * output.mWidth];
+			uint8* outputLine0 = &output[(y * 3) * output.getWidth()];
+			uint8* outputLine1 = &output[(y * 3 + 1) * output.getWidth()];
+			uint8* outputLine2 = &output[(y * 3 + 2) * output.getWidth()];
 
-			for (uint32 x = 0; x < input.mWidth; ++x)
+			for (uint32 x = 0; x < (uint32)input.getWidth(); ++x)
 			{
 				const uint32 x0 = std::max<uint32>(x, 1) - 1;
 				const uint32 x1 = x;
-				const uint32 x2 = std::min<uint32>(x + 1, input.mWidth - 1);
+				const uint32 x2 = std::min<uint32>(x + 1, input.getWidth() - 1);
 
 				const uint8 A = inputLine0[x0];
 				const uint8 B = inputLine0[x1];

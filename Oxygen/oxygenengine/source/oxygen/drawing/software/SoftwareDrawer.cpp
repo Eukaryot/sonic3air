@@ -91,7 +91,7 @@ namespace softwaredrawer
 
 	void mirrorBitmapX(Bitmap& destBitmap, int& destReservedSize, const Bitmap& sourceBitmap)
 	{
-		destBitmap.createReusingMemory(sourceBitmap.getWidth(), sourceBitmap.getHeight(), destReservedSize);
+		destBitmap.createReusingMemory(sourceBitmap.getSize(), destReservedSize);
 		for (int y = 0; y < sourceBitmap.getHeight(); ++y)
 		{
 			const uint32* src = sourceBitmap.getPixelPointer(sourceBitmap.getWidth() - 1, y);
@@ -190,7 +190,7 @@ namespace softwaredrawer
 			else
 			{
 				mOutputWrapper = BitmapViewMutable<uint32>(mCurrentRenderTarget->accessBitmap());
-				mScissorRect.set(0, 0, mCurrentRenderTarget->getWidth(), mCurrentRenderTarget->getHeight());
+				mScissorRect.set(Vec2i(), mCurrentRenderTarget->getSize());
 			}
 		}
 

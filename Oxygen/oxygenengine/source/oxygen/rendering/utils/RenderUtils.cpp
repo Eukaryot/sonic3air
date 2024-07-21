@@ -145,15 +145,15 @@ void RenderUtils::fillPatternsFromSpriteData(std::vector<RenderUtils::SinglePatt
 void RenderUtils::blitSpritePattern(PaletteBitmap& output, int px, int py, const PatternData& patternData, bool flipX, bool flipY)
 {
 	const int32 minX = std::max<int32>(0, -px);
-	const int32 maxX = std::min<int32>(8, output.mWidth - px);
+	const int32 maxX = std::min<int32>(8, output.getWidth() - px);
 	const int32 minY = std::max<int32>(0, -py);
-	const int32 maxY = std::min<int32>(8, output.mHeight - py);
+	const int32 maxY = std::min<int32>(8, output.getHeight() - py);
 
 	for (int32 iy = minY; iy < maxY; ++iy)
 	{
 		const int32 srcY = flipY ? (7 - iy) : iy;
 		const uint8* src = &patternData.mPixels[minX + srcY * 8];
-		uint8* dst = &output.mData[(px + minX) + (py + iy) * output.mWidth];
+		uint8* dst = output.getPixelPointer(px + minX, py + iy);
 
 		if (flipX)
 		{

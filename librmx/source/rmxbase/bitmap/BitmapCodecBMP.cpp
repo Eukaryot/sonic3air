@@ -33,7 +33,7 @@ namespace rmx
 	};
 	#pragma pack()
 
-	inline uint32 RGBA_to_BGRA(uint32 color)
+	inline uint32 swapRedBlue(uint32 color)
 	{
 		return (color & 0xff00ff00) | ((color & 0x00ff0000) >> 16) | ((color & 0x000000ff) << 16);
 	}
@@ -88,7 +88,7 @@ namespace rmx
 		stream.read(palette, palSize * sizeof(uint32));
 		for (int i = 0; i < palSize; ++i)
 		{
-			palette[i] = RGBA_to_BGRA(palette[i] | 0xff000000);
+			palette[i] = swapRedBlue(palette[i] | 0xff000000);
 		}
 
 		// Skip unrecognized parts of the header
@@ -131,7 +131,7 @@ namespace rmx
 
 				case 32:
 					for (int x = 0; x < width; ++x)
-						dataPtr[x] = RGBA_to_BGRA(*(uint32*)&buffer[x*4]);
+						dataPtr[x] = swapRedBlue(*(uint32*)&buffer[x*4]);
 					break;
 			}
 			buffer += stride;
@@ -189,7 +189,7 @@ namespace rmx
 		{
 			const uint32* src = bitmap.getPixelPointer(0, height-y-1);
 			for (int x = 0; x < width; ++x)
-				output[x] = RGBA_to_BGRA(src[x]);
+				output[x] = swapRedBlue(src[x]);
 			stream.write(output, width*4);
 		}
 

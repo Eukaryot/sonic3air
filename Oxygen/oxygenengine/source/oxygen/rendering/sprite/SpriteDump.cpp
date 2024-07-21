@@ -199,8 +199,8 @@ void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 				PaletteBitmap& bitmap = bitmaps.back().first;
 				if (bitmap.loadBMP(buffer, &palette))
 				{
-					imgSize.x = std::max<int>(imgSize.x, bitmap.mWidth);
-					imgSize.y = std::max<int>(imgSize.y, bitmap.mHeight);
+					imgSize.x = std::max<int>(imgSize.x, bitmap.getWidth());
+					imgSize.y = std::max<int>(imgSize.y, bitmap.getHeight());
 				}
 				else
 				{
@@ -228,9 +228,9 @@ void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 		const PaletteBitmap& bitmap = bitmaps[i].first;
 		const Entry& entry = *bitmaps[i].second;
 
-		const Vec2i destPosition(imgSize.x * (int)(i % 16) + (imgSize.x - bitmap.mWidth) / 2,
-								 imgSize.y * (int)(i / 16) + (imgSize.y - bitmap.mHeight) / 2);
-		output.copyRect(bitmap, Recti(0, 0, bitmap.mWidth, bitmap.mHeight), destPosition);
+		const Vec2i destPosition(imgSize.x * (int)(i % 16) + (imgSize.x - bitmap.getWidth()) / 2,
+								 imgSize.y * (int)(i / 16) + (imgSize.y - bitmap.getHeight()) / 2);
+		output.copyRect(bitmap, Recti(0, 0, bitmap.getWidth(), bitmap.getHeight()), destPosition);
 
 		// Example:   "title_screen_air": { "File": "title_screen.png", "Rect": "0,0,152,18", "Center": "76,9" },
 
@@ -240,7 +240,7 @@ void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 		}
 		json << "\r\n\t\"" << categoryName << "_" << rmx::hexString(entry.mSpriteNumber, 2) << "\": ";
 		json << "{ \"File\": \"" << atlasOutputName << ".bmp\", ";
-		json << "\"Rect\": \"" << destPosition.x << "," << destPosition.y << "," << bitmap.mWidth << "," << bitmap.mHeight << "\", ";
+		json << "\"Rect\": \"" << destPosition.x << "," << destPosition.y << "," << bitmap.getWidth() << "," << bitmap.getHeight() << "\", ";
 		json << "\"Center\": \"" << (-entry.mOffset.x) << "," << (-entry.mOffset.y) << "\" }";
 	}
 	json << "\r\n}\r\n";

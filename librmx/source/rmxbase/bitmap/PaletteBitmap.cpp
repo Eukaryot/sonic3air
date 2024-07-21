@@ -50,7 +50,14 @@ PaletteBitmap::~PaletteBitmap()
 	delete[] mData;
 }
 
-void PaletteBitmap::create(uint32 width, uint32 height)
+void PaletteBitmap::setPixel(int x, int y, uint8 color)
+{
+	if (!isValidPosition(x, y))
+		return;
+	mData[x + y * mWidth] = color;
+}
+
+void PaletteBitmap::create(int width, int height)
 {
 	if (width != mWidth || height != mHeight)
 	{
@@ -61,10 +68,10 @@ void PaletteBitmap::create(uint32 width, uint32 height)
 	}
 }
 
-void PaletteBitmap::create(uint32 width, uint32 height, uint8 fillValue)
+void PaletteBitmap::create(int width, int height, uint8 color)
 {
 	create(width, height);
-	clear(fillValue);
+	clear(color);
 }
 
 void PaletteBitmap::copy(const PaletteBitmap& source)
@@ -253,7 +260,7 @@ bool PaletteBitmap::loadBMP(const std::vector<uint8>& bmpContent, std::vector<ui
 	return true;
 }
 
-bool PaletteBitmap::saveBMP(std::vector<uint8>& bmpContent, const uint32* palette)
+bool PaletteBitmap::saveBMP(std::vector<uint8>& bmpContent, const uint32* palette) const
 {
 	VectorBinarySerializer serializer(false, bmpContent);
 	const uint32 stride = (mWidth * 8 + 31) / 32 * 4;
@@ -283,7 +290,7 @@ bool PaletteBitmap::saveBMP(std::vector<uint8>& bmpContent, const uint32* palett
 		serializer.write(swapRedBlue(palette[i]) & 0x00ffffff);
 	}
 
-	for (uint32 line = 0; line < mHeight; ++line)
+	for (int line = 0; line < mHeight; ++line)
 	{
 		serializer.write(&mData[(mHeight - 1 - line) * mWidth], mWidth);
 		if (mWidth != stride)

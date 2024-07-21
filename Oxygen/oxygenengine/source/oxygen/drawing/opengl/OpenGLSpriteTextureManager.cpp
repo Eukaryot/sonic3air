@@ -23,7 +23,7 @@ BufferTexture* OpenGLSpriteTextureManager::getPaletteSpriteTexture(const SpriteC
 	if (texture.mChangeCounter != cacheItem.mChangeCounter)
 	{
 		const PaletteBitmap& bitmap = useUpscaledSprite ? sprite.getUpscaledBitmap() : sprite.getBitmap();
-		texture.mTexture.create(BufferTexture::PixelFormat::UINT_8, bitmap.getWidth(), bitmap.getHeight(), bitmap.mData);
+		texture.mTexture.create(BufferTexture::PixelFormat::UINT_8, bitmap.getSize(), bitmap.getData());
 		texture.mChangeCounter = cacheItem.mChangeCounter;
 	}
 	return &texture.mTexture;

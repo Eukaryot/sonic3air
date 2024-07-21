@@ -89,7 +89,7 @@ void PatternManager::dumpAsPaletteBitmap(PaletteBitmap& output) const
 		for (int x = 0; x < 512; ++x)
 		{
 			const int patternIndex = (x/8) + (y/8) * 64;
-			output.mData[x+y*512] = mPatternCache[patternIndex].mFlipVariation[0].mPixels[(x%8) + (y%8) * 8] + getLastUsedAtex((uint16)patternIndex);
+			output[x+y*512] = mPatternCache[patternIndex].mFlipVariation[0].mPixels[(x%8) + (y%8) * 8] + getLastUsedAtex((uint16)patternIndex);
 		}
 	}
 }

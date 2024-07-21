@@ -24,7 +24,7 @@ namespace
 		{
 			const int offset = firstPattern * 0x40;
 			const int size = (lastPattern - firstPattern + 1) * 0x40;
-			glBufferSubData(GL_TEXTURE_BUFFER, offset, size, bitmap.mData + offset);
+			glBufferSubData(GL_TEXTURE_BUFFER, offset, size, bitmap.getData() + offset);
 		}
 		else
 	#endif
@@ -33,13 +33,13 @@ namespace
 			if (lastPattern - firstPattern >= 0x700)
 			{
 				// Update the whole texture
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 0x40, 0x800, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, bitmap.mData);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 0x40, 0x800, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, bitmap.getData());
 			}
 			else
 			{
 				// Update only the changed lines
 				//  -> There's exactly one patterns per texture row
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, firstPattern, 0x40, (lastPattern - firstPattern + 1), GL_LUMINANCE, GL_UNSIGNED_BYTE, &bitmap.mData[firstPattern * 0x40]);
+				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, firstPattern, 0x40, (lastPattern - firstPattern + 1), GL_LUMINANCE, GL_UNSIGNED_BYTE, &bitmap[firstPattern * 0x40]);
 			}
 		}
 	}
@@ -137,7 +137,7 @@ void OpenGLRenderResources::refresh()
 			for (int k = currentChanges.mFirst; k <= currentChanges.mLast; ++k)
 			{
 				const uint8* src = patternCache[k].mFlipVariation[0].mPixels;
-				uint8* dst = &bitmap.mData[k * 0x40];
+				uint8* dst = &bitmap[k * 0x40];
 				memcpy(dst, src, 0x40);
 			}
 

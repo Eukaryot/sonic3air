@@ -184,21 +184,21 @@ void Bitmap::clearAlpha(uint8 alpha)
 
 uint32 Bitmap::getPixelSafe(int x, int y) const
 {
-	if (x < 0 || x >= mWidth || y < 0 || y >= mHeight)
+	if (!isValidPosition(x, y))
 		return 0;
 	return mData[x + y * mWidth];
 }
 
 uint32* Bitmap::getPixelPointerSafe(int x, int y)
 {
-	if (x < 0 || x >= mWidth || y < 0 || y >= mHeight)
+	if (!isValidPosition(x, y))
 		return nullptr;
 	return &mData[x + y * mWidth];
 }
 
 const uint32* Bitmap::getPixelPointerSafe(int x, int y) const
 {
-	if (x < 0 || x >= mWidth || y < 0 || y >= mHeight)
+	if (!isValidPosition(x, y))
 		return nullptr;
 	return &mData[x + y * mWidth];
 }
@@ -241,19 +241,17 @@ uint32 Bitmap::sampleLinear(float x, float y) const
 
 void Bitmap::setPixel(int x, int y, uint32 color)
 {
-	if (x < 0 || x >= mWidth || y < 0 || y >= mHeight)
+	if (!isValidPosition(x, y))
 		return;
-	mData[x+y*mWidth] = color;
+	mData[x + y * mWidth] = color;
 }
 
 void Bitmap::setPixel(int x, int y, float red, float green, float blue, float alpha)
 {
-	if (x < 0 || x >= mWidth || y < 0 || y >= mHeight)
-		return;
-	mData[x+y*mWidth] = (uint32)(saturate(red)   * 255.0f)
-					 + ((uint32)(saturate(green) * 255.0f) << 8)
-					 + ((uint32)(saturate(blue)  * 255.0f) << 16)
-					 + ((uint32)(saturate(alpha) * 255.0f) << 24);
+	setPixel(x, y, (uint32)(saturate(red)   * 255.0f)
+				+ ((uint32)(saturate(green) * 255.0f) << 8)
+				+ ((uint32)(saturate(blue)  * 255.0f) << 16)
+				+ ((uint32)(saturate(alpha) * 255.0f) << 24));
 }
 
 bool Bitmap::decode(InputStream& stream, Bitmap::LoadResult& outResult, const char* format)
