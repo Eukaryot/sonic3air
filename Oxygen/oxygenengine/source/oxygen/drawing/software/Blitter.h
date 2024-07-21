@@ -48,8 +48,8 @@ public:
 
 		inline SpriteWrapper(const Bitmap& bitmap, Vec2i pivot) : mBitmapView(bitmap), mPivot(pivot) {}
 		inline SpriteWrapper(const Bitmap& bitmap, Vec2i pivot, Recti innerRect) : mBitmapView(bitmap, innerRect), mPivot(pivot - innerRect.getPos()) {}
-		inline SpriteWrapper(uint32* data, Vec2i size, Vec2i pivot) : mBitmapView(data, size), mPivot(pivot) {}
-		inline SpriteWrapper(uint32* data, Vec2i size, Vec2i pivot, Recti innerRect) : mBitmapView(data, size, innerRect), mPivot(pivot - innerRect.getPos()) {}
+		inline SpriteWrapper(const uint32* data, Vec2i size, Vec2i pivot) : mBitmapView(data, size), mPivot(pivot) {}
+		inline SpriteWrapper(const uint32* data, Vec2i size, Vec2i pivot, Recti innerRect) : mBitmapView(data, size, innerRect), mPivot(pivot - innerRect.getPos()) {}
 	};
 
 	struct IndexedSpriteWrapper
