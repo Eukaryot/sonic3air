@@ -55,6 +55,10 @@ namespace rmx
 		bool  mouseIn(const Recti& rect) const	{ return rect.contains(mInputContext.mMousePos); }
 		void  warpMouse(int x, int y);
 
+		// Consumption of the current event (like a keyboard, mouse, update, render call)
+		void  consumeCurrentEvent()		{ mCurrentEventConsumed = true; }
+		bool  wasEventConsumed() const	{ return mCurrentEventConsumed; }
+
 	private:
 		void run();
 		void startTick();
@@ -71,7 +75,6 @@ namespace rmx
 		// Root element
 		GuiBase mRoot;
 
-		InputContext mInputContext;
 		bool   mInitialized = false;
 		bool   mRunning = false;
 		uint32 mTicks = 0;
@@ -79,6 +82,9 @@ namespace rmx
 		float  mTimeDifference = 0.0f;
 		float  mFrameRate = 0.0f;
 		int    mFrameCounter = 0;
+
+		InputContext mInputContext;
+		bool mCurrentEventConsumed = false;
 	};
 
 

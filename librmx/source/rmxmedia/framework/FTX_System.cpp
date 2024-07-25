@@ -136,6 +136,8 @@ namespace rmx
 		ev.state = (evnt.type == SDL_KEYDOWN);
 		ev.repeat = (evnt.repeat != 0);
 		mInputContext.applyEvent(ev);
+
+		mCurrentEventConsumed = false;
 		mRoot.keyboard(ev);
 	}
 
@@ -143,6 +145,8 @@ namespace rmx
 	{
 		TextInputEvent ev;
 		ev.text.readUnicode((const uint8*)evnt.text, (uint32)strlen(evnt.text), UnicodeEncoding::UTF8);
+
+		mCurrentEventConsumed = false;
 		mRoot.textinput(ev);
 	}
 
@@ -158,6 +162,8 @@ namespace rmx
 		ev.state = (evnt.type == SDL_MOUSEBUTTONDOWN);
 		ev.position.set(evnt.x, evnt.y);
 		mInputContext.applyEvent(ev);
+
+		mCurrentEventConsumed = false;
 		mRoot.mouse(ev);
 	}
 
@@ -180,6 +186,7 @@ namespace rmx
 		mFrameRate = (1.0f / dt) * (1.0f - adaption) + mFrameRate * adaption;
 
 		// Update root GuiBase instance
+		mCurrentEventConsumed = false;
 		mRoot.update(dt);
 		++mFrameCounter;
 	}
@@ -192,6 +199,7 @@ namespace rmx
 		if (!FTX::Video->isActive())
 			return;
 
+		mCurrentEventConsumed = false;
 		FTX::Video->beginRendering();
 		mRoot.render();
 		FTX::Video->endRendering();

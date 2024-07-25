@@ -68,13 +68,15 @@ public:
 
 private:
 	void internalRemoveChild(GuiBase& child);
-	void onIteratingChildrenDone();
+
+	void beginIteratingChildren();
+	void endIteratingChildren();
 
 protected:
 	Recti mRect;
 
 private:
-	std::vector<GuiBase*> mChildren;
+	std::vector<GuiBase*> mChildren;	// Front children get rendered first, but updated last
 	GuiBase* mParent = nullptr;
 
 	std::vector<GuiBase*> mChildrenToRemove;

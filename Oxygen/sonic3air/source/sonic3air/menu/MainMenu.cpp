@@ -22,7 +22,6 @@
 #include "oxygen/application/mainview/GameView.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/helper/Utils.h"
-#include "oxygen/simulation/Simulation.h"
 
 
 namespace mainmenu

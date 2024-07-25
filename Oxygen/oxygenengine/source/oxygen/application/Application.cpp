@@ -849,6 +849,7 @@ bool Application::updateLoading()
 				RMX_LOG_INFO("Adding game app instance");
 				mGameApp = &EngineMain::getDelegate().createGameApp();
 				addChild(*mGameApp);
+				moveToBack(*mGameApp);	// Move to the back, particularly to have it behind game view, which must gets its update call first
 				break;
 			}
 

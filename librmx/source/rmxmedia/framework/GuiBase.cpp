@@ -93,7 +93,7 @@ void GuiBase::moveToFront(GuiBase& child)
 void GuiBase::moveToBack(GuiBase& child)
 {
 	RMX_ASSERT(child.mParent == this, "Element to move to back is not a child");
-	if (mChildren.front() != &child)	// Child behind all others is the first one in the child list
+	if (mChildren.front() == &child)	// Child behind all others is the first one in the child list
 		return;
 
 	internalRemoveChild(child);
@@ -111,12 +111,12 @@ void GuiBase::sdlEvent(const SDL_Event& ev)
 	if (!mEnabled)
 		return;
 
-	mIteratingChildren = true;
-	for (GuiBase* child : mChildren)
+	beginIteratingChildren();
+	for (int k = (int)mChildren.size() - 1; k >= 0; --k)	// Iterate in reverse order
 	{
-		child->sdlEvent(ev);
+		mChildren[k]->sdlEvent(ev);
 	}
-	onIteratingChildrenDone();
+	endIteratingChildren();
 }
 
 void GuiBase::mouse(const rmx::MouseEvent& ev)
@@ -124,12 +124,12 @@ void GuiBase::mouse(const rmx::MouseEvent& ev)
 	if (!mEnabled)
 		return;
 
-	mIteratingChildren = true;
-	for (GuiBase* child : mChildren)
+	beginIteratingChildren();
+	for (int k = (int)mChildren.size() - 1; k >= 0; --k)	// Iterate in reverse order
 	{
-		child->mouse(ev);
+		mChildren[k]->mouse(ev);
 	}
-	onIteratingChildrenDone();
+	endIteratingChildren();
 }
 
 void GuiBase::keyboard(const rmx::KeyboardEvent& ev)
@@ -137,12 +137,12 @@ void GuiBase::keyboard(const rmx::KeyboardEvent& ev)
 	if (!mEnabled)
 		return;
 
-	mIteratingChildren = true;
-	for (GuiBase* child : mChildren)
+	beginIteratingChildren();
+	for (int k = (int)mChildren.size() - 1; k >= 0; --k)	// Iterate in reverse order
 	{
-		child->keyboard(ev);
+		mChildren[k]->keyboard(ev);
 	}
-	onIteratingChildrenDone();
+	endIteratingChildren();
 }
 
 void GuiBase::textinput(const rmx::TextInputEvent& ev)
@@ -150,12 +150,12 @@ void GuiBase::textinput(const rmx::TextInputEvent& ev)
 	if (!mEnabled)
 		return;
 
-	mIteratingChildren = true;
-	for (GuiBase* child : mChildren)
+	beginIteratingChildren();
+	for (int k = (int)mChildren.size() - 1; k >= 0; --k)	// Iterate in reverse order
 	{
-		child->textinput(ev);
+		mChildren[k]->textinput(ev);
 	}
-	onIteratingChildrenDone();
+	endIteratingChildren();
 }
 
 void GuiBase::update(float deltaSeconds)
@@ -163,12 +163,12 @@ void GuiBase::update(float deltaSeconds)
 	if (!mEnabled || !mVisible)
 		return;
 
-	mIteratingChildren = true;
-	for (GuiBase* child : mChildren)
+	beginIteratingChildren();
+	for (int k = (int)mChildren.size() - 1; k >= 0; --k)	// Iterate in reverse order
 	{
-		child->update(deltaSeconds);
+		mChildren[k]->update(deltaSeconds);
 	}
-	onIteratingChildrenDone();
+	endIteratingChildren();
 }
 
 void GuiBase::render()
@@ -176,14 +176,13 @@ void GuiBase::render()
 	if (!mVisible)
 		return;
 
-	mIteratingChildren = true;
-	for (GuiBase* child : mChildren)
+	beginIteratingChildren();
+	for (int k = 0; k < (int)mChildren.size(); ++k)			// Iterate in forward order
 	{
-		child->render();
+		mChildren[k]->render();
 	}
-	onIteratingChildrenDone();
+	endIteratingChildren();
 }
-
 
 void GuiBase::internalRemoveChild(GuiBase& child)
 {
@@ -197,9 +196,15 @@ void GuiBase::internalRemoveChild(GuiBase& child)
 	}
 }
 
-void GuiBase::onIteratingChildrenDone()
+void GuiBase::beginIteratingChildren()
+{
+	mIteratingChildren = true;
+}
+
+void GuiBase::endIteratingChildren()
 {
 	mIteratingChildren = false;
+
 	for (GuiBase* child : mChildrenToRemove)
 	{
 		internalRemoveChild(*child);
