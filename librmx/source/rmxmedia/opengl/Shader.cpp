@@ -168,7 +168,7 @@ void Shader::bind()
 		}
 	}
 	glUseProgram(mProgram);
-	mTextureCount = 0;
+	resetTextureCount();
 }
 
 void Shader::unbind()

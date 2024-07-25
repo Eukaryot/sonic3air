@@ -21,7 +21,10 @@ void OpenGLShader::resetLastUsedShader()
 bool OpenGLShader::bindShader()
 {
 	if (mLastUsedShader == this)
+	{
+		mShader.resetTextureCount();	// To ensure that the following calls to "Shader::setTexture" use the correct texture index
 		return false;
+	}
 
 	mShader.bind();
 	mLastUsedShader = this;

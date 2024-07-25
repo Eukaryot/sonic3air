@@ -69,6 +69,7 @@ public:
 	void setMatrix(GLuint loc, const Mat3f& matrix);
 	void setMatrix(GLuint loc, const Mat4f& matrix);
 
+	inline void resetTextureCount()  { mTextureCount = 0; }
 	void setTexture(GLuint loc, GLuint handle, GLenum target);
 	void setTexture(GLuint loc, const Texture& texture);
 
