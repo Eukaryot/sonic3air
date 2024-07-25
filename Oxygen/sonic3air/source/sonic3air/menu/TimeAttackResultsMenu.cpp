@@ -117,7 +117,7 @@ void TimeAttackResultsMenu::render()
 			GameApp::instance().enableStillImageBlur(true, 0.5f);
 		}
 
-		Recti rect(roundToInt(mRect.width) - global::mTimeAttackResultsBG.getWidth(), 0, global::mTimeAttackResultsBG.getWidth(), global::mTimeAttackResultsBG.getHeight());
+		Recti rect(mRect.width - global::mTimeAttackResultsBG.getWidth(), 0, global::mTimeAttackResultsBG.getWidth(), global::mTimeAttackResultsBG.getHeight());
 		drawer.drawRect(rect, global::mTimeAttackResultsBG);
 
 		const String text = String("Your time:   ") + formatTime(mYourTime, true);

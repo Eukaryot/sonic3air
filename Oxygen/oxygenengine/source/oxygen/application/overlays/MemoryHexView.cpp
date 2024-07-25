@@ -23,7 +23,7 @@ MemoryHexView::~MemoryHexView()
 
 void MemoryHexView::initialize()
 {
-	setRect(5, 480, 720, 100);
+	setRect(Recti(5, 480, 720, 100));
 
 	// Debug output font
 	mFont.setSize(15.0f);
@@ -45,7 +45,7 @@ void MemoryHexView::keyboard(const rmx::KeyboardEvent& ev)
 			case 'i':
 			{
 				mLines = (mLines == 0) ? 2 : (mLines < 16) ? (mLines * 2) : 0;
-				mRect.height = (float)(20 + 20 * mLines);
+				mRect.height = 20 + 20 * mLines;
 				break;
 			}
 
@@ -78,7 +78,7 @@ void MemoryHexView::render()
 
 		drawer.drawRect(mRect, Color(0.0f, 0.0f, 0.0f, 0.6f));
 
-		Rectf rect = getRect();
+		Recti rect = getRect();
 		rect.y += 10;
 		for (uint32 y = 0; y < mLines; ++y)
 		{

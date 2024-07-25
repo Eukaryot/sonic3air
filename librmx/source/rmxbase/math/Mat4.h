@@ -284,20 +284,19 @@ public:
 		Vec3<TYPE> out0(dir0);
 		out0.normalize();
 		Vec3<TYPE> out1(dir1);
-		Vec3<TYPE> out2;
-		out2.cross(out0, out1);
+		Vec3<TYPE> out2 = Vec3<TYPE>::crossProduct(out0, out1);
 		if (out2.sqrLen() == 0)
 		{
 			out1 = Vec3f::UNIT_Z;
-			out2.cross(out0, out1);
+			out2 = Vec3<TYPE>::crossProduct(out0, out1);
 			if (out2.sqrLen() == 0)
 			{
 				out1 = Vec3f::UNIT_Y;
-				out2.cross(out0, out1);
+				out2 = Vec3<TYPE>::crossProduct(out0, out1);
 			}
 		}
 		out2.normalize();
-		out1.cross(out2, out0);
+		out1 = Vec3<TYPE>::crossProduct(out2, out0);
 		for (int i = 0; i < 4; ++i)
 		{
 			data[i*4+0] = out0.data[i];
@@ -349,8 +348,7 @@ public:
 		TYPE dot = gam0.dot(in1);
 		dot = (dot < -1) ? -1 : ((dot > +1) ? +1 : dot);
 		gamma = rad2deg(acos(dot));
-		Vec3<TYPE> tmp;
-		tmp.cross(gam0, in1);
+		Vec3<TYPE> tmp = Vec3<TYPE>::crossProduct(gam0, in1);
 		if (tmp.dot(in2) < 0)
 			gamma = -gamma;
 	}

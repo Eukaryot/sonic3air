@@ -69,7 +69,7 @@ namespace rmx
 		void lockAudio();
 		void unlockAudio();
 
-		void regularUpdate(float timeElapsed);	// Should best be called once every frame
+		void regularUpdate(float deltaSeconds);	// Should best be called once every frame
 
 		void setGlobalVolume(float volume);
 

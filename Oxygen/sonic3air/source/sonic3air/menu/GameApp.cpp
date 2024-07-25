@@ -75,20 +75,23 @@ void GameApp::initialize()
 
 	if (nullptr == mApplicationContextMenu)
 	{
-		mApplicationContextMenu = createChild<ApplicationContextMenu>();
+		mApplicationContextMenu = &createChild<ApplicationContextMenu>();
 	}
 }
 
 void GameApp::deinitialize()
 {
 	// Remove children that get explicitly deleted
-	mGameView->removeChild(mMenuBackground);
-	mGameView->removeChild(mPauseMenu);
-	mGameView->removeChild(mTimeAttackResultsMenu);
+	if (nullptr != mMenuBackground)
+		mGameView->removeChild(*mMenuBackground);
+	if (nullptr != mPauseMenu)
+		mGameView->removeChild(*mPauseMenu);
+	if (nullptr != mTimeAttackResultsMenu)
+		mGameView->removeChild(*mTimeAttackResultsMenu);
 	if (nullptr != mSecretUnlockedWindow)
-		mGameView->removeChild(mSecretUnlockedWindow);
+		mGameView->removeChild(*mSecretUnlockedWindow);
 	if (nullptr != mSkippableCutsceneWindow)
-		mGameView->removeChild(mSkippableCutsceneWindow);
+		mGameView->removeChild(*mSkippableCutsceneWindow);
 }
 
 void GameApp::mouse(const rmx::MouseEvent& ev)
@@ -143,28 +146,29 @@ void GameApp::update(float timeElapsed)
 
 	if (nullptr != mPauseMenu->getParent() && mPauseMenu->canBeRemoved())
 	{
-		mGameView->removeChild(mPauseMenu);
+		mGameView->removeChild(*mPauseMenu);
 	}
+
 	if (nullptr != mRemoveChild && mRemoveChild->getParent() == mGameView)
 	{
-		mGameView->removeChild(mRemoveChild);
+		mGameView->removeChild(*mRemoveChild);
 		mRemoveChild = nullptr;
 	}
 
 	// Make sure the overlay windows are always on top
 	if (nullptr != mSecretUnlockedWindow && nullptr != mSecretUnlockedWindow->getParent())
 	{
-		mSecretUnlockedWindow->getParent()->moveToFront(mSecretUnlockedWindow);
+		mSecretUnlockedWindow->getParent()->moveToFront(*mSecretUnlockedWindow);
 	}
 	if (nullptr != mSkippableCutsceneWindow && nullptr != mSkippableCutsceneWindow->getParent())
 	{
 		if (mSkippableCutsceneWindow->canBeRemoved())
 		{
-			mGameView->removeChild(mSkippableCutsceneWindow);
+			mGameView->removeChild(*mSkippableCutsceneWindow);
 		}
 		else
 		{
-			mSkippableCutsceneWindow->getParent()->moveToFront(mSkippableCutsceneWindow);
+			mSkippableCutsceneWindow->getParent()->moveToFront(*mSkippableCutsceneWindow);
 		}
 	}
 }
@@ -207,12 +211,12 @@ void GameApp::openMainMenu()
 	AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
 
 	if (mPauseMenu->getParent() == mGameView)
-		mGameView->removeChild(mPauseMenu);
+		mGameView->removeChild(*mPauseMenu);
 	if (mTimeAttackResultsMenu->getParent() == mGameView)
-		mGameView->removeChild(mTimeAttackResultsMenu);
+		mGameView->removeChild(*mTimeAttackResultsMenu);
 
 	mCurrentState = State::MAIN_MENU;
-	mGameView->addChild(mMenuBackground);
+	mGameView->addChild(*mMenuBackground);
 	mGameView->startFadingIn();
 
 	mGameMenuManager->forceRemoveAll();
@@ -226,7 +230,7 @@ void GameApp::openOptionsMenuInGame()
 	mCurrentState = State::INGAME_OPTIONS;
 
 	mPauseMenu->setEnabled(false);
-	mGameView->addChild(mMenuBackground);
+	mGameView->addChild(*mMenuBackground);
 	mGameView->startFadingIn();
 	mMenuBackground->openOptions(true);
 }
@@ -250,7 +254,7 @@ void GameApp::onFadedOutOptions()
 	{
 		// Coming from in-game options, then go back into the game
 		if (mMenuBackground->getParent() == mGameView)
-			mGameView->removeChild(mMenuBackground);
+			mGameView->removeChild(*mMenuBackground);
 
 		mPauseMenu->setEnabled(true);
 		mPauseMenu->onReturnFromOptions();
@@ -284,7 +288,7 @@ void GameApp::onGamePaused(bool canRestart)
 	mPauseMenu->onFadeIn();
 	if (nullptr == mPauseMenu->getParent())
 	{
-		mGameView->addChild(mPauseMenu);
+		mGameView->addChild(*mPauseMenu);
 	}
 }
 
@@ -297,7 +301,7 @@ void GameApp::restartTimeAttack()
 {
 	mCurrentState = State::INGAME;
 	Game::instance().restartTimeAttack(true);
-	mGameView->removeChild(mTimeAttackResultsMenu);
+	mGameView->removeChild(*mTimeAttackResultsMenu);
 }
 
 void GameApp::returnToMenu()
@@ -317,7 +321,7 @@ void GameApp::showTimeAttackResults(int hundreds, const std::vector<int>& otherT
 		}
 		mTimeAttackResultsMenu->onFadeIn();
 
-		mGameView->addChild(mTimeAttackResultsMenu);
+		mGameView->addChild(*mTimeAttackResultsMenu);
 	}
 }
 
@@ -332,7 +336,7 @@ void GameApp::showUnlockedWindow(SecretUnlockedWindow::EntryType entryType, cons
 	{
 		mSecretUnlockedWindow = new SecretUnlockedWindow();
 	}
-	mGameView->addChild(mSecretUnlockedWindow);
+	mGameView->addChild(*mSecretUnlockedWindow);
 	mSecretUnlockedWindow->show(entryType, title, content, (entryType == SecretUnlockedWindow::EntryType::SECRET) ? 0x68 : 0x63);
 }
 
@@ -342,13 +346,12 @@ void GameApp::showSkippableCutsceneWindow(bool show)
 	{
 		if (!show)
 			return;
-		mSkippableCutsceneWindow = new SkippableCutsceneWindow();
-		mGameView->addChild(mSkippableCutsceneWindow);
+		mSkippableCutsceneWindow = &mGameView->createChild<SkippableCutsceneWindow>();
 	}
 	else
 	{
 		if (nullptr == mSkippableCutsceneWindow->getParent())
-			mGameView->addChild(mSkippableCutsceneWindow);
+			mGameView->addChild(*mSkippableCutsceneWindow);
 	}
 	mSkippableCutsceneWindow->show(show);
 }

@@ -31,7 +31,7 @@ namespace rmx
 
 		template<typename T> void run()
 		{
-			T* t = mRoot.createChild<T>();
+			T& t = mRoot.createChild<T>();
 			run();
 			mRoot.deleteChild(t);
 		}

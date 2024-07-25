@@ -150,7 +150,7 @@ void MenuBackground::deinitialize()
 {
 	for (GameMenuBase* child : mAllChildren)
 	{
-		removeChild(child);
+		removeChild(*child);
 	}
 }
 

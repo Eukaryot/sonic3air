@@ -49,6 +49,7 @@ public:
 	inline GLint getFormat() const	{ return mFormat; }
 	inline int getWidth() const		{ return mWidth; }
 	inline int getHeight() const	{ return mHeight; }
+	inline Vec2i getSize() const	{ return Vec2i(mWidth, mHeight); }
 	inline Recti getRect() const	{ return Recti(0, 0, mWidth, mHeight); }
 	inline float getAspectRatio() const  { return (float)mWidth / (float)mHeight; }
 

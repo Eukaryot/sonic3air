@@ -203,7 +203,6 @@ void TouchControlsOverlay::render()
 		drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 0.8f));
 
 		Color color = (mConfigMode.mState == ConfigMode::State::DONE_BUTTON_DOWN) ? Color::YELLOW : Color::WHITE;
-		color.a = mAlpha;
 		drawer.drawRect(getScreenFromNormalizedTouchRect(DONE_BUTTON_RECT), mDoneText, color);
 	}
 

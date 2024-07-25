@@ -42,9 +42,9 @@ namespace lemon
 	Compiler::Compiler(Module& module, GlobalsLookup& globalsLookup, const CompileOptions& compileOptions) :
 		mModule(module),
 		mGlobalsLookup(globalsLookup),
-		mCompileOptions(compileOptions),
-		mTokenProcessing(globalsLookup, module, compileOptions),
-		mPreprocessor(compileOptions, mTokenProcessing)
+		mCompileOptions(compileOptions),	// Making a copy
+		mTokenProcessing(globalsLookup, module, mCompileOptions),
+		mPreprocessor(mCompileOptions, mTokenProcessing)
 	{
 	}
 

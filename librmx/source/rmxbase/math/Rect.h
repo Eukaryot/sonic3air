@@ -114,6 +114,14 @@ public:
 
 	bool contains(const Vec2<TYPE>& vec) const	{ return contains(vec.x, vec.y); }
 
+	void extendToInclude(const Vec2<TYPE>& vec)
+	{
+		if (vec.x < x)			 { width  += (x - vec.x);  x = vec.x; }
+		if (vec.y < y)			 { height += (y - vec.y);  y = vec.y; }
+		if (vec.x >= x + width)	 { width  = vec.x - x + 1; }
+		if (vec.y >= y + height) { height = vec.y - y + 1; }
+	}
+
 	Vec2<TYPE> getClosestPoint(const Vec2<TYPE>& vec) const
 	{
 		Vec2<TYPE> result;

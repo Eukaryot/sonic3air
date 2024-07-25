@@ -182,15 +182,15 @@ public:
 		}
 		else if (axis == 1)
 		{
-			data[0]       = _cos;
-			data[2]       = +_sin;
+			data[0]     = _cos;
+			data[2]     = +_sin;
 			data[3*2]   = -_sin;
 			data[3*2+2] = _cos;
 		}
 		else
 		{
-			data[0]     = _cos;
-			data[1]     = -_sin;
+			data[0]   = _cos;
+			data[1]   = -_sin;
 			data[3]   = +_sin;
 			data[3+1] = _cos;
 		}
@@ -212,7 +212,7 @@ public:
 		setIdentity();
 		for (int i = 0; i < 3; ++i)
 		{
-			data[i]       = dir0.data[i];
+			data[i]     = dir0.data[i];
 			data[3+i]   = dir1.data[i];
 			data[2*3+i] = dir2.data[i];
 		}
@@ -232,20 +232,19 @@ public:
 		Vec3<TYPE> out0(dir0);
 		out0.normalize();
 		Vec3<TYPE> out1(dir1);
-		Vec3<TYPE> out2;
-		out2.cross(out0, out1);
+		Vec3<TYPE> out2 = Vec3<TYPE>::crossProduct(out0, out1);
 		if (out2.sqrLen() == 0)
 		{
 			out1 = Vec3<TYPE>::UNIT_Z;
-			out2.cross(out0, out1);
+			out2 = Vec3<TYPE>::crossProduct(out0, out1);
 			if (out2.sqrLen() == 0)
 			{
 				out1 = Vec3<TYPE>::UNIT_Y;
-				out2.cross(out0, out1);
+				out2 = Vec3<TYPE>::crossProduct(out0, out1);
 			}
 		}
 		out2.normalize();
-		out1.cross(out2, out0);
+		out1 = Vec3<TYPE>::crossProduct(out2, out0);
 		for (int i = 0; i < 3; ++i)
 		{
 			data[i*3+0] = out0.data[i];

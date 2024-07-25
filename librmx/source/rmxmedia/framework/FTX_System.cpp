@@ -199,9 +199,9 @@ namespace rmx
 
 	void FTX_SystemManager::run(GuiBase& app)
 	{
-		mRoot.addChild(&app);
+		mRoot.addChild(app);
 		run();
-		mRoot.removeChild(&app);
+		mRoot.removeChild(app);
 	}
 
 	void FTX_SystemManager::mainLoop()

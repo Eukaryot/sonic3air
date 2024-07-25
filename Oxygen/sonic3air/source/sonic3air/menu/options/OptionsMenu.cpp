@@ -317,7 +317,7 @@ void OptionsMenu::initialize()
 	if (nullptr == mControllerSetupMenu)
 	{
 		mControllerSetupMenu = new ControllerSetupMenu(*this);
-		addChild(mControllerSetupMenu);
+		addChild(*mControllerSetupMenu);
 	}
 
 	// Rebuild mods tab & mods option entries

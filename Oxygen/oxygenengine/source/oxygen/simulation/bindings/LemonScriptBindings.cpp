@@ -529,7 +529,7 @@ namespace
 
 		if (decimal && wrapper.mType->getClass() == lemon::DataTypeDefinition::Class::INTEGER)
 		{
-			const std::string valueString = *String(0, "%d", wrapper.mValue);
+			const std::string valueString = *String(0, "%d", wrapper.mValue.get<int64>());
 			debugLogInternal(valueString);
 		}
 		else

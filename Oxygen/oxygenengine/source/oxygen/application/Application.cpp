@@ -76,8 +76,8 @@ void Application::initialize()
 	{
 		RMX_LOG_INFO("Adding game view");
 		mGameView = new GameView(*mSimulation);
-		addChild(mGameView);
-		mBackdropView = createChild<BackdropView>();
+		addChild(*mGameView);
+		mBackdropView = &createChild<BackdropView>();
 	}
 
 	mWindowMode = (WindowMode)Configuration::instance().mWindowMode;
@@ -85,19 +85,19 @@ void Application::initialize()
 	if (EngineMain::getDelegate().useDeveloperFeatures())
 	{
 		RMX_LOG_INFO("Adding debug views");
-		mDebugSidePanel = createChild<DebugSidePanel>();
+		mDebugSidePanel = &createChild<DebugSidePanel>();
 		createChild<MemoryHexView>();
 		createChild<DebugLogView>();
 	}
 
-	//mOxygenMenu = mGameView->createChild<OxygenMenu>();
-	mProfilingView = createChild<ProfilingView>();
-	mCheatSheetOverlay = createChild<CheatSheetOverlay>();
+	//mOxygenMenu = &mGameView->createChild<OxygenMenu>();
+	mProfilingView = &createChild<ProfilingView>();
+	mCheatSheetOverlay = &createChild<CheatSheetOverlay>();
 
 	if (nullptr != mTouchControlsOverlay && nullptr == mTouchControlsOverlay->getParent())
 	{
 		mTouchControlsOverlay->buildTouchControls();
-		addChild(mTouchControlsOverlay);
+		addChild(*mTouchControlsOverlay);
 	}
 
 	// Font
@@ -115,7 +115,7 @@ void Application::deinitialize()
 	// Destroy game app here already, instead of using the auto-deletion of children
 	if (nullptr != mGameApp)
 	{
-		deleteChild(mGameApp);
+		deleteChild(*mGameApp);
 		mGameApp = nullptr;
 	}
 
@@ -308,7 +308,7 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 						{
 							if (!mSaveStateMenu->isActive() && mSimulation->isRunning())
 							{
-								addChild(mSaveStateMenu);
+								addChild(*mSaveStateMenu);
 								mSaveStateMenu->init(false);
 								mSimulation->setSpeed(0.0f);
 							}
@@ -324,7 +324,7 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 							// Load state menu
 							if (!mSaveStateMenu->isActive() && mSimulation->isRunning())
 							{
-								addChild(mSaveStateMenu);
+								addChild(*mSaveStateMenu);
 								mSaveStateMenu->init(true);
 								mSimulation->setSpeed(0.0f);
 							}
@@ -421,7 +421,7 @@ void Application::update(float timeElapsed)
 	#if defined(DEBUG)
 		if (nullptr == mGameSetupScreen)
 		{
-			mGameSetupScreen = mGameView->createChild<GameSetupScreen>();
+			mGameSetupScreen = &mGameView->createChild<GameSetupScreen>();
 		}
 	#endif
 
@@ -431,7 +431,7 @@ void Application::update(float timeElapsed)
 	{
 		if (nullptr != mGameSetupScreen)
 		{
-			mGameView->deleteChild(mGameSetupScreen);
+			mGameView->deleteChild(*mGameSetupScreen);
 			mGameSetupScreen = nullptr;
 		}
 	}
@@ -482,7 +482,7 @@ void Application::update(float timeElapsed)
 
 	if (nullptr != mRemoveChild)
 	{
-		removeChild(mRemoveChild);
+		removeChild(*mRemoveChild);
 		mRemoveChild = nullptr;
 	}
 
@@ -848,7 +848,7 @@ bool Application::updateLoading()
 
 				RMX_LOG_INFO("Adding game app instance");
 				mGameApp = &EngineMain::getDelegate().createGameApp();
-				addChild(mGameApp);
+				addChild(*mGameApp);
 				break;
 			}
 

@@ -55,7 +55,7 @@ void SecretUnlockedWindow::update(float timeElapsed)
 			mPhase = Phase::NONE;
 			if (mEnqueuedEntries.empty())
 			{
-				getParent()->removeChild(this);
+				removeFromParent();
 			}
 			else
 			{

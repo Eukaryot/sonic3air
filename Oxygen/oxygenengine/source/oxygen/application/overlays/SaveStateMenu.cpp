@@ -123,7 +123,7 @@ void SaveStateMenu::keyboard(const rmx::KeyboardEvent& ev)
 
 			case SDLK_ESCAPE:
 			{
-				((Application*)mParent)->childClosed(*this);
+				static_cast<Application*>(getParent())->childClosed(*this);
 				break;
 			}
 
@@ -198,7 +198,7 @@ void SaveStateMenu::update(float timeElapsed)
 		}
 		else if (controller.B.justPressed() || controller.Back.justPressed())
 		{
-			((Application*)mParent)->childClosed(*this);
+			static_cast<Application*>(getParent())->childClosed(*this);
 		}
 	}
 }
@@ -352,5 +352,5 @@ void SaveStateMenu::onAccept(bool loadingAllowed, bool savingAllowed)
 		}
 	}
 
-	((Application*)mParent)->childClosed(*this);
+	static_cast<Application*>(getParent())->childClosed(*this);
 }

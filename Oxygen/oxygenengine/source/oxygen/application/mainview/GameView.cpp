@@ -123,7 +123,7 @@ void GameView::updateGameViewport()
 			const Rectf letterBox = RenderUtils::getLetterBoxRect(mRect, gameScreenRect.getAspectRatio());
 			mGameViewport.width = round((letterBox.width + mRect.width) * 0.5f);		// Average size of letter box and full stretch
 			mGameViewport.height = round((letterBox.height + mRect.height) * 0.5f);
-			mGameViewport.setPos((mRect.getSize() - mGameViewport.getSize()) * 0.5f);	// Center on screen
+			mGameViewport.setPos((mRect.getSize() - mGameViewport.getSize()) / 2);	// Center on screen
 			break;
 		}
 
@@ -198,10 +198,7 @@ void GameView::deinitialize()
 	GuiBase::deinitialize();
 
 	// Remove all children, as they must not get deleted automatically (which would be the case if they stay added as children)
-	while (!mChildren.empty())
-	{
-		removeChild(*mChildren.begin());
-	}
+	removeAllChildren();
 }
 
 void GameView::keyboard(const rmx::KeyboardEvent& ev)
