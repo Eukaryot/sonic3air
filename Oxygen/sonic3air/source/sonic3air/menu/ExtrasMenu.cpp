@@ -299,7 +299,7 @@ void ExtrasMenu::update(float timeElapsed)
 	}
 	else if (mState > State::SHOW)
 	{
-		mVisibility = saturate(mVisibility - timeElapsed * 6.0f);
+		mVisibility = saturate(mVisibility - timeElapsed * 4.0f);
 		if (mVisibility <= 0.0f)
 		{
 			if (mState == State::FADE_TO_GAME && mActiveTab == 0)
