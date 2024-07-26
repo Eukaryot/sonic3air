@@ -41,11 +41,12 @@ namespace lemon
 		template<typename T> const T& as() const  { return static_cast<const T&>(*this); }
 
 		FlyweightString getName() const;
-		inline uint16 getID() const			{ return mID; }
-		inline size_t getBytes() const		{ return mBytes; }
-		inline Class getClass() const		{ return mClass; }
-		inline BaseType getBaseType() const	{ return mBaseType; }
-		inline bool isPredefined() const	{ return mClass > Class::STRING; }
+		inline uint16 getID() const			 { return mID; }
+		inline size_t getBytes() const		 { return mBytes; }
+		inline size_t getSizeOnStack() const { return (mBytes + 7) / 8; }
+		inline Class getClass() const		 { return mClass; }
+		inline BaseType getBaseType() const	 { return mBaseType; }
+		inline bool isPredefined() const	 { return mClass > Class::STRING; }
 
 		virtual uint16 getDataTypeHash() const  { return mID; }
 
@@ -73,7 +74,7 @@ namespace lemon
 	{
 	public:
 		inline AnyDataType() :
-			DataTypeDefinition("any", 1, Class::ANY, 0, BaseType::UINT_64)
+			DataTypeDefinition("any", 1, Class::ANY, 16, BaseType::UINT_64)
 		{}
 	};
 
