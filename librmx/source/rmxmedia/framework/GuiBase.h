@@ -25,7 +25,8 @@ public:
 	GuiBase();
 	virtual ~GuiBase();
 
-	inline GuiBase* getParent() const  { return mParent; }
+	inline bool hasParent() const		{ return nullptr != mParent; }
+	inline GuiBase* getParent() const	{ return mParent; }
 	inline const std::vector<GuiBase*>& getChildren() const  { return mChildren; }
 
 	void addChild(GuiBase& child);
@@ -47,17 +48,11 @@ public:
 
 	void removeFromParent();
 
-	void setRect(const Recti& rect)		{ mRect = rect; }
-	const Recti& getRect() const		{ return mRect; }
+	inline const Recti& getRect() const		{ return mRect; }
+	inline void setRect(const Recti& rect)	{ mRect = rect; }
 
-	virtual void setEnabled(bool value)	{ mEnabled = value; }
-	bool isEnabled() const				{ return mEnabled && (nullptr != mParent); }
-
-	virtual void setVisible(bool value)	{ mVisible = value; }
-	bool isVisible() const				{ return mVisible && (nullptr != mParent); }
-
-	virtual void initialize() {}
-	virtual void deinitialize() {}
+	virtual void initialize();
+	virtual void deinitialize();
 
 	virtual void sdlEvent(const SDL_Event& ev);
 	virtual void mouse(const rmx::MouseEvent& ev);
@@ -81,7 +76,4 @@ private:
 
 	std::vector<GuiBase*> mChildrenToRemove;
 	bool mIteratingChildren = false;
-
-	bool mEnabled = true;
-	bool mVisible = true;
 };

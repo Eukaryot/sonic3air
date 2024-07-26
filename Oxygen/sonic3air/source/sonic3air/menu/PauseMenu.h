@@ -22,9 +22,8 @@ public:
 	virtual void onFadeIn() override;
 	virtual bool canBeRemoved() override;
 
-	virtual void initialize() override;
-	virtual void deinitialize() override;
-	virtual void keyboard(const rmx::KeyboardEvent& ev) override;
+	inline void setEnabled(bool enabled)  { mIsEnabled = enabled; }
+
 	virtual void update(float timeElapsed) override;
 	virtual void render() override;
 
@@ -56,6 +55,8 @@ private:
 	float mVisibility = 0.0f;
 	float mDialogVisibility = 0.0f;
 	float mTimeShown = 0.0f;
+	bool mIsEnabled = true;
+
 	bool mScreenshotMode = false;
 	bool mRestartEnabled = false;
 	Vec2i mRestoreGameResolution;

@@ -86,21 +86,9 @@ bool PauseMenu::canBeRemoved()
 	return (mState == State::INACTIVE && mVisibility <= 0.0f);
 }
 
-void PauseMenu::initialize()
-{
-}
-
-void PauseMenu::deinitialize()
-{
-}
-
-void PauseMenu::keyboard(const rmx::KeyboardEvent& ev)
-{
-}
-
 void PauseMenu::update(float timeElapsed)
 {
-	if (!isEnabled())
+	if (!mIsEnabled)
 		return;
 
 	if (mRestoreGameResolution != Vec2i())
