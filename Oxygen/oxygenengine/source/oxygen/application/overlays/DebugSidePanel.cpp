@@ -968,7 +968,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					for (size_t i = 0; i < entry.mEntries.size(); ++i)
 					{
 						const DebugTracking::ScriptLogSingleEntry& singleEntry = entry.mEntries[i];
-						const uint64 key = (((uint64)entry.mEntries.size() << 16) + ((uint64)i << 32)) ^ rmx::getMurmur2_64(String(singleEntry.mValue));
+						const uint64 key = (((uint64)entry.mEntries.size() << 16) + ((uint64)i << 32)) ^ rmx::getMurmur2_64(singleEntry.mValue);
 						builder.addLine(singleEntry.mValue, color, 56, key);
 
 						if (category.mOpenKeys.count(key) != 0)

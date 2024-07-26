@@ -71,7 +71,7 @@ void RawDataCollection::loadRawDataInDirectory(const std::wstring& path, bool is
 			if (entryJson["File"].isString())
 			{
 				const char* filename = entryJson["File"].asCString();
-				const uint64 key = rmx::getMurmur2_64(String(it.key().asCString()));
+				const uint64 key = rmx::getMurmur2_64(it.key().asCString());
 				rawData = &mRawDataPool.createObject();
 				rawData->mIsModded = isModded;
 				if (!FTX::FileSystem->readFile(fileEntry.mPath + String(filename).toStdWString(), rawData->mContent))
