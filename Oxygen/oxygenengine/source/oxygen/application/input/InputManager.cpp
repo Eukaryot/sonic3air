@@ -185,7 +185,7 @@ namespace
 		}
 		joystickName.lowerCase();
 		const uint64 nameHashes[2] = { rmx::getMurmur2_64(joystickName), controllerName.empty() ? 0 : rmx::getMurmur2_64(controllerName) };
-		static const uint64 WILDCARD_HASH = rmx::getMurmur2_64(String("*"));
+		constexpr uint64 WILDCARD_HASH = rmx::constMurmur2_64("*");
 
 		for (size_t k = 0; k < definitions.size(); ++k)
 		{
@@ -936,7 +936,7 @@ void InputManager::setControllerLEDsForPlayer(int playerIndex, const Color& colo
 
 void InputManager::handleActiveModsChanged()
 {
-	static const uint64 FEATURE_NAME_HASH = rmx::getMurmur2_64("Controls_LR");
+	constexpr uint64 FEATURE_NAME_HASH = rmx::constMurmur2_64("Controls_LR");
 	mUsingControlsLR = ModManager::instance().anyActiveModUsesFeature(FEATURE_NAME_HASH);
 
 	if (TouchControlsOverlay::hasInstance())

@@ -14,7 +14,7 @@
 
 
 RemasteredMusicDownload::RemasteredMusicDownload() :
-	mDownloadID(rmx::getMurmur2_64("RemasteredSoundtrack"))
+	mDownloadID(rmx::constMurmur2_64("RemasteredSoundtrack"))
 {
 }
 

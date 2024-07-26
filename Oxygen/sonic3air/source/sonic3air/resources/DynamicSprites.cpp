@@ -13,18 +13,18 @@
 #include "oxygen/resources/SpriteCollection.h"
 
 
-const uint64 DynamicSprites::INPUT_ICON_BUTTON_UP    = rmx::getMurmur2_64("@input_icon_button_up");
-const uint64 DynamicSprites::INPUT_ICON_BUTTON_DOWN  = rmx::getMurmur2_64("@input_icon_button_down");
-const uint64 DynamicSprites::INPUT_ICON_BUTTON_LEFT  = rmx::getMurmur2_64("@input_icon_button_left");
-const uint64 DynamicSprites::INPUT_ICON_BUTTON_RIGHT = rmx::getMurmur2_64("@input_icon_button_right");
-const uint64 DynamicSprites::INPUT_ICON_BUTTON_A     = rmx::getMurmur2_64("@input_icon_button_A");
-const uint64 DynamicSprites::INPUT_ICON_BUTTON_B     = rmx::getMurmur2_64("@input_icon_button_B");
-const uint64 DynamicSprites::INPUT_ICON_BUTTON_X     = rmx::getMurmur2_64("@input_icon_button_X");
-const uint64 DynamicSprites::INPUT_ICON_BUTTON_Y     = rmx::getMurmur2_64("@input_icon_button_Y");
-const uint64 DynamicSprites::INPUT_ICON_BUTTON_START = rmx::getMurmur2_64("@input_icon_button_start");
-const uint64 DynamicSprites::INPUT_ICON_BUTTON_BACK  = rmx::getMurmur2_64("@input_icon_button_back");
-const uint64 DynamicSprites::INPUT_ICON_BUTTON_L     = rmx::getMurmur2_64("@input_icon_button_L");
-const uint64 DynamicSprites::INPUT_ICON_BUTTON_R     = rmx::getMurmur2_64("@input_icon_button_R");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_UP    = rmx::constMurmur2_64("@input_icon_button_up");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_DOWN  = rmx::constMurmur2_64("@input_icon_button_down");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_LEFT  = rmx::constMurmur2_64("@input_icon_button_left");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_RIGHT = rmx::constMurmur2_64("@input_icon_button_right");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_A     = rmx::constMurmur2_64("@input_icon_button_A");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_B     = rmx::constMurmur2_64("@input_icon_button_B");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_X     = rmx::constMurmur2_64("@input_icon_button_X");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_Y     = rmx::constMurmur2_64("@input_icon_button_Y");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_START = rmx::constMurmur2_64("@input_icon_button_start");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_BACK  = rmx::constMurmur2_64("@input_icon_button_back");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_L     = rmx::constMurmur2_64("@input_icon_button_L");
+const uint64 DynamicSprites::INPUT_ICON_BUTTON_R     = rmx::constMurmur2_64("@input_icon_button_R");
 
 DynamicSprites::GamepadStyle::GamepadStyle(const std::string& identifier)
 {
@@ -169,18 +169,18 @@ void DynamicSprites::updateSpriteRedirects()
 
 		case InputManager::InputType::TOUCH:
 		{
-			static const uint64 INPUT_ICON_TOUCH_UP    = rmx::getMurmur2_64("input_icon_touch_up");
-			static const uint64 INPUT_ICON_TOUCH_DOWN  = rmx::getMurmur2_64("input_icon_touch_down");
-			static const uint64 INPUT_ICON_TOUCH_LEFT  = rmx::getMurmur2_64("input_icon_touch_left");
-			static const uint64 INPUT_ICON_TOUCH_RIGHT = rmx::getMurmur2_64("input_icon_touch_right");
-			static const uint64 INPUT_ICON_TOUCH_A     = rmx::getMurmur2_64("input_icon_touch_A");
-			static const uint64 INPUT_ICON_TOUCH_B     = rmx::getMurmur2_64("input_icon_touch_B");
-			static const uint64 INPUT_ICON_TOUCH_X     = rmx::getMurmur2_64("input_icon_touch_X");
-			static const uint64 INPUT_ICON_TOUCH_Y     = rmx::getMurmur2_64("input_icon_touch_Y");
-			static const uint64 INPUT_ICON_TOUCH_START = rmx::getMurmur2_64("input_icon_touch_start");
-			static const uint64 INPUT_ICON_TOUCH_BACK  = rmx::getMurmur2_64("input_icon_touch_back");
-			static const uint64 INPUT_ICON_TOUCH_L     = rmx::getMurmur2_64("input_icon_touch_L");
-			static const uint64 INPUT_ICON_TOUCH_R     = rmx::getMurmur2_64("input_icon_touch_R");
+			constexpr uint64 INPUT_ICON_TOUCH_UP    = rmx::constMurmur2_64("input_icon_touch_up");
+			constexpr uint64 INPUT_ICON_TOUCH_DOWN  = rmx::constMurmur2_64("input_icon_touch_down");
+			constexpr uint64 INPUT_ICON_TOUCH_LEFT  = rmx::constMurmur2_64("input_icon_touch_left");
+			constexpr uint64 INPUT_ICON_TOUCH_RIGHT = rmx::constMurmur2_64("input_icon_touch_right");
+			constexpr uint64 INPUT_ICON_TOUCH_A     = rmx::constMurmur2_64("input_icon_touch_A");
+			constexpr uint64 INPUT_ICON_TOUCH_B     = rmx::constMurmur2_64("input_icon_touch_B");
+			constexpr uint64 INPUT_ICON_TOUCH_X     = rmx::constMurmur2_64("input_icon_touch_X");
+			constexpr uint64 INPUT_ICON_TOUCH_Y     = rmx::constMurmur2_64("input_icon_touch_Y");
+			constexpr uint64 INPUT_ICON_TOUCH_START = rmx::constMurmur2_64("input_icon_touch_start");
+			constexpr uint64 INPUT_ICON_TOUCH_BACK  = rmx::constMurmur2_64("input_icon_touch_back");
+			constexpr uint64 INPUT_ICON_TOUCH_L     = rmx::constMurmur2_64("input_icon_touch_L");
+			constexpr uint64 INPUT_ICON_TOUCH_R     = rmx::constMurmur2_64("input_icon_touch_R");
 
 			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_UP,    INPUT_ICON_TOUCH_UP);
 			spriteCollection.setupRedirect(INPUT_ICON_BUTTON_DOWN,  INPUT_ICON_TOUCH_DOWN);

@@ -194,7 +194,7 @@ namespace rmx
 		printToLog(errorSeverity, message);
 
 		// Check if ignored
-		const uint32 hash = (uint32)getMurmur2_64(String(filename)) ^ (uint32)line;
+		const uint32 hash = (uint32)getMurmur2_64(filename) ^ (uint32)line;
 		if (gIgnoredAssertHashes.count(hash) != 0)
 			return false;
 

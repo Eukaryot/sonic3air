@@ -16,17 +16,17 @@ namespace
 {
 	void drawSpeechBalloon(Drawer& drawer, const Recti& innerRect, const Color& color, int arrowDirection, int arrowX)
 	{
-		static const uint64 key00 = rmx::getMurmur2_64(std::string_view("speechballoon_00"));
-		static const uint64 key01 = rmx::getMurmur2_64(std::string_view("speechballoon_01"));
-		static const uint64 key02 = rmx::getMurmur2_64(std::string_view("speechballoon_02"));
-		static const uint64 key10 = rmx::getMurmur2_64(std::string_view("speechballoon_10"));
-		static const uint64 key11 = rmx::getMurmur2_64(std::string_view("speechballoon_11"));
-		static const uint64 key12 = rmx::getMurmur2_64(std::string_view("speechballoon_12"));
-		static const uint64 key20 = rmx::getMurmur2_64(std::string_view("speechballoon_20"));
-		static const uint64 key21 = rmx::getMurmur2_64(std::string_view("speechballoon_21"));
-		static const uint64 key22 = rmx::getMurmur2_64(std::string_view("speechballoon_22"));
-		static const uint64 arrowUp = rmx::getMurmur2_64(std::string_view("speechballoon_arrow_up"));
-		static const uint64 arrowDown = rmx::getMurmur2_64(std::string_view("speechballoon_arrow_down"));
+		constexpr uint64 key00 = rmx::constMurmur2_64("speechballoon_00");
+		constexpr uint64 key01 = rmx::constMurmur2_64("speechballoon_01");
+		constexpr uint64 key02 = rmx::constMurmur2_64("speechballoon_02");
+		constexpr uint64 key10 = rmx::constMurmur2_64("speechballoon_10");
+		constexpr uint64 key11 = rmx::constMurmur2_64("speechballoon_11");
+		constexpr uint64 key12 = rmx::constMurmur2_64("speechballoon_12");
+		constexpr uint64 key20 = rmx::constMurmur2_64("speechballoon_20");
+		constexpr uint64 key21 = rmx::constMurmur2_64("speechballoon_21");
+		constexpr uint64 key22 = rmx::constMurmur2_64("speechballoon_22");
+		constexpr uint64 arrowUp = rmx::constMurmur2_64("speechballoon_arrow_up");
+		constexpr uint64 arrowDown = rmx::constMurmur2_64("speechballoon_arrow_down");
 
 		constexpr int ARROW_WIDTH = 12;
 

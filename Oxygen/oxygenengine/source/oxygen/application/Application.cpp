@@ -557,9 +557,9 @@ void Application::render()
 
 		// TODO: The sprites are from S3AIR, but used in OxygenApp as well
 	#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(PLATFORM_IOS)
-		static const uint64 key = rmx::getMurmur2_64(std::string_view("auto_pause_text_tap"));
+		constexpr uint64 key = rmx::constMurmur2_64("auto_pause_text_tap");
 	#else
-		static const uint64 key = rmx::getMurmur2_64(std::string_view("auto_pause_text_key"));
+		constexpr uint64 key = rmx::constMurmur2_64("auto_pause_text_key");
 	#endif
 		const float scale = (float)(FTX::screenHeight() / 160);		// A bit larger than he usual upscaled pixel size
 		drawer.drawSprite(FTX::screenSize() / 2, key, Color(0.3f, 1.0f, 1.0f), Vec2f(scale));

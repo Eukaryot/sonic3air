@@ -37,6 +37,7 @@ namespace rmx
 		return (string[0] == 0) ? value : compileTimeFNV_64(&string[1], (value ^ static_cast<uint32>(string[0])) * FNV1a_64_MAGIC_PRIME);
 	}
 
+
 	// Calculate Murmur2 64-bit hash for data
 	uint64 getMurmur2_64(const uint8* data, size_t bytes);
 	uint64 getMurmur2_64(const char* str);
@@ -47,6 +48,52 @@ namespace rmx
 	uint64 getMurmur2_64(const std::wstring& str);
 	uint64 getMurmur2_64(std::string_view str);
 	uint64 getMurmur2_64(std::wstring_view str);
+
+	// Compile-time constant Murmur2 64-bit hash for a string
+	constexpr uint64 constMurmur2_64(const char* data)
+	{
+		// Code is based on https://github.com/abrandoned/murmur2/blob/master/MurmurHash2.c
+		//  -> Namely "MurmurHash64A", i.e. the version optimized for 64-bit architectures
+		//  -> We're using a fixed seed of 0
+
+		size_t bytes = 0;
+		while (data[bytes] != 0)
+			++bytes;
+
+		const uint64 m = 0xc6a4a7935bd1e995ull;
+		const int r = 47;
+		uint64 h = (uint64)bytes * m;
+
+		const char* end = data + (bytes / 8 * 8);
+		while (data != end)
+		{
+			uint64 k = ((uint64)data[0]) + ((uint64)data[1] << 8) + ((uint64)data[2] << 16) + ((uint64)data[3] << 24) + ((uint64)data[4] << 32) + ((uint64)data[5] << 40) + ((uint64)data[6] << 48) + ((uint64)data[7] << 56);
+			data += 8;
+			k *= m;
+			k ^= k >> r;
+			k *= m;
+			h ^= k;
+			h *= m;
+		}
+
+		switch (bytes & 0x07)
+		{
+			case 7:  h ^= ((uint64)data[6]) << 48;  [[fallthrough]];
+			case 6:  h ^= ((uint64)data[5]) << 40;  [[fallthrough]];
+			case 5:  h ^= ((uint64)data[4]) << 32;  [[fallthrough]];
+			case 4:  h ^= ((uint64)data[3]) << 24;  [[fallthrough]];
+			case 3:  h ^= ((uint64)data[2]) << 16;  [[fallthrough]];
+			case 2:  h ^= ((uint64)data[1]) << 8;   [[fallthrough]];
+			case 1:  h ^= ((uint64)data[0]);
+				h *= m;
+		};
+
+		h ^= h >> r;
+		h *= m;
+		h ^= h >> r;
+		return h;
+	}
+
 
 	// Calculate CRC32 checksum for data
 	uint32 getCRC32(const uint8* data, size_t bytes);

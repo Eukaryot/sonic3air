@@ -101,9 +101,9 @@ bool PlayerProgress::load()
 	// Prefer loading from persistent data
 	PersistentData& persistentData = PersistentData::instance();
 
-	const std::vector<uint8>& achievementsData = persistentData.getData(rmx::getMurmur2_64("s3air_achievements"), rmx::getMurmur2_64("Achievements"));
-	const std::vector<uint8>& secretsData = persistentData.getData(rmx::getMurmur2_64("s3air_unlocks"), rmx::getMurmur2_64("Secrets"));
-	const std::vector<uint8>& finishedZoneActsData = persistentData.getData(rmx::getMurmur2_64("s3air_unlocks"), rmx::getMurmur2_64("FinishedZoneActs"));
+	const std::vector<uint8>& achievementsData     = persistentData.getData(rmx::constMurmur2_64("s3air_achievements"), rmx::constMurmur2_64("Achievements"));
+	const std::vector<uint8>& secretsData          = persistentData.getData(rmx::constMurmur2_64("s3air_unlocks"), rmx::constMurmur2_64("Secrets"));
+	const std::vector<uint8>& finishedZoneActsData = persistentData.getData(rmx::constMurmur2_64("s3air_unlocks"), rmx::constMurmur2_64("FinishedZoneActs"));
 
 	if (!achievementsData.empty() || !secretsData.empty() || !finishedZoneActsData.empty())
 	{

@@ -19,39 +19,39 @@ namespace lemon
 
 		static const std::map<uint64, const DataTypeDefinition*> varTypeLookup =
 		{
-			{ rmx::getMurmur2_64(String("void")),	&PredefinedDataTypes::VOID },
-			{ rmx::getMurmur2_64(String("s8")),		&PredefinedDataTypes::INT_8 },
-			{ rmx::getMurmur2_64(String("s16")),	&PredefinedDataTypes::INT_16 },
-			{ rmx::getMurmur2_64(String("s32")),	&PredefinedDataTypes::INT_32 },
-			{ rmx::getMurmur2_64(String("s64")),	&PredefinedDataTypes::INT_64 },
-			{ rmx::getMurmur2_64(String("bool")),	&PredefinedDataTypes::UINT_8 },		// Only a synonym for u8
-			{ rmx::getMurmur2_64(String("u8")),		&PredefinedDataTypes::UINT_8 },
-			{ rmx::getMurmur2_64(String("u16")),	&PredefinedDataTypes::UINT_16 },
-			{ rmx::getMurmur2_64(String("u32")),	&PredefinedDataTypes::UINT_32 },
-			{ rmx::getMurmur2_64(String("u64")),	&PredefinedDataTypes::UINT_64 },
-			{ rmx::getMurmur2_64(String("float")),	&PredefinedDataTypes::FLOAT },
-			{ rmx::getMurmur2_64(String("double")),	&PredefinedDataTypes::DOUBLE },
-			{ rmx::getMurmur2_64(String("string")),	&PredefinedDataTypes::STRING }
+			{ rmx::constMurmur2_64("void"),		&PredefinedDataTypes::VOID },
+			{ rmx::constMurmur2_64("s8"),		&PredefinedDataTypes::INT_8 },
+			{ rmx::constMurmur2_64("s16"),		&PredefinedDataTypes::INT_16 },
+			{ rmx::constMurmur2_64("s32"),		&PredefinedDataTypes::INT_32 },
+			{ rmx::constMurmur2_64("s64"),		&PredefinedDataTypes::INT_64 },
+			{ rmx::constMurmur2_64("bool"),		&PredefinedDataTypes::UINT_8 },		// Only a synonym for u8
+			{ rmx::constMurmur2_64("u8"),		&PredefinedDataTypes::UINT_8 },
+			{ rmx::constMurmur2_64("u16"),		&PredefinedDataTypes::UINT_16 },
+			{ rmx::constMurmur2_64("u32"),		&PredefinedDataTypes::UINT_32 },
+			{ rmx::constMurmur2_64("u64"),		&PredefinedDataTypes::UINT_64 },
+			{ rmx::constMurmur2_64("float"),	&PredefinedDataTypes::FLOAT },
+			{ rmx::constMurmur2_64("double"),	&PredefinedDataTypes::DOUBLE },
+			{ rmx::constMurmur2_64("string"),	&PredefinedDataTypes::STRING }
 		};
 
 		static const std::map<uint64, Keyword> keywordLookup =
 		{
-			{ rmx::getMurmur2_64(String("function")),	  Keyword::FUNCTION },
-			{ rmx::getMurmur2_64(String("global")),		  Keyword::GLOBAL },
-			{ rmx::getMurmur2_64(String("constant")),	  Keyword::CONSTANT },
-			{ rmx::getMurmur2_64(String("define")),		  Keyword::DEFINE },
-			{ rmx::getMurmur2_64(String("declare")),	  Keyword::DECLARE },
-			{ rmx::getMurmur2_64(String("return")),		  Keyword::RETURN },
-			{ rmx::getMurmur2_64(String("call")),		  Keyword::CALL },
-			{ rmx::getMurmur2_64(String("jump")),		  Keyword::JUMP },
-			{ rmx::getMurmur2_64(String("break")),		  Keyword::BREAK },
-			{ rmx::getMurmur2_64(String("continue")),	  Keyword::CONTINUE },
-			{ rmx::getMurmur2_64(String("if")),			  Keyword::IF },
-			{ rmx::getMurmur2_64(String("else")),		  Keyword::ELSE },
-			{ rmx::getMurmur2_64(String("while")),		  Keyword::WHILE },
-			{ rmx::getMurmur2_64(String("for")),		  Keyword::FOR },
-			{ rmx::getMurmur2_64(String("addressof")),	  Keyword::ADDRESSOF },
-			{ rmx::getMurmur2_64(String("makeCallable")), Keyword::MAKECALLABLE }
+			{ rmx::constMurmur2_64("function"),		Keyword::FUNCTION },
+			{ rmx::constMurmur2_64("global"),		Keyword::GLOBAL },
+			{ rmx::constMurmur2_64("constant"),		Keyword::CONSTANT },
+			{ rmx::constMurmur2_64("define"),		Keyword::DEFINE },
+			{ rmx::constMurmur2_64("declare"),		Keyword::DECLARE },
+			{ rmx::constMurmur2_64("return"),		Keyword::RETURN },
+			{ rmx::constMurmur2_64("call"),			Keyword::CALL },
+			{ rmx::constMurmur2_64("jump"),			Keyword::JUMP },
+			{ rmx::constMurmur2_64("break"),		Keyword::BREAK },
+			{ rmx::constMurmur2_64("continue"),		Keyword::CONTINUE },
+			{ rmx::constMurmur2_64("if"),			Keyword::IF },
+			{ rmx::constMurmur2_64("else"),			Keyword::ELSE },
+			{ rmx::constMurmur2_64("while"),		Keyword::WHILE },
+			{ rmx::constMurmur2_64("for"),			Keyword::FOR },
+			{ rmx::constMurmur2_64("addressof"),	Keyword::ADDRESSOF },
+			{ rmx::constMurmur2_64("makeCallable"), Keyword::MAKECALLABLE }
 		};
 
 		static const std::vector<const char*> reservedKeywords =
@@ -123,8 +123,8 @@ namespace lemon
 			}
 
 			// Check for "true", "false"
-			static const uint64 trueHash  = rmx::getMurmur2_64(std::string_view("true"));
-			static const uint64 falseHash = rmx::getMurmur2_64(std::string_view("false"));
+			constexpr uint64 trueHash  = rmx::constMurmur2_64("true");
+			constexpr uint64 falseHash = rmx::constMurmur2_64("false");
 			if (identifierHash == trueHash || identifierHash == falseHash)
 			{
 				ConstantParserToken& token = outTokens.create<ConstantParserToken>();

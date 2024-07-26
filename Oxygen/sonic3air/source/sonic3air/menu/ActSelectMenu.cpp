@@ -270,15 +270,15 @@ void ActSelectMenu::render()
 
 	// Show character selection
 	{
-		drawer.drawSprite(Vec2i(anchorX - 122, 159), rmx::getMurmur2_64("charselectionbox"), Color(1.0f, 1.0f, 1.0f, alpha));
+		drawer.drawSprite(Vec2i(anchorX - 122, 159), rmx::constMurmur2_64("charselectionbox"), Color(1.0f, 1.0f, 1.0f, alpha));
 
 		static const uint64 charSpriteKey[5] =
 		{
-			rmx::getMurmur2_64("menu_characters_sonic_tails"),		// Sonic & Tails
-			rmx::getMurmur2_64("menu_characters_sonic"),			// Sonic
-			rmx::getMurmur2_64("menu_characters_tails"),			// Tails
-			rmx::getMurmur2_64("menu_characters_knuckles"),			// Knuckles
-			rmx::getMurmur2_64("menu_characters_knuckles_tails")	// Knuckles & Tails
+			rmx::constMurmur2_64("menu_characters_sonic_tails"),	// Sonic & Tails
+			rmx::constMurmur2_64("menu_characters_sonic"),			// Sonic
+			rmx::constMurmur2_64("menu_characters_tails"),			// Tails
+			rmx::constMurmur2_64("menu_characters_knuckles"),		// Knuckles
+			rmx::constMurmur2_64("menu_characters_knuckles_tails")	// Knuckles & Tails
 		};
 		const uint32 charSelection = clamp(mCharacterEntry->selected().mValue, 0, 4);
 		drawer.drawSprite(Vec2i(anchorX - 125, 156), charSpriteKey[charSelection], Color(1.0f, 1.0f, 1.0f, alpha));
