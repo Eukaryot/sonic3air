@@ -20,5 +20,5 @@ public:
 	uint64 getRandomUint64();
 
 private:
-	uint64 mState[4];
+	uint64 mState[4] = { 1, 2, 3, 4 };	// Just some arbitrary initial state avoiding that everything is zero
 };
