@@ -420,31 +420,18 @@ void SpriteCollection::loadSpriteDefinitions(const std::wstring& path)
 
 			for (auto it = iterator->begin(); it != iterator->end(); ++it)
 			{
-				if (it.key().asString() == "File" && !it->asString().empty())
+				Json::String keyString = it.key().asString();
+				if (keyString == "File")
 				{
-					filename = *String(it->asString()).toWString();
+					JsonHelper::parseWString(filename, it);
 				}
-				else if (it.key().asString() == "Center" && !it->asString().empty())
+				else if (keyString == "Center")
 				{
-					std::vector<String> parts;
-					String(it->asString()).split(parts, ',');
-					if (parts.size() == 2)
-					{
-						center.x = parts[0].parseInt();
-						center.y = parts[1].parseInt();
-					}
+					JsonHelper::parseVec2i(center, it);
 				}
-				else if (it.key().asString() == "Rect" && !it->asString().empty())
+				else if (keyString == "Rect")
 				{
-					std::vector<String> parts;
-					String(it->asString()).split(parts, ',');
-					if (parts.size() == 4)
-					{
-						rect.x = parts[0].parseInt();
-						rect.y = parts[1].parseInt();
-						rect.width = parts[2].parseInt();
-						rect.height = parts[3].parseInt();
-					}
+					JsonHelper::parseRecti(rect, it);
 				}
 			}
 

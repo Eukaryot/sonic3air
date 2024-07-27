@@ -17,6 +17,10 @@ public:
 	static Json::Value loadFile(const std::wstring& filename);
 	static bool saveFile(const std::wstring& filename, const Json::Value& value);
 
+	static bool parseWString(std::wstring& output, const Json::Value::const_iterator& it);
+	static bool parseVec2i(Vec2i& output, const Json::Value::const_iterator& it);
+	static bool parseRecti(Recti& output, const Json::Value::const_iterator& it);
+
 public:
 	inline JsonHelper(const Json::Value& json) : rmx::JsonHelper(json) {}
 };
