@@ -209,7 +209,7 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 		sprite.mUseUpscaledSprite = true;
 
 		const constexpr float SCALE = 1.0f / 3.0f;
-		const Vec2f transformedOffset = sprite.mTransformation.transformVector(sprite.mCacheItem->mSprite->mOffset);
+		const Vec2f transformedOffset = sprite.mTransformation.transformVector(Vec2f(sprite.mCacheItem->mSprite->mOffset));
 		sprite.mPosition.x += roundToInt(transformedOffset.x * (1.0f - SCALE));
 		sprite.mPosition.y += roundToInt(transformedOffset.y * (1.0f - SCALE));
 		sprite.mSize *= 3;

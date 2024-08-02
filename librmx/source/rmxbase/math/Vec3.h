@@ -36,9 +36,10 @@ public:
 	Vec3(const Vec3& source) : x(source.x), y(source.y), z(source.z) {}
 	Vec3(TYPE x_, TYPE y_, TYPE z_) : x(x_), y(y_), z(z_) {}
 
-	template<typename T> Vec3(const Vec3<T>& source)
+	template<typename T> explicit Vec3(const Vec3<T>& source)
 	{
-		FORi(data[i] = TYPE(source.data[i]));
+		for (int i = 0; i < 3; ++i)
+			data[i] = rmx::convertType<T, TYPE>(source.data[i]);
 	}
 
 	void clear()

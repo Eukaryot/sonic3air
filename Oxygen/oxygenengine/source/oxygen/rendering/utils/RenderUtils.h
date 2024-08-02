@@ -35,8 +35,8 @@ public:
 	};
 
 public:
-	static Rectf getLetterBoxRect(const Rectf& frameRect, float aspectRatio);
-	static Rectf getScaleToFillRect(const Rectf& frameRect, float aspectRatio);
+	static Recti getLetterBoxRect(const Recti& frameRect, float aspectRatio);
+	static Recti getScaleToFillRect(const Recti& frameRect, float aspectRatio);
 
 	static void expandPatternDataFromVRAM(uint8* dst, const void* src_);
 	static void expandPatternDataFromROM(uint8* dst, const void* src_);

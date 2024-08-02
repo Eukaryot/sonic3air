@@ -379,7 +379,7 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 
 	std::vector<TypeInfo> typeInfos;
 	std::vector<ExtendedTypeInfo> extendedTypeInfos;
-	getTypeInfos(typeInfos, Vec2f(0.0f, 0.0f), text, spacing);
+	getTypeInfos(typeInfos, Vec2i(), text, spacing);
 
 	applyToTypeInfos(extendedTypeInfos, typeInfos);
 	if (extendedTypeInfos.empty())

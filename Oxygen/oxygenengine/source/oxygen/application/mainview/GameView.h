@@ -27,7 +27,7 @@ public:
 	GameView(Simulation& simulation);
 	~GameView();
 
-	inline const Rectf& getGameViewport() const  { return mGameViewport; }
+	inline const Recti& getGameViewport() const  { return mGameViewport; }
 	void updateGameViewport();
 
 	bool translatePositionIntoGameViewport(Vec2f& outPosition, const Vec2f& inPosition) const;
@@ -68,7 +68,7 @@ private:
 private:
 	Simulation& mSimulation;
 
-	Rectf mGameViewport;
+	Recti mGameViewport;
 
 	float mFadeValue = 1.0f;
 	float mFadeChange = 0.0f;

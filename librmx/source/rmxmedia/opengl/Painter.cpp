@@ -163,7 +163,7 @@ namespace rmx
 	void Painter::print(Font& font, const Recti& rect, const StringReader& text, const PrintOptions& printOptions)
 	{
 		OpenGLFontOutput& fontOutput = getOpenGLFontOutput(font);
-		const Vec2f pos = font.alignText(rect, text, printOptions.mAlignment);
+		const Vec2i pos = font.alignText(rect, text, printOptions.mAlignment);
 
 		std::vector<Font::TypeInfo> typeinfos;
 		font.getTypeInfos(typeinfos, pos, text, printOptions.mSpacing);

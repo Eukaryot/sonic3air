@@ -48,6 +48,7 @@ public:
 	Vec2<TYPE> getPos() const    { return Vec2<TYPE>(x, y); }
 	Vec2<TYPE> getSize() const   { return Vec2<TYPE>(width, height); }
 	Vec2<TYPE> getCenter() const { return Vec2<TYPE>(x + width / TYPE(2), y + height / TYPE(2)); }
+	Vec2<TYPE> getEndPos() const { return Vec2<TYPE>(x + width, y + height); }
 
 	void set(TYPE px, TYPE py, TYPE w, TYPE h)  { x = px;  y = py;  width = w;  height = h; }
 	void set(Vec2<TYPE> pos, Vec2<TYPE> size)	{ x = pos.x;  y = pos.y;  width = size.x;  height = size.y; }

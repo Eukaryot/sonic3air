@@ -67,6 +67,20 @@ int vectorIndexOf(const std::vector<T>& vec, T element)
 	return -1;
 }
 
+// Remove all instances of an element from an std::vector
+template<typename T, typename S>
+void vectorRemoveAll(std::vector<T>& container, S value)
+{
+	container.erase(std::remove(container.begin(), container.end(), value), container.end());
+}
+
+// Remove all elements matching the predicate from an std::vector
+template<typename T, class PRED>
+void vectorRemoveByPredicate(std::vector<T>& container, PRED predicate)
+{
+	container.erase(std::remove_if(container.begin(), container.end(), predicate), container.end());
+}
+
 
 // Find an element in an std::map
 template<typename K, typename V>

@@ -222,16 +222,14 @@ void TouchControlsOverlay::render()
 			if (nullptr == item)
 				continue;
 
-			Rectf rect;
-			rect.setPos(visualElement.mCenter - visualElement.mHalfExtend);
-			rect.setSize(visualElement.mHalfExtend * 2.0f);
-
 			Color color = (mConfigMode.mEnabled && visualElement.mReactToState == mConfigMode.mState) ? Color::CYAN : Color::WHITE;
 			color.a = alpha;
 
+			Rectf rect(visualElement.mCenter - visualElement.mHalfExtend, visualElement.mHalfExtend * 2.0f);
 			rect = getScreenFromNormalizedTouchRect(rect);
 			const Vec2f scale = rect.getSize() / Vec2f(item->mSprite->getSize());
-			drawer.drawSprite(rect.getPos() + rect.getSize() / 2, spriteKey, color, scale);
+
+			drawer.drawSprite(Vec2i(rect.getCenter()), spriteKey, color, scale);
 		}
 		drawer.setSamplingMode(SamplingMode::POINT);
 	}

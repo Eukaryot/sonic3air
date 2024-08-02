@@ -103,6 +103,13 @@ FORCE_INLINE double roundToDouble(double value)	{ return floor(value + 0.5); }
 template<typename T> static T roundForInt(float value)  { return (T)value; }
 
 
+namespace rmx
+{
+	template<typename S, typename T> T convertType(S value)  { return (T)value; }
+	template<> int convertType(float value);
+}
+
+
 // Linear interpolation
 FORCE_INLINE float interpolate(float v0, float v1, float factor)		{ return v0 + (v1 - v0) * factor; }
 FORCE_INLINE double interpolate(double v0, double v1, double factor)	{ return v0 + (v1 - v0) * factor; }

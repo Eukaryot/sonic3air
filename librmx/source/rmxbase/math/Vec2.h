@@ -36,9 +36,10 @@ public:
 	Vec2(const Vec2& source) : x(source.x), y(source.y) {}
 	Vec2(TYPE x_, TYPE y_) : x(x_), y(y_) {}
 
-	template<typename T> Vec2(const Vec2<T>& source)
+	template<typename T> explicit Vec2(const Vec2<T>& source)
 	{
-		FORi(data[i] = TYPE(source.data[i]));
+		for (int i = 0; i < 2; ++i)
+			data[i] = rmx::convertType<T, TYPE>(source.data[i]);
 	}
 
 	void clear()	{ FORi(data[i] = 0); }

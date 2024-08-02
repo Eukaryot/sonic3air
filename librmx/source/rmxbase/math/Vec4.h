@@ -42,9 +42,10 @@ public:
 		FORi(data[i] = source.data[i]); w = w_;
 	}
 
-	template<typename T> Vec4(const Vec4<T>& source)
+	template<typename T> explicit Vec4(const Vec4<T>& source)
 	{
-		FORi(data[i] = TYPE(source.data[i]));
+		for (int i = 0; i < 3; ++i)
+			data[i] = rmx::convertType<T, TYPE>(source.data[i]);
 	}
 
 	void clear()	{ FORi(data[i] = 0); }

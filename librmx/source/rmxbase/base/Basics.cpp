@@ -18,6 +18,8 @@ namespace rmx
 	template<> uint32 swapBytes(uint32 value) { return swapBytes32(value); }
 	template<> int64  swapBytes(int64 value)  { return swapBytes64(value); }
 	template<> uint64 swapBytes(uint64 value) { return swapBytes64(value); }
+
+	template<> int convertType(float value)   { return roundToInt(value); }
 }
 
 

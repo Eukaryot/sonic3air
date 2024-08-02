@@ -78,8 +78,6 @@ namespace rmx
 		SDL_Event evnt;
 		while (SDL_PollEvent(&evnt))
 		{
-			mRoot.sdlEvent(evnt);
-
 			switch (evnt.type)
 			{
 				case SDL_QUIT:
@@ -113,6 +111,8 @@ namespace rmx
 					ctx.mMousePos.set(evnt.motion.x, evnt.motion.y);
 					break;
 			}
+
+			mRoot.sdlEvent(evnt);
 		}
 
 		// Track changes since previous update

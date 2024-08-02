@@ -157,7 +157,7 @@ void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture, const Vec2f& uv
 
 void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture, const Recti& textureInnerRect, const Color& tintColor)
 {
-	const Vec2f texSize = Vec2f(texture.getSize());
+	const Vec2f texSize(texture.getSize());
 	if (texSize.x < 1.0f || texSize.y < 1.0f)
 		return;
 

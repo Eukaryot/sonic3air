@@ -20,43 +20,43 @@ namespace
 
 
 
-Rectf RenderUtils::getLetterBoxRect(const Rectf& frameRect, float aspectRatio)
+Recti RenderUtils::getLetterBoxRect(const Recti& frameRect, float aspectRatio)
 {
-	Rectf rect = frameRect;
+	Recti rect = frameRect;
 	const float frameRatio = frameRect.getAspectRatio();
 
 	if (frameRatio < aspectRatio)
 	{
-		const int newHeight = (int)((float)rect.height * frameRatio / aspectRatio + 0.5f);
+		const int newHeight = roundToInt((float)rect.height * frameRatio / aspectRatio);
 		rect.y += (rect.height - newHeight) / 2;
-		rect.height = (float)newHeight;
+		rect.height = newHeight;
 	}
 	else
 	{
-		const int newWidth = (int)((float)rect.width * aspectRatio / frameRatio + 0.5f);
+		const int newWidth = roundToInt((float)rect.width * aspectRatio / frameRatio);
 		rect.x += (rect.width - newWidth) / 2;
-		rect.width = (float)newWidth;
+		rect.width = newWidth;
 	}
 	return rect;
 }
 
 
-Rectf RenderUtils::getScaleToFillRect(const Rectf& frameRect, float aspectRatio)
+Recti RenderUtils::getScaleToFillRect(const Recti& frameRect, float aspectRatio)
 {
-	Rectf rect = frameRect;
+	Recti rect = frameRect;
 	const float frameRatio = frameRect.getAspectRatio();
 
 	if (frameRatio > aspectRatio)
 	{
-		const int newHeight = (int)((float)rect.height * frameRatio / aspectRatio + 0.5f);
+		const int newHeight = roundToInt((float)rect.height * frameRatio / aspectRatio);
 		rect.y += (rect.height - newHeight) / 2;
-		rect.height = (float)newHeight;
+		rect.height = newHeight;
 	}
 	else
 	{
-		const int newWidth = (int)((float)rect.width * aspectRatio / frameRatio + 0.5f);
+		const int newWidth = roundToInt((float)rect.width * aspectRatio / frameRatio);
 		rect.x += (rect.width - newWidth) / 2;
-		rect.width = (float)newWidth;
+		rect.width = newWidth;
 	}
 	return rect;
 }

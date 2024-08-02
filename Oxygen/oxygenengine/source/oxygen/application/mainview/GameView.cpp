@@ -109,8 +109,8 @@ void GameView::updateGameViewport()
 			const int scale = (int)mGameViewport.height / gameScreenRect.height;
 			if (scale >= 1)
 			{
-				mGameViewport.width = (float)(gameScreenRect.width * scale);
-				mGameViewport.height = (float)(gameScreenRect.height * scale);
+				mGameViewport.width = roundToInt((float)gameScreenRect.width * scale);
+				mGameViewport.height = roundToInt((float)gameScreenRect.height * scale);
 				mGameViewport.x = mRect.x + (mRect.width - mGameViewport.width) / 2;
 				mGameViewport.y = mRect.y + (mRect.height - mGameViewport.height) / 2;
 			}
@@ -120,9 +120,9 @@ void GameView::updateGameViewport()
 		case 2:
 		{
 			// Halfway stretch to fill
-			const Rectf letterBox = RenderUtils::getLetterBoxRect(mRect, gameScreenRect.getAspectRatio());
-			mGameViewport.width = round((letterBox.width + mRect.width) * 0.5f);		// Average size of letter box and full stretch
-			mGameViewport.height = round((letterBox.height + mRect.height) * 0.5f);
+			const Recti letterBox = RenderUtils::getLetterBoxRect(mRect, gameScreenRect.getAspectRatio());
+			mGameViewport.width = roundToInt((letterBox.width + mRect.width) * 0.5f);		// Average size of letter box and full stretch
+			mGameViewport.height = roundToInt((letterBox.height + mRect.height) * 0.5f);
 			mGameViewport.setPos((mRect.getSize() - mGameViewport.getSize()) / 2);	// Center on screen
 			break;
 		}
@@ -442,7 +442,7 @@ void GameView::mouse(const rmx::MouseEvent& ev)
 		if (nullptr != functionName)
 		{
 			Vec2f relativePosition;
-			if (translatePositionIntoGameViewport(relativePosition, ev.position))
+			if (translatePositionIntoGameViewport(relativePosition, Vec2f(ev.position)))
 			{
 				const uint8 flags = (FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_RSHIFT)) ? 0x01 : 0x00;
 
@@ -552,7 +552,7 @@ void GameView::update(float timeElapsed)
 				}
 
 				Vec2f relativePosition;
-				if (translatePositionIntoRect(relativePosition, rect, FTX::mousePos()))
+				if (translatePositionIntoRect(relativePosition, rect, Vec2f(FTX::mousePos())))
 				{
 					const uint32 index = (int)(relativePosition.x * 64.0f) + (int)(relativePosition.y * 32.0f) * 64;
 					debugTracking.updateScriptLogValue("~index", rmx::hexString(index, 4));
@@ -744,17 +744,17 @@ void GameView::render()
 	if (!FTX::Video->getVideoConfig().mAutoClearScreen)
 	{
 		// Draw black bars so no screen clearing is needed
-		const float x1 = mGameViewport.x;
-		const float x2 = mGameViewport.x + mGameViewport.width;
-		const float x3 = (float)FTX::Video->getScreenWidth();
-		const float y1 = mGameViewport.y;
-		const float y2 = mGameViewport.y + mGameViewport.height;
-		const float y3 = (float)FTX::Video->getScreenHeight();
+		const int x1 = mGameViewport.x;
+		const int x2 = mGameViewport.x + mGameViewport.width;
+		const int x3 = FTX::Video->getScreenWidth();
+		const int y1 = mGameViewport.y;
+		const int y2 = mGameViewport.y + mGameViewport.height;
+		const int y3 = FTX::Video->getScreenHeight();
 
-		drawer.drawRect(Rectf(0, 0, x3, y1), Color::BLACK);
-		drawer.drawRect(Rectf(0, y2, x3, y3 - y2), Color::BLACK);
-		drawer.drawRect(Rectf(0, y1, x1, y2 - y1), Color::BLACK);
-		drawer.drawRect(Rectf(x2, y1, x3 - x2, y2 - y1), Color::BLACK);
+		drawer.drawRect(Recti(0, 0, x3, y1), Color::BLACK);
+		drawer.drawRect(Recti(0, y2, x3, y3 - y2), Color::BLACK);
+		drawer.drawRect(Recti(0, y1, x1, y2 - y1), Color::BLACK);
+		drawer.drawRect(Recti(x2, y1, x3 - x2, y2 - y1), Color::BLACK);
 	}
 
 	// Enable alpha again

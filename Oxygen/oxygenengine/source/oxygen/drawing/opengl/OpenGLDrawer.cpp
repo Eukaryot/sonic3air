@@ -317,7 +317,7 @@ namespace opengldrawer
 		void printText(Font& font, const StringReader& text, const Recti& rect, const DrawerPrintOptions& printOptions)
 		{
 			OpenGLFontOutput& fontOutput = getOpenGLFontOutput(font);
-			const Vec2f pos = font.alignText(rect, text, printOptions.mAlignment);
+			const Vec2i pos = font.alignText(rect, text, printOptions.mAlignment);
 
 			static std::vector<Font::TypeInfo> typeInfos;
 			typeInfos.clear();
