@@ -135,6 +135,7 @@ public:
 	}
 
 	inline Storage getValue() const  { return mFlags; }
+	inline Storage& accessValue()	 { return mFlags; }
 
 	inline bool operator==(const BitFlagSet& other) const
 	{
