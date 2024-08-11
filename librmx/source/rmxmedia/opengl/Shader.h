@@ -38,6 +38,9 @@ public:
 	static inline std::function<bool(BlendMode)> mShaderApplyBlendModeCallback;				// Internal application of blend function will only be done if this is not set, or returns false
 
 public:
+	static void unbindShader();
+
+public:
 	Shader();
 	~Shader();
 

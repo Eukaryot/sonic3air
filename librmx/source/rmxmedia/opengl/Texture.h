@@ -28,14 +28,18 @@ public:
 	void create(GLenum type = GL_TEXTURE_2D);
 	void create(GLint format = rmx::OpenGLHelper::FORMAT_RGBA);
 	void create(int width, int height, GLint format = rmx::OpenGLHelper::FORMAT_RGBA);
+	void create(const Vec2i& size, GLint format = rmx::OpenGLHelper::FORMAT_RGBA);
 	void createCubemap(GLint format = rmx::OpenGLHelper::FORMAT_RGBA);
 	void createCubemap(int width, int height, GLint format = rmx::OpenGLHelper::FORMAT_RGBA);
+	void createCubemap(const Vec2i& size, GLint format = rmx::OpenGLHelper::FORMAT_RGBA);
 
 	void load(const void* data, int width, int height);
+	void load(const void* data, const Vec2i& size);
 	void load(const Bitmap& bitmap);
 	void load(const String& filename);
 	void loadCubemap(const String& filename);
 
+	void updateAll(const void* data);
 	void updateRect(const void* data, const Recti& rect);
 	void updateRect(const Bitmap& bitmap, int px, int py);
 
@@ -64,7 +68,7 @@ public:
 
 	inline GLuint operator*() const  { return mHandle; }
 
-	static GLenum getDefaultDataFormat(GLenum internalFormat);
+	static GLenum getDefaultDataFormat(GLint internalFormat);
 
 private:
 	void initialize();

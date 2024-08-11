@@ -141,6 +141,22 @@ public:
 		*this = getIntersection(other1, other2);
 	}
 
+	void addBorder(float border)
+	{
+		x -= border;
+		y -= border;
+		width += border * 2;
+		height += border * 2;
+	}
+
+	void addBorder(const Vec2<TYPE>& border)
+	{
+		x -= border.x;
+		y -= border.y;
+		width += border.x * 2;
+		height += border.y * 2;
+	}
+
 	TYPE& operator[](size_t index)				{ return mData[index]; }
 	const TYPE& operator[](size_t index) const	{ return mData[index]; }
 

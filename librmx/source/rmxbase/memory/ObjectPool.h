@@ -64,7 +64,7 @@ public:
 		mFreeItems.clear();
 	}
 
-	inline bool empty() const
+	inline bool isEmpty() const
 	{
 		// Get total number of reserved objects
 		size_t totalNumberOfObjects = 0;

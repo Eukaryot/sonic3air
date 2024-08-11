@@ -117,6 +117,8 @@ public:
 	inline TYPE& pop_back()			 { --count; return list[count]; }
 
 	inline bool empty() const		 { return count == 0; }
+	inline bool isEmpty() const		 { return count == 0; }
+	inline bool nonEmpty() const	 { return count != 0; }
 
 	TYPE* add()
 	{

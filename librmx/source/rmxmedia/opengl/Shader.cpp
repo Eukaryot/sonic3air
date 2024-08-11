@@ -13,6 +13,12 @@
 
 /* ----- Shader -------------------------------------------------------------------------------------------------- */
 
+void Shader::unbindShader()
+{
+	glUseProgram(0);
+	glActiveTexture(GL_TEXTURE0);
+}
+
 Shader::Shader()
 {
 }
@@ -173,8 +179,7 @@ void Shader::bind()
 
 void Shader::unbind()
 {
-	glUseProgram(0);
-	glActiveTexture(GL_TEXTURE0);
+	unbindShader();
 }
 
 bool Shader::load(const String& filename, const String& techname, const String& additionalDefines)

@@ -58,7 +58,7 @@ bool Texture::checkHandle() const
 	return (mHandle != 0);
 }
 
-GLenum Texture::getDefaultDataFormat(GLenum internalFormat)
+GLenum Texture::getDefaultDataFormat(GLint internalFormat)
 {
 	if (internalFormat == GL_DEPTH_COMPONENT)
 		return GL_DEPTH_COMPONENT;
@@ -66,6 +66,9 @@ GLenum Texture::getDefaultDataFormat(GLenum internalFormat)
 	if (internalFormat >= GL_DEPTH_COMPONENT16 && internalFormat <= GL_DEPTH_COMPONENT32)
 		return GL_DEPTH_COMPONENT;
 #endif
+
+	if (internalFormat == GL_R8)	// TODO: Translate others as well
+		return GL_RED;
 	return GL_RGBA;
 }
 
@@ -122,6 +125,11 @@ void Texture::create(int width, int height, GLint format)
 	glTexImage2D(mType, 0, mFormat, mWidth, mHeight, 0, getDefaultDataFormat(mFormat), GL_UNSIGNED_BYTE, nullptr);
 }
 
+void Texture::create(const Vec2i& size, GLint format)
+{
+	create(size.x, size.y, format);
+}
+
 void Texture::createCubemap(GLint format)
 {
 	if (!checkHandle())
@@ -159,13 +167,23 @@ void Texture::createCubemap(int width, int height, GLint format)
 	}
 }
 
+void Texture::createCubemap(const Vec2i& size, GLint format)
+{
+	createCubemap(size.x, size.y, format);
+}
+
 void Texture::load(const void* data, int width, int height)
 {
 	if (nullptr == data)
 		return;
 
 	create(width, height, rmx::OpenGLHelper::FORMAT_RGBA);
-	glTexImage2D(mType, 0, mFormat, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(mType, 0, mFormat, mWidth, mHeight, 0, getDefaultDataFormat(mFormat), GL_UNSIGNED_BYTE, data);
+}
+
+void Texture::load(const void* data, const Vec2i& size)
+{
+	load(data, size.x, size.y);
 }
 
 void Texture::load(const Bitmap& bitmap)
@@ -205,13 +223,18 @@ void Texture::loadCubemap(const String& filename)
 	}
 }
 
+void Texture::updateAll(const void* data)
+{
+	glTexImage2D(mType, 0, mFormat, mWidth, mHeight, 0, getDefaultDataFormat(mFormat), GL_UNSIGNED_BYTE, data);
+}
+
 void Texture::updateRect(const void* data, const Recti& rect)
 {
 	if (nullptr == data || rect.empty())
 		return;
 
 	glBindTexture(mType, mHandle);
-	glTexSubImage2D(mType, 0, rect.x, rect.y, rect.width, rect.height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexSubImage2D(mType, 0, rect.x, rect.y, rect.width, rect.height, getDefaultDataFormat(mFormat), GL_UNSIGNED_BYTE, data);
 }
 
 void Texture::updateRect(const Bitmap& bitmap, int px, int py)

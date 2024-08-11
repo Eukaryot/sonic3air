@@ -68,6 +68,9 @@ public:
 	void clearAlpha(uint8 alpha);
 
 	inline bool empty() const				{ return (nullptr == mData); }
+	inline bool isEmpty() const				{ return (nullptr == mData); }
+	inline bool nonEmpty() const			{ return (nullptr != mData); }
+
 	inline int getWidth() const				{ return mWidth; }
 	inline int getHeight() const			{ return mHeight; }
 	inline Vec2i getSize() const			{ return Vec2i(mWidth, mHeight); }

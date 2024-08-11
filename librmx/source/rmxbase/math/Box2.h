@@ -30,6 +30,7 @@ public:
 	float getAspectRatio() const	{ return (float)(mMax.x - mMin.x) / (float)(mMax.y - mMin.y); }
 
 	bool empty() const		{ return (mMax.x <= mMin.x) || (mMax.y <= mMin.y); }
+	bool isEmpty() const	{ return (mMax.x <= mMin.x) || (mMax.y <= mMin.y); }
 	bool nonEmpty() const	{ return !empty(); }
 
 	bool equal(const TBox2& other) const	{ return (mMin == other.mMin) && (mMax == other.mMax); }

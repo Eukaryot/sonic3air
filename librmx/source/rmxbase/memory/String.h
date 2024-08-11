@@ -74,6 +74,7 @@ public:
 
 	inline int length() const			{ return (int)mLength; }
 	inline bool empty() const			{ return (mLength == 0); }
+	inline bool isEmpty() const			{ return (mLength == 0); }
 	inline bool nonEmpty() const		{ return (mLength != 0); }
 	inline int getReservedSize() const	{ return mSize; }
 
