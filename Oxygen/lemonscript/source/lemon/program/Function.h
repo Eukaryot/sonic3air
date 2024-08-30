@@ -49,8 +49,9 @@ namespace lemon
 
 		enum class Flag
 		{
-			ALLOW_INLINE_EXECUTION = 0x01,	// Native only: Function can be called directly inside the opcode run loop and does not interfere with control flow
-			COMPILE_TIME_CONSTANT  = 0x02	// Native only: Function only does calculation on the parameters, does not read from run-time sources and has no side-effects
+			ALLOW_INLINE_EXECUTION	 = 0x01,	// Native only: Function can be called directly inside the opcode run loop and does not interfere with control flow
+			COMPILE_TIME_CONSTANT	 = 0x02,	// Native only: Function only does calculation on the parameters, does not read from run-time sources and has no side-effects
+			EXCLUDE_FROM_DEFINITIONS = 0x80,	// Don't show in function listings produced by "Module::dumpDefinitionsToScriptFile"
 		};
 
 	public:

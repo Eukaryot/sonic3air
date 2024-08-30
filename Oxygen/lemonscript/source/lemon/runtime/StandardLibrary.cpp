@@ -315,6 +315,7 @@ namespace lemon
 		// Functions
 		const BitFlagSet<Function::Flag> defaultFlags(Function::Flag::ALLOW_INLINE_EXECUTION);
 		const BitFlagSet<Function::Flag> compileTimeConstant(Function::Flag::ALLOW_INLINE_EXECUTION, Function::Flag::COMPILE_TIME_CONSTANT);
+		const BitFlagSet<Function::Flag> excludeFromDefinitions(Function::Flag::EXCLUDE_FROM_DEFINITIONS);
 
 		builder.addNativeFunction("min", lemon::wrap(&functions::minimum<int8>), compileTimeConstant);
 		builder.addNativeFunction("min", lemon::wrap(&functions::minimum<uint8>), compileTimeConstant);
@@ -507,28 +508,28 @@ namespace lemon
 		builder.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat8), defaultFlags)
 			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5", "arg6", "arg7", "arg8");
 
-		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build1), defaultFlags)
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build1), defaultFlags | excludeFromDefinitions)
 			.setParameters("format", "arg1");
 
-		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build2), defaultFlags)
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build2), defaultFlags | excludeFromDefinitions)
 			.setParameters("format", "arg1", "arg2");
 
-		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build3), defaultFlags)
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build3), defaultFlags | excludeFromDefinitions)
 			.setParameters("format", "arg1", "arg2", "arg3");
 
-		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build4), defaultFlags)
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build4), defaultFlags | excludeFromDefinitions)
 			.setParameters("format", "arg1", "arg2", "arg3", "arg4");
 
-		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build5), defaultFlags)
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build5), defaultFlags | excludeFromDefinitions)
 			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5");
 
-		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build6), defaultFlags)
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build6), defaultFlags | excludeFromDefinitions)
 			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5", "arg6");
 
-		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build7), defaultFlags)
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build7), defaultFlags | excludeFromDefinitions)
 			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5", "arg6", "arg7");
 
-		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build8), defaultFlags)
+		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build8), defaultFlags | excludeFromDefinitions)
 			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5", "arg6", "arg7", "arg8");
 
 		builder.addNativeFunction("strlen", lemon::wrap(&functions::string_length), defaultFlags)

@@ -182,14 +182,16 @@ namespace lemon
 			for (const Function* function : mFunctions)
 			{
 				const bool isMethod = !function->getContext().isEmpty();
-				if (isMethod == outputMethods)
-				{
-					if (function->getName().getString()[0] != '#')	// Exclude hidden built-ins (which can't be accessed by scripts directly anyways)
-					{
-						currentFunctions.push_back(function);
-					}
-				}
+				if (isMethod != outputMethods)
+					continue;
+				if (function->hasFlag(Function::Flag::EXCLUDE_FROM_DEFINITIONS))
+					continue;
+				if (function->getName().getString()[0] == '#')	// Exclude hidden built-ins (which can't be accessed by scripts directly anyways)
+					continue;
+
+				currentFunctions.push_back(function);
 			}
+
 			if (currentFunctions.empty())
 				continue;
 
