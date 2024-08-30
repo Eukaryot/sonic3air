@@ -536,6 +536,7 @@ bool TCPSocket::receiveInternal(ReceiveResult& outReceiveResult)
 		}
 		else
 		{
+			outReceiveResult.mBuffer.clear();
 		#ifdef _WIN32
 			const int errorCode = WSAGetLastError();
 			if (errorCode == WSAECONNRESET)		// Ignore this error, see https://stackoverflow.com/questions/30749423/is-winsock-error-10054-wsaeconnreset-normal-with-udp-to-from-localhost
@@ -783,6 +784,7 @@ bool UDPSocket::receiveInternal(ReceiveResult& outReceiveResult)
 		const int result = ::recvfrom(mInternal->mSocket, (char*)&outReceiveResult.mBuffer[bytesRead], CHUNK_SIZE, 0, (sockaddr*)&senderAddr, &senderAddrSize);
 		if (result < 0)
 		{
+			outReceiveResult.mBuffer.clear();
 		#ifdef _WIN32
 			const int errorCode = WSAGetLastError();
 			if (errorCode == WSAECONNRESET)		// Ignore this error, see https://stackoverflow.com/questions/30749423/is-winsock-error-10054-wsaeconnreset-normal-with-udp-to-from-localhost
@@ -795,7 +797,6 @@ bool UDPSocket::receiveInternal(ReceiveResult& outReceiveResult)
 				RMX_ERROR("recv failed with error: " << result, );
 			}
 		#endif
-			outReceiveResult.mBuffer.clear();
 			return false;
 		}
 
