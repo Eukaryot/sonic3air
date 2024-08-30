@@ -67,6 +67,21 @@ int vectorIndexOf(const std::vector<T>& vec, T element)
 	return -1;
 }
 
+// Find an element matching the predicate in an std::vector
+template<typename T, class PRED>
+T* vectorFindByPredicate(std::vector<T>& vec, PRED predicate)
+{
+	const auto it = std::find_if(vec.begin(), vec.end(), predicate);
+	return (it == vec.end()) ? nullptr : &*it;
+}
+
+template<typename T, class PRED>
+const T* vectorFindByPredicate(const std::vector<T>& vec, PRED predicate)
+{
+	const auto it = std::find_if(vec.begin(), vec.end(), predicate);
+	return (it == vec.end()) ? nullptr : &*it;
+}
+
 // Remove all instances of an element from an std::vector
 template<typename T, typename S>
 void vectorRemoveAll(std::vector<T>& container, S value)

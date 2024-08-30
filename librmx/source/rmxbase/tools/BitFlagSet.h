@@ -153,6 +153,22 @@ public:
 		return *this;
 	}
 
+	inline BitFlagSet operator|(const BitFlagSet& other) const	{ return BitFlagSet(mFlags | other.mFlags); }
+	inline BitFlagSet operator&(const BitFlagSet& other) const	{ return BitFlagSet(mFlags & other.mFlags); }
+	inline BitFlagSet operator^(const BitFlagSet& other) const	{ return BitFlagSet(mFlags ^ other.mFlags); }
+
+	inline BitFlagSet operator|(Enum flag) const  { return BitFlagSet(mFlags | static_cast<Storage>(flag)); }
+	inline BitFlagSet operator&(Enum flag) const  { return BitFlagSet(mFlags & static_cast<Storage>(flag)); }
+	inline BitFlagSet operator^(Enum flag) const  { return BitFlagSet(mFlags ^ static_cast<Storage>(flag)); }
+
+	inline void operator|=(const BitFlagSet& other)  { mFlags |= other.mFlags; }
+	inline void operator&=(const BitFlagSet& other)  { mFlags &= other.mFlags; }
+	inline void operator^=(const BitFlagSet& other)  { mFlags ^= other.mFlags; }
+
+	inline void operator|=(Enum flag)  { mFlags |= static_cast<Storage>(flag); }
+	inline void operator&=(Enum flag)  { mFlags &= static_cast<Storage>(flag); }
+	inline void operator^=(Enum flag)  { mFlags ^= static_cast<Storage>(flag); }
+
 private:
 	Storage mFlags = 0;   // Bitmask of the currently set flags, composed using bitwise OR
 };
