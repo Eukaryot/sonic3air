@@ -419,6 +419,13 @@ namespace rmx
 		listDirectoryContentInternal(nullptr, &outDirectories, basePath, L"", false);
 	}
 
+	bool FileIO::isDirectoryPath(std::wstring_view path)
+	{
+		if (path.empty())
+			return false;
+		return (path.back() == L'/' || path.back() == L'\\');
+	}
+
 	void FileIO::normalizePath(std::wstring& path, bool isDirectory)
 	{
 		if (path.empty())

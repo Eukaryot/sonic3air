@@ -36,7 +36,9 @@ FontSource* FontSourceBitmapFactory::construct(const FontSourceKey& key)
 {
 	if (key.mName.endsWith(".json"))
 	{
-		return new FontSourceBitmap(key.mName);
+		WString name;
+		name.fromUTF8(key.mName);
+		return new FontSourceBitmap(*name);
 	}
 	return nullptr;
 }

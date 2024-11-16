@@ -56,7 +56,7 @@ namespace rmx
 
 	bool FileSystem::exists(std::wstring_view path)
 	{
-		mTempPath2 = normalizePath(path, mTempPath2, false);
+		mTempPath2 = normalizePath(path, mTempPath2, FileIO::isDirectoryPath(path));
 		for (MountPoint& mountPoint : mMountPoints)
 		{
 			const std::wstring* localPath = applyMountPoint(mountPoint, mTempPath2, mTempPath);

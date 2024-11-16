@@ -42,6 +42,7 @@ namespace rmx
 		static void listFilesByMask(std::wstring_view filemask, bool recursive, std::vector<FileEntry>& outFileEntries);
 		static void listDirectories(std::wstring_view path, std::vector<std::wstring>& outDirectories);
 
+		static bool isDirectoryPath(std::wstring_view path);
 		static void normalizePath(std::wstring& path, bool isDirectory);
 		static std::wstring_view normalizePath(std::wstring_view path, std::wstring& tempBuffer, bool isDirectory);
 

@@ -357,13 +357,15 @@ void FontCollection::updateLoadedFonts()
 		for (int index = (int)collectedFont.mDefinitions.size() - 1; index >= 0; --index)
 		{
 			const Definition& definition = collectedFont.mDefinitions[index];
-			collectedFont.mFontSource = new FontSourceBitmap(WString(definition.mDefinitionFile).toString());
+			collectedFont.mFontSource = new FontSourceBitmap(definition.mDefinitionFile);
 			if (collectedFont.mFontSource->isValid())
 			{
 				collectedFont.mLoadedDefinitionIndex = index;
 				break;
 			}
+
 			// If loading failed, try the next definition
+			SAFE_DELETE(collectedFont.mFontSource);
 		}
 
 		// Update the font source in all font instances (note that it might also be a null pointer)
@@ -375,7 +377,6 @@ void FontCollection::updateLoadedFonts()
 		// If loading failed for all definitions, remove the collected font instance
 		if (collectedFont.mLoadedDefinitionIndex == -1 && collectedFont.mManagedFonts.size() <= 1)
 		{
-			delete &collectedFont;
 			keysToRemove.push_back(key);
 		}
 	}
@@ -383,6 +384,7 @@ void FontCollection::updateLoadedFonts()
 	for (uint64 key : keysToRemove)
 	{
 		mCollectedFonts.erase(key);
+		mFontsByKeyHash.erase(key);
 	}
 
 	// Invalidate cached printed texts

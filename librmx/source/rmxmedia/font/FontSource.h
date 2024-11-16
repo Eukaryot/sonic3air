@@ -59,7 +59,7 @@ private:
 class API_EXPORT FontSourceBitmap : public FontSource
 {
 public:
-	explicit FontSourceBitmap(const String& jsonFilename);
+	explicit FontSourceBitmap(const std::wstring& jsonFilename);
 
 	bool isValid() const  { return mLoadingSucceeded; }
 
