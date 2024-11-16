@@ -194,4 +194,7 @@
       <Filter>font</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="librmx.natvis" />
+  </ItemGroup>
 </Project>

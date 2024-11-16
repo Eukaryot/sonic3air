@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+	<Type Name="StringTemplate&lt;*&gt;">
+		<DisplayString>{mData}</DisplayString>
+	</Type>
+
+	<Type Name="CArray&lt;*&gt;">
+		<DisplayString>{{ count={count} }}</DisplayString>
+		<Expand>
+			<Item Name="count" ExcludeView="simple">count</Item>
+			<Item Name="size" ExcludeView="simple">size</Item>
+			<ArrayItems>
+				<Size>count</Size>
+				<ValuePointer>list</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="TRect&lt;*&gt;">
+		<DisplayString>Rect: {{ {x}, {y}, {width}, {height} }}</DisplayString>
+	</Type>
+
+	<Type Name="Bitmap">
+		<DisplayString>{{ mWidth={mWidth}, mHeight={mHeight} }}</DisplayString>
+		<Expand>
+			<Item Name="mWidth" ExcludeView="simple">mWidth</Item>
+			<Item Name="mHeight" ExcludeView="simple">mHeight</Item>
+			<ArrayItems>
+				<Size>mWidth * mHeight</Size>
+				<ValuePointer>mData</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+</AutoVisualizer>
