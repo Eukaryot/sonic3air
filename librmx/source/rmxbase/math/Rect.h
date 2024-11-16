@@ -141,7 +141,7 @@ public:
 		*this = getIntersection(other1, other2);
 	}
 
-	void addBorder(float border)
+	void addBorder(TYPE border)
 	{
 		x -= border;
 		y -= border;
