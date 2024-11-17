@@ -264,8 +264,13 @@ void Simulation::update(float timeElapsed)
 	if (mRewindSteps >= 0)
 	{
 		setSpeed(0.0f);
-		if (mRewindSteps >= 1)
-			jumpToFrame(mFrameNumber - mRewindSteps);
+		while (mRewindSteps >= 1)
+		{
+			if (jumpToFrame(mFrameNumber - mRewindSteps))
+				mRewindSteps = 0;
+			else
+				--mRewindSteps;		// Try again with one step less
+		}
 		mRewindSteps = -1;
 	}
 
