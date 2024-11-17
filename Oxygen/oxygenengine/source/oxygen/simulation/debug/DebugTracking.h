@@ -103,6 +103,8 @@ public:
 
 	// Debug watches
 	inline const std::vector<Watch*>& getWatches() const  { return mWatches; }
+	bool hasWatch(uint32 address, uint16 bytes) const;
+	int getExistingWatchIndex(uint32 address, uint16 bytes) const;
 	void updateWatches();
 	void clearWatches(bool clearPersistent = false);
 	void addWatch(uint32 address, uint16 bytes, bool persistent);

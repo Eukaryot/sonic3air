@@ -157,6 +157,26 @@ void DebugTracking::addColorLogEntry(std::string_view name, uint32 startAddress,
 	Application::instance().getSimulation().stopSingleStepContinue();
 }
 
+bool DebugTracking::hasWatch(uint32 address, uint16 bytes) const
+{
+	return (getExistingWatchIndex(address, bytes) >= 0);
+}
+
+int DebugTracking::getExistingWatchIndex(uint32 address, uint16 bytes) const
+{
+	address &= 0x00ffffff;
+
+	int index = -1;
+	for (int i = 0; i < (int)mWatches.size(); ++i)
+	{
+		if (mWatches[i]->mAddress == address && mWatches[i]->mBytes == bytes)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
 void DebugTracking::updateWatches()
 {
 	if (!mWatchHitsThisUpdate.empty())
@@ -203,11 +223,8 @@ void DebugTracking::addWatch(uint32 address, uint16 bytes, bool persistent)
 	address &= 0x00ffffff;
 
 	// Check if already exists
-	for (const Watch* watch : mWatches)
-	{
-		if (watch->mAddress == address && watch->mBytes == bytes)
-			return;
-	}
+	if (hasWatch(address, bytes))
+		return;
 
 	// Add a new watch in EmulatorInterface
 	EmulatorInterface::Watch& internalWatch = vectorAdd(mEmulatorInterface.getWatches());
@@ -230,15 +247,7 @@ void DebugTracking::removeWatch(uint32 address, uint16 bytes)
 	address &= 0x00ffffff;
 
 	// Try to find the watch
-	int index = -1;
-	for (int i = 0; i < (int)mWatches.size(); ++i)
-	{
-		if (mWatches[i]->mAddress == address && mWatches[i]->mBytes == bytes)
-		{
-			index = i;
-			break;
-		}
-	}
+	const int index = getExistingWatchIndex(address, bytes);
 	if (index == -1)
 		return;
 
