@@ -456,6 +456,12 @@ void GameView::mouse(const rmx::MouseEvent& ev)
 	}
 }
 
+void GameView::earlyUpdate(float timeElapsed)
+{
+	// Update children earlier than GameView's own siblings, especially S3AIR's MenuBackground before GameApp
+	GuiBase::update(timeElapsed);
+}
+
 void GameView::update(float timeElapsed)
 {
 	if (mFadeChange != 0.0f)
@@ -571,8 +577,6 @@ void GameView::update(float timeElapsed)
 			}
 		}
 	}
-
-	GuiBase::update(timeElapsed);
 }
 
 void GameView::render()

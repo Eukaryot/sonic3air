@@ -478,6 +478,7 @@ void Application::update(float timeElapsed)
 	LogDisplay& logDisplay = LogDisplay::instance();
 	logDisplay.mLogDisplayTimeout = std::max(logDisplay.mLogDisplayTimeout - std::min(timeElapsed, 0.1f), 0.0f);
 
+	mGameView->earlyUpdate(timeElapsed);
 	GuiBase::update(timeElapsed);
 
 	if (nullptr != mRemoveChild)
@@ -849,7 +850,6 @@ bool Application::updateLoading()
 				RMX_LOG_INFO("Adding game app instance");
 				mGameApp = &EngineMain::getDelegate().createGameApp();
 				addChild(*mGameApp);
-				moveToBack(*mGameApp);	// Move to the back, particularly to have it behind game view, which must gets its update call first
 				break;
 			}
 

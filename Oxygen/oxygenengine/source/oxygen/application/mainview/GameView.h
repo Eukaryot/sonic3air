@@ -39,6 +39,7 @@ public:
 	virtual void deinitialize() override;
 	virtual void keyboard(const rmx::KeyboardEvent& ev) override;
 	virtual void mouse(const rmx::MouseEvent& ev) override;
+	void earlyUpdate(float timeElapsed);
 	virtual void update(float timeElapsed) override;
 	virtual void render() override;
 
