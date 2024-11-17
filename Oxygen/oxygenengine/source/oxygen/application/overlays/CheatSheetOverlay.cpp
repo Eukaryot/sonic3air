@@ -84,7 +84,7 @@ void CheatSheetOverlay::render()
 	const size_t NUM_TEXTS_NONDEV = 8;
 	const size_t NUM_TEXTS = EngineMain::getDelegate().useDeveloperFeatures() ? (texts.size() / 2) : NUM_TEXTS_NONDEV;
 
-	mRect.setSize(330, 58 + NUM_TEXTS * 18);
+	mRect.setSize(330, 58 + (int)NUM_TEXTS * 18);
 	mRect.setPos((FTX::screenWidth() - mRect.width) * 19/20, roundToInt((float)(FTX::screenHeight() - mRect.height) * (1.0f - alpha * 0.1f)));
 	drawer.drawRect(mRect, Color(0.1f, 0.1f, 0.1f, alpha * 0.6f));
 

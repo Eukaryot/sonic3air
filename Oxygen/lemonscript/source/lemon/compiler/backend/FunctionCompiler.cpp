@@ -113,7 +113,7 @@ namespace lemon
 			addOpcode(Opcode::Type::SET_VARIABLE_VALUE, variable->getDataType(), variable->getID());
 
 			// Pop value from stack (as SET_VARIABLE_VALUE opcode does not consume it)
-			const int sizeOnStack = variable->getDataType()->getSizeOnStack();
+			const int sizeOnStack = (int)variable->getDataType()->getSizeOnStack();
 			RMX_ASSERT(sizeOnStack != 0, "Invalid stack size of type " << variable->getDataType()->getName().getString());
 			addOpcode(Opcode::Type::MOVE_STACK, -sizeOnStack);
 		}
@@ -781,7 +781,7 @@ namespace lemon
 
 		if (consumeResult && token.mDataType->getClass() != DataTypeDefinition::Class::VOID)
 		{
-			const int sizeOnStack = token.mDataType->getSizeOnStack();
+			const int sizeOnStack = (int)token.mDataType->getSizeOnStack();
 			RMX_ASSERT(sizeOnStack != 0, "Invalid stack size of type " << token.mDataType->getName().getString());
 			addOpcode(Opcode::Type::MOVE_STACK, -sizeOnStack);	// Pop result of statement
 		}

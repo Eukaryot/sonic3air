@@ -466,7 +466,7 @@ void ModsMenu::update(float timeElapsed)
 					modEntry.mMakeActive = makeActive;
 
 					if (newTab.mMenuEntries.mSelectedEntryIndex >= (int)newTab.mMenuEntries.size())
-						newTab.mMenuEntries.mSelectedEntryIndex = std::max<int>(1, newTab.mMenuEntries.size()) - 1;
+						newTab.mMenuEntries.mSelectedEntryIndex = std::max<int>(1, (int)newTab.mMenuEntries.size()) - 1;
 					newTab.mMenuEntries.insertByReference(entry, newTab.mMenuEntries.mSelectedEntryIndex);
 					menuEntries.erase(menuEntries.mSelectedEntryIndex);
 
