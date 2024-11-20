@@ -392,10 +392,9 @@ void ResourceScriptGenerator::generateLevelObjectTableScript(CodeExec& codeExec)
 				const LemonScriptProgram::Hook* hook = codeExec.getLemonScriptProgram().checkForAddressHook(objectAddress);
 				if (nullptr != hook && hook->mFunction)
 				{
-					std::string filename;
-					uint32 lineNumber;
-					codeExec.getLemonScriptProgram().resolveLocation(*hook->mFunction, 0, filename, lineNumber);
-					output << " -- " << filename;
+					LemonScriptProgram::ResolvedLocation location;
+					codeExec.getLemonScriptProgram().resolveLocation(location, *hook->mFunction, 0);
+					output << " -- " << location.mScriptFilename;
 				}
 				output << "\r\n";
 			}

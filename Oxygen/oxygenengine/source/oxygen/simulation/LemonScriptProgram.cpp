@@ -497,36 +497,37 @@ const Mod* LemonScriptProgram::getModByModule(const lemon::Module& module) const
 	return (nullptr != appendedInfo) ? appendedInfo->mMod : nullptr;
 }
 
-void LemonScriptProgram::resolveLocation(uint32 functionId, uint32 programCounter, std::string& scriptFilename, uint32& lineNumber) const
+void LemonScriptProgram::resolveLocation(ResolvedLocation& outResolvedLocation, uint32 functionId, uint32 programCounter) const
 {
 	const lemon::Function* function = mInternal.mProgram.getFunctionByID(functionId);
 	if (nullptr == function)
 	{
-		scriptFilename = *String(0, "<unknown function id %d>", functionId);
+		outResolvedLocation.mScriptFilename = *String(0, "<unknown function id %d>", functionId);
 	}
 	else
 	{
-		resolveLocation(*function, programCounter, scriptFilename, lineNumber);
+		resolveLocation(outResolvedLocation, *function, programCounter);
 	}
 }
 
-void LemonScriptProgram::resolveLocation(const lemon::Function& function, uint32 programCounter, std::string& scriptFilename, uint32& lineNumber)
+void LemonScriptProgram::resolveLocation(ResolvedLocation& outResolvedLocation, const lemon::Function& function, uint32 programCounter)
 {
 	if (function.getType() == lemon::Function::Type::SCRIPT)
 	{
 		const lemon::ScriptFunction& scriptFunc = static_cast<const lemon::ScriptFunction&>(function);
 		if (programCounter < scriptFunc.mOpcodes.size())
 		{
-			scriptFilename = *WString(scriptFunc.mSourceFileInfo->mFilename).toString();
-			lineNumber = scriptFunc.mOpcodes[programCounter].mLineNumber - scriptFunc.mSourceBaseLineOffset + 1;
+			outResolvedLocation.mSourceFileInfo = scriptFunc.mSourceFileInfo;
+			outResolvedLocation.mScriptFilename = *WString(scriptFunc.mSourceFileInfo->mFilename).toString();
+			outResolvedLocation.mLineNumber = scriptFunc.mOpcodes[programCounter].mLineNumber - scriptFunc.mSourceBaseLineOffset + 1;
 		}
 		else
 		{
-			scriptFilename = *String(0, "<invalid program counter %d in function '%.*s'>", programCounter, function.getName().getString().length(), function.getName().getString().data());
+			outResolvedLocation.mScriptFilename = *String(0, "<invalid program counter %d in function '%.*s'>", programCounter, function.getName().getString().length(), function.getName().getString().data());
 		}
 	}
 	else
 	{
-		scriptFilename = *String(0, "<native function '%.*s'>", function.getName().getString().length(), function.getName().getString().data());
+		outResolvedLocation.mScriptFilename = *String(0, "<native function '%.*s'>", function.getName().getString().length(), function.getName().getString().data());
 	}
 }

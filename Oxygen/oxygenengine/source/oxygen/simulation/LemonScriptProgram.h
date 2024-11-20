@@ -22,12 +22,20 @@ namespace lemon
 	class RuntimeFunction;
 	class ScriptFunction;
 	class Variable;
+	struct SourceFileInfo;
 }
 
 
 class LemonScriptProgram
 {
 public:
+	struct ResolvedLocation
+	{
+		const lemon::SourceFileInfo* mSourceFileInfo = nullptr;
+		std::string mScriptFilename;
+		uint32 mLineNumber = 0;
+	};
+
 	struct LoadOptions
 	{
 		enum class ModuleSelection
@@ -40,6 +48,13 @@ public:
 		bool mEnforceFullReload = false;
 		ModuleSelection mModuleSelection = ModuleSelection::ALL_MODS;
 		uint32 mAppVersion = 0;
+	};
+
+	enum class LoadScriptsResult
+	{
+		NO_CHANGE,
+		PROGRAM_CHANGED,
+		FAILED
 	};
 
 	struct GlobalDefine
@@ -66,13 +81,6 @@ public:
 		const lemon::ScriptFunction* mFunction = nullptr;	// Only really used for update hooks
 	};
 
-	enum class LoadScriptsResult
-	{
-		NO_CHANGE,
-		PROGRAM_CHANGED,
-		FAILED
-	};
-
 public:
 	LemonScriptProgram();
 	~LemonScriptProgram();
@@ -93,10 +101,10 @@ public:
 
 	const Mod* getModByModule(const lemon::Module& module) const;
 
-	void resolveLocation(uint32 functionId, uint32 programCounter, std::string& scriptFilename, uint32& lineNumber) const;
+	void resolveLocation(ResolvedLocation& outResolvedLocation, uint32 functionId, uint32 programCounter) const;
 
 public:
-	static void resolveLocation(const lemon::Function& function, uint32 programCounter, std::string& scriptFilename, uint32& lineNumber);
+	static void resolveLocation(ResolvedLocation& outResolvedLocation, const lemon::Function& function, uint32 programCounter);
 
 private:
 	bool loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename);

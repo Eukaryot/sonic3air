@@ -30,17 +30,9 @@ const std::string& DebugTracking::Location::toString(CodeExec& codeExec) const
 		}
 		else
 		{
-			std::string scriptFilename;
-			uint32 lineNumber;
-			if (mProgramCounter.has_value())
-			{
-				codeExec.getLemonScriptProgram().resolveLocation(*mFunction, (uint32)*mProgramCounter, scriptFilename, lineNumber);
-				mLineNumber = lineNumber;
-			}
-			else
-			{
-				codeExec.getLemonScriptProgram().resolveLocation(*mFunction, 0, scriptFilename, lineNumber);
-			}
+			LemonScriptProgram::ResolvedLocation location;
+			codeExec.getLemonScriptProgram().resolveLocation(location, *mFunction, mProgramCounter.has_value() ? (uint32)*mProgramCounter : 0);
+			mLineNumber = location.mLineNumber;
 			mResolvedString = mFunction->getName().getString();
 		}
 	}

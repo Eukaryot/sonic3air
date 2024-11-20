@@ -147,7 +147,7 @@ namespace lemon
 		else
 		{
 			// There could be jumps leading to the position after the return, correct them
-			//  -> E.g. when the function ends with and if-block that itself ends with a return
+			//  -> E.g. when the function ends with an if-block that itself ends with a return
 			for (Opcode& opcode : mOpcodes)
 			{
 				if (opcode.mType == Opcode::Type::JUMP || opcode.mType == Opcode::Type::JUMP_CONDITIONAL)

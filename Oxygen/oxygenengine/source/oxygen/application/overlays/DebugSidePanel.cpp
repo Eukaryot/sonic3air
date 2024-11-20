@@ -643,10 +643,9 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					#if 0
 						if (key == category.mChangedKey)
 						{
-							std::string scriptFilename;
-							uint32 lineNumber;
-							codeExec.getLemonScriptProgram().resolveLocation(*hit.mLocation.mFunction, (uint32)hit.mLocation.mProgramCounter, scriptFilename, lineNumber);
-							textLine->mCodeLocation = "\"" + scriptFilename + "\":" + std::to_string(lineNumber);
+							LemonScriptProgram::ResolvedLocation location;
+							codeExec.getLemonScriptProgram().resolveLocation(location, *hit.mLocation.mFunction, (uint32)*hit.mLocation.mProgramCounter);
+							textLine->mCodeLocation = "\"" + location.mScriptFilename + "\":" + std::to_string(location.mLineNumber);
 
 							// TODO: The script file name needs to contains the full file path for this to work, not just the file name itself
 							//  -> Maybe store a list of source files in the module?
