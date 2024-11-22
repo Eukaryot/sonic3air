@@ -6,7 +6,7 @@ struct JSProgram
 {
 	static void Init();
 	static void RunScript(const char* script);
-	static void RunScripts(const char* path);
+	static void RunScripts();
 
 	static duk_context* ctx;
 };

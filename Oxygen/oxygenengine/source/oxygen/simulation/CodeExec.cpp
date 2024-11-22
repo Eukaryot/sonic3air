@@ -346,7 +346,7 @@ bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 	options.mAppVersion = EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber;
 	const WString mainScriptPath = config.mScriptsDir + config.mMainScriptName;
 
-	JSProgram::RunScripts(mainScriptPath.toStdString().c_str());
+	JSProgram::RunScripts();
 
 	const LemonScriptProgram::LoadScriptsResult result = mLemonScriptProgram.loadScripts(mainScriptPath.toStdString(), options);
 	if (result == LemonScriptProgram::LoadScriptsResult::PROGRAM_CHANGED)

@@ -7,6 +7,7 @@
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/resources/FontCollection.h"
 #include "oxygen/simulation/EmulatorInterface.h"
+#include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/RuntimeEnvironment.h"
 
 #include <lemon/program/ModuleBindingsBuilder.h>
@@ -21,11 +22,13 @@ void JSBindings::Init()
 /* SYSTEM */
 
 
-duk_ret_t System_RMX_LOG_INFO(duk_context* ctx)
+duk_ret_t System_writeDisplayLine(duk_context* ctx)
 {
-    const char* group = duk_require_string(JSProgram::ctx, 0);
+    const char* text = duk_require_string(ctx, 0);
 
-    RMX_LOG_INFO(group);
+    if (text)
+        LogDisplay::instance().setLogDisplay(text, 2.0f);
+
     return false;
 }
 
@@ -35,7 +38,7 @@ void JSBindings::System()
 
     // exposed name, native name, arg count
     const duk_function_list_entry list[] = {
-        { "RMX_LOG_INFO", System_RMX_LOG_INFO, 1 },
+        { "writeDisplayLine", System_writeDisplayLine, 1 },
 
         { NULL, NULL, 0 }
     };
