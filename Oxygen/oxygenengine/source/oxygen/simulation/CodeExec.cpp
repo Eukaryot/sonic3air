@@ -7,6 +7,7 @@
 */
 
 #include "oxygen/pch.h"
+#include "oxygen/scripting/JSProgram.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LemonScriptProgram.h"
@@ -271,6 +272,7 @@ CodeExec::CodeExec() :
 	mDebugTracking(*this, mEmulatorInterface, mLemonScriptRuntime)
 {
 	mRuntimeEnvironment.mEmulatorInterface = &mEmulatorInterface;
+	JSProgram::Init();
 
 	mIsDeveloperMode = EngineMain::getDelegate().useDeveloperFeatures();
 	if (mIsDeveloperMode)
@@ -343,6 +345,8 @@ bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 	options.mModuleSelection = EngineMain::getDelegate().mayLoadScriptMods() ? LemonScriptProgram::LoadOptions::ModuleSelection::ALL_MODS : LemonScriptProgram::LoadOptions::ModuleSelection::BASE_GAME_ONLY;
 	options.mAppVersion = EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber;
 	const WString mainScriptPath = config.mScriptsDir + config.mMainScriptName;
+
+	JSProgram::RunScripts(mainScriptPath.toStdString().c_str());
 
 	const LemonScriptProgram::LoadScriptsResult result = mLemonScriptProgram.loadScripts(mainScriptPath.toStdString(), options);
 	if (result == LemonScriptProgram::LoadScriptsResult::PROGRAM_CHANGED)
