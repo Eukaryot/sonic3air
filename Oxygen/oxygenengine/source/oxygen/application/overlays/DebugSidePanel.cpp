@@ -123,7 +123,7 @@ void DebugSidePanel::keyboard(const rmx::KeyboardEvent& ev)
 {
 	GuiBase::keyboard(ev);
 
-	if (ev.state)
+	if (ev.state && !FTX::System->wasEventConsumed())
 	{
 		DebugSidePanelCategory& category = *mCategories[mActiveCategoryIndex];
 		switch (ev.key)
@@ -147,7 +147,7 @@ void DebugSidePanel::keyboard(const rmx::KeyboardEvent& ev)
 
 void DebugSidePanel::mouse(const rmx::MouseEvent& ev)
 {
-	if (ev.state && ev.button == rmx::MouseButton::Left)
+	if (ev.state && ev.button == rmx::MouseButton::Left && !FTX::System->wasEventConsumed())
 	{
 		if (mMouseOverTab > 0)
 		{
@@ -173,7 +173,7 @@ void DebugSidePanel::mouse(const rmx::MouseEvent& ev)
 
 void DebugSidePanel::update(float timeElapsed)
 {
-	if (FTX::mouseWheel() != 0)
+	if (FTX::mouseWheel() != 0 && !FTX::System->wasEventConsumed())
 	{
 		DebugSidePanelCategory& category = *mCategories[mActiveCategoryIndex];
 		category.mScrollPosition -= FTX::mouseWheel() * 75;
@@ -220,7 +220,7 @@ void DebugSidePanel::render()
 				lastType = mCategories[i]->mType;
 			}
 
-			const bool mouseInRect = FTX::mouseIn(r);
+			const bool mouseInRect = (FTX::mouseIn(r) && !FTX::System->wasEventConsumed());
 			if (mouseInRect)
 			{
 				drawer.drawRect(r, Color(1.0f, 1.0f, 0.0f, 0.5f));
@@ -288,7 +288,7 @@ void DebugSidePanel::render()
 				selectionRect.height = 12;
 
 				// Check if mouse cursor is inside
-				if (line.mKey != INVALID_KEY && FTX::mouseIn(selectionRect))
+				if (line.mKey != INVALID_KEY && FTX::mouseIn(selectionRect) && !FTX::System->wasEventConsumed())
 				{
 					mMouseOverKey = line.mKey;
 				}
@@ -300,7 +300,7 @@ void DebugSidePanel::render()
 	// Draw mouse-over highlight for width change
 	{
 		const Recti sensorRect(mainRect.x - 6, mainRect.y, 12, mainRect.height);
-		const bool hovered = FTX::mouseIn(sensorRect);
+		const bool hovered = FTX::mouseIn(sensorRect) && !FTX::System->wasEventConsumed();
 		if (hovered || mChangingSidePanelWidth)
 		{
 			drawer.drawRect(sensorRect, mChangingSidePanelWidth ? Color(0.1f, 0.1f, 0.1f) : Color(0.0f, 0.0f, 0.0));

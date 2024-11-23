@@ -38,7 +38,7 @@ void MemoryHexView::keyboard(const rmx::KeyboardEvent& ev)
 {
 	GuiBase::keyboard(ev);
 
-	if (ev.state)
+	if (ev.state && !FTX::System->wasEventConsumed())
 	{
 		switch (ev.key)
 		{
