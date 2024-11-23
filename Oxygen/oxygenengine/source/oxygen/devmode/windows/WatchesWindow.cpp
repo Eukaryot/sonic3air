@@ -13,17 +13,13 @@
 
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/application/Application.h"
+#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LemonScriptProgram.h"
 #include "oxygen/simulation/Simulation.h"
 
 #include <lemon/program/Function.h>
-
-#if defined(PLATFORM_WINDOWS)
-	#include <Windows.h>	// Only for "ShellExecuteEx"
-	#undef min
-#endif
 
 
 WatchesWindow::WatchesWindow() :
@@ -33,8 +29,8 @@ WatchesWindow::WatchesWindow() :
 
 void WatchesWindow::buildContent()
 {
-	ImGui::SetWindowPos(ImVec2(50.0f, 250.0f), ImGuiCond_FirstUseEver);
-	ImGui::SetWindowSize(ImVec2(360.0f, 180.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowPos(ImVec2(50.0f, 240.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowSize(ImVec2(400.0f, 200.0f), ImGuiCond_FirstUseEver);
 
 	CodeExec& codeExec = Application::instance().getSimulation().getCodeExec();
 	EmulatorInterface& emulatorInterface = codeExec.getEmulatorInterface();
@@ -81,9 +77,14 @@ void WatchesWindow::buildContent()
 
 					String hitTitle;
 					if (watch->mBytes <= 4)
-						hitTitle = String(0, "%s   at %s", rmx::hexString(hit.mWrittenValue, watch->mBytes * 2).c_str(), hit.mLocation.toString(codeExec).c_str());
+					{
+						const std::string& functionName = hit.mLocation.toString(codeExec);
+						hitTitle = String(0, "%s   at %s, line %d", rmx::hexString(hit.mWrittenValue, watch->mBytes * 2).c_str(), functionName.c_str(), hit.mLocation.mLineNumber);
+					}
 					else
+					{
 						hitTitle = String(0, "u%d[0xffff%04x] = %s   at %s", hit.mBytes * 8, hit.mAddress, rmx::hexString(hit.mWrittenValue, std::min(hit.mBytes * 2, 8)).c_str(), hit.mLocation.toString(codeExec).c_str());
+					}
 
 					ImGui::PushID(hitIndex);
 					if (ImGui::TreeNodeEx("Call Stack", 0, *hitTitle))
@@ -100,37 +101,25 @@ void WatchesWindow::buildContent()
 							{
 								ImGui::TextColored(lightGrayColor, "        %s, line %d", functionName.c_str(), loc.mLineNumber);
 
-							#if 0 && defined(PLATFORM_WINDOWS)
-								if (hit.mLocation.mProgramCounter.has_value())
+							#if defined(PLATFORM_WINDOWS)
+								if (loc.mProgramCounter.has_value())
 								{
 									ImGui::SameLine();
 									ImGui::PushID((int)k);
 									if (ImGui::SmallButton("VC"))
 									{
 										LemonScriptProgram::ResolvedLocation location;
-										codeExec.getLemonScriptProgram().resolveLocation(location, *hit.mLocation.mFunction, (uint32)hit.mLocation.mProgramCounter.value());
+										codeExec.getLemonScriptProgram().resolveLocation(location, *loc.mFunction, (uint32)loc.mProgramCounter.value());
 										if (location.mSourceFileInfo)
 										{
-											// TODO: Add full path to Visual Studio Code, something like "C:/Users/<username>/AppData/Local/Programs/Microsoft VS Code/Code.exe"
+											// TODO: Add the actual full path to Visual Studio Code
 											//  -> This should be configurable in the settings.json - and if it's not set, don't show the VC button in the first place
-											//  -> Note that simply using "code" can work as well, but will open a console window, while using the full path doesn't
-											std::wstring applicationPath = L"code";
+											std::wstring applicationPath = Configuration::instance().mAppDataPath + L"../../Local/Programs/Microsoft VS Code/Code.exe";
 
-											// TODO: The full path here is not necessarily actually the full path, but a relative one
-											std::wstring parameters = L"-r -g \"" + location.mSourceFileInfo->mFullPath + L"\":" + std::to_wstring(loc.mLineNumber);
+											// TODO: The full path here is not necessarily actually the full path, but can be a relative one
+											std::wstring arguments = L"-r -g \"" + location.mSourceFileInfo->mFullPath + L"\":" + std::to_wstring(loc.mLineNumber);
 
-											// TODO: Move all of this over to PlatformFunctions
-											SHELLEXECUTEINFOW ShExecInfo = { 0 };
-											ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFOW);
-											ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-											ShExecInfo.hwnd = nullptr;
-											ShExecInfo.lpVerb = L"open";
-											ShExecInfo.lpFile = applicationPath.c_str();
-											ShExecInfo.lpParameters = parameters.c_str();
-											ShExecInfo.lpDirectory = L"";
-											ShExecInfo.nShow = SW_SHOW;
-											ShExecInfo.hInstApp = nullptr; 
-											ShellExecuteExW(&ShExecInfo);
+											PlatformFunctions::openApplicationExternal(applicationPath, arguments);
 										}
 									}
 									ImGui::PopID();
