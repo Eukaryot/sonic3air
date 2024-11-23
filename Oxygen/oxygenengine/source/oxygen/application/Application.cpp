@@ -28,6 +28,7 @@
 #include "oxygen/application/overlays/SaveStateMenu.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/video/VideoOut.h"
+#include "oxygen/devmode/ImGuiIntegration.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/platform/PlatformFunctions.h"
@@ -134,6 +135,8 @@ void Application::sdlEvent(const SDL_Event& ev)
 	GuiBase::sdlEvent(ev);
 
 	//RMX_LOG_INFO("SDL event: type = " << ev.type);
+
+	ImGuiIntegration::processSdlEvent(ev);
 
 	// Inform input manager as well
 	if (ev.type == SDL_KEYDOWN || ev.type == SDL_KEYUP)		// TODO: Also add joystick events?
@@ -274,6 +277,12 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 						{
 							PlatformFunctions::openFileExternal(L"config.json");
 						}
+					#ifdef SUPPORT_IMGUI
+						else if (EngineMain::getDelegate().useDeveloperFeatures())
+						{
+							ImGuiIntegration::toggleMainWindow();
+						}
+					#endif
 						else
 						{
 							mCheatSheetOverlay->toggle();
@@ -407,6 +416,11 @@ void Application::update(float timeElapsed)
 		RMX_LOG_INFO("Start of first application update call");
 	}
 
+	if (ImGuiIntegration::isCapturingMouse())
+	{
+		FTX::System->consumeCurrentEvent();
+	}
+
 	// Global slow motion for debugging menu transitions etc.
 	const bool isDeveloperMode = EngineMain::getDelegate().useDeveloperFeatures();
 	if (isDeveloperMode && FTX::keyState(SDLK_RSHIFT))
@@ -517,6 +531,8 @@ void Application::render()
 		RMX_LOG_INFO("Start of first application render call");
 	}
 
+	ImGuiIntegration::startFrame();
+
 	Drawer& drawer = EngineMain::instance().getDrawer();
 	drawer.setupRenderWindow(&EngineMain::instance().getSDLWindow());
 
@@ -567,6 +583,9 @@ void Application::render()
 	}
 
 	drawer.performRendering();
+
+	ImGuiIntegration::showDebugWindow();
+	ImGuiIntegration::endFrame();
 
 	// Needed only for precise profiling
 	//glFinish();

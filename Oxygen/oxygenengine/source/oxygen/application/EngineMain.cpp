@@ -17,16 +17,17 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/download/DownloadManager.h"
+#include "oxygen/devmode/ImGuiIntegration.h"
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/software/SoftwareDrawer.h"
-#include "oxygen/platform/CrashHandler.h"
-#include "oxygen/platform/PlatformFunctions.h"
-#include "oxygen/resources/FontCollection.h"
-#include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/file/PackedFileProvider.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/JsonHelper.h"
 #include "oxygen/helper/Logging.h"
+#include "oxygen/platform/CrashHandler.h"
+#include "oxygen/platform/PlatformFunctions.h"
+#include "oxygen/resources/FontCollection.h"
+#include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/rendering/RenderResources.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/PersistentData.h"
@@ -186,6 +187,8 @@ void EngineMain::switchToRenderMethod(Configuration::RenderMethod newRenderMetho
 
 		// Check OpenGL in the config again, it could have changed - namely if OpenGL initialization failed
 		nowUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
+
+		ImGuiIntegration::onWindowRecreated(nowUsingOpenGL);
 	}
 
 	if (nowUsingOpenGL)
@@ -326,6 +329,12 @@ bool EngineMain::startupEngine()
 	mAudioOut = &EngineMain::getDelegate().createAudioOut();
 	mAudioOut->startup();
 
+	// TODO: During development, ImGui is only active in debug builds
+#ifdef DEBUG
+	ImGuiIntegration::setEnabled(config.mDevMode.mEnabled);
+#endif
+	ImGuiIntegration::startup();
+
 	// Done
 	RMX_LOG_INFO("Engine startup successful");
 	return true;
@@ -344,6 +353,8 @@ void EngineMain::run()
 
 void EngineMain::shutdown()
 {
+	ImGuiIntegration::shutdown();
+
 	destroyWindow();
 
 	// Shutdown subsystems
