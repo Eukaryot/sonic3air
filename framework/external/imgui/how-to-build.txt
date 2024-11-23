@@ -1,0 +1,29 @@
+
+=== Build for Windows with Visual Studio 2019 ===
+
+
+Using the build script
+	- Just execute "build_sdl.bat" and you're done
+
+
+Alternative: Manual build
+	- Open the Visual Studio Solution at "SDL2\VisualC\SDL.sln"
+	- Changes needed after download
+		1.) Switch to static library build for project SDL2 (all configurations):
+			 General -> Configuration Type = "Static library (.lib)"
+		2.) Link statically against the VC++ runtime, for projects SDL2 and SDL2main:
+			 C/C++ -> Code Generation -> Runtime Library = "Multi-threaded (/MT)" (yes, also for Debug)
+	- Build as Debug + Release, both Win32 + x64
+	- Without further adjustments, all other projects except SDL2 and SDL2main will fail to build, but we only need those anyway
+	- Afterwards execute "copy_sdl.bat" to copy headers and libs in place
+
+
+Fixes to apply after updating
+	- For static Windows builds, add the HAVE_LIBC definition into "SDL2\include\SDL_config_windows."
+	- Include fix for Android audio when plugging in/out headphones
+	- From the "Changes needed after download", apply at least the first one
+
+
+Notes on SDL2 static builds
+	- The following libraries need to be linked separately under Windows if you link to SDL2 statically:
+		winmm.lib, imm32.lib, version.lib, setupapi.lib

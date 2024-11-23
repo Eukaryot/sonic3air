@@ -58,6 +58,7 @@ public:
 	static void openFileExternal(const std::wstring& path);
 	static void openDirectoryExternal(const std::wstring& path);
 	static void openURLExternal(const std::string& url);
+	static bool openApplicationExternal(const std::wstring& path, const std::wstring& arguments, const std::wstring& directory = L"");
 
 	static bool hasClipboardSupport();
 	static bool copyToClipboard(std::wstring_view string);

@@ -13,6 +13,7 @@
 #include "oxygen/rendering/sprite/PaletteSprite.h"
 
 class EmulatorInterface;
+class Mod;
 class SpriteDump;
 
 
@@ -53,9 +54,8 @@ public:
 
 		Type mType = Type::UNKNOWN;
 		ROMSpriteData mROMSpriteData;	// Only for type ROM_DATA
-	#ifdef DEBUG
 		std::string mSourceIdentifier;	// Only for type SPRITE_FILE
-	#endif
+		const Mod* mMod = nullptr;		// Only for type SPRITE_FILE
 	};
 
 	struct Item
@@ -81,6 +81,8 @@ public:
 	Item& getOrCreatePaletteSprite(uint64 key);
 	Item& getOrCreateComponentSprite(uint64 key);
 
+	inline const std::unordered_map<uint64, Item>& getAllSprites() const  { return mSpriteItems; }
+
 	Item& setupSpriteFromROM(EmulatorInterface& emulatorInterface, const ROMSpriteData& romSpriteData, uint8 atex);
 
 	void clearRedirect(uint64 sourceKey);
@@ -100,7 +102,7 @@ private:
 
 private:
 	Item& createItem(uint64 key);
-	void loadSpriteDefinitions(const std::wstring& path);
+	void loadSpriteDefinitions(const std::wstring& path, const Mod* mod);
 	void addSpritePalette(uint64 paletteKey, std::vector<uint32>& palette);
 
 private:

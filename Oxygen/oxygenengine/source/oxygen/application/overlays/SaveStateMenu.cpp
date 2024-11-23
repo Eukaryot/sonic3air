@@ -109,7 +109,7 @@ void SaveStateMenu::deinitialize()
 
 void SaveStateMenu::keyboard(const rmx::KeyboardEvent& ev)
 {
-	if (ev.state)
+	if (ev.state && !FTX::System->wasEventConsumed())
 	{
 		switch (ev.key)
 		{

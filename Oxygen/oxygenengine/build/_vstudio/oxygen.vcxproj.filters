@@ -91,6 +91,12 @@
     <Filter Include="rendering\parts\palette">
       <UniqueIdentifier>{024aa6e6-0643-4877-a939-04441686575c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="devmode">
+      <UniqueIdentifier>{fad00101-ca62-4d18-9200-2355a6823252}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="devmode\windows">
+      <UniqueIdentifier>{fa83976a-22f3-48e0-9249-ec0580c42843}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -465,6 +471,27 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleCopyScreenShader.cpp">
       <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\ImGuiIntegration.cpp">
+      <Filter>devmode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\DevModeMainWindow.cpp">
+      <Filter>devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\DevModeWindowBase.cpp">
+      <Filter>devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\GameSimWindow.cpp">
+      <Filter>devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.cpp">
+      <Filter>devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\WatchesWindow.cpp">
+      <Filter>devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\SpriteBrowserWindow.cpp">
+      <Filter>devmode\windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -876,6 +903,33 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleCopyScreenShader.h">
       <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\ImGuiIntegration.h">
+      <Filter>devmode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\ImGuiHelpers.h">
+      <Filter>devmode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\ImGuiDefinitions.h">
+      <Filter>devmode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\DevModeMainWindow.h">
+      <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\DevModeWindowBase.h">
+      <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\GameSimWindow.h">
+      <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.h">
+      <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\WatchesWindow.h">
+      <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\SpriteBrowserWindow.h">
+      <Filter>devmode\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

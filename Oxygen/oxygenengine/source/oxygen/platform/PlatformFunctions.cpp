@@ -582,6 +582,16 @@ void PlatformFunctions::openURLExternal(const std::string& url)
 #endif
 }
 
+bool PlatformFunctions::openApplicationExternal(const std::wstring& path, const std::wstring& arguments, const std::wstring& directory)
+{
+#ifdef PLATFORM_WINDOWS
+	return ::ShellExecuteW(nullptr, L"open", path.c_str(), arguments.c_str(), directory.c_str(), SW_SHOW);
+#else
+	// Not implemented for other platforms
+	return false;
+#endif
+}
+
 bool PlatformFunctions::isDebuggerPresent()
 {
 #ifdef PLATFORM_WINDOWS

@@ -74,6 +74,7 @@ include_directories(${WORKSPACE_DIR}/framework/external/ogg-vorbis/libvorbis/inc
 include_directories(${WORKSPACE_DIR}/framework/external/ogg-vorbis/libvorbis/lib)
 include_directories(build/zlib)		# Needed for zconf.h
 include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizip)
+include_directories(${WORKSPACE_DIR}/framework/external/imgui/imgui)
 include_directories(${WORKSPACE_DIR}/librmx/source)
 include_directories(${WORKSPACE_DIR}/librmx/source/rmxmedia/_glew)
 include_directories(${WORKSPACE_DIR}/Oxygen/lemonscript/source)
@@ -104,6 +105,17 @@ file(GLOB MINIZIP_SOURCES ${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/
 add_library(minizip ${MINIZIP_SOURCES})
 
 target_link_libraries(minizip zlibstatic)
+
+
+
+# imgui
+
+file(GLOB_RECURSE IMGUI_SOURCES ${WORKSPACE_DIR}/framework/external/imgui/imgui/*.cpp)
+
+add_library(imgui ${IMGUI_SOURCES})
+
+target_link_libraries(imgui SDL2-static)
+target_link_libraries(imgui OpenGL::GL)
 
 
 
@@ -181,13 +193,16 @@ file(GLOB_RECURSE OXYGEN_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxy
 add_library(oxygen ${OXYGEN_SOURCES})
 
 if (NOT CMAKE_VERSION VERSION_LESS "3.16.0")
-	target_precompile_headers(oxygen PRIVATE ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygen/pch.h)
+	# TODO: Precompiled headers lead to build errors with ImGui, there's a conflict between GLEW and ImGui's OpenGL headers
+	#  -> A way around this might be to not have <rmxmedia.h> in oxygen's PCH, at least for CMake builds
+	#target_precompile_headers(oxygen PRIVATE ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygen/pch.h)
 endif()
 
 target_link_libraries(oxygen minizip)
 target_link_libraries(oxygen rmxmedia)
 target_link_libraries(oxygen rmxext_oggvorbis)
 target_link_libraries(oxygen lemonscript)
+target_link_libraries(oxygen imgui)
 target_link_libraries(oxygen oxygen_netcore)
 
 if (UNIX AND CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")

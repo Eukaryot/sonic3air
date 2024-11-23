@@ -204,7 +204,8 @@ void GameView::deinitialize()
 void GameView::keyboard(const rmx::KeyboardEvent& ev)
 {
 	GuiBase::keyboard(ev);
-	if (ev.state)
+
+	if (ev.state && !FTX::System->wasEventConsumed())
 	{
 		const bool altPressed = (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT));
 

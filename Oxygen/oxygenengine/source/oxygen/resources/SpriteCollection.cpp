@@ -200,10 +200,10 @@ void SpriteCollection::clear()
 void SpriteCollection::loadAllSpriteDefinitions()
 {
 	// Load or reload from all mods
-	loadSpriteDefinitions(L"data/sprites");
+	loadSpriteDefinitions(L"data/sprites", nullptr);
 	for (const Mod* mod : ModManager::instance().getActiveMods())
 	{
-		loadSpriteDefinitions(mod->mFullPath + L"sprites");
+		loadSpriteDefinitions(mod->mFullPath + L"sprites", mod);
 	}
 }
 
@@ -359,7 +359,7 @@ SpriteCollection::Item& SpriteCollection::createItem(uint64 key)
 	return item;
 }
 
-void SpriteCollection::loadSpriteDefinitions(const std::wstring& path)
+void SpriteCollection::loadSpriteDefinitions(const std::wstring& path, const Mod* mod)
 {
 	struct PaletteSpriteSheet
 	{
@@ -448,9 +448,10 @@ void SpriteCollection::loadSpriteDefinitions(const std::wstring& path)
 				}
 
 				Item& item = createItem(key);
-			#ifdef DEBUG
+				item.mSourceInfo.mType = SourceInfo::Type::SPRITE_FILE;
 				item.mSourceInfo.mSourceIdentifier = *identifier;
-			#endif
+				item.mSourceInfo.mMod = mod;
+
 				const std::wstring fullpath = fileEntry.mPath + filename;
 
 				// Palette or RGBA?
