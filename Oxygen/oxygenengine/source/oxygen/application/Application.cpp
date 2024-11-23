@@ -205,7 +205,15 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 		return;
 	}
 
+	if (ImGuiIntegration::isCapturingKeyboard())
+	{
+		FTX::System->consumeCurrentEvent();
+	}
+
 	GuiBase::keyboard(ev);
+
+	if (FTX::System->wasEventConsumed())
+		return;
 
 	if (ev.state)
 	{
@@ -409,6 +417,16 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 	}
 }
 
+void Application::mouse(const rmx::MouseEvent& ev)
+{
+	if (ImGuiIntegration::isCapturingMouse())
+	{
+		FTX::System->consumeCurrentEvent();
+	}
+
+	GuiBase::mouse(ev);
+}
+
 void Application::update(float timeElapsed)
 {
 	if (mIsVeryFirstFrameForLogging)
@@ -416,7 +434,7 @@ void Application::update(float timeElapsed)
 		RMX_LOG_INFO("Start of first application update call");
 	}
 
-	if (ImGuiIntegration::isCapturingMouse())
+	if (ImGuiIntegration::isCapturingMouse() || ImGuiIntegration::isCapturingKeyboard())
 	{
 		FTX::System->consumeCurrentEvent();
 	}
@@ -529,6 +547,11 @@ void Application::render()
 	if (mIsVeryFirstFrameForLogging)
 	{
 		RMX_LOG_INFO("Start of first application render call");
+	}
+
+	if (ImGuiIntegration::isCapturingMouse())
+	{
+		FTX::System->consumeCurrentEvent();
 	}
 
 	ImGuiIntegration::startFrame();

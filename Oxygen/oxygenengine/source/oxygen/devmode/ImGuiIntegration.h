@@ -27,6 +27,7 @@ public:
 	static void onWindowRecreated(bool useOpenGL);
 
 	static bool isCapturingMouse();
+	static bool isCapturingKeyboard();
 
 	static inline Color& getAccentColor()  { return mAccentColor; }
 

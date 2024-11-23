@@ -49,6 +49,13 @@ void ApplicationContextMenu::initialize()
 
 void ApplicationContextMenu::mouse(const rmx::MouseEvent& ev)
 {
+	if (FTX::System->wasEventConsumed())
+	{
+		mActive = false;
+		mContextMenuClick.set(-1, -1);
+		return;
+	}
+
 	if (ev.state)
 	{
 		if (ev.button == rmx::MouseButton::Right && !FTX::keyState(SDLK_LALT) && !FTX::keyState(SDLK_RALT))
@@ -111,7 +118,7 @@ void ApplicationContextMenu::render()
 		for (Item& item : mItems)
 		{
 			rect.y += 2;
-			const bool selected = rect.contains(FTX::mousePos());
+			const bool selected = rect.contains(FTX::mousePos()) && !FTX::System->wasEventConsumed();
 			if (mContextMenuClick.x >= 0 && rect.contains(mContextMenuClick))
 			{
 				clickedItem = &item;

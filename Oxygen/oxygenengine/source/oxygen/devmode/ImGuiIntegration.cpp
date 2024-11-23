@@ -154,6 +154,11 @@ bool ImGuiIntegration::isCapturingMouse()
 	return mRunning && ImGui::GetIO().WantCaptureMouse;
 }
 
+bool ImGuiIntegration::isCapturingKeyboard()
+{
+	return mRunning && ImGui::GetIO().WantCaptureKeyboard;
+}
+
 void ImGuiIntegration::refreshImGuiStyle()
 {
 	if (!mRunning)
