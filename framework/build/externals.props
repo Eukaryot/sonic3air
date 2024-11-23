@@ -8,10 +8,10 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(WorkspaceDir)\librmx\source\;$(FrameworkIncDir);$(FrameworkIncDir)\freetype;$(FrameworkIncDir)\freeimage;$(FrameworkIncDir)\minizip;$(FrameworkIncDir)\sdl;$(FrameworkIncDir)\zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(WorkspaceDir)\librmx\source\;$(FrameworkIncDir);$(FrameworkIncDir)\freetype;$(FrameworkIncDir)\freeimage;$(FrameworkIncDir)\imgui;$(FrameworkIncDir)\minizip;$(FrameworkIncDir)\sdl;$(FrameworkIncDir)\zlib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(WorkspaceDir)\librmx\lib\$(BuildCode)\;$(FrameworkLibDir);$(FrameworkLibDir)\curl;$(FrameworkLibDir)\freetype;$(FrameworkLibDir)\freeimage;$(FrameworkLibDir)\libogg;$(FrameworkLibDir)\libvorbis;$(FrameworkLibDir)\minizip;$(FrameworkLibDir)\sdl;$(FrameworkLibDir)\zlib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(WorkspaceDir)\librmx\lib\$(BuildCode)\;$(FrameworkLibDir);$(FrameworkLibDir)\curl;$(FrameworkLibDir)\freetype;$(FrameworkLibDir)\freeimage;$(FrameworkLibDir)\imgui;$(FrameworkLibDir)\libogg;$(FrameworkLibDir)\libvorbis;$(FrameworkLibDir)\minizip;$(FrameworkLibDir)\sdl;$(FrameworkLibDir)\zlib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

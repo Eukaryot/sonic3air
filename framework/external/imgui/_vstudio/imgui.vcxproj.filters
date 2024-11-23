@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="backends">
+      <UniqueIdentifier>{3c5ac33d-3de0-4886-9461-a032aad32d95}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\imgui\backends\imgui_impl_opengl2.cpp">
+      <Filter>backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\backends\imgui_impl_opengl3.cpp">
+      <Filter>backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\backends\imgui_impl_sdl2.cpp">
+      <Filter>backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\backends\imgui_impl_sdlrenderer2.cpp">
+      <Filter>backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\imgui.cpp" />
+    <ClCompile Include="..\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\imgui\imgui_widgets.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\imgui\backends\imgui_impl_opengl2.h">
+      <Filter>backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\imgui\backends\imgui_impl_opengl3.h">
+      <Filter>backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\imgui\backends\imgui_impl_opengl3_loader.h">
+      <Filter>backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\imgui\backends\imgui_impl_sdl2.h">
+      <Filter>backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\imgui\backends\imgui_impl_sdlrenderer2.h">
+      <Filter>backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\imgui\imconfig.h" />
+    <ClInclude Include="..\imgui\imgui.h" />
+    <ClInclude Include="..\imgui\imgui_internal.h" />
+    <ClInclude Include="..\imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\imgui\imstb_textedit.h" />
+    <ClInclude Include="..\imgui\imstb_truetype.h" />
+  </ItemGroup>
+</Project>
