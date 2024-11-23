@@ -13,6 +13,7 @@
 
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/application/modding/Mod.h"
+#include "oxygen/resources/PaletteCollection.h"
 
 
 SpriteBrowserWindow::SpriteBrowserWindow() :
@@ -49,11 +50,16 @@ void SpriteBrowserWindow::buildContent()
 				return a->mSourceInfo.mSourceIdentifier < b->mSourceInfo.mSourceIdentifier;
 			}
 		);
+
+		mPreviewItem = nullptr;
+		mPreviewTexture = Texture();
 	}
 	
 	// TODO: Cache filter results
 	static char filterString[64] = { 0 };
 	ImGui::InputText("Filter", filterString, 64, 0);
+
+	const SpriteCollection::Item* clickedItem = nullptr;
 
 	if (ImGui::BeginTable("Sprite Table", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_ScrollY, ImVec2(0.0f, 200.0f)))
 	{
@@ -70,6 +76,8 @@ void SpriteBrowserWindow::buildContent()
 				continue;
 
 			const ImVec4 textColor = (nullptr == item->mSourceInfo.mMod) ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.5f, 1.0f, 1.0f, 1.0f);
+
+			ImGui::PushID(item);
 
 			ImGui::TableNextRow();
 			
@@ -98,8 +106,91 @@ void SpriteBrowserWindow::buildContent()
 			{
 				ImGui::TextColored(textColor, "%s", item->mSourceInfo.mMod->mDisplayName.c_str());
 			}
+
+			ImGui::SameLine();
+			ImGui::Selectable("", false, ImGuiSelectableFlags_SpanAllColumns);
+			if (ImGui::IsItemClicked())
+			{
+				clickedItem = item;
+			}
+			ImGui::PopID();
 		}
 		ImGui::EndTable();
+	}
+
+	// Preview
+	if (nullptr != clickedItem && mPreviewItem != clickedItem)
+	{
+		mPreviewItem = clickedItem;
+
+		if (clickedItem->mUsesComponentSprite)
+		{
+			const Bitmap& bitmap = static_cast<ComponentSprite*>(clickedItem->mSprite)->getBitmap();
+			mPreviewTexture.load(bitmap);
+			mPreviewTexture.setFilterNearest();
+		}
+		else
+		{
+			const uint64 paletteKey = rmx::getMurmur2_64("@" + mPreviewItem->mSourceInfo.mSourceIdentifier);
+			const PaletteBase* palette = PaletteCollection::instance().getPalette(paletteKey, 0);
+			if (nullptr != palette)
+			{
+				const PaletteBitmap& paletteBitmap = static_cast<PaletteSprite*>(clickedItem->mSprite)->getBitmap();
+				paletteBitmap.convertToRGBA(mTempBitmap, palette->getRawColors(), palette->getSize());
+				mPreviewTexture.load(mTempBitmap);
+				mPreviewTexture.setFilterNearest();
+			}
+			else
+			{
+				mPreviewTexture = Texture();
+			}
+		}
+	}
+
+	if (nullptr != mPreviewItem)
+	{
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Spacing();
+
+		ImGui::Text("%s", mPreviewItem->mSourceInfo.mSourceIdentifier.c_str());
+
+		ImGui::Text("%s", mPreviewItem->mUsesComponentSprite ? "Component sprite" : (mPreviewTexture.getHandle() != 0) ? "Palette sprite (with palette loaded from the BMP file)" : "Palette sprite");
+
+		if (mPreviewTexture.getHandle() != 0)
+		{
+			ImGui::Text("Preview");
+			ImGui::SameLine();
+			if (ImGui::Button("Auto"))
+				mPreviewScale = 0;
+			ImGui::SameLine();
+			if (ImGui::Button("1x"))
+				mPreviewScale = 1;
+			ImGui::SameLine();
+			if (ImGui::Button("2x"))
+				mPreviewScale = 2;
+			ImGui::SameLine();
+			if (ImGui::Button("4x"))
+				mPreviewScale = 4;
+			ImGui::SameLine();
+			if (ImGui::Button("8x"))
+				mPreviewScale = 8;
+			ImGui::SameLine();
+			if (ImGui::Button("16x"))
+				mPreviewScale = 16;
+
+			int scale = mPreviewScale;
+			if (scale == 0)
+				scale = clamp(std::min(500 / mPreviewTexture.getWidth(), 350 / mPreviewTexture.getHeight()), 1, 8);
+
+			ImGui::BeginChild("Preview Image", ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
+			ImGui::Image(mPreviewTexture.getHandle(), ImVec2((float)(mPreviewTexture.getWidth() * scale), (float)(mPreviewTexture.getHeight() * scale)));
+			ImGui::EndChild();
+		}
+		else
+		{
+			ImGui::Text("No preview available");
+		}
 	}
 }
 

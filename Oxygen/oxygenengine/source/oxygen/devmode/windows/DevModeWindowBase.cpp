@@ -12,8 +12,9 @@
 #if defined(SUPPORT_IMGUI)
 
 
-DevModeWindowBase::DevModeWindowBase(std::string_view title) :
-	mTitle(title)
+DevModeWindowBase::DevModeWindowBase(std::string_view title, ImGuiWindowFlags windowFlags) :
+	mTitle(title),
+	mImGuiWindowFlags(windowFlags)
 {
 }
 
@@ -22,7 +23,7 @@ bool DevModeWindowBase::buildWindow()
 	if (!mIsWindowOpen)
 		return false;
 
-	if (!ImGui::Begin(mTitle.c_str(), &mIsWindowOpen, 0))
+	if (!ImGui::Begin(mTitle.c_str(), &mIsWindowOpen, mImGuiWindowFlags))
 	{
 		ImGui::End();
 		return false;

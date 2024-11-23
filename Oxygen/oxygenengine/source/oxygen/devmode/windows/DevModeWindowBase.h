@@ -20,7 +20,7 @@ class DevModeWindowBase
 friend class DevModeMainWindow;
 
 public:
-	DevModeWindowBase(std::string_view title);
+	DevModeWindowBase(std::string_view title, ImGuiWindowFlags windowFlags = ImGuiWindowFlags_AlwaysAutoResize);
 	inline ~DevModeWindowBase() {}
 
 	virtual bool buildWindow();
@@ -29,6 +29,7 @@ public:
 public:
 	std::string mTitle;
 	bool mIsWindowOpen = false;
+	ImGuiWindowFlags mImGuiWindowFlags = 0;
 
 protected:
 	DevModeMainWindow* mDevModeMainWindow = nullptr;

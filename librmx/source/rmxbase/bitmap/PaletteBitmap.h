@@ -55,6 +55,8 @@ public:
 	bool loadBMP(const std::vector<uint8>& bmpContent, std::vector<uint32>* outPalette = nullptr);	// Expecting palette colors to use ABGR32 format
 	bool saveBMP(std::vector<uint8>& bmpContent, const uint32* palette) const;
 
+	void convertToRGBA(Bitmap& output, const uint32* palette, size_t paletteSize) const;
+
 	// Operators
 	inline uint8& operator[](size_t index)							{ return mData[index]; }
 	inline const uint8& operator[](size_t index) const				{ return mData[index]; }

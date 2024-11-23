@@ -26,6 +26,11 @@ public:
 private:
 	uint32 mSpriteCollectionChangeCounter = 0;
 	std::vector<const SpriteCollection::Item*> mSortedItems;
+
+	const SpriteCollection::Item* mPreviewItem = nullptr;
+	int mPreviewScale = 0;
+	Texture mPreviewTexture;
+	Bitmap mTempBitmap;
 };
 
 #endif

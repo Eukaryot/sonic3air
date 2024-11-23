@@ -302,6 +302,22 @@ bool PaletteBitmap::saveBMP(std::vector<uint8>& bmpContent, const uint32* palett
 	return true;
 }
 
+void PaletteBitmap::convertToRGBA(Bitmap& output, const uint32* palette, size_t paletteSize) const
+{
+	output.create(mWidth, mHeight);
+
+	const uint8* src = getData();
+	uint32* dst = output.getData();
+
+	for (int k = 0; k < getPixelCount(); ++k)
+	{
+		uint8 index = *src;
+		*dst = (index < paletteSize) ? (0xff000000 | palette[index]) : 0;
+		++src;
+		++dst;
+	}
+}
+
 void PaletteBitmap::memcpyRect(uint8* dst, int dwid, uint8* src, int swid, int wid, int hgt)
 {
 	for (int y = 0; y < hgt; ++y)
