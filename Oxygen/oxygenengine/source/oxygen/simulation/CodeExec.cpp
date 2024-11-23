@@ -272,8 +272,8 @@ CodeExec::CodeExec() :
 	mDebugTracking(*this, mEmulatorInterface, mLemonScriptRuntime)
 {
 	mRuntimeEnvironment.mEmulatorInterface = &mEmulatorInterface;
-	JSProgram::Init();
 
+	JSProgram::Init();
 	mIsDeveloperMode = EngineMain::getDelegate().useDeveloperFeatures();
 	if (mIsDeveloperMode)
 	{
@@ -345,8 +345,6 @@ bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 	options.mModuleSelection = EngineMain::getDelegate().mayLoadScriptMods() ? LemonScriptProgram::LoadOptions::ModuleSelection::ALL_MODS : LemonScriptProgram::LoadOptions::ModuleSelection::BASE_GAME_ONLY;
 	options.mAppVersion = EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber;
 	const WString mainScriptPath = config.mScriptsDir + config.mMainScriptName;
-
-	JSProgram::RunScripts();
 
 	const LemonScriptProgram::LoadScriptsResult result = mLemonScriptProgram.loadScripts(mainScriptPath.toStdString(), options);
 	if (result == LemonScriptProgram::LoadScriptsResult::PROGRAM_CHANGED)
@@ -456,6 +454,7 @@ void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enfo
 	EngineMain::getDelegate().onRuntimeInit(*this);
 
 	mExecutionState = ExecutionState::READY;
+	JSProgram::RunScripts();
 	mAccumulatedStepsOfCurrentFrame = 0;
 }
 
