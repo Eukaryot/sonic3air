@@ -27,7 +27,7 @@ MemoryHexViewWindow::MemoryHexViewWindow() :
 void MemoryHexViewWindow::buildContent()
 {
 	ImGui::SetWindowPos(ImVec2(50.0f, 450.0f), ImGuiCond_FirstUseEver);
-	ImGui::SetWindowSize(ImVec2(520.0f, 260.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowSize(ImVec2(520.0f, 270.0f), ImGuiCond_FirstUseEver);
 
 	CodeExec& codeExec = Application::instance().getSimulation().getCodeExec();
 	EmulatorInterface& emulatorInterface = codeExec.getEmulatorInterface();
@@ -135,7 +135,8 @@ void MemoryHexViewWindow::buildContent()
 
 	ImGui::Spacing();
 	ImGui::Spacing();
-	ImGui::Spacing();
+	ImGuiHelpers::ScopedIndent si;
+
 	if (mClickedAddress == 0xffffffff)
 	{
 		ImGui::Text("Click any address to show here");

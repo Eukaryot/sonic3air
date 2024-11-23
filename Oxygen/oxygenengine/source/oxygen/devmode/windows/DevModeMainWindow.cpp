@@ -15,6 +15,7 @@
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/devmode/windows/GameSimWindow.h"
 #include "oxygen/devmode/windows/MemoryHexViewWindow.h"
+#include "oxygen/devmode/windows/SpriteBrowserWindow.h"
 #include "oxygen/devmode/windows/WatchesWindow.h"
 
 
@@ -26,6 +27,7 @@ DevModeMainWindow::DevModeMainWindow() :
 	createWindow(mGameSimWindow);
 	createWindow(mMemoryHexViewWindow);
 	createWindow(mWatchesWindow);
+	createWindow(mSpriteBrowserWindow);
 }
 
 DevModeMainWindow::~DevModeMainWindow()
@@ -60,7 +62,11 @@ void DevModeMainWindow::buildContent()
 	}
 
 #ifdef DEBUG
+	ImGui::Spacing();
 	ImGui::Checkbox("ImGui Demo", &mShowImGuiDemo);
+
+	// Just for debugging
+	//ImGui::Text("ImGui Capture:   %s %s", ImGui::GetIO().WantCaptureMouse ? "[M]" : "      ", ImGui::GetIO().WantCaptureKeyboard ? "[K]" : "");
 #endif
 
 	if (ImGui::CollapsingHeader("Settings", 0))

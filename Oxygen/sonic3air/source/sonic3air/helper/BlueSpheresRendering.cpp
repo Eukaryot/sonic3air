@@ -586,9 +586,7 @@ void BlueSpheresRendering::buildSprite(const uint8* lookupDataBase, const String
 	{
 		const uint64 spriteKey = rmx::getMurmur2_64(spriteIdentifier[k]);
 		SpriteCollection::Item& item = spriteCollection.getOrCreatePaletteSprite(spriteKey);
-	#ifdef DEBUG
 		item.mSourceInfo.mSourceIdentifier = *spriteIdentifier[k];
-	#endif
 		++item.mChangeCounter;
 		bitmaps[k] = &static_cast<PaletteSprite*>(item.mSprite)->accessBitmap();
 		items[k] = &item;
