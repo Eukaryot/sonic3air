@@ -23,7 +23,7 @@ SpriteBrowserWindow::SpriteBrowserWindow() :
 
 void SpriteBrowserWindow::buildContent()
 {
-	ImGui::SetWindowPos(ImVec2(350.0f, 150.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowPos(ImVec2(350.0f, 10.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowSize(ImVec2(500.0f, 250.0f), ImGuiCond_FirstUseEver);
 
 	// Refresh list if needed
@@ -152,10 +152,18 @@ void SpriteBrowserWindow::buildContent()
 		ImGui::Spacing();
 		ImGui::Spacing();
 		ImGui::Spacing();
+		ImGuiHelpers::ScopedIndent si;
 
 		ImGui::Text("%s", mPreviewItem->mSourceInfo.mSourceIdentifier.c_str());
 
-		ImGui::Text("%s", mPreviewItem->mUsesComponentSprite ? "Component sprite" : (mPreviewTexture.getHandle() != 0) ? "Palette sprite (with palette loaded from the BMP file)" : "Palette sprite");
+		if (nullptr != mPreviewItem->mSprite)
+		{
+			ImGui::Text("%s, %d x %d pixels", mPreviewItem->mUsesComponentSprite ? "Component sprite" : "Palette sprite", mPreviewItem->mSprite->getSize().x, mPreviewItem->mSprite->getSize().y);
+		}
+		else
+		{
+			ImGui::Text("%s", mPreviewItem->mUsesComponentSprite ? "Component sprite" : "Palette sprite");
+		}
 
 		if (mPreviewTexture.getHandle() != 0)
 		{
@@ -186,6 +194,33 @@ void SpriteBrowserWindow::buildContent()
 			ImGui::BeginChild("Preview Image", ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
 			ImGui::Image(mPreviewTexture.getHandle(), ImVec2((float)(mPreviewTexture.getWidth() * scale), (float)(mPreviewTexture.getHeight() * scale)));
 			ImGui::EndChild();
+
+			if (!mPreviewItem->mUsesComponentSprite)
+			{
+				ImGui::Checkbox("View BMP palette", &mShowPalette);
+				if (mShowPalette)
+				{
+					const uint64 paletteKey = rmx::getMurmur2_64("@" + mPreviewItem->mSourceInfo.mSourceIdentifier);
+					const PaletteBase* palette = PaletteCollection::instance().getPalette(paletteKey, 0);
+					if (nullptr != palette)
+					{
+						ImGui::BeginChild("Palette", ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
+						ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(2, 2));
+						ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+						for (int k = 0; k < (int)palette->getSize(); ++k)
+						{
+							Color color = Color::fromABGR32(palette->getRawColors()[k]);
+							if (k & 15)
+								ImGui::SameLine();
+							ImGui::PushID(k);
+							ImGui::ColorButton(*String(0, "Palette color #%d", k), ImVec4(color.r, color.b, color.g, color.a), ImGuiColorEditFlags_NoBorder | ImGuiColorEditFlags_NoLabel, ImVec2(12, 12));
+							ImGui::PopID();
+						}
+						ImGui::PopStyleVar(2);
+						ImGui::EndChild();
+					}
+				}
+			}
 		}
 		else
 		{

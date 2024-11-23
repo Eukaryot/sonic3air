@@ -31,6 +31,7 @@ private:
 	int mPreviewScale = 0;
 	Texture mPreviewTexture;
 	Bitmap mTempBitmap;
+	bool mShowPalette = false;
 };
 
 #endif
