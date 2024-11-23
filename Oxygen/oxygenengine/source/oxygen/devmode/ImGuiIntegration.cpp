@@ -223,6 +223,7 @@ void ImGuiIntegration::showDebugWindow()  {}
 void ImGuiIntegration::endFrame()  {}
 void ImGuiIntegration::onWindowRecreated(bool useOpenGL)  {}
 bool ImGuiIntegration::isCapturingMouse()  { return false; }
+bool ImGuiIntegration::isCapturingKeyboard()  { return false; }
 void ImGuiIntegration::refreshImGuiStyle()  {}
 void ImGuiIntegration::toggleMainWindow()  {}
 

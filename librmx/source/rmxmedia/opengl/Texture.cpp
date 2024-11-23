@@ -65,10 +65,10 @@ GLenum Texture::getDefaultDataFormat(GLint internalFormat)
 #ifdef ALLOW_LEGACY_OPENGL
 	if (internalFormat >= GL_DEPTH_COMPONENT16 && internalFormat <= GL_DEPTH_COMPONENT32)
 		return GL_DEPTH_COMPONENT;
-#endif
-
 	if (internalFormat == GL_R8)	// TODO: Translate others as well
 		return GL_RED;
+#endif
+
 	return GL_RGBA;
 }
 
