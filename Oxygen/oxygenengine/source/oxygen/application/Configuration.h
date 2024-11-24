@@ -45,6 +45,8 @@ public:
 	struct DevModeSettings
 	{
 		bool mEnabled = false;
+		float mGameViewScale = 1.0f;
+		Vec2f mGameViewAlignment;
 	};
 
 	struct GameRecorder

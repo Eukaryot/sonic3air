@@ -11,7 +11,7 @@
 	"StartPhase": "2",				// 0: Disclaimer, 1: Title Screen, 2: Main Menu, 3: In-game (loading a save state)
 
 	// Video
-	"WindowSize": "1200 x 740",
+	"WindowSize": "1600 x 960",
 	"GameScreen": "400 x 224",		// Can be changed with numpad multiply/divide
 	"Filtering": "0",				// Can be toggled with Alt + F
 
@@ -52,6 +52,6 @@
 	},
 
 	// Script / Debug
-	"CompileScripts": "0",
+	"CompileScripts":  "0",
 	"WaitForDebugger": "0"
 }

@@ -23,14 +23,14 @@
 
 
 WatchesWindow::WatchesWindow() :
-	DevModeWindowBase("Watches")
+	DevModeWindowBase("Watches", 0)
 {
 }
 
 void WatchesWindow::buildContent()
 {
 	ImGui::SetWindowPos(ImVec2(50.0f, 240.0f), ImGuiCond_FirstUseEver);
-	ImGui::SetWindowSize(ImVec2(400.0f, 200.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowSize(ImVec2(450.0f, 300.0f), ImGuiCond_FirstUseEver);
 
 	CodeExec& codeExec = Application::instance().getSimulation().getCodeExec();
 	EmulatorInterface& emulatorInterface = codeExec.getEmulatorInterface();
@@ -47,98 +47,106 @@ void WatchesWindow::buildContent()
 	}
 	else
 	{
-		for (const DebugTracking::Watch* watch : watches)
+		if (ImGui::BeginTable("Watches Table", 1, ImGuiTableFlags_Borders, ImVec2(0.0f, 0.0f)))
 		{
-			// Display 0xffff???? instead of 0x00ff????
-			uint32 displayAddress = watch->mAddress;
-			if ((displayAddress & 0x00ff0000) == 0x00ff0000)
-				displayAddress |= 0xff000000;
-
-			String watchTitle;
-			if (watch->mBytes <= 4)
-				watchTitle = String(0, "u%d[0x%08x]", watch->mBytes * 8, displayAddress);
-			else
-				watchTitle = String(0, "0x%02x bytes at 0x%08x", watch->mBytes, displayAddress);
-
-			if (ImGui::TreeNodeEx(*watchTitle, ImGuiTreeNodeFlags_DefaultOpen))
+			for (const DebugTracking::Watch* watch : watches)
 			{
+				ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(0);
+				ImGui::Spacing();		// TODO: Can this be achieved with setting the padding right somewhere instead?
+
+				// Display 0xffff???? instead of 0x00ff????
+				uint32 displayAddress = watch->mAddress;
+				if ((displayAddress & 0x00ff0000) == 0x00ff0000)
+					displayAddress |= 0xff000000;
+
+				String watchTitle;
 				if (watch->mBytes <= 4)
-				{
-					if (watch->mHits.empty())
-						ImGui::TextColored(grayColor, "       %s   (no changes this frame)", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str());
-					else
-						ImGui::Text("       %s   initially", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str());
-				}
+					watchTitle = String(0, "u%d[0x%08x]", watch->mBytes * 8, displayAddress);
+				else
+					watchTitle = String(0, "0x%02x bytes at 0x%08x", watch->mBytes, displayAddress);
 
-				for (size_t hitIndex = 0; hitIndex < watch->mHits.size(); ++hitIndex)
+				if (ImGui::TreeNodeEx(*watchTitle, ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					const auto& hit = *watch->mHits[hitIndex];
-					const uint64 key = ((uint64)watch->mAddress << 32) + hitIndex;
-
-					String hitTitle;
 					if (watch->mBytes <= 4)
 					{
-						const std::string& functionName = hit.mLocation.toString(codeExec);
-						hitTitle = String(0, "%s   at %s, line %d", rmx::hexString(hit.mWrittenValue, watch->mBytes * 2).c_str(), functionName.c_str(), hit.mLocation.mLineNumber);
-					}
-					else
-					{
-						hitTitle = String(0, "u%d[0xffff%04x] = %s   at %s", hit.mBytes * 8, hit.mAddress, rmx::hexString(hit.mWrittenValue, std::min(hit.mBytes * 2, 8)).c_str(), hit.mLocation.toString(codeExec).c_str());
+						if (watch->mHits.empty())
+							ImGui::TextColored(grayColor, "       %s   (no changes this frame)", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str());
+						else
+							ImGui::Text("       %s   initially", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str());
 					}
 
-					ImGui::PushID(hitIndex);
-					if (ImGui::TreeNodeEx("Call Stack", 0, *hitTitle))
+					for (size_t hitIndex = 0; hitIndex < watch->mHits.size(); ++hitIndex)
 					{
-						ImGui::TextColored(lightGrayColor, "   Call Stack:");
-						std::vector<DebugTracking::Location> callStack;
-						debugTracking.getCallStackFromCallFrameIndex(callStack, hit.mCallFrameIndex, hit.mLocation.mProgramCounter);
+						const auto& hit = *watch->mHits[hitIndex];
+						const uint64 key = ((uint64)watch->mAddress << 32) + hitIndex;
 
-						for (size_t k = 0; k < callStack.size(); ++k)
+						String hitTitle;
+						if (watch->mBytes <= 4)
 						{
-							const DebugTracking::Location& loc = callStack[k];
-							const std::string& functionName = loc.toString(debugTracking.getCodeExec());
-							if (loc.mLineNumber >= 0)
-							{
-								ImGui::TextColored(lightGrayColor, "        %s, line %d", functionName.c_str(), loc.mLineNumber);
-
-							#if defined(PLATFORM_WINDOWS)
-								if (loc.mProgramCounter.has_value())
-								{
-									ImGui::SameLine();
-									ImGui::PushID((int)k);
-									if (ImGui::SmallButton("VC"))
-									{
-										LemonScriptProgram::ResolvedLocation location;
-										codeExec.getLemonScriptProgram().resolveLocation(location, *loc.mFunction, (uint32)loc.mProgramCounter.value());
-										if (location.mSourceFileInfo)
-										{
-											// TODO: Add the actual full path to Visual Studio Code
-											//  -> This should be configurable in the settings.json - and if it's not set, don't show the VC button in the first place
-											std::wstring applicationPath = Configuration::instance().mAppDataPath + L"../../Local/Programs/Microsoft VS Code/Code.exe";
-
-											// TODO: The full path here is not necessarily actually the full path, but can be a relative one
-											std::wstring arguments = L"-r -g \"" + location.mSourceFileInfo->mFullPath + L"\":" + std::to_wstring(loc.mLineNumber);
-
-											PlatformFunctions::openApplicationExternal(applicationPath, arguments);
-										}
-									}
-									ImGui::PopID();
-								}
-							#endif
-							}
-							else
-							{
-								ImGui::TextColored(lightGrayColor, "        %s", functionName.c_str());
-							}
+							const std::string& functionName = hit.mLocation.toString(codeExec);
+							hitTitle = String(0, "%s   at %s, line %d", rmx::hexString(hit.mWrittenValue, watch->mBytes * 2).c_str(), functionName.c_str(), hit.mLocation.mLineNumber);
+						}
+						else
+						{
+							hitTitle = String(0, "u%d[0xffff%04x] = %s   at %s", hit.mBytes * 8, hit.mAddress, rmx::hexString(hit.mWrittenValue, std::min(hit.mBytes * 2, 8)).c_str(), hit.mLocation.toString(codeExec).c_str());
 						}
 
-						ImGui::TreePop();
+						ImGui::PushID(hitIndex);
+						if (ImGui::TreeNodeEx("Call Stack", 0, *hitTitle))
+						{
+							ImGui::TextColored(lightGrayColor, "   Call Stack:");
+							std::vector<DebugTracking::Location> callStack;
+							debugTracking.getCallStackFromCallFrameIndex(callStack, hit.mCallFrameIndex, hit.mLocation.mProgramCounter);
+
+							for (size_t k = 0; k < callStack.size(); ++k)
+							{
+								const DebugTracking::Location& loc = callStack[k];
+								const std::string& functionName = loc.toString(debugTracking.getCodeExec());
+								if (loc.mLineNumber >= 0)
+								{
+									ImGui::TextColored(lightGrayColor, "        %s, line %d", functionName.c_str(), loc.mLineNumber);
+
+								#if defined(PLATFORM_WINDOWS)
+									if (loc.mProgramCounter.has_value())
+									{
+										ImGui::SameLine();
+										ImGui::PushID((int)k);
+										if (ImGui::SmallButton("VC"))
+										{
+											LemonScriptProgram::ResolvedLocation location;
+											codeExec.getLemonScriptProgram().resolveLocation(location, *loc.mFunction, (uint32)loc.mProgramCounter.value());
+											if (location.mSourceFileInfo)
+											{
+												// TODO: Add the actual full path to Visual Studio Code
+												//  -> This should be configurable in the settings.json - and if it's not set, don't show the VC button in the first place
+												std::wstring applicationPath = Configuration::instance().mAppDataPath + L"../../Local/Programs/Microsoft VS Code/Code.exe";
+
+												// TODO: The full path here is not necessarily actually the full path, but can be a relative one
+												std::wstring arguments = L"-r -g \"" + location.mSourceFileInfo->mFullPath + L"\":" + std::to_wstring(loc.mLineNumber);
+
+												PlatformFunctions::openApplicationExternal(applicationPath, arguments);
+											}
+										}
+										ImGui::PopID();
+									}
+								#endif
+								}
+								else
+								{
+									ImGui::TextColored(lightGrayColor, "        %s", functionName.c_str());
+								}
+							}
+
+							ImGui::TreePop();
+						}
+						ImGui::PopID();
 					}
-					ImGui::PopID();
+					ImGui::TreePop();
 				}
-				ImGui::TreePop();
+				ImGui::Spacing();
 			}
-			ImGui::Spacing();
+			ImGui::EndTable();
 		}
 	}
 }

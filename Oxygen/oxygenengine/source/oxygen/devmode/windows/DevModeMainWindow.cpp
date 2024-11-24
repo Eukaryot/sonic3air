@@ -55,8 +55,9 @@ bool DevModeMainWindow::buildWindow()
 
 void DevModeMainWindow::buildContent()
 {
-	ImGui::SetWindowPos(ImVec2(8.0f, 8.0f), ImGuiCond_FirstUseEver);
-	ImGui::SetWindowSize(ImVec2(200.0f, 180.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowPos(ImVec2(5.0f, 5.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowSize(ImVec2(150.0f, 200.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowCollapsed(true, ImGuiCond_FirstUseEver);
 
 	for (DevModeWindowBase* window : mAllWindows)
 	{
@@ -79,6 +80,23 @@ void DevModeMainWindow::buildContent()
 		if (ImGui::ColorEdit3("Dev Mode UI Accent Color", accentColor.data, ImGuiColorEditFlags_NoInputs))
 		{
 			ImGuiIntegration::refreshImGuiStyle();
+		}
+
+		// TODO: Move this somewhere else
+		if (ImGui::CollapsingHeader("Game View Window", 0))
+		{
+			Configuration& config = Configuration::instance();
+			ImGui::SliderFloat("Size", &config.mDevMode.mGameViewScale, 0.2f, 1.0f);
+
+			ImGui::SliderFloat("Alignment X", &config.mDevMode.mGameViewAlignment.x, -1.0f, 1.0f);
+			ImGui::SameLine();
+			if (ImGui::Button("Center##x"))
+				config.mDevMode.mGameViewAlignment.x = 0.0f;
+
+			ImGui::SliderFloat("Alignment Y", &config.mDevMode.mGameViewAlignment.y, -1.0f, 1.0f);
+			ImGui::SameLine();
+			if (ImGui::Button("Center##y"))
+				config.mDevMode.mGameViewAlignment.y = 0.0f;
 		}
 	}
 }

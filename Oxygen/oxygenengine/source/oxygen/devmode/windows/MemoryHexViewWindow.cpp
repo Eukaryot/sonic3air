@@ -63,7 +63,7 @@ void MemoryHexViewWindow::buildContent()
 	ImGui::InputScalar("Start Address", ImGuiDataType_U32, &mStartAddress, nullptr, nullptr, "%08x", ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsNoBlank);
 	ImGui::Spacing();
 
-	if (ImGui::BeginTable("Hex View", 17, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_NoSavedSettings, ImVec2(500.0f, 0.0f)))
+	if (ImGui::BeginTable("Hex View", 17, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_NoSavedSettings))
 	{
 		uint32 address = mStartAddress;
 		static uint32 hoveredAddress = 0xffffffff;
@@ -75,6 +75,8 @@ void MemoryHexViewWindow::buildContent()
 		const uint32 cellBGColorHovered = ImGui::GetColorU32(ImVec4(0.5f, 0.5f, 0.0f, 0.6f) );
 
 		ImGui::TableSetupColumn("Address", ImGuiTableColumnFlags_WidthFixed, 70.0f);
+		for (int column = 1; column <= 16; ++column)
+			ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 15.0f);
 
 		ImGui::TableNextRow();
 		ImGui::TableSetColumnIndex(0);

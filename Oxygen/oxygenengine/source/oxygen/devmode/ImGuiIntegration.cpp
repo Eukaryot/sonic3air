@@ -22,6 +22,7 @@ namespace
 {
 	DevModeMainWindow* mDevModeMainWindow = nullptr;
 	ImFont* mDefaultFont = nullptr;
+	std::wstring mIniFilePath;
 
 	bool loadFont(const char* filename, float size, ImFont*& outFont)
 	{
@@ -59,11 +60,26 @@ void ImGuiIntegration::startup()
 	ImGui_ImplOpenGL3_Init();
 
 	// Configure paths
-	//  -> TODO: Create folder if needed
-	//  -> TODO: Switch to wchar_t support here, by using "ImGui::LoadIniSettingsFromMemory"
-	static std::string iniFilename = WString(Configuration::instance().mAppDataPath).toStdString() + "devmode/imgui.ini";
-	ImGui::GetIO().IniFilename = iniFilename.c_str();
+	{
+		ImGui::GetIO().IniFilename = nullptr;	// Disable automatic load & save by ImGui, we're handling that ourselves
 
+		const std::wstring iniBasePath = Configuration::instance().mAppDataPath + L"devmode/";
+		mIniFilePath = iniBasePath + L"imgui.ini";
+
+		if (!FTX::FileSystem->exists(iniBasePath))
+		{
+			FTX::FileSystem->createDirectory(iniBasePath);
+		}
+		else
+		{
+			std::vector<uint8> content;
+			if (FTX::FileSystem->readFile(mIniFilePath, content) && !content.empty())
+			{
+				ImGui::LoadIniSettingsFromMemory((const char*)&content[0], content.size());
+			}
+		}
+	}
+	
 	mRunning = true;
 
 	// Configure default styles
@@ -130,6 +146,15 @@ void ImGuiIntegration::endFrame()
 	// ImGui rendering
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	// Save ini if there was a change
+	if (ImGui::GetIO().WantSaveIniSettings)
+	{
+		ImGui::GetIO().WantSaveIniSettings = false;
+		size_t contentSize = 0;
+		const char* content = ImGui::SaveIniSettingsToMemory(&contentSize);
+		FTX::FileSystem->saveFile(mIniFilePath, content, contentSize);
+	}
 }
 
 void ImGuiIntegration::onWindowRecreated(bool useOpenGL)

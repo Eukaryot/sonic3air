@@ -329,10 +329,8 @@ bool EngineMain::startupEngine()
 	mAudioOut = &EngineMain::getDelegate().createAudioOut();
 	mAudioOut->startup();
 
-	// TODO: During development, ImGui is only active in debug builds
-#ifdef DEBUG
+	// ImGui integration
 	ImGuiIntegration::setEnabled(config.mDevMode.mEnabled);
-#endif
 	ImGuiIntegration::startup();
 
 	// Done

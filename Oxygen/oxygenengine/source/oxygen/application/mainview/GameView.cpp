@@ -90,9 +90,10 @@ GameView::~GameView()
 
 void GameView::updateGameViewport()
 {
+	const Configuration& config = Configuration::instance();
 	const Recti gameScreenRect = VideoOut::instance().getScreenRect();
 
-	switch (Configuration::instance().mUpscaling)
+	switch (config.mUpscaling)
 	{
 		default:
 		case 0:
@@ -106,13 +107,17 @@ void GameView::updateGameViewport()
 		{
 			// Integer upscaling
 			mGameViewport = RenderUtils::getLetterBoxRect(mRect, gameScreenRect.getAspectRatio());
-			const int scale = (int)mGameViewport.height / gameScreenRect.height;
-			if (scale >= 1)
+
+			if (!config.mDevMode.mEnabled)	// If dev mode is enabled, integer scale is handled differently, see below
 			{
-				mGameViewport.width = roundToInt((float)gameScreenRect.width * scale);
-				mGameViewport.height = roundToInt((float)gameScreenRect.height * scale);
-				mGameViewport.x = mRect.x + (mRect.width - mGameViewport.width) / 2;
-				mGameViewport.y = mRect.y + (mRect.height - mGameViewport.height) / 2;
+				const int scale = mGameViewport.height / gameScreenRect.height;
+				if (scale >= 1)
+				{
+					mGameViewport.width = roundToInt((float)gameScreenRect.width * scale);
+					mGameViewport.height = roundToInt((float)gameScreenRect.height * scale);
+					mGameViewport.x = mRect.x + (mRect.width - mGameViewport.width) / 2;
+					mGameViewport.y = mRect.y + (mRect.height - mGameViewport.height) / 2;
+				}
 			}
 			break;
 		}
@@ -121,9 +126,8 @@ void GameView::updateGameViewport()
 		{
 			// Halfway stretch to fill
 			const Recti letterBox = RenderUtils::getLetterBoxRect(mRect, gameScreenRect.getAspectRatio());
-			mGameViewport.width = roundToInt((letterBox.width + mRect.width) * 0.5f);		// Average size of letter box and full stretch
-			mGameViewport.height = roundToInt((letterBox.height + mRect.height) * 0.5f);
-			mGameViewport.setPos((mRect.getSize() - mGameViewport.getSize()) / 2);	// Center on screen
+			mGameViewport.setPos((letterBox.getPos() + mRect.getPos()) / 2);		// Average between letter box and full stretch
+			mGameViewport.setSize((letterBox.getSize() + mRect.getSize()) / 2);
 			break;
 		}
 
@@ -140,6 +144,22 @@ void GameView::updateGameViewport()
 			mGameViewport = RenderUtils::getScaleToFillRect(mRect, gameScreenRect.getAspectRatio());
 			break;
 		}
+	}
+
+	if (config.mDevMode.mEnabled)
+	{
+		// Consider integer scaling
+		Vec2f scaledSize = Vec2f(mGameViewport.getSize()) * config.mDevMode.mGameViewScale;
+		if (config.mUpscaling == 1)
+		{
+			const int scale = std::max((int)((float)mGameViewport.height * config.mDevMode.mGameViewScale) / gameScreenRect.height, 1);
+			scaledSize = Vec2f(gameScreenRect.getSize() * scale);
+		}
+
+		const Vec2f maxPos = Vec2f(mRect.getEndPos()) - scaledSize;
+		mGameViewport.x = maxPos.x * (1.0f + config.mDevMode.mGameViewAlignment.x) / 2.0f;
+		mGameViewport.y = maxPos.y * (1.0f + config.mDevMode.mGameViewAlignment.y) / 2.0f;
+		mGameViewport.setSize(Vec2i(scaledSize));
 	}
 }
 
@@ -584,6 +604,7 @@ void GameView::render()
 {
 	mRect = FTX::screenRect();
 
+	const Configuration& config = Configuration::instance();
 	Drawer& drawer = EngineMain::instance().getDrawer();
 	VideoOut& videoOut = VideoOut::instance();
 	const Recti gameScreenRect = VideoOut::instance().getScreenRect();
@@ -636,7 +657,7 @@ void GameView::render()
 	drawer.setBlendMode(BlendMode::OPAQUE);
 
 	// Simple mirror mode implementation: Just mirror the whole screen
-	if (Configuration::instance().mMirrorMode)
+	if (config.mMirrorMode)
 	{
 		drawer.drawRect(gameScreenRect, videoOut.getGameScreenTexture(), Vec2f(1.0f, 0.0f), Vec2f(0.0f, 1.0f), Color::WHITE);
 	}
@@ -731,7 +752,7 @@ void GameView::render()
 		drawer.drawRect(gameScreenRect, Color(0.0f, 0.0f, 0.0f, 1.0f - mFadeValue));
 	}
 
-	if (Configuration::instance().mPerformanceDisplay == 1)
+	if (config.mPerformanceDisplay == 1)
 	{
 		// Show frame rate, using pixelated display
 		const double averageTime = Profiling::getRootRegion().mAverageTime;

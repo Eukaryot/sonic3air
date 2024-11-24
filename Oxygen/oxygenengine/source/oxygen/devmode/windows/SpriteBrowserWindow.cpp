@@ -68,6 +68,7 @@ void SpriteBrowserWindow::buildContent()
 		ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 90);
 		ImGui::TableSetupColumn("Source");
 
+		ImGui::TableSetupScrollFreeze(0, 1);
 		ImGui::TableHeadersRow();
 
 		for (const SpriteCollection::Item* item : mSortedItems)
@@ -108,8 +109,7 @@ void SpriteBrowserWindow::buildContent()
 			}
 
 			ImGui::SameLine();
-			ImGui::Selectable("", false, ImGuiSelectableFlags_SpanAllColumns);
-			if (ImGui::IsItemClicked())
+			if (ImGui::Selectable("", mPreviewItem == item, ImGuiSelectableFlags_SpanAllColumns))
 			{
 				clickedItem = item;
 			}
