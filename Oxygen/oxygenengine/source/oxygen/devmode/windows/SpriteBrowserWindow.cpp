@@ -213,7 +213,7 @@ void SpriteBrowserWindow::buildContent()
 							if (k & 15)
 								ImGui::SameLine();
 							ImGui::PushID(k);
-							ImGui::ColorButton(*String(0, "Palette color #%d", k), ImVec4(color.r, color.b, color.g, color.a), ImGuiColorEditFlags_NoBorder | ImGuiColorEditFlags_NoLabel, ImVec2(12, 12));
+							ImGui::ColorButton(*String(0, "Palette color #%d", k), ImVec4(color.r, color.g, color.b, color.a), ImGuiColorEditFlags_NoBorder | ImGuiColorEditFlags_NoLabel, ImVec2(12, 12));
 							ImGui::PopID();
 						}
 						ImGui::PopStyleVar(2);
