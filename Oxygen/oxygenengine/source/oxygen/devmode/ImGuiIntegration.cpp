@@ -26,8 +26,18 @@ namespace
 
 	bool loadFont(const char* filename, float size, ImFont*& outFont)
 	{
-		RMX_CHECK(FTX::FileSystem->exists(filename), "Could not find font file: '" << filename << "'", return false);
-		outFont = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename, size, nullptr, ImGui::GetIO().Fonts->GetGlyphRangesDefault());
+		outFont = nullptr;
+		std::vector<uint8> content;
+		if (!FTX::FileSystem->readFile(filename, content))
+		{
+			RMX_ERROR("Could not find font file: '" << filename << "'", );
+		}
+		else
+		{
+			uint8* buffer = new uint8[content.size()];
+			memcpy(buffer, &content[0], (int)content.size());
+			outFont = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(buffer, (int)content.size(), size, nullptr, ImGui::GetIO().Fonts->GetGlyphRangesDefault());
+		}
 		return (nullptr != outFont);
 	}
 }
@@ -88,6 +98,14 @@ void ImGuiIntegration::startup()
 	refreshImGuiStyle();
 
 	mDevModeMainWindow = new DevModeMainWindow();
+
+#if defined(PLATFORM_ANDROID)
+	// Use a much larger scale on Android, otherwise it's too finicky to interact with ImGui at all
+	ImGui::GetIO().FontGlobalScale = 2.0f;
+
+	// Configure SDL to interpret finger taps as mouse clicks as well for mobile devices
+	SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "1");
+#endif
 }
 
 void ImGuiIntegration::shutdown()

@@ -21,7 +21,7 @@ friend class DevModeMainWindow;
 
 public:
 	DevModeWindowBase(std::string_view title, ImGuiWindowFlags windowFlags = ImGuiWindowFlags_AlwaysAutoResize);
-	inline ~DevModeWindowBase() {}
+	virtual ~DevModeWindowBase() {}
 
 	virtual bool buildWindow();
 	virtual void buildContent() = 0;

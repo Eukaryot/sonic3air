@@ -157,8 +157,8 @@ void GameView::updateGameViewport()
 		}
 
 		const Vec2f maxPos = Vec2f(mRect.getEndPos()) - scaledSize;
-		mGameViewport.x = maxPos.x * (1.0f + config.mDevMode.mGameViewAlignment.x) / 2.0f;
-		mGameViewport.y = maxPos.y * (1.0f + config.mDevMode.mGameViewAlignment.y) / 2.0f;
+		mGameViewport.x = roundToInt(maxPos.x * (1.0f + config.mDevMode.mGameViewAlignment.x) / 2.0f);
+		mGameViewport.y = roundToInt(maxPos.y * (1.0f + config.mDevMode.mGameViewAlignment.y) / 2.0f);
 		mGameViewport.setSize(Vec2i(scaledSize));
 	}
 }

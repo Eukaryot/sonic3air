@@ -93,7 +93,7 @@ void WatchesWindow::buildContent()
 						}
 
 						ImGui::PushID(hitIndex);
-						if (ImGui::TreeNodeEx("Call Stack", 0, *hitTitle))
+						if (ImGui::TreeNodeEx("Call Stack", 0, "%s", *hitTitle))
 						{
 							ImGui::TextColored(lightGrayColor, "   Call Stack:");
 							std::vector<DebugTracking::Location> callStack;

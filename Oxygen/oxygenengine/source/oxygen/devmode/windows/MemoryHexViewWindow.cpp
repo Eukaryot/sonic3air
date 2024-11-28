@@ -86,9 +86,7 @@ void MemoryHexViewWindow::buildContent()
 		{
 			ImGui::TableSetColumnIndex(column);
 			ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, cellBGColorTitle);
-			static char buffer[8];
-			sprintf(buffer, "%02x", column - 1);
-			ImGui::TextColored(cellColorTitle, buffer);
+			ImGui::TextColored(cellColorTitle, "%02x", column - 1);
 		}
 
 		for (int row = 0; row < mNumRows; ++row)

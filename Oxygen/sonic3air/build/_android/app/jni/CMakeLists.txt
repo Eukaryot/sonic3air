@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(WORKSPACE_DIR ../../../../../..)
 
 #add_definitions(-DDEBUG)
+add_definitions(-DIMGUI_IMPL_OPENGL_ES2)
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -23,6 +24,7 @@ include_directories(${WORKSPACE_DIR}/framework/external/ogg-vorbis/libogg/includ
 include_directories(${WORKSPACE_DIR}/framework/external/ogg-vorbis/libvorbis/include)
 include_directories(${WORKSPACE_DIR}/framework/external/ogg-vorbis/libvorbis/lib)
 include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizip)
+include_directories(${WORKSPACE_DIR}/framework/external/imgui/imgui)
 include_directories(${WORKSPACE_DIR}/librmx/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/lemonscript/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/oxygenengine/source)
@@ -51,6 +53,19 @@ target_link_libraries(minizip z)		# zlib
 
 
 
+# imgui
+
+file(GLOB IMGUI_SOURCES ${WORKSPACE_DIR}/framework/external/imgui/imgui/*.cpp
+						${WORKSPACE_DIR}/framework/external/imgui/imgui/backends/imgui_impl_opengl3.cpp
+						${WORKSPACE_DIR}/framework/external/imgui/imgui/backends/imgui_impl_sdl2.cpp)
+
+add_library(imgui ${IMGUI_SOURCES})
+
+target_link_libraries(imgui SDL2)
+target_link_libraries(imgui GLESv2)
+
+
+
 # rmxbase
 
 file(GLOB_RECURSE RMXBASE_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxbase/*.cpp)
@@ -69,8 +84,8 @@ file(GLOB_RECURSE RMXMEDIA_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxmedia/*.cpp
 
 add_library(rmxmedia SHARED ${RMXMEDIA_SOURCES})
 
-target_link_libraries(rmxmedia GLESv2)
 target_link_libraries(rmxmedia SDL2)
+target_link_libraries(rmxmedia GLESv2)
 target_link_libraries(rmxmedia rmxbase)
 
 
@@ -116,6 +131,7 @@ target_link_libraries(oxygen minizip)
 target_link_libraries(oxygen rmxmedia)
 target_link_libraries(oxygen rmxext_oggvorbis)
 target_link_libraries(oxygen lemonscript)
+target_link_libraries(oxygen imgui)
 target_link_libraries(oxygen oxygen_netcore)
 
 
