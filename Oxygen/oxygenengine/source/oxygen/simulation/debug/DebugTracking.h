@@ -66,6 +66,7 @@ public:
 		};
 
 		std::vector<Hit*> mHits;
+		std::string mName;
 		uint32 mAddress = 0;
 		uint16 mBytes = 0;
 		bool mPersistent = false;
@@ -107,7 +108,7 @@ public:
 	int getExistingWatchIndex(uint32 address, uint16 bytes) const;
 	void updateWatches();
 	void clearWatches(bool clearPersistent = false);
-	void addWatch(uint32 address, uint16 bytes, bool persistent);
+	void addWatch(uint32 address, uint16 bytes, bool persistent, std::string_view name = "");
 	void removeWatch(uint32 address, uint16 bytes);
 
 	// VRAM writes

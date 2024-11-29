@@ -12,6 +12,7 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/devmode/ImGuiHelpers.h"
+#include "oxygen/devmode/windows/DevModeMainWindow.h"
 #include "oxygen/application/Application.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/CodeExec.h"
@@ -32,9 +33,106 @@ void WatchesWindow::buildContent()
 	ImGui::SetWindowPos(ImVec2(50.0f, 240.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowSize(ImVec2(450.0f, 300.0f), ImGuiCond_FirstUseEver);
 
+	const float uiScale = ImGui::GetIO().FontGlobalScale;
+
 	CodeExec& codeExec = Application::instance().getSimulation().getCodeExec();
 	EmulatorInterface& emulatorInterface = codeExec.getEmulatorInterface();
 	DebugTracking& debugTracking = codeExec.getDebugTracking();
+
+	if (ImGui::CollapsingHeader("Add Watch"))
+	{
+		ImGuiHelpers::ScopedIndent si;
+
+		static char filterString[64] = { 0 };
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Filter:");
+		ImGui::SameLine();
+		ImGui::InputText("##Filter", filterString, 64, 0);
+		const bool disabled = (filterString[0] == 0);
+		if (disabled)
+			ImGui::BeginDisabled();
+		ImGui::SameLine();
+		if (ImGui::Button("Clear"))
+			filterString[0] = 0;
+		if (disabled)
+			ImGui::EndDisabled();
+
+		if (ImGui::BeginTable("Global Defines Table", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_ScrollY, ImVec2(0.0f, 150.0f * uiScale)))
+		{
+			ImGui::TableSetupColumn("Identifier");
+			ImGui::TableSetupColumn("Address", ImGuiTableColumnFlags_WidthFixed, 100 * uiScale);
+			ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthFixed, 80 * uiScale);
+			ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 92 * uiScale);
+
+			ImGui::TableSetupScrollFreeze(0, 1);
+			ImGui::TableHeadersRow();
+
+			const std::vector<LemonScriptProgram::GlobalDefine>& globalDefines = codeExec.getLemonScriptProgram().getGlobalDefines();
+			for (const LemonScriptProgram::GlobalDefine& globalDefine : globalDefines)
+			{
+				if (filterString[0] && globalDefine.mName.getString().find(filterString) == std::string::npos)
+					continue;
+
+				ImGui::PushID(&globalDefine);
+				ImGui::TableNextRow();
+
+				ImGui::TableSetColumnIndex(0);
+				ImGui::Text("%.*s", (int)globalDefine.mName.getString().length(), globalDefine.mName.getString().data());
+
+				ImGui::TableSetColumnIndex(1);
+				if (globalDefine.mAddress <= 0xffffff)
+					ImGui::Text("%su%d[0x%06x]", (globalDefine.mBytes == 1) ? "  " : "", globalDefine.mBytes * 8, globalDefine.mAddress);
+				else
+					ImGui::Text("%su%d[0x%08x]", (globalDefine.mBytes == 1) ? "  " : "", globalDefine.mBytes * 8, globalDefine.mAddress);
+
+				ImGui::TableSetColumnIndex(2);
+				switch (globalDefine.mBytes)
+				{
+					case 1:
+					{
+						const uint8 value = emulatorInterface.readMemory8(globalDefine.mAddress);
+						ImGui::Text("0x%02x", value);
+						break;
+					}
+					case 2:
+					{
+						const uint16 value = emulatorInterface.readMemory16(globalDefine.mAddress);
+						ImGui::Text("0x%04x", value);
+						break;
+					}
+					case 4:
+					{
+						const uint32 value = emulatorInterface.readMemory32(globalDefine.mAddress);
+						ImGui::Text("0x%08x", value);
+						break;
+					}
+				}
+
+				ImGui::TableSetColumnIndex(3);
+				if (debugTracking.hasWatch(globalDefine.mAddress, globalDefine.mBytes))
+				{
+					if (ImGui::SmallButton("Remove Watch"))
+					{
+						debugTracking.removeWatch(globalDefine.mAddress, globalDefine.mBytes);
+					}
+				}
+				else
+				{
+					if (ImGui::SmallButton("Add Watch"))
+					{
+						debugTracking.addWatch(globalDefine.mAddress, globalDefine.mBytes, true, globalDefine.mName.getString());
+						mDevModeMainWindow->openWatchesWindow();
+					}
+				}
+
+				ImGui::PopID();
+			}
+
+			ImGui::EndTable();
+		}
+	}
+
+	ImGui::Spacing();
 
 	const ImVec4 grayColor(0.6f, 0.6f, 0.6f, 1.0f);
 	const ImVec4 lightGrayColor(0.75f, 0.75f, 0.75f, 1.0f);
@@ -47,6 +145,8 @@ void WatchesWindow::buildContent()
 	}
 	else
 	{
+		const DebugTracking::Watch* watchToRemove = nullptr;
+
 		if (ImGui::BeginTable("Watches Table", 1, ImGuiTableFlags_Borders, ImVec2(0.0f, 0.0f)))
 		{
 			for (const DebugTracking::Watch* watch : watches)
@@ -65,9 +165,19 @@ void WatchesWindow::buildContent()
 					watchTitle = String(0, "u%d[0x%08x]", watch->mBytes * 8, displayAddress);
 				else
 					watchTitle = String(0, "0x%02x bytes at 0x%08x", watch->mBytes, displayAddress);
+				if (!watch->mName.empty())
+					watchTitle = String(watch->mName) + " -- " + watchTitle;
 
 				if (ImGui::TreeNodeEx(*watchTitle, ImGuiTreeNodeFlags_DefaultOpen))
 				{
+					ImGui::SameLine();
+					ImGui::Text("  ");
+					ImGui::SameLine();
+					if (ImGui::SmallButton("Remove"))
+					{
+						watchToRemove = watch;
+					}
+
 					if (watch->mBytes <= 4)
 					{
 						if (watch->mHits.empty())
@@ -147,6 +257,11 @@ void WatchesWindow::buildContent()
 				ImGui::Spacing();
 			}
 			ImGui::EndTable();
+		}
+
+		if (nullptr != watchToRemove)
+		{
+			debugTracking.removeWatch(watchToRemove->mAddress, watchToRemove->mBytes);
 		}
 	}
 }

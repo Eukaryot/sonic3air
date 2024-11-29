@@ -496,6 +496,9 @@
     <ClCompile Include="..\..\source\oxygen\devmode\windows\PaletteViewWindow.cpp">
       <Filter>devmode\windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\SettingsWindow.cpp">
+      <Filter>devmode\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -935,6 +938,9 @@
       <Filter>devmode\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\devmode\windows\PaletteViewWindow.h">
+      <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\SettingsWindow.h">
       <Filter>devmode\windows</Filter>
     </ClInclude>
   </ItemGroup>

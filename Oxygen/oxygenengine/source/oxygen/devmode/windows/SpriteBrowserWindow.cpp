@@ -26,6 +26,8 @@ void SpriteBrowserWindow::buildContent()
 	ImGui::SetWindowPos(ImVec2(350.0f, 10.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowSize(ImVec2(500.0f, 250.0f), ImGuiCond_FirstUseEver);
 
+	const float uiScale = ImGui::GetIO().FontGlobalScale;
+
 	// Refresh list if needed
 	const SpriteCollection& spriteCollection = SpriteCollection::instance();
 	if (mSpriteCollectionChangeCounter != spriteCollection.getGlobalChangeCounter())
@@ -57,11 +59,22 @@ void SpriteBrowserWindow::buildContent()
 	
 	// TODO: Cache filter results
 	static char filterString[64] = { 0 };
-	ImGui::InputText("Filter", filterString, 64, 0);
+	ImGui::AlignTextToFramePadding();
+	ImGui::Text("Filter:");
+	ImGui::SameLine();
+	ImGui::InputText("##Filter", filterString, 64, 0);
+	const bool disabled = (filterString[0] == 0);
+	if (disabled)
+		ImGui::BeginDisabled();
+	ImGui::SameLine();
+	if (ImGui::Button("Clear"))
+		filterString[0] = 0;
+	if (disabled)
+		ImGui::EndDisabled();
 
 	const SpriteCollection::Item* clickedItem = nullptr;
 
-	if (ImGui::BeginTable("Sprite Table", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_ScrollY, ImVec2(0.0f, 200.0f)))
+	if (ImGui::BeginTable("Sprite Table", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_ScrollY, ImVec2(0.0f, 200.0f * uiScale)))
 	{
 		ImGui::TableSetupColumn("Identifier");
 		ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 75);
@@ -204,8 +217,10 @@ void SpriteBrowserWindow::buildContent()
 					const PaletteBase* palette = PaletteCollection::instance().getPalette(paletteKey, 0);
 					if (nullptr != palette)
 					{
+						const ImVec2 colorEntrySize(roundToFloat(12.0f * uiScale), roundToFloat(12.0f * uiScale));
+
 						ImGui::BeginChild("Palette", ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
-						ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(2, 2));
+						ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(roundToFloat(2.0f * uiScale), roundToFloat(2.0f * uiScale)));
 						ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
 						for (int k = 0; k < (int)palette->getSize(); ++k)
 						{
@@ -213,7 +228,7 @@ void SpriteBrowserWindow::buildContent()
 							if (k & 15)
 								ImGui::SameLine();
 							ImGui::PushID(k);
-							ImGui::ColorButton(*String(0, "Palette color #%d", k), ImVec4(color.r, color.g, color.b, color.a), ImGuiColorEditFlags_NoBorder | ImGuiColorEditFlags_NoLabel, ImVec2(12, 12));
+							ImGui::ColorButton(*String(0, "Palette color #%d", k), ImVec4(color.r, color.g, color.b, color.a), ImGuiColorEditFlags_NoBorder | ImGuiColorEditFlags_NoLabel, colorEntrySize);
 							ImGui::PopID();
 						}
 						ImGui::PopStyleVar(2);

@@ -11,11 +11,11 @@
 
 #if defined(SUPPORT_IMGUI)
 
-#include "oxygen/devmode/ImGuiIntegration.h"
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/devmode/windows/GameSimWindow.h"
 #include "oxygen/devmode/windows/MemoryHexViewWindow.h"
 #include "oxygen/devmode/windows/PaletteViewWindow.h"
+#include "oxygen/devmode/windows/SettingsWindow.h"
 #include "oxygen/devmode/windows/SpriteBrowserWindow.h"
 #include "oxygen/devmode/windows/WatchesWindow.h"
 
@@ -30,6 +30,7 @@ DevModeMainWindow::DevModeMainWindow() :
 	createWindow(mWatchesWindow);
 	createWindow(mPaletteViewWindow);
 	createWindow(mSpriteBrowserWindow);
+	createWindow(mSettingsWindow);
 }
 
 DevModeMainWindow::~DevModeMainWindow()
@@ -71,34 +72,6 @@ void DevModeMainWindow::buildContent()
 	// Just for debugging
 	//ImGui::Text("ImGui Capture:   %s %s", ImGui::GetIO().WantCaptureMouse ? "[M]" : "      ", ImGui::GetIO().WantCaptureKeyboard ? "[K]" : "");
 #endif
-
-	if (ImGui::CollapsingHeader("Settings", 0))
-	{
-		ImGuiHelpers::ScopedIndent si;
-
-		Color& accentColor = ImGuiIntegration::getAccentColor();
-		if (ImGui::ColorEdit3("Dev Mode UI Accent Color", accentColor.data, ImGuiColorEditFlags_NoInputs))
-		{
-			ImGuiIntegration::refreshImGuiStyle();
-		}
-
-		// TODO: Move this somewhere else
-		if (ImGui::CollapsingHeader("Game View Window", 0))
-		{
-			Configuration& config = Configuration::instance();
-			ImGui::SliderFloat("Size", &config.mDevMode.mGameViewScale, 0.2f, 1.0f);
-
-			ImGui::SliderFloat("Alignment X", &config.mDevMode.mGameViewAlignment.x, -1.0f, 1.0f);
-			ImGui::SameLine();
-			if (ImGui::Button("Center##x"))
-				config.mDevMode.mGameViewAlignment.x = 0.0f;
-
-			ImGui::SliderFloat("Alignment Y", &config.mDevMode.mGameViewAlignment.y, -1.0f, 1.0f);
-			ImGui::SameLine();
-			if (ImGui::Button("Center##y"))
-				config.mDevMode.mGameViewAlignment.y = 0.0f;
-		}
-	}
 }
 
 void DevModeMainWindow::openWatchesWindow()

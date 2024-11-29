@@ -17,6 +17,7 @@
 class GameSimWindow;
 class MemoryHexViewWindow;
 class PaletteViewWindow;
+class SettingsWindow;
 class SpriteBrowserWindow;
 class WatchesWindow;
 
@@ -49,6 +50,7 @@ private:
 	SpriteBrowserWindow* mSpriteBrowserWindow = nullptr;
 	PaletteViewWindow* mPaletteViewWindow = nullptr;
 	WatchesWindow* mWatchesWindow = nullptr;
+	SettingsWindow* mSettingsWindow = nullptr;
 
 	bool mShowImGuiDemo = false;
 };

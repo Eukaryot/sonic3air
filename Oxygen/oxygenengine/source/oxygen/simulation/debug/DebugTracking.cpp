@@ -210,7 +210,7 @@ void DebugTracking::clearWatches(bool clearPersistent)
 	}
 }
 
-void DebugTracking::addWatch(uint32 address, uint16 bytes, bool persistent)
+void DebugTracking::addWatch(uint32 address, uint16 bytes, bool persistent, std::string_view name)
 {
 	address &= 0x00ffffff;
 
@@ -225,6 +225,7 @@ void DebugTracking::addWatch(uint32 address, uint16 bytes, bool persistent)
 
 	// Add a new watch here
 	Watch& watch = mWatchPool.rentObject();
+	watch.mName = name;
 	watch.mAddress = address;
 	watch.mBytes = bytes;
 	watch.mPersistent = persistent;

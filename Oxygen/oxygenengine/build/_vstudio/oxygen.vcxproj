@@ -58,6 +58,7 @@
     <ClCompile Include="..\..\source\oxygen\devmode\windows\GameSimWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\PaletteViewWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\SettingsWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\SpriteBrowserWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\WatchesWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\download\Downloader.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="..\..\source\oxygen\devmode\windows\GameSimWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\PaletteViewWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\SettingsWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\SpriteBrowserWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\WatchesWindow.h" />
     <ClInclude Include="..\..\source\oxygen\download\Downloader.h" />

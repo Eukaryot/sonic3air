@@ -66,7 +66,10 @@ void PaletteViewWindow::buildContent()
 
 void PaletteViewWindow::drawPalette(const PaletteBase& palette)
 {
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(2, 2));
+	const float uiScale = ImGui::GetIO().FontGlobalScale;
+	const ImVec2 colorEntrySize(roundToFloat(14.0f * uiScale), roundToFloat(14.0f * uiScale));
+
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(roundToFloat(2.0f * uiScale), roundToFloat(2.0f * uiScale)));
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
 
 	for (int k = 0; k < std::min((int)palette.getSize(), 256); ++k)
@@ -75,7 +78,7 @@ void PaletteViewWindow::drawPalette(const PaletteBase& palette)
 		if (k & 15)
 			ImGui::SameLine();
 		ImGui::PushID(k);
-		ImGui::ColorButton(*String(0, "Palette color #%d", k), ImVec4(color.r, color.g, color.b, color.a), ImGuiColorEditFlags_NoBorder | ImGuiColorEditFlags_NoLabel, ImVec2(14, 14));
+		ImGui::ColorButton(*String(0, "Palette color #%d", k), ImVec4(color.r, color.g, color.b, color.a), ImGuiColorEditFlags_NoBorder | ImGuiColorEditFlags_NoLabel, colorEntrySize);
 		ImGui::PopID();
 	}
 	ImGui::PopStyleVar(2);
