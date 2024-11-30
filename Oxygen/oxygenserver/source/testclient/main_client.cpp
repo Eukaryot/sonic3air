@@ -69,6 +69,7 @@ private:
 	{
 		NONE,
 		WAITING_FOR_CONNECTION,
+		EXTERNAL_ADDRESS_REQUEST_SENT,
 		JOIN_REQUEST_SENT,
 		READY_TO_SEND_MESSAGE,
 		MESSAGE_SENT,
@@ -76,6 +77,7 @@ private:
 
 	State mState = State::NONE;
 	NetConnection mConnection;
+	network::GetExternalAddressRequest mGetExternalAddressRequest;
 	network::JoinChannelRequest mJoinChannelRequest;
 };
 
@@ -141,7 +143,20 @@ void TestClient::updateClient()
 		{
 			if (mConnection.getState() == NetConnection::State::CONNECTED)
 			{
-				// Send request
+				// Send request to get own external address
+				mConnection.sendRequest(mGetExternalAddressRequest);
+				mState = State::EXTERNAL_ADDRESS_REQUEST_SENT;
+			}
+			break;
+		}
+
+		case State::EXTERNAL_ADDRESS_REQUEST_SENT:
+		{
+			if (mGetExternalAddressRequest.hasResponse())
+			{
+				RMX_LOG_INFO("Received own external address: IP = " << mGetExternalAddressRequest.mResponse.mIP << ", Port = " << mGetExternalAddressRequest.mResponse.mPort);
+
+				// Send request to join a channel
 				mJoinChannelRequest.mQuery.mChannelName = "test-channel";
 				mJoinChannelRequest.mQuery.mChannelHash = (uint32)rmx::getMurmur2_64(mJoinChannelRequest.mQuery.mChannelName);
 				mConnection.sendRequest(mJoinChannelRequest);

@@ -55,6 +55,33 @@ namespace network
 	};
 
 
+	class GetExternalAddressRequest : public highlevel::RequestBase
+	{
+		struct QueryData
+		{
+			// No parameters at all
+
+			inline void serializeData(VectorBinarySerializer& serializer, uint8 protocolVersion)
+			{
+			}
+		};
+
+		struct ResponseData
+		{
+			std::string mIP;
+			uint16 mPort = 0;
+
+			inline void serializeData(VectorBinarySerializer& serializer, uint8 protocolVersion)
+			{
+				serializer.serialize(mIP, 64);
+				serializer.serialize(mPort);
+			}
+		};
+
+		HIGHLEVEL_REQUEST_DEFINE_FUNCTIONALITY("GetExternalAddressRequest")
+	};
+
+
 	class AppUpdateCheckRequest : public highlevel::RequestBase
 	{
 		struct QueryData

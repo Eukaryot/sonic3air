@@ -48,6 +48,7 @@ void Server::runServer()
 		// Fill in available features
 		mCachedServerFeaturesRequest.mResponse.mFeatures.emplace_back(network::GetServerFeaturesRequest::Response::Feature("app-update-check", 1, 1));
 		mCachedServerFeaturesRequest.mResponse.mFeatures.emplace_back(network::GetServerFeaturesRequest::Response::Feature("channel-broadcasting", 1, 1));
+		mCachedServerFeaturesRequest.mResponse.mFeatures.emplace_back(network::GetServerFeaturesRequest::Response::Feature("query-external-address", 1, 1));
 	}
 
 	// Setup sub-systems
@@ -139,6 +140,19 @@ bool Server::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 				return false;
 
 			// Nothing more to change, the response is already filled in
+			return evaluation.respond(request);
+		}
+
+		case network::GetExternalAddressRequest::Query::PACKET_TYPE:
+		{
+			using Request = network::GetExternalAddressRequest;
+			Request request;
+			if (!evaluation.readQuery(request))
+				return false;
+
+			// Send back the sender's IP and port as seen from the server
+			request.mResponse.mIP = evaluation.mConnection.getRemoteAddress().getIP();
+			request.mResponse.mPort = evaluation.mConnection.getRemoteAddress().getPort();
 			return evaluation.respond(request);
 		}
 	}
