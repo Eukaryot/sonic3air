@@ -319,6 +319,14 @@ namespace rmx
 		return stringEndsWith<std::wstring_view>(fullString, prefix);
 	}
 
+	bool containsCaseInsensitive(std::string_view fullString, std::string_view substring)
+	{
+		const auto it = std::search(fullString.begin(), fullString.end(), substring.begin(), substring.end(),
+			[](char a, char b) { return std::toupper(a) == std::toupper(b); }
+		);
+		return (it != fullString.end());
+	}
+
 	std::string getTimestampStringForFilename()
 	{
 		time_t now = time(0);

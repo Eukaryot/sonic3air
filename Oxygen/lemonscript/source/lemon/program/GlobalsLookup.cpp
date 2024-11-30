@@ -84,16 +84,16 @@ namespace lemon
 		return mapFind(mAllIdentifiers, nameHash);
 	}
 
-	const std::vector<Function*>& GlobalsLookup::getFunctionsByName(uint64 nameHash) const
+	const std::vector<GlobalsLookup::FunctionReference>& GlobalsLookup::getFunctionsByName(uint64 nameHash) const
 	{
-		static const std::vector<Function*> EMPTY_FUNCTIONS;
+		static const std::vector<FunctionReference> EMPTY_FUNCTIONS;
 		const auto it = mFunctionsByName.find(nameHash);
 		return (it == mFunctionsByName.end()) ? EMPTY_FUNCTIONS : it->second;
 	}
 
-	const Function* GlobalsLookup::getFunctionByNameAndSignature(uint64 nameHash, uint32 signatureHash, bool* outAnyFound) const
+	const GlobalsLookup::FunctionReference* GlobalsLookup::getFunctionByNameAndSignature(uint64 nameHash, uint32 signatureHash, bool* outAnyFound) const
 	{
-		const std::vector<Function*>& candidateFunctions = getFunctionsByName(nameHash);
+		const std::vector<FunctionReference>& candidateFunctions = getFunctionsByName(nameHash);
 		if (candidateFunctions.empty())
 		{
 			if (nullptr != outAnyFound)
@@ -104,18 +104,18 @@ namespace lemon
 			if (nullptr != outAnyFound)
 				*outAnyFound = true;
 
-			for (const Function* func : candidateFunctions)
+			for (const FunctionReference& func : candidateFunctions)
 			{
-				if (func->getSignatureHash() == signatureHash)
-					return func;
+				if (func.mFunction->getSignatureHash() == signatureHash)
+					return &func;
 			}
 		}
 		return nullptr;
 	}
 
-	const std::vector<Function*>& GlobalsLookup::getMethodsByName(uint64 contextNameHash) const
+	const std::vector<GlobalsLookup::FunctionReference>& GlobalsLookup::getMethodsByName(uint64 contextNameHash) const
 	{
-		static const std::vector<Function*> EMPTY_FUNCTIONS;
+		static const std::vector<FunctionReference> EMPTY_FUNCTIONS;
 		const auto it = mMethodsByName.find(contextNameHash);
 		return (it == mMethodsByName.end()) ? EMPTY_FUNCTIONS : it->second;
 	}
@@ -125,19 +125,23 @@ namespace lemon
 		const uint64 nameHash = function.getName().getHash();
 		if (function.getContext().isEmpty())
 		{
-			mFunctionsByName[nameHash].push_back(&function);
-			for (const FlyweightString& str : function.getAliasNames())
+			vectorAdd(mFunctionsByName[nameHash]).mFunction = &function;
+			for (const Function::AliasName& aliasName : function.getAliasNames())
 			{
-				mFunctionsByName[str.getHash()].push_back(&function);
+				FunctionReference& ref = vectorAdd(mFunctionsByName[aliasName.mName.getHash()]);
+				ref.mFunction = &function;
+				ref.mIsDeprecated = aliasName.mIsDeprecated;
 			}
 		}
 		else
 		{
 			const uint64 contextHash = function.getContext().getHash();
-			mMethodsByName[contextHash + nameHash].push_back(&function);
-			for (const FlyweightString& str : function.getAliasNames())
+			vectorAdd(mMethodsByName[contextHash + nameHash]).mFunction = &function;
+			for (const Function::AliasName& aliasName : function.getAliasNames())
 			{
-				mMethodsByName[contextHash + str.getHash()].push_back(&function);
+				FunctionReference& ref = vectorAdd(mMethodsByName[contextHash + aliasName.mName.getHash()]);
+				ref.mFunction = &function;
+				ref.mIsDeprecated = aliasName.mIsDeprecated;
 			}
 		}
 	}

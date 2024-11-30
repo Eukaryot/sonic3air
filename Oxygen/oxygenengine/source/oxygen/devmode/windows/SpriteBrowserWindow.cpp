@@ -58,19 +58,8 @@ void SpriteBrowserWindow::buildContent()
 	}
 	
 	// TODO: Cache filter results
-	static char filterString[64] = { 0 };
-	ImGui::AlignTextToFramePadding();
-	ImGui::Text("Filter:");
-	ImGui::SameLine();
-	ImGui::InputText("##Filter", filterString, 64, 0);
-	const bool disabled = (filterString[0] == 0);
-	if (disabled)
-		ImGui::BeginDisabled();
-	ImGui::SameLine();
-	if (ImGui::Button("Clear"))
-		filterString[0] = 0;
-	if (disabled)
-		ImGui::EndDisabled();
+	static ImGuiHelpers::FilterString filterString;
+	filterString.draw();
 
 	const SpriteCollection::Item* clickedItem = nullptr;
 
@@ -86,7 +75,7 @@ void SpriteBrowserWindow::buildContent()
 
 		for (const SpriteCollection::Item* item : mSortedItems)
 		{
-			if (filterString[0] && item->mSourceInfo.mSourceIdentifier.find(filterString) == std::string::npos)
+			if (!filterString.shouldInclude(item->mSourceInfo.mSourceIdentifier))
 				continue;
 
 			const ImVec4 textColor = (nullptr == item->mSourceInfo.mMod) ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.5f, 1.0f, 1.0f, 1.0f);

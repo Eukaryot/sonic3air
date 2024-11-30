@@ -52,12 +52,14 @@
     <ClCompile Include="..\..\source\oxygen\application\overlays\SaveStateMenu.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\overlays\TouchControlsOverlay.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\video\VideoOut.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\ImGuiHelpers.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\ImGuiIntegration.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\DevModeMainWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\DevModeWindowBase.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\GameSimWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\PaletteViewWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\ScriptBuildWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\SettingsWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\SpriteBrowserWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\WatchesWindow.cpp" />
@@ -198,6 +200,7 @@
     <ClInclude Include="..\..\source\oxygen\devmode\windows\GameSimWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\PaletteViewWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\ScriptBuildWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\SettingsWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\SpriteBrowserWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\WatchesWindow.h" />

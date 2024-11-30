@@ -1,0 +1,107 @@
+﻿/*
+*	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
+*	Copyright (C) 2017-2024 by Eukaryot
+*
+*	Published under the GNU GPLv3 open source software license, see license.txt
+*	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+#include "oxygen/pch.h"
+#include "oxygen/devmode/windows/ScriptBuildWindow.h"
+
+#if defined(SUPPORT_IMGUI)
+
+#include "oxygen/devmode/ImGuiHelpers.h"
+#include "oxygen/application/Application.h"
+#include "oxygen/application/modding/Mod.h"
+#include "oxygen/simulation/CodeExec.h"
+#include "oxygen/simulation/LemonScriptProgram.h"
+#include "oxygen/simulation/Simulation.h"
+
+#include <lemon/program/Module.h>
+
+
+ScriptBuildWindow::ScriptBuildWindow() :
+	DevModeWindowBase("Script Build", 0)
+{
+}
+
+void ScriptBuildWindow::buildContent()
+{
+	ImGui::SetWindowPos(ImVec2(350.0f, 10.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowSize(ImVec2(500.0f, 250.0f), ImGuiCond_FirstUseEver);
+
+	const float uiScale = ImGui::GetIO().FontGlobalScale;
+
+	const LemonScriptProgram& program = Application::instance().getSimulation().getCodeExec().getLemonScriptProgram();
+
+	static ImGuiHelpers::FilterString filterString;
+	filterString.draw();
+	ImGui::SameLine();
+	ImGui::Text("Filter by module name or author");
+
+	ImGui::Spacing();
+
+	if (ImGui::BeginTable("Watches Table", 1, ImGuiTableFlags_Borders, ImVec2(0.0f, 0.0f)))
+	{
+		for (const lemon::Module* module : program.getModules())
+		{
+			const Mod* mod = program.getModByModule(*module);
+
+			if (!filterString.shouldInclude(module->getModuleName()))
+			{
+				if (nullptr == mod || !filterString.shouldInclude(mod->mAuthor))
+					continue;
+			}
+
+			ImGui::TableNextRow();
+
+			ImGui::TableSetColumnIndex(0);
+			ImGui::Spacing();
+
+			const ImVec4 textColor = (nullptr == mod) ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.5f, 1.0f, 1.0f, 1.0f);
+
+			ImGui::PushID(module);
+
+			ImGui::PushStyleColor(ImGuiCol_Text, textColor);
+			const bool isOpen = ImGui::TreeNodeEx(&module, 0, "%s", module->getModuleName().c_str());
+			ImGui::PopStyleColor();
+
+			if (isOpen)
+			{
+				if (module->getWarnings().empty())
+				{
+					ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.5f), "       No warnings");
+				}
+				else
+				{
+					for (const lemon::CompilerWarning& warning : module->getWarnings())
+					{
+						if (ImGui::TreeNodeEx(&warning, ImGuiTreeNodeFlags_DefaultOpen, "%s", warning.mMessage.c_str()))
+						{
+							for (const lemon::CompilerWarning::Occurrence& occurrence : warning.mOccurrences)
+							{
+								if (nullptr != occurrence.mSourceFileInfo)
+								{
+									ImGui::BulletText("In '%s', line %d", WString(occurrence.mSourceFileInfo->mFilename).toStdString().c_str(), occurrence.mLineNumber);
+									ImGui::PushID(&occurrence);
+									ImGuiHelpers::OpenCodeLocation::drawButton(occurrence.mSourceFileInfo->mFullPath, occurrence.mLineNumber);
+									ImGui::PopID();
+								}
+							}
+							ImGui::TreePop();
+						}
+					}
+				}
+				ImGui::TreePop();
+			}
+
+			ImGui::PopID();
+			ImGui::Spacing();
+		}
+
+		ImGui::EndTable();
+	}
+}
+
+#endif

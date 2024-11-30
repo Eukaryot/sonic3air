@@ -542,20 +542,23 @@ void GameView::update(float timeElapsed)
 		mDebugOutput = -1;
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
-			if (FTX::keyState(','))
+			if (!FTX::System->wasEventConsumed())
 			{
-				// Debug output for plane B
-				mDebugOutput = 0;
-			}
-			else if (FTX::keyState('.'))
-			{
-				// Debug output for plane A or W
-				mDebugOutput = (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT)) ? 2 : 1;
-			}
-			else if (FTX::keyState('-'))
-			{
-				// Debug output for patterns
-				mDebugOutput = 3;
+				if (FTX::keyState(','))
+				{
+					// Debug output for plane B
+					mDebugOutput = 0;
+				}
+				else if (FTX::keyState('.'))
+				{
+					// Debug output for plane A or W
+					mDebugOutput = (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT)) ? 2 : 1;
+				}
+				else if (FTX::keyState('-'))
+				{
+					// Debug output for patterns
+					mDebugOutput = 3;
+				}
 			}
 
 			DebugTracking& debugTracking = Application::instance().getSimulation().getCodeExec().getDebugTracking();

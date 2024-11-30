@@ -159,11 +159,13 @@ namespace lemon
 		if (!pragmaSplitter.mEntries.empty())
 		{
 			bool hadAddressHook = false;
+			bool hadAlias = false;
 			for (const lemon::PragmaSplitter::Entry& entry : pragmaSplitter.mEntries)
 			{
 				if (entry.mArgument == "alias")
 				{
-					mAliasNames.push_back(entry.mValue);
+					vectorAdd(mAliasNames).mName = entry.mValue;
+					hadAlias = true;
 				}
 				else if (entry.mArgument == "address-hook")
 				{
@@ -177,6 +179,13 @@ namespace lemon
 				{
 					// You can use "translated" to denote that some code was already put into script, but should not be an actual address hook
 					hadAddressHook = true;
+				}
+				else if (entry.mArgument == "deprecated")
+				{
+					if (hadAlias)
+					{
+						mAliasNames.back().mIsDeprecated = true;
+					}
 				}
 			}
 

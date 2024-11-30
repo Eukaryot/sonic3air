@@ -27,7 +27,7 @@
 		LEMON_DEBUG_BREAK(errorMessage); \
 		std::ostringstream stream; \
 		stream << errorMessage; \
-		throw CompilerException(stream.str().c_str()); \
+		throw CompilerException(stream.str()); \
 	} \
 }
 
@@ -38,7 +38,7 @@
 		LEMON_DEBUG_BREAK(errorMessage); \
 		std::ostringstream stream; \
 		stream << errorMessage; \
-		throw CompilerException(stream.str().c_str(), lineNumber); \
+		throw CompilerException(stream.str(), lineNumber); \
 	} \
 }
 
@@ -47,8 +47,16 @@
 	LEMON_DEBUG_BREAK(errorMessage); \
 	std::ostringstream stream; \
 	stream << errorMessage; \
-	throw CompilerException(stream.str().c_str(), errorCode, data1, data2); \
+	throw CompilerException(stream.str(), errorCode, data1, data2); \
 }
+
+#define ADD_WARNING(warningType, warningMessage, lineNumber) \
+{ \
+	std::ostringstream stream; \
+	stream << warningMessage; \
+	Compiler::getActiveInstance()->addWarning(warningType, stream.str(), lineNumber); \
+}
+
 
 
 namespace lemon

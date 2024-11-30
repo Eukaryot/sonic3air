@@ -43,19 +43,8 @@ void WatchesWindow::buildContent()
 	{
 		ImGuiHelpers::ScopedIndent si;
 
-		static char filterString[64] = { 0 };
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Filter:");
-		ImGui::SameLine();
-		ImGui::InputText("##Filter", filterString, 64, 0);
-		const bool disabled = (filterString[0] == 0);
-		if (disabled)
-			ImGui::BeginDisabled();
-		ImGui::SameLine();
-		if (ImGui::Button("Clear"))
-			filterString[0] = 0;
-		if (disabled)
-			ImGui::EndDisabled();
+		static ImGuiHelpers::FilterString filterString;
+		filterString.draw();
 
 		if (ImGui::BeginTable("Global Defines Table", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_ScrollY, ImVec2(0.0f, 150.0f * uiScale)))
 		{
@@ -70,7 +59,7 @@ void WatchesWindow::buildContent()
 			const std::vector<LemonScriptProgram::GlobalDefine>& globalDefines = codeExec.getLemonScriptProgram().getGlobalDefines();
 			for (const LemonScriptProgram::GlobalDefine& globalDefine : globalDefines)
 			{
-				if (filterString[0] && globalDefine.mName.getString().find(filterString) == std::string::npos)
+				if (!filterString.shouldInclude(globalDefine.mName.getString()))
 					continue;
 
 				ImGui::PushID(&globalDefine);
@@ -217,30 +206,18 @@ void WatchesWindow::buildContent()
 								{
 									ImGui::TextColored(lightGrayColor, "        %s, line %d", functionName.c_str(), loc.mLineNumber);
 
-								#if defined(PLATFORM_WINDOWS)
 									if (loc.mProgramCounter.has_value())
 									{
-										ImGui::SameLine();
 										ImGui::PushID((int)k);
-										if (ImGui::SmallButton("VC"))
+										if (ImGuiHelpers::OpenCodeLocation::drawButton())
 										{
 											LemonScriptProgram::ResolvedLocation location;
 											codeExec.getLemonScriptProgram().resolveLocation(location, *loc.mFunction, (uint32)loc.mProgramCounter.value());
-											if (location.mSourceFileInfo)
-											{
-												// TODO: Add the actual full path to Visual Studio Code
-												//  -> This should be configurable in the settings.json - and if it's not set, don't show the VC button in the first place
-												std::wstring applicationPath = Configuration::instance().mAppDataPath + L"../../Local/Programs/Microsoft VS Code/Code.exe";
 
-												// TODO: The full path here is not necessarily actually the full path, but can be a relative one
-												std::wstring arguments = L"-r -g \"" + location.mSourceFileInfo->mFullPath + L"\":" + std::to_wstring(loc.mLineNumber);
-
-												PlatformFunctions::openApplicationExternal(applicationPath, arguments);
-											}
+											ImGuiHelpers::OpenCodeLocation::open(location.mSourceFileInfo->mFullPath, loc.mLineNumber);
 										}
 										ImGui::PopID();
 									}
-								#endif
 								}
 								else
 								{

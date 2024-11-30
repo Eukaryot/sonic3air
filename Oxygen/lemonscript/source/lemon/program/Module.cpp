@@ -90,6 +90,7 @@ namespace lemon
 		// Clear source file infos
 		mSourceFileInfoPool.clear();
 		mAllSourceFiles.clear();
+		mWarnings.clear();
 	}
 
 	void Module::startCompiling(const GlobalsLookup& globalsLookup)
@@ -281,7 +282,7 @@ namespace lemon
 		return mFunctions[uniqueId & 0xffff];
 	}
 
-	ScriptFunction& Module::addScriptFunction(FlyweightString name, const DataTypeDefinition* returnType, const Function::ParameterList& parameters, std::vector<FlyweightString>* aliasNames)
+	ScriptFunction& Module::addScriptFunction(FlyweightString name, const DataTypeDefinition* returnType, const Function::ParameterList& parameters, std::vector<Function::AliasName>* aliasNames)
 	{
 		ScriptFunction& func = mScriptFunctionPool.createObject();
 		func.setModule(*this);

@@ -27,9 +27,12 @@ namespace lemon
 		struct ErrorMessage
 		{
 			std::string mMessage;
-			std::wstring mFilename;
+			const SourceFileInfo* mSourceFileInfo = nullptr;
 			CompilerError mError;
 		};
+
+	public:
+		static inline Compiler* getActiveInstance()  { return mActiveInstance; }
 
 	public:
 		Compiler(Module& module, GlobalsLookup& globalsLookup, const CompileOptions& compileOptions);
@@ -37,14 +40,19 @@ namespace lemon
 
 		bool loadScript(const std::wstring& path);
 
-		bool loadCodeLines(std::vector<std::string_view>& outLines, const std::wstring& path);
-		bool compileLines(const std::vector<std::string_view>& lines);
+		void addWarning(CompilerWarning::Code warningCode, std::string_view warningMessage, uint32 lineNumber);
 
 		inline const std::vector<ErrorMessage>& getErrors() const  { return mErrors; }
 
 	private:
+		bool loadCodeLines(std::vector<std::string_view>& outLines, const std::wstring& path);
+		bool compileLines(const std::vector<std::string_view>& lines);
+
 		bool loadScriptInternal(const std::wstring& basepath, const std::wstring& filename, std::vector<std::string_view>& outLines, std::unordered_set<uint64>& includedPathHashes);
 		void runCompilerBackend(std::vector<FunctionNode*>& functionNodes);
+
+	private:
+		static inline Compiler* mActiveInstance = nullptr;
 
 	private:
 		Module& mModule;

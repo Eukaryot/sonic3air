@@ -13,6 +13,8 @@
 
 namespace lemon
 {
+	struct SourceFileInfo;
+
 	struct CompilerError
 	{
 		enum class Code
@@ -25,5 +27,25 @@ namespace lemon
 		uint64 mData1 = 0;
 		uint64 mData2 = 0;
 		uint32 mLineNumber = 0;
+	};
+
+	struct CompilerWarning
+	{
+		enum class Code
+		{
+			UNDEFINED					= 0,		// Should not be used at all
+			DEPRECATED_FUNCTION_ALIAS	= 0x0100,
+		};
+
+		struct Occurrence
+		{
+			const SourceFileInfo* mSourceFileInfo = nullptr;
+			uint32 mLineNumber = 0;
+		};
+
+		Code mCode = Code::UNDEFINED;
+		std::string mMessage;
+		uint64 mMessageHash = 0;
+		std::vector<Occurrence> mOccurrences;
 	};
 }

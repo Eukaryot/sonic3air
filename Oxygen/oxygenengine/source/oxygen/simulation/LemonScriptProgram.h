@@ -100,6 +100,7 @@ public:
 	const std::vector<GlobalDefine>& getGlobalDefines() const  { return mGlobalDefines; }
 
 	const Mod* getModByModule(const lemon::Module& module) const;
+	const std::vector<const lemon::Module*>& getModules() const;
 
 	void resolveLocation(ResolvedLocation& outResolvedLocation, uint32 functionId, uint32 programCounter) const;
 

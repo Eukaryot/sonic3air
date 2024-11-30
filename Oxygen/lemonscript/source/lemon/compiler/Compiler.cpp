@@ -36,6 +36,15 @@ namespace lemon
 				return -1;
 			}
 		}
+
+		// TODO: This could be more useful if defined in rmx somewhere
+		struct ScopeGuard
+		{
+			template<typename T> explicit ScopeGuard(T&& function) : mFunction(std::move(function)) {}
+			~ScopeGuard() { mFunction(); }
+
+			std::function<void()> mFunction;
+		};
 	}
 
 
@@ -57,6 +66,12 @@ namespace lemon
 
 	bool Compiler::loadScript(const std::wstring& path)
 	{
+		// Set active instance, and reset it when leaving this function
+		RMX_ASSERT(nullptr == mActiveInstance, "Compiler active instance already set");
+		mActiveInstance = this;
+		ScopeGuard guard( []() { mActiveInstance = nullptr; } );
+
+		// Start compilation
 		mErrors.clear();
 		mModule.startCompiling(mGlobalsLookup);
 
@@ -68,7 +83,48 @@ namespace lemon
 
 		// Compile
 		compileSuccess = compileLines(inputLines);
-		return compileSuccess;
+		if (!compileSuccess)
+			return false;
+
+		// Translate line numbers in warnings
+		for (CompilerWarning& warning : mModule.mWarnings)
+		{
+			for (CompilerWarning::Occurrence& occurrence : warning.mOccurrences)
+			{
+				const auto& translated = mLineNumberTranslation.translateLineNumber(occurrence.mLineNumber);
+				occurrence.mSourceFileInfo = translated.mSourceFileInfo;
+				occurrence.mLineNumber = translated.mLineNumber;
+			}
+		}
+
+		return true;
+	}
+
+	void Compiler::addWarning(CompilerWarning::Code warningCode, std::string_view warningMessage, uint32 lineNumber)
+	{
+		const uint64 messageHash = rmx::getMurmur2_64(warningMessage);
+
+		// Search for that same warning message
+		CompilerWarning* warning = nullptr;
+		for (CompilerWarning& existingWarning : mModule.mWarnings)
+		{
+			if (existingWarning.mMessageHash == messageHash)
+			{
+				warning = &existingWarning;
+				break;
+			}
+		}
+
+		if (nullptr == warning)
+		{
+			// Create new warning
+			warning = &vectorAdd(mModule.mWarnings);
+			warning->mCode = warningCode;
+			warning->mMessage = warningMessage;
+			warning->mMessageHash = messageHash;
+		}
+
+		vectorAdd(warning->mOccurrences).mLineNumber = lineNumber;
 	}
 
 	bool Compiler::loadCodeLines(std::vector<std::string_view>& outLines, const std::wstring& path)
@@ -131,7 +187,7 @@ namespace lemon
 			const auto& translated = mLineNumberTranslation.translateLineNumber(e.mError.mLineNumber);
 			ErrorMessage& error = vectorAdd(mErrors);
 			error.mMessage = e.what();
-			error.mFilename = translated.mSourceFileInfo->mFilename;
+			error.mSourceFileInfo = translated.mSourceFileInfo;
 			error.mError = e.mError;
 			error.mError.mLineNumber = translated.mLineNumber + 1;	// Add one because line numbers always start at 1 for user display
 		}
@@ -194,7 +250,7 @@ namespace lemon
 		{
 			ErrorMessage& error = vectorAdd(mErrors);
 			error.mMessage = e.what();
-			error.mFilename = filename;
+			error.mSourceFileInfo = &sourceFileInfo;
 			error.mError = e.mError;
 			return false;
 		}

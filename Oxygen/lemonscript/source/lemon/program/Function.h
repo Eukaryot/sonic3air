@@ -47,6 +47,12 @@ namespace lemon
 			std::vector<uint32> mData;
 		};
 
+		struct AliasName
+		{
+			FlyweightString mName;
+			bool mIsDeprecated = false;
+		};
+
 		enum class Flag
 		{
 			ALLOW_INLINE_EXECUTION	 = 0x01,	// Native only: Function can be called directly inside the opcode run loop and does not interfere with control flow
@@ -67,7 +73,7 @@ namespace lemon
 		inline FlyweightString getContext() const { return mContext; }
 		inline FlyweightString getName() const    { return mName; }
 		inline uint64 getNameAndSignatureHash() const { return mNameAndSignatureHash; }
-		inline const std::vector<FlyweightString>& getAliasNames() const { return mAliasNames; }
+		inline const std::vector<AliasName>& getAliasNames() const { return mAliasNames; }
 
 		const DataTypeDefinition* getReturnType() const  { return mReturnType; }
 		const ParameterList& getParameters() const  { return mParameters; }
@@ -89,7 +95,7 @@ namespace lemon
 		FlyweightString mContext;		// Name of the type if this is a method-like function
 		FlyweightString mName;
 		uint64 mNameAndSignatureHash = 0;
-		std::vector<FlyweightString> mAliasNames;
+		std::vector<AliasName> mAliasNames;
 
 		// Signature
 		const DataTypeDefinition* mReturnType = &PredefinedDataTypes::VOID;

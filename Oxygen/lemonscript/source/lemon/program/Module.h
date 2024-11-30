@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "lemon/compiler/Errors.h"
 #include "lemon/program/Constant.h"
 #include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
@@ -24,10 +25,11 @@ namespace lemon
 
 	class API_EXPORT Module
 	{
-	friend class Program;
+	friend class Compiler;
 	friend class GlobalsLookup;
-	friend class ScriptFunction;
 	friend class ModuleSerializer;
+	friend class Program;
+	friend class ScriptFunction;
 
 	public:
 		struct AppendedInfo
@@ -60,7 +62,7 @@ namespace lemon
 		inline const std::vector<ScriptFunction*>& getScriptFunctions() const { return mScriptFunctions; }
 		const Function* getFunctionByUniqueId(uint64 uniqueId) const;
 
-		ScriptFunction& addScriptFunction(FlyweightString name, const DataTypeDefinition* returnType, const Function::ParameterList& parameters, std::vector<FlyweightString>* aliasNames = nullptr);
+		ScriptFunction& addScriptFunction(FlyweightString name, const DataTypeDefinition* returnType, const Function::ParameterList& parameters, std::vector<Function::AliasName>* aliasNames = nullptr);
 		NativeFunction& addNativeFunction(FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, BitFlagSet<Function::Flag> flags = BitFlagSet<Function::Flag>());
 		NativeFunction& addNativeMethod(FlyweightString context, FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, BitFlagSet<Function::Flag> flags = BitFlagSet<Function::Flag>());
 
@@ -96,6 +98,8 @@ namespace lemon
 
 		inline uint64 getCompiledCodeHash() const     { return mCompiledCodeHash; }
 		inline void setCompiledCodeHash(uint64 hash)  { mCompiledCodeHash = hash; }
+
+		inline const std::vector<CompilerWarning>& getWarnings() const  { return mWarnings; }
 
 	private:
 		void addFunctionInternal(Function& func);
@@ -152,6 +156,7 @@ namespace lemon
 		uint64 mCompiledCodeHash = 0;
 		ObjectPool<SourceFileInfo> mSourceFileInfoPool;
 		std::vector<SourceFileInfo*> mAllSourceFiles;
+		std::vector<CompilerWarning> mWarnings;
 	};
 
 }

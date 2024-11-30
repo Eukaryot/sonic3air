@@ -14,6 +14,7 @@
 
 namespace ImGuiHelpers
 {
+
 	struct ScopedIndent
 	{
 	public:
@@ -25,13 +26,31 @@ namespace ImGuiHelpers
 
 		inline ~ScopedIndent()
 		{
-			ImGui::Indent(-mIndent);
+			ImGui::Unindent(mIndent);
 			ImGui::Spacing();
 		}
 
 	private:
 		float mIndent;
 	};
-};
+
+
+	struct FilterString
+	{
+		char mString[256] = { 0 };
+
+		void draw();
+		bool shouldInclude(std::string_view str) const;
+	};
+
+
+	struct OpenCodeLocation
+	{
+		static bool drawButton();
+		static bool drawButton(const std::wstring& path, int lineNumber);
+		static bool open(const std::wstring& path, int lineNumber);
+	};
+
+}
 
 #endif

@@ -8,6 +8,7 @@
 
 #include "lemon/pch.h"
 #include "lemon/compiler/frontend/TokenProcessing.h"
+#include "lemon/compiler/Compiler.h"
 #include "lemon/compiler/TokenHelper.h"
 #include "lemon/compiler/TokenTypes.h"
 #include "lemon/compiler/Utility.h"
@@ -90,19 +91,17 @@ namespace lemon
 			return false;
 		}
 
-		void fillCachedBuiltInFunctionSingle(TokenProcessing::CachedBuiltinFunction& outCached, const GlobalsLookup& globalsLookup, const BuiltInFunctions::FunctionName& functionName)
+		void fillCachedBuiltInFunction(TokenProcessing::CachedBuiltinFunction& outCached, bool allowMultiple, const GlobalsLookup& globalsLookup, const BuiltInFunctions::FunctionName& functionName)
 		{
-			const std::vector<Function*>& functions = globalsLookup.getFunctionsByName(functionName.mHash);
+			const std::vector<GlobalsLookup::FunctionReference>& functions = globalsLookup.getFunctionsByName(functionName.mHash);
 			RMX_ASSERT(!functions.empty(), "Unable to find built-in function '" << functionName.mName << "'");
-			RMX_ASSERT(functions.size() == 1, "Multiple definitions for built-in function '" << functionName.mName << "'");
-			outCached.mFunctions = functions;
-		}
+			RMX_ASSERT(allowMultiple || functions.size() == 1, "Multiple definitions for built-in function '" << functionName.mName << "'");
 
-		void fillCachedBuiltInFunctionMultiple(TokenProcessing::CachedBuiltinFunction& outCached, const GlobalsLookup& globalsLookup, const BuiltInFunctions::FunctionName& functionName)
-		{
-			const std::vector<Function*>& functions = globalsLookup.getFunctionsByName(functionName.mHash);
-			RMX_ASSERT(!functions.empty(), "Unable to find built-in function '" << functionName.mName << "'");
-			outCached.mFunctions = functions;
+			outCached.mFunctions.clear();
+			for (const GlobalsLookup::FunctionReference& ref : functions)
+			{
+				outCached.mFunctions.push_back(ref.mFunction);
+			}
 		}
 
 		template<typename T>
@@ -124,14 +123,14 @@ namespace lemon
 		mCompileOptions(compileOptions),
 		mTypeCasting(compileOptions)
 	{
-		fillCachedBuiltInFunctionMultiple(mBuiltinConstantArrayAccess,			globalsLookup, BuiltInFunctions::CONSTANT_ARRAY_ACCESS);
-		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorPlus,				globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS);
-		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorPlusInt64,		globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64);
-		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorPlusInt64Inv,		globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64_INV);
-		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorLess,				globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS);
-		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorLessOrEqual,		globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS_OR_EQUAL);
-		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorGreater,			globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER);
-		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorGreaterOrEqual,	globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER_OR_EQUAL);
+		fillCachedBuiltInFunction(mBuiltinConstantArrayAccess,			true,  globalsLookup, BuiltInFunctions::CONSTANT_ARRAY_ACCESS);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorPlus,			false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorPlusInt64,		false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorPlusInt64Inv,	false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64_INV);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorLess,			false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorLessOrEqual,	false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS_OR_EQUAL);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorGreater,		false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorGreaterOrEqual,	false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER_OR_EQUAL);
 
 		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlus,           &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING);
 		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusInt64,      &PredefinedDataTypes::STRING, &PredefinedDataTypes::INT_64, &PredefinedDataTypes::STRING);
@@ -624,7 +623,7 @@ namespace lemon
 				const Function* function = nullptr;
 				const Variable* thisPointerVariable = nullptr;
 
-				const std::vector<Function*>* candidateFunctions = &mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
+				const std::vector<GlobalsLookup::FunctionReference>* candidateFunctions = &mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
 				if (!candidateFunctions->empty())
 				{
 					// Is it a global function
@@ -637,11 +636,11 @@ namespace lemon
 					isBaseCall = true;
 
 					const std::string_view baseName = identifierToken.mName.getString().substr(5);
-					const std::vector<Function*>& candidates = mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(baseName));
-					for (Function* candidate : candidates)
+					const std::vector<GlobalsLookup::FunctionReference>& candidates = mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(baseName));
+					for (const GlobalsLookup::FunctionReference& candidate : candidates)
 					{
 						// Base function signature must be the same as current function's
-						if (candidate->getSignatureHash() == mContext.mFunction->getSignatureHash() && candidate != mContext.mFunction)
+						if (candidate.mFunction->getSignatureHash() == mContext.mFunction->getSignatureHash() && candidate.mFunction != mContext.mFunction)
 						{
 							baseFunctionExists = true;
 							break;
@@ -788,18 +787,27 @@ namespace lemon
 					else
 					{
 						// Find best-fitting correct function overload
-						function = nullptr;
+						const GlobalsLookup::FunctionReference* bestFit = nullptr;
 						uint32 bestPriority = 0xff000000;
-						for (const Function* candidateFunction : *candidateFunctions)
+						for (const GlobalsLookup::FunctionReference& candidateFunction : *candidateFunctions)
 						{
-							const uint32 priority = mTypeCasting.getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
+							const uint32 priority = mTypeCasting.getPriorityOfSignature(parameterTypes, candidateFunction.mFunction->getParameters());
 							if (priority < bestPriority)
 							{
 								bestPriority = priority;
-								function = candidateFunction;
+								bestFit = &candidateFunction;
 							}
 						}
 						CHECK_ERROR(bestPriority < 0xff000000, "No appropriate function overload found calling '" << functionName << "', the number or types of parameters passed are wrong", mLineNumber);
+
+						if (nullptr != bestFit)
+						{
+							function = bestFit->mFunction;
+							if (bestFit->mIsDeprecated)
+							{
+								ADD_WARNING(CompilerWarning::Code::DEPRECATED_FUNCTION_ALIAS, "Function name '" << identifierToken.mName << "' is deprecated, consider using the new name '" << function->getName() << "' instead", mLineNumber);
+							}
+						}
 					}
 				}
 
@@ -1206,7 +1214,7 @@ namespace lemon
 				IdentifierToken& identifierToken = content[0].as<IdentifierToken>();
 
 				bool anyFound = false;
-				const Function* function = mGlobalsLookup.getFunctionByNameAndSignature(identifierToken.mName.getHash(), Function::getVoidSignatureHash(), &anyFound);
+				const GlobalsLookup::FunctionReference* function = mGlobalsLookup.getFunctionByNameAndSignature(identifierToken.mName.getHash(), Function::getVoidSignatureHash(), &anyFound);
 				if (nullptr == function)
 				{
 					if (anyFound)
@@ -1216,7 +1224,7 @@ namespace lemon
 				}
 
 				// Check module for existing registration, and add there if not
-				const uint32 address = mModule.addOrFindCallableFunctionAddress(*function);
+				const uint32 address = mModule.addOrFindCallableFunctionAddress(*function->mFunction);
 
 				// Replace makeCallable and the parenthesis with the callable address as a constant
 				ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
@@ -1239,15 +1247,15 @@ namespace lemon
 				if (content.size() == 1 && content[0].isA<IdentifierToken>())
 				{
 					IdentifierToken& identifierToken = content[0].as<IdentifierToken>();
-					const std::vector<Function*>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
+					const std::vector<GlobalsLookup::FunctionReference>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
 					CHECK_ERROR(!candidateFunctions.empty(), "Unknown function '" << identifierToken.mName.getString() << "' in addressof", mLineNumber);
 
 					uint32 address = 0;
-					for (const Function* function : candidateFunctions)
+					for (const GlobalsLookup::FunctionReference& function : candidateFunctions)
 					{
-						if (function->getType() == Function::Type::SCRIPT)
+						if (function.mFunction->getType() == Function::Type::SCRIPT)
 						{
-							const std::vector<uint32>& addressHooks = static_cast<const ScriptFunction*>(function)->getAddressHooks();
+							const std::vector<uint32>& addressHooks = static_cast<const ScriptFunction*>(function.mFunction)->getAddressHooks();
 							if (!addressHooks.empty())
 							{
 								address = addressHooks[0];
