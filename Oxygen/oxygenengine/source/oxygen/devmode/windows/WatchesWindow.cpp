@@ -24,7 +24,7 @@
 
 
 WatchesWindow::WatchesWindow() :
-	DevModeWindowBase("Watches", 0)
+	DevModeWindowBase("Watches", Category::DEBUGGING, 0)
 {
 }
 

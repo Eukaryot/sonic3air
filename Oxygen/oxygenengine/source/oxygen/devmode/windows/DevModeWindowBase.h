@@ -20,7 +20,17 @@ class DevModeWindowBase
 friend class DevModeMainWindow;
 
 public:
-	DevModeWindowBase(std::string_view title, ImGuiWindowFlags windowFlags = ImGuiWindowFlags_AlwaysAutoResize);
+	enum class Category
+	{
+		GAME_CONTROLS,
+		DEBUGGING,
+		SCRIPTS,
+		ASSET_BROWSERS,
+		MISC
+	};
+
+public:
+	DevModeWindowBase(std::string_view title, Category category, ImGuiWindowFlags windowFlags);
 	virtual ~DevModeWindowBase() {}
 
 	virtual bool buildWindow();
@@ -28,6 +38,7 @@ public:
 
 public:
 	std::string mTitle;
+	Category mCategory = Category::MISC;
 	bool mIsWindowOpen = false;
 	ImGuiWindowFlags mImGuiWindowFlags = 0;
 

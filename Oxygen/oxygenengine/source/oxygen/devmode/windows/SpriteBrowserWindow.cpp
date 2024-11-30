@@ -17,7 +17,7 @@
 
 
 SpriteBrowserWindow::SpriteBrowserWindow() :
-	DevModeWindowBase("Sprite Browser")
+	DevModeWindowBase("Sprite Browser", Category::ASSET_BROWSERS, ImGuiWindowFlags_AlwaysAutoResize)
 {
 }
 

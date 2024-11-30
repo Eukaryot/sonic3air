@@ -75,6 +75,7 @@ void AudioCollection::clear()
 	mAudioDefinitions.clear();
 	for (size_t i = 0; i < (size_t)Package::_NUM; ++i)
 		mNumSourcesByPackageType[i] = 0;
+	++mChangeCounter;
 }
 
 void AudioCollection::clearPackage(Package package)
@@ -101,6 +102,7 @@ void AudioCollection::clearPackage(Package package)
 		}
 	}
 	mNumSourcesByPackageType[(size_t)package] = 0;
+	++mChangeCounter;
 }
 
 bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstring& filename, Package package)
@@ -272,6 +274,7 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 		}
 	}
 
+	++mChangeCounter;
 	return true;
 }
 
@@ -290,6 +293,7 @@ void AudioCollection::determineActiveSourceRegistrations(bool preferOriginalSoun
 		}
 		audioDefinition.mActiveSource = bestSourceReg;
 	}
+	++mChangeCounter;
 }
 
 const AudioCollection::AudioDefinition* AudioCollection::getAudioDefinition(uint64 keyId) const

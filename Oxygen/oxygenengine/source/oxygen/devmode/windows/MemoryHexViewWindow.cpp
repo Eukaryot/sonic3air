@@ -20,7 +20,7 @@
 
 
 MemoryHexViewWindow::MemoryHexViewWindow() :
-	DevModeWindowBase("Memory Hex View")
+	DevModeWindowBase("Memory Hex View", Category::DEBUGGING, ImGuiWindowFlags_AlwaysAutoResize)
 {
 }
 

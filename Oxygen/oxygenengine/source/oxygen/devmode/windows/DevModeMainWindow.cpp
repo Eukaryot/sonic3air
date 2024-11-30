@@ -12,6 +12,7 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/devmode/ImGuiHelpers.h"
+#include "oxygen/devmode/windows/AudioBrowserWindow.h"
 #include "oxygen/devmode/windows/GameSimWindow.h"
 #include "oxygen/devmode/windows/MemoryHexViewWindow.h"
 #include "oxygen/devmode/windows/PaletteViewWindow.h"
@@ -22,17 +23,26 @@
 
 
 DevModeMainWindow::DevModeMainWindow() :
-	DevModeWindowBase("Dev Mode (F1)")
+	DevModeWindowBase("Dev Mode (F1)", Category::MISC, ImGuiWindowFlags_AlwaysAutoResize)
 {
 	mIsWindowOpen = true;
 
-	createWindow(mGameSimWindow);
-	createWindow(mMemoryHexViewWindow);
-	createWindow(mWatchesWindow);
-	createWindow(mPaletteViewWindow);
-	createWindow(mSpriteBrowserWindow);
-	createWindow(mScriptBuildWindow);
-	createWindow(mSettingsWindow);
+	// Create windows
+	//  -> Note that the order of creation defines he listing order isnide each categories
+	{
+		createWindow(mGameSimWindow);
+
+		createWindow(mPaletteViewWindow);
+		createWindow(mMemoryHexViewWindow);
+		createWindow(mWatchesWindow);
+
+		createWindow(mScriptBuildWindow);
+
+		createWindow(mAudioBrowserWindow);
+		createWindow(mSpriteBrowserWindow);
+
+		createWindow(mSettingsWindow);
+	}
 }
 
 DevModeMainWindow::~DevModeMainWindow()
@@ -44,6 +54,7 @@ DevModeMainWindow::~DevModeMainWindow()
 bool DevModeMainWindow::buildWindow()
 {
 	const bool result = DevModeWindowBase::buildWindow();
+
 	for (DevModeWindowBase* window : mAllWindows)
 	{
 		window->buildWindow();
@@ -62,13 +73,33 @@ void DevModeMainWindow::buildContent()
 	ImGui::SetWindowSize(ImVec2(150.0f, 200.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowCollapsed(true, ImGuiCond_FirstUseEver);
 
-	for (DevModeWindowBase* window : mAllWindows)
+	const char* TEXT_BY_CATEGORY[] =
 	{
-		ImGui::Checkbox(window->mTitle.c_str(), &window->mIsWindowOpen);
+		"Simulation",
+		"Debugging",
+		"Scripts",
+		"Assets",
+		"Misc"
+	};
+	constexpr int NUM_CATEGORIES = (int)DevModeWindowBase::Category::MISC + 1;
+	static_assert(sizeof(TEXT_BY_CATEGORY) / sizeof(const char*) == NUM_CATEGORIES);
+
+	for (int categoryIndex = 0; categoryIndex < NUM_CATEGORIES; ++categoryIndex)
+	{
+		ImGui::SeparatorText(TEXT_BY_CATEGORY[categoryIndex]);
+		for (DevModeWindowBase* window : mAllWindows)
+		{
+			if (window->mCategory == (DevModeWindowBase::Category)categoryIndex)
+			{
+				ImGui::Checkbox(window->mTitle.c_str(), &window->mIsWindowOpen);
+			}
+		}
 	}
 
 #ifdef DEBUG
 	ImGui::Spacing();
+	ImGui::Spacing();
+	ImGui::SeparatorText("ImGui");
 	ImGui::Checkbox("ImGui Demo", &mShowImGuiDemo);
 
 	// Just for debugging

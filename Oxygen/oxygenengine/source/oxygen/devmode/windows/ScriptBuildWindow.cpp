@@ -16,13 +16,14 @@
 #include "oxygen/application/modding/Mod.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/LemonScriptProgram.h"
+#include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/Simulation.h"
 
 #include <lemon/program/Module.h>
 
 
 ScriptBuildWindow::ScriptBuildWindow() :
-	DevModeWindowBase("Script Build", 0)
+	DevModeWindowBase("Script Build", Category::SCRIPTS, 0)
 {
 }
 
@@ -33,14 +34,25 @@ void ScriptBuildWindow::buildContent()
 
 	const float uiScale = ImGui::GetIO().FontGlobalScale;
 
-	const LemonScriptProgram& program = Application::instance().getSimulation().getCodeExec().getLemonScriptProgram();
+	Simulation& simulation = Application::instance().getSimulation();
+	const LemonScriptProgram& program = simulation.getCodeExec().getLemonScriptProgram();
+
+	if (ImGui::Button("Reload scripts"))
+	{
+		HighResolutionTimer timer;
+		timer.start();
+		if (simulation.triggerFullScriptsReload())
+		{
+			LogDisplay::instance().setLogDisplay(String(0, "Reloaded scripts in %0.2f sec", timer.getSecondsSinceStart()));
+		}
+	}
+
+	ImGui::Spacing();
 
 	static ImGuiHelpers::FilterString filterString;
 	filterString.draw();
 	ImGui::SameLine();
 	ImGui::Text("Filter by module name or author");
-
-	ImGui::Spacing();
 
 	if (ImGui::BeginTable("Watches Table", 1, ImGuiTableFlags_Borders, ImVec2(0.0f, 0.0f)))
 	{

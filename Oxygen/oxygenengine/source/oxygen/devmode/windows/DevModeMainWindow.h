@@ -14,6 +14,7 @@
 
 #include "oxygen/devmode/windows/DevModeWindowBase.h"
 
+class AudioBrowserWindow;
 class GameSimWindow;
 class MemoryHexViewWindow;
 class PaletteViewWindow;
@@ -46,13 +47,14 @@ private:
 private:
 	std::vector<DevModeWindowBase*> mAllWindows;
 
+	AudioBrowserWindow* mAudioBrowserWindow = nullptr;
 	GameSimWindow* mGameSimWindow = nullptr;
 	MemoryHexViewWindow* mMemoryHexViewWindow = nullptr;
-	SpriteBrowserWindow* mSpriteBrowserWindow = nullptr;
 	PaletteViewWindow* mPaletteViewWindow = nullptr;
 	ScriptBuildWindow* mScriptBuildWindow = nullptr;
-	WatchesWindow* mWatchesWindow = nullptr;
 	SettingsWindow* mSettingsWindow = nullptr;
+	SpriteBrowserWindow* mSpriteBrowserWindow = nullptr;
+	WatchesWindow* mWatchesWindow = nullptr;
 
 	bool mShowImGuiDemo = false;
 };

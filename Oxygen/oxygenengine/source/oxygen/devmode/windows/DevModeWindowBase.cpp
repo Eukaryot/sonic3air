@@ -12,8 +12,9 @@
 #if defined(SUPPORT_IMGUI)
 
 
-DevModeWindowBase::DevModeWindowBase(std::string_view title, ImGuiWindowFlags windowFlags) :
+DevModeWindowBase::DevModeWindowBase(std::string_view title, Category category, ImGuiWindowFlags windowFlags) :
 	mTitle(title),
+	mCategory(category),
 	mImGuiWindowFlags(windowFlags)
 {
 }

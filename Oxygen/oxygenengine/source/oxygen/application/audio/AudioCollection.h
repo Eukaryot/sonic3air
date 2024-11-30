@@ -13,7 +13,7 @@
 class AudioSourceBase;
 
 
-class AudioCollection
+class AudioCollection : public SingleInstance<AudioCollection>
 {
 public:
 	enum class Package
@@ -96,7 +96,10 @@ public:
 	SourceRegistration* getSourceRegistration(uint64 keyId) const;
 	SourceRegistration* getSourceRegistration(uint64 keyId, Package preferredPackage) const;
 
+	inline uint32 getChangeCounter() const  { return mChangeCounter; }
+
 private:
 	std::map<uint64, AudioDefinition> mAudioDefinitions;
 	int mNumSourcesByPackageType[(size_t)Package::_NUM] = { 0 };
+	uint32 mChangeCounter = 0;
 };

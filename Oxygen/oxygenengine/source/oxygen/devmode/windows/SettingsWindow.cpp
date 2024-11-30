@@ -80,7 +80,7 @@ namespace
 
 
 SettingsWindow::SettingsWindow() :
-	DevModeWindowBase("Settings", 0)
+	DevModeWindowBase("Settings", Category::MISC, 0)
 {
 }
 
