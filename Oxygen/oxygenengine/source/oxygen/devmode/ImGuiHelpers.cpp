@@ -17,20 +17,43 @@
 namespace ImGuiHelpers
 {
 
-	void FilterString::draw()
+	void WideInputString::set(std::wstring_view str)
+	{
+		if (str == mWideString)
+			return;
+
+		mWideString = str;
+		const String utf8 = mWideString.toUTF8();
+		if (utf8.length() < 255)
+		{
+			memcpy(mInternalUTF8, *utf8, utf8.length() + 1);
+		}
+		else
+		{
+			memcpy(mInternalUTF8, *utf8, 255);
+			mInternalUTF8[255] = 0;
+		}
+	}
+
+	void WideInputString::refreshFromInternal()
+	{
+		mWideString.fromUTF8(std::string_view(mInternalUTF8));
+	}
+
+
+	bool FilterString::draw()
 	{
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("Filter:");
 		ImGui::SameLine();
-		ImGui::InputText("##Filter", mString, 256, 0);
-		const bool disabled = (mString[0] == 0);
-		if (disabled)
-			ImGui::BeginDisabled();
+		const bool result = ImGui::InputText("##Filter", mString, 256, 0);
+
+		ImGui::BeginDisabled(mString[0] == 0);
 		ImGui::SameLine();
 		if (ImGui::Button("Clear"))
 			mString[0] = 0;
-		if (disabled)
-			ImGui::EndDisabled();
+		ImGui::EndDisabled();
+		return result;
 	}
 
 	bool FilterString::shouldInclude(std::string_view str) const
@@ -61,20 +84,34 @@ namespace ImGuiHelpers
 
 	bool OpenCodeLocation::open(const std::wstring& path, int lineNumber)
 	{
-	#if defined(PLATFORM_WINDOWS)
-		// TODO: Add the actual full path to Visual Studio Code
-		//  -> This should be configurable in the settings.json - and if it's not set, don't show the VC button in the first place
-		std::wstring applicationPath = Configuration::instance().mAppDataPath + L"../../Local/Programs/Microsoft VS Code/Code.exe";
+		const Configuration::ExternalCodeEditor& config = Configuration::instance().mDevMode.mExternalCodeEditor;
 
-		// TODO: The full path here is not necessarily actually the full path, but can be a relative one
-		// TODO: Also, the path might be inside a zip file
-		std::wstring arguments = L"-r -g \"" + path + L"\":" + std::to_wstring(lineNumber);
+		std::wstring execPath;
+		std::wstring_view argumentsFormat;
+		if (config.mActiveType == "vscode")
+		{
+			execPath = config.mVisualStudioCodePath;
+			argumentsFormat = L"-r -g \"{file}\":{line}";
+		}
+		else if (config.mActiveType == "npp")
+		{
+			execPath = config.mNotepadPlusPlusPath;
+			argumentsFormat = L"\"{file}\" -n{line}";
+		}
+		else
+		{
+			execPath = config.mCustomEditorPath;
+			argumentsFormat = config.mCustomEditorArgs;
+		}
 
-		return PlatformFunctions::openApplicationExternal(applicationPath, arguments);
-	#else
-		// Not implemented
+		if (!execPath.empty() && FTX::FileSystem->isFile(execPath))
+		{
+			WString arguments = argumentsFormat;
+			arguments.replace(L"{file}", path);
+			arguments.replace(L"{line}", std::to_wstring(lineNumber));
+			return PlatformFunctions::openApplicationExternal(execPath, arguments.toStdWString());
+		}
 		return false;
-	#endif
 	}
 
 }

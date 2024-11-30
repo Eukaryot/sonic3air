@@ -69,6 +69,36 @@ namespace rmx
 		return false;
 	}
 
+	bool FileSystem::isFile(std::wstring_view path)
+	{
+		mTempPath2 = normalizePath(path, mTempPath2, FileIO::isDirectoryPath(path));
+		for (MountPoint& mountPoint : mMountPoints)
+		{
+			const std::wstring* localPath = applyMountPoint(mountPoint, mTempPath2, mTempPath);
+			if (nullptr != localPath)
+			{
+				if (mountPoint.mFileProvider->isFile(*localPath))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	bool FileSystem::isDirectory(std::wstring_view path)
+	{
+		mTempPath2 = normalizePath(path, mTempPath2, FileIO::isDirectoryPath(path));
+		for (MountPoint& mountPoint : mMountPoints)
+		{
+			const std::wstring* localPath = applyMountPoint(mountPoint, mTempPath2, mTempPath);
+			if (nullptr != localPath)
+			{
+				if (mountPoint.mFileProvider->isDirectory(*localPath))
+					return true;
+			}
+		}
+		return false;
+	}
+
 	uint64 FileSystem::getFileSize(std::wstring_view filename)
 	{
 		mTempPath2 = normalizePath(filename, mTempPath2, false);

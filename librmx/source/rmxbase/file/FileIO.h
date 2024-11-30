@@ -27,6 +27,9 @@ namespace rmx
 
 	public:
 		static bool exists(std::wstring_view path);
+		static bool isFile(std::wstring_view path);
+		static bool isDirectory(std::wstring_view path);
+
 		static bool getFileSize(std::wstring_view filename, uint64& outSize);
 		static bool getFileTime(std::wstring_view filename, time_t& outTime);
 

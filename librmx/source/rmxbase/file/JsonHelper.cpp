@@ -118,7 +118,9 @@ namespace rmx
 		const Json::Value& value = mJson[key];
 		if (value.isString())
 		{
-			output = *String(value.asString()).toWString();		// TODO: Is there an encoding for non-ASCII characters?
+			WString result;
+			result.fromUTF8(value.asString());
+			output = *result;
 			return true;
 		}
 		return false;

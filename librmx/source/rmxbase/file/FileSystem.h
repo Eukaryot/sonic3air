@@ -25,6 +25,9 @@ namespace rmx
 		~FileSystem();
 
 		bool exists(std::wstring_view filename);
+		bool isFile(std::wstring_view path);
+		bool isDirectory(std::wstring_view path);
+
 		uint64 getFileSize(std::wstring_view filename);
 		time_t getFileTime(std::wstring_view filename);
 

@@ -39,12 +39,23 @@ namespace rmx
 	bool FileProviderSDL::exists(const std::wstring& path)
 	{
 		// Note that this works only for files, not directories
+		return isFile(path);
+	}
+
+	bool FileProviderSDL::isFile(const std::wstring& path)
+	{
 		SDL_RWops* context = openFileWithRWops(path);
 		if (nullptr != context)
 		{
 			SDL_RWclose(context);
 			return true;
 		}
+		return false;
+	}
+
+	bool FileProviderSDL::isDirectory(const std::wstring& path)
+	{
+		// TODO: Not implemented
 		return false;
 	}
 

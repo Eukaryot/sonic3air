@@ -393,6 +393,9 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 		// Script
 		rootHelper.tryReadInt("ScriptOptimizationLevel", mScriptOptimizationLevel);
 
+		// Dev mode
+		loadDevModeSettings(rootHelper);
+
 		// Mod settings
 		loadModSettings(root, mModSettings);
 	}
@@ -514,6 +517,33 @@ void Configuration::saveSettings()
 		// Script
 		root["ScriptOptimizationLevel"] = mScriptOptimizationLevel;
 
+		// Dev mode
+		{
+			Json::Value devModeJson = root["DevMode"];
+
+			devModeJson["Enabled"] = mDevMode.mEnabled;
+
+			devModeJson["LoadSaveState"] = WString(mLoadSaveState).toUTF8().toStdString();
+			devModeJson["LoadLevel"] = mLoadLevel;
+			devModeJson["UseCharacters"] = mUseCharacters;
+
+			devModeJson["EnableROMDataAnalyser"] = mEnableROMDataAnalyser;
+
+			{
+				Json::Value extJson = devModeJson["ExternalCodeEditor"];
+
+				extJson["Type"] = mDevMode.mExternalCodeEditor.mActiveType;
+				extJson["VSCodePath"] = WString(mDevMode.mExternalCodeEditor.mVisualStudioCodePath).toUTF8().toStdString();
+				extJson["NppPath"] = WString(mDevMode.mExternalCodeEditor.mNotepadPlusPlusPath).toUTF8().toStdString();
+				extJson["CustomEditorPath"] = WString(mDevMode.mExternalCodeEditor.mCustomEditorPath).toUTF8().toStdString();
+				extJson["CustomEditorArgs"] = WString(mDevMode.mExternalCodeEditor.mCustomEditorArgs).toUTF8().toStdString();
+			
+				devModeJson["ExternalCodeEditor"] = extJson;
+			}
+
+			root["DevMode"] = devModeJson;
+		}
+
 		// Mod settings
 		saveModSettings(root, mModSettings);
 
@@ -577,22 +607,7 @@ void Configuration::evaluateGameRecording()
 void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 {
 	// Read dev mode setting first, as other settings rely on it
-	if (!mDevMode.mEnabled)	// If either config or settings set this to true, then it stays true
-	{
-		Json::Value devModeJson = rootHelper.mJson["DevMode"];
-		if (devModeJson.isObject())
-		{
-			JsonHelper devModeHelper(devModeJson);
-			devModeHelper.tryReadBool("Enabled", mDevMode.mEnabled);
-
-			devModeHelper.tryReadString("LoadSaveState", mLoadSaveState);
-			devModeHelper.tryReadInt("LoadLevel", mLoadLevel);
-			devModeHelper.tryReadInt("UseCharacters", mUseCharacters);
-			mUseCharacters = clamp(mUseCharacters, 0, 4);
-
-			devModeHelper.tryReadBool("EnableROMDataAnalyser", mEnableROMDataAnalyser);
-		}
-	}
+	loadDevModeSettings(rootHelper);
 
 	// Paths
 	if (mRomPath.empty())
@@ -669,6 +684,39 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 	// Script
 	rootHelper.tryReadBool("CompileScripts", mForceCompileScripts);
 #endif
+}
+
+void Configuration::loadDevModeSettings(JsonHelper& rootHelper)
+{
+	const bool devModeWasEnabled = mDevMode.mEnabled;
+
+	Json::Value devModeJson = rootHelper.mJson["DevMode"];
+	if (devModeJson.isObject())
+	{
+		JsonHelper devModeHelper(devModeJson);
+		devModeHelper.tryReadBool("Enabled", mDevMode.mEnabled);
+
+		devModeHelper.tryReadString("LoadSaveState", mLoadSaveState);
+		devModeHelper.tryReadInt("LoadLevel", mLoadLevel);
+		devModeHelper.tryReadInt("UseCharacters", mUseCharacters);
+		mUseCharacters = clamp(mUseCharacters, 0, 4);
+
+		devModeHelper.tryReadBool("EnableROMDataAnalyser", mEnableROMDataAnalyser);
+
+		Json::Value extJson = devModeHelper.mJson["ExternalCodeEditor"];
+		if (extJson.isObject())
+		{
+			JsonHelper extHelper(extJson);
+			extHelper.tryReadString("Type", mDevMode.mExternalCodeEditor.mActiveType);
+			extHelper.tryReadString("VSCodePath", mDevMode.mExternalCodeEditor.mVisualStudioCodePath);
+			extHelper.tryReadString("NppPath", mDevMode.mExternalCodeEditor.mNotepadPlusPlusPath);
+			extHelper.tryReadString("CustomEditorPath", mDevMode.mExternalCodeEditor.mCustomEditorPath);
+			extHelper.tryReadString("CustomEditorArgs", mDevMode.mExternalCodeEditor.mCustomEditorArgs);
+		}
+	}
+
+	// If either config or settings set this to true, then it stays true
+	mDevMode.mEnabled |= devModeWasEnabled;
 }
 
 void Configuration::saveSettingsInput(const std::wstring& filename) const

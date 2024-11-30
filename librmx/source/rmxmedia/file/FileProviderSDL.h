@@ -16,7 +16,11 @@ namespace rmx
 	{
 	public:
 		bool exists(const std::wstring& path) override;
+		bool isFile(const std::wstring& path) override;
+		bool isDirectory(const std::wstring& path) override;
+
 		bool getFileSize(const std::wstring& filename, uint64& outFileSize) override;
+
 		bool readFile(const std::wstring& filename, std::vector<uint8>& outData) override;
 		bool listFiles(const std::wstring& path, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries) override;
 		bool listFilesByMask(const std::wstring& filemask, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries) override;

@@ -251,6 +251,28 @@ namespace rmx
 	#endif
 	}
 
+	bool FileIO::isFile(std::wstring_view path)
+	{
+	#ifdef USE_STD_FILESYSTEM
+		const std_filesystem::path fspath(path.data());
+		return std_filesystem::is_regular_file(fspath);
+	#else
+		RMX_ASSERT(false, "Not implemented: FileIO::isFile");
+		return false;
+	#endif
+	}
+
+	bool FileIO::isDirectory(std::wstring_view path)
+	{
+	#ifdef USE_STD_FILESYSTEM
+		const std_filesystem::path fspath(path.data());
+		return std_filesystem::is_directory(fspath);
+	#else
+		RMX_ASSERT(false, "Not implemented: FileIO::isDirectory");
+		return false;
+	#endif
+	}
+
 	bool FileIO::getFileSize(std::wstring_view filename, uint64& outSize)
 	{
 	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)

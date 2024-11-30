@@ -17,6 +17,16 @@ namespace rmx
 		return FileIO::exists(path);
 	}
 
+	bool RealFileProvider::isFile(const std::wstring& path)
+	{
+		return FileIO::isFile(path);
+	}
+
+	bool RealFileProvider::isDirectory(const std::wstring& path)
+	{
+		return FileIO::isDirectory(path);
+	}
+
 	bool RealFileProvider::getFileSize(const std::wstring& filename, uint64& outFileSize)
 	{
 		return FileIO::getFileSize(filename, outFileSize);

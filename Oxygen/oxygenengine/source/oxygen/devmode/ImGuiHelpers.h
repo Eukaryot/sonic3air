@@ -35,11 +35,22 @@ namespace ImGuiHelpers
 	};
 
 
+	struct WideInputString
+	{
+		WString mWideString;
+		char mInternalUTF8[256] = { 0 };
+
+		const WString& get() const  { return mWideString; }
+		void set(std::wstring_view str);
+		void refreshFromInternal();
+	};
+
+
 	struct FilterString
 	{
 		char mString[256] = { 0 };
 
-		void draw();
+		bool draw();
 		bool shouldInclude(std::string_view str) const;
 	};
 

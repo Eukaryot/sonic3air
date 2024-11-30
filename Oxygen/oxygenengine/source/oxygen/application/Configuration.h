@@ -42,11 +42,22 @@ public:
 		_NUM
 	};
 
+	struct ExternalCodeEditor
+	{
+		std::string mActiveType;			// Can be "custom", "vscode", "npp", or empty
+		std::wstring mVisualStudioCodePath;
+		std::wstring mNotepadPlusPlusPath;
+		std::wstring mCustomEditorPath;
+		std::wstring mCustomEditorArgs = L"--file \"{file}\" --line {line}";
+	};
+
 	struct DevModeSettings
 	{
 		bool mEnabled = false;
 		float mGameViewScale = 1.0f;
 		Vec2f mGameViewAlignment;
+
+		ExternalCodeEditor mExternalCodeEditor;
 	};
 
 	struct GameRecorder
@@ -116,6 +127,7 @@ protected:
 
 private:
 	void loadConfigurationProperties(JsonHelper& rootHelper);
+	void loadDevModeSettings(JsonHelper& rootHelper);
 	void saveSettingsInput(const std::wstring& filename) const;
 
 public:
