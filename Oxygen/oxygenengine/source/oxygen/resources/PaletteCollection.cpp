@@ -12,23 +12,11 @@
 #include "oxygen/application/modding/ModManager.h"
 
 
-const PaletteBase* PaletteCollection::getPalette(uint64 key, uint8 line) const
-{
-	const PaletteBase* palette = mapFind(mPalettes, key + line);
-	if (nullptr != palette)
-		return palette;
-
-	PaletteBase*const* palettePtr = mapFind(mRedirections, key + line);
-	if (nullptr != palettePtr)
-		return *palettePtr;
-
-	return nullptr;
-}
-
 void PaletteCollection::clear()
 {
 	mPalettes.clear();
 	mRedirections.clear();
+	++mGlobalChangeCounter;
 }
 
 void PaletteCollection::loadPalettes()
@@ -43,6 +31,19 @@ void PaletteCollection::loadPalettes()
 	}
 
 	addSpritePalettes();
+}
+
+const PaletteBase* PaletteCollection::getPalette(uint64 key, uint8 line) const
+{
+	const PaletteBase* palette = mapFind(mPalettes, key + line);
+	if (nullptr != palette)
+		return palette;
+
+	PaletteBase*const* palettePtr = mapFind(mRedirections, key + line);
+	if (nullptr != palettePtr)
+		return *palettePtr;
+
+	return nullptr;
 }
 
 void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool isModded)
@@ -74,14 +75,14 @@ void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool i
 		String name = WString(fileEntry.mFilename).toString();
 		name.remove(name.length() - 4, 4);
 
-		uint64 key = rmx::getMurmur2_64(name);		// Hash is the key of the first palette, the others are enumerated from there
+		const uint64 paletteKey = rmx::getMurmur2_64(name);		// Hash is the key of the first palette, the others are enumerated from there
 		const int numLines = std::min(bitmap.getHeight(), 64);
 		const int numColorsPerLine = std::min(bitmap.getWidth(), 64);
 
 		for (int line = 0; line < numLines; ++line)
 		{
-			PaletteBase& palette = mPalettes[key + line];
-			palette.initPalette(key + line, numColorsPerLine, properties);
+			PaletteBase& palette = mPalettes[paletteKey + line];
+			palette.initPalette(paletteKey + line, numColorsPerLine, properties, name);
 			palette.writeRawColors(bitmap.getPixelPointer(0, line), numColorsPerLine);
 		}
 	}
@@ -89,26 +90,28 @@ void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool i
 
 void PaletteCollection::addSpritePalettes()
 {
-	SpriteCollection::SpritePalettes& spritePalettes = SpriteCollection::instance().mSpritePalettes;
+	std::unordered_map<uint64, SpriteCollection::SpritePalette>& spritePalettes = SpriteCollection::instance().mSpritePalettes;
+	std::unordered_map<uint64, uint64>& redirections = SpriteCollection::instance().mPaletteRedirections;
 
 	// TODO: The properties flags set here assume that all sprite palettes are modded, but this might not actually be the case
 	const BitFlagSet<PaletteBase::Properties> properties = makeBitFlagSet(PaletteBase::Properties::READ_ONLY, PaletteBase::Properties::MODDED);
 
 	// Copy palettes
-	for (const std::pair<uint64, std::vector<uint32>>& pair : spritePalettes.mPalettes)
+	for (const auto& pair : spritePalettes)
 	{
-		const std::vector<uint32>& colors = pair.second;
+		const SpriteCollection::SpritePalette& spritePalette = pair.second;
+		const std::vector<uint32>& colors = spritePalette.mColors;
 		if (colors.empty())
 			continue;
 
-		const uint64 key = pair.first;
-		PaletteBase& palette = mPalettes[key];
-		palette.initPalette(key, colors.size(), properties);
+		const uint64 paletteKey = pair.first;
+		PaletteBase& palette = mPalettes[paletteKey];
+		palette.initPalette(paletteKey, colors.size(), properties, (nullptr != spritePalette.mItem) ? spritePalette.mItem->mSourceInfo.mSourceIdentifier : "");
 		palette.writeRawColors(&colors[0], colors.size());
 	}
 
 	// Copy and resolve redirections
-	for (const std::pair<uint64, uint64>& pair : spritePalettes.mRedirections)
+	for (const std::pair<uint64, uint64>& pair : redirections)
 	{
 		PaletteBase* target = mapFind(mPalettes, pair.second);
 		RMX_ASSERT(nullptr != target, "Broken redirection");
@@ -119,5 +122,6 @@ void PaletteCollection::addSpritePalettes()
 	}
 
 	// Clear palettes in sprite cache now that we loaded them all
-	spritePalettes = SpriteCollection::SpritePalettes();
+	spritePalettes.clear();
+	redirections.clear();
 }

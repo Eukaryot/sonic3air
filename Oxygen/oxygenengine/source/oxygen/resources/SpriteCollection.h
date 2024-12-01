@@ -94,20 +94,22 @@ public:
 	void dumpSprite(uint64 key, std::string_view categoryKey, uint8 spriteNumber, uint8 atex);
 
 private:
-	struct SpritePalettes
+	struct SpritePalette
 	{
-		std::unordered_map<uint64, std::vector<uint32>> mPalettes;
-		std::unordered_map<uint64, uint64> mRedirections;
+		const Item* mItem = nullptr;
+		std::vector<uint32> mColors;
 	};
 
 private:
 	Item& createItem(uint64 key);
 	void loadSpriteDefinitions(const std::wstring& path, const Mod* mod);
-	void addSpritePalette(uint64 paletteKey, std::vector<uint32>& palette);
+	void addSpritePalette(uint64 paletteKey, const Item& item, std::vector<uint32>& palette);
 
 private:
 	std::unordered_map<uint64, Item> mSpriteItems;
-	SpritePalettes mSpritePalettes;
+
+	std::unordered_map<uint64, SpritePalette> mSpritePalettes;
+	std::unordered_map<uint64, uint64> mPaletteRedirections;
 
 	SpriteDump* mSpriteDump = nullptr;
 	uint32 mGlobalChangeCounter = 0;

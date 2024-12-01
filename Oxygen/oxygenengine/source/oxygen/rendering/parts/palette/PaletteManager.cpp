@@ -40,8 +40,8 @@ Color PaletteManager::unpackColor(uint16 packedColor)
 
 PaletteManager::PaletteManager()
 {
-	mMainPalette[0].initPalette(0, MAIN_PALETTE_SIZE, BitFlagSet<PaletteBase::Properties>());
-	mMainPalette[1].initPalette(1, MAIN_PALETTE_SIZE, BitFlagSet<PaletteBase::Properties>());
+	mMainPalette[0].initPalette(0, MAIN_PALETTE_SIZE, BitFlagSet<PaletteBase::Properties>(), "#_main_primary");
+	mMainPalette[1].initPalette(1, MAIN_PALETTE_SIZE, BitFlagSet<PaletteBase::Properties>(), "#_main_secondary");
 }
 
 void PaletteManager::preFrameUpdate()

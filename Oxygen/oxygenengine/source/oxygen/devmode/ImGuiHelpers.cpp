@@ -68,7 +68,7 @@ namespace ImGuiHelpers
 	{
 	#if defined(PLATFORM_WINDOWS)
 		ImGui::SameLine();
-		return ImGui::SmallButton("VC");
+		return ImGui::SmallButton("Open");
 	#else
 		// Not implemented
 		return false;

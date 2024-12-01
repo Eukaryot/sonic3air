@@ -60,6 +60,7 @@
     <ClCompile Include="..\..\source\oxygen\devmode\windows\GameSimWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\GameVisualizationsWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\PaletteBrowserWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\PaletteViewWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\RenderedGeometryWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\ScriptBuildWindow.cpp" />
@@ -204,6 +205,7 @@
     <ClInclude Include="..\..\source\oxygen\devmode\windows\GameSimWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\GameVisualizationsWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\PaletteBrowserWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\PaletteViewWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\RenderedGeometryWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\ScriptBuildWindow.h" />

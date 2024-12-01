@@ -126,7 +126,7 @@ void MenuBackground::initialize()
 
 					PreviewSprite& previewSprite = mPreviewSprites[key];
 					previewSprite.mSpriteKey = rmx::getMurmur2_64(spriteName);
-					previewSprite.mPaletteKey = rmx::getMurmur2_64(String("@") + spriteName);
+					previewSprite.mPaletteKey = previewSprite.mSpriteKey;
 				}
 			}
 		}

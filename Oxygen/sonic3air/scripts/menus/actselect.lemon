@@ -341,7 +341,7 @@ function void ActSelect.Menu(u8 fadeInMethod)
 				key = ActSelect.GetZonePreviewKey(selectedZone, selectedAct, previewImage)
 
 				SpriteHandle spr = Renderer.addSpriteHandle(key, s16(getScreenWidth() - 480) / 2 + offset, 18, 0xf004)
-				spr.setPrimaryPalette("@" + key, 0)
+				spr.setPrimaryPalette(key, 0)
 				spr.setFlags(SPRITE_FLAG_FULLY_OPAQUE)
 				spr.setUseGlobalComponentTint(true)
 			}
@@ -355,7 +355,7 @@ function void ActSelect.Menu(u8 fadeInMethod)
 				key = ActSelect.GetZonePreviewKey(selectedZone, selectedAct, previewImage + 1)
 
 				SpriteHandle spr = Renderer.addSpriteHandle(key, s16(getScreenWidth() - 480) / 2 + offset, 18, 0xf006)
-				spr.setPrimaryPalette("@" + key, 0)
+				spr.setPrimaryPalette(key, 0)
 				spr.setFlags(SPRITE_FLAG_FULLY_OPAQUE)
 				spr.setUseGlobalComponentTint(true)
 

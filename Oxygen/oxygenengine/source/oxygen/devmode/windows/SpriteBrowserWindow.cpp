@@ -30,9 +30,9 @@ void SpriteBrowserWindow::buildContent()
 
 	// Refresh list if needed
 	const SpriteCollection& spriteCollection = SpriteCollection::instance();
-	if (mSpriteCollectionChangeCounter != spriteCollection.getGlobalChangeCounter())
+	if (mLastSpriteCollectionChangeCounter != spriteCollection.getGlobalChangeCounter())
 	{
-		mSpriteCollectionChangeCounter = spriteCollection.getGlobalChangeCounter();
+		mLastSpriteCollectionChangeCounter = spriteCollection.getGlobalChangeCounter();
 
 		mSortedItems.clear();
 		for (const auto& pair : spriteCollection.getAllSprites())
@@ -47,11 +47,7 @@ void SpriteBrowserWindow::buildContent()
 		}
 
 		std::sort(mSortedItems.begin(), mSortedItems.end(),
-			[](const SpriteCollection::Item* a, const SpriteCollection::Item* b)
-			{
-				return a->mSourceInfo.mSourceIdentifier < b->mSourceInfo.mSourceIdentifier;
-			}
-		);
+			[](const SpriteCollection::Item* a, const SpriteCollection::Item* b) { return a->mSourceInfo.mSourceIdentifier < b->mSourceInfo.mSourceIdentifier; });
 
 		mPreviewItem = nullptr;
 		mPreviewTexture = Texture();
@@ -133,7 +129,7 @@ void SpriteBrowserWindow::buildContent()
 		}
 		else
 		{
-			const uint64 paletteKey = rmx::getMurmur2_64("@" + mPreviewItem->mSourceInfo.mSourceIdentifier);
+			const uint64 paletteKey = rmx::getMurmur2_64(mPreviewItem->mSourceInfo.mSourceIdentifier);
 			const PaletteBase* palette = PaletteCollection::instance().getPalette(paletteKey, 0);
 			if (nullptr != palette)
 			{
@@ -202,7 +198,7 @@ void SpriteBrowserWindow::buildContent()
 				ImGui::Checkbox("View BMP palette", &mShowPalette);
 				if (mShowPalette)
 				{
-					const uint64 paletteKey = rmx::getMurmur2_64("@" + mPreviewItem->mSourceInfo.mSourceIdentifier);
+					const uint64 paletteKey = rmx::getMurmur2_64(mPreviewItem->mSourceInfo.mSourceIdentifier);
 					const PaletteBase* palette = PaletteCollection::instance().getPalette(paletteKey, 0);
 					if (nullptr != palette)
 					{

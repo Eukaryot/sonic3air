@@ -10,11 +10,12 @@
 #include "oxygen/rendering/parts/palette/Palette.h"
 
 
-void PaletteBase::initPalette(uint64 key, size_t size, BitFlagSet<Properties> properties)
+void PaletteBase::initPalette(uint64 key, size_t size, BitFlagSet<Properties> properties, std::string_view identifier)
 {
 	mKey = key;
 	mColors.resize(size);
 	mProperties = properties;
+	mIdentifier = identifier;
 }
 
 void PaletteBase::dumpColors(uint32* outColors, size_t numColors) const
@@ -32,9 +33,9 @@ void PaletteBase::writeRawColors(const uint32* colors, size_t numColors)
 }
 
 
-void Palette::initPalette(uint64 key, size_t size, BitFlagSet<Properties> properties)
+void Palette::initPalette(uint64 key, size_t size, BitFlagSet<Properties> properties, std::string_view identifier)
 {
-	PaletteBase::initPalette(key, size, properties);
+	PaletteBase::initPalette(key, size, properties, identifier);
 	mPackedColorCache.resize(size);
 }
 

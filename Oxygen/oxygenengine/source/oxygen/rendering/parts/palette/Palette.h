@@ -21,25 +21,27 @@ public:
 	};
 
 public:
-	virtual void initPalette(uint64 key, size_t size, BitFlagSet<Properties> properties);
+	virtual void initPalette(uint64 key, size_t size, BitFlagSet<Properties> properties, std::string_view identifier);
 
-	inline uint64 getKey() const				{ return mKey; }
-	inline size_t getSize() const				{ return mColors.size(); }
-	inline const uint32* getRawColors() const	{ return &mColors[0]; }
+	inline uint64 getKey() const					{ return mKey; }
+	inline const std::string& getIdentifier() const	{ return mIdentifier; }
+	inline size_t getSize() const					{ return mColors.size(); }
+	inline const uint32* getRawColors() const		{ return &mColors[0]; }
 
-	inline uint32 getEntry(int index) const		{ return (index >= 0 && index < (int)getSize()) ? mColors[index] : 0; }
-	inline Color getColor(int index) const		{ return Color::fromABGR32(getEntry(index)); }
+	inline uint32 getEntry(int index) const			{ return (index >= 0 && index < (int)getSize()) ? mColors[index] : 0; }
+	inline Color getColor(int index) const			{ return Color::fromABGR32(getEntry(index)); }
 
 	void dumpColors(uint32* outColors, size_t numColors) const;
 	virtual void writeRawColors(const uint32* colors, size_t numColors);
 
-	inline uint16 getChangeCounter() const		{ return mChangeCounter; }
-	inline void increaseChangeCounter()			{ ++mChangeCounter; }
+	inline uint16 getChangeCounter() const			{ return mChangeCounter; }
+	inline void increaseChangeCounter()				{ ++mChangeCounter; }
 
 	inline BitFlagSet<Properties> getProperties() const  { return mProperties; }
 
 protected:
 	uint64 mKey = 0;
+	std::string mIdentifier;
 	std::vector<uint32> mColors;	// Colors in the palette, using ABGR32 format
 	uint16 mChangeCounter = 1;
 	BitFlagSet<Properties> mProperties;
@@ -51,7 +53,7 @@ class Palette : public PaletteBase
 friend class PaletteManager;
 
 public:
-	virtual void initPalette(uint64 key, size_t size, BitFlagSet<Properties> properties) override;
+	virtual void initPalette(uint64 key, size_t size, BitFlagSet<Properties> properties, std::string_view identifier) override;
 
 	uint16 getEntryPacked(uint16 colorIndex, bool allowExtendedPacked = false) const;
 

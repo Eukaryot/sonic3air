@@ -24,7 +24,7 @@ public:
 	virtual void buildContent() override;
 
 private:
-	uint32 mSpriteCollectionChangeCounter = 0;
+	uint32 mLastSpriteCollectionChangeCounter = 0;
 	std::vector<const SpriteCollection::Item*> mSortedItems;
 
 	const SpriteCollection::Item* mPreviewItem = nullptr;

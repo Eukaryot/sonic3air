@@ -13,22 +13,22 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/devmode/windows/DevModeWindowBase.h"
-#include "oxygen/application/audio/AudioCollection.h"
+
+class PaletteBase;
 
 
-class AudioBrowserWindow : public DevModeWindowBase
+class PaletteBrowserWindow : public DevModeWindowBase
 {
 public:
-	AudioBrowserWindow();
+	PaletteBrowserWindow();
 
 	virtual void buildContent() override;
 
 private:
-	std::vector<const AudioCollection::AudioDefinition*> mAudioDefinitions;
-	uint32 mLastAudioCollectionChangeCounter = 0;
+	std::vector<const PaletteBase*> mSortedPalettes;
+	uint32 mLastPaletteCollectionChangeCounter = 0;
 
-	AudioReference mPlayingAudio;
-	const AudioCollection::AudioDefinition* mPlayingDefinition = nullptr;
+	const PaletteBase* mPreviewPalette = nullptr;
 };
 
 #endif
