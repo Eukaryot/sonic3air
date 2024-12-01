@@ -19,6 +19,7 @@ class GameSimWindow;
 class GameVisualizationsWindow;
 class MemoryHexViewWindow;
 class PaletteViewWindow;
+class RenderedGeometryWindow;
 class ScriptBuildWindow;
 class SettingsWindow;
 class SpriteBrowserWindow;
@@ -53,6 +54,7 @@ private:
 	GameVisualizationsWindow* mGameVisualizationsWindow = nullptr;
 	MemoryHexViewWindow* mMemoryHexViewWindow = nullptr;
 	PaletteViewWindow* mPaletteViewWindow = nullptr;
+	RenderedGeometryWindow* mRenderedGeometryWindow = nullptr;
 	ScriptBuildWindow* mScriptBuildWindow = nullptr;
 	SettingsWindow* mSettingsWindow = nullptr;
 	SpriteBrowserWindow* mSpriteBrowserWindow = nullptr;

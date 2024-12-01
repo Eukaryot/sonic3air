@@ -234,6 +234,8 @@ public:
 	String(const StdStringView& str) : BASE(str) {}
 	String(int ignoreMe, const char* format, ...);
 
+	void formatString(const char* format, ...);
+
 	String& operator=(const String& str) { copy(str); return *this; }
 
 	WString toWString() const;
@@ -262,6 +264,8 @@ public:
 	explicit WString(const std::basic_string<char, std::char_traits<char>, std::allocator<char>>& str) : WString(String(str)) {}
 	explicit WString(const std::basic_string_view<char>& str) : WString(String(str)) {}
 	WString(int ignoreMe, const wchar_t* format, ...);
+
+	void formatString(const wchar_t* format, ...);
 
 	WString& operator=(const WString& str) { copy(str); return *this; }
 

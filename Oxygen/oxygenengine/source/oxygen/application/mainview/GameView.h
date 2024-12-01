@@ -64,6 +64,8 @@ public:
 
 	DebugVisualizations& accessDebugVisualizations()  { return mDebugVisualizations; }
 
+	void addWorldHighlightRect(const Recti& rect, const Color& color);
+
 private:
 	void setLogDisplay(const String& string, float time = 2.0f);
 	void setGameSpeed(float speed);
@@ -87,11 +89,13 @@ private:
 
 	StillImage mStillImage;
 
-	DebugVisualizations mDebugVisualizations;
-	DrawerTexture mDebugVisualizationsOverlay;
-
 	DrawerTexture mFinalGameTexture;
 
 	float mRewindTimer = 0.0f;
 	int mRewindCounter = 0;
+
+	DebugVisualizations mDebugVisualizations;
+	DrawerTexture mDebugVisualizationsOverlay;
+
+	std::vector<std::pair<Recti, Color>> mWorldHighlightRects;
 };

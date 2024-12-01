@@ -511,6 +511,9 @@
     <ClCompile Include="..\..\source\oxygen\devmode\windows\GameVisualizationsWindow.cpp">
       <Filter>devmode\windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\RenderedGeometryWindow.cpp">
+      <Filter>devmode\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -962,6 +965,9 @@
       <Filter>devmode\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\devmode\windows\GameVisualizationsWindow.h">
+      <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\RenderedGeometryWindow.h">
       <Filter>devmode\windows</Filter>
     </ClInclude>
   </ItemGroup>

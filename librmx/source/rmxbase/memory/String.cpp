@@ -69,6 +69,26 @@ String::String(int ignoreMe, const char* format, ...)
 	mData[mLength] = 0;
 }
 
+void String::formatString(const char* format, ...)
+{
+	if (nullptr == format || format[0] == 0)
+		return;
+
+	va_list argv;
+	va_start(argv, format);
+	static char buffer[1024];
+	rmx::StringTraits<char>::buildFormatted(buffer, 1024, format, argv);
+	va_end(argv);
+
+	int len = 0;
+	while (buffer[len])
+		++len;
+	expand(len);
+	memcpy(mData, buffer, len * sizeof(char));
+	mLength = len;
+	mData[mLength] = 0;
+}
+
 WString String::toWString() const
 {
 	WString output;
@@ -99,6 +119,26 @@ std::wstring String::toStdWString() const
 WString::WString(int ignoreMe, const wchar_t* format, ...)
 {
 	init();
+	if (nullptr == format || format[0] == 0)
+		return;
+
+	va_list argv;
+	va_start(argv, format);
+	static wchar_t buffer[1024];
+	rmx::StringTraits<wchar_t>::buildFormatted(buffer, 1024, format, argv);
+	va_end(argv);
+
+	int len = 0;
+	while (buffer[len])
+		++len;
+	expand(len);
+	memcpy(mData, buffer, len * sizeof(wchar_t));
+	mLength = len;
+	mData[mLength] = 0;
+}
+
+void WString::formatString(const wchar_t* format, ...)
+{
 	if (nullptr == format || format[0] == 0)
 		return;
 
