@@ -285,7 +285,7 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 					{
 						case 'm':
 						{
-							mDebugPaletteDisplay = (mDebugPaletteDisplay + 2) % 3 - 1;
+							mDebugVisualizations.mDebugPaletteDisplay = (mDebugVisualizations.mDebugPaletteDisplay + 2) % 3 - 1;
 							break;
 						}
 					}
@@ -355,12 +355,12 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 
 						case 'v':
 						{
-							mDebugVisualizationsEnabled = !mDebugVisualizationsEnabled;
+							toggle(mDebugVisualizations.mEnabled);
 							break;
 						}
 						case 'c':
 						{
-							++mDebugVisualizationsMode;
+							++mDebugVisualizations.mMode;
 							break;
 						}
 
@@ -413,14 +413,14 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 
 						case SDLK_TAB:
 						{
-							if (mDebugOutput >= 0)
+							if (mDebugVisualizations.mDebugOutput >= 0)
 							{
-								VideoOut::instance().dumpDebugDraw(mDebugOutput);
+								VideoOut::instance().dumpDebugDraw(mDebugVisualizations.mDebugOutput);
 								setLogDisplay("Dumped debug output to BMP file");
 							}
-							else if (mDebugPaletteDisplay >= 0)
+							else if (mDebugVisualizations.mDebugPaletteDisplay >= 0)
 							{
-								dumpPaletteAsBMP(mDebugPaletteDisplay);
+								dumpPaletteAsBMP(mDebugVisualizations.mDebugPaletteDisplay);
 								setLogDisplay("Dumped palette to 'palette_dump.bmp'");
 							}
 							break;
@@ -539,25 +539,25 @@ void GameView::update(float timeElapsed)
 
 	// Debug output
 	{
-		mDebugOutput = -1;
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
-			if (!FTX::System->wasEventConsumed())
+			if (!FTX::System->wasEventConsumed() && (FTX::keyChange(',') || FTX::keyChange('.') || FTX::keyChange('-')))
 			{
+				mDebugVisualizations.mDebugOutput = -1;
 				if (FTX::keyState(','))
 				{
 					// Debug output for plane B
-					mDebugOutput = 0;
+					mDebugVisualizations.mDebugOutput = 0;
 				}
 				else if (FTX::keyState('.'))
 				{
 					// Debug output for plane A or W
-					mDebugOutput = (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT)) ? 2 : 1;
+					mDebugVisualizations.mDebugOutput = (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT)) ? 2 : 1;
 				}
 				else if (FTX::keyState('-'))
 				{
 					// Debug output for patterns
-					mDebugOutput = 3;
+					mDebugVisualizations.mDebugOutput = 3;
 				}
 			}
 
@@ -566,12 +566,12 @@ void GameView::update(float timeElapsed)
 			debugTracking.clearScriptLogValue("~addr");
 			debugTracking.clearScriptLogValue("~ptrn");
 
-			if (mDebugOutput >= 0)
+			if (mDebugVisualizations.mDebugOutput >= 0)
 			{
 				// Get the mouse position inside the debug output
 				PlaneManager& planeManager = VideoOut::instance().getRenderParts().getPlaneManager();
 				Rectf rect;
-				if (mDebugOutput <= PlaneManager::PLANE_A)
+				if (mDebugVisualizations.mDebugOutput <= PlaneManager::PLANE_A)
 				{
 					const Vec2i playfieldSize = planeManager.getPlayfieldSizeInPixels();
 					rect = RenderUtils::getLetterBoxRect(mRect, (float)playfieldSize.x / (float)playfieldSize.y);
@@ -586,10 +586,10 @@ void GameView::update(float timeElapsed)
 				{
 					const uint32 index = (int)(relativePosition.x * 64.0f) + (int)(relativePosition.y * 32.0f) * 64;
 					debugTracking.updateScriptLogValue("~index", rmx::hexString(index, 4));
-					if (mDebugOutput < 2)
+					if (mDebugVisualizations.mDebugOutput < 2)
 					{
-						const uint16 address = planeManager.getPatternVRAMAddress(mDebugOutput, (uint16)index);
-						const uint16 pattern = planeManager.getPatternAtIndex(mDebugOutput, (uint16)index);
+						const uint16 address = planeManager.getPatternVRAMAddress(mDebugVisualizations.mDebugOutput, (uint16)index);
+						const uint16 pattern = planeManager.getPatternAtIndex(mDebugVisualizations.mDebugOutput, (uint16)index);
 						debugTracking.updateScriptLogValue("~addr", rmx::hexString(address, 4));
 						debugTracking.updateScriptLogValue("~ptrn", rmx::hexString(pattern, 4));
 					}
@@ -638,14 +638,14 @@ void GameView::render()
 		child->setRect(gameScreenRect);
 	}
 
-	if (mDebugOutput >= 0)
+	if (mDebugVisualizations.mDebugOutput >= 0)
 	{
 		// Draw a dark background over the full screen
 		drawer.setBlendMode(BlendMode::OPAQUE);
 		drawer.drawRect(FTX::screenRect(), Color(0.15f, 0.15f, 0.15f));
 		drawer.performRendering();
 
-		videoOut.renderDebugDraw(mDebugOutput, mRect);
+		videoOut.renderDebugDraw(mDebugVisualizations.mDebugOutput, mRect);
 
 		// Enable alpha again for the UI
 		drawer.setBlendMode(BlendMode::ALPHA);
@@ -673,7 +673,7 @@ void GameView::render()
 	drawer.setBlendMode(BlendMode::ALPHA);
 
 	// Debug visualizations
-	if (mDebugVisualizationsEnabled)
+	if (mDebugVisualizations.mEnabled)
 	{
 		if (!mDebugVisualizationsOverlay.isValid())
 		{
@@ -682,17 +682,17 @@ void GameView::render()
 		Bitmap& bitmap = mDebugVisualizationsOverlay.accessBitmap();
 		bitmap.resize(gameScreenRect.width, gameScreenRect.height);
 		bitmap.clear(0);
-		EngineMain::getDelegate().fillDebugVisualization(bitmap, mDebugVisualizationsMode);
+		EngineMain::getDelegate().fillDebugVisualization(bitmap, mDebugVisualizations.mMode);
 		mDebugVisualizationsOverlay.bitmapUpdated();
 
 		drawer.drawRect(gameScreenRect, mDebugVisualizationsOverlay);
 	}
 
 	// Palette debug output
-	if (mDebugPaletteDisplay >= 0)
+	if (mDebugVisualizations.mDebugPaletteDisplay >= 0)
 	{
 		const PaletteManager& paletteManager = videoOut.getRenderParts().getPaletteManager();
-		for (int paletteIndex = 0; paletteIndex <= mDebugPaletteDisplay; ++paletteIndex)
+		for (int paletteIndex = 0; paletteIndex <= mDebugVisualizations.mDebugPaletteDisplay; ++paletteIndex)
 		{
 			const int baseX = 2 + paletteIndex * 84;
 			const int baseY = 2;
@@ -714,7 +714,7 @@ void GameView::render()
 				}
 			}
 		}
-		if (mDebugPaletteDisplay >= 1)
+		if (mDebugVisualizations.mDebugPaletteDisplay >= 1)
 		{
 			const int baseX = 2 + 2 * 84;
 			const int baseY = 2;
