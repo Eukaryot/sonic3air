@@ -673,11 +673,11 @@ void GameView::render()
 	drawer.setBlendMode(BlendMode::ALPHA);
 
 	// Highlight rects (from rendered geometry dev mode window)
-	for (const std::pair<Recti, Color>& pair : mWorldHighlightRects)
+	for (const std::pair<Recti, Color>& pair : mScreenHighlightRects)
 	{
 		drawer.drawRect(pair.first, pair.second);
 	}
-	mWorldHighlightRects.clear();
+	mScreenHighlightRects.clear();
 
 	// Debug visualizations
 	if (mDebugVisualizations.mEnabled)
@@ -831,9 +831,9 @@ void GameView::setStillImageMode(StillImageMode mode, float timeout)
 	mStillImage.mBlurringStepTimer = 0.0f;
 }
 
-void GameView::addWorldHighlightRect(const Recti& rect, const Color& color)
+void GameView::addScreenHighlightRect(const Recti& rect, const Color& color)
 {
-	mWorldHighlightRects.emplace_back(rect, color);
+	mScreenHighlightRects.emplace_back(rect, color);
 }
 
 void GameView::setLogDisplay(const String& string, float time)

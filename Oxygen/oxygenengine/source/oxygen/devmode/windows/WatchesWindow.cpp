@@ -191,7 +191,7 @@ void WatchesWindow::buildContent()
 							hitTitle = String(0, "u%d[0xffff%04x] = %s   at %s", hit.mBytes * 8, hit.mAddress, rmx::hexString(hit.mWrittenValue, std::min(hit.mBytes * 2, 8)).c_str(), hit.mLocation.toString(codeExec).c_str());
 						}
 
-						ImGui::PushID(hitIndex);
+						ImGui::PushID((int)hitIndex);
 						if (ImGui::TreeNodeEx("Call Stack", 0, "%s", *hitTitle))
 						{
 							ImGui::TextColored(lightGrayColor, "   Call Stack:");

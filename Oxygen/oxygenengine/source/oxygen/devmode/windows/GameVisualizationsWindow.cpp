@@ -13,6 +13,10 @@
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/mainview/GameView.h"
+#include "oxygen/application/video/VideoOut.h"
+#include "oxygen/devmode/ImGuiHelpers.h"
+#include "oxygen/rendering/parts/RenderParts.h"
+#include "oxygen/simulation/LogDisplay.h"
 
 
 GameVisualizationsWindow::GameVisualizationsWindow() :
@@ -26,6 +30,26 @@ void GameVisualizationsWindow::buildContent()
 	ImGui::SetWindowSize(ImVec2(400.0f, 150.0f), ImGuiCond_FirstUseEver);
 
 	GameView& gameView = Application::instance().getGameView();
+	VideoOut& videoOut = VideoOut::instance();
+
+	// Layer rendering
+	{
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Render Layers:");
+
+		ImGuiHelpers::ScopedIndent si;
+
+		const char* NAMES[] = { "Plane B", "Plane A", "VDP Sprites", "Custom Sprites" };
+		for (int k = 0; k < 8; ++k)
+		{
+			ImGui::PushID(k);
+			if (k % 4 == 0)
+				ImGui::Text(k == 0 ? "Normal:  " : "Prio:        ");
+			ImGui::SameLine();
+			ImGui::Checkbox(NAMES[k % 4], &videoOut.getRenderParts().mLayerRendering[k]);
+			ImGui::PopID();
+		}
+	}
 
 	// Ground overlay
 	{

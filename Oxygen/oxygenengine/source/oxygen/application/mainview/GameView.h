@@ -64,7 +64,7 @@ public:
 
 	DebugVisualizations& accessDebugVisualizations()  { return mDebugVisualizations; }
 
-	void addWorldHighlightRect(const Recti& rect, const Color& color);
+	void addScreenHighlightRect(const Recti& rect, const Color& color);
 
 private:
 	void setLogDisplay(const String& string, float time = 2.0f);
@@ -97,5 +97,5 @@ private:
 	DebugVisualizations mDebugVisualizations;
 	DrawerTexture mDebugVisualizationsOverlay;
 
-	std::vector<std::pair<Recti, Color>> mWorldHighlightRects;
+	std::vector<std::pair<Recti, Color>> mScreenHighlightRects;
 };
