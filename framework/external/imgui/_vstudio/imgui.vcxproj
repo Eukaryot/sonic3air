@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\imgui\backends\imgui_impl_opengl2.cpp" />
     <ClCompile Include="..\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\imgui\backends\imgui_impl_sdl2.cpp" />
     <ClCompile Include="..\imgui\backends\imgui_impl_sdlrenderer2.cpp" />
@@ -30,7 +29,6 @@
     <ClCompile Include="..\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\imgui\backends\imgui_impl_opengl2.h" />
     <ClInclude Include="..\imgui\backends\imgui_impl_opengl3.h" />
     <ClInclude Include="..\imgui\backends\imgui_impl_opengl3_loader.h" />
     <ClInclude Include="..\imgui\backends\imgui_impl_sdl2.h" />
