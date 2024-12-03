@@ -244,11 +244,12 @@ namespace lemon
 		fileHandle.write(&content[0], content.length());
 	}
 
-	const SourceFileInfo& Module::addSourceFileInfo(const std::wstring& basepath, const std::wstring& filename)
+	const SourceFileInfo& Module::addSourceFileInfo(const std::wstring& localPath, const std::wstring& filename)
 	{
 		SourceFileInfo& sourceFileInfo = mSourceFileInfoPool.createObject();
+		sourceFileInfo.mModule = this;
 		sourceFileInfo.mFilename = filename;
-		sourceFileInfo.mFullPath = basepath + filename;
+		sourceFileInfo.mLocalPath = localPath;
 		sourceFileInfo.mIndex = mAllSourceFiles.size();
 		mAllSourceFiles.push_back(&sourceFileInfo);
 		return sourceFileInfo;

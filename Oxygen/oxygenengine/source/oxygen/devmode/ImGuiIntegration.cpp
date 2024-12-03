@@ -94,7 +94,6 @@ void ImGuiIntegration::startup()
 
 	// Configure default styles
 	loadFont("data/font/ttf/DroidSans.ttf", 15.0f, mDefaultFont);
-	mAccentColor.set(0.2f, 0.5f, 0.8f);
 	refreshImGuiStyle();
 
 	mDevModeMainWindow = new DevModeMainWindow();
@@ -212,9 +211,10 @@ void ImGuiIntegration::refreshImGuiStyle()
 	style.FrameRounding = 3.0f;
 	style.ItemSpacing.y = 5.0f;
 
+	Color accentColor = Configuration::instance().mDevMode.mUIAccentColor;
 	const auto GetAccentColorMix = [&](float accent, float saturation = 1.0f, float grayValue = 0.3f)
 	{
-		return ImVec4(interpolate(grayValue, mAccentColor.x * accent, saturation), interpolate(grayValue, mAccentColor.y * accent, saturation), interpolate(grayValue, mAccentColor.z * accent, saturation), 1.0f);
+		return ImVec4(interpolate(grayValue, accentColor.x * accent, saturation), interpolate(grayValue, accentColor.y * accent, saturation), interpolate(grayValue, accentColor.z * accent, saturation), 1.0f);
 	};
 
 	style.Colors[ImGuiCol_Text]				= ImVec4(1.0f, 1.0f, 1.0f, 1.0f);

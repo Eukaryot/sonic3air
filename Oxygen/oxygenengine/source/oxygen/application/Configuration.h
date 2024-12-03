@@ -56,7 +56,7 @@ public:
 		bool mEnabled = false;
 		float mGameViewScale = 1.0f;
 		Vec2f mGameViewAlignment;
-
+		Color mUIAccentColor = Color(0.2f, 0.5f, 0.8f);
 		ExternalCodeEditor mExternalCodeEditor;
 	};
 

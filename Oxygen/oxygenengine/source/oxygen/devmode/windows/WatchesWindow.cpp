@@ -213,8 +213,10 @@ void WatchesWindow::buildContent()
 										{
 											LemonScriptProgram::ResolvedLocation location;
 											codeExec.getLemonScriptProgram().resolveLocation(location, *loc.mFunction, (uint32)loc.mProgramCounter.value());
-
-											ImGuiHelpers::OpenCodeLocation::open(location.mSourceFileInfo->mFullPath, loc.mLineNumber);
+											if (nullptr != location.mSourceFileInfo)
+											{
+												ImGuiHelpers::OpenCodeLocation::open(location.mSourceFileInfo->getFullFilePath(), loc.mLineNumber);
+											}
 										}
 										ImGui::PopID();
 									}

@@ -82,11 +82,12 @@ namespace lemon
 		//  - 0x10 = Opcode JUMP_SWITCH added
 		//  - 0x11 = Serialization of callable function addresses
 		//  - 0x12 = Support for deprecation flags in function alias names
+		//  - 0x13 = Source file info with local paths
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";	// "Lemonscript Module"
-		const uint16 MINIMUM_VERSION = 0x12;
-		uint16 version = 0x12;
+		const uint16 MINIMUM_VERSION = 0x13;
+		uint16 version = 0x13;
 
 		if (outerSerializer.isReading())
 		{
@@ -137,17 +138,20 @@ namespace lemon
 			if (serializer.isReading())
 			{
 				std::wstring filename;
+				std::wstring localPath;
 				for (size_t i = 0; i < numberOfSourceFiles; ++i)
 				{
-					serializer.serialize(filename, 1024);
-					module.addSourceFileInfo(L"", filename);
+					serializer.serialize(filename, 255);
+					serializer.serialize(localPath, 255);
+					module.addSourceFileInfo(localPath, filename);
 				}
 			}
 			else
 			{
 				for (const SourceFileInfo* sourceFileInfo : module.mAllSourceFiles)
 				{
-					serializer.write(sourceFileInfo->mFilename, 1024);
+					serializer.write(sourceFileInfo->mFilename, 255);
+					serializer.write(sourceFileInfo->mLocalPath, 255);
 				}
 			}
 		}

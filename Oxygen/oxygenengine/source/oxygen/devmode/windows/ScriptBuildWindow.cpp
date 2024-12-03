@@ -97,7 +97,7 @@ void ScriptBuildWindow::buildContent()
 								{
 									ImGui::BulletText("In '%s', line %d", WString(occurrence.mSourceFileInfo->mFilename).toStdString().c_str(), occurrence.mLineNumber);
 									ImGui::PushID(&occurrence);
-									ImGuiHelpers::OpenCodeLocation::drawButton(occurrence.mSourceFileInfo->mFullPath, occurrence.mLineNumber);
+									ImGuiHelpers::OpenCodeLocation::drawButton(occurrence.mSourceFileInfo->getFullFilePath(), occurrence.mLineNumber);
 									ImGui::PopID();
 								}
 							}

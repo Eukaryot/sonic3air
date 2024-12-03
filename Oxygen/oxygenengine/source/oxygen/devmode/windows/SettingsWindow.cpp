@@ -107,7 +107,7 @@ void SettingsWindow::buildContent()
 			config.mDevMode.mGameViewAlignment.y = 0.0f;
 	}
 
-	Color& accentColor = ImGuiIntegration::getAccentColor();
+	Color& accentColor = Configuration::instance().mDevMode.mUIAccentColor;
 	if (ImGui::ColorEdit3("Dev Mode UI Accent Color", accentColor.data, ImGuiColorEditFlags_NoInputs))
 	{
 		ImGuiIntegration::refreshImGuiStyle();

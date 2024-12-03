@@ -13,10 +13,16 @@
 
 namespace lemon
 {
+	class Module;
+
 	struct SourceFileInfo
 	{
+		Module* mModule = nullptr;	// Module that this is part of
 		std::wstring mFilename;		// File name only, without path
-		std::wstring mFullPath;		// Path including file name
-		size_t mIndex = 0;
+		std::wstring mLocalPath;	// Local path relative to the main script
+		size_t mIndex = 0;			// Index inside the array of source file infos
+
+		std::wstring getFullFilePath() const;
+		std::wstring getLocalFilePath() const;
 	};
 }

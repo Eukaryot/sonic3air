@@ -530,6 +530,14 @@ void Configuration::saveSettings()
 			devModeJson["EnableROMDataAnalyser"] = mEnableROMDataAnalyser;
 
 			{
+				Json::Value uiJson = devModeJson["DevModeUI"];
+
+				uiJson["AccentColor"] = rmx::hexString(mDevMode.mUIAccentColor.getARGB32() & 0xffffff, 6);
+
+				devModeJson["DevModeUI"] = uiJson;
+			}
+
+			{
 				Json::Value extJson = devModeJson["ExternalCodeEditor"];
 
 				extJson["Type"] = mDevMode.mExternalCodeEditor.mActiveType;
@@ -702,6 +710,15 @@ void Configuration::loadDevModeSettings(JsonHelper& rootHelper)
 		mUseCharacters = clamp(mUseCharacters, 0, 4);
 
 		devModeHelper.tryReadBool("EnableROMDataAnalyser", mEnableROMDataAnalyser);
+
+		Json::Value uiJson = devModeHelper.mJson["DevModeUI"];
+		if (uiJson.isObject())
+		{
+			JsonHelper uiHelper(uiJson);
+			std::string accentColorString;
+			if (uiHelper.tryReadString("AccentColor", accentColorString))
+				mDevMode.mUIAccentColor.setARGB32(rmx::parseInteger(accentColorString) | 0xff000000);
+		}
 
 		Json::Value extJson = devModeHelper.mJson["ExternalCodeEditor"];
 		if (extJson.isObject())

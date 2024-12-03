@@ -130,22 +130,24 @@ namespace lemon
 	bool Compiler::loadCodeLines(std::vector<std::string_view>& outLines, const std::wstring& path)
 	{
 		// Split into base path and file name
-		WString basepath;
+		WString basePath;
 		WString filename = path;
-		int pos = filename.findChars(L"/\\", filename.length() - 1, -1);
+		const int pos = filename.findChars(L"/\\", filename.length() - 1, -1);
 		if (pos > 0)
 		{
-			basepath = filename.getSubString(0, pos);
-			basepath.add('/');
+			basePath = filename.getSubString(0, pos);
+			basePath.add('/');
 			filename.makeSubString(pos + 1, -1);
 		}
+		mScriptBasePath = basePath;
+		mModule.mScriptBasePath = basePath;
 
 		mScriptFiles.clear();
 		mScriptFiles.reserve(0x200);
 
 		// Recursively load script files
 		std::unordered_set<uint64> includedPathHashes;
-		if (!loadScriptInternal(*basepath, *filename, outLines, includedPathHashes))
+		if (!loadScriptInternal(L"", *filename, outLines, includedPathHashes))
 			return false;
 
 		if (!mCompileOptions.mOutputCombinedSource.empty())
@@ -195,10 +197,10 @@ namespace lemon
 		return false;
 	}
 
-	bool Compiler::loadScriptInternal(const std::wstring& basepath, const std::wstring& filename, std::vector<std::string_view>& outLines, std::unordered_set<uint64>& includedPathHashes)
+	bool Compiler::loadScriptInternal(const std::wstring& localPath, const std::wstring& filename, std::vector<std::string_view>& outLines, std::unordered_set<uint64>& includedPathHashes)
 	{
-		const std::wstring filepath = basepath + filename;
-		const uint64 pathHash = rmx::getMurmur2_64(filepath);
+		const std::wstring localFilePath = localPath + filename;
+		const uint64 pathHash = rmx::getMurmur2_64(localFilePath);
 		if (includedPathHashes.count(pathHash) > 0)
 		{
 			// File was already included before, silently ignore the double inclusion
@@ -208,19 +210,19 @@ namespace lemon
 
 		ScriptFile& scriptFile = mScriptFilesPool.createObject();
 		mScriptFiles.push_back(&scriptFile);
-		scriptFile.mBasePath = basepath;
+		scriptFile.mLocalPath = localPath;
 		scriptFile.mFilename = filename;
 		scriptFile.mFirstLine = outLines.size() + 1;
 
-		if (!scriptFile.mContent.loadFile(filepath))
+		if (!scriptFile.mContent.loadFile(mScriptBasePath + localFilePath))
 		{
 			ErrorMessage& error = vectorAdd(mErrors);
-			error.mMessage = "Failed to load script file '" + WString(filename).toStdString() + "' at '" + WString(basepath).toStdString() + "'";
+			error.mMessage = "Failed to load script file '" + WString(filename).toStdString() + "' at '" + WString(mScriptBasePath + localPath).toStdString() + "'";
 			return false;
 		}
 
 		// Register source file at module
-		const SourceFileInfo& sourceFileInfo = mModule.addSourceFileInfo(basepath, filename);
+		const SourceFileInfo& sourceFileInfo = mModule.addSourceFileInfo(localPath, filename);
 
 		// Update line number translation
 		mLineNumberTranslation.push((uint32)outLines.size() + 1, sourceFileInfo, 0);
@@ -271,12 +273,12 @@ namespace lemon
 				includeFilename.replace('\\', '/');
 
 				// Split into base path and file name
-				String includeBasepath;
+				String includeBasePath;
 				int pos = includeFilename.findChar('/', includeFilename.length()-1, -1);
 				if (pos > 0)
 				{
-					includeBasepath = includeFilename.getSubString(0, pos);
-					includeBasepath.add('/');
+					includeBasePath = includeFilename.getSubString(0, pos);
+					includeBasePath.add('/');
 					includeFilename.makeSubString(pos+1, -1);
 				}
 
@@ -285,16 +287,16 @@ namespace lemon
 				{
 					std::vector<rmx::FileIO::FileEntry> fileEntries;
 					fileEntries.reserve(8);
-					FTX::FileSystem->listFilesByMask(basepath + *includeBasepath.toWString() + L"*.lemon", false, fileEntries);
+					FTX::FileSystem->listFilesByMask(mScriptBasePath + localPath + *includeBasePath.toWString() + L"*.lemon", false, fileEntries);
 					for (const rmx::FileIO::FileEntry& fileEntry : fileEntries)
 					{
-						if (!loadScriptInternal(basepath + *includeBasepath.toWString(), fileEntry.mFilename, outLines, includedPathHashes))
+						if (!loadScriptInternal(localPath + *includeBasePath.toWString(), fileEntry.mFilename, outLines, includedPathHashes))
 							return false;
 					}
 				}
 				else
 				{
-					if (!loadScriptInternal(basepath + *includeBasepath.toWString(), *(includeFilename + ".lemon").toWString(), outLines, includedPathHashes))
+					if (!loadScriptInternal(localPath + *includeBasePath.toWString(), *(includeFilename + ".lemon").toWString(), outLines, includedPathHashes))
 						return false;
 				}
 

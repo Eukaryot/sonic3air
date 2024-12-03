@@ -48,7 +48,7 @@ namespace lemon
 		bool loadCodeLines(std::vector<std::string_view>& outLines, const std::wstring& path);
 		bool compileLines(const std::vector<std::string_view>& lines);
 
-		bool loadScriptInternal(const std::wstring& basepath, const std::wstring& filename, std::vector<std::string_view>& outLines, std::unordered_set<uint64>& includedPathHashes);
+		bool loadScriptInternal(const std::wstring& localPath, const std::wstring& filename, std::vector<std::string_view>& outLines, std::unordered_set<uint64>& includedPathHashes);
 		void runCompilerBackend(std::vector<FunctionNode*>& functionNodes);
 
 	private:
@@ -63,9 +63,11 @@ namespace lemon
 		TokenProcessing mTokenProcessing;
 		Preprocessor mPreprocessor;
 
+		std::wstring mScriptBasePath;
+
 		struct ScriptFile
 		{
-			std::wstring mBasePath;
+			std::wstring mLocalPath;
 			std::wstring mFilename;
 			String mContent;
 			size_t mFirstLine = 0;

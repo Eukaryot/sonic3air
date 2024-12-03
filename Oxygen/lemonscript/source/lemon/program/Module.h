@@ -52,13 +52,16 @@ namespace lemon
 
 		void dumpDefinitionsToScriptFile(const std::wstring& filename, bool append = false);
 
-		const SourceFileInfo& addSourceFileInfo(const std::wstring& basepath, const std::wstring& filename);
+		inline const std::wstring& getScriptBasePath() const	{ return mScriptBasePath; }
+		inline void setScriptBasePath(std::wstring_view path)	{ mScriptBasePath = path; }
+		const SourceFileInfo& addSourceFileInfo(const std::wstring& localPath, const std::wstring& filename);
 
 		// Preprocessor definitions
 		void registerNewPreprocessorDefinitions(PreprocessorDefinitionMap& preprocessorDefinitions);
 		Constant& addPreprocessorDefinition(FlyweightString name, int64 value);
 
 		// Functions
+		inline const std::vector<Function*>& getAllFunctions() const		  { return mFunctions; }
 		inline const std::vector<ScriptFunction*>& getScriptFunctions() const { return mScriptFunctions; }
 		const Function* getFunctionByUniqueId(uint64 uniqueId) const;
 
@@ -154,6 +157,7 @@ namespace lemon
 
 		// Misc
 		uint64 mCompiledCodeHash = 0;
+		std::wstring mScriptBasePath;
 		ObjectPool<SourceFileInfo> mSourceFileInfoPool;
 		std::vector<SourceFileInfo*> mAllSourceFiles;
 		std::vector<CompilerWarning> mWarnings;

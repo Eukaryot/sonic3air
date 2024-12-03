@@ -45,6 +45,7 @@
     <ClCompile Include="..\..\source\lemon\program\ModuleSerializer.cpp" />
     <ClCompile Include="..\..\source\lemon\program\Opcode.cpp" />
     <ClCompile Include="..\..\source\lemon\program\Program.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\SourceFileInfo.cpp" />
     <ClCompile Include="..\..\source\lemon\program\StringRef.cpp" />
     <ClCompile Include="..\..\source\lemon\runtime\BuiltInFunctions.cpp" />
     <ClCompile Include="..\..\source\lemon\runtime\ControlFlow.cpp" />

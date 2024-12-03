@@ -29,14 +29,11 @@ public:
 	static bool isCapturingMouse();
 	static bool isCapturingKeyboard();
 
-	static inline Color& getAccentColor()  { return mAccentColor; }
-
 	static void refreshImGuiStyle();
 
 	static void toggleMainWindow();
 
 private:
-	static inline Color mAccentColor;
 	static inline bool mEnabled = false;
 	static inline bool mRunning = false;
 };
