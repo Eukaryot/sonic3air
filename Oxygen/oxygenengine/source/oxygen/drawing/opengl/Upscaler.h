@@ -23,7 +23,7 @@ public:
 	void startup();
 	void shutdown();
 
-	void renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textureResolution);
+	void renderImage(const Recti& rect, GLuint textureHandle, Vec2i textureResolution);
 
 private:
 	OpenGLDrawerResources& mResources;

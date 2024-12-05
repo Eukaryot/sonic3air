@@ -41,7 +41,7 @@ void Upscaler::shutdown()
 {
 }
 
-void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textureResolution)
+void Upscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i textureResolution)
 {
 	const int filtering = Configuration::instance().mFiltering;
 	const int scanlines = Configuration::instance().mScanlines;
@@ -178,12 +178,13 @@ void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textur
 
 		secondShader->bind();
 		secondShader->setParam("GameResolution", Vec2f(textureResolution));
-		secondShader->setParam("OutputSize", Vec2f(rect.width, rect.height));
+		secondShader->setParam("OutputSize", Vec2f(rect.getSize()));
 		secondShader->setTexture("MainTexture", mPass0Texture.getHandle(), GL_TEXTURE_2D);
 		secondShader->setTexture("OrigTexture", textureHandle, GL_TEXTURE_2D);
 	}
 
-	glViewport_Recti(rect);
+	// Flip rect in y direction
+	glViewport_Recti(Recti(rect.x, FTX::screenHeight() - rect.height - rect.y, rect.width, rect.height));
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glViewport_Recti(FTX::screenRect());
 
