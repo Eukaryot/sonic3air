@@ -363,6 +363,7 @@
 		9E49B9C6260C31B300719EC5 /* GameSetupScreen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E49B9BC260C31B300719EC5 /* GameSetupScreen.cpp */; };
 		9E49B9C7260C31B300719EC5 /* GameSetupScreen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E49B9BC260C31B300719EC5 /* GameSetupScreen.cpp */; };
 		9E49B9C8260C31B300719EC5 /* GameSetupScreen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E49B9BC260C31B300719EC5 /* GameSetupScreen.cpp */; };
+		9E5978B72D011E8200198EB7 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E0EFFA42B01CFDC0078ACB6 /* libcurl.tbd */; };
 		9E5FD84427EC081600CD430A /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E5FD83927EC041600CD430A /* libSDL2.a */; platformFilter = ios; };
 		9E5FD84527EC082700CD430A /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E7E291825EF27630021AE3A /* ioapi.c */; };
 		9E5FD84627EC082A00CD430A /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E7E291025EF26AF0021AE3A /* unzip.c */; };
@@ -2413,6 +2414,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E5978B72D011E8200198EB7 /* libcurl.tbd in Frameworks */,
 				9EC1F78E28178F0B0073C39E /* CoreAudio.framework in Frameworks */,
 				9EC1F79328178FF10073C39E /* Carbon.framework in Frameworks */,
 				9E7E292325EF27920021AE3A /* libz.tbd in Frameworks */,
@@ -5873,7 +5875,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 24.02.02.0;
+				MARKETING_VERSION = 24.02.02.1;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5922,7 +5924,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 24.02.02.0;
+				MARKETING_VERSION = 24.02.02.1;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5977,7 +5979,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 24.02.02.0;
+				MARKETING_VERSION = 24.02.02.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air.sonic3air-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -6034,7 +6036,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 24.02.02.0;
+				MARKETING_VERSION = 24.02.02.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air.sonic3air-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -6198,7 +6200,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 24.02.02.0;
+				MARKETING_VERSION = 24.02.02.1;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air-dev";
 				PRODUCT_NAME = "sonic3air-dev";
@@ -6242,7 +6244,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 24.02.02.0;
+				MARKETING_VERSION = 24.02.02.1;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air-dev";
 				PRODUCT_NAME = "sonic3air-dev";
@@ -6286,7 +6288,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 24.02.02.0;
+				MARKETING_VERSION = 24.02.02.1;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air.oxygenApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6330,7 +6332,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 24.02.02.0;
+				MARKETING_VERSION = 24.02.02.1;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air.oxygenApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
