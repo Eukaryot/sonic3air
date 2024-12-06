@@ -601,7 +601,7 @@ void Application::render()
 	#else
 		constexpr uint64 key = rmx::constMurmur2_64("auto_pause_text_key");
 	#endif
-		const float scale = (float)(FTX::screenHeight() / 160);		// A bit larger than he usual upscaled pixel size
+		const float scale = (float)(FTX::screenHeight() / 160);		// A bit larger than the usual upscaled pixel size
 		drawer.drawSprite(FTX::screenSize() / 2, key, Color(0.3f, 1.0f, 1.0f), Vec2f(scale));
 	}
 

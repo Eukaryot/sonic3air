@@ -717,7 +717,7 @@ void Configuration::loadDevModeSettings(JsonHelper& rootHelper)
 			JsonHelper uiHelper(uiJson);
 			std::string accentColorString;
 			if (uiHelper.tryReadString("AccentColor", accentColorString))
-				mDevMode.mUIAccentColor.setARGB32(rmx::parseInteger(accentColorString) | 0xff000000);
+				mDevMode.mUIAccentColor.setARGB32((uint32)rmx::parseInteger(accentColorString) | 0xff000000);
 		}
 
 		Json::Value extJson = devModeHelper.mJson["ExternalCodeEditor"];
