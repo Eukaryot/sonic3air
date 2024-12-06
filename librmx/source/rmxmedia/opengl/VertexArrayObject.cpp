@@ -10,34 +10,107 @@
 
 #ifdef RMX_WITH_OPENGL_SUPPORT
 
+// OpenGL ES 2 does not support actual vertex array objects - but despite its name, the VertexArrayObject class will still without them (though a bit less efficient in that case)
+#if !defined(RMX_USE_GLES2)
+	#define RMX_OPENGL_SUPPORT_VAO
+#endif
+
 namespace opengl
 {
+
 	VertexArrayObject::~VertexArrayObject()
 	{
-		if (mHandle != 0)
-		{
-			glDeleteVertexArrays(1, &mHandle);
+	#ifdef RMX_OPENGL_SUPPORT_VAO
+		if (mVertexArrayObjectHandle != 0)
+			glDeleteVertexArrays(1, &mVertexArrayObjectHandle);
+	#endif
+	
+		if (mVertexBufferObjectHandle != 0)
 			glDeleteBuffers(1, &mVertexBufferObjectHandle);
-		}
 	}
 
 	void VertexArrayObject::setup(Format format)
 	{
-		const bool needsInitialization = (mHandle == 0);
+		const bool needsInitialization = (mVertexBufferObjectHandle == 0);
+	#ifdef RMX_OPENGL_SUPPORT_VAO
 		if (needsInitialization)
 		{
-			glGenVertexArrays(1, &mHandle);
+			glGenVertexArrays(1, &mVertexArrayObjectHandle);
 			glGenBuffers(1, &mVertexBufferObjectHandle);
-			glBindVertexArray(mHandle);
+			glBindVertexArray(mVertexArrayObjectHandle);
 			glBindBuffer(GL_ARRAY_BUFFER, mVertexBufferObjectHandle);
 		}
 		else
 		{
-			glBindVertexArray(mHandle);
+			glBindVertexArray(mVertexArrayObjectHandle);
 		}
+	#else
+		if (needsInitialization)
+		{
+			glGenBuffers(1, &mVertexBufferObjectHandle);
+			glBindBuffer(GL_ARRAY_BUFFER, mVertexBufferObjectHandle);
+		}
+	#endif
 
 		mCurrentFormat = format;
-		switch (format)
+		applyCurrentFormat();
+	}
+
+	void VertexArrayObject::updateVertexData(const float* vertexData, size_t numVertices)
+	{
+		if (mVertexBufferObjectHandle == 0)
+		{
+			RMX_ASSERT(false, "VAO must be setup with a format before updating data");
+			return;
+		}
+
+	#ifdef RMX_OPENGL_SUPPORT_VAO
+		glBindVertexArray(mVertexArrayObjectHandle);
+	#endif
+		glBindBuffer(GL_ARRAY_BUFFER, mVertexBufferObjectHandle);
+		glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)(mFloatsPerVertex * numVertices * sizeof(GLfloat)), vertexData, GL_STATIC_DRAW);
+		mNumBufferedVertices = numVertices;
+	}
+
+	void VertexArrayObject::bind()
+	{
+	#ifdef RMX_OPENGL_SUPPORT_VAO
+		// Bind the VAO, which will implicitly bind the VBO
+		if (mVertexArrayObjectHandle != 0)
+		{
+			glBindVertexArray(mVertexArrayObjectHandle);
+		}
+	#else
+		// Explicitly bind the VAO, and apply the format
+		if (mVertexBufferObjectHandle != 0)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, mVertexBufferObjectHandle);
+			applyCurrentFormat();
+		}
+	#endif
+	}
+
+	void VertexArrayObject::unbind() const
+	{
+	#ifdef RMX_OPENGL_SUPPORT_VAO
+		glBindVertexArray(0);
+	#else
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	#endif
+	}
+
+	void VertexArrayObject::draw(GLenum mode)
+	{
+		if (mNumBufferedVertices > 0)
+		{
+			bind();
+			glDrawArrays(mode, 0, (GLsizei)mNumBufferedVertices);
+		}
+	}
+
+	void VertexArrayObject::applyCurrentFormat()
+	{
+		switch (mCurrentFormat)
 		{
 			case Format::P2:
 			{
@@ -102,50 +175,12 @@ namespace opengl
 		{
 			glEnableVertexAttribArray((GLuint)i);
 		}
-		if (!needsInitialization)
+		for (size_t i = mNumVertexAttributes; i < 4; ++i)	// Assuming we'll never use more than 4 vertex attributes inside here
 		{
-			for (size_t i = mNumVertexAttributes; i < 4; ++i)	// Assuming we'll never use more than 4 vertex attributes inside here
-			{
-				glDisableVertexAttribArray((GLuint)i);
-			}
+			glDisableVertexAttribArray((GLuint)i);
 		}
 	}
 
-	void VertexArrayObject::updateVertexData(const float* vertexData, size_t numVertices)
-	{
-		if (mHandle == 0)
-		{
-			RMX_ASSERT(false, "VAO must be setup with a format before updating data");
-			return;
-		}
-
-		glBindVertexArray(mHandle);
-		glBindBuffer(GL_ARRAY_BUFFER, mVertexBufferObjectHandle);
-		glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)(mFloatsPerVertex * numVertices * sizeof(GLfloat)), vertexData, GL_STATIC_DRAW);
-		mNumBufferedVertices = numVertices;
-	}
-
-	void VertexArrayObject::bind() const
-	{
-		if (mHandle != 0)
-		{
-			glBindVertexArray(mHandle);
-		}
-	}
-
-	void VertexArrayObject::unbind() const
-	{
-		glBindVertexArray(0);
-	}
-
-	void VertexArrayObject::draw(GLenum mode) const
-	{
-		if (mHandle != 0 && mNumBufferedVertices > 0)
-		{
-			glBindVertexArray(mHandle);
-			glDrawArrays(mode, 0, (GLsizei)mNumBufferedVertices);
-		}
-	}
 }
 
 #endif

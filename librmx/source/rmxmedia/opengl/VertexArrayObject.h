@@ -33,19 +33,23 @@ namespace opengl
 	public:
 		~VertexArrayObject();
 
+		inline bool isValid() const  { return mVertexBufferObjectHandle != 0; }
 		void setup(Format format);
 
 		inline size_t getNumBufferedVertices() const  { return mNumBufferedVertices; }
 		void updateVertexData(const float* vertexData, size_t numVertices);
 
-		void bind() const;
+		void bind();
 		void unbind() const;
 
-		void draw(GLenum mode) const;		// Shortcut for "bind()" + "glDrawArrays(mode, 0, mNumBufferedVertices)"
+		void draw(GLenum mode);		// Shortcut for "bind()" + "glDrawArrays(mode, 0, mNumBufferedVertices)"
 
 	private:
-		GLuint mHandle = 0;						// Vertex array object handle
+		void applyCurrentFormat();
+
+	private:
 		GLuint mVertexBufferObjectHandle = 0;	// We could actually use multiple VBOs (e.g. one for positions, one for texcoords), but one is sufficient
+		GLuint mVertexArrayObjectHandle = 0;	// Vertex array object handle (only used if VAOs are actually supported, depending on the platform)
 		Format mCurrentFormat = Format::UNDEFINED;
 
 		size_t mNumBufferedVertices = 0;
