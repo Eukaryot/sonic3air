@@ -142,6 +142,4 @@ file(GLOB_RECURSE SONIC3AIR_SOURCES ${WORKSPACE_DIR}/Oxygen/sonic3air/source/son
 
 add_library(main SHARED ${SONIC3AIR_SOURCES})
 
-target_compile_definitions(main PUBLIC ENDUSER)
-
 target_link_libraries(main oxygen)

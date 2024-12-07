@@ -268,8 +268,6 @@ if (UNIX AND NOT APPLE)
 	set_target_properties(Sonic3AIR PROPERTIES OUTPUT_NAME "sonic3air_linux")
 endif()
 
-target_compile_definitions(Sonic3AIR PUBLIC ENDUSER)
-
 if (NOT CMAKE_VERSION VERSION_LESS "3.16.0")
 	target_precompile_headers(Sonic3AIR PRIVATE ${WORKSPACE_DIR}/Oxygen/sonic3air/source/sonic3air/pch.h)
 endif()

@@ -9,16 +9,8 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release-Enduser|x64">
-      <Configuration>Release-Enduser</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release-Enduser|Win32">
-      <Configuration>Release-Enduser</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
@@ -179,20 +171,6 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -209,14 +187,6 @@
     <Import Project="../../../oxygenengine/build/_vstudio/oxygen.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="../../../oxygenengine/build/_vstudio/oxygen.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="../../../oxygenengine/build/_vstudio/oxygen.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="../../../oxygenengine/build/_vstudio/oxygen.props" />
   </ImportGroup>
@@ -237,16 +207,6 @@
     <OutDir>$(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>Sonic3AIR</TargetName>
-    <IntDir>tmp\sonic3air_$(Configuration)_$(BuildCode)\</IntDir>
-    <OutDir>$(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode)\</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|Win32'">
-    <TargetName>Sonic3AIR</TargetName>
-    <IntDir>tmp\sonic3air_$(Configuration)_$(BuildCode)\</IntDir>
-    <OutDir>$(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode)\</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|x64'">
     <TargetName>Sonic3AIR</TargetName>
     <IntDir>tmp\sonic3air_$(Configuration)_$(BuildCode)\</IntDir>
     <OutDir>$(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode)\</OutDir>
@@ -362,66 +322,6 @@ exit /b 0</Command>
       <Command>robocopy $(ProjectDir)..\..\..\oxygenengine\data\shader $(ProjectDir)..\..\data\shader /mir &gt; nul
 exit /b 0</Command>
     </PreBuildEvent>
-    <PostBuildEvent>
-      <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86_64 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
-exit /b 0</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../../source;../../source/external;../../../lemonscript/source;../../../oxygenengine/source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ENDUSER;MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>sonic3air/pch.h</PrecompiledHeaderFile>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../../lemonscript/lib/$(BuildCode);../../../oxygenengine/build/_vstudio/lib/Release_$(BuildCode);$(SolutionDir)lib/$(Configuration)_$(BuildCode);$(SolutionDir)lib/Release_$(BuildCode);$(SolutionDir)../../source/external/discord_game_sdk/lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lemonscript.lib;oxygen_netcore.lib;oxygen.lib;imgui.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>Windows</SubSystem>
-      <IgnoreSpecificDefaultLibraries>
-      </IgnoreSpecificDefaultLibraries>
-    </Link>
-    <PreBuildEvent>
-      <Command>robocopy $(ProjectDir)..\..\..\oxygenengine\data\shader $(ProjectDir)..\..\data\shader /mir &gt; nul
-exit /b 0</Command>
-    </PreBuildEvent>
-    <PreLinkEvent />
-    <PostBuildEvent>
-      <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
-exit /b 0</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../../source;../../source/external;../../../lemonscript/source;../../../oxygenengine/source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ENDUSER;MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>sonic3air/pch.h</PrecompiledHeaderFile>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../../lemonscript/lib/$(BuildCode);../../../oxygenengine/build/_vstudio/lib/Release_$(BuildCode);$(SolutionDir)lib/$(Configuration)_$(BuildCode);$(SolutionDir)lib/Release_$(BuildCode);$(SolutionDir)../../source/external/discord_game_sdk/lib/x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lemonscript.lib;oxygen_netcore.lib;oxygen.lib;imgui.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>Windows</SubSystem>
-      <IgnoreSpecificDefaultLibraries>
-      </IgnoreSpecificDefaultLibraries>
-    </Link>
-    <PreBuildEvent>
-      <Command>robocopy $(ProjectDir)..\..\..\oxygenengine\data\shader $(ProjectDir)..\..\data\shader /mir &gt; nul
-exit /b 0</Command>
-    </PreBuildEvent>
-    <PreLinkEvent />
     <PostBuildEvent>
       <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86_64 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
 exit /b 0</Command>

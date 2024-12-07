@@ -470,12 +470,10 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 			// Overwrite project path from config
 			config.mProjectPath = argumentProjectPath;
 		}
-		if (!config.mProjectPath.empty())
-		{
-			RMX_LOG_INFO("Loading game profile");
-			const bool loadedProject = mInternal.mGameProfile.loadOxygenProjectFromFile(config.mProjectPath + L"oxygenproject.json");
-			RMX_CHECK(loadedProject, "Failed to load game profile from '" << *WString(config.mProjectPath).toString() << "oxygenproject.json'", );
-		}
+
+		RMX_LOG_INFO("Loading game profile");
+		const bool loadedProject = mInternal.mGameProfile.loadOxygenProjectFromFile(config.mProjectPath + L"oxygenproject.json");
+		RMX_CHECK(loadedProject, "Failed to load game profile from '" << *WString(config.mProjectPath).toString() << "oxygenproject.json'", );
 	}
 
 	RMX_LOG_INFO("Loading settings");
