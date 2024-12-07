@@ -37,6 +37,10 @@ protected:
 class InputManager : public SingleInstance<InputManager>
 {
 public:
+	static const constexpr size_t NUM_PLAYERS = 2;
+	static const std::string KEYBOARD_DEVICE_NAMES[NUM_PLAYERS];
+
+public:
 	struct RealDevice;
 
 	enum class InputType
@@ -208,7 +212,6 @@ private:
 	void stopControllerRumbleForDevice(RealDevice& device);
 
 private:
-	static const constexpr size_t NUM_PLAYERS = 2;
 	Player mPlayers[NUM_PLAYERS];
 
 	std::vector<Control*> mAllControls;

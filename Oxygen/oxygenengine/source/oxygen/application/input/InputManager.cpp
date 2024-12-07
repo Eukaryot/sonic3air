@@ -279,6 +279,8 @@ const char* InputManager::RealDevice::getName() const
 
 
 
+const std::string InputManager::KEYBOARD_DEVICE_NAMES[NUM_PLAYERS] = { "Keyboard1", "Keyboard2" };
+
 InputManager::InputManager()
 {
 	mKeyboards.reserve(NUM_PLAYERS);
@@ -551,7 +553,7 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 	if (mKeyboards.empty())
 	{
 		// First-time setup for keyboards
-		//  -> Though only one physical keyboard is supported, these are two "real devices", to allow for two players using one keyboard together
+		//  -> Though only one physical keyboard is supported, these are several "real devices", to allow for multiple players using one keyboard together
 		for (size_t i = 0; i < NUM_PLAYERS; ++i)
 		{
 			RealDevice& device = vectorAdd(mKeyboards);
@@ -560,8 +562,7 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 			device.mSDLGameController = nullptr;
 
 			using Button = InputConfig::DeviceDefinition::Button;
-			static_assert(NUM_PLAYERS == 2);
-			const std::string key = (i == 0) ? "Keyboard1" : "Keyboard2";
+			const std::string& key = KEYBOARD_DEVICE_NAMES[i];
 			InputConfig::DeviceDefinition* inputDeviceDefinition = getInputDeviceDefinitionByIdentifier(key);
 			if (nullptr == inputDeviceDefinition)
 			{
@@ -742,10 +743,11 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 void InputManager::updatePlayerGamepadAssignments()
 {
 	// Try to map real devices to players
-	std::vector<RealDevice*> devicesByPlayer[2];
+	RMX_ASSERT(mKeyboards.size() == NUM_PLAYERS, "Wrong number of keyboards");
+	std::vector<RealDevice*> devicesByPlayer[NUM_PLAYERS];
 	for (size_t i = 0; i < mKeyboards.size(); ++i)
 	{
-		devicesByPlayer[i % 2].push_back(&mKeyboards[i]);
+		devicesByPlayer[i].push_back(&mKeyboards[i]);
 		mKeyboards[i].mAssignedPlayer = (int)i;
 	}
 
@@ -753,7 +755,7 @@ void InputManager::updatePlayerGamepadAssignments()
 	{
 		gamepad.mAssignedPlayer = Configuration::instance().mAutoAssignGamepadPlayerIndex;
 	}
-	for (int playerIndex = 1; playerIndex >= 0; --playerIndex)	// Reverse order to make sure player 1 overwrites player 2
+	for (int playerIndex = NUM_PLAYERS - 1; playerIndex >= 0; --playerIndex)	// Reverse order to make sure player 1 overwrites player 2
 	{
 		RealDevice* gamepad = findGamepadBySDLJoystickInstanceId(mPlayers[playerIndex].mPreferredGamepad.mSDLJoystickInstanceId);
 		if (nullptr != gamepad)
@@ -833,9 +835,16 @@ InputConfig::DeviceDefinition* InputManager::getDeviceDefinition(const RealDevic
 {
 	if (device.mType == InputConfig::DeviceType::KEYBOARD)
 	{
-		static_assert(NUM_PLAYERS == 2);
-		const int keyboardIndex = (&device == &mKeyboards[1]) ? 1 : 0;
-		const std::string key = (keyboardIndex == 0) ? "Keyboard1" : "Keyboard2";
+		size_t keyboardIndex = 0;
+		for (size_t k = 1; k < NUM_PLAYERS; ++k)
+		{
+			if (&device == &mKeyboards[k])
+			{
+				keyboardIndex = k;
+				break;
+			}
+		}
+		const std::string& key = KEYBOARD_DEVICE_NAMES[keyboardIndex];
 		return getInputDeviceDefinitionByIdentifier(key);
 	}
 	else
