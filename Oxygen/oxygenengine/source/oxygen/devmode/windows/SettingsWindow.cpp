@@ -33,7 +33,8 @@ namespace
 	std::vector<ExternalCodeEditor> buildExternalCodeEditorsList()
 	{
 		std::vector<ExternalCodeEditor> editors;
-		Configuration::ExternalCodeEditor& config = Configuration::instance().mDevMode.mExternalCodeEditor;
+		Configuration& config = Configuration::instance();
+		Configuration::ExternalCodeEditor& editorConfig = config.mDevMode.mExternalCodeEditor;
 
 	#if defined(PLATFORM_WINDOWS)
 		{
@@ -41,8 +42,8 @@ namespace
 			editor.mName = "Visual Studio Code";
 			editor.mExecutableName = "Code.exe";
 			editor.mConfigType = "vscode";
-			editor.mConfigPathVariable = &config.mVisualStudioCodePath;
-			editor.mDefaultPath = Configuration::instance().mAppDataPath + L"../../Local/Programs/Microsoft VS Code/Code.exe";
+			editor.mConfigPathVariable = &editorConfig.mVisualStudioCodePath;
+			editor.mDefaultPath = config.mAppDataPath + L"../../Local/Programs/Microsoft VS Code/Code.exe";
 			FTX::FileSystem->normalizePath(editor.mDefaultPath, false);
 		}
 
@@ -51,7 +52,7 @@ namespace
 			editor.mName = "Notepad++";
 			editor.mExecutableName = "Notepad++.exe";
 			editor.mConfigType = "npp";
-			editor.mConfigPathVariable = &config.mNotepadPlusPlusPath;
+			editor.mConfigPathVariable = &editorConfig.mNotepadPlusPlusPath;
 			editor.mDefaultPath = L"C:/Program Files/Notepad++/notepad++.exe";
 		}
 	#endif
@@ -63,7 +64,7 @@ namespace
 			editor.mName = "Custom";
 			editor.mExecutableName = "Executable";
 			editor.mConfigType = "custom";
-			editor.mConfigPathVariable = &config.mCustomEditorPath;
+			editor.mConfigPathVariable = &editorConfig.mCustomEditorPath;
 		}
 
 		for (ExternalCodeEditor& editor : editors)
@@ -89,11 +90,12 @@ void SettingsWindow::buildContent()
 	ImGui::SetWindowPos(ImVec2(350.0f, 10.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowSize(ImVec2(500.0f, 250.0f), ImGuiCond_FirstUseEver);
 
+	Configuration& config = Configuration::instance();
+
 	if (ImGui::CollapsingHeader("Game View Window", 0))
 	{
 		ImGuiHelpers::ScopedIndent si;
 
-		Configuration& config = Configuration::instance();
 		ImGui::SliderFloat("Size", &config.mDevMode.mGameViewScale, 0.2f, 1.0f, "%.2f");
 
 		ImGui::SliderFloat("Alignment X", &config.mDevMode.mGameViewAlignment.x, -1.0f, 1.0f, "%.3f");
@@ -107,13 +109,16 @@ void SettingsWindow::buildContent()
 			config.mDevMode.mGameViewAlignment.y = 0.0f;
 	}
 
-	Color& accentColor = Configuration::instance().mDevMode.mUIAccentColor;
+	Color& accentColor = config.mDevMode.mUIAccentColor;
 	if (ImGui::ColorEdit3("Dev Mode UI Accent Color", accentColor.data, ImGuiColorEditFlags_NoInputs))
 	{
 		ImGuiIntegration::refreshImGuiStyle();
 	}
 
-	ImGui::DragFloat("UI Scale", &ImGui::GetIO().FontGlobalScale, 0.003f, 0.5f, 4.0f, "%.1f");
+	if (ImGui::DragFloat("UI Scale", &config.mDevMode.mUIScale, 0.003f, 0.5f, 4.0f, "%.1f"))
+	{
+		ImGui::GetIO().FontGlobalScale = config.mDevMode.mUIScale;;
+	}
 
 	// External file editor settings
 	//  -> Only really makes sense on desktop platforms
@@ -122,7 +127,7 @@ void SettingsWindow::buildContent()
 	{
 		ImGuiHelpers::ScopedIndent si(8);
 
-		Configuration::ExternalCodeEditor& config = Configuration::instance().mDevMode.mExternalCodeEditor;
+		Configuration::ExternalCodeEditor& editorConfig = config.mDevMode.mExternalCodeEditor;
 
 		// Help marker
 		ImGui::Text("Setup an external text editor for viewing scripts");
@@ -136,9 +141,9 @@ void SettingsWindow::buildContent()
 			ImGui::EndTooltip();
 		}
 
-		if (ImGui::RadioButton("None", config.mActiveType.empty()))
+		if (ImGui::RadioButton("None", editorConfig.mActiveType.empty()))
 		{
-			config.mActiveType.clear();
+			editorConfig.mActiveType.clear();
 		}
 
 		static std::vector<ExternalCodeEditor> editors = buildExternalCodeEditorsList();
@@ -146,10 +151,10 @@ void SettingsWindow::buildContent()
 		{
 			ImGui::PushID(&editor);
 
-			bool active = (config.mActiveType == editor.mConfigType);
+			bool active = (editorConfig.mActiveType == editor.mConfigType);
 			if (ImGui::RadioButton(*String(0, "Use %s", editor.mName.c_str()), active))
 			{
-				config.mActiveType = editor.mConfigType;
+				editorConfig.mActiveType = editor.mConfigType;
 				active = true;
 			}
 
@@ -198,12 +203,12 @@ void SettingsWindow::buildContent()
 			if (editor.mConfigType == "custom")
 			{
 				static ImGuiHelpers::WideInputString argsText;
-				argsText.set(config.mCustomEditorArgs);
+				argsText.set(editorConfig.mCustomEditorArgs);
 
 				if (ImGui::InputText("Arguments Format", argsText.mInternalUTF8, sizeof(argsText.mInternalUTF8)))
 				{
 					argsText.refreshFromInternal();
-					config.mCustomEditorArgs = argsText.get();
+					editorConfig.mCustomEditorArgs = argsText.get();
 				}
 			}
 

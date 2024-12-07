@@ -256,6 +256,10 @@ Configuration::Configuration()
 	mUseAudioThreading = false;
 #endif
 
+#if defined(PLATFORM_ANDROID)
+	// Use a much larger default UI scale on Android, otherwise it's too finicky to interact with ImGui at all
+	mDevMode.mUIScale = 2.0f;
+#endif
 }
 
 void Configuration::initialization()
@@ -532,6 +536,7 @@ void Configuration::saveSettings()
 			{
 				Json::Value uiJson = devModeJson["DevModeUI"];
 
+				uiJson["Scale"] = mDevMode.mUIScale;
 				uiJson["AccentColor"] = rmx::hexString(mDevMode.mUIAccentColor.getARGB32() & 0xffffff, 6);
 
 				devModeJson["DevModeUI"] = uiJson;
@@ -715,6 +720,8 @@ void Configuration::loadDevModeSettings(JsonHelper& rootHelper)
 		if (uiJson.isObject())
 		{
 			JsonHelper uiHelper(uiJson);
+			uiHelper.tryReadFloat("Scale", mDevMode.mUIScale);
+
 			std::string accentColorString;
 			if (uiHelper.tryReadString("AccentColor", accentColorString))
 				mDevMode.mUIAccentColor.setARGB32((uint32)rmx::parseInteger(accentColorString) | 0xff000000);

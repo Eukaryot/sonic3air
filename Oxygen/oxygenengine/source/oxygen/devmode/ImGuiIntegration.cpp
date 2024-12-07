@@ -89,7 +89,9 @@ void ImGuiIntegration::startup()
 			}
 		}
 	}
-	
+
+	ImGui::GetIO().FontGlobalScale = Configuration::instance().mDevMode.mUIScale;
+
 	mRunning = true;
 
 	// Configure default styles
@@ -99,9 +101,6 @@ void ImGuiIntegration::startup()
 	mDevModeMainWindow = new DevModeMainWindow();
 
 #if defined(PLATFORM_ANDROID)
-	// Use a much larger scale on Android, otherwise it's too finicky to interact with ImGui at all
-	ImGui::GetIO().FontGlobalScale = 2.0f;
-
 	// Configure SDL to interpret finger taps as mouse clicks as well for mobile devices
 	SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "1");
 #endif
