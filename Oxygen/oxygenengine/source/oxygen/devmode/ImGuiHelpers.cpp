@@ -66,7 +66,11 @@ namespace ImGuiHelpers
 
 	bool OpenCodeLocation::drawButton()
 	{
-	#if defined(PLATFORM_WINDOWS)
+		const Configuration::ExternalCodeEditor& config = Configuration::instance().mDevMode.mExternalCodeEditor;
+		if (config.mActiveType.empty())
+			return false;
+
+	#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
 		ImGui::SameLine();
 		return ImGui::SmallButton("Open");
 	#else

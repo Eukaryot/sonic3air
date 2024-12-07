@@ -124,12 +124,29 @@ void SettingsWindow::buildContent()
 
 		Configuration::ExternalCodeEditor& config = Configuration::instance().mDevMode.mExternalCodeEditor;
 
+		// Help marker
+		ImGui::Text("Setup an external text editor for viewing scripts");
+		ImGui::SameLine();
+		ImGui::TextDisabled("(?)");
+		if (ImGui::BeginItemTooltip())
+		{
+			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			ImGui::TextUnformatted("When an external text or code editor is set up here, call stack listings for e.g. watch hits in the \"Watches\" window will show \"Open\" buttons. Clicking on one of these will open the respective script file in the selected editor and jump to the correct line.");
+			ImGui::PopTextWrapPos();
+			ImGui::EndTooltip();
+		}
+
+		if (ImGui::RadioButton("None", config.mActiveType.empty()))
+		{
+			config.mActiveType.clear();
+		}
+
 		static std::vector<ExternalCodeEditor> editors = buildExternalCodeEditorsList();
 		for (ExternalCodeEditor& editor : editors)
 		{
 			ImGui::PushID(&editor);
-			bool active = (config.mActiveType == editor.mConfigType);
 
+			bool active = (config.mActiveType == editor.mConfigType);
 			if (ImGui::RadioButton(*String(0, "Use %s", editor.mName.c_str()), active))
 			{
 				config.mActiveType = editor.mConfigType;

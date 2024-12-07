@@ -584,8 +584,10 @@ void PlatformFunctions::openURLExternal(const std::string& url)
 
 bool PlatformFunctions::openApplicationExternal(const std::wstring& path, const std::wstring& arguments, const std::wstring& directory)
 {
-#ifdef PLATFORM_WINDOWS
+#if defined(PLATFORM_WINDOWS)
 	return ::ShellExecuteW(nullptr, L"open", path.c_str(), arguments.c_str(), directory.c_str(), SW_SHOW);
+#elif defined(PLATFORM_LINUX)
+	return system(*WString(path + L" " + arguments).toUTF8());
 #else
 	// Not implemented for other platforms
 	return false;
