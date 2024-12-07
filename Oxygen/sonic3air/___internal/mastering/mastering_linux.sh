@@ -53,7 +53,6 @@ mv "audioremaster.bin" "_master_image_template/data"
 cp -r "data/metadata.json" "_master_image_template/data"
 
 # Copy scripts
-## TODO: This does not work with ENDUSER builds, which is the default for Linux (see CMakeLists.txt)
 cp "saves/scripts.bin" "_master_image_template/data"
 
 

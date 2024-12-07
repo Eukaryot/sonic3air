@@ -55,9 +55,7 @@ void ConfigurationImpl::preLoadInitialization()
 {
 	SharedDatabase::initialize();
 
-#ifndef ENDUSER
 	mCompiledScriptSavePath = L"saves/scripts.bin";
-#endif
 }
 
 bool ConfigurationImpl::loadConfigurationInternal(JsonHelper& jsonHelper)
