@@ -1,12 +1,12 @@
 
-Mastering Enduser Builds
-°°°°°°°°°°°°°°°°°°°°°°°°
+Mastering Packaged Builds
+°°°°°°°°°°°°°°°°°°°°°°°°°
 
 
 Preparations for all versions
 	- Scripts
 		- Review scripts to make sure that debugging stuff and similar is out
-		- Build scripts once by starting S3AIR as a (non-enduser) Release build
+		- Build scripts once by starting S3AIR as a Release build
 	- Update version in "source/version.inc"
 	- Execute "mastering_build_data.bat" under Windows
 	- Commit the results, especially in master image template
