@@ -249,21 +249,10 @@ function void fn0632ca()
 //# address-hook(0x063308) end(0x06331e)
 function void fn063308()
 {
-	// In original game code, there's only the content of the if-block (i.e. if main character is Knuckles) here in this function
-	if (isMainCharacter(CHARACTER_KNUCKLES))
-	{
-		A1 = 0xffff0000 + u16[A0 + 0x46]
-		objA0.animation.sprite = 0
-		if (u8[A1 + 0x22] == 2)
-		{
-			objA0.animation.sprite = 1
-		}
-		Child.DrawSprite()
-	}
-	else
-	{
-		DrawOrUnloadObject()
-	}
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	bool leverDown = (u8[A1 + 0x22] == 2)
+	objA0.animation.sprite = leverDown ? 1 : 0
+	Child.DrawSprite()
 }
 
 
