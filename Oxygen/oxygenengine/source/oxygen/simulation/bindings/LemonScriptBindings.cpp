@@ -359,6 +359,11 @@ namespace
 		return (System_getPlatformFlags() & flag) != 0;
 	}
 
+	bool System_isDevModeActive()
+	{
+		return EngineMain::getDelegate().useDeveloperFeatures();
+	}
+
 	bool System_hasExternalRawData(lemon::StringRef key)
 	{
 		const std::vector<const RawDataCollection::RawData*>& rawDataVector = RawDataCollection::instance().getRawData(key.getHash());
@@ -1051,6 +1056,8 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 		builder.addNativeFunction("System.hasPlatformFlag", lemon::wrap(&System_hasPlatformFlag), defaultFlags)
 			.setParameters("flag");
+
+		builder.addNativeFunction("System.isDevModeActive", lemon::wrap(&System_isDevModeActive), defaultFlags);
 
 
 		// Access external data
