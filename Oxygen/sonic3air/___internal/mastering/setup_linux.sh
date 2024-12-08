@@ -20,6 +20,7 @@ Encoding=UTF-8
 Exec=$basepath2/sonic3air_linux
 Icon=$basepath1/data/icon.png
 Terminal=false
+Categories=Game;
 EOM
 
 # Set executable flag
