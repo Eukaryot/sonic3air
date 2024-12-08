@@ -91,6 +91,21 @@ void ScriptBuildWindow::buildContent()
 					{
 						if (ImGui::TreeNodeEx(&warning, ImGuiTreeNodeFlags_DefaultOpen, "%s", warning.mMessage.c_str()))
 						{
+						#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MAC) || defined(PLATFORM_LINUX)
+							// Context menu
+							if (ImGui::BeginPopupContextItem())
+							{
+								if (ImGui::Button("Copy warning text to clipboard"))
+								{
+									SDL_SetClipboardText(warning.mMessage.c_str());
+									ImGui::CloseCurrentPopup();
+								}
+								ImGui::EndPopup();
+							}
+							ImGui::SetItemTooltip("Right-click for options");
+						#endif
+
+							// List of occurences
 							for (const lemon::CompilerWarning::Occurrence& occurrence : warning.mOccurrences)
 							{
 								if (nullptr != occurrence.mSourceFileInfo)
