@@ -523,6 +523,12 @@
     <ClCompile Include="..\..\source\oxygen\application\gpconnect\GameplayConnector.cpp">
       <Filter>application\gpconnect</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\gpconnect\GameplayClient.cpp">
+      <Filter>application\gpconnect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\gpconnect\GameplayHost.cpp">
+      <Filter>application\gpconnect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -983,6 +989,15 @@
       <Filter>devmode\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\gpconnect\GameplayConnector.h">
+      <Filter>application\gpconnect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\gpconnect\GPCPackets.h">
+      <Filter>application\gpconnect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\gpconnect\GameplayClient.h">
+      <Filter>application\gpconnect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\gpconnect\GameplayHost.h">
       <Filter>application\gpconnect</Filter>
     </ClInclude>
   </ItemGroup>

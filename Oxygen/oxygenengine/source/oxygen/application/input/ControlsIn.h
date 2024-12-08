@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <rmxbase.h>
+#include "oxygen/application/input/InputManager.h"
 
 
 class ControlsIn : public SingleInstance<ControlsIn>
@@ -35,27 +35,30 @@ public:
 		uint16 mCurrentInput = 0;
 		uint16 mPreviousInput = 0;
 		uint16 mIgnoreInput = 0;
+		bool mInputWasInjected = false;
 	};
 
-	static const size_t NUM_GAMEPADS = 2;
+	static const size_t NUM_GAMEPADS = InputManager::NUM_PLAYERS;
 
 public:
 	ControlsIn();
 
-	void startup();
-	void shutdown();
-	void update(bool readControllers);
+	void beginInputUpdate();
+	void endInputUpdate();
+	void injectInput(uint32 padIndex, uint16 inputFlags);
 
 	void setIgnores(uint16 bitmask);
 	void setAllIgnores();
 
+	Gamepad& getGamepad(size_t index);
 	const Gamepad& getGamepad(size_t index) const;
 	inline uint16 getInputPad(size_t index) const  { return getGamepad(index).mCurrentInput; }
 
-	void injectInput(uint32 padIndex, uint16 inputFlags);
-
 	inline bool areGamepadsSwitched() const  { return mGamepadsSwitched; }
 	bool switchGamepads();
+
+private:
+	uint16 getInputFlagsFromController(uint32 padIndex) const;
 
 private:
 	Gamepad mGamepad[NUM_GAMEPADS];

@@ -318,9 +318,6 @@ bool EngineMain::startupEngine()
 	RMX_LOG_INFO("Input initialization...");
 	InputManager::instance().startup();
 
-	RMX_LOG_INFO("Startup of ControlsIn");
-	mInternal.mControlsIn.startup();
-
 	// Audio
 	RMX_LOG_INFO("Audio initialization...");
 	FTX::Audio->initialize(config.mAudioSampleRate, 2, 1024);
@@ -362,7 +359,6 @@ void EngineMain::shutdown()
 		mAudioOut->shutdown();
 		SAFE_DELETE(mAudioOut);
 	}
-	mInternal.mControlsIn.shutdown();
 
 	// Shutdown drawer
 	mDrawer.shutdown();

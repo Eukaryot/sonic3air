@@ -8,7 +8,6 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/application/input/ControlsIn.h"
-#include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/Configuration.h"
 
 
@@ -40,57 +39,48 @@ ControlsIn::ControlsIn()
 	}
 }
 
-void ControlsIn::startup()
+void ControlsIn::beginInputUpdate()
 {
-}
-
-void ControlsIn::shutdown()
-{
-}
-
-void ControlsIn::update(bool readControllers)
-{
-	if (!readControllers)
-		return;
-
-	const bool switchLeftRight = Configuration::instance().mMirrorMode;
-
-	// Update controllers
-	for (int controllerIndex = 0; controllerIndex < NUM_GAMEPADS; ++controllerIndex)
+	// Backup input
+	for (int padIndex = 0; padIndex < NUM_GAMEPADS; ++padIndex)
 	{
-		const uint32 padIndex = (mGamepadsSwitched && controllerIndex < 2) ? (1 - controllerIndex) : controllerIndex;
 		mGamepad[padIndex].mPreviousInput = mGamepad[padIndex].mCurrentInput;
-
-		// Calculate new input flags
-		uint16 inputFlags = 0;
-		for (const auto& pair : inputFlagsLookup[controllerIndex])
-		{
-			if (pair.first->isPressed())
-			{
-				inputFlags |= pair.second;
-			}
-		}
-		if (switchLeftRight)
-		{
-			inputFlags = (inputFlags & 0xfff3) | ((inputFlags & (uint16)Button::LEFT) << 1) | ((inputFlags & (uint16)Button::RIGHT) >> 1);
-		}
-
-		// Remove all inputs from our list of ignored input that are currently not pressed
-		mGamepad[padIndex].mIgnoreInput &= inputFlags;
-
-		// Remove all inputs from actual output that are still ignored
-		inputFlags &= ~mGamepad[padIndex].mIgnoreInput;
-
-		// Assign to emulator input flags
-		mGamepad[padIndex].mCurrentInput = inputFlags;
+		mGamepad[padIndex].mInputWasInjected = false;
 	}
+}
+
+void ControlsIn::endInputUpdate()
+{
+	for (int padIndex = 0; padIndex < NUM_GAMEPADS; ++padIndex)
+	{
+		if (!mGamepad[padIndex].mInputWasInjected)
+		{
+			// Update from actual local controllers
+			mGamepad[padIndex].mCurrentInput = getInputFlagsFromController(padIndex);
+		}
+
+		// Remove all flags from our list of ignored inputs that are currently not pressed
+		mGamepad[padIndex].mIgnoreInput &= mGamepad[padIndex].mCurrentInput;
+
+		// Remove all flags from actual inputs that are still ignored
+		mGamepad[padIndex].mCurrentInput &= ~mGamepad[padIndex].mIgnoreInput;
+	}
+}
+
+void ControlsIn::injectInput(uint32 padIndex, uint16 inputFlags)
+{
+	RMX_ASSERT(padIndex < (uint32)NUM_GAMEPADS, "Invalid pad index " << padIndex);
+
+	mGamepad[padIndex].mPreviousInput = mGamepad[padIndex].mCurrentInput;
+	mGamepad[padIndex].mCurrentInput = inputFlags;
+	mGamepad[padIndex].mInputWasInjected = true;
 }
 
 void ControlsIn::setIgnores(uint16 bitmask)
 {
-	for (int controllerIndex = 0; controllerIndex < NUM_GAMEPADS; ++controllerIndex)
+	for (int padIndex = 0; padIndex < NUM_GAMEPADS; ++padIndex)
 	{
-		mGamepad[controllerIndex].mIgnoreInput = bitmask;
+		mGamepad[padIndex].mIgnoreInput = bitmask;
 	}
 }
 
@@ -99,7 +89,7 @@ void ControlsIn::setAllIgnores()
 	setIgnores(0x0fff);
 }
 
-const ControlsIn::Gamepad& ControlsIn::getGamepad(size_t index) const
+ControlsIn::Gamepad& ControlsIn::getGamepad(size_t index)
 {
 	if (index < NUM_GAMEPADS)
 	{
@@ -112,16 +102,35 @@ const ControlsIn::Gamepad& ControlsIn::getGamepad(size_t index) const
 	}
 }
 
-void ControlsIn::injectInput(uint32 padIndex, uint16 inputFlags)
+const ControlsIn::Gamepad& ControlsIn::getGamepad(size_t index) const
 {
-	RMX_CHECK(padIndex < (uint32)NUM_GAMEPADS, "Invalid controller index", return);
-
-	mGamepad[padIndex].mPreviousInput = mGamepad[padIndex].mCurrentInput;
-	mGamepad[padIndex].mCurrentInput = inputFlags;
+	return const_cast<ControlsIn*>(this)->getGamepad(index);
 }
 
 bool ControlsIn::switchGamepads()
 {
 	mGamepadsSwitched = !mGamepadsSwitched;
 	return mGamepadsSwitched;
+}
+
+uint16 ControlsIn::getInputFlagsFromController(uint32 padIndex) const
+{
+	uint16 inputFlags = 0;
+
+	const uint32 controllerIndex = mGamepadsSwitched ? (1 - padIndex) : padIndex;
+	for (const auto& pair : inputFlagsLookup[controllerIndex])
+	{
+		if (pair.first->isPressed())
+		{
+			inputFlags |= pair.second;
+		}
+	}
+
+	// In mirror mode, exchange left and right
+	if (Configuration::instance().mMirrorMode)
+	{
+		inputFlags = (inputFlags & 0xfff3) | ((inputFlags & (uint16)Button::LEFT) << 1) | ((inputFlags & (uint16)Button::RIGHT) >> 1);
+	}
+
+	return inputFlags;
 }

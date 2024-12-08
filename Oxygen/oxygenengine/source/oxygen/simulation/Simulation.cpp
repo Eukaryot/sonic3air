@@ -356,7 +356,6 @@ void Simulation::update(float timeElapsed)
 bool Simulation::generateFrame()
 {
 	ControlsIn& controlsIn = ControlsIn::instance();
-	GameplayConnector& gameplayConnector = GameplayConnector::instance();
 
 	const bool isGameRecorderPlayback = Configuration::instance().mGameRecorder.mIsPlayback;
 	const bool isGameRecorderRecording = Configuration::instance().mGameRecorder.mIsRecording;
@@ -365,7 +364,6 @@ bool Simulation::generateFrame()
 	const float tickLength = 1.0f / getSimulationFrequency();
 
 	bool completedCurrentFrame = false;
-	bool inputWasInjected = false;
 
 	// Steps to do when beginning a new frame
 	if (beginningNewFrame)
@@ -382,8 +380,10 @@ bool Simulation::generateFrame()
 			recordKeyFrame(0, *this, mGameRecorder, GameRecorder::InputData());
 		}
 
+		controlsIn.beginInputUpdate();
+
 		// Update gameplay connector
-		gameplayConnector.onFrameUpdate(controlsIn, mFrameNumber, inputWasInjected);
+		GameplayConnector::instance().onFrameUpdate(controlsIn, mFrameNumber);
 
 		// If game recorder has input data for the frame transition, then use that
 		//  -> This is particularly relevant for rewinds, namely for the small fast forwards from the previous keyframe
@@ -413,7 +413,6 @@ bool Simulation::generateFrame()
 
 			controlsIn.injectInput(0, result.mInput->mInputs[0]);
 			controlsIn.injectInput(1, result.mInput->mInputs[1]);
-			inputWasInjected = true;
 		}
 
 		// Update input state
@@ -426,11 +425,10 @@ bool Simulation::generateFrame()
 					const InputRecorder::InputState& inputState = mInputRecorder.updatePlayback(mFrameNumber);
 					controlsIn.injectInput(0, inputState.mInputFlags[0]);
 					controlsIn.injectInput(1, inputState.mInputFlags[1]);
-					inputWasInjected = true;
 				}
 			}
 
-			controlsIn.update(!inputWasInjected);
+			controlsIn.endInputUpdate();
 
 			EngineMain::getDelegate().onControlsUpdate();
 

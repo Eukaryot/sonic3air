@@ -33,6 +33,7 @@ public:
 		EMPTY,					// Not connected in any way
 		TCP_READY,				// Has a valid TCP socket, but not further setup yet
 		REQUESTED_CONNECTION,	// Sent a StartConnectionPacket, no response yet (only used on client side)
+		ACCEPTED,				// Accepted connection, but no further packet was received yet (only used on server side)
 		CONNECTED,				// Fully connected
 		DISCONNECTED			// Connection was lost or intentionally disconnected (see DisconnectReason)
 	};

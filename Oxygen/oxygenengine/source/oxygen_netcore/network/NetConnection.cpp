@@ -247,7 +247,7 @@ void NetConnection::acceptIncomingConnectionUDP(ConnectionManager& connectionMan
 {
 	clear();
 
-	mState = State::CONNECTED;
+	mState = State::ACCEPTED;
 	mConnectionManager = &connectionManager;
 	mLocalConnectionID = 0;			// Not yet set, see "addConnection" below
 	mRemoteConnectionID = remoteConnectionID;
@@ -267,7 +267,7 @@ void NetConnection::acceptIncomingConnectionUDP(ConnectionManager& connectionMan
 
 void NetConnection::acceptIncomingConnectionTCP(ConnectionManager& connectionManager, uint16 remoteConnectionID, uint64 currentTimestamp)
 {
-	mState = State::CONNECTED;
+	mState = State::ACCEPTED;
 	mRemoteConnectionID = remoteConnectionID;
 
 	mCurrentTimestamp = currentTimestamp;
@@ -297,6 +297,10 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 	serializer.skip(6);		// Skip low level signature and connection IDs, they got evaluated already
 	if (serializer.getRemaining() <= 0)
 		return;
+
+	// If this is the first packet that the server received after connection was accepted, this turn the connection into a fully connected one
+	if (mState == State::ACCEPTED)
+		mState = State::CONNECTED;
 
 	switch (receivedPacket.mLowLevelSignature)
 	{
