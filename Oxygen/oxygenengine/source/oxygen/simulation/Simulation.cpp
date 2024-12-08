@@ -18,6 +18,7 @@
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/audio/AudioOutBase.h"
+#include "oxygen/application/gpconnect/GameplayConnector.h"
 #include "oxygen/application/input/InputRecorder.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
@@ -355,6 +356,8 @@ void Simulation::update(float timeElapsed)
 bool Simulation::generateFrame()
 {
 	ControlsIn& controlsIn = ControlsIn::instance();
+	GameplayConnector& gameplayConnector = GameplayConnector::instance();
+
 	const bool isGameRecorderPlayback = Configuration::instance().mGameRecorder.mIsPlayback;
 	const bool isGameRecorderRecording = Configuration::instance().mGameRecorder.mIsRecording;
 
@@ -378,6 +381,9 @@ bool Simulation::generateFrame()
 		{
 			recordKeyFrame(0, *this, mGameRecorder, GameRecorder::InputData());
 		}
+
+		// Update gameplay connector
+		gameplayConnector.onFrameUpdate(controlsIn, mFrameNumber, inputWasInjected);
 
 		// If game recorder has input data for the frame transition, then use that
 		//  -> This is particularly relevant for rewinds, namely for the small fast forwards from the previous keyframe
@@ -405,8 +411,8 @@ bool Simulation::generateFrame()
 				}
 			}
 
-			ControlsIn::instance().injectInput(0, result.mInput->mInputs[0]);
-			ControlsIn::instance().injectInput(1, result.mInput->mInputs[1]);
+			controlsIn.injectInput(0, result.mInput->mInputs[0]);
+			controlsIn.injectInput(1, result.mInput->mInputs[1]);
 			inputWasInjected = true;
 		}
 

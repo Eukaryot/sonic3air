@@ -39,7 +39,7 @@ public:
 		mPort(0)
 	{}
 
-	inline SocketAddress(const std::string& ip, uint16 port) :
+	inline SocketAddress(std::string_view ip, uint16 port) :
 		mHasSockAddr(false),
 		mHasIpPort(true),
 		mIP(ip),
@@ -62,7 +62,7 @@ public:
 		mHasIpPort = false;
 	}
 
-	inline void set(const std::string& ip, uint16 port)
+	inline void set(std::string_view ip, uint16 port)
 	{
 		mHasSockAddr = false;
 		mHasIpPort = true;

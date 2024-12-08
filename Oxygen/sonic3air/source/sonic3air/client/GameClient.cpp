@@ -49,7 +49,6 @@ GameClient::GameClient() :
 
 GameClient::~GameClient()
 {
-	Sockets::shutdownSockets();
 }
 
 void GameClient::setupClient()

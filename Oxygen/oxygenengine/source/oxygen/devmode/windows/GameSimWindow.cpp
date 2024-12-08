@@ -12,6 +12,8 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/application/Application.h"
+#include "oxygen/application/gpconnect/GameplayConnector.h"
+#include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/simulation/Simulation.h"
 
 
@@ -105,6 +107,63 @@ void GameSimWindow::buildContent()
 		simulation.setNextSingleStep(true, false);
 	}
 	ImGui::PopItemFlag();
+
+#ifdef DEBUG
+	// TEST: Gameplay connection
+	{
+		ImGui::SeparatorText("Gameplay Connector");
+		ImGuiHelpers::ScopedIndent si;
+
+		GameplayConnector& gameplayConnector = GameplayConnector::instance();
+		bool hostRunning = false;
+
+		switch (gameplayConnector.getRole())
+		{
+			case GameplayConnector::Role::NONE:
+				ImGui::Text("Inactive");
+				break;
+
+			case GameplayConnector::Role::HOST:
+				ImGui::Text("Host: %d connections", gameplayConnector.getConnectionsToClient().size());
+				hostRunning = true;
+				break;
+
+			case GameplayConnector::Role::CLIENT:
+			{
+				switch (gameplayConnector.getConnectionToHost().getState())
+				{
+					case NetConnection::State::EMPTY:				 ImGui::Text("Client: No connection");  break;
+					case NetConnection::State::TCP_READY:			 ImGui::Text("Client: TCP ready");  break;
+					case NetConnection::State::REQUESTED_CONNECTION: ImGui::Text("Client: Requested connection");  break;
+					case NetConnection::State::CONNECTED:			 ImGui::Text("Client: Connected");  break;
+					case NetConnection::State::DISCONNECTED:		 ImGui::Text("Client: Disconnected");  break;
+				}
+				break;
+			}
+		}
+		
+		ImGui::BeginDisabled(gameplayConnector.getRole() == GameplayConnector::Role::HOST);
+		if (ImGui::Button("Start as host"))
+		{
+			gameplayConnector.setupAsHost();
+		}
+		ImGui::EndDisabled();
+
+		ImGui::BeginDisabled(gameplayConnector.getRole() == GameplayConnector::Role::CLIENT);
+		if (ImGui::Button("Join as client"))
+		{
+			gameplayConnector.startConnectToHost("127.0.0.1", GameplayConnector::DEFAULT_PORT);
+		}
+		ImGui::EndDisabled();
+
+		ImGui::BeginDisabled(gameplayConnector.getRole() == GameplayConnector::Role::NONE);
+		if (ImGui::Button("Close connection"))
+		{
+			gameplayConnector.closeConnections();
+		}
+		ImGui::EndDisabled();
+	}
+#endif
 }
 
 #endif

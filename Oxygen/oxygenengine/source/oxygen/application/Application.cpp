@@ -13,6 +13,7 @@
 #include "oxygen/application/GameLoader.h"
 #include "oxygen/application/audio/AudioOutBase.h"
 #include "oxygen/application/audio/AudioPlayer.h"
+#include "oxygen/application/gpconnect/GameplayConnector.h"
 #include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/mainview/GameView.h"
@@ -43,7 +44,8 @@ static const float MOUSE_HIDE_TIME = 1.0f;	// Seconds until mouse cursor gets hi
 Application::Application() :
 	mGameLoader(new GameLoader()),
 	mSimulation(new Simulation()),
-	mSaveStateMenu(new SaveStateMenu())
+	mSaveStateMenu(new SaveStateMenu()),
+	mGameplayConnector(new GameplayConnector())
 {
 	if (hasVirtualGamepad())
 	{
@@ -67,6 +69,8 @@ Application::~Application()
 	delete mGameLoader;
 	delete mSaveStateMenu;
 	delete mSimulation;
+
+	Sockets::shutdownSockets();
 }
 
 void Application::initialize()
@@ -467,6 +471,9 @@ void Application::update(float timeElapsed)
 			mGameSetupScreen = nullptr;
 		}
 	}
+
+	// Update connection
+	mGameplayConnector->updateConnections(timeElapsed);
 
 	// Update drawer
 	EngineMain::instance().getDrawer().updateDrawer(timeElapsed);

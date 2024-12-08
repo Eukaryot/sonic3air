@@ -97,6 +97,9 @@
     <Filter Include="devmode\windows">
       <UniqueIdentifier>{fa83976a-22f3-48e0-9249-ec0580c42843}</UniqueIdentifier>
     </Filter>
+    <Filter Include="application\gpconnect">
+      <UniqueIdentifier>{e96a1c23-873e-4a9d-90f8-d5b2f6ee817d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -516,6 +519,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\devmode\windows\PaletteBrowserWindow.cpp">
       <Filter>devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\gpconnect\GameplayConnector.cpp">
+      <Filter>application\gpconnect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -975,6 +981,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\devmode\windows\PaletteBrowserWindow.h">
       <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\gpconnect\GameplayConnector.h">
+      <Filter>application\gpconnect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
