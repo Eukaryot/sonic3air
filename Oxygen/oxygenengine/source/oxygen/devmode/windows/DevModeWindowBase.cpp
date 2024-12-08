@@ -30,6 +30,18 @@ bool DevModeWindowBase::buildWindow()
 		return false;
 	}
 
+	// Check if window is outside the visible screen
+	// -> We only check the right / bottom side, as ImGui already handles the others
+	{
+		const Vec2f maxPos = Vec2f(FTX::screenSize()) - Vec2f(10.0f);
+		const ImVec2 originalScreenPos = ImGui::GetWindowPos();
+		const ImVec2 screenPos(std::min(originalScreenPos.x, maxPos.x), std::min(originalScreenPos.y, maxPos.y));
+		if (screenPos.x != originalScreenPos.x || screenPos.y != originalScreenPos.y)
+		{
+			ImGui::SetWindowPos(screenPos);
+		}
+	}
+
 	buildContent();
 
 	ImGui::End();
