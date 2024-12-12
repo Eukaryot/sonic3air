@@ -83,7 +83,7 @@ void GameplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 
 		// Limit applied inputs history to 30 frames
 		while (playerConnection->mAppliedInputs.size() > 30)
-			playerConnection->mAppliedInputs.pop_back();
+			playerConnection->mAppliedInputs.pop_front();
 
 		maxNumFrames = std::max(maxNumFrames, playerConnection->mAppliedInputs.size());
 	}

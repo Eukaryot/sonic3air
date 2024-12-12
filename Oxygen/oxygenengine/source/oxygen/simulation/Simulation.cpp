@@ -368,6 +368,10 @@ bool Simulation::generateFrame()
 	// Steps to do when beginning a new frame
 	if (beginningNewFrame)
 	{
+		// Check if we can even begin a new frame
+		if (!GameplayConnector::instance().canBeginNextFrame(mFrameNumber))
+			return false;
+
 		// Tell game instance
 		EngineMain::getDelegate().onPreFrameUpdate();
 

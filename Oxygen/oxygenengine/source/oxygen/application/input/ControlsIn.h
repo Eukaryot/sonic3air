@@ -45,6 +45,8 @@ public:
 
 	void beginInputUpdate();
 	void endInputUpdate();
+
+	uint16 getInputFromController(uint32 padIndex) const;
 	void injectInput(uint32 padIndex, uint16 inputFlags);
 
 	void setIgnores(uint16 bitmask);
@@ -56,9 +58,6 @@ public:
 
 	inline bool areGamepadsSwitched() const  { return mGamepadsSwitched; }
 	bool switchGamepads();
-
-private:
-	uint16 getInputFlagsFromController(uint32 padIndex) const;
 
 private:
 	Gamepad mGamepad[NUM_GAMEPADS];

@@ -26,15 +26,18 @@ public:
 	GameplayConnector();
 	~GameplayConnector();
 
+	inline ConnectionManager& getConnectionManager()		{ return mConnectionManager; }
+
 	inline const GameplayHost* getGameplayHost() const		{ return mGameplayHost; }
 	inline const GameplayClient* getGameplayClient() const	{ return mGameplayClient; }
 
-	bool setupAsHost();
+	bool setupAsHost(uint16 port = DEFAULT_PORT);
 	void startConnectToHost(std::string_view hostIP, uint16 hostPort);
 	void closeConnections();
 
 	void updateConnections(float deltaSeconds);
 
+	bool canBeginNextFrame(uint32 frameNumber);
 	void onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber);
 
 protected:

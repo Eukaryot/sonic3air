@@ -24,14 +24,14 @@ GameplayConnector::~GameplayConnector()
 	closeConnections();
 }
 
-bool GameplayConnector::setupAsHost()
+bool GameplayConnector::setupAsHost(uint16 port)
 {
 	closeConnections();
 
 	Sockets::startupSockets();
-	if (!mUDPSocket.bindToPort(DEFAULT_PORT, USE_IPV6))
+	if (!mUDPSocket.bindToPort(port, USE_IPV6))
 	{
-		RMX_ASSERT(false, "UDP socket bind to port " << DEFAULT_PORT << " failed");
+		RMX_ASSERT(false, "UDP socket bind to port " << port << " failed");
 		return false;
 	}
 
@@ -65,6 +65,15 @@ void GameplayConnector::updateConnections(float deltaSeconds)
 
 	updateReceivePackets(mConnectionManager);
 	mConnectionManager.updateConnections(getCurrentTimestamp());
+}
+
+bool GameplayConnector::canBeginNextFrame(uint32 frameNumber)
+{
+	if (nullptr != mGameplayClient)
+	{
+		return mGameplayClient->canBeginNextFrame(frameNumber);
+	}
+	return true;
 }
 
 void GameplayConnector::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)

@@ -30,10 +30,20 @@ public:
 
 	void startConnection(std::string_view hostIP, uint16 hostPort, uint64 timestamp);
 
+	bool canBeginNextFrame(uint32 frameNumber);
 	void onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber);
 	bool onReceivedPacket(ReceivedPacketEvaluation& evaluation);
 
 private:
+	struct ReceivedFrame
+	{
+		uint16 mInputByPlayer[2] = { 0 };
+	};
+
+private:
 	ConnectionManager& mConnectionManager;
 	HostConnection mHostConnection;
+
+	std::deque<ReceivedFrame> mReceivedFrames;
+	uint32 mLatestFrameNumber = 0;
 };

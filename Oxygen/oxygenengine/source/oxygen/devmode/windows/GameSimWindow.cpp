@@ -18,10 +18,18 @@
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/simulation/Simulation.h"
 
+// TEST
+#include "oxygen/application/gpconnect/SingleRequest.h"
+#include "oxygen_netcore/serverclient/Packets.h"
+
 
 GameSimWindow::GameSimWindow() :
 	DevModeWindowBase("Game", Category::GAME_CONTROLS, ImGuiWindowFlags_AlwaysAutoResize)
 {
+#ifdef DEBUG
+	// Just for testing
+	mIsWindowOpen = true;
+#endif
 }
 
 void GameSimWindow::buildContent()
@@ -146,9 +154,27 @@ void GameSimWindow::buildContent()
 		ImGui::EndDisabled();
 
 		ImGui::BeginDisabled(nullptr != gameplayConnector.getGameplayClient());
-		if (ImGui::Button("Join as client"))
 		{
-			gameplayConnector.startConnectToHost("127.0.0.1", GameplayConnector::DEFAULT_PORT);
+			static char ipBuffer[32] = "127.0.0.1";
+			static int port = GameplayConnector::DEFAULT_PORT;
+			if (ImGui::Button("Join as client"))
+			{
+				gameplayConnector.startConnectToHost(ipBuffer, port);
+			}
+
+			ImGui::SameLine();
+			ImGui::Text(" IP:");
+			ImGui::SameLine();
+			ImGui::PushItemWidth(90);
+			ImGui::InputText("##IP", ipBuffer, 32);
+			ImGui::PopItemWidth();
+
+			ImGui::SameLine();
+			ImGui::Text("Port:");
+			ImGui::SameLine();
+			ImGui::PushItemWidth(50);
+			ImGui::InputInt("##Port", &port, 0, 0, ImGuiInputTextFlags_CharsDecimal);
+			ImGui::PopItemWidth();
 		}
 		ImGui::EndDisabled();
 
@@ -158,6 +184,36 @@ void GameSimWindow::buildContent()
 			gameplayConnector.closeConnections();
 		}
 		ImGui::EndDisabled();
+	}
+
+	// TEST: Retrieve own external address
+	{
+		ImGui::SeparatorText("External Address");
+		ImGuiHelpers::ScopedIndent si;
+
+		static network::GetExternalAddressRequest request;
+		static SingleRequest singleRequest;
+
+		if (singleRequest.getState() == SingleRequest::State::INACTIVE)
+		{
+			ImGui::Text("Ready");
+		}
+		else if (singleRequest.getState() == SingleRequest::State::FINISHED)
+		{
+			ImGui::Text("Received address: IP: %s, Port: %d", request.mResponse.mIP.c_str(), request.mResponse.mPort);
+		}
+		else
+		{
+			ImGui::Text("In progress...");
+			singleRequest.updateRequest();
+		}
+
+		if (ImGui::Button("Start"))
+		{
+			// TODO: Replace this hard-coded address
+			ImGui::SameLine();
+			singleRequest.startRequest("gameserver.sonic3air.org", 21094, request, GameplayConnector::instance().getConnectionManager());
+		}
 	}
 #endif
 }

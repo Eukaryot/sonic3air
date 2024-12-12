@@ -34,6 +34,7 @@
     <ClCompile Include="..\..\source\oxygen\application\gpconnect\GameplayClient.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\gpconnect\GameplayConnector.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\gpconnect\GameplayHost.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\gpconnect\SingleRequest.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\ControlsIn.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\InputConfig.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\InputManager.cpp" />
@@ -182,6 +183,7 @@
     <ClInclude Include="..\..\source\oxygen\application\gpconnect\GameplayConnector.h" />
     <ClInclude Include="..\..\source\oxygen\application\gpconnect\GameplayHost.h" />
     <ClInclude Include="..\..\source\oxygen\application\gpconnect\GPCPackets.h" />
+    <ClInclude Include="..\..\source\oxygen\application\gpconnect\SingleRequest.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\ControlsIn.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\InputConfig.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\InputManager.h" />

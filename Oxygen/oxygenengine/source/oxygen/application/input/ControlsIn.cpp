@@ -56,7 +56,7 @@ void ControlsIn::endInputUpdate()
 		if (!mGamepad[padIndex].mInputWasInjected)
 		{
 			// Update from actual local controllers
-			mGamepad[padIndex].mCurrentInput = getInputFlagsFromController(padIndex);
+			mGamepad[padIndex].mCurrentInput = getInputFromController(padIndex);
 		}
 
 		// Remove all flags from our list of ignored inputs that are currently not pressed
@@ -65,6 +65,28 @@ void ControlsIn::endInputUpdate()
 		// Remove all flags from actual inputs that are still ignored
 		mGamepad[padIndex].mCurrentInput &= ~mGamepad[padIndex].mIgnoreInput;
 	}
+}
+
+uint16 ControlsIn::getInputFromController(uint32 padIndex) const
+{
+	uint16 inputFlags = 0;
+
+	const uint32 controllerIndex = mGamepadsSwitched ? (1 - padIndex) : padIndex;
+	for (const auto& pair : inputFlagsLookup[controllerIndex])
+	{
+		if (pair.first->isPressed())
+		{
+			inputFlags |= pair.second;
+		}
+	}
+
+	// In mirror mode, exchange left and right
+	if (Configuration::instance().mMirrorMode)
+	{
+		inputFlags = (inputFlags & 0xfff3) | ((inputFlags & (uint16)Button::LEFT) << 1) | ((inputFlags & (uint16)Button::RIGHT) >> 1);
+	}
+
+	return inputFlags;
 }
 
 void ControlsIn::injectInput(uint32 padIndex, uint16 inputFlags)
@@ -111,26 +133,4 @@ bool ControlsIn::switchGamepads()
 {
 	mGamepadsSwitched = !mGamepadsSwitched;
 	return mGamepadsSwitched;
-}
-
-uint16 ControlsIn::getInputFlagsFromController(uint32 padIndex) const
-{
-	uint16 inputFlags = 0;
-
-	const uint32 controllerIndex = mGamepadsSwitched ? (1 - padIndex) : padIndex;
-	for (const auto& pair : inputFlagsLookup[controllerIndex])
-	{
-		if (pair.first->isPressed())
-		{
-			inputFlags |= pair.second;
-		}
-	}
-
-	// In mirror mode, exchange left and right
-	if (Configuration::instance().mMirrorMode)
-	{
-		inputFlags = (inputFlags & 0xfff3) | ((inputFlags & (uint16)Button::LEFT) << 1) | ((inputFlags & (uint16)Button::RIGHT) >> 1);
-	}
-
-	return inputFlags;
 }
