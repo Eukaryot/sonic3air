@@ -188,6 +188,8 @@ bool Server::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 	// Go through sub-systems
 	if (mChannels.onReceivedRequestQuery(evaluation))
 		return true;
+	if (mNetplaySetup.onReceivedRequestQuery(evaluation))
+		return true;
 	if (mUpdateCheck.onReceivedRequestQuery(evaluation))
 		return true;
 

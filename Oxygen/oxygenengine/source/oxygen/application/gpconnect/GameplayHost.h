@@ -10,6 +10,7 @@
 
 #include "oxygen_netcore/network/ConnectionListener.h"
 #include "oxygen_netcore/network/NetConnection.h"
+#include "oxygen_netcore/serverclient/NetplaySetupPackets.h"
 
 #include "oxygen/application/gpconnect/GPCPackets.h"
 
@@ -20,6 +21,14 @@ class GameplayConnector;
 class GameplayHost
 {
 public:
+	enum class State
+	{
+		IDLE,			// Not started anything yet, usually waiting for a game server connection
+		REGISTERED,		// Sent registration to game server, now waiting for a client to join with a "ConnectToNetplayPacket"
+		RUNNING,		// Connection to client established
+		FAILED
+	};
+
 	struct PlayerConnection : public NetConnection
 	{
 		uint8 mPlayerIndex = 0;
@@ -37,13 +46,18 @@ public:
 	NetConnection* createNetConnection(const SocketAddress& senderAddress);
 	void destroyNetConnection(NetConnection& connection);
 
-	void onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber);
+	void updateConnection(float deltaSeconds);
+	bool onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluation);
 
+	void onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber);
 	bool onReceivedPacket(ReceivedPacketEvaluation& evaluation);
 
 private:
 	ConnectionManager& mConnectionManager;
 	GameplayConnector& mGameplayConnector;
+	State mState = State::IDLE;
+
+	network::RegisterForNetplayRequest mRegistrationRequest;
 
 	std::vector<PlayerConnection*> mPlayerConnections;
 };

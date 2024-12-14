@@ -23,39 +23,37 @@ namespace network
 	};
 
 
-	// Sent from the netplay host to the server
-	class RegisterNetplayHostPacket : public highlevel::PacketBase
+	class RegisterForNetplayRequest : public highlevel::RequestBase
 	{
-		HIGHLEVEL_PACKET_DEFINE_PACKET_TYPE("RegisterNetplayHostPacket");
-
-		uint64 mSessionID = 0;
-		std::string mGameSocketExternalIP;
-		uint16 mGameSocketExternalPort = 0;
-
-		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
+		struct QueryData
 		{
-			serializer.serialize(mSessionID);
-			serializer.serialize(mGameSocketExternalIP, 64);
-			serializer.serialize(mGameSocketExternalPort);
-		}
-	};
+			bool mIsHost = false;
+			uint64 mSessionID = 0;
+			std::string mGameSocketExternalIP;
+			uint16 mGameSocketExternalPort = 0;
 
+			inline void serializeData(VectorBinarySerializer& serializer, uint8 protocolVersion)
+			{
+				serializer.serialize(mIsHost);
+				serializer.serialize(mSessionID);
+				serializer.serialize(mGameSocketExternalIP, 64);
+				serializer.serialize(mGameSocketExternalPort);
+			}
+		};
 
-	// Sent from the netplay client to the server
-	class RegisterNetplayClientPacket : public highlevel::PacketBase
-	{
-		HIGHLEVEL_PACKET_DEFINE_PACKET_TYPE("RegisterNetplayClientPacket");
-
-		uint64 mSessionID = 0;
-		std::string mGameSocketExternalIP;
-		uint16 mGameSocketExternalPort = 0;
-
-		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
+		struct ResponseData
 		{
-			serializer.serialize(mSessionID);
-			serializer.serialize(mGameSocketExternalIP, 64);
-			serializer.serialize(mGameSocketExternalPort);
-		}
+			bool mSuccess = true;
+			uint64 mSessionID = 0;
+
+			inline void serializeData(VectorBinarySerializer& serializer, uint8 protocolVersion)
+			{
+				serializer.serialize(mSuccess);
+				serializer.serialize(mSessionID);
+			}
+		};
+
+		HIGHLEVEL_REQUEST_DEFINE_FUNCTIONALITY("RegisterForNetplayRequest")
 	};
 
 
@@ -75,6 +73,23 @@ namespace network
 			serializer.serializeAs<uint8>(mConnectionType);
 			serializer.serialize(mConnectToIP, 64);
 			serializer.serialize(mConnectToPort);
+		}
+	};
+
+
+	// Sent between host and client
+	struct PunchthroughConnectionlessPacket : public lowlevel::PacketBase
+	{
+		uint32 mQueryID = 0;
+		bool mSenderReceivedPackets = false;
+
+		static const constexpr uint16 SIGNATURE = 0x295e;
+		virtual uint16 getSignature() const override  { return SIGNATURE; }
+
+		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
+		{
+			serializer.serialize(mQueryID);
+			serializer.serialize(mSenderReceivedPackets);
 		}
 	};
 

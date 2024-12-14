@@ -8,16 +8,11 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/client/GameClient.h"
-#include "sonic3air/ConfigurationImpl.h"
 
 
 GameClient::GameClient() :
 	mGhostSync(*this),
 	mUpdateCheck(*this)
-{
-}
-
-GameClient::~GameClient()
 {
 }
 
@@ -42,6 +37,7 @@ void GameClient::updateClient(float timeElapsed)
 		{
 			mGhostSync.evaluateServerFeaturesResponse(engineServerClient.getServerFeatures());
 			mUpdateCheck.evaluateServerFeaturesResponse(engineServerClient.getServerFeatures());
+
 			mEvaluatedServerFeatures = true;
 		}
 	}

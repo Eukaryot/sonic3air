@@ -10,6 +10,7 @@
 
 #include "oxygen_netcore/network/ConnectionListener.h"
 #include "oxygen_netcore/network/NetConnection.h"
+#include "oxygen_netcore/serverclient/NetplaySetupPackets.h"
 
 class ControlsIn;
 class GameplayConnector;
@@ -18,11 +19,12 @@ class GameplayConnector;
 class GameplayClient
 {
 public:
-	enum class ConnectionState
+	enum class State
 	{
-		NONE,
-		CONNECT_TO_SERVER,
-		WAIT_FOR_EXTERNAL_ADDRESS,
+		IDLE,			// Not started anything yet, usually waiting for a game server connection
+		REGISTERED,		// Sent registration to game server, now waiting for a "ConnectToNetplayPacket"
+		RUNNING,		// Connection to host established
+		FAILED
 	};
 
 	struct HostConnection : public NetConnection
@@ -36,8 +38,8 @@ public:
 
 	inline const HostConnection& getHostConnection() const  { return mHostConnection; }
 
-	void registerAtServer();
-	void startConnection(std::string_view hostIP, uint16 hostPort);
+	void updateConnection(float deltaSeconds);
+	bool onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluation);
 
 	bool canBeginNextFrame(uint32 frameNumber);
 	void onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber);
@@ -53,7 +55,9 @@ private:
 	ConnectionManager& mConnectionManager;
 	GameplayConnector& mGameplayConnector;
 	HostConnection mHostConnection;
-	ConnectionState mConnectionState = ConnectionState::NONE;
+	State mState = State::IDLE;
+
+	network::RegisterForNetplayRequest mRegistrationRequest;
 
 	std::deque<ReceivedFrame> mReceivedFrames;
 	uint32 mLatestFrameNumber = 0;

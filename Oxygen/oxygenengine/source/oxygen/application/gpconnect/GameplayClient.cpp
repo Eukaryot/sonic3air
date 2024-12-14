@@ -11,6 +11,7 @@
 #include "oxygen/application/gpconnect/GameplayConnector.h"
 #include "oxygen/application/gpconnect/GPCPackets.h"
 #include "oxygen/application/input/ControlsIn.h"
+#include "oxygen/client/EngineServerClient.h"
 
 #include "oxygen_netcore/serverclient/NetplaySetupPackets.h"
 #include "oxygen_netcore/serverclient/Packets.h"
@@ -28,19 +29,68 @@ GameplayClient::~GameplayClient()
 	mHostConnection.clear();
 }
 
-void GameplayClient::registerAtServer()
+void GameplayClient::updateConnection(float deltaSeconds)
 {
-	// TODO: This should not use the host connection, but the normal game server connection (which unfortunately only exists in the S3AIR code...)
-	SocketAddress serverAddress("127.0.0.1", 21094);
-	mHostConnection.startConnectTo(mConnectionManager, serverAddress);
+	EngineServerClient& engineServerClient = EngineServerClient::instance();
 
-	mConnectionState = ConnectionState::CONNECT_TO_SERVER;
+	switch (mState)
+	{
+		case State::IDLE:
+		{
+			// Wait until the server connection is established, server features were queried, and the game socket's external address was retrieved
+			if (!engineServerClient.hasReceivedServerFeatures() || mGameplayConnector.getExternalAddressQuery().mOwnExternalIP.empty())
+				break;
+
+			// TODO: Why not check the server features?
+
+			// Register at game server
+			mRegistrationRequest = network::RegisterForNetplayRequest();
+			mRegistrationRequest.mQuery.mIsHost = false;
+			mRegistrationRequest.mQuery.mSessionID = 0x12345;	// TODO: This is just for testing and should be replaced by a random ID
+			mRegistrationRequest.mQuery.mGameSocketExternalIP = mGameplayConnector.getExternalAddressQuery().mOwnExternalIP;
+			mRegistrationRequest.mQuery.mGameSocketExternalPort = mGameplayConnector.getExternalAddressQuery().mOwnExternalPort;
+			engineServerClient.getServerConnection().sendRequest(mRegistrationRequest);
+
+			mState = State::REGISTERED;
+			break;
+		}
+
+		case State::REGISTERED:
+		{
+			// Check registration
+			if (mRegistrationRequest.hasResponse())
+			{
+				if (!mRegistrationRequest.mResponse.mSuccess)
+				{
+					mState = State::FAILED;
+					break;
+				}
+			}
+			break;
+		}
+
+		default:
+			break;
+	}
 }
 
-void GameplayClient::startConnection(std::string_view hostIP, uint16 hostPort)
+bool GameplayClient::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluation)
 {
-	SocketAddress hostAddress(hostIP, hostPort);
-	mHostConnection.startConnectTo(mConnectionManager, hostAddress);
+	switch (evaluation.mPacketType)
+	{
+		case network::ConnectToNetplayPacket::PACKET_TYPE:
+		{
+			network::ConnectToNetplayPacket packet;
+			if (!evaluation.readPacket(packet))
+				return false;
+
+			// Connect to the given address
+			mHostConnection.startConnectTo(mConnectionManager, SocketAddress(packet.mConnectToIP, packet.mConnectToPort));
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool GameplayClient::canBeginNextFrame(uint32 frameNumber)
@@ -89,18 +139,6 @@ bool GameplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 {
 	switch (evaluation.mPacketType)
 	{
-		// TODO: This packet is expected from the normal game server connection, not the host connection!
-		case network::ConnectToNetplayPacket::PACKET_TYPE:
-		{
-			network::ConnectToNetplayPacket packet;
-			if (!evaluation.readPacket(packet))
-				return false;
-
-			// Connect to the given address
-			mHostConnection.startConnectTo(mConnectionManager, SocketAddress(packet.mConnectToIP, packet.mConnectToPort));
-			return true;
-		}
-
 		case GameStateIncrementPacket::PACKET_TYPE:
 		{
 			GameStateIncrementPacket packet;

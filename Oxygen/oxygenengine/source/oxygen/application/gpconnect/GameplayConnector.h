@@ -38,6 +38,7 @@ public:
 	void closeConnections();
 
 	void updateConnections(float deltaSeconds);
+	bool onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluation);
 
 	bool canBeginNextFrame(uint32 frameNumber);
 	void onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber);

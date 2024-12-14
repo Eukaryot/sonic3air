@@ -15,71 +15,87 @@
 
 bool NetplaySetup::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 {
+	return false;
+}
+
+bool NetplaySetup::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
+{
 	switch (evaluation.mPacketType)
 	{
-		case network::RegisterNetplayHostPacket::PACKET_TYPE:
+		case network::RegisterForNetplayRequest::Query::PACKET_TYPE:
 		{
-			network::RegisterNetplayHostPacket packet;
-			if (!evaluation.readPacket(packet))
+			using Request = network::RegisterForNetplayRequest;
+			Request request;
+			if (!evaluation.readQuery(request))
 				return false;
 
-			if (nullptr != mapFind(mSessions, packet.mSessionID))
+			const uint64 sessionID = request.mQuery.mSessionID;
+
+			request.mResponse.mSessionID = request.mQuery.mSessionID;
+			request.mResponse.mSuccess = true;
+
+			if (request.mQuery.mIsHost)
 			{
-				// TODO: Send back an error (or maybe change the whole packet to be a request instead?)
-				return true;
+				if (nullptr != mapFind(mSessions, sessionID))
+				{
+					// TODO: Send back an error (or maybe change the whole packet to be a request instead?)
+					return true;
+				}
+
+				// Add new session
+				Session& session = mSessions[sessionID];
+				session.mSessionID = sessionID;
+				session.mRegistrationTimestamp = ConnectionManager::getCurrentTimestamp();
+				session.mHostConnection = &evaluation.mConnection;
+
+				session.mHostGameSocketIP = request.mQuery.mGameSocketExternalIP;
+				session.mHostGameSocketPort = request.mQuery.mGameSocketExternalPort;
+			}
+			else
+			{
+				// Check if the session exists and its host is still valid
+				Session* session = mapFind(mSessions, sessionID);
+				if (nullptr != session && session->mHostConnection.isValid())
+				{
+					// Inform the host and the client
+					ParticipantInfo host;
+					host.mGameSocketIP = session->mHostGameSocketIP;
+					host.mGameSocketPort = session->mHostGameSocketPort;
+					host.mConnection = session->mHostConnection;
+
+					ParticipantInfo client;
+					client.mGameSocketIP = request.mQuery.mGameSocketExternalIP;
+					client.mGameSocketPort = request.mQuery.mGameSocketExternalPort;
+					client.mConnection = &evaluation.mConnection;
+
+					connectHostAndClient(*session, host, client);
+				}
+				else
+				{
+					request.mResponse.mSuccess = false;
+				}
 			}
 
-			// Add new session
-			Session& session = mSessions[packet.mSessionID];
-			session.mSessionID = packet.mSessionID;
-			session.mRegistrationTimestamp = ConnectionManager::getCurrentTimestamp();
-			session.mHostConnection = &evaluation.mConnection;
 
-			session.mHostGameSocketIP = packet.mGameSocketExternalIP;
-			session.mHostGameSocketPort = packet.mGameSocketExternalPort;
-
-			return true;
-		}
-	}
-
-	switch (evaluation.mPacketType)
-	{
-		case network::RegisterNetplayClientPacket::PACKET_TYPE:
-		{
-			network::RegisterNetplayClientPacket packet;
-			if (!evaluation.readPacket(packet))
-				return false;
-
-			Session* session = mapFind(mSessions, packet.mSessionID);
-			if (nullptr == session)
-			{
-				// TODO: Send back an error (or maybe make the whole packet into a request instead?)
-				return true;
-			}
-
-			// Check if the host is still valid
-			if (!session->mHostConnection.isValid())
-			{
-				// TODO: Send back an error
-				return false;
-			}
-
-			// Inform the host and the client
-			network::ConnectToNetplayPacket response;
-			response.mSessionID = session->mSessionID;
-			response.mConnectionType = network::NetplayConnectionType::PUNCHTHROUGH;	// TODO: Decide which connection type is the right one
-
-			response.mConnectToIP = packet.mGameSocketExternalIP;
-			response.mConnectToPort = packet.mGameSocketExternalPort;
-			session->mHostConnection->sendPacket(response);
-
-			response.mConnectToIP = session->mHostGameSocketIP;
-			response.mConnectToPort = session->mHostGameSocketPort;
-			evaluation.mConnection.sendPacket(response);
-
-			return true;
+			return evaluation.respond(request);
 		}
 	}
 
 	return false;
+}
+
+void NetplaySetup::connectHostAndClient(Session& session, const ParticipantInfo& host, const ParticipantInfo& client)
+{
+	// Inform the host and the client
+	network::ConnectToNetplayPacket response;
+	response.mSessionID = session.mSessionID;
+	response.mConnectionType = network::NetplayConnectionType::PUNCHTHROUGH;	// TODO: Decide which connection type is the right one
+
+	response.mConnectToIP = client.mGameSocketIP;
+	response.mConnectToPort = client.mGameSocketPort;
+	host.mConnection->sendPacket(response);
+
+	response.mConnectToIP = host.mGameSocketIP;
+	response.mConnectToPort = host.mGameSocketPort;
+	client.mConnection->sendPacket(response);
 }

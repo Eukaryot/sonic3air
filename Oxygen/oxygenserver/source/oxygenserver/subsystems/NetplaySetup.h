@@ -15,6 +15,7 @@ class NetplaySetup
 {
 public:
 	bool onReceivedPacket(ReceivedPacketEvaluation& evaluation);
+	bool onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation);
 
 private:
 	struct Session
@@ -27,5 +28,16 @@ private:
 		uint16 mHostGameSocketPort = 0;
 	};
 
+	struct ParticipantInfo
+	{
+		NetConnection* mConnection = nullptr;
+		std::string_view mGameSocketIP;
+		uint16 mGameSocketPort = 0;
+	};
+
+private:
+	void connectHostAndClient(Session& session, const ParticipantInfo& host, const ParticipantInfo& client);
+
+private:
 	std::unordered_map<uint64, Session> mSessions;
 };

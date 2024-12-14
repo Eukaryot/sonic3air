@@ -22,7 +22,6 @@ class GameClient : public EngineServerClient::Listener, public SingleInstance<Ga
 {
 public:
 	GameClient();
-	~GameClient();
 
 	GhostSync& getGhostSync()		 { return mGhostSync; }
 	UpdateCheck& getUpdateCheck()	 { return mUpdateCheck; }

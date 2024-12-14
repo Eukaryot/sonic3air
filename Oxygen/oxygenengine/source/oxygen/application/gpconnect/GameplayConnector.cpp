@@ -56,7 +56,6 @@ void GameplayConnector::startConnectToHost(std::string_view hostIP, uint16 hostP
 	}
 
 	mGameplayClient = new GameplayClient(mConnectionManager, *this);
-	mGameplayClient->startConnection(hostIP, hostPort);
 
 	retrieveSocketExternalAddress();
 }
@@ -75,6 +74,30 @@ void GameplayConnector::updateConnections(float deltaSeconds)
 		return;
 
 	mConnectionManager.updateConnectionManager();
+
+	if (nullptr != mGameplayHost)
+	{
+		mGameplayHost->updateConnection(deltaSeconds);
+	}
+	if (nullptr != mGameplayClient)
+	{
+		mGameplayClient->updateConnection(deltaSeconds);
+	}
+}
+
+bool GameplayConnector::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluation)
+{
+	if (nullptr != mGameplayHost)
+	{
+		if (mGameplayHost->onReceivedGameServerPacket(evaluation))
+			return true;
+	}
+	if (nullptr != mGameplayClient)
+	{
+		if (mGameplayClient->onReceivedGameServerPacket(evaluation))
+			return true;
+	}
+	return false;
 }
 
 bool GameplayConnector::canBeginNextFrame(uint32 frameNumber)
