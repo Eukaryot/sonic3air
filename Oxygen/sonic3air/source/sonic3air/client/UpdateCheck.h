@@ -39,7 +39,7 @@ public:
 	void startUpdateCheck();
 
 	void performUpdate();
-	void evaluateServerFeaturesResponse(const network::GetServerFeaturesRequest& request);
+	void evaluateServerFeaturesResponse(const network::GetServerFeaturesRequest::Response& response);
 
 private:
 	GameClient& mGameClient;

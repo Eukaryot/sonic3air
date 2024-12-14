@@ -55,6 +55,7 @@
     <ClCompile Include="..\..\source\oxygen\application\overlays\SaveStateMenu.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\overlays\TouchControlsOverlay.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\video\VideoOut.cpp" />
+    <ClCompile Include="..\..\source\oxygen\client\EngineServerClient.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\ImGuiHelpers.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\ImGuiIntegration.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\AudioBrowserWindow.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="..\..\source\oxygen\application\overlays\SaveStateMenu.h" />
     <ClInclude Include="..\..\source\oxygen\application\overlays\TouchControlsOverlay.h" />
     <ClInclude Include="..\..\source\oxygen\application\video\VideoOut.h" />
+    <ClInclude Include="..\..\source\oxygen\client\EngineServerClient.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiDefinitions.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiHelpers.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiIntegration.h" />

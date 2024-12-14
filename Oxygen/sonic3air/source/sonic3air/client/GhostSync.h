@@ -44,7 +44,7 @@ public:
 	bool isActive() const;
 
 	void performUpdate();
-	void evaluateServerFeaturesResponse(const network::GetServerFeaturesRequest& request);
+	void evaluateServerFeaturesResponse(const network::GetServerFeaturesRequest::Response& response);
 	bool onReceivedPacket(ReceivedPacketEvaluation& evaluation);
 
 	void onPostUpdateFrame();

@@ -16,6 +16,7 @@
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
+#include "oxygen/client/EngineServerClient.h"
 #include "oxygen/download/DownloadManager.h"
 #include "oxygen/devmode/ImGuiIntegration.h"
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
@@ -37,23 +38,24 @@
 #endif
 
 
-#if !defined(PLATFORM_MAC) && !defined(PLATFORM_ANDROID)	// Maybe other platforms can be excluded as well? Possibly only Windows and Linux need this
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
 	#define LOAD_APP_ICON_PNG
 #endif
 
 
 struct EngineMain::Internal
 {
-	GameProfile		mGameProfile;
-	InputManager	mInputManager;
-	LogDisplay		mLogDisplay;
-	ModManager		mModManager;
-	ResourcesCache	mResourcesCache;
-	FontCollection	mFontCollection;
-	PersistentData	mPersistentData;
-	VideoOut		mVideoOut;
-	ControlsIn		mControlsIn;
-	DownloadManager mDownloadManager;
+	GameProfile		   mGameProfile;
+	InputManager	   mInputManager;
+	LogDisplay		   mLogDisplay;
+	ModManager		   mModManager;
+	ResourcesCache	   mResourcesCache;
+	FontCollection	   mFontCollection;
+	PersistentData	   mPersistentData;
+	VideoOut		   mVideoOut;
+	ControlsIn		   mControlsIn;
+	DownloadManager	   mDownloadManager;
+	EngineServerClient mEngineServerClient;
 
 #if defined(PLATFORM_ANDROID)
 	AndroidJavaInterface mAndroidJavaInterface;

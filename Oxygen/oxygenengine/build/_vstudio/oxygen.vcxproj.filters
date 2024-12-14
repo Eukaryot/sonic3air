@@ -100,6 +100,9 @@
     <Filter Include="application\gpconnect">
       <UniqueIdentifier>{e96a1c23-873e-4a9d-90f8-d5b2f6ee817d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="client">
+      <UniqueIdentifier>{1811b36a-6788-4a53-86d7-c10213280aef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -531,6 +534,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\helper\JsonSerializer.cpp">
       <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\client\EngineServerClient.cpp">
+      <Filter>client</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1008,6 +1014,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\helper\JsonSerializer.h">
       <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\client\EngineServerClient.h">
+      <Filter>client</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -14,24 +14,7 @@
 #include "oxygen_netcore/serverclient/Packets.h"
 #include "oxygen_netcore/serverclient/ProtocolVersion.h"
 
-
-namespace
-{
-	// TODO: This is just copied from GameClient in S3AIR code, please refactor
-	bool resolveGameServerHostName(const std::string& hostName, std::string& outServerIP)
-	{
-	#if !defined(GAME_CLIENT_USE_WSS)
-		// For UDP/TCP, try the "gameserver" subdomain first
-		//  -> This does not work for emscripten websockets, see implementation of "resolveToIp"
-		//  -> It allows for having different servers for UDP/TCP, and websockets
-		if (Sockets::resolveToIP("gameserver." + hostName, outServerIP))
-			return true;
-	#endif
-
-		// Use the host name itself
-		return Sockets::resolveToIP(hostName, outServerIP);
-	}
-}
+#include "oxygen/client/EngineServerClient.h"
 
 
 GameplayConnector::GameplayConnector() :
@@ -180,7 +163,7 @@ void GameplayConnector::retrieveSocketExternalAddress()
 	mExternalAddressQuery.mQueryID = (uint64)(1 + rand()) + ((uint64)rand() << 16) + ((uint64)rand() << 32) + ((uint64)rand() << 48);
 
 	std::string serverIP;
-	if (!resolveGameServerHostName(Configuration::instance().mGameServerBase.mServerHostName, serverIP))
+	if (!EngineServerClient::resolveGameServerHostName(Configuration::instance().mGameServerBase.mServerHostName, serverIP))
 	{
 		// TODO: Error handling
 		RMX_ASSERT(false, "Failed to resolve game server host name");

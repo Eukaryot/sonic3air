@@ -14,6 +14,8 @@
 
 #include "oxygen_netcore/network/NetConnection.h"
 
+#include "oxygen/client/EngineServerClient.h"
+
 
 namespace
 {
@@ -75,10 +77,11 @@ const network::AppUpdateCheckRequest::Response* UpdateCheck::getResponse() const
 
 void UpdateCheck::startUpdateCheck()
 {
-	if (!mGameClient.isConnected())
+	EngineServerClient& engineServerClient = EngineServerClient::instance();
+	if (!engineServerClient.isConnected())
 	{
 		// Start connecting, the rest is done later in "performUpdate"
-		mGameClient.connectToServer();
+		engineServerClient.connectToServer();
 		mState = State::CONNECTING;
 	}
 	mUpdateRequested = true;
@@ -86,7 +89,8 @@ void UpdateCheck::startUpdateCheck()
 
 void UpdateCheck::performUpdate()
 {
-	if (!mGameClient.isConnected())
+	EngineServerClient& engineServerClient = EngineServerClient::instance();
+	if (!engineServerClient.isConnected())
 	{
 		// TODO: Start a connection if needed
 		return;
@@ -100,7 +104,7 @@ void UpdateCheck::performUpdate()
 		case State::CONNECTING:
 		{
 			// Wait for "evaluateServerFeaturesResponse" to be called, and only check for errors here
-			if (mGameClient.getConnectionState() == GameClient::ConnectionState::FAILED)
+			if (engineServerClient.getConnectionState() == EngineServerClient::ConnectionState::FAILED)
 			{
 				mState = State::FAILED;
 			}
@@ -129,7 +133,7 @@ void UpdateCheck::performUpdate()
 			mAppUpdateCheckRequest.mQuery.mReleaseChannel = ::getReleaseChannelName();
 			mAppUpdateCheckRequest.mQuery.mInstalledAppVersion = BUILD_NUMBER;
 			mAppUpdateCheckRequest.mQuery.mInstalledContentVersion = BUILD_NUMBER;
-			mGameClient.getServerConnection().sendRequest(mAppUpdateCheckRequest);
+			engineServerClient.getServerConnection().sendRequest(mAppUpdateCheckRequest);
 
 			mLastUpdateCheckTimestamp = ConnectionManager::getCurrentTimestamp();
 			mState = State::WAITING_FOR_RESPONSE;
@@ -158,10 +162,10 @@ void UpdateCheck::performUpdate()
 	}
 }
 
-void UpdateCheck::evaluateServerFeaturesResponse(const network::GetServerFeaturesRequest& request)
+void UpdateCheck::evaluateServerFeaturesResponse(const network::GetServerFeaturesRequest::Response& response)
 {
 	bool supportsUpdate = false;
-	for (const network::GetServerFeaturesRequest::Response::Feature& feature : request.mResponse.mFeatures)
+	for (const network::GetServerFeaturesRequest::Response::Feature& feature : response.mFeatures)
 	{
 		if (feature.mIdentifier == "app-update-check" && feature.mVersions.contains(1))
 		{

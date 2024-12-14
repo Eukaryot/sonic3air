@@ -16,6 +16,7 @@
 #include "oxygen_netcore/network/ConnectionListener.h"
 #include "oxygen_netcore/network/NetConnection.h"
 
+#include "oxygen/client/EngineServerClient.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 
 
@@ -39,14 +40,13 @@ void GhostSync::performUpdate()
 		return;
 	}
 
+	EngineServerClient& engineServerClient = EngineServerClient::instance();
+
 	switch (mState)
 	{
 		case State::INACTIVE:
 		{
-			if (!mGameClient.isConnected())
-			{
-				mGameClient.connectToServer();
-			}
+			engineServerClient.connectToServer();
 			mState = State::CONNECTING;
 			break;
 		}
@@ -54,18 +54,9 @@ void GhostSync::performUpdate()
 		case State::CONNECTING:
 		{
 			// Wait for "evaluateServerFeaturesResponse" to be called, and only check for errors here
-			switch (mGameClient.getConnectionState())
+			if (engineServerClient.getConnectionState() == EngineServerClient::ConnectionState::FAILED)
 			{
-				case GameClient::ConnectionState::NOT_CONNECTED:
-					mState = State::INACTIVE;
-					break;
-
-				case GameClient::ConnectionState::FAILED:
-					mState = State::FAILED;
-					break;
-
-				default:
-					break;
+				mState = State::FAILED;
 			}
 			break;
 		}
@@ -78,7 +69,7 @@ void GhostSync::performUpdate()
 				// Join channel
 				mJoinChannelRequest.mQuery.mChannelName = "sonic3air-ghostsync-" + ConfigurationImpl::instance().mGameServerImpl.mGhostSync.mChannelName + "-" + subChannelName;
 				mJoinChannelRequest.mQuery.mChannelHash = (uint32)rmx::getMurmur2_64(mJoinChannelRequest.mQuery.mChannelName);
-				mGameClient.getServerConnection().sendRequest(mJoinChannelRequest);
+				engineServerClient.getServerConnection().sendRequest(mJoinChannelRequest);
 
 				mJoiningSubChannelName = subChannelName;
 				mState = State::JOINING_CHANNEL;
@@ -111,7 +102,7 @@ void GhostSync::performUpdate()
 			if (mJoiningSubChannelName != subChannelName)
 			{
 				mLeaveChannelRequest.mQuery.mChannelHash = mJoinedChannelHash;
-				mGameClient.getServerConnection().sendRequest(mLeaveChannelRequest);
+				engineServerClient.getServerConnection().sendRequest(mLeaveChannelRequest);
 
 				mJoiningSubChannelName = nullptr;
 				mState = State::LEAVING_CHANNEL;
@@ -138,10 +129,10 @@ void GhostSync::performUpdate()
 	}
 }
 
-void GhostSync::evaluateServerFeaturesResponse(const network::GetServerFeaturesRequest& request)
+void GhostSync::evaluateServerFeaturesResponse(const network::GetServerFeaturesRequest::Response& response)
 {
 	bool supportsUpdate = false;
-	for (const network::GetServerFeaturesRequest::Response::Feature& feature : request.mResponse.mFeatures)
+	for (const network::GetServerFeaturesRequest::Response::Feature& feature : response.mFeatures)
 	{
 		if (feature.mIdentifier == "channel-broadcasting" && feature.mVersions.contains(1))
 		{
@@ -294,7 +285,7 @@ void GhostSync::updateSending()
 		packet.mChannelHash = mJoinedChannelHash;
 		packet.mMessageType = GHOSTSYNC_BROADCAST_MESSAGE_TYPE;
 		packet.mMessageVersion = GHOSTSYNC_BROADCAST_MESSAGE_VERSION;
-		mGameClient.getServerConnection().sendPacket(packet, NetConnection::SendFlags::UNRELIABLE);
+		EngineServerClient::instance().getServerConnection().sendPacket(packet, NetConnection::SendFlags::UNRELIABLE);
 
 		mOwnUnsentGhostData.clear();
 	}
