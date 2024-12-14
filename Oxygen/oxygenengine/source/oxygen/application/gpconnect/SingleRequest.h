@@ -31,9 +31,6 @@ public:
 	void updateRequest();
 
 private:
-	uint64 getCurrentTimestamp() const;
-
-private:
 	State mState = State::INACTIVE;
 	highlevel::RequestBase* mRequest = nullptr;
 	NetConnection mConnection;

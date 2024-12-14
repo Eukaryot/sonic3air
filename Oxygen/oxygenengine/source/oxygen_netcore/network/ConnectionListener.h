@@ -22,6 +22,19 @@ namespace highlevel
 //  - They also feature some easy-of-use functions to simplify the code in the listener implementation
 
 
+struct ConnectionlessPacketEvaluation
+{
+	ConnectionManager& mConnectionManager;
+	SocketAddress mSenderAddress;
+	uint16 mLowLevelSignature = 0;
+	VectorBinarySerializer& mSerializer;
+
+	inline ConnectionlessPacketEvaluation(ConnectionManager& connectionManager, const SocketAddress& senderAddress, uint16 lowLevelSignature, VectorBinarySerializer& serializer) :
+		mConnectionManager(connectionManager), mSenderAddress(senderAddress), mLowLevelSignature(lowLevelSignature), mSerializer(serializer)
+	{}
+};
+
+
 struct ReceivedPacketEvaluation
 {
 	NetConnection& mConnection;
@@ -77,8 +90,12 @@ struct ReceivedRequestEvaluation
 
 struct ConnectionListenerInterface
 {
-	virtual bool onReceivedPacket(ReceivedPacketEvaluation& evaluation)			  { return false; }
-	virtual bool onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)	  { return false; }
-	virtual void onReceivedRequestResponse(ReceivedRequestEvaluation& evaluation) {}
-	virtual void onReceivedRequestError(ReceivedRequestEvaluation& evaluation)	  {}
+	virtual NetConnection* createNetConnection(ConnectionManager& connectionManager, const SocketAddress& senderAddress) = 0;
+	virtual void destroyNetConnection(NetConnection& connection) = 0;
+
+	virtual bool onReceivedConnectionlessPacket(ConnectionlessPacketEvaluation& evaluation)	{ return false; }
+	virtual bool onReceivedPacket(ReceivedPacketEvaluation& evaluation)						{ return false; }
+	virtual bool onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)				{ return false; }
+	virtual void onReceivedRequestResponse(ReceivedRequestEvaluation& evaluation)			{}
+	virtual void onReceivedRequestError(ReceivedRequestEvaluation& evaluation)				{}
 };

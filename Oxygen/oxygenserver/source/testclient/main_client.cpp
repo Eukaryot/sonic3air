@@ -8,10 +8,10 @@
 
 #define RMX_LIB
 
+#include "oxygen_netcore/network/ConnectionListener.h"
 #include "oxygen_netcore/network/ConnectionManager.h"
-#include "oxygen_netcore/network/RequestBase.h"
 #include "oxygen_netcore/network/NetConnection.h"
-#include "oxygen_netcore/network/ServerClientBase.h"
+#include "oxygen_netcore/network/RequestBase.h"
 #include "oxygen_netcore/serverclient/Packets.h"
 #include "oxygen_netcore/serverclient/ProtocolVersion.h"
 
@@ -21,7 +21,7 @@
 #include <thread>
 
 
-class TestClient : public ServerClientBase
+class TestClient : public ConnectionListenerInterface
 {
 public:
 	void runClient();
@@ -106,29 +106,27 @@ void TestClient::runClient()
 			RMX_ERROR("Unable to resolve server name " << SERVER_NAME, return);
 		serverAddress.set(serverIP, connectionManager.hasUDPSocket() ? UDP_SERVER_PORT : TCP_SERVER_PORT);
 	}
-	if (!mConnection.startConnectTo(connectionManager, serverAddress, getCurrentTimestamp()))
+	if (!mConnection.startConnectTo(connectionManager, serverAddress))
 		RMX_ERROR("Starting a connection failed", return);
 
 	mState = State::WAITING_FOR_CONNECTION;
 
-	uint64 lastTimestamp = getCurrentTimestamp();
+	uint64 lastTimestamp = ConnectionManager::getCurrentTimestamp();
 	uint64 lastMessageTimestamp = 0;
 	while (true)
 	{
 		if (mConnection.getState() == NetConnection::State::EMPTY)
 			break;
 
-		const uint64 currentTimestamp = getCurrentTimestamp();
+		const uint64 currentTimestamp = ConnectionManager::getCurrentTimestamp();
 		const uint64 millisecondsElapsed = currentTimestamp - lastTimestamp;
 		lastTimestamp = currentTimestamp;
 
 		// Check for new packets
-		if (!updateReceivePackets(connectionManager))
+		if (!connectionManager.updateConnectionManager())
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
-
-		connectionManager.updateConnections(currentTimestamp);
 
 		// Update client state
 		updateClient();

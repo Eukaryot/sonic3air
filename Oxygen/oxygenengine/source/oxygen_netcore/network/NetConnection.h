@@ -19,7 +19,6 @@ class ConnectionManager;
 // UDP-based virtual connection
 class NetConnection
 {
-friend class ServerClientBase;
 friend class ConnectionManager;
 friend class WebSocketClient;
 friend class highlevel::RequestBase;
@@ -83,8 +82,8 @@ public:
 	uint8 getHighLevelProtocolVersion() const	{ return mHighLevelProtocolVersion; }
 	void setProtocolVersions(uint8 lowLevelProtocolVersion, uint8 highLevelProtocolVersion);
 
-	void setupWithTCPSocket(ConnectionManager& connectionManager, TCPSocket& socketToMove, uint64 currentTimestamp);
-	bool startConnectTo(ConnectionManager& connectionManager, const SocketAddress& remoteAddress, uint64 currentTimestamp);
+	void setupWithTCPSocket(ConnectionManager& connectionManager, TCPSocket& socketToMove);
+	bool startConnectTo(ConnectionManager& connectionManager, const SocketAddress& remoteAddress);
 	bool isConnectedTo(uint16 localConnectionID, uint16 remoteConnectionID, uint64 senderKey) const;
 	void disconnect(DisconnectReason disconnectReason = DisconnectReason::MANUAL);
 	bool receivedAnyUniquePacketIDs() const;
@@ -98,11 +97,11 @@ public:
 	void updateConnection(uint64 currentTimestamp);
 
 private:
-	// Called by ServerClientBase
-	void acceptIncomingConnectionUDP(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey, uint64 currentTimestamp);
-	void acceptIncomingConnectionTCP(ConnectionManager& connectionManager, uint16 remoteConnectionID, uint64 currentTimestamp);
+	// Called by ConnectionManager
+	void acceptIncomingConnectionUDP(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey);
+	void acceptIncomingConnectionTCP(ConnectionManager& connectionManager, uint16 remoteConnectionID);
 	void sendAcceptConnectionPacket();
-	void handleLowLevelPacket(ReceivedPacket& receivedPacket);
+	void handleLowLevelPacket(const ReceivedPacket& receivedPacket);
 
 	// Called by RequestBsae
 	void unregisterRequest(highlevel::RequestBase& request);
@@ -118,7 +117,7 @@ private:
 	bool sendHighLevelPacket(highlevel::PacketBase& packet, SendFlags::Flags flags, uint32& outUniquePacketID);
 	bool sendHighLevelPacket(lowlevel::HighLevelPacket& lowLevelPacket, highlevel::PacketBase& highLevelPacket, SendFlags::Flags flags, uint32& outUniquePacketID);
 
-	void handleHighLevelPacket(ReceivedPacket& receivedPacket, const lowlevel::HighLevelPacket& highLevelPacket, VectorBinarySerializer& serializer, uint32 uniqueResponseID);
+	void handleHighLevelPacket(const ReceivedPacket& receivedPacket, const lowlevel::HighLevelPacket& highLevelPacket, VectorBinarySerializer& serializer, uint32 uniqueResponseID);
 	void processExtractedHighLevelPacket(const ReceivedPacketCache::CacheItem& extracted);
 
 private:

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "oxygen_netcore/network/ServerClientBase.h"
+#include "oxygen_netcore/network/ConnectionListener.h"
 #include "oxygen_netcore/network/ConnectionManager.h"
 
 class ControlsIn;
@@ -16,7 +16,7 @@ class GameplayClient;
 class GameplayHost;
 
 
-class GameplayConnector : public ServerClientBase, public SingleInstance<GameplayConnector>
+class GameplayConnector : public ConnectionListenerInterface, public SingleInstance<GameplayConnector>
 {
 public:
 	static const uint16 DEFAULT_PORT = 28840;
@@ -43,6 +43,8 @@ public:
 protected:
 	virtual NetConnection* createNetConnection(ConnectionManager& connectionManager, const SocketAddress& senderAddress) override;
 	virtual void destroyNetConnection(NetConnection& connection) override;
+
+	virtual bool onReceivedConnectionlessPacket(ConnectionlessPacketEvaluation& evaluation)	override;
 	virtual bool onReceivedPacket(ReceivedPacketEvaluation& evaluation) override;
 
 private:

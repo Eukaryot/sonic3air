@@ -9,8 +9,6 @@
 #include "oxygen/pch.h"
 #include "oxygen/application/gpconnect/SingleRequest.h"
 
-#include <chrono>
-
 
 void SingleRequest::startRequest(const std::string& serverHostName, uint16 serverPort, highlevel::RequestBase& request, ConnectionManager& connectionManager)
 {
@@ -21,12 +19,12 @@ void SingleRequest::startRequest(const std::string& serverHostName, uint16 serve
 
 	mRequest = &request;
 	mState = State::CONNECTION_STARTED;
-	mConnection.startConnectTo(connectionManager, SocketAddress(ip, serverPort), getCurrentTimestamp());
+	mConnection.startConnectTo(connectionManager, SocketAddress(ip, serverPort));
 }
 
 void SingleRequest::updateRequest()
 {
-	mConnection.updateConnection(getCurrentTimestamp());
+	mConnection.updateConnection(ConnectionManager::getCurrentTimestamp());
 
 	switch (mState)
 	{
@@ -55,9 +53,4 @@ void SingleRequest::updateRequest()
 			break;
 		}
 	}
-}
-
-uint64 SingleRequest::getCurrentTimestamp() const
-{
-	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }

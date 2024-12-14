@@ -70,17 +70,15 @@ void GameClient::setupClient()
 
 void GameClient::updateClient(float timeElapsed)
 {
-	const uint64 currentTimestamp = getCurrentTimestamp();
 	if (mServerConnection.getState() != NetConnection::State::EMPTY)
 	{
 		// Check for new packets
-		updateReceivePackets(mConnectionManager);
-		mConnectionManager.updateConnections(currentTimestamp);
+		mConnectionManager.updateConnectionManager();
 	}
 
 	if (mServerConnection.getState() != NetConnection::State::CONNECTED)
 	{
-		updateNotConnected(currentTimestamp);
+		updateNotConnected();
 	}
 	else
 	{
@@ -97,7 +95,7 @@ void GameClient::connectToServer()
 	if (mConnectionState == ConnectionState::NOT_CONNECTED || mConnectionState == ConnectionState::FAILED)
 	{
 		// Start connecting now
-		startConnectingToServer(getCurrentTimestamp());
+		startConnectingToServer();
 	}
 }
 
@@ -108,7 +106,7 @@ bool GameClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 	return false;
 }
 
-void GameClient::startConnectingToServer(uint64 currentTimestamp)
+void GameClient::startConnectingToServer()
 {
 	SocketAddress serverAddress;
 	{
@@ -129,12 +127,12 @@ void GameClient::startConnectingToServer(uint64 currentTimestamp)
 	#endif
 	}
 
-	mServerConnection.startConnectTo(mConnectionManager, serverAddress, currentTimestamp);
-	mLastConnectionAttemptTimestamp = currentTimestamp;
+	mServerConnection.startConnectTo(mConnectionManager, serverAddress);
+	mLastConnectionAttemptTimestamp = ConnectionManager::getCurrentTimestamp();
 	mConnectionState = ConnectionState::CONNECTING;
 }
 
-void GameClient::updateNotConnected(uint64 currentTimestamp)
+void GameClient::updateNotConnected()
 {
 	// TODO: This method certainly needs to handle more cases
 
@@ -160,9 +158,9 @@ void GameClient::updateNotConnected(uint64 currentTimestamp)
 	if (mServerConnection.getState() == NetConnection::State::DISCONNECTED)
 	{
 		// Try connecting once again after 30 seconds
-		if (currentTimestamp > mLastConnectionAttemptTimestamp + 30000)
+		if (ConnectionManager::getCurrentTimestamp() > mLastConnectionAttemptTimestamp + 30000)
 		{
-			startConnectingToServer(currentTimestamp);
+			startConnectingToServer();
 		}
 	}
 }

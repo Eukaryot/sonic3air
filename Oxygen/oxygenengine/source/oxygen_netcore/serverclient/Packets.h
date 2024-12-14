@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "oxygen_netcore/network/LowLevelPackets.h"
 #include "oxygen_netcore/network/VersionRange.h"
 #include "oxygen_netcore/serverclient/ChannelBroadcastPackets.h"
 #include "oxygen_netcore/serverclient/FileTransferPackets.h"
@@ -16,6 +17,43 @@
 // Packets for communication between Oxygen server and client
 namespace network
 {
+
+	// Note that unlike the others, these are a connectionless, low-level packets
+	struct GetExternalAddressConnectionless : public lowlevel::PacketBase
+	{
+		uint8 mPacketVersion = 1;
+		uint64 mQueryID = 0;
+
+		static const constexpr uint16 SIGNATURE = 0x3bcf;
+		virtual uint16 getSignature() const override  { return SIGNATURE; }
+
+		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
+		{
+			serializer.serialize(mPacketVersion);
+			serializer.serialize(mQueryID);
+		}
+	};
+
+	struct ReplyExternalAddressConnectionless : public lowlevel::PacketBase
+	{
+		uint8 mPacketVersion = 1;
+		uint64 mQueryID = 0;
+		std::string mIP;
+		uint16 mPort = 0;
+
+		static const constexpr uint16 SIGNATURE = 0xf151;
+		virtual uint16 getSignature() const override  { return SIGNATURE; }
+
+		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
+		{
+			serializer.serialize(mPacketVersion);
+			serializer.serialize(mQueryID);
+			serializer.serialize(mIP, 64);
+			serializer.serialize(mPort);
+		}
+	};
+
+
 
 	class GetServerFeaturesRequest : public highlevel::RequestBase
 	{

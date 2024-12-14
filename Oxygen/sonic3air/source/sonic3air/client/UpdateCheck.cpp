@@ -115,7 +115,7 @@ void UpdateCheck::performUpdate()
 			mUpdateRequested = false;
 
 			// Don't start a new update check if the last one was in the last 20 seconds (for the same update channel)
-			if (mLastUpdateCheckTimestamp != 0 && mGameClient.getCurrentTimestamp() < mLastUpdateCheckTimestamp + 20 * 1000)
+			if (mLastUpdateCheckTimestamp != 0 && ConnectionManager::getCurrentTimestamp() < mLastUpdateCheckTimestamp + 20 * 1000)
 				break;
 
 			mState = State::SEND_QUERY;
@@ -131,7 +131,7 @@ void UpdateCheck::performUpdate()
 			mAppUpdateCheckRequest.mQuery.mInstalledContentVersion = BUILD_NUMBER;
 			mGameClient.getServerConnection().sendRequest(mAppUpdateCheckRequest);
 
-			mLastUpdateCheckTimestamp = mGameClient.getCurrentTimestamp();
+			mLastUpdateCheckTimestamp = ConnectionManager::getCurrentTimestamp();
 			mState = State::WAITING_FOR_RESPONSE;
 			break;
 		}

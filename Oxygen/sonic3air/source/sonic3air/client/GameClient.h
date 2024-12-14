@@ -11,7 +11,7 @@
 #include "sonic3air/client/GhostSync.h"
 #include "sonic3air/client/UpdateCheck.h"
 
-#include "oxygen_netcore/network/ServerClientBase.h"
+#include "oxygen_netcore/network/ConnectionListener.h"
 #include "oxygen_netcore/network/ConnectionManager.h"
 #include "oxygen_netcore/serverclient/Packets.h"
 
@@ -24,7 +24,7 @@
 #endif
 
 
-class GameClient : public ServerClientBase, public SingleInstance<GameClient>
+class GameClient : public ConnectionListenerInterface, public SingleInstance<GameClient>
 {
 public:
 	enum class ConnectionState
@@ -73,9 +73,9 @@ private:
 	};
 
 private:
-	void startConnectingToServer(uint64 currentTimestamp);
+	void startConnectingToServer();
 
-	void updateNotConnected(uint64 currentTimestamp);
+	void updateNotConnected();
 	void updateConnected();
 
 private:

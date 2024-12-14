@@ -76,7 +76,7 @@ namespace lowlevel
 			// The errors marking with (*) are sent without an actual establishes connection - that means they do not include a proper local connection ID and just re-use the received remote connection ID
 			UNKNOWN					= 0,
 			CONNECTION_INVALID		= 1,	// (*) Received a packet with an unknown connection ID
-			UNSUPPORTED_VERSION		= 2,	// (*) Received a start connection packet that uses protocol versions that can't be supported
+			UNSUPPORTED_VERSION		= 2,	// (*) Received a start connection packet (or other) that uses protocol versions that can't be supported
 			TOO_MANY_CONNECTIONS	= 3,	// (*) Remote server / client has too many active connections already
 		};
 		ErrorCode mErrorCode = ErrorCode::UNKNOWN;

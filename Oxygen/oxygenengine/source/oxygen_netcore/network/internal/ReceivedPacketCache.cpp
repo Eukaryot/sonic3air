@@ -28,7 +28,7 @@ void ReceivedPacketCache::clear()
 	mLastExtractedUniquePacketID = 0;
 }
 
-bool ReceivedPacketCache::enqueuePacket(ReceivedPacket& receivedPacket, const lowlevel::HighLevelPacket& packet, VectorBinarySerializer& serializer, uint32 uniqueRequestID)
+bool ReceivedPacketCache::enqueuePacket(const ReceivedPacket& receivedPacket, const lowlevel::HighLevelPacket& packet, VectorBinarySerializer& serializer, uint32 uniqueRequestID)
 {
 	ReceivedPacketCache::CacheItem* itemToFill = nullptr;
 

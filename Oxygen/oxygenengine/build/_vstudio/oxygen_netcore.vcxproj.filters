@@ -14,9 +14,6 @@
     <ClInclude Include="..\..\source\oxygen_netcore\network\LowLevelPackets.h">
       <Filter>network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen_netcore\network\ServerClientBase.h">
-      <Filter>network</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen_netcore\network\HighLevelPacketBase.h">
       <Filter>network</Filter>
     </ClInclude>
@@ -78,9 +75,6 @@
       <Filter>network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen_netcore\network\ConnectionManager.cpp">
-      <Filter>network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen_netcore\network\ServerClientBase.cpp">
       <Filter>network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen_netcore\network\internal\ReceivedPacketCache.cpp">

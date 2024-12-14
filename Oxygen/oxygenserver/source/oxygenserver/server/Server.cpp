@@ -10,6 +10,7 @@
 #include "oxygenserver/server/Server.h"
 #include "oxygenserver/Configuration.h"
 
+#include "oxygen_netcore/network/ConnectionManager.h"
 #include "oxygen_netcore/network/LagStopwatch.h"
 #include "oxygen_netcore/serverclient/ProtocolVersion.h"
 
@@ -55,28 +56,20 @@ void Server::runServer()
 	mVirtualDirectory.startup();
 
 	// Prepare timing
-	uint64 lastTimestamp = getCurrentTimestamp();
+	uint64 lastTimestamp = ConnectionManager::getCurrentTimestamp();
 	mLastCleanupTimestamp = lastTimestamp;
 
 	// Run the main loop
 	while (true)
 	{
-		const uint64 currentTimestamp = getCurrentTimestamp();
+		const uint64 currentTimestamp = ConnectionManager::getCurrentTimestamp();
 		const uint64 millisecondsElapsed = currentTimestamp - lastTimestamp;
 		lastTimestamp = currentTimestamp;
 
 		// Check for new packets
+		if (!connectionManager.updateConnectionManager())
 		{
-			LAG_STOPWATCH("updateReceivePackets", 2000);
-			if (!updateReceivePackets(connectionManager))
-			{
-				std::this_thread::sleep_for(std::chrono::milliseconds(10));
-			}
-		}
-
-		{
-			LAG_STOPWATCH("updateConnections", 2000);
-			connectionManager.updateConnections(currentTimestamp);
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 
 		// Perform cleanup regularly
@@ -114,6 +107,39 @@ void Server::destroyNetConnection(NetConnection& connection)
 
 	mNetConnectionsByPlayerID.erase(serverNetConnection.getPlayerID());
 	mNetConnectionPool.destroyObject(serverNetConnection);
+}
+
+bool Server::onReceivedConnectionlessPacket(ConnectionlessPacketEvaluation& evaluation)
+{
+	switch (evaluation.mLowLevelSignature)
+	{
+		case network::GetExternalAddressConnectionless::SIGNATURE:
+		{
+			network::GetExternalAddressConnectionless packet;
+			if (!packet.serializePacket(evaluation.mSerializer, 1))
+				return false;
+
+			if (packet.mPacketVersion == 1)
+			{
+				network::ReplyExternalAddressConnectionless reply;
+				reply.mQueryID = packet.mQueryID;
+				reply.mPacketVersion = packet.mPacketVersion;
+				reply.mIP = evaluation.mSenderAddress.getIP();
+				reply.mPort = evaluation.mSenderAddress.getPort();
+				evaluation.mConnectionManager.sendConnectionlessLowLevelPacket(reply, evaluation.mSenderAddress, 0, 0);
+			}
+			else
+			{
+				// Send back an error packet
+				lowlevel::ErrorPacket reply;
+				reply.mErrorCode = lowlevel::ErrorPacket::ErrorCode::UNSUPPORTED_VERSION;
+				evaluation.mConnectionManager.sendConnectionlessLowLevelPacket(reply, evaluation.mSenderAddress, 0, 0);
+			}
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool Server::onReceivedPacket(ReceivedPacketEvaluation& evaluation)

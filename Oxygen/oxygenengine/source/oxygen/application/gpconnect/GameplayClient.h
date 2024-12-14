@@ -28,7 +28,7 @@ public:
 
 	inline const HostConnection& getHostConnection() const  { return mHostConnection; }
 
-	void startConnection(std::string_view hostIP, uint16 hostPort, uint64 timestamp);
+	void startConnection(std::string_view hostIP, uint16 hostPort);
 
 	bool canBeginNextFrame(uint32 frameNumber);
 	void onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber);

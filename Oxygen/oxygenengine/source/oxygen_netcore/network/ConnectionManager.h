@@ -33,6 +33,9 @@ public:
 	DebugSettings mDebugSettings;
 
 public:
+	static uint64 getCurrentTimestamp();
+
+public:
 	ConnectionManager(UDPSocket* udpSocket, TCPSocket* tcpListenSocket, ConnectionListenerInterface& listener, VersionRange<uint8> highLevelProtocolVersionRange);
 
 	inline bool hasUDPSocket() const			  { return (nullptr != mUDPSocket); }
@@ -44,28 +47,19 @@ public:
 
 	inline VersionRange<uint8> getHighLevelProtocolVersionRange() const  { return mHighLevelProtocolVersionRange; }
 
-	void updateConnections(uint64 currentTimestamp);
-	bool updateReceivePackets();	// TODO: This is meant to be executed by a thread later on
-
-	void syncPacketQueues();
-
-	inline bool hasAnyPacket() const  { return !mReceivedPackets.mSyncedQueue.empty(); }
-	ReceivedPacket* getNextReceivedPacket();
-	std::list<TCPSocket>& getIncomingTCPConnections()  { return mIncomingTCPConnections; }
+	bool updateConnectionManager();
 
 	bool sendUDPPacketData(const std::vector<uint8>& data, const SocketAddress& remoteAddress);
 	bool sendTCPPacketData(const std::vector<uint8>& data, TCPSocket& socket, bool isWebSocketServer);
+
 	bool sendConnectionlessLowLevelPacket(lowlevel::PacketBase& lowLevelPacket, const SocketAddress& remoteAddress, uint16 localConnectionID, uint16 remoteConnectionID);
 
-	NetConnection* findConnectionTo(uint64 senderKey) const;
-
 protected:
-	// Only meant to be called from the NetConnection
+	// Only meant to be called from NetConnection
 	void addConnection(NetConnection& connection);
 	void removeConnection(NetConnection& connection);
 	SentPacket& rentSentPacket();
 
-	// Internal
 	void receivedPacketInternal(const std::vector<uint8>& buffer, const SocketAddress& senderAddress, NetConnection* connection);
 
 private:
@@ -77,6 +71,20 @@ private:
 	};
 
 	typedef HandleProvider<uint16, NetConnection*, 16> ConnectionsProvider;
+
+private:
+	void updateConnections(uint64 currentTimestamp);
+	bool updateReceivePacketsInternal();	// TODO: This is meant to be executed by a thread later on
+
+	void syncPacketQueues();
+
+	inline bool hasAnyPacket() const  { return !mReceivedPackets.mSyncedQueue.empty(); }
+	ReceivedPacket* getNextReceivedPacket();
+	std::list<TCPSocket>& getIncomingTCPConnections()  { return mIncomingTCPConnections; }
+
+	void handleReceivedPacket(const ReceivedPacket& receivedPacket);
+	void handleStartConnectionPacket(const ReceivedPacket& receivedPacket);
+	NetConnection* findConnectionTo(uint64 senderKey) const;
 
 private:
 	UDPSocket* mUDPSocket = nullptr;		// Only set if UDP is used (or both UDP and TCP)

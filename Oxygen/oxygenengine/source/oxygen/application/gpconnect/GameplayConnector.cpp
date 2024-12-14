@@ -11,6 +11,7 @@
 #include "oxygen/application/gpconnect/GameplayClient.h"
 #include "oxygen/application/gpconnect/GameplayHost.h"
 
+#include "oxygen_netcore/serverclient/Packets.h"
 #include "oxygen_netcore/serverclient/ProtocolVersion.h"
 
 
@@ -48,7 +49,7 @@ void GameplayConnector::startConnectToHost(std::string_view hostIP, uint16 hostP
 		RMX_ERROR("Socket bind to any port failed", return);
 
 	mGameplayClient = new GameplayClient(mConnectionManager);
-	mGameplayClient->startConnection(hostIP, hostPort, getCurrentTimestamp());
+	mGameplayClient->startConnection(hostIP, hostPort);
 }
 
 void GameplayConnector::closeConnections()
@@ -63,8 +64,7 @@ void GameplayConnector::updateConnections(float deltaSeconds)
 	if (!mUDPSocket.isValid())
 		return;
 
-	updateReceivePackets(mConnectionManager);
-	mConnectionManager.updateConnections(getCurrentTimestamp());
+	mConnectionManager.updateConnectionManager();
 }
 
 bool GameplayConnector::canBeginNextFrame(uint32 frameNumber)
@@ -110,6 +110,23 @@ void GameplayConnector::destroyNetConnection(NetConnection& connection)
 	}
 
 	delete &connection;
+}
+
+bool GameplayConnector::onReceivedConnectionlessPacket(ConnectionlessPacketEvaluation& evaluation)
+{
+	switch (evaluation.mLowLevelSignature)
+	{
+		case network::ReplyExternalAddressConnectionless::SIGNATURE:
+		{
+			network::ReplyExternalAddressConnectionless packet;
+			if (!packet.serializePacket(evaluation.mSerializer, 1))
+				return false;
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool GameplayConnector::onReceivedPacket(ReceivedPacketEvaluation& evaluation)

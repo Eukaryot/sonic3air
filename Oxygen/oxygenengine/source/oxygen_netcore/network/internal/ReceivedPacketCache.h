@@ -20,7 +20,7 @@ public:
 		lowlevel::HighLevelPacket mPacketHeader;
 		uint32 mUniqueRequestID = 0;	// Only used for "lowlevel::RequestResponsePacket"
 		size_t mHeaderSize = 0;
-		ReceivedPacket* mReceivedPacket = nullptr;
+		const ReceivedPacket* mReceivedPacket = nullptr;
 	};
 
 public:
@@ -28,7 +28,7 @@ public:
 
 	void clear();
 
-	bool enqueuePacket(ReceivedPacket& receivedPacket, const lowlevel::HighLevelPacket& packet, VectorBinarySerializer& serializer, uint32 uniqueRequestID);
+	bool enqueuePacket(const ReceivedPacket& receivedPacket, const lowlevel::HighLevelPacket& packet, VectorBinarySerializer& serializer, uint32 uniqueRequestID);
 	bool extractPacket(CacheItem& outExtractionResult);
 
 	inline uint32 getLastExtractedUniquePacketID() const  { return mLastExtractedUniquePacketID; }

@@ -11,6 +11,9 @@
 #include "oxygen/application/gpconnect/GPCPackets.h"
 #include "oxygen/application/input/ControlsIn.h"
 
+#include "oxygen_netcore/network/ConnectionManager.h"
+#include "oxygen_netcore/serverclient/Packets.h"
+
 
 GameplayClient::GameplayClient(ConnectionManager& connectionManager) :
 	mConnectionManager(connectionManager)
@@ -23,10 +26,15 @@ GameplayClient::~GameplayClient()
 	mHostConnection.clear();
 }
 
-void GameplayClient::startConnection(std::string_view hostIP, uint16 hostPort, uint64 timestamp)
+void GameplayClient::startConnection(std::string_view hostIP, uint16 hostPort)
 {
 	SocketAddress serverAddress(hostIP, hostPort);
-	mHostConnection.startConnectTo(mConnectionManager, serverAddress, timestamp);
+	mHostConnection.startConnectTo(mConnectionManager, serverAddress);
+
+	// Retrieve own external address
+	// TODO: This needs to be repeated if necessary
+	network::GetExternalAddressConnectionless packet;
+	mConnectionManager.sendConnectionlessLowLevelPacket(packet, SocketAddress("127.0.0.1", 21094), 0, 0);
 }
 
 bool GameplayClient::canBeginNextFrame(uint32 frameNumber)

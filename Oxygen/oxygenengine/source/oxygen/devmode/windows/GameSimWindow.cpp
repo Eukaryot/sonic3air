@@ -187,6 +187,7 @@ void GameSimWindow::buildContent()
 	}
 
 	// TEST: Retrieve own external address
+#if 0
 	{
 		ImGui::SeparatorText("External Address");
 		ImGuiHelpers::ScopedIndent si;
@@ -215,6 +216,7 @@ void GameSimWindow::buildContent()
 			singleRequest.startRequest("gameserver.sonic3air.org", 21094, request, GameplayConnector::instance().getConnectionManager());
 		}
 	}
+#endif
 #endif
 }
 
