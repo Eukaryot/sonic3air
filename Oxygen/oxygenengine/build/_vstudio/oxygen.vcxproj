@@ -91,6 +91,7 @@
     <ClCompile Include="..\..\source\oxygen\file\PackedFileProvider.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\ZipFileProvider.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\HighResolutionTimer.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\JsonSerializer.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Profiling.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\RandomNumberGenerator.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\TextInputHandler.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="..\..\source\oxygen\file\ZipFileProvider.h" />
     <ClInclude Include="..\..\source\oxygen\helper\DrawerHelper.h" />
     <ClInclude Include="..\..\source\oxygen\helper\HighResolutionTimer.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\JsonSerializer.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Profiling.h" />
     <ClInclude Include="..\..\source\oxygen\helper\RandomNumberGenerator.h" />
     <ClInclude Include="..\..\source\oxygen\helper\TextInputHandler.h" />

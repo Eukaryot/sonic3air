@@ -12,7 +12,7 @@
 
 #include <lemon/compiler/PreprocessorDefinition.h>
 
-class JsonHelper;
+class JsonSerializer;
 
 
 class Configuration
@@ -130,13 +130,16 @@ public:
 
 protected:
 	virtual void preLoadInitialization() = 0;
-	virtual bool loadConfigurationInternal(JsonHelper& jsonHelper) = 0;
-	virtual bool loadSettingsInternal(JsonHelper& jsonHelper, SettingsType settingsType) = 0;
-	virtual void saveSettingsInternal(Json::Value& root, SettingsType settingsType) = 0;
+	virtual bool loadConfigurationInternal(JsonSerializer& jsonSerializer) = 0;
+	virtual bool loadSettingsInternal(JsonSerializer& jsonSerializer, SettingsType settingsType) = 0;
+	virtual void saveSettingsInternal(JsonSerializer& jsonSerializer, SettingsType settingsType) = 0;
 
 private:
-	void loadConfigurationProperties(JsonHelper& rootHelper);
-	void loadDevModeSettings(JsonHelper& rootHelper);
+	void loadConfigurationProperties(JsonSerializer& jsonSerializer);
+
+	void serializeStandardSettings(JsonSerializer& serializer);
+	void serializeDevMode(JsonSerializer& serializer);
+
 	void saveSettingsInput(const std::wstring& filename) const;
 
 public:

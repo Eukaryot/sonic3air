@@ -529,6 +529,9 @@
     <ClCompile Include="..\..\source\oxygen\application\gpconnect\GameplayHost.cpp">
       <Filter>application\gpconnect</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\JsonSerializer.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -1002,6 +1005,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\gpconnect\ExternalAddressQuery.h">
       <Filter>application\gpconnect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\JsonSerializer.h">
+      <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

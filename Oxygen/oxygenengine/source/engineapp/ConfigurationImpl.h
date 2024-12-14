@@ -10,7 +10,7 @@ public:
 
 protected:
 	inline void preLoadInitialization() override {}
-	bool loadConfigurationInternal(JsonHelper& jsonHelper) override;
-	bool loadSettingsInternal(JsonHelper& jsonHelper, SettingsType settingsType) override;
-	inline void saveSettingsInternal(Json::Value& root, SettingsType settingsType) override {}
+	bool loadConfigurationInternal(JsonSerializer& serializer) override;
+	bool loadSettingsInternal(JsonSerializer& serializer, SettingsType settingsType) override;
+	inline void saveSettingsInternal(JsonSerializer& serializer, SettingsType settingsType) override {}
 };

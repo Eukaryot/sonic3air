@@ -10,7 +10,7 @@ ConfigurationImpl::ConfigurationImpl()
 	mScriptOptimizationLevel = 1;
 }
 
-bool ConfigurationImpl::loadConfigurationInternal(JsonHelper& jsonHelper)
+bool ConfigurationImpl::loadConfigurationInternal(JsonSerializer& serializer)
 {
 	// Enable dev mode in any case
 	Configuration::instance().mDevMode.mEnabled = true;
@@ -18,7 +18,7 @@ bool ConfigurationImpl::loadConfigurationInternal(JsonHelper& jsonHelper)
 	return true;
 }
 
-bool ConfigurationImpl::loadSettingsInternal(JsonHelper& jsonHelper, SettingsType settingsType)
+bool ConfigurationImpl::loadSettingsInternal(JsonSerializer& serializer, SettingsType settingsType)
 {
 	return true;
 }

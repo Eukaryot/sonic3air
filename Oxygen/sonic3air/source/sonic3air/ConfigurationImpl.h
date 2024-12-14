@@ -11,6 +11,7 @@
 #include "oxygen/application/Configuration.h"
 
 class GameProfile;
+class JsonSerializer;
 
 
 class ConfigurationImpl : public ::Configuration
@@ -32,12 +33,13 @@ public:
 
 protected:
 	void preLoadInitialization() override;
-	bool loadConfigurationInternal(JsonHelper& jsonHelper) override;
-	bool loadSettingsInternal(JsonHelper& rootHelper, SettingsType settingsType) override;
-	void saveSettingsInternal(Json::Value& root, SettingsType settingsType) override;
+	bool loadConfigurationInternal(JsonSerializer& serializer) override;
+	bool loadSettingsInternal(JsonSerializer& serializer, SettingsType settingsType) override;
+	void saveSettingsInternal(JsonSerializer& serializer, SettingsType settingsType) override;
 
 private:
-	void loadSharedSettingsConfig(JsonHelper& rootHelper);
+	void serializeSettingsInternal(JsonSerializer& serializer);
+	void serializeSharedSettingsConfig(JsonSerializer& serializer);
 
 public:
 	// Audio
