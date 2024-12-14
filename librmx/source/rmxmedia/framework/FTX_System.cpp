@@ -529,7 +529,9 @@ namespace rmx
 	{
 	#ifdef PLATFORM_WINDOWS
 		SDL_SysWMinfo info;
-		SDL_GetWindowWMInfo(mMainWindow, &info);
+		SDL_VERSION(&info.version);
+		if (!SDL_GetWindowWMInfo(mMainWindow, &info))
+			return 0;
 		return (uint64)info.info.win.window;
 	#else
 		// TODO: Implement this
