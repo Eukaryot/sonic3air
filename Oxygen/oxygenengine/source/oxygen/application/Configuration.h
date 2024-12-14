@@ -42,6 +42,14 @@ public:
 		_NUM
 	};
 
+	struct GameServerBase
+	{
+		std::string mServerHostName;
+		int mServerPortUDP = 21094;		// Used by most platforms
+		int mServerPortTCP = 21095;		// Used only as a fallback for UDP
+		int mServerPortWSS = 21096;		// Used by the web version
+	};
+
 	struct ExternalCodeEditor
 	{
 		std::string mActiveType;			// Can be "custom", "vscode", "npp", or empty
@@ -201,6 +209,9 @@ public:
 
 	// Misc
 	bool mMirrorMode = false;
+
+	// Game server
+	GameServerBase mGameServerBase;
 
 	// Internal
 	bool mForceCompileScripts = false;

@@ -8,15 +8,17 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/application/gpconnect/GameplayClient.h"
+#include "oxygen/application/gpconnect/GameplayConnector.h"
 #include "oxygen/application/gpconnect/GPCPackets.h"
 #include "oxygen/application/input/ControlsIn.h"
 
-#include "oxygen_netcore/network/ConnectionManager.h"
+#include "oxygen_netcore/serverclient/NetplaySetupPackets.h"
 #include "oxygen_netcore/serverclient/Packets.h"
 
 
-GameplayClient::GameplayClient(ConnectionManager& connectionManager) :
-	mConnectionManager(connectionManager)
+GameplayClient::GameplayClient(ConnectionManager& connectionManager, GameplayConnector& gameplayConnector) :
+	mConnectionManager(connectionManager),
+	mGameplayConnector(gameplayConnector)
 {
 }
 
@@ -26,15 +28,19 @@ GameplayClient::~GameplayClient()
 	mHostConnection.clear();
 }
 
-void GameplayClient::startConnection(std::string_view hostIP, uint16 hostPort)
+void GameplayClient::registerAtServer()
 {
-	SocketAddress serverAddress(hostIP, hostPort);
+	// TODO: This should not use the host connection, but the normal game server connection (which unfortunately only exists in the S3AIR code...)
+	SocketAddress serverAddress("127.0.0.1", 21094);
 	mHostConnection.startConnectTo(mConnectionManager, serverAddress);
 
-	// Retrieve own external address
-	// TODO: This needs to be repeated if necessary
-	network::GetExternalAddressConnectionless packet;
-	mConnectionManager.sendConnectionlessLowLevelPacket(packet, SocketAddress("127.0.0.1", 21094), 0, 0);
+	mConnectionState = ConnectionState::CONNECT_TO_SERVER;
+}
+
+void GameplayClient::startConnection(std::string_view hostIP, uint16 hostPort)
+{
+	SocketAddress hostAddress(hostIP, hostPort);
+	mHostConnection.startConnectTo(mConnectionManager, hostAddress);
 }
 
 bool GameplayClient::canBeginNextFrame(uint32 frameNumber)
@@ -83,6 +89,18 @@ bool GameplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 {
 	switch (evaluation.mPacketType)
 	{
+		// TODO: This packet is expected from the normal game server connection, not the host connection!
+		case network::ConnectToNetplayPacket::PACKET_TYPE:
+		{
+			network::ConnectToNetplayPacket packet;
+			if (!evaluation.readPacket(packet))
+				return false;
+
+			// Connect to the given address
+			mHostConnection.startConnectTo(mConnectionManager, SocketAddress(packet.mConnectToIP, packet.mConnectToPort));
+			return true;
+		}
+
 		case GameStateIncrementPacket::PACKET_TYPE:
 		{
 			GameStateIncrementPacket packet;
@@ -112,10 +130,6 @@ bool GameplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 					}
 					// Player inputs not included in the packet stay at 0
 				}
-
-				// TODO:
-				//  - Use the input data for the simulation
-				//  - Control simulation speed (incl. possible stops) depending on the last received frame number
 
 				mLatestFrameNumber = packet.mFrameNumber;
 			}

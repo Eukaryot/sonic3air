@@ -39,9 +39,11 @@ public:
 
 	void addPlayerToChannel(Channel& channel, ServerNetConnection& playerConnection);
 	void removePlayerFromAllChannels(ServerNetConnection& playerConnection);
-	void removePlayerFromSingleChannel(Channel& channel, ServerNetConnection& playerConnection);
+	bool removePlayerFromSingleChannel(Channel& channel, ServerNetConnection& playerConnection);
+	void cleanupEmptyChannels();
 
 private:
 	std::unordered_map<uint32, Channel*> mAllChannels;	// Key is the channel ID
+	std::vector<Channel*> mPossiblyEmptyChannels;		// These channels will be destroyed on cleanup if still empty by then
 	ObjectPool<Channel> mChannelPool;
 };

@@ -397,6 +397,20 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 		// Script
 		rootHelper.tryReadInt("ScriptOptimizationLevel", mScriptOptimizationLevel);
 
+		// Game server
+		{
+			const Json::Value& gameServerJson = rootHelper.mJson["GameServer"];
+			if (!gameServerJson.isNull())
+			{
+				// General game server settings
+				JsonHelper gameServerHelper(gameServerJson);
+				gameServerHelper.tryReadString("ServerAddress", mGameServerBase.mServerHostName);
+				gameServerHelper.tryReadInt("ServerPortUDP", mGameServerBase.mServerPortUDP);
+				gameServerHelper.tryReadInt("ServerPortTCP", mGameServerBase.mServerPortTCP);
+				gameServerHelper.tryReadInt("ServerPortWSS", mGameServerBase.mServerPortWSS);
+			}
+		}
+
 		// Dev mode
 		loadDevModeSettings(rootHelper);
 
@@ -520,6 +534,16 @@ void Configuration::saveSettings()
 
 		// Script
 		root["ScriptOptimizationLevel"] = mScriptOptimizationLevel;
+
+		// Game server
+		{
+			Json::Value gameServerJson = root["GameServer"];
+			gameServerJson["ServerAddress"] = mGameServerBase.mServerHostName;
+			gameServerJson["ServerPortUDP"] = mGameServerBase.mServerPortUDP;
+			gameServerJson["ServerPortTCP"] = mGameServerBase.mServerPortTCP;
+			gameServerJson["ServerPortWSS"] = mGameServerBase.mServerPortWSS;
+			root["GameServer"] = gameServerJson;
+		}
 
 		// Dev mode
 		{

@@ -27,6 +27,9 @@
     <ClInclude Include="..\..\source\oxygenserver\server\CrashHandler.h">
       <Filter>server</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygenserver\subsystems\NetplaySetup.h">
+      <Filter>subsystems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygenserver\main_server.cpp" />
@@ -49,6 +52,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygenserver\server\CrashHandler.cpp">
       <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygenserver\subsystems\NetplaySetup.cpp">
+      <Filter>subsystems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

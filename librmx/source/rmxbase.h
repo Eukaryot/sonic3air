@@ -52,6 +52,7 @@
 #include "rmxbase/data/SinglePtr.h"
 #include "rmxbase/data/SmartPtr.h"
 #include "rmxbase/data/GlobalObjectPtr.h"
+#include "rmxbase/data/WeakPtr.h"
 #include "rmxbase/memory/RC4Encryption.h"
 #include "rmxbase/memory/String.h"
 #include "rmxbase/memory/UTF8Conversion.h"

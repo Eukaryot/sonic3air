@@ -147,6 +147,8 @@ bool Server::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 	// Go through sub-systems
 	if (mChannels.onReceivedPacket(evaluation))
 		return true;
+	if (mNetplaySetup.onReceivedPacket(evaluation))
+		return true;
 
 	// Failed
 	return false;

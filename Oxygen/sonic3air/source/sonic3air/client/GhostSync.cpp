@@ -33,7 +33,7 @@ bool GhostSync::isActive() const
 
 void GhostSync::performUpdate()
 {
-	if (!ConfigurationImpl::instance().mGameServer.mGhostSync.mEnabled)
+	if (!ConfigurationImpl::instance().mGameServerImpl.mGhostSync.mEnabled)
 	{
 		// TODO: Undo registrations etc. if already connected before
 		return;
@@ -76,7 +76,7 @@ void GhostSync::performUpdate()
 			if (nullptr != subChannelName)
 			{
 				// Join channel
-				mJoinChannelRequest.mQuery.mChannelName = "sonic3air-ghostsync-" + ConfigurationImpl::instance().mGameServer.mGhostSync.mChannelName + "-" + subChannelName;
+				mJoinChannelRequest.mQuery.mChannelName = "sonic3air-ghostsync-" + ConfigurationImpl::instance().mGameServerImpl.mGhostSync.mChannelName + "-" + subChannelName;
 				mJoinChannelRequest.mQuery.mChannelHash = (uint32)rmx::getMurmur2_64(mJoinChannelRequest.mQuery.mChannelName);
 				mGameClient.getServerConnection().sendRequest(mJoinChannelRequest);
 
@@ -149,7 +149,7 @@ void GhostSync::evaluateServerFeaturesResponse(const network::GetServerFeaturesR
 		}
 	}
 
-	if (supportsUpdate && ConfigurationImpl::instance().mGameServer.mGhostSync.mEnabled)
+	if (supportsUpdate && ConfigurationImpl::instance().mGameServerImpl.mGhostSync.mEnabled)
 	{
 		if (mState <= State::CONNECTING)
 		{
@@ -307,7 +307,7 @@ void GhostSync::updateGhostPlayers()
 
 	// TODO: Check own player's state and whether showing others even makes sense
 
-	ConfigurationImpl::GhostSync& config = ConfigurationImpl::instance().mGameServer.mGhostSync;
+	ConfigurationImpl::GhostSync& config = ConfigurationImpl::instance().mGameServerImpl.mGhostSync;
 	EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
 
 	std::vector<uint32> playersToRemove;

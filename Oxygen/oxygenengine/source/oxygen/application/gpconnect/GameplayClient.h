@@ -12,22 +12,31 @@
 #include "oxygen_netcore/network/NetConnection.h"
 
 class ControlsIn;
+class GameplayConnector;
 
 
 class GameplayClient
 {
 public:
+	enum class ConnectionState
+	{
+		NONE,
+		CONNECT_TO_SERVER,
+		WAIT_FOR_EXTERNAL_ADDRESS,
+	};
+
 	struct HostConnection : public NetConnection
 	{
 		// Nothing here yet
 	};
 
 public:
-	explicit GameplayClient(ConnectionManager& connectionManager);
+	GameplayClient(ConnectionManager& connectionManager, GameplayConnector& gameplayConnector);
 	~GameplayClient();
 
 	inline const HostConnection& getHostConnection() const  { return mHostConnection; }
 
+	void registerAtServer();
 	void startConnection(std::string_view hostIP, uint16 hostPort);
 
 	bool canBeginNextFrame(uint32 frameNumber);
@@ -42,7 +51,9 @@ private:
 
 private:
 	ConnectionManager& mConnectionManager;
+	GameplayConnector& mGameplayConnector;
 	HostConnection mHostConnection;
+	ConnectionState mConnectionState = ConnectionState::NONE;
 
 	std::deque<ReceivedFrame> mReceivedFrames;
 	uint32 mLatestFrameNumber = 0;

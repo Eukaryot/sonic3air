@@ -18,7 +18,8 @@
 namespace network
 {
 
-	// Note that unlike the others, these are a connectionless, low-level packets
+	// ----- Connectionless, low-level packets -----
+
 	struct GetExternalAddressConnectionless : public lowlevel::PacketBase
 	{
 		uint8 mPacketVersion = 1;
@@ -54,6 +55,8 @@ namespace network
 	};
 
 
+
+	// ----- High-level requests -----
 
 	class GetServerFeaturesRequest : public highlevel::RequestBase
 	{

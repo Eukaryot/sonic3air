@@ -8,11 +8,27 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/application/gpconnect/GameplayHost.h"
+#include "oxygen/application/gpconnect/GameplayConnector.h"
 #include "oxygen/application/input/ControlsIn.h"
 
+#include "oxygen_netcore/serverclient/NetplaySetupPackets.h"
 
-GameplayHost::GameplayHost(ConnectionManager& connectionManager) :
-	mConnectionManager(connectionManager)
+
+namespace
+{
+	// TODO: Replace this dummy
+	struct DummyPacket : public lowlevel::PacketBase
+	{
+		static const constexpr uint16 SIGNATURE = 0x0013;
+		virtual uint16 getSignature() const override  { return SIGNATURE; }
+		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override {}
+	};
+}
+
+
+GameplayHost::GameplayHost(ConnectionManager& connectionManager, GameplayConnector& gameplayConnector) :
+	mConnectionManager(connectionManager),
+	mGameplayConnector(gameplayConnector)
 {
 }
 
@@ -124,6 +140,28 @@ bool GameplayHost::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 {
 	switch (evaluation.mPacketType)
 	{
+		// TODO: This packet is expected from the normal game server connection, not the host connection!
+		case network::ConnectToNetplayPacket::PACKET_TYPE:
+		{
+			network::ConnectToNetplayPacket packet;
+			if (!evaluation.readPacket(packet))
+				return false;
+
+			switch (packet.mConnectionType)
+			{
+				case network::NetplayConnectionType::PUNCHTHROUGH:
+				{
+					// Send some packets towards the client, until receiving a response
+					// TODO: This is just a single one... :/
+					DummyPacket dummy;
+					mConnectionManager.sendConnectionlessLowLevelPacket(dummy, SocketAddress(packet.mConnectToIP, packet.mConnectToPort), 0, 0);
+					break;
+				}
+			}
+			
+			return true;
+		}
+
 		case PlayerInputIncrementPacket::PACKET_TYPE:
 		{
 			PlayerInputIncrementPacket packet;

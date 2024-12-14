@@ -15,6 +15,25 @@
 #include "oxygen_netcore/serverclient/ProtocolVersion.h"
 
 
+namespace
+{
+	// TODO: This is just copied from GameClient in S3AIR code, please refactor
+	bool resolveGameServerHostName(const std::string& hostName, std::string& outServerIP)
+	{
+	#if !defined(GAME_CLIENT_USE_WSS)
+		// For UDP/TCP, try the "gameserver" subdomain first
+		//  -> This does not work for emscripten websockets, see implementation of "resolveToIp"
+		//  -> It allows for having different servers for UDP/TCP, and websockets
+		if (Sockets::resolveToIP("gameserver." + hostName, outServerIP))
+			return true;
+	#endif
+
+		// Use the host name itself
+		return Sockets::resolveToIP(hostName, outServerIP);
+	}
+}
+
+
 GameplayConnector::GameplayConnector() :
 	mConnectionManager(&mUDPSocket, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE)
 {
@@ -25,18 +44,20 @@ GameplayConnector::~GameplayConnector()
 	closeConnections();
 }
 
-bool GameplayConnector::setupAsHost(uint16 port)
+bool GameplayConnector::setupAsHost(uint16 port, bool useIPv6)
 {
 	closeConnections();
 
 	Sockets::startupSockets();
-	if (!mUDPSocket.bindToPort(port, USE_IPV6))
+	if (!mUDPSocket.bindToPort(port, useIPv6))
 	{
 		RMX_ASSERT(false, "UDP socket bind to port " << port << " failed");
 		return false;
 	}
 
-	mGameplayHost = new GameplayHost(mConnectionManager);
+	mGameplayHost = new GameplayHost(mConnectionManager, *this);
+
+	retrieveSocketExternalAddress();
 	return true;
 }
 
@@ -46,16 +67,22 @@ void GameplayConnector::startConnectToHost(std::string_view hostIP, uint16 hostP
 
 	Sockets::startupSockets();
 	if (!mUDPSocket.bindToAnyPort())
-		RMX_ERROR("Socket bind to any port failed", return);
+	{
+		RMX_ERROR("Socket bind to any port failed", );
+		return;
+	}
 
-	mGameplayClient = new GameplayClient(mConnectionManager);
+	mGameplayClient = new GameplayClient(mConnectionManager, *this);
 	mGameplayClient->startConnection(hostIP, hostPort);
+
+	retrieveSocketExternalAddress();
 }
 
 void GameplayConnector::closeConnections()
 {
 	SAFE_DELETE(mGameplayHost);
 	SAFE_DELETE(mGameplayClient);
+	mExternalAddressQuery = ExternalAddressQuery();
 	mUDPSocket.close();
 }
 
@@ -122,6 +149,11 @@ bool GameplayConnector::onReceivedConnectionlessPacket(ConnectionlessPacketEvalu
 			if (!packet.serializePacket(evaluation.mSerializer, 1))
 				return false;
 
+			if (mExternalAddressQuery.mQueryID == packet.mQueryID)
+			{
+				mExternalAddressQuery.mOwnExternalIP = packet.mIP;
+				mExternalAddressQuery.mOwnExternalPort = packet.mPort;
+			}
 			return true;
 		}
 	}
@@ -140,4 +172,24 @@ bool GameplayConnector::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 		return mGameplayClient->onReceivedPacket(evaluation);
 	}
 	return false;
+}
+
+void GameplayConnector::retrieveSocketExternalAddress()
+{
+	mExternalAddressQuery = ExternalAddressQuery();
+	mExternalAddressQuery.mQueryID = (uint64)(1 + rand()) + ((uint64)rand() << 16) + ((uint64)rand() << 32) + ((uint64)rand() << 48);
+
+	std::string serverIP;
+	if (!resolveGameServerHostName(Configuration::instance().mGameServerBase.mServerHostName, serverIP))
+	{
+		// TODO: Error handling
+		RMX_ASSERT(false, "Failed to resolve game server host name");
+		return;
+	}
+
+	// Retrieve external address for the socket
+	// TODO: This needs to be repeated if necessary
+	network::GetExternalAddressConnectionless packet;
+	packet.mQueryID = mExternalAddressQuery.mQueryID;
+	mConnectionManager.sendConnectionlessLowLevelPacket(packet, SocketAddress(serverIP, Configuration::instance().mGameServerBase.mServerPortUDP), 0, 0);
 }

@@ -53,7 +53,7 @@ GameClient::~GameClient()
 
 void GameClient::setupClient()
 {
-	const ConfigurationImpl::GameServer& config = ConfigurationImpl::instance().mGameServer;
+	const Configuration::GameServerBase& config = Configuration::instance().mGameServerBase;
 	if (!config.mServerHostName.empty())
 	{
 		Sockets::startupSockets();
@@ -110,7 +110,7 @@ void GameClient::startConnectingToServer()
 {
 	SocketAddress serverAddress;
 	{
-		const ConfigurationImpl::GameServer& config = ConfigurationImpl::instance().mGameServer;
+		const Configuration::GameServerBase& config = Configuration::instance().mGameServerBase;
 		std::string serverIP;
 		if (!resolveGameServerHostName(config.mServerHostName, serverIP))
 		{

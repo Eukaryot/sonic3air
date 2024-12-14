@@ -65,6 +65,9 @@
     <ClInclude Include="..\..\source\oxygen_netcore\base\HandleProvider.h">
       <Filter>base</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\serverclient\NetplaySetupPackets.h">
+      <Filter>serverclient</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen_netcore\pch.cpp" />

@@ -19,6 +19,8 @@ namespace highlevel
 
 	struct PacketBase
 	{
+	friend struct PacketTypeRegistration;
+
 	public:
 		bool serializePacket(VectorBinarySerializer& serializer, uint8 protocolVersion)
 		{
@@ -33,7 +35,7 @@ namespace highlevel
 	protected:
 		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) = 0;
 
-	public:
+	private:
 		static inline std::unordered_map<uint32, std::string> mPacketTypeRegistry;
 	};
 

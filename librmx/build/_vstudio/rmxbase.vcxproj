@@ -215,6 +215,7 @@
     <ClInclude Include="..\..\source\rmxbase\data\SinglePtr.h" />
     <ClInclude Include="..\..\source\rmxbase\data\Singleton.h" />
     <ClInclude Include="..\..\source\rmxbase\data\SmartPtr.h" />
+    <ClInclude Include="..\..\source\rmxbase\data\WeakPtr.h" />
     <ClInclude Include="..\..\source\rmxbase\file\FileCrawler.h" />
     <ClInclude Include="..\..\source\rmxbase\file\FileHandle.h" />
     <ClInclude Include="..\..\source\rmxbase\file\FileIO.h" />
@@ -273,6 +274,7 @@
     <ClCompile Include="..\..\source\rmxbase\bitmap\BitmapCodecPNG.cpp" />
     <ClCompile Include="..\..\source\rmxbase\bitmap\Color.cpp" />
     <ClCompile Include="..\..\source\rmxbase\bitmap\PaletteBitmap.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\data\WeakPtr.cpp" />
     <ClCompile Include="..\..\source\rmxbase\file\FileCrawler.cpp" />
     <ClCompile Include="..\..\source\rmxbase\file\FileHandle.cpp" />
     <ClCompile Include="..\..\source\rmxbase\file\FileIO.cpp" />

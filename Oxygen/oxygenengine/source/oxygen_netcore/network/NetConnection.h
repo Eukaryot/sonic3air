@@ -17,7 +17,7 @@ class ConnectionManager;
 
 
 // UDP-based virtual connection
-class NetConnection
+class NetConnection : public rmx::WeakPtrTarget
 {
 friend class ConnectionManager;
 friend class WebSocketClient;

@@ -14,6 +14,7 @@
 #include "oxygen/application/gpconnect/GPCPackets.h"
 
 class ControlsIn;
+class GameplayConnector;
 
 
 class GameplayHost
@@ -28,7 +29,7 @@ public:
 	};
 
 public:
-	explicit GameplayHost(ConnectionManager& connectionManager);
+	GameplayHost(ConnectionManager& connectionManager, GameplayConnector& gameplayConnector);
 	~GameplayHost();
 
 	inline const std::vector<PlayerConnection*>& getPlayerConnections() const  { return mPlayerConnections; }
@@ -42,5 +43,7 @@ public:
 
 private:
 	ConnectionManager& mConnectionManager;
+	GameplayConnector& mGameplayConnector;
+
 	std::vector<PlayerConnection*> mPlayerConnections;
 };

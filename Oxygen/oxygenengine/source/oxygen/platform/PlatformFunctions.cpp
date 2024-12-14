@@ -453,7 +453,7 @@ PlatformFunctions::DialogResult PlatformFunctions::showDialogBox(rmx::ErrorSever
 		default:							type |= MB_ICONINFORMATION;	break;
 	}
 
-	const int result = MessageBoxA(nullptr, text.c_str(), caption.c_str(), type);
+	const int result = MessageBoxA((HWND)FTX::Video->getNativeWindowHandle(), text.c_str(), caption.c_str(), type);
 	switch (result)
 	{
 		case IDOK:		return DialogResult::OK;

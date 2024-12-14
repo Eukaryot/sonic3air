@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "oxygen/application/gpconnect/ExternalAddressQuery.h"
+
 #include "oxygen_netcore/network/ConnectionListener.h"
 #include "oxygen_netcore/network/ConnectionManager.h"
 
@@ -20,7 +22,6 @@ class GameplayConnector : public ConnectionListenerInterface, public SingleInsta
 {
 public:
 	static const uint16 DEFAULT_PORT = 28840;
-	static const bool USE_IPV6 = false;
 
 public:
 	GameplayConnector();
@@ -30,8 +31,9 @@ public:
 
 	inline const GameplayHost* getGameplayHost() const		{ return mGameplayHost; }
 	inline const GameplayClient* getGameplayClient() const	{ return mGameplayClient; }
+	inline const ExternalAddressQuery& getExternalAddressQuery() const  { return mExternalAddressQuery; }
 
-	bool setupAsHost(uint16 port = DEFAULT_PORT);
+	bool setupAsHost(uint16 port = DEFAULT_PORT, bool useIPv6 = false);
 	void startConnectToHost(std::string_view hostIP, uint16 hostPort);
 	void closeConnections();
 
@@ -48,9 +50,13 @@ protected:
 	virtual bool onReceivedPacket(ReceivedPacketEvaluation& evaluation) override;
 
 private:
+	void retrieveSocketExternalAddress();
+
+private:
 	UDPSocket mUDPSocket;
 	ConnectionManager mConnectionManager;
 
 	GameplayHost* mGameplayHost = nullptr;
 	GameplayClient* mGameplayClient = nullptr;
+	ExternalAddressQuery mExternalAddressQuery;
 };

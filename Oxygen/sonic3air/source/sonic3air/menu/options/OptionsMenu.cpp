@@ -102,12 +102,12 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	{
 		ConfigurationImpl& config = ConfigurationImpl::instance();
 
-		setupOptionEntryInt(option::RELEASE_CHANNEL,			&config.mGameServer.mUpdateCheck.mReleaseChannel);
+		setupOptionEntryInt(option::RELEASE_CHANNEL,			&config.mGameServerImpl.mUpdateCheck.mReleaseChannel);
 
 		setupOptionEntryEnum8(option::FRAME_SYNC,				&config.mFrameSync);
 
-		setupOptionEntryBool(option::GHOST_SYNC,				&config.mGameServer.mGhostSync.mEnabled);
-		setupOptionEntryInt(option::GHOST_SYNC_RENDERING,		&config.mGameServer.mGhostSync.mGhostRendering);
+		setupOptionEntryBool(option::GHOST_SYNC,				&config.mGameServerImpl.mGhostSync.mEnabled);
+		setupOptionEntryInt(option::GHOST_SYNC_RENDERING,		&config.mGameServerImpl.mGhostSync.mGhostRendering);
 		setupOptionEntryBool(option::SHOW_CONTROLS_DISPLAY,		&config.mShowControlsDisplay);
 		setupOptionEntryInt(option::SCRIPT_OPTIMIZATION,		&config.mScriptOptimizationLevel);
 		setupOptionEntryInt(option::GAME_RECORDING_MODE,		&config.mGameRecorder.mRecordingMode);

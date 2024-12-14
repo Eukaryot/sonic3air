@@ -48,7 +48,8 @@ void ConfigurationImpl::fillDefaultGameProfile(GameProfile& gameProfile)
 ConfigurationImpl::ConfigurationImpl()
 {
 	// Setup defaults
-	mGameServer.mUpdateCheck.mReleaseChannel = getReleaseChannelValueForBuild();
+	mGameServerBase.mServerHostName = "sonic3air.org";
+	mGameServerImpl.mUpdateCheck.mReleaseChannel = getReleaseChannelValueForBuild();
 }
 
 void ConfigurationImpl::preLoadInitialization()
@@ -192,24 +193,19 @@ void ConfigurationImpl::saveSettingsInternal(Json::Value& root, SettingsType set
 
 	// Game server
 	{
-		Json::Value gameServerJson;
-		{
-			gameServerJson["ServerAddress"] = mGameServer.mServerHostName;
-			gameServerJson["ServerPortUDP"] = mGameServer.mServerPortUDP;
-			gameServerJson["ServerPortTCP"] = mGameServer.mServerPortTCP;
-			gameServerJson["ServerPortWSS"] = mGameServer.mServerPortWSS;
+		Json::Value gameServerJson = root["GameServer"];
 
-			Json::Value ghostSyncJson;
-			ghostSyncJson["Enabled"] = mGameServer.mGhostSync.mEnabled ? 1 : 0;
-			ghostSyncJson["ChannelName"] = mGameServer.mGhostSync.mChannelName;
-			ghostSyncJson["ShowOffscreenGhosts"] = mGameServer.mGhostSync.mShowOffscreenGhosts ? 1 : 0;
-			ghostSyncJson["GhostRendering"] = mGameServer.mGhostSync.mGhostRendering;
-			gameServerJson["GhostSync"] = ghostSyncJson;
+		Json::Value ghostSyncJson;
+		ghostSyncJson["Enabled"] = mGameServerImpl.mGhostSync.mEnabled ? 1 : 0;
+		ghostSyncJson["ChannelName"] = mGameServerImpl.mGhostSync.mChannelName;
+		ghostSyncJson["ShowOffscreenGhosts"] = mGameServerImpl.mGhostSync.mShowOffscreenGhosts ? 1 : 0;
+		ghostSyncJson["GhostRendering"] = mGameServerImpl.mGhostSync.mGhostRendering;
+		gameServerJson["GhostSync"] = ghostSyncJson;
 
-			Json::Value updateCheckJson;
-			updateCheckJson["ReleaseChannel"] = mGameServer.mUpdateCheck.mReleaseChannel;
-			gameServerJson["UpdateCheck"] = updateCheckJson;
-		}
+		Json::Value updateCheckJson;
+		updateCheckJson["ReleaseChannel"] = mGameServerImpl.mUpdateCheck.mReleaseChannel;
+		gameServerJson["UpdateCheck"] = updateCheckJson;
+
 		root["GameServer"] = gameServerJson;
 	}
 }
@@ -230,19 +226,14 @@ void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
 		const Json::Value& gameServerJson = rootHelper.mJson["GameServer"];
 		if (!gameServerJson.isNull())
 		{
-			// General game server settings
 			JsonHelper gameServerHelper(gameServerJson);
-			gameServerHelper.tryReadString("ServerAddress", mGameServer.mServerHostName);
-			gameServerHelper.tryReadInt("ServerPortUDP", mGameServer.mServerPortUDP);
-			gameServerHelper.tryReadInt("ServerPortTCP", mGameServer.mServerPortTCP);
-			gameServerHelper.tryReadInt("ServerPortWSS", mGameServer.mServerPortWSS);
 
 			// Update Check settings
 			const Json::Value& updateCheckJson = gameServerHelper.mJson["UpdateCheck"];
 			if (!updateCheckJson.isNull())
 			{
 				JsonHelper jsonHelper(updateCheckJson);
-				jsonHelper.tryReadInt("UpdateChannel", mGameServer.mUpdateCheck.mReleaseChannel);
+				jsonHelper.tryReadInt("UpdateChannel", mGameServerImpl.mUpdateCheck.mReleaseChannel);
 			}
 
 			// Ghost Sync settings
@@ -250,10 +241,10 @@ void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
 			if (!ghostSyncJson.isNull())
 			{
 				JsonHelper jsonHelper(ghostSyncJson);
-				jsonHelper.tryReadBool("Enabled", mGameServer.mGhostSync.mEnabled);
-				jsonHelper.tryReadString("ChannelName", mGameServer.mGhostSync.mChannelName);
-				jsonHelper.tryReadBool("ShowOffscreenGhosts", mGameServer.mGhostSync.mShowOffscreenGhosts);
-				jsonHelper.tryReadInt("GhostRendering", mGameServer.mGhostSync.mGhostRendering);
+				jsonHelper.tryReadBool("Enabled", mGameServerImpl.mGhostSync.mEnabled);
+				jsonHelper.tryReadString("ChannelName", mGameServerImpl.mGhostSync.mChannelName);
+				jsonHelper.tryReadBool("ShowOffscreenGhosts", mGameServerImpl.mGhostSync.mShowOffscreenGhosts);
+				jsonHelper.tryReadInt("GhostRendering", mGameServerImpl.mGhostSync.mGhostRendering);
 			}
 		}
 	}

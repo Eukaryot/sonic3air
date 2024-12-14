@@ -76,14 +76,10 @@ public:
 		bool mShowOffscreenGhosts = true;
 		int mGhostRendering = 3;
 	};
-	struct GameServer
+	struct GameServerImpl
 	{
-		std::string mServerHostName = "sonic3air.org";
-		int mServerPortUDP = 21094;		// Used by most platforms
-		int mServerPortTCP = 21095;		// Used only as a fallback for UDP
-		int mServerPortWSS = 21096;		// Used by the web version
 		UpdateCheck mUpdateCheck;
 		GhostSync mGhostSync;
 	};
-	GameServer mGameServer;
+	GameServerImpl mGameServerImpl;
 };

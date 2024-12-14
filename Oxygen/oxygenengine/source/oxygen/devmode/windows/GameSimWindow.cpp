@@ -18,10 +18,6 @@
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/simulation/Simulation.h"
 
-// TEST
-#include "oxygen/application/gpconnect/SingleRequest.h"
-#include "oxygen_netcore/serverclient/Packets.h"
-
 
 GameSimWindow::GameSimWindow() :
 	DevModeWindowBase("Game", Category::GAME_CONTROLS, ImGuiWindowFlags_AlwaysAutoResize)
@@ -149,7 +145,8 @@ void GameSimWindow::buildContent()
 		ImGui::BeginDisabled(nullptr != gameplayConnector.getGameplayHost());
 		if (ImGui::Button("Start as host"))
 		{
-			gameplayConnector.setupAsHost();
+			const bool USE_IPV6 = false;	// TODO: IPv6 does not work, the the server doesn't support it
+			gameplayConnector.setupAsHost(GameplayConnector::DEFAULT_PORT, USE_IPV6);
 		}
 		ImGui::EndDisabled();
 
@@ -183,40 +180,13 @@ void GameSimWindow::buildContent()
 		{
 			gameplayConnector.closeConnections();
 		}
+
+		if (!gameplayConnector.getExternalAddressQuery().mOwnExternalIP.empty())
+		{
+			ImGui::Text("Retrieved own external address: IP = %s, port = %d", gameplayConnector.getExternalAddressQuery().mOwnExternalIP.c_str(), gameplayConnector.getExternalAddressQuery().mOwnExternalPort);
+		}
 		ImGui::EndDisabled();
 	}
-
-	// TEST: Retrieve own external address
-#if 0
-	{
-		ImGui::SeparatorText("External Address");
-		ImGuiHelpers::ScopedIndent si;
-
-		static network::GetExternalAddressRequest request;
-		static SingleRequest singleRequest;
-
-		if (singleRequest.getState() == SingleRequest::State::INACTIVE)
-		{
-			ImGui::Text("Ready");
-		}
-		else if (singleRequest.getState() == SingleRequest::State::FINISHED)
-		{
-			ImGui::Text("Received address: IP: %s, Port: %d", request.mResponse.mIP.c_str(), request.mResponse.mPort);
-		}
-		else
-		{
-			ImGui::Text("In progress...");
-			singleRequest.updateRequest();
-		}
-
-		if (ImGui::Button("Start"))
-		{
-			// TODO: Replace this hard-coded address
-			ImGui::SameLine();
-			singleRequest.startRequest("gameserver.sonic3air.org", 21094, request, GameplayConnector::instance().getConnectionManager());
-		}
-	}
-#endif
 #endif
 }
 
