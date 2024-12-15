@@ -840,6 +840,11 @@ void Game::onGameRecordingHeaderSave(std::vector<uint8>& buffer)
 
 void Game::checkActiveModsUsedFeatures()
 {
+	// Update number of players depending on the three / four player mod feature
+	const bool usesThreePlayers = ModManager::instance().anyActiveModUsesFeature(rmx::constMurmur2_64("ThreePlayers"));
+	const bool usesFourPlayers = ModManager::instance().anyActiveModUsesFeature(rmx::constMurmur2_64("FourPlayers"));
+	Configuration::instance().mNumPlayers = usesFourPlayers ? 4 : usesThreePlayers ? 3 : 2;
+
 	// Check mods for usage of Crowd Control
 	const bool usesCrowdControl = ModManager::instance().anyActiveModUsesFeature(rmx::constMurmur2_64("CrowdControl"));
 	if (usesCrowdControl)
