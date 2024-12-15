@@ -16,7 +16,7 @@
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
-#include "oxygen/client/EngineServerClient.h"
+#include "oxygen/network/EngineServerClient.h"
 #include "oxygen/download/DownloadManager.h"
 #include "oxygen/devmode/ImGuiIntegration.h"
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"

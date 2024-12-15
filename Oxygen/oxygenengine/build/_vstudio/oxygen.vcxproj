@@ -31,9 +31,6 @@
     <ClCompile Include="..\..\source\oxygen\application\EngineMain.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\GameLoader.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\GameProfile.cpp" />
-    <ClCompile Include="..\..\source\oxygen\application\gpconnect\GameplayClient.cpp" />
-    <ClCompile Include="..\..\source\oxygen\application\gpconnect\GameplayConnector.cpp" />
-    <ClCompile Include="..\..\source\oxygen\application\gpconnect\GameplayHost.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\ControlsIn.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\InputConfig.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\InputManager.cpp" />
@@ -55,7 +52,6 @@
     <ClCompile Include="..\..\source\oxygen\application\overlays\SaveStateMenu.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\overlays\TouchControlsOverlay.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\video\VideoOut.cpp" />
-    <ClCompile Include="..\..\source\oxygen\client\EngineServerClient.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\ImGuiHelpers.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\ImGuiIntegration.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\AudioBrowserWindow.cpp" />
@@ -98,6 +94,10 @@
     <ClCompile Include="..\..\source\oxygen\helper\RandomNumberGenerator.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\TextInputHandler.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Transform2D.cpp" />
+    <ClCompile Include="..\..\source\oxygen\network\EngineServerClient.cpp" />
+    <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayClient.cpp" />
+    <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayHost.cpp" />
+    <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -181,11 +181,6 @@
     <ClInclude Include="..\..\source\oxygen\application\EngineMain.h" />
     <ClInclude Include="..\..\source\oxygen\application\GameLoader.h" />
     <ClInclude Include="..\..\source\oxygen\application\GameProfile.h" />
-    <ClInclude Include="..\..\source\oxygen\application\gpconnect\ExternalAddressQuery.h" />
-    <ClInclude Include="..\..\source\oxygen\application\gpconnect\GameplayClient.h" />
-    <ClInclude Include="..\..\source\oxygen\application\gpconnect\GameplayConnector.h" />
-    <ClInclude Include="..\..\source\oxygen\application\gpconnect\GameplayHost.h" />
-    <ClInclude Include="..\..\source\oxygen\application\gpconnect\GPCPackets.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\ControlsIn.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\InputConfig.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\InputManager.h" />
@@ -207,7 +202,6 @@
     <ClInclude Include="..\..\source\oxygen\application\overlays\SaveStateMenu.h" />
     <ClInclude Include="..\..\source\oxygen\application\overlays\TouchControlsOverlay.h" />
     <ClInclude Include="..\..\source\oxygen\application\video\VideoOut.h" />
-    <ClInclude Include="..\..\source\oxygen\client\EngineServerClient.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiDefinitions.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiHelpers.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiIntegration.h" />
@@ -254,6 +248,12 @@
     <ClInclude Include="..\..\source\oxygen\helper\RandomNumberGenerator.h" />
     <ClInclude Include="..\..\source\oxygen\helper\TextInputHandler.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Transform2D.h" />
+    <ClInclude Include="..\..\source\oxygen\network\EngineServerClient.h" />
+    <ClInclude Include="..\..\source\oxygen\network\netplay\ExternalAddressQuery.h" />
+    <ClInclude Include="..\..\source\oxygen\network\netplay\NetplayClient.h" />
+    <ClInclude Include="..\..\source\oxygen\network\netplay\NetplayHost.h" />
+    <ClInclude Include="..\..\source\oxygen\network\netplay\NetplayManager.h" />
+    <ClInclude Include="..\..\source\oxygen\network\netplay\NetplayPackets.h" />
     <ClInclude Include="..\..\source\oxygen\pch.h" />
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h" />
     <ClInclude Include="..\..\source\oxygen\helper\FileHelper.h" />

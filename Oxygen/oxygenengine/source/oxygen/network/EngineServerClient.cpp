@@ -7,8 +7,8 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/client/EngineServerClient.h"
-#include "oxygen/application/gpconnect/GameplayConnector.h"
+#include "oxygen/network/EngineServerClient.h"
+#include "oxygen/network/netplay/NetplayManager.h"
 
 #include "oxygen_netcore/serverclient/NetplaySetupPackets.h"
 #include "oxygen_netcore/serverclient/ProtocolVersion.h"
@@ -163,7 +163,7 @@ bool EngineServerClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 		case network::ConnectToNetplayPacket::PACKET_TYPE:
 		{
 			// Pass on to netplay
-			return GameplayConnector::instance().onReceivedGameServerPacket(evaluation);
+			return NetplayManager::instance().onReceivedGameServerPacket(evaluation);
 		}
 	}
 

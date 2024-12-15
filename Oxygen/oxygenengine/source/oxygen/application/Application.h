@@ -17,9 +17,9 @@ class CheatSheetOverlay;
 class DebugSidePanel;
 class GameApp;
 class GameLoader;
-class GameplayConnector;
 class GameSetupScreen;
 class GameView;
+class NetplayManager;
 class OxygenMenu;
 class ProfilingView;
 class SaveStateMenu;
@@ -50,7 +50,7 @@ public:
 	inline GameView& getGameView()							{ return *mGameView; }
 	inline TouchControlsOverlay* getTouchControlsOverlay()	{ return mTouchControlsOverlay; }
 	inline DebugSidePanel* getDebugSidePanel()				{ return mDebugSidePanel; }
-	inline GameplayConnector& getGameplayConnector()		{ return *mGameplayConnector; }
+	inline NetplayManager& getNetplayManager()				{ return *mNetplayManager; }
 
 	WindowMode getWindowMode() const  { return mWindowMode; }
 	void setWindowMode(WindowMode windowMode, bool force = false);
@@ -95,7 +95,7 @@ private:
 	SaveStateMenu* mSaveStateMenu = nullptr;
 	DebugSidePanel* mDebugSidePanel = nullptr;
 	ProfilingView* mProfilingView = nullptr;
-	GameplayConnector* mGameplayConnector = nullptr;
+	NetplayManager* mNetplayManager = nullptr;
 
 	// Input
 	float mMouseHideTimer = 0.0f;

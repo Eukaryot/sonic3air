@@ -7,20 +7,20 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/application/gpconnect/GameplayHost.h"
-#include "oxygen/application/gpconnect/GameplayConnector.h"
+#include "oxygen/network/netplay/NetplayHost.h"
+#include "oxygen/network/netplay/NetplayManager.h"
 #include "oxygen/application/input/ControlsIn.h"
 
-#include "oxygen/client/EngineServerClient.h"
+#include "oxygen/network/EngineServerClient.h"
 
 
-GameplayHost::GameplayHost(ConnectionManager& connectionManager, GameplayConnector& gameplayConnector) :
+NetplayHost::NetplayHost(ConnectionManager& connectionManager, NetplayManager& netplayManager) :
 	mConnectionManager(connectionManager),
-	mGameplayConnector(gameplayConnector)
+	mNetplayManager(netplayManager)
 {
 }
 
-GameplayHost::~GameplayHost()
+NetplayHost::~NetplayHost()
 {
 	// Destroy all connections to clients
 	for (size_t k = 0; k < mPlayerConnections.size(); ++k)
@@ -32,14 +32,14 @@ GameplayHost::~GameplayHost()
 	mPlayerConnections.clear();
 }
 
-void GameplayHost::registerAtServer()
+void NetplayHost::registerAtServer()
 {
 	// Request game server connection
 	EngineServerClient::instance().connectToServer();
 	mState = State::CONNECT_TO_SERVER;
 }
 
-NetConnection* GameplayHost::createNetConnection(const SocketAddress& senderAddress)
+NetConnection* NetplayHost::createNetConnection(const SocketAddress& senderAddress)
 {
 	PlayerConnection* connection = new PlayerConnection();
 
@@ -50,12 +50,12 @@ NetConnection* GameplayHost::createNetConnection(const SocketAddress& senderAddr
 	return connection;
 }
 
-void GameplayHost::destroyNetConnection(NetConnection& connection)
+void NetplayHost::destroyNetConnection(NetConnection& connection)
 {
 	vectorRemoveAll(mPlayerConnections, &connection);
 }
 
-void GameplayHost::updateConnection(float deltaSeconds)
+void NetplayHost::updateConnection(float deltaSeconds)
 {
 	EngineServerClient& engineServerClient = EngineServerClient::instance();
 
@@ -77,7 +77,7 @@ void GameplayHost::updateConnection(float deltaSeconds)
 			engineServerClient.connectToServer();
 
 			// Wait until the server connection is established, server features were queried, and the game socket's external address was retrieved
-			if (!engineServerClient.hasReceivedServerFeatures() || mGameplayConnector.getExternalAddressQuery().mOwnExternalIP.empty())
+			if (!engineServerClient.hasReceivedServerFeatures() || mNetplayManager.getExternalAddressQuery().mOwnExternalIP.empty())
 				break;
 
 			// TODO: Why not check the server features?
@@ -86,8 +86,8 @@ void GameplayHost::updateConnection(float deltaSeconds)
 			mRegistrationRequest = network::RegisterForNetplayRequest();
 			mRegistrationRequest.mQuery.mIsHost = true;
 			mRegistrationRequest.mQuery.mSessionID = 0x12345;	// TODO: This is just for testing and should be replaced by a random ID
-			mRegistrationRequest.mQuery.mGameSocketExternalIP = mGameplayConnector.getExternalAddressQuery().mOwnExternalIP;
-			mRegistrationRequest.mQuery.mGameSocketExternalPort = mGameplayConnector.getExternalAddressQuery().mOwnExternalPort;
+			mRegistrationRequest.mQuery.mGameSocketExternalIP = mNetplayManager.getExternalAddressQuery().mOwnExternalIP;
+			mRegistrationRequest.mQuery.mGameSocketExternalPort = mNetplayManager.getExternalAddressQuery().mOwnExternalPort;
 			engineServerClient.getServerConnection().sendRequest(mRegistrationRequest);
 
 			mState = State::REGISTERED;
@@ -126,7 +126,7 @@ void GameplayHost::updateConnection(float deltaSeconds)
 	}
 }
 
-bool GameplayHost::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluation)
+bool NetplayHost::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluation)
 {
 	switch (evaluation.mPacketType)
 	{
@@ -159,7 +159,7 @@ bool GameplayHost::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluati
 	return false;
 }
 
-void GameplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
+void NetplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 {
 	std::vector<PlayerConnection*> activeConnections;
 	{
@@ -235,7 +235,7 @@ void GameplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 	}
 }
 
-bool GameplayHost::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
+bool NetplayHost::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 {
 	switch (evaluation.mPacketType)
 	{

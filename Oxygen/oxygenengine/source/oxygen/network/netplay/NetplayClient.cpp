@@ -7,42 +7,42 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/application/gpconnect/GameplayClient.h"
-#include "oxygen/application/gpconnect/GameplayConnector.h"
-#include "oxygen/application/gpconnect/GPCPackets.h"
+#include "oxygen/network/netplay/NetplayClient.h"
+#include "oxygen/network/netplay/NetplayManager.h"
+#include "oxygen/network/netplay/NetplayPackets.h"
 #include "oxygen/application/input/ControlsIn.h"
-#include "oxygen/client/EngineServerClient.h"
+#include "oxygen/network/EngineServerClient.h"
 
 #include "oxygen_netcore/serverclient/NetplaySetupPackets.h"
 #include "oxygen_netcore/serverclient/Packets.h"
 
 
-GameplayClient::GameplayClient(ConnectionManager& connectionManager, GameplayConnector& gameplayConnector) :
+NetplayClient::NetplayClient(ConnectionManager& connectionManager, NetplayManager& netplayManager) :
 	mConnectionManager(connectionManager),
-	mGameplayConnector(gameplayConnector)
+	mNetplayManager(netplayManager)
 {
 }
 
-GameplayClient::~GameplayClient()
+NetplayClient::~NetplayClient()
 {
 	// TODO: This just destroys the connection, but doesn't tell the host about it
 	mHostConnection.clear();
 }
 
-void GameplayClient::joinViaServer()
+void NetplayClient::joinViaServer()
 {
 	// Request game server connection
 	EngineServerClient::instance().connectToServer();
 	mState = State::CONNECT_TO_SERVER;
 }
 
-void GameplayClient::connectDirectlyToHost(std::string_view ip, uint16 port)
+void NetplayClient::connectDirectlyToHost(std::string_view ip, uint16 port)
 {
 	mHostConnection.startConnectTo(mConnectionManager, SocketAddress(ip, port));
 	mState = State::CONNECT_TO_HOST;
 }
 
-void GameplayClient::updateConnection(float deltaSeconds)
+void NetplayClient::updateConnection(float deltaSeconds)
 {
 	EngineServerClient& engineServerClient = EngineServerClient::instance();
 
@@ -54,7 +54,7 @@ void GameplayClient::updateConnection(float deltaSeconds)
 			engineServerClient.connectToServer();
 
 			// Wait until the server connection is established, server features were queried, and the game socket's external address was retrieved
-			if (!engineServerClient.hasReceivedServerFeatures() || mGameplayConnector.getExternalAddressQuery().mOwnExternalIP.empty())
+			if (!engineServerClient.hasReceivedServerFeatures() || mNetplayManager.getExternalAddressQuery().mOwnExternalIP.empty())
 				break;
 
 			// TODO: Why not check the server features?
@@ -63,8 +63,8 @@ void GameplayClient::updateConnection(float deltaSeconds)
 			mRegistrationRequest = network::RegisterForNetplayRequest();
 			mRegistrationRequest.mQuery.mIsHost = false;
 			mRegistrationRequest.mQuery.mSessionID = 0x12345;	// TODO: This is just for testing and should be replaced by a random ID
-			mRegistrationRequest.mQuery.mGameSocketExternalIP = mGameplayConnector.getExternalAddressQuery().mOwnExternalIP;
-			mRegistrationRequest.mQuery.mGameSocketExternalPort = mGameplayConnector.getExternalAddressQuery().mOwnExternalPort;
+			mRegistrationRequest.mQuery.mGameSocketExternalIP = mNetplayManager.getExternalAddressQuery().mOwnExternalIP;
+			mRegistrationRequest.mQuery.mGameSocketExternalPort = mNetplayManager.getExternalAddressQuery().mOwnExternalPort;
 			engineServerClient.getServerConnection().sendRequest(mRegistrationRequest);
 
 			mState = State::REGISTERED;
@@ -99,7 +99,7 @@ void GameplayClient::updateConnection(float deltaSeconds)
 	}
 }
 
-bool GameplayClient::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluation)
+bool NetplayClient::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluation)
 {
 	switch (evaluation.mPacketType)
 	{
@@ -119,7 +119,7 @@ bool GameplayClient::onReceivedGameServerPacket(ReceivedPacketEvaluation& evalua
 	return false;
 }
 
-bool GameplayClient::canBeginNextFrame(uint32 frameNumber)
+bool NetplayClient::canBeginNextFrame(uint32 frameNumber)
 {
 	// Don't proceed beyond the latest received frame number
 	if (frameNumber > mLatestFrameNumber)
@@ -128,7 +128,7 @@ bool GameplayClient::canBeginNextFrame(uint32 frameNumber)
 	return true;
 }
 
-void GameplayClient::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
+void NetplayClient::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 {
 	if (mHostConnection.getState() != NetConnection::State::CONNECTED)
 		return;
@@ -161,7 +161,7 @@ void GameplayClient::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 	}
 }
 
-bool GameplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
+bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 {
 	switch (evaluation.mPacketType)
 	{

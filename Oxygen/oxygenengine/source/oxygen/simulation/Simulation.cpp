@@ -18,7 +18,7 @@
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/audio/AudioOutBase.h"
-#include "oxygen/application/gpconnect/GameplayConnector.h"
+#include "oxygen/network/netplay/NetplayManager.h"
 #include "oxygen/application/input/InputRecorder.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
@@ -369,7 +369,7 @@ bool Simulation::generateFrame()
 	if (beginningNewFrame)
 	{
 		// Check if we can even begin a new frame
-		if (!GameplayConnector::instance().canBeginNextFrame(mFrameNumber))
+		if (!NetplayManager::instance().canBeginNextFrame(mFrameNumber))
 			return false;
 
 		// Tell game instance
@@ -386,8 +386,8 @@ bool Simulation::generateFrame()
 
 		controlsIn.beginInputUpdate();
 
-		// Update gameplay connector
-		GameplayConnector::instance().onFrameUpdate(controlsIn, mFrameNumber);
+		// Update netplay
+		NetplayManager::instance().onFrameUpdate(controlsIn, mFrameNumber);
 
 		// If game recorder has input data for the frame transition, then use that
 		//  -> This is particularly relevant for rewinds, namely for the small fast forwards from the previous keyframe

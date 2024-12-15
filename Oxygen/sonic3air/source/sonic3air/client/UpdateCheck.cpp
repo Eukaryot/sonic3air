@@ -14,7 +14,7 @@
 
 #include "oxygen_netcore/network/NetConnection.h"
 
-#include "oxygen/client/EngineServerClient.h"
+#include "oxygen/network/EngineServerClient.h"
 
 
 namespace

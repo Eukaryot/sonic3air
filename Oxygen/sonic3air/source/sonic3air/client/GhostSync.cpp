@@ -16,7 +16,7 @@
 #include "oxygen_netcore/network/ConnectionListener.h"
 #include "oxygen_netcore/network/NetConnection.h"
 
-#include "oxygen/client/EngineServerClient.h"
+#include "oxygen/network/EngineServerClient.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 
 

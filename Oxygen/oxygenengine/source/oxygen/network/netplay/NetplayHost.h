@@ -12,13 +12,13 @@
 #include "oxygen_netcore/network/NetConnection.h"
 #include "oxygen_netcore/serverclient/NetplaySetupPackets.h"
 
-#include "oxygen/application/gpconnect/GPCPackets.h"
+#include "oxygen/network/netplay/NetplayPackets.h"
 
 class ControlsIn;
-class GameplayConnector;
+class NetplayManager;
 
 
-class GameplayHost
+class NetplayHost
 {
 public:
 	enum class State
@@ -40,8 +40,8 @@ public:
 	};
 
 public:
-	GameplayHost(ConnectionManager& connectionManager, GameplayConnector& gameplayConnector);
-	~GameplayHost();
+	NetplayHost(ConnectionManager& connectionManager, NetplayManager& netplayManager);
+	~NetplayHost();
 
 	inline State getState() const  { return mState; }
 	inline const std::vector<PlayerConnection*>& getPlayerConnections() const  { return mPlayerConnections; }
@@ -59,7 +59,7 @@ public:
 
 private:
 	ConnectionManager& mConnectionManager;
-	GameplayConnector& mGameplayConnector;
+	NetplayManager& mNetplayManager;
 	State mState = State::NONE;
 
 	network::RegisterForNetplayRequest mRegistrationRequest;

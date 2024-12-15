@@ -15,7 +15,7 @@
 #include "oxygen_netcore/network/ConnectionManager.h"
 #include "oxygen_netcore/serverclient/Packets.h"
 
-#include "oxygen/client/EngineServerClient.h"
+#include "oxygen/network/EngineServerClient.h"
 
 
 class GameClient : public EngineServerClient::Listener, public SingleInstance<GameClient>

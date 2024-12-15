@@ -97,11 +97,11 @@
     <Filter Include="devmode\windows">
       <UniqueIdentifier>{fa83976a-22f3-48e0-9249-ec0580c42843}</UniqueIdentifier>
     </Filter>
-    <Filter Include="application\gpconnect">
-      <UniqueIdentifier>{e96a1c23-873e-4a9d-90f8-d5b2f6ee817d}</UniqueIdentifier>
+    <Filter Include="network">
+      <UniqueIdentifier>{bda58169-9ff3-4e0f-b925-86b7e05a5bba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="client">
-      <UniqueIdentifier>{1811b36a-6788-4a53-86d7-c10213280aef}</UniqueIdentifier>
+    <Filter Include="network\netplay">
+      <UniqueIdentifier>{4a237758-a433-4d69-ad33-1a130e7d4ea6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -523,23 +523,23 @@
     <ClCompile Include="..\..\source\oxygen\devmode\windows\PaletteBrowserWindow.cpp">
       <Filter>devmode\windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\application\gpconnect\GameplayConnector.cpp">
-      <Filter>application\gpconnect</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\application\gpconnect\GameplayClient.cpp">
-      <Filter>application\gpconnect</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\application\gpconnect\GameplayHost.cpp">
-      <Filter>application\gpconnect</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\helper\JsonSerializer.cpp">
       <Filter>helper</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\client\EngineServerClient.cpp">
-      <Filter>client</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\devmode\windows\NetworkingWindow.cpp">
       <Filter>devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayClient.cpp">
+      <Filter>network\netplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayHost.cpp">
+      <Filter>network\netplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayManager.cpp">
+      <Filter>network\netplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\network\EngineServerClient.cpp">
+      <Filter>network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1000,29 +1000,29 @@
     <ClInclude Include="..\..\source\oxygen\devmode\windows\PaletteBrowserWindow.h">
       <Filter>devmode\windows</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\application\gpconnect\GameplayConnector.h">
-      <Filter>application\gpconnect</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\application\gpconnect\GPCPackets.h">
-      <Filter>application\gpconnect</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\application\gpconnect\GameplayClient.h">
-      <Filter>application\gpconnect</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\application\gpconnect\GameplayHost.h">
-      <Filter>application\gpconnect</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\application\gpconnect\ExternalAddressQuery.h">
-      <Filter>application\gpconnect</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\helper\JsonSerializer.h">
       <Filter>helper</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\client\EngineServerClient.h">
-      <Filter>client</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\devmode\windows\NetworkingWindow.h">
       <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\network\netplay\ExternalAddressQuery.h">
+      <Filter>network\netplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\network\netplay\NetplayClient.h">
+      <Filter>network\netplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\network\netplay\NetplayHost.h">
+      <Filter>network\netplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\network\netplay\NetplayManager.h">
+      <Filter>network\netplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\network\netplay\NetplayPackets.h">
+      <Filter>network\netplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\network\EngineServerClient.h">
+      <Filter>network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

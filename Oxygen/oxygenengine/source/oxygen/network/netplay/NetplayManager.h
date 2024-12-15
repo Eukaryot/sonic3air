@@ -8,29 +8,29 @@
 
 #pragma once
 
-#include "oxygen/application/gpconnect/ExternalAddressQuery.h"
+#include "oxygen/network/netplay/ExternalAddressQuery.h"
 
 #include "oxygen_netcore/network/ConnectionListener.h"
 #include "oxygen_netcore/network/ConnectionManager.h"
 
 class ControlsIn;
-class GameplayClient;
-class GameplayHost;
+class NetplayClient;
+class NetplayHost;
 
 
-class GameplayConnector : public ConnectionListenerInterface, public SingleInstance<GameplayConnector>
+class NetplayManager : public ConnectionListenerInterface, public SingleInstance<NetplayManager>
 {
 public:
 	static const uint16 DEFAULT_PORT = 28840;
 
 public:
-	GameplayConnector();
-	~GameplayConnector();
+	NetplayManager();
+	~NetplayManager();
 
 	inline ConnectionManager& getConnectionManager()		{ return mConnectionManager; }
 
-	inline const GameplayHost* getGameplayHost() const		{ return mGameplayHost; }
-	inline const GameplayClient* getGameplayClient() const	{ return mGameplayClient; }
+	inline const NetplayHost* getNetplayHost() const		{ return mNetplayHost; }
+	inline const NetplayClient* getNetplayClient() const	{ return mNetplayClient; }
 	inline const ExternalAddressQuery& getExternalAddressQuery() const  { return mExternalAddressQuery; }
 
 	bool setupAsHost(bool registerSessionAtServer, uint16 port = DEFAULT_PORT, bool useIPv6 = false);
@@ -59,7 +59,7 @@ private:
 	UDPSocket mUDPSocket;
 	ConnectionManager mConnectionManager;
 
-	GameplayHost* mGameplayHost = nullptr;
-	GameplayClient* mGameplayClient = nullptr;
+	NetplayHost* mNetplayHost = nullptr;
+	NetplayClient* mNetplayClient = nullptr;
 	ExternalAddressQuery mExternalAddressQuery;
 };

@@ -11,9 +11,9 @@
 
 #if defined(SUPPORT_IMGUI)
 
-#include "oxygen/application/gpconnect/GameplayClient.h"
-#include "oxygen/application/gpconnect/GameplayConnector.h"
-#include "oxygen/application/gpconnect/GameplayHost.h"
+#include "oxygen/network/netplay/NetplayClient.h"
+#include "oxygen/network/netplay/NetplayManager.h"
+#include "oxygen/network/netplay/NetplayHost.h"
 #include "oxygen/devmode/ImGuiHelpers.h"
 
 
@@ -34,15 +34,15 @@ void NetworkingWindow::buildContent()
 		ImGui::SeparatorText("Gameplay Connector");
 		ImGuiHelpers::ScopedIndent si;
 
-		GameplayConnector& gameplayConnector = GameplayConnector::instance();
+		NetplayManager& netplayManager = NetplayManager::instance();
 
-		if (nullptr != gameplayConnector.getGameplayHost())
+		if (nullptr != netplayManager.getNetplayHost())
 		{
-			ImGui::Text("Host: %d connections", gameplayConnector.getGameplayHost()->getPlayerConnections().size());
+			ImGui::Text("Host: %d connections", netplayManager.getNetplayHost()->getPlayerConnections().size());
 		}
-		else if (nullptr != gameplayConnector.getGameplayClient())
+		else if (nullptr != netplayManager.getNetplayClient())
 		{
-			switch (gameplayConnector.getGameplayClient()->getHostConnection().getState())
+			switch (netplayManager.getNetplayClient()->getHostConnection().getState())
 			{
 				case NetConnection::State::EMPTY:				 ImGui::Text("Client: No connection");  break;
 				case NetConnection::State::TCP_READY:			 ImGui::Text("Client: TCP ready");  break;
@@ -56,36 +56,36 @@ void NetworkingWindow::buildContent()
 			ImGui::Text("Inactive");
 		}
 		
-		ImGui::BeginDisabled(nullptr != gameplayConnector.getGameplayHost());
+		ImGui::BeginDisabled(nullptr != netplayManager.getNetplayHost());
 		{
 			const bool USE_IPV6 = false;	// TODO: IPv6 does not work, the the server doesn't support it
 			if (ImGui::Button("Host via server"))
 			{
-				gameplayConnector.setupAsHost(true, GameplayConnector::DEFAULT_PORT, USE_IPV6);
+				netplayManager.setupAsHost(true, NetplayManager::DEFAULT_PORT, USE_IPV6);
 			}
 
 			ImGui::SameLine();
 			if (ImGui::Button("Host directly"))
 			{
-				gameplayConnector.setupAsHost(false, GameplayConnector::DEFAULT_PORT, USE_IPV6);
+				netplayManager.setupAsHost(false, NetplayManager::DEFAULT_PORT, USE_IPV6);
 			}
 		}
 		ImGui::EndDisabled();
 
-		ImGui::BeginDisabled(nullptr != gameplayConnector.getGameplayClient());
+		ImGui::BeginDisabled(nullptr != netplayManager.getNetplayClient());
 		{
 			static char ipBuffer[32] = "127.0.0.1";
-			static int port = GameplayConnector::DEFAULT_PORT;
+			static int port = NetplayManager::DEFAULT_PORT;
 
 			if (ImGui::Button("Join via server"))
 			{
-				gameplayConnector.startJoinViaServer();
+				netplayManager.startJoinViaServer();
 			}
 
 			ImGui::SameLine();
 			if (ImGui::Button("Join directly"))
 			{
-				gameplayConnector.startJoinDirect(ipBuffer, port);
+				netplayManager.startJoinDirect(ipBuffer, port);
 			}
 
 			ImGui::SameLine();
@@ -104,41 +104,41 @@ void NetworkingWindow::buildContent()
 		}
 		ImGui::EndDisabled();
 
-		ImGui::BeginDisabled(nullptr == gameplayConnector.getGameplayHost() && nullptr == gameplayConnector.getGameplayClient());
+		ImGui::BeginDisabled(nullptr == netplayManager.getNetplayHost() && nullptr == netplayManager.getNetplayClient());
 		if (ImGui::Button("Close connection"))
 		{
-			gameplayConnector.closeConnections();
+			netplayManager.closeConnections();
 		}
 		ImGui::EndDisabled();
 
-		if (!gameplayConnector.getExternalAddressQuery().mOwnExternalIP.empty())
+		if (!netplayManager.getExternalAddressQuery().mOwnExternalIP.empty())
 		{
-			ImGui::Text("Retrieved own external address: IP = %s, port = %d", gameplayConnector.getExternalAddressQuery().mOwnExternalIP.c_str(), gameplayConnector.getExternalAddressQuery().mOwnExternalPort);
+			ImGui::Text("Retrieved own external address: IP = %s, port = %d", netplayManager.getExternalAddressQuery().mOwnExternalIP.c_str(), netplayManager.getExternalAddressQuery().mOwnExternalPort);
 		}
 
-		if (nullptr != gameplayConnector.getGameplayHost())
+		if (nullptr != netplayManager.getNetplayHost())
 		{
-			switch (gameplayConnector.getGameplayHost()->getState())
+			switch (netplayManager.getNetplayHost()->getState())
 			{
-				case GameplayHost::State::NONE:					ImGui::Text("Inactive");  break;
-				case GameplayHost::State::CONNECT_TO_SERVER:	ImGui::Text("Connecting to game server");  break;
-				case GameplayHost::State::REGISTERED:			ImGui::Text("Registered at game server");  break;
-				case GameplayHost::State::PUNCHTHROUGH:			ImGui::Text("NAT punchthrough");  break;
-				case GameplayHost::State::RUNNING:				ImGui::Text("Session running");  break;
-				case GameplayHost::State::FAILED:				ImGui::Text("Failed");  break;
+				case NetplayHost::State::NONE:					ImGui::Text("Inactive");  break;
+				case NetplayHost::State::CONNECT_TO_SERVER:		ImGui::Text("Connecting to game server");  break;
+				case NetplayHost::State::REGISTERED:			ImGui::Text("Registered at game server");  break;
+				case NetplayHost::State::PUNCHTHROUGH:			ImGui::Text("NAT punchthrough");  break;
+				case NetplayHost::State::RUNNING:				ImGui::Text("Session running");  break;
+				case NetplayHost::State::FAILED:				ImGui::Text("Failed");  break;
 			}
 		}
 
-		if (nullptr != gameplayConnector.getGameplayClient())
+		if (nullptr != netplayManager.getNetplayClient())
 		{
-			switch (gameplayConnector.getGameplayClient()->getState())
+			switch (netplayManager.getNetplayClient()->getState())
 			{
-				case GameplayClient::State::NONE:				ImGui::Text("Inactive");  break;
-				case GameplayClient::State::CONNECT_TO_SERVER:  ImGui::Text("Connecting to game server");  break;
-				case GameplayClient::State::REGISTERED:			ImGui::Text("Registered at game server");  break;
-				case GameplayClient::State::CONNECT_TO_HOST:	ImGui::Text("Connecting to host");  break;
-				case GameplayClient::State::RUNNING:			ImGui::Text("Session running");  break;
-				case GameplayClient::State::FAILED:				ImGui::Text("Failed");  break;
+				case NetplayClient::State::NONE:				ImGui::Text("Inactive");  break;
+				case NetplayClient::State::CONNECT_TO_SERVER:	ImGui::Text("Connecting to game server");  break;
+				case NetplayClient::State::REGISTERED:			ImGui::Text("Registered at game server");  break;
+				case NetplayClient::State::CONNECT_TO_HOST:		ImGui::Text("Connecting to host");  break;
+				case NetplayClient::State::RUNNING:				ImGui::Text("Session running");  break;
+				case NetplayClient::State::FAILED:				ImGui::Text("Failed");  break;
 			}
 		}
 	}

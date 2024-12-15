@@ -7,121 +7,120 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/application/gpconnect/GameplayConnector.h"
-#include "oxygen/application/gpconnect/GameplayClient.h"
-#include "oxygen/application/gpconnect/GameplayHost.h"
+#include "oxygen/network/netplay/NetplayManager.h"
+#include "oxygen/network/netplay/NetplayClient.h"
+#include "oxygen/network/netplay/NetplayHost.h"
+#include "oxygen/network/EngineServerClient.h"
 
 #include "oxygen_netcore/serverclient/Packets.h"
 #include "oxygen_netcore/serverclient/ProtocolVersion.h"
 
-#include "oxygen/client/EngineServerClient.h"
 
-
-GameplayConnector::GameplayConnector() :
+NetplayManager::NetplayManager() :
 	mConnectionManager(&mUDPSocket, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE)
 {
 }
 
-GameplayConnector::~GameplayConnector()
+NetplayManager::~NetplayManager()
 {
 	closeConnections();
 }
 
-bool GameplayConnector::setupAsHost(bool registerSessionAtServer, uint16 port, bool useIPv6)
+bool NetplayManager::setupAsHost(bool registerSessionAtServer, uint16 port, bool useIPv6)
 {
-	if (!restartConnection(true, port, useIPv6) || nullptr == mGameplayHost)
+	if (!restartConnection(true, port, useIPv6) || nullptr == mNetplayHost)
 		return false;
 
 	if (registerSessionAtServer)
 	{
-		mGameplayHost->registerAtServer();
+		mNetplayHost->registerAtServer();
 	}
 	return true;
 }
 
-void GameplayConnector::startJoinViaServer()
+void NetplayManager::startJoinViaServer()
 {
-	if (!restartConnection(false) || nullptr == mGameplayClient)
+	if (!restartConnection(false) || nullptr == mNetplayClient)
 		return;
 
-	mGameplayClient->joinViaServer();
+	mNetplayClient->joinViaServer();
 }
 
-void GameplayConnector::startJoinDirect(std::string_view ip, uint16 port)
+void NetplayManager::startJoinDirect(std::string_view ip, uint16 port)
 {
-	if (!restartConnection(false) || nullptr == mGameplayClient)
+	if (!restartConnection(false) || nullptr == mNetplayClient)
 		return;
 
-	mGameplayClient->connectDirectlyToHost(ip, port);
+	mNetplayClient->connectDirectlyToHost(ip, port);
 }
 
-void GameplayConnector::closeConnections()
+void NetplayManager::closeConnections()
 {
-	SAFE_DELETE(mGameplayHost);
-	SAFE_DELETE(mGameplayClient);
+	SAFE_DELETE(mNetplayHost);
+	SAFE_DELETE(mNetplayClient);
 	mExternalAddressQuery = ExternalAddressQuery();
 	mUDPSocket.close();
 }
 
-void GameplayConnector::updateConnections(float deltaSeconds)
+void NetplayManager::updateConnections(float deltaSeconds)
 {
 	if (!mUDPSocket.isValid())
 		return;
 
 	mConnectionManager.updateConnectionManager();
 
-	if (nullptr != mGameplayHost)
+	if (nullptr != mNetplayHost)
 	{
-		mGameplayHost->updateConnection(deltaSeconds);
+		mNetplayHost->updateConnection(deltaSeconds);
 	}
-	if (nullptr != mGameplayClient)
+	if (nullptr != mNetplayClient)
 	{
-		mGameplayClient->updateConnection(deltaSeconds);
+		mNetplayClient->updateConnection(deltaSeconds);
 	}
 }
 
-bool GameplayConnector::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluation)
+bool NetplayManager::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluation)
 {
-	if (nullptr != mGameplayHost)
+	if (nullptr != mNetplayHost)
 	{
-		if (mGameplayHost->onReceivedGameServerPacket(evaluation))
+		if (mNetplayHost->onReceivedGameServerPacket(evaluation))
 			return true;
 	}
-	if (nullptr != mGameplayClient)
+	if (nullptr != mNetplayClient)
 	{
-		if (mGameplayClient->onReceivedGameServerPacket(evaluation))
+		if (mNetplayClient->onReceivedGameServerPacket(evaluation))
 			return true;
 	}
 	return false;
 }
 
-bool GameplayConnector::canBeginNextFrame(uint32 frameNumber)
+bool NetplayManager::canBeginNextFrame(uint32 frameNumber)
 {
-	if (nullptr != mGameplayClient)
+	if (nullptr != mNetplayClient)
 	{
-		return mGameplayClient->canBeginNextFrame(frameNumber);
+		return mNetplayClient->canBeginNextFrame(frameNumber);
 	}
 	return true;
 }
 
-void GameplayConnector::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
+void NetplayManager::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 {
-	if (nullptr != mGameplayHost)
+	if (nullptr != mNetplayHost)
 	{
-		mGameplayHost->onFrameUpdate(controlsIn, frameNumber);
+		mNetplayHost->onFrameUpdate(controlsIn, frameNumber);
 	}
-	if (nullptr != mGameplayClient)
+	if (nullptr != mNetplayClient)
 	{
-		mGameplayClient->onFrameUpdate(controlsIn, frameNumber);
+		mNetplayClient->onFrameUpdate(controlsIn, frameNumber);
 	}
 }
 
-NetConnection* GameplayConnector::createNetConnection(ConnectionManager& connectionManager, const SocketAddress& senderAddress)
+NetConnection* NetplayManager::createNetConnection(ConnectionManager& connectionManager, const SocketAddress& senderAddress)
 {
-	if (nullptr != mGameplayHost)
+	if (nullptr != mNetplayHost)
 	{
 		// Accept incoming connection
-		return mGameplayHost->createNetConnection(senderAddress);
+		return mNetplayHost->createNetConnection(senderAddress);
 	}
 	else
 	{
@@ -130,17 +129,17 @@ NetConnection* GameplayConnector::createNetConnection(ConnectionManager& connect
 	}
 }
 
-void GameplayConnector::destroyNetConnection(NetConnection& connection)
+void NetplayManager::destroyNetConnection(NetConnection& connection)
 {
-	if (nullptr != mGameplayHost)
+	if (nullptr != mNetplayHost)
 	{
-		mGameplayHost->destroyNetConnection(connection);
+		mNetplayHost->destroyNetConnection(connection);
 	}
 
 	delete &connection;
 }
 
-bool GameplayConnector::onReceivedConnectionlessPacket(ConnectionlessPacketEvaluation& evaluation)
+bool NetplayManager::onReceivedConnectionlessPacket(ConnectionlessPacketEvaluation& evaluation)
 {
 	switch (evaluation.mLowLevelSignature)
 	{
@@ -162,20 +161,20 @@ bool GameplayConnector::onReceivedConnectionlessPacket(ConnectionlessPacketEvalu
 	return false;
 }
 
-bool GameplayConnector::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
+bool NetplayManager::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 {
-	if (nullptr != mGameplayHost)
+	if (nullptr != mNetplayHost)
 	{
-		return mGameplayHost->onReceivedPacket(evaluation);
+		return mNetplayHost->onReceivedPacket(evaluation);
 	}
-	if (nullptr != mGameplayClient)
+	if (nullptr != mNetplayClient)
 	{
-		return mGameplayClient->onReceivedPacket(evaluation);
+		return mNetplayClient->onReceivedPacket(evaluation);
 	}
 	return false;
 }
 
-bool GameplayConnector::restartConnection(bool asHost, uint16 hostPort, bool useIPv6)
+bool NetplayManager::restartConnection(bool asHost, uint16 hostPort, bool useIPv6)
 {
 	closeConnections();
 	Sockets::startupSockets();
@@ -199,18 +198,18 @@ bool GameplayConnector::restartConnection(bool asHost, uint16 hostPort, bool use
 
 	if (asHost)
 	{
-		mGameplayHost = new GameplayHost(mConnectionManager, *this);
+		mNetplayHost = new NetplayHost(mConnectionManager, *this);
 	}
 	else
 	{
-		mGameplayClient = new GameplayClient(mConnectionManager, *this);
+		mNetplayClient = new NetplayClient(mConnectionManager, *this);
 	}
 
 	retrieveSocketExternalAddress();
 	return true;
 }
 
-void GameplayConnector::retrieveSocketExternalAddress()
+void NetplayManager::retrieveSocketExternalAddress()
 {
 	mExternalAddressQuery = ExternalAddressQuery();
 	mExternalAddressQuery.mQueryID = (uint64)(1 + rand()) + ((uint64)rand() << 16) + ((uint64)rand() << 32) + ((uint64)rand() << 48);

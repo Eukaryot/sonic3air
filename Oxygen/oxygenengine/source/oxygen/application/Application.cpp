@@ -13,7 +13,7 @@
 #include "oxygen/application/GameLoader.h"
 #include "oxygen/application/audio/AudioOutBase.h"
 #include "oxygen/application/audio/AudioPlayer.h"
-#include "oxygen/application/gpconnect/GameplayConnector.h"
+#include "oxygen/network/netplay/NetplayManager.h"
 #include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/mainview/GameView.h"
@@ -45,7 +45,7 @@ Application::Application() :
 	mGameLoader(new GameLoader()),
 	mSimulation(new Simulation()),
 	mSaveStateMenu(new SaveStateMenu()),
-	mGameplayConnector(new GameplayConnector())
+	mNetplayManager(new NetplayManager())
 {
 	if (hasVirtualGamepad())
 	{
@@ -69,6 +69,7 @@ Application::~Application()
 	delete mGameLoader;
 	delete mSaveStateMenu;
 	delete mSimulation;
+	delete mNetplayManager;
 
 	Sockets::shutdownSockets();
 }
@@ -472,8 +473,8 @@ void Application::update(float timeElapsed)
 		}
 	}
 
-	// Update connection
-	mGameplayConnector->updateConnections(timeElapsed);
+	// Update netplay connections
+	mNetplayManager->updateConnections(timeElapsed);
 
 	// Update drawer
 	EngineMain::instance().getDrawer().updateDrawer(timeElapsed);

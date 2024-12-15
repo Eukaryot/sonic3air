@@ -13,10 +13,10 @@
 #include "oxygen_netcore/serverclient/NetplaySetupPackets.h"
 
 class ControlsIn;
-class GameplayConnector;
+class NetplayManager;
 
 
-class GameplayClient
+class NetplayClient
 {
 public:
 	enum class State
@@ -35,8 +35,8 @@ public:
 	};
 
 public:
-	GameplayClient(ConnectionManager& connectionManager, GameplayConnector& gameplayConnector);
-	~GameplayClient();
+	NetplayClient(ConnectionManager& connectionManager, NetplayManager& netplayManager);
+	~NetplayClient();
 
 	inline State getState() const  { return mState; }
 	inline const HostConnection& getHostConnection() const  { return mHostConnection; }
@@ -59,7 +59,7 @@ private:
 
 private:
 	ConnectionManager& mConnectionManager;
-	GameplayConnector& mGameplayConnector;
+	NetplayManager& mNetplayManager;
 	HostConnection mHostConnection;
 	State mState = State::NONE;
 
