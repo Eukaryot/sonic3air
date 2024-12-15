@@ -43,8 +43,8 @@ NetConnection* NetplayHost::createNetConnection(const SocketAddress& senderAddre
 {
 	PlayerConnection* connection = new PlayerConnection();
 
-	// TODO: Set player index accordingly, it should rather start at 1 and take into account the other connections' player indices
-	connection->mPlayerIndex = (uint8)mPlayerConnections.size();
+	// TODO: Set player index accordingly, it should take into account the other connections' player indices and use a free one
+	connection->mPlayerIndex = (uint8)mPlayerConnections.size() + 1;
 
 	mPlayerConnections.push_back(connection);
 	return connection;
@@ -185,45 +185,56 @@ void NetplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 	if (activeConnections.empty())
 		return;
 
-	size_t maxNumFrames = 0;
-
-	// Inject input states from the clients
-	for (PlayerConnection* playerConnection : activeConnections)
+	// Add new frame to the history
 	{
-		// Apply last received input for that player
-		const uint16 input = playerConnection->mLastReceivedInput;
-		controlsIn.injectInput(playerConnection->mPlayerIndex, input);
+		mInputHistory.emplace_back();
+		InputFrame& newInputFrame = mInputHistory.back();
 
-		playerConnection->mAppliedInputs.push_back(input);
+		// Apply host's local input (local player 1 only)
+		newInputFrame.mInputsByPlayer[0] = controlsIn.getInputFromController(0);
 
-		// Limit applied inputs history to 30 frames
-		while (playerConnection->mAppliedInputs.size() > 30)
-			playerConnection->mAppliedInputs.pop_front();
+		// Apply last received input from the clients
+		for (PlayerConnection* playerConnection : activeConnections)
+		{
+			if (playerConnection->mPlayerIndex >= 0 && playerConnection->mPlayerIndex < 4)
+			{
+				const uint16 input = playerConnection->mLastReceivedInput;
+				newInputFrame.mInputsByPlayer[playerConnection->mPlayerIndex] = input;
+			}
+		}
 
-		maxNumFrames = std::max(maxNumFrames, playerConnection->mAppliedInputs.size());
+		// Limit inputs history to a reasonable number of frames
+		while (mInputHistory.size() > 30)
+			mInputHistory.pop_front();
 	}
+
+	// Apply input locally
+	{
+		const InputFrame& inputFrame = mInputHistory.back();
+		for (int playerIndex = 0; playerIndex < 2; ++playerIndex)
+		{
+			controlsIn.injectInput(playerIndex, inputFrame.mInputsByPlayer[playerIndex]);
+		}
+	}
+
+	const size_t numPlayers = activeConnections.size() + 1;
+	const size_t numFrames = std::min<size_t>(mInputHistory.size(), 30);
 
 	// Build packet to send to the clients
 	GameStateIncrementPacket packet;
-	packet.mNumPlayers = (uint8)activeConnections.size();
-	packet.mNumFrames = (uint8)maxNumFrames;
+	packet.mNumPlayers = (uint8)numPlayers;
+	packet.mNumFrames = (uint8)numFrames;
 	packet.mFrameNumber = frameNumber;
 	packet.mInputs.resize(packet.mNumPlayers * packet.mNumFrames);
 
-	if (maxNumFrames > 0)
+	// Copy input data from players
 	{
-		// Copy input data from players
 		uint16* input = &packet.mInputs[0];
-		for (PlayerConnection* playerConnection : activeConnections)
+		for (auto it = mInputHistory.rbegin(); it != mInputHistory.rend(); ++it)
 		{
-			for (size_t k = 0; k < maxNumFrames - playerConnection->mAppliedInputs.size(); ++k)
+			for (int playerIndex = 0; playerIndex < (int)numPlayers; ++playerIndex)
 			{
-				*input = 0;
-				++input;
-			}
-			for (auto it = playerConnection->mAppliedInputs.begin(); it != playerConnection->mAppliedInputs.end(); ++it)
-			{
-				*input = *it;
+				*input = it->mInputsByPlayer[playerIndex];
 				++input;
 			}
 		}

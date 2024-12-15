@@ -188,9 +188,11 @@ bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 				{
 					mReceivedFrames.emplace_back();
 					ReceivedFrame& newFrame = mReceivedFrames.back();
+					const uint16* input = &packet.mInputs[0];
 					for (int playerIndex = 0; playerIndex < packet.mNumPlayers; ++playerIndex)
 					{
-						newFrame.mInputByPlayer[playerIndex] = packet.mInputs[inputsBaseIndex + k + packet.mNumFrames * playerIndex];
+						newFrame.mInputByPlayer[playerIndex] = *input;
+						++input;
 					}
 					// Player inputs not included in the packet stay at 0
 				}

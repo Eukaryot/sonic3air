@@ -36,7 +36,11 @@ public:
 		uint8 mPlayerIndex = 0;
 		uint32 mLastReceivedFrameNumber = 0;
 		uint16 mLastReceivedInput = 0;
-		std::deque<uint16> mAppliedInputs;		// Applied player inputs for the last x frames
+	};
+
+	struct InputFrame
+	{
+		uint16 mInputsByPlayer[4] = { 0 };
 	};
 
 public:
@@ -65,4 +69,5 @@ private:
 	network::RegisterForNetplayRequest mRegistrationRequest;
 
 	std::vector<PlayerConnection*> mPlayerConnections;
+	std::deque<InputFrame> mInputHistory;
 };

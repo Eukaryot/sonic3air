@@ -19,7 +19,7 @@ struct GameStateIncrementPacket : public highlevel::PacketBase
 	uint32 mFrameNumber = 0;		// Most recent frame number
 	uint8 mNumFrames = 0;
 	uint8 mNumPlayers = 0;
-	std::vector<uint16> mInputs;	// One input per player and frame
+	std::vector<uint16> mInputs;	// One input per player and frame (player inputs are packed together, forming one frame)
 
 	virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
 	{
