@@ -8,7 +8,6 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/network/EngineServerClient.h"
-#include "oxygen/network/netplay/NetplayManager.h"
 
 #include "oxygen_netcore/serverclient/NetplaySetupPackets.h"
 #include "oxygen_netcore/serverclient/ProtocolVersion.h"
@@ -81,65 +80,69 @@ bool EngineServerClient::setupClient()
 
 void EngineServerClient::updateClient(float timeElapsed)
 {
-	if (mServerConnection.getState() == NetConnection::State::EMPTY)
-		return;
-
-	if (mServerConnection.getState() == NetConnection::State::DISCONNECTED)
+	// First update the server connection
+	if (mServerConnection.getState() != NetConnection::State::EMPTY)
 	{
-		// Try connecting once again after 30 seconds
-		mConnectionState = ConnectionState::FAILED;
-		if (ConnectionManager::getCurrentTimestamp() > mLastConnectionAttemptTimestamp + 30000)
+		if (mServerConnection.getState() == NetConnection::State::DISCONNECTED)
 		{
-			startConnectingToServer();
-		}
-	}
-	else
-	{
-		// Check for new packets
-		mConnectionManager.updateConnectionManager();
-	}
-
-	switch (mConnectionState)
-	{
-		case ConnectionState::CONNECTING:
-		{
-			// Wait until connected
-			if (mServerConnection.getState() == NetConnection::State::CONNECTED)
+			// Try connecting once again after 30 seconds
+			mConnectionState = ConnectionState::FAILED;
+			if (ConnectionManager::getCurrentTimestamp() > mLastConnectionAttemptTimestamp + 30000)
 			{
-				mServerConnection.sendRequest(mGetServerFeaturesRequest);
-				mConnectionState = ConnectionState::WAIT_FOR_FEATURES;
+				startConnectingToServer();
 			}
-			break;
 		}
-
-		case ConnectionState::WAIT_FOR_FEATURES:
+		else
 		{
-			switch (mGetServerFeaturesRequest.getState())
-			{
-				case highlevel::RequestBase::State::SUCCESS:
-				{
-					// Ready for actual online feature use
-					mConnectionState = ConnectionState::READY;
-					break;
-				}
-
-				case highlevel::RequestBase::State::FAILED:
-				{
-					// That failed...
-					mServerConnection.clear();
-					mConnectionState = ConnectionState::FAILED;
-					break;
-				}
-
-				default:
-					break;
-			}
-			break;
+			// Check for new packets
+			mConnectionManager.updateConnectionManager();
 		}
 
-		default:
-			break;
+		switch (mConnectionState)
+		{
+			case ConnectionState::CONNECTING:
+			{
+				// Wait until connected
+				if (mServerConnection.getState() == NetConnection::State::CONNECTED)
+				{
+					mServerConnection.sendRequest(mGetServerFeaturesRequest);
+					mConnectionState = ConnectionState::WAIT_FOR_FEATURES;
+				}
+				break;
+			}
+
+			case ConnectionState::WAIT_FOR_FEATURES:
+			{
+				switch (mGetServerFeaturesRequest.getState())
+				{
+					case highlevel::RequestBase::State::SUCCESS:
+					{
+						// Ready for actual online feature use
+						mConnectionState = ConnectionState::READY;
+						break;
+					}
+
+					case highlevel::RequestBase::State::FAILED:
+					{
+						// That failed...
+						mServerConnection.clear();
+						mConnectionState = ConnectionState::FAILED;
+						break;
+					}
+
+					default:
+						break;
+				}
+				break;
+			}
+
+			default:
+				break;
+		}
 	}
+
+	// Now update netplay
+	mNetplayManager.updateConnections(timeElapsed);
 }
 
 void EngineServerClient::connectToServer()

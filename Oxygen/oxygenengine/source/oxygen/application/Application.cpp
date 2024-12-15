@@ -13,7 +13,6 @@
 #include "oxygen/application/GameLoader.h"
 #include "oxygen/application/audio/AudioOutBase.h"
 #include "oxygen/application/audio/AudioPlayer.h"
-#include "oxygen/network/netplay/NetplayManager.h"
 #include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/mainview/GameView.h"
@@ -32,6 +31,7 @@
 #include "oxygen/devmode/ImGuiIntegration.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/helper/Profiling.h"
+#include "oxygen/network/EngineServerClient.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/PersistentData.h"
@@ -44,8 +44,7 @@ static const float MOUSE_HIDE_TIME = 1.0f;	// Seconds until mouse cursor gets hi
 Application::Application() :
 	mGameLoader(new GameLoader()),
 	mSimulation(new Simulation()),
-	mSaveStateMenu(new SaveStateMenu()),
-	mNetplayManager(new NetplayManager())
+	mSaveStateMenu(new SaveStateMenu())
 {
 	if (hasVirtualGamepad())
 	{
@@ -69,7 +68,6 @@ Application::~Application()
 	delete mGameLoader;
 	delete mSaveStateMenu;
 	delete mSimulation;
-	delete mNetplayManager;
 
 	Sockets::shutdownSockets();
 }
@@ -473,8 +471,8 @@ void Application::update(float timeElapsed)
 		}
 	}
 
-	// Update netplay connections
-	mNetplayManager->updateConnections(timeElapsed);
+	// Update engine server client and netplay
+	EngineServerClient::instance().updateClient(timeElapsed);
 
 	// Update drawer
 	EngineMain::instance().getDrawer().updateDrawer(timeElapsed);

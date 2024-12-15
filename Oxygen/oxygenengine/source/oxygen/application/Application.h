@@ -19,7 +19,6 @@ class GameApp;
 class GameLoader;
 class GameSetupScreen;
 class GameView;
-class NetplayManager;
 class OxygenMenu;
 class ProfilingView;
 class SaveStateMenu;
@@ -50,7 +49,6 @@ public:
 	inline GameView& getGameView()							{ return *mGameView; }
 	inline TouchControlsOverlay* getTouchControlsOverlay()	{ return mTouchControlsOverlay; }
 	inline DebugSidePanel* getDebugSidePanel()				{ return mDebugSidePanel; }
-	inline NetplayManager& getNetplayManager()				{ return *mNetplayManager; }
 
 	WindowMode getWindowMode() const  { return mWindowMode; }
 	void setWindowMode(WindowMode windowMode, bool force = false);
@@ -95,7 +93,6 @@ private:
 	SaveStateMenu* mSaveStateMenu = nullptr;
 	DebugSidePanel* mDebugSidePanel = nullptr;
 	ProfilingView* mProfilingView = nullptr;
-	NetplayManager* mNetplayManager = nullptr;
 
 	// Input
 	float mMouseHideTimer = 0.0f;

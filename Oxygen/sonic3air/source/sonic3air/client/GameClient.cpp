@@ -26,13 +26,10 @@ void GameClient::setupClient()
 
 void GameClient::updateClient(float timeElapsed)
 {
-	EngineServerClient& engineServerClient = EngineServerClient::instance();
-
-	engineServerClient.updateClient(timeElapsed);
-
+	// Check if server features were read
 	if (!mEvaluatedServerFeatures)
 	{
-		// Check if server features were read
+		EngineServerClient& engineServerClient = EngineServerClient::instance();
 		if (engineServerClient.hasReceivedServerFeatures())
 		{
 			mGhostSync.evaluateServerFeaturesResponse(engineServerClient.getServerFeatures());

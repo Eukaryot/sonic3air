@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "oxygen/network/netplay/NetplayManager.h"
+
 #include "oxygen_netcore/network/ConnectionListener.h"
 #include "oxygen_netcore/network/ConnectionManager.h"
 #include "oxygen_netcore/serverclient/Packets.h"
@@ -81,6 +83,8 @@ private:
 	UDPSocket mUDPSocket;
 	ConnectionManager mConnectionManager;
 	NetConnection mServerConnection;
+
+	NetplayManager mNetplayManager;
 	Listener* mListener = nullptr;
 
 	ConnectionState mConnectionState = ConnectionState::NOT_CONNECTED;
