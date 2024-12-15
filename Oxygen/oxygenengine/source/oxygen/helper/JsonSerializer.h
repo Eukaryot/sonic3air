@@ -28,6 +28,8 @@ public:
 
 	bool serializeComponents(const char* key, Vec2i& value);
 	bool serializeVectorAsSizeString(const char* key, Vec2i& value);
+	bool serializeHexColorRGB(const char* key, Color& value);
+	bool serializeArray(const char* key, std::vector<std::string>& value);
 
 	template <typename T, typename S>
 	bool serializeAs(const char* key, S& value)

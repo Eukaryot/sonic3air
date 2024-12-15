@@ -92,19 +92,62 @@ bool JsonSerializer::serializeVectorAsSizeString(const char* key, Vec2i& value)
 		serialize(key, str);
 		std::vector<String> components;
 		String(str).split(components, 'x');
-		if (components.size() >= 2)
-		{
-			value.x = components[0].parseInt();
-			value.y = components[1].parseInt();
-			return true;
-		}
-		return false;
+		if (components.size() < 2)
+			return false;
+
+		value.x = components[0].parseInt();
+		value.y = components[1].parseInt();
+		return true;
 	}
 	else
 	{
 		std::string str = *String(0, "%d x %d", value.x, value.y);
 		return serialize(key, str);
 	}
+}
+
+bool JsonSerializer::serializeHexColorRGB(const char* key, Color& value)
+{
+	std::string str;
+	if (mReading)
+	{
+		if (!serialize(key, str))
+			return false;
+
+		value.setARGB32((uint32)rmx::parseInteger(str) | 0xff000000);
+		return true;
+	}
+	else
+	{
+		str = rmx::hexString(value.getARGB32() & 0xffffff, 6);
+		return serialize(key, str);
+	}
+}
+
+bool JsonSerializer::serializeArray(const char* key, std::vector<std::string>& value)
+{
+	if (mReading)
+	{
+		value.clear();
+		const Json::Value& jsonArray = (*mCurrentJson)[key];
+		if (!jsonArray.isArray())
+			return false;
+
+		for (Json::Value::ArrayIndex k = 0; k < jsonArray.size(); ++k)
+		{
+			if (!jsonArray[k].isString())
+				return false;
+			value.emplace_back(jsonArray[k].asString());
+		}
+	}
+	else
+	{
+		Json::Value jsonArray(Json::arrayValue);
+		for (const std::string& str : value)
+			jsonArray.append(str);
+		(*mCurrentJson)[key] = jsonArray;
+	}
+	return true;
 }
 
 bool JsonSerializer::beginObject(const char* key)

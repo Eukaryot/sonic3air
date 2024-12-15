@@ -49,6 +49,9 @@ private:
 	}
 
 private:
+	DevModeWindowBase* findWindowByTitle(const std::string& title);
+
+private:
 	std::vector<DevModeWindowBase*> mAllWindows;
 
 	AudioBrowserWindow* mAudioBrowserWindow = nullptr;

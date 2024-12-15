@@ -33,16 +33,19 @@ public:
 	DevModeWindowBase(std::string_view title, Category category, ImGuiWindowFlags windowFlags);
 	virtual ~DevModeWindowBase() {}
 
+	bool getIsWindowOpen() const  { return mIsWindowOpen; }
+	void toggleIsWindowOpen()	  { toggle(mIsWindowOpen); }
+
 	virtual bool buildWindow();
 	virtual void buildContent() = 0;
 
-public:
-	std::string mTitle;
-	Category mCategory = Category::MISC;
+protected:
+	const std::string mTitle;
+	const Category mCategory = Category::MISC;
+
 	bool mIsWindowOpen = false;
 	ImGuiWindowFlags mImGuiWindowFlags = 0;
 
-protected:
 	DevModeMainWindow* mDevModeMainWindow = nullptr;
 };
 

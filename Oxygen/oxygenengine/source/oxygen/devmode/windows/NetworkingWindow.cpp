@@ -20,8 +20,6 @@
 NetworkingWindow::NetworkingWindow() :
 	DevModeWindowBase("Networking", Category::MISC, ImGuiWindowFlags_AlwaysAutoResize)
 {
-	// Just for testing
-	mIsWindowOpen = true;
 }
 
 void NetworkingWindow::buildContent()

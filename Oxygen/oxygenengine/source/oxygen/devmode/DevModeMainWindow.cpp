@@ -32,7 +32,7 @@ DevModeMainWindow::DevModeMainWindow() :
 	mIsWindowOpen = true;
 
 	// Create windows
-	//  -> Note that the order of creation defines he listing order isnide each categories
+	//  -> Note that the order of creation defines the listing order inside each category
 	{
 		createWindow(mGameSimWindow);
 
@@ -40,9 +40,6 @@ DevModeMainWindow::DevModeMainWindow() :
 		createWindow(mRenderedGeometryWindow);
 		createWindow(mPaletteViewWindow);
 		createWindow(mMemoryHexViewWindow);
-	#ifdef DEBUG
-		createWindow(mNetworkingWindow);
-	#endif
 		createWindow(mWatchesWindow);
 
 		createWindow(mScriptBuildWindow);
@@ -52,13 +49,38 @@ DevModeMainWindow::DevModeMainWindow() :
 		createWindow(mPaletteBrowserWindow);
 
 		createWindow(mSettingsWindow);
+	#ifdef DEBUG
+		createWindow(mNetworkingWindow);
+	#endif
+	}
+
+	// Open windows depending on what was saved in settings
+	for (const std::string& windowTitle : Configuration::instance().mDevMode.mOpenUIWindows)
+	{
+		DevModeWindowBase* window = findWindowByTitle(windowTitle);
+		if (nullptr != window)
+			window->mIsWindowOpen = true;
 	}
 }
 
 DevModeMainWindow::~DevModeMainWindow()
 {
+	// Save which windows are open
+	{
+		std::vector<std::string>& windowTitles = Configuration::instance().mDevMode.mOpenUIWindows;
+		windowTitles.clear();
+		for (DevModeWindowBase* window : mAllWindows)
+		{
+			if (window->mIsWindowOpen)
+				windowTitles.push_back(window->mTitle);
+		}
+	}
+
+	// Destroy window instances
 	for (DevModeWindowBase* window : mAllWindows)
+	{
 		delete window;
+	}
 }
 
 bool DevModeMainWindow::buildWindow()
@@ -129,6 +151,16 @@ void DevModeMainWindow::buildContent()
 void DevModeMainWindow::openWatchesWindow()
 {
 	mWatchesWindow->mIsWindowOpen = true;
+}
+
+DevModeWindowBase* DevModeMainWindow::findWindowByTitle(const std::string& title)
+{
+	for (DevModeWindowBase* window : mAllWindows)
+	{
+		if (window->mTitle == title)
+			return window;
+	}
+	return nullptr;
 }
 
 #endif

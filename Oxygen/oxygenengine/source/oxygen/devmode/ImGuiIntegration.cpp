@@ -250,7 +250,7 @@ void ImGuiIntegration::toggleMainWindow()
 {
 	if (mRunning && nullptr != mDevModeMainWindow)
 	{
-		toggle(mDevModeMainWindow->mIsWindowOpen);
+		mDevModeMainWindow->toggleIsWindowOpen();
 	}
 }
 

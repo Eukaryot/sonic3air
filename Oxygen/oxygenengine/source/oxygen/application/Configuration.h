@@ -66,6 +66,7 @@ public:
 		Vec2f mGameViewAlignment;
 		float mUIScale = 1.0f;
 		Color mUIAccentColor = Color(0.2f, 0.5f, 0.8f);
+		std::vector<std::string> mOpenUIWindows;
 		ExternalCodeEditor mExternalCodeEditor;
 	};
 
@@ -233,6 +234,6 @@ protected:
 	Json::Value mSettingsJsons[3];	// Uses SettingsType as key
 
 private:
-	static Configuration* mSingleInstance;
+	static inline Configuration* mSingleInstance;
 	bool mSettingsReadOnly = false;
 };

@@ -17,17 +17,6 @@
 
 namespace
 {
-	void tryParseWindowSize(String string, Vec2i& result)
-	{
-		std::vector<String> resolution;
-		string.split(resolution, 'x');
-		if (resolution.size() >= 2)
-		{
-			result.x = resolution[0].parseInt();
-			result.y = resolution[1].parseInt();
-		}
-	}
-
 	void readInputDevices(const Json::Value& rootJson, std::vector<InputConfig::DeviceDefinition>& inputDeviceDefinitions)
 	{
 		// Input devices
@@ -137,11 +126,7 @@ namespace
 				outAutoDetect = (renderMethodString == "auto");
 				if (outAutoDetect)
 				{
-				#if !defined(PLATFORM_VITA)
-					outRenderMethod = Configuration::RenderMethod::OPENGL_FULL;
-				#else
-					outRenderMethod = Configuration::RenderMethod::OPENGL_SOFT;
-				#endif
+					outRenderMethod = Configuration::getHighestSupportedRenderMethod();
 				}
 			}
 		}
@@ -232,8 +217,6 @@ namespace
 }
 
 
-
-Configuration* Configuration::mSingleInstance = nullptr;
 
 Configuration::RenderMethod Configuration::getHighestSupportedRenderMethod()
 {
@@ -411,40 +394,7 @@ void Configuration::saveSettings()
 		serializeStandardSettings(serializer);
 
 		// Dev mode
-		{
-			Json::Value devModeJson = root["DevMode"];
-
-			devModeJson["Enabled"] = mDevMode.mEnabled;
-
-			devModeJson["LoadSaveState"] = WString(mLoadSaveState).toUTF8().toStdString();
-			devModeJson["LoadLevel"] = mLoadLevel;
-			devModeJson["UseCharacters"] = mUseCharacters;
-
-			devModeJson["EnableROMDataAnalyser"] = mEnableROMDataAnalyser;
-
-			{
-				Json::Value uiJson = devModeJson["DevModeUI"];
-
-				uiJson["Scale"] = mDevMode.mUIScale;
-				uiJson["AccentColor"] = rmx::hexString(mDevMode.mUIAccentColor.getARGB32() & 0xffffff, 6);
-
-				devModeJson["DevModeUI"] = uiJson;
-			}
-
-			{
-				Json::Value extJson = devModeJson["ExternalCodeEditor"];
-
-				extJson["Type"] = mDevMode.mExternalCodeEditor.mActiveType;
-				extJson["VSCodePath"] = WString(mDevMode.mExternalCodeEditor.mVisualStudioCodePath).toUTF8().toStdString();
-				extJson["NppPath"] = WString(mDevMode.mExternalCodeEditor.mNotepadPlusPlusPath).toUTF8().toStdString();
-				extJson["CustomEditorPath"] = WString(mDevMode.mExternalCodeEditor.mCustomEditorPath).toUTF8().toStdString();
-				extJson["CustomEditorArgs"] = WString(mDevMode.mExternalCodeEditor.mCustomEditorArgs).toUTF8().toStdString();
-			
-				devModeJson["ExternalCodeEditor"] = extJson;
-			}
-
-			root["DevMode"] = devModeJson;
-		}
+		serializeDevMode(serializer);
 
 		// Mod settings
 		saveModSettings(root, mModSettings);
@@ -682,18 +632,19 @@ void Configuration::serializeDevMode(JsonSerializer& serializer)
 
 		serializer.serialize("LoadSaveState", mLoadSaveState);
 		serializer.serialize("LoadLevel", mLoadLevel);
-		serializer.serialize("UseCharacters", mUseCharacters);
-		mUseCharacters = clamp(mUseCharacters, 0, 4);
+		if (serializer.serialize("UseCharacters", mUseCharacters))
+		{
+			if (serializer.isReading())
+				mUseCharacters = clamp(mUseCharacters, 0, 4);
+		}
 
 		serializer.serialize("EnableROMDataAnalyser", mEnableROMDataAnalyser);
 
 		if (serializer.beginObject("DevModeUI"))
 		{
 			serializer.serialize("Scale", mDevMode.mUIScale);
-
-			std::string accentColorString;
-			if (serializer.serialize("AccentColor", accentColorString))
-				mDevMode.mUIAccentColor.setARGB32((uint32)rmx::parseInteger(accentColorString) | 0xff000000);
+			serializer.serializeHexColorRGB("AccentColor", mDevMode.mUIAccentColor);
+			serializer.serializeArray("OpenWindows", mDevMode.mOpenUIWindows);
 			serializer.endObject();
 		}
 
@@ -734,14 +685,7 @@ void Configuration::saveSettingsInput(const std::wstring& filename) const
 			{
 				const bool keyboard_a = String(a->mIdentifier).startsWith("Keyboard");
 				const bool keyboard_b = String(b->mIdentifier).startsWith("Keyboard");
-				if (keyboard_a != keyboard_b)
-				{
-					return keyboard_a;
-				}
-				else
-				{
-					return a->mIdentifier < b->mIdentifier;
-				}
+				return (keyboard_a != keyboard_b) ? keyboard_a : (a->mIdentifier < b->mIdentifier);
 			});
 	}
 
