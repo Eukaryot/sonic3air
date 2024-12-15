@@ -9,9 +9,8 @@
 #include "oxygen/pch.h"
 #include "oxygen/network/netplay/NetplayHost.h"
 #include "oxygen/network/netplay/NetplayManager.h"
-#include "oxygen/application/input/ControlsIn.h"
-
 #include "oxygen/network/EngineServerClient.h"
+#include "oxygen/application/input/ControlsIn.h"
 
 
 NetplayHost::NetplayHost(ConnectionManager& connectionManager, NetplayManager& netplayManager) :

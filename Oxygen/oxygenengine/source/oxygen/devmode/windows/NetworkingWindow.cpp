@@ -11,10 +11,10 @@
 
 #if defined(SUPPORT_IMGUI)
 
+#include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/network/netplay/NetplayClient.h"
 #include "oxygen/network/netplay/NetplayManager.h"
 #include "oxygen/network/netplay/NetplayHost.h"
-#include "oxygen/devmode/ImGuiHelpers.h"
 
 
 NetworkingWindow::NetworkingWindow() :

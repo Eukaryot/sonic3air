@@ -10,8 +10,8 @@
 #include "oxygen/network/netplay/NetplayClient.h"
 #include "oxygen/network/netplay/NetplayManager.h"
 #include "oxygen/network/netplay/NetplayPackets.h"
-#include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/network/EngineServerClient.h"
+#include "oxygen/application/input/ControlsIn.h"
 
 #include "oxygen_netcore/serverclient/NetplaySetupPackets.h"
 #include "oxygen_netcore/serverclient/Packets.h"
