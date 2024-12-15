@@ -130,6 +130,8 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntryPercent(option::VGAMEPAD_OPACITY,		&config.mVirtualGamepad.mOpacity);
 		setupOptionEntryPercent(option::CONTROLLER_RUMBLE_P1,	&config.mControllerRumbleIntensity[0]);
 		setupOptionEntryPercent(option::CONTROLLER_RUMBLE_P2,	&config.mControllerRumbleIntensity[1]);
+		setupOptionEntryPercent(option::CONTROLLER_RUMBLE_P3,	&config.mControllerRumbleIntensity[2]);
+		setupOptionEntryPercent(option::CONTROLLER_RUMBLE_P4,	&config.mControllerRumbleIntensity[3]);
 
 		setupOptionEntry(option::ROTATION,					SharedDatabase::Setting::SETTING_SMOOTH_ROTATION);
 		setupOptionEntry(option::SPEEDUP_AFTER_IMAGES,		SharedDatabase::Setting::SETTING_SPEEDUP_AFTERIMGS);
@@ -252,10 +254,6 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 				mUnlockedSecretsEntries[k].push_back(mOptionEntries[unlockable].mGameMenuEntry);
 			}
 		}
-
-		// Gather gamepad assignment entries
-		mGamepadAssignmentEntries[0] = mOptionEntries[option::CONTROLLER_PLAYER_1].mGameMenuEntry;
-		mGamepadAssignmentEntries[1] = mOptionEntries[option::CONTROLLER_PLAYER_2].mGameMenuEntry;
 	}
 }
 
@@ -368,6 +366,16 @@ void OptionsMenu::initialize()
 			entry.addOption(mSoundTestAudioDefinitions[index]->mKeyString, (uint32)index);
 		}
 		entry.sanitizeSelectedIndex();
+	}
+
+	// Show or hide 3 and 4 player input settings
+	static_assert(InputManager::NUM_PLAYERS == 4);
+	for (int playerIndex = 1; playerIndex < InputManager::NUM_PLAYERS; ++playerIndex)
+	{
+		const bool validPlayerIndex = (playerIndex < Configuration::instance().mNumPlayers);
+		mOptionEntries[option::CONTROLLER_PLAYER_1 + playerIndex].mGameMenuEntry->setVisible(validPlayerIndex);
+		mOptionEntries[option::CONTROLLER_RUMBLE_P1 + playerIndex].mGameMenuEntry->setVisible(validPlayerIndex);
+		mOptionEntries[option::CONTROLLER_AUTOASSIGN].mGameMenuEntry->getOptionByValue(playerIndex)->mVisible = validPlayerIndex;
 	}
 
 	// Fill gamepad lists
@@ -544,6 +552,8 @@ void OptionsMenu::update(float timeElapsed)
 
 							case option::CONTROLLER_PLAYER_1:
 							case option::CONTROLLER_PLAYER_2:
+							case option::CONTROLLER_PLAYER_3:
+							case option::CONTROLLER_PLAYER_4:
 							{
 								const InputManager::RealDevice* gamepad = InputManager::instance().getGamepadByJoystickInstanceId(selectedEntry.selected().mValue);
 								InputManager::instance().setPreferredGamepad((int)(selectedEntry.mData - option::CONTROLLER_PLAYER_1), gamepad);
@@ -573,7 +583,7 @@ void OptionsMenu::update(float timeElapsed)
 								{
 									mOptionEntries[selectedData].applyValue();
 
-									if (selectedData >= option::CONTROLLER_RUMBLE_P1 && selectedData <= option::CONTROLLER_RUMBLE_P2)
+									if (selectedData >= option::CONTROLLER_RUMBLE_P1 && selectedData <= option::CONTROLLER_RUMBLE_P4)
 									{
 										InputManager::instance().setControllerRumbleForPlayer(selectedData - option::CONTROLLER_RUMBLE_P1, 1.0f, 1.0f, 300);
 									}
@@ -1263,9 +1273,9 @@ void OptionsMenu::refreshGamepadLists(bool forceUpdate)
 	if (mLastGamepadsChangeCounter != changeCounter || forceUpdate)
 	{
 		mLastGamepadsChangeCounter = changeCounter;
-		for (int playerIndex = 0; playerIndex < 2; ++playerIndex)
+		for (int playerIndex = 0; playerIndex < InputManager::NUM_PLAYERS; ++playerIndex)
 		{
-			GameMenuEntry& entry = *mGamepadAssignmentEntries[playerIndex];
+			GameMenuEntry& entry = *mOptionEntries[option::CONTROLLER_PLAYER_1 + playerIndex].mGameMenuEntry;
 			const int32 preferredValue = InputManager::instance().getPreferredGamepadByJoystickInstanceId(playerIndex);
 			const uint32 oldSelectedValue = (preferredValue >= 0) ? (uint32)preferredValue : entry.hasSelected() ? entry.selected().mValue : (uint32)-1;
 			entry.mOptions.resize(1);	// First entry is the "None" entry

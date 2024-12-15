@@ -37,7 +37,7 @@ protected:
 class InputManager : public SingleInstance<InputManager>
 {
 public:
-	static const constexpr size_t NUM_PLAYERS = 2;
+	static const constexpr size_t NUM_PLAYERS = 4;
 	static const std::string KEYBOARD_DEVICE_NAMES[NUM_PLAYERS];
 
 public:

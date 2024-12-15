@@ -575,9 +575,9 @@ const InputManager::RealDevice* ControllerSetupMenu::getSelectedDevice() const
 		return nullptr;
 
 	const uint32 deviceId = mControllerSelectEntry->selected().mValue;
-	if (deviceId >= 0xfffe)
+	if (deviceId >= 0xfff0 && deviceId < 0xfff0 + InputManager::NUM_PLAYERS)
 	{
-		return &InputManager::instance().getKeyboards()[deviceId - 0xfffe];
+		return &InputManager::instance().getKeyboards()[deviceId - 0xfff0];
 	}
 	else
 	{
@@ -656,22 +656,13 @@ void ControllerSetupMenu::refreshGamepadList(bool forceUpdate)
 
 		GameMenuEntry& entry = *mControllerSelectEntry;
 		const int oldValue = entry.hasSelected() ? entry.selected().mValue : 0;		// Default value 0 = select first controller if something goes wrong
+		entry.mOptions.clear();
 		if (Application::instance().hasKeyboard())
 		{
-			if (entry.mOptions.size() >= 2 && entry.mOptions[0].mValue == 0xfffe)
+			for (int k = 0; k < Configuration::instance().mNumPlayers; ++k)
 			{
-				entry.mOptions.resize(2);	// Reduce back to first two entries, which are for keyboard
+				entry.addOption("Keyboard Player " + std::to_string(k + 1), 0xfff0 + k);
 			}
-			else
-			{
-				entry.mOptions.clear();
-				entry.addOption("Keyboard Player 1", 0xfffe);
-				entry.addOption("Keyboard Player 2", 0xffff);
-			}
-		}
-		else
-		{
-			entry.mOptions.clear();
 		}
 
 		for (const InputManager::RealDevice& gamepad : InputManager::instance().getGamepads())

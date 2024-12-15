@@ -323,7 +323,7 @@ void InputConfig::setupDefaultKeyboardMappings(DeviceDefinition& outDeviceDefini
 	}
 	else
 	{
-		// Leave keyboard 2 empty
+		// Leave other keyboards empty
 	}
 }
 

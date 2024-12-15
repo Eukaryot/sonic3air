@@ -586,8 +586,12 @@ void Configuration::serializeStandardSettings(JsonSerializer& serializer)
 	// Input
 	serializer.serialize("PreferredGamepadPlayer1", mPreferredGamepad[0]);
 	serializer.serialize("PreferredGamepadPlayer2", mPreferredGamepad[1]);
+	serializer.serialize("PreferredGamepadPlayer3", mPreferredGamepad[2]);
+	serializer.serialize("PreferredGamepadPlayer4", mPreferredGamepad[3]);
 	serializer.serialize("ControllerRumblePlayer1", mControllerRumbleIntensity[0]);
 	serializer.serialize("ControllerRumblePlayer2", mControllerRumbleIntensity[1]);
+	serializer.serialize("ControllerRumblePlayer3", mControllerRumbleIntensity[2]);
+	serializer.serialize("ControllerRumblePlayer4", mControllerRumbleIntensity[3]);
 	serializer.serialize("AutoAssignGamepadPlayerIndex", mAutoAssignGamepadPlayerIndex);
 
 	// Virtual gamepad

@@ -488,7 +488,7 @@ void OptionsConfig::buildControls()
 	{
 		configBuilder.addSetting("Setup Keyboard & Game Controllers...", option::CONTROLLER_SETUP);		// This text here won't be used, see rendering
 
-		for (int k = 0; k < 2; ++k)
+		for (int k = 0; k < InputManager::NUM_PLAYERS; ++k)
 		{
 			configBuilder.addSetting(*String(0, "Controller Player %d", k+1), (option::Option)(option::CONTROLLER_PLAYER_1 + k));
 			if (Application::instance().hasVirtualGamepad())
@@ -501,7 +501,9 @@ void OptionsConfig::buildControls()
 		configBuilder.addSetting("Other controllers", option::CONTROLLER_AUTOASSIGN)
 			.addOption("Not used", -1)
 			.addOption("Assign to Player 1", 0)
-			.addOption("Assign to Player 2", 1);
+			.addOption("Assign to Player 2", 1)
+			.addOption("Assign to Player 3", 2)
+			.addOption("Assign to Player 4", 3);
 	}
 
 	if (Application::instance().hasVirtualGamepad())
@@ -517,7 +519,7 @@ void OptionsConfig::buildControls()
 
 	CATEGORY("Controller Rumble")
 	{
-		for (int k = 0; k < 2; ++k)
+		for (int k = 0; k < InputManager::NUM_PLAYERS; ++k)
 		{
 			configBuilder.addSetting(*String(0, "Rumble Player %d", k+1), (option::Option)(option::CONTROLLER_RUMBLE_P1 + k));
 			configBuilder.addOption("Off", 0);

@@ -111,6 +111,8 @@ public:
 		GLOBAL = 2		// "settings_global.json"
 	};
 
+	static const int NUM_PLAYERS = 4;
+
 public:
 	inline static bool hasInstance()		 { return (nullptr != mSingleInstance); }
 	inline static Configuration& instance()  { return *mSingleInstance; }
@@ -164,6 +166,7 @@ public:
 	// General
 	bool   mFailSafeMode = false;
 	int	   mPlatformFlags = -1;
+	int    mNumPlayers = 2;			// Can be up to InputManager::NUM_PLAYERS = 4
 
 	// Game
 	std::wstring mLoadSaveState;
@@ -203,9 +206,9 @@ public:
 	// Input
 	std::vector<InputConfig::DeviceDefinition> mInputDeviceDefinitions;
 	VirtualGamepad mVirtualGamepad;
-	std::string mPreferredGamepad[2];
+	std::string mPreferredGamepad[NUM_PLAYERS];
 	int mAutoAssignGamepadPlayerIndex = 0;	// Default is player 1 (who has index 0)
-	float mControllerRumbleIntensity[2] = { 0, 0 };
+	float mControllerRumbleIntensity[NUM_PLAYERS] = { 0 };
 
 	// Input recorder
 	std::wstring mInputRecorderInput;

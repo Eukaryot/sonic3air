@@ -601,10 +601,10 @@ namespace
 		if (playerIndex < 0)
 		{
 			// All players
-			InputManager::instance().resetControllerRumbleForPlayer(0);
-			InputManager::instance().resetControllerRumbleForPlayer(1);
+			for (int k = 0; k < InputManager::NUM_PLAYERS; ++k)
+				InputManager::instance().resetControllerRumbleForPlayer(k);
 		}
-		else if (playerIndex < 2)
+		else if (playerIndex < InputManager::NUM_PLAYERS)
 		{
 			InputManager::instance().resetControllerRumbleForPlayer(playerIndex);
 		}
@@ -617,10 +617,10 @@ namespace
 		if (playerIndex < 0)
 		{
 			// All players
-			InputManager::instance().setControllerRumbleForPlayer(0, lowFrequencyRumble, highFrequencyRumble, milliseconds);
-			InputManager::instance().setControllerRumbleForPlayer(1, lowFrequencyRumble, highFrequencyRumble, milliseconds);
+			for (int k = 0; k < InputManager::NUM_PLAYERS; ++k)
+				InputManager::instance().setControllerRumbleForPlayer(k, lowFrequencyRumble, highFrequencyRumble, milliseconds);
 		}
-		else if (playerIndex < 2)
+		else if (playerIndex < InputManager::NUM_PLAYERS)
 		{
 			InputManager::instance().setControllerRumbleForPlayer(playerIndex, lowFrequencyRumble, highFrequencyRumble, milliseconds);
 		}
