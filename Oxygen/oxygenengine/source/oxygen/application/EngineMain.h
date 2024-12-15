@@ -11,6 +11,7 @@
 #include "oxygen/application/Configuration.h"
 #include "oxygen/drawing/Drawer.h"
 
+class ArgumentsReader;
 class AudioOutBase;
 class CodeExec;
 class Configuration;
@@ -81,10 +82,10 @@ public:
 	static void earlySetup();
 
 public:
-	EngineMain(EngineDelegateInterface& delegate_);
+	EngineMain(EngineDelegateInterface& delegate_, ArgumentsReader& arguments);
 	~EngineMain();
 
-	void execute(int argc, char** argv);
+	void execute();
 
 	void onActiveModsChanged();
 	bool reloadFilePackage(std::wstring_view packageName, bool forceReload);
@@ -104,7 +105,7 @@ private:
 	void shutdown();
 
 	void initDirectories();
-	bool initConfigAndSettings(const std::wstring& argumentProjectPath);
+	bool initConfigAndSettings();
 	bool initFileSystem();
 	bool loadFilePackages(bool forceReload);
 	bool loadFilePackageByIndex(size_t index, bool forceReload);
@@ -114,7 +115,7 @@ private:
 
 private:
 	EngineDelegateInterface& mDelegate;
-	std::vector<std::string> mArguments;
+	ArgumentsReader& mArguments;
 
 	struct Internal;
 	Internal& mInternal;

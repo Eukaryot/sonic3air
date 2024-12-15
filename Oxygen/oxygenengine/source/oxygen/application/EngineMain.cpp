@@ -9,6 +9,7 @@
 #include "oxygen/pch.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/Application.h"
+#include "oxygen/application/ArgumentsReader.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/GameProfile.h"
 #include "oxygen/application/audio/AudioOutBase.h"
@@ -82,8 +83,9 @@ void EngineMain::earlySetup()
 	INIT_RMXEXT_OGGVORBIS;
 }
 
-EngineMain::EngineMain(EngineDelegateInterface& delegate_) :
+EngineMain::EngineMain(EngineDelegateInterface& delegate_, ArgumentsReader& arguments) :
 	mDelegate(delegate_),
+	mArguments(arguments),
 	mInternal(*new Internal())
 {
 }
@@ -93,17 +95,8 @@ EngineMain::~EngineMain()
 	delete &mInternal;
 }
 
-void EngineMain::execute(int argc, char** argv)
+void EngineMain::execute()
 {
-#if !defined(PLATFORM_VITA)
-	// Setup arguments
-	mArguments.reserve(argc);
-	for (int i = 0; i < argc; ++i)
-	{
-		mArguments.emplace_back(argv[i]);
-	}
-#endif
-
 	// Startup the Oxygen engine part that is independent from the application / project
 	if (startupEngine())
 	{
@@ -234,29 +227,6 @@ bool EngineMain::startupEngine()
 	if (!mDelegate.onEnginePreStartup())
 		return false;
 
-	std::wstring argumentProjectPath;
-#if !defined(PLATFORM_ANDROID) && !defined(PLATFORM_VITA)
-	// Parse arguments
-	for (size_t i = 1; i < mArguments.size(); ++i)
-	{
-		if (mArguments[i][0] == '-')
-		{
-			// TODO: Add handling for options
-		}
-		else
-		{
-			const String arg(mArguments[i]);
-
-			std::wstring path = arg.toStdWString();
-			FTX::FileSystem->normalizePath(path, true);
-			if (FTX::FileSystem->exists(path + L"oxygenproject.json"))
-			{
-				argumentProjectPath = path;
-			}
-		}
-	}
-#endif
-
 	const EngineDelegateInterface::AppMetaData& appMetaData = mDelegate.getAppMetaData();
 	Configuration& config = Configuration::instance();
 
@@ -276,20 +246,12 @@ bool EngineMain::startupEngine()
 		RMX_LOG_INFO("--- STARTUP ---");
 		RMX_LOG_INFO("Logging started");
 		RMX_LOG_INFO("Application version: " << appMetaData.mBuildVersionString);
-
-		String commandLine;
-		for (std::string& arg : mArguments)
-		{
-			if (!commandLine.empty())
-				commandLine.add(' ');
-			commandLine.add(arg);
-		}
-		RMX_LOG_INFO("Command line:  " << commandLine.toStdString());
-		RMX_LOG_INFO("App data path: " << WString(config.mAppDataPath).toStdString());
+		RMX_LOG_INFO("Executable path:     " << WString(mArguments.mExecutableCallPath).toStdString());
+		RMX_LOG_INFO("App data path:       " << WString(config.mAppDataPath).toStdString());
 	}
 
 	// Load configuration and settings
-	if (!initConfigAndSettings(argumentProjectPath))
+	if (!initConfigAndSettings())
 		return false;
 
 	// Setup file system
@@ -382,7 +344,7 @@ void EngineMain::initDirectories()
 	Configuration& config = Configuration::instance();
 
 #if !defined(PLATFORM_ANDROID) && !defined(PLATFORM_VITA)
-	config.mExePath = *String(mArguments[0]).toWString();
+	config.mExePath = mArguments.mExecutableCallPath;
 #endif
 
 	// Get app data path
@@ -439,7 +401,7 @@ void EngineMain::initDirectories()
 	config.mPersistentDataBasePath = config.mAppDataPath + L"storage/";
 }
 
-bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
+bool EngineMain::initConfigAndSettings()
 {
 	RMX_LOG_INFO("Initializing configuration");
 	Configuration& config = Configuration::instance();
@@ -463,10 +425,10 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 	const bool hasCustomGameProfile = mDelegate.setupCustomGameProfile();
 	if (!hasCustomGameProfile)
 	{
-		if (!argumentProjectPath.empty())
+		if (!mArguments.mProjectPath.empty() && FTX::FileSystem->exists(mArguments.mProjectPath + L"oxygenproject.json"))
 		{
 			// Overwrite project path from config
-			config.mProjectPath = argumentProjectPath;
+			config.mProjectPath = mArguments.mProjectPath;
 		}
 
 		RMX_LOG_INFO("Loading game profile");
@@ -482,6 +444,12 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 	{
 		// Save default settings once immediately
 		config.saveSettings();
+	}
+
+	// Respect display index if set on the command line
+	if (mArguments.mDisplayIndex >= 0)
+	{
+		config.mDisplayIndex = mArguments.mDisplayIndex;
 	}
 
 	// Evaluate fail-safe mode

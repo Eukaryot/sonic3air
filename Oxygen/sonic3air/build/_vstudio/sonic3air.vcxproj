@@ -88,8 +88,8 @@
     <ClInclude Include="..\..\source\sonic3air\data\TimeAttackData.h" />
     <ClInclude Include="..\..\source\sonic3air\EngineDelegate.h" />
     <ClInclude Include="..\..\source\sonic3air\Game.h" />
+    <ClInclude Include="..\..\source\sonic3air\GameArgumentsReader.h" />
     <ClInclude Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.h" />
-    <ClInclude Include="..\..\source\sonic3air\helper\ArgumentsReader.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\BlueSpheresRendering.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\CommandForwarder.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\DiscordIntegration.h" />

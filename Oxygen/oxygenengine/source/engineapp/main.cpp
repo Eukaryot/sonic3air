@@ -10,6 +10,7 @@
 #include "engineapp/pch.h"
 #include "engineapp/EngineDelegate.h"
 
+#include "oxygen/application/ArgumentsReader.h"
 #include "oxygen/platform/PlatformFunctions.h"
 
 
@@ -26,20 +27,18 @@ int main(int argc, char** argv)
 {
 	EngineMain::earlySetup();
 
+	ArgumentsReader arguments;
+	arguments.read(argc, argv);
+
 	// Make sure we're in the correct working directory
-	if (argc > 0)
-	{
-		WString wstr;
-		wstr.fromUTF8(std::string(argv[0]));
-		PlatformFunctions::changeWorkingDirectory(wstr.toStdWString());
-	}
+	PlatformFunctions::changeWorkingDirectory(arguments.mExecutableCallPath);
 
 	// Create engine delegate and angine main instance
 	{
 		EngineDelegate myDelegate;
-		EngineMain myMain(myDelegate);
+		EngineMain myMain(myDelegate, arguments);
 
-		myMain.execute(argc, argv);
+		myMain.execute();
 	}
 
 	return 0;

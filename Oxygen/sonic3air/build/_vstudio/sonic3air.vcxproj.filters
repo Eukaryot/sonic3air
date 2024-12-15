@@ -323,9 +323,6 @@
     <ClInclude Include="..\..\source\sonic3air\menu\helper\GameMenuScrolling.h">
       <Filter>menu\helper</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\sonic3air\helper\ArgumentsReader.h">
-      <Filter>helper</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\helper\BlueSpheresRendering.h">
       <Filter>helper</Filter>
     </ClInclude>
@@ -350,6 +347,7 @@
     <ClInclude Include="..\..\source\sonic3air\platform\PlatformSpecifics.h">
       <Filter>platform</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\GameArgumentsReader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\config.json" />

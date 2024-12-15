@@ -1024,6 +1024,9 @@
     <ClInclude Include="..\..\source\oxygen\network\EngineServerClient.h">
       <Filter>network</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\ArgumentsReader.h">
+      <Filter>application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Oxygen.natvis" />

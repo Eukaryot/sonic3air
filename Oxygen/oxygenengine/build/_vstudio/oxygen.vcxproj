@@ -170,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\application\Application.h" />
+    <ClInclude Include="..\..\source\oxygen\application\ArgumentsReader.h" />
     <ClInclude Include="..\..\source\oxygen\application\audio\AudioCollection.h" />
     <ClInclude Include="..\..\source\oxygen\application\audio\AudioOutBase.h" />
     <ClInclude Include="..\..\source\oxygen\application\audio\AudioPlayer.h" />

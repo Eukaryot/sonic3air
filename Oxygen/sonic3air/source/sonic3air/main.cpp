@@ -8,7 +8,7 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/EngineDelegate.h"
-#include "sonic3air/helper/ArgumentsReader.h"
+#include "sonic3air/GameArgumentsReader.h"
 #include "sonic3air/helper/PackageBuilder.h"
 #include "sonic3air/platform/PlatformSpecifics.h"
 
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 	EngineMain::earlySetup();
 	PlatformSpecifics::platformStartup();
 
-	ArgumentsReader arguments;
+	GameArgumentsReader arguments;
 
 #if defined(PLATFORM_VITA)
 	argc = 0;
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 	{
 		// Create engine delegate and engine main instance
 		EngineDelegate myDelegate;
-		EngineMain myMain(myDelegate);
+		EngineMain myMain(myDelegate, arguments);
 
 		// Evaluate some more arguments
 		Configuration& config = Configuration::instance();
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 		}
 
 		// Now run the game
-		myMain.execute(argc, argv);
+		myMain.execute();
 	}
 	catch (const std::exception& e)
 	{
