@@ -11,7 +11,7 @@
 
 #if defined(SUPPORT_IMGUI)
 
-#include "oxygen/devmode/windows/DevModeMainWindow.h"
+#include "oxygen/devmode/DevModeMainWindow.h"
 
 #include "imgui.h"
 #include "backends/imgui_impl_opengl3.h"

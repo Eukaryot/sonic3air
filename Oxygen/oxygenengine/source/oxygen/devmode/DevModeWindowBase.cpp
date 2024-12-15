@@ -7,7 +7,7 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/devmode/windows/DevModeWindowBase.h"
+#include "oxygen/devmode/DevModeWindowBase.h"
 
 #if defined(SUPPORT_IMGUI)
 

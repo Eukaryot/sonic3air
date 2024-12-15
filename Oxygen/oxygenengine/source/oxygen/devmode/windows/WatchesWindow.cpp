@@ -12,7 +12,7 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/devmode/ImGuiHelpers.h"
-#include "oxygen/devmode/windows/DevModeMainWindow.h"
+#include "oxygen/devmode/DevModeMainWindow.h"
 #include "oxygen/application/Application.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/CodeExec.h"

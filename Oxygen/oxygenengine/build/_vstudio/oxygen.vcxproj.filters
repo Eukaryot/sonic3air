@@ -481,12 +481,6 @@
     <ClCompile Include="..\..\source\oxygen\devmode\ImGuiIntegration.cpp">
       <Filter>devmode</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\DevModeMainWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\DevModeWindowBase.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\devmode\windows\GameSimWindow.cpp">
       <Filter>devmode\windows</Filter>
     </ClCompile>
@@ -540,6 +534,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\network\EngineServerClient.cpp">
       <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\DevModeMainWindow.cpp">
+      <Filter>devmode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\DevModeWindowBase.cpp">
+      <Filter>devmode</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -961,12 +961,6 @@
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiDefinitions.h">
       <Filter>devmode</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\DevModeMainWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\DevModeWindowBase.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\devmode\windows\GameSimWindow.h">
       <Filter>devmode\windows</Filter>
     </ClInclude>
@@ -1026,6 +1020,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\ArgumentsReader.h">
       <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\DevModeMainWindow.h">
+      <Filter>devmode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\DevModeWindowBase.h">
+      <Filter>devmode</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

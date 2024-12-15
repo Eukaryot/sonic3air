@@ -12,7 +12,7 @@
 
 #if defined(SUPPORT_IMGUI)
 
-#include "oxygen/devmode/windows/DevModeWindowBase.h"
+#include "oxygen/devmode/DevModeWindowBase.h"
 
 
 class NetworkingWindow : public DevModeWindowBase
