@@ -33,8 +33,9 @@ public:
 	inline const GameplayClient* getGameplayClient() const	{ return mGameplayClient; }
 	inline const ExternalAddressQuery& getExternalAddressQuery() const  { return mExternalAddressQuery; }
 
-	bool setupAsHost(uint16 port = DEFAULT_PORT, bool useIPv6 = false);
-	void startConnectToHost(std::string_view hostIP, uint16 hostPort);
+	bool setupAsHost(bool registerSessionAtServer, uint16 port = DEFAULT_PORT, bool useIPv6 = false);
+	void startJoinViaServer();
+	void startJoinDirect(std::string_view ip, uint16 port);
 	void closeConnections();
 
 	void updateConnections(float deltaSeconds);
@@ -51,6 +52,7 @@ protected:
 	virtual bool onReceivedPacket(ReceivedPacketEvaluation& evaluation) override;
 
 private:
+	bool restartConnection(bool asHost, uint16 hostPort = 0, bool useIPv6 = false);
 	void retrieveSocketExternalAddress();
 
 private:

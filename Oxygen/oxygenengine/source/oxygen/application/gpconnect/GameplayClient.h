@@ -21,9 +21,11 @@ class GameplayClient
 public:
 	enum class State
 	{
-		IDLE,			// Not started anything yet, usually waiting for a game server connection
-		REGISTERED,		// Sent registration to game server, now waiting for a "ConnectToNetplayPacket"
-		RUNNING,		// Connection to host established
+		NONE,				// Not started anything yet
+		CONNECT_TO_SERVER,	// Waiting for a game server connection
+		REGISTERED,			// Sent registration to game server, now waiting for a "ConnectToNetplayPacket"
+		CONNECT_TO_HOST,	// Waiting for connection to host
+		RUNNING,			// Connection to host established
 		FAILED
 	};
 
@@ -36,7 +38,11 @@ public:
 	GameplayClient(ConnectionManager& connectionManager, GameplayConnector& gameplayConnector);
 	~GameplayClient();
 
+	inline State getState() const  { return mState; }
 	inline const HostConnection& getHostConnection() const  { return mHostConnection; }
+
+	void joinViaServer();
+	void connectDirectlyToHost(std::string_view ip, uint16 port);
 
 	void updateConnection(float deltaSeconds);
 	bool onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluation);
@@ -55,7 +61,7 @@ private:
 	ConnectionManager& mConnectionManager;
 	GameplayConnector& mGameplayConnector;
 	HostConnection mHostConnection;
-	State mState = State::IDLE;
+	State mState = State::NONE;
 
 	network::RegisterForNetplayRequest mRegistrationRequest;
 

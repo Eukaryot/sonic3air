@@ -538,6 +538,9 @@
     <ClCompile Include="..\..\source\oxygen\client\EngineServerClient.cpp">
       <Filter>client</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\NetworkingWindow.cpp">
+      <Filter>devmode\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -1017,6 +1020,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\client\EngineServerClient.h">
       <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\NetworkingWindow.h">
+      <Filter>devmode\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

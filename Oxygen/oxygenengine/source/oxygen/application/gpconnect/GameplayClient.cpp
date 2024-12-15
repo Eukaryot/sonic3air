@@ -29,14 +29,30 @@ GameplayClient::~GameplayClient()
 	mHostConnection.clear();
 }
 
+void GameplayClient::joinViaServer()
+{
+	// Request game server connection
+	EngineServerClient::instance().connectToServer();
+	mState = State::CONNECT_TO_SERVER;
+}
+
+void GameplayClient::connectDirectlyToHost(std::string_view ip, uint16 port)
+{
+	mHostConnection.startConnectTo(mConnectionManager, SocketAddress(ip, port));
+	mState = State::CONNECT_TO_HOST;
+}
+
 void GameplayClient::updateConnection(float deltaSeconds)
 {
 	EngineServerClient& engineServerClient = EngineServerClient::instance();
 
 	switch (mState)
 	{
-		case State::IDLE:
+		case State::CONNECT_TO_SERVER:
 		{
+			// Keep requesting game server connection
+			engineServerClient.connectToServer();
+
 			// Wait until the server connection is established, server features were queried, and the game socket's external address was retrieved
 			if (!engineServerClient.hasReceivedServerFeatures() || mGameplayConnector.getExternalAddressQuery().mOwnExternalIP.empty())
 				break;
@@ -69,6 +85,15 @@ void GameplayClient::updateConnection(float deltaSeconds)
 			break;
 		}
 
+		case State::CONNECT_TO_HOST:
+		{
+			if (mHostConnection.getState() == NetConnection::State::CONNECTED)
+			{
+				mState = State::RUNNING;
+			}
+			break;
+		}
+
 		default:
 			break;
 	}
@@ -86,6 +111,7 @@ bool GameplayClient::onReceivedGameServerPacket(ReceivedPacketEvaluation& evalua
 
 			// Connect to the given address
 			mHostConnection.startConnectTo(mConnectionManager, SocketAddress(packet.mConnectToIP, packet.mConnectToPort));
+			mState = State::CONNECT_TO_HOST;
 			return true;
 		}
 	}

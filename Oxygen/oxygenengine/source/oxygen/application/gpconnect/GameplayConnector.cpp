@@ -27,37 +27,32 @@ GameplayConnector::~GameplayConnector()
 	closeConnections();
 }
 
-bool GameplayConnector::setupAsHost(uint16 port, bool useIPv6)
+bool GameplayConnector::setupAsHost(bool registerSessionAtServer, uint16 port, bool useIPv6)
 {
-	closeConnections();
-
-	Sockets::startupSockets();
-	if (!mUDPSocket.bindToPort(port, useIPv6))
-	{
-		RMX_ASSERT(false, "UDP socket bind to port " << port << " failed");
+	if (!restartConnection(true, port, useIPv6) || nullptr == mGameplayHost)
 		return false;
+
+	if (registerSessionAtServer)
+	{
+		mGameplayHost->registerAtServer();
 	}
-
-	mGameplayHost = new GameplayHost(mConnectionManager, *this);
-
-	retrieveSocketExternalAddress();
 	return true;
 }
 
-void GameplayConnector::startConnectToHost(std::string_view hostIP, uint16 hostPort)
+void GameplayConnector::startJoinViaServer()
 {
-	closeConnections();
-
-	Sockets::startupSockets();
-	if (!mUDPSocket.bindToAnyPort())
-	{
-		RMX_ERROR("Socket bind to any port failed", );
+	if (!restartConnection(false) || nullptr == mGameplayClient)
 		return;
-	}
 
-	mGameplayClient = new GameplayClient(mConnectionManager, *this);
+	mGameplayClient->joinViaServer();
+}
 
-	retrieveSocketExternalAddress();
+void GameplayConnector::startJoinDirect(std::string_view ip, uint16 port)
+{
+	if (!restartConnection(false) || nullptr == mGameplayClient)
+		return;
+
+	mGameplayClient->connectDirectlyToHost(ip, port);
 }
 
 void GameplayConnector::closeConnections()
@@ -178,6 +173,41 @@ bool GameplayConnector::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 		return mGameplayClient->onReceivedPacket(evaluation);
 	}
 	return false;
+}
+
+bool GameplayConnector::restartConnection(bool asHost, uint16 hostPort, bool useIPv6)
+{
+	closeConnections();
+	Sockets::startupSockets();
+
+	if (asHost && hostPort != 0)
+	{
+		if (!mUDPSocket.bindToPort(hostPort, useIPv6))
+		{
+			RMX_ASSERT(false, "UDP socket bind to port " << hostPort << " failed");
+			return false;
+		}
+	}
+	else
+	{
+		if (!mUDPSocket.bindToAnyPort())
+		{
+			RMX_ERROR("Socket bind to any port failed", );
+			return false;
+		}
+	}
+
+	if (asHost)
+	{
+		mGameplayHost = new GameplayHost(mConnectionManager, *this);
+	}
+	else
+	{
+		mGameplayClient = new GameplayClient(mConnectionManager, *this);
+	}
+
+	retrieveSocketExternalAddress();
+	return true;
 }
 
 void GameplayConnector::retrieveSocketExternalAddress()

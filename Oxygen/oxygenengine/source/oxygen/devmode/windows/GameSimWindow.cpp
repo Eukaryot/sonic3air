@@ -12,9 +12,6 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/application/Application.h"
-#include "oxygen/application/gpconnect/GameplayClient.h"
-#include "oxygen/application/gpconnect/GameplayConnector.h"
-#include "oxygen/application/gpconnect/GameplayHost.h"
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/simulation/Simulation.h"
 
@@ -22,10 +19,6 @@
 GameSimWindow::GameSimWindow() :
 	DevModeWindowBase("Game", Category::GAME_CONTROLS, ImGuiWindowFlags_AlwaysAutoResize)
 {
-#ifdef DEBUG
-	// Just for testing
-	mIsWindowOpen = true;
-#endif
 }
 
 void GameSimWindow::buildContent()
@@ -113,81 +106,6 @@ void GameSimWindow::buildContent()
 		simulation.setNextSingleStep(true, false);
 	}
 	ImGui::PopItemFlag();
-
-#ifdef DEBUG
-	// TEST: Gameplay connection
-	{
-		ImGui::SeparatorText("Gameplay Connector");
-		ImGuiHelpers::ScopedIndent si;
-
-		GameplayConnector& gameplayConnector = GameplayConnector::instance();
-
-		if (nullptr != gameplayConnector.getGameplayHost())
-		{
-			ImGui::Text("Host: %d connections", gameplayConnector.getGameplayHost()->getPlayerConnections().size());
-		}
-		else if (nullptr != gameplayConnector.getGameplayClient())
-		{
-			switch (gameplayConnector.getGameplayClient()->getHostConnection().getState())
-			{
-				case NetConnection::State::EMPTY:				 ImGui::Text("Client: No connection");  break;
-				case NetConnection::State::TCP_READY:			 ImGui::Text("Client: TCP ready");  break;
-				case NetConnection::State::REQUESTED_CONNECTION: ImGui::Text("Client: Requested connection");  break;
-				case NetConnection::State::CONNECTED:			 ImGui::Text("Client: Connected");  break;
-				case NetConnection::State::DISCONNECTED:		 ImGui::Text("Client: Disconnected");  break;
-			}
-		}
-		else
-		{
-			ImGui::Text("Inactive");
-		}
-		
-		ImGui::BeginDisabled(nullptr != gameplayConnector.getGameplayHost());
-		if (ImGui::Button("Start as host"))
-		{
-			const bool USE_IPV6 = false;	// TODO: IPv6 does not work, the the server doesn't support it
-			gameplayConnector.setupAsHost(GameplayConnector::DEFAULT_PORT, USE_IPV6);
-		}
-		ImGui::EndDisabled();
-
-		ImGui::BeginDisabled(nullptr != gameplayConnector.getGameplayClient());
-		{
-			static char ipBuffer[32] = "127.0.0.1";
-			static int port = GameplayConnector::DEFAULT_PORT;
-			if (ImGui::Button("Join as client"))
-			{
-				gameplayConnector.startConnectToHost(ipBuffer, port);
-			}
-
-			ImGui::SameLine();
-			ImGui::Text(" IP:");
-			ImGui::SameLine();
-			ImGui::PushItemWidth(90);
-			ImGui::InputText("##IP", ipBuffer, 32);
-			ImGui::PopItemWidth();
-
-			ImGui::SameLine();
-			ImGui::Text("Port:");
-			ImGui::SameLine();
-			ImGui::PushItemWidth(50);
-			ImGui::InputInt("##Port", &port, 0, 0, ImGuiInputTextFlags_CharsDecimal);
-			ImGui::PopItemWidth();
-		}
-		ImGui::EndDisabled();
-
-		ImGui::BeginDisabled(nullptr == gameplayConnector.getGameplayHost() && nullptr == gameplayConnector.getGameplayClient());
-		if (ImGui::Button("Close connection"))
-		{
-			gameplayConnector.closeConnections();
-		}
-
-		if (!gameplayConnector.getExternalAddressQuery().mOwnExternalIP.empty())
-		{
-			ImGui::Text("Retrieved own external address: IP = %s, port = %d", gameplayConnector.getExternalAddressQuery().mOwnExternalIP.c_str(), gameplayConnector.getExternalAddressQuery().mOwnExternalPort);
-		}
-		ImGui::EndDisabled();
-	}
-#endif
 }
 
 #endif

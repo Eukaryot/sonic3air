@@ -32,6 +32,13 @@ GameplayHost::~GameplayHost()
 	mPlayerConnections.clear();
 }
 
+void GameplayHost::registerAtServer()
+{
+	// Request game server connection
+	EngineServerClient::instance().connectToServer();
+	mState = State::CONNECT_TO_SERVER;
+}
+
 NetConnection* GameplayHost::createNetConnection(const SocketAddress& senderAddress)
 {
 	PlayerConnection* connection = new PlayerConnection();
@@ -54,8 +61,21 @@ void GameplayHost::updateConnection(float deltaSeconds)
 
 	switch (mState)
 	{
-		case State::IDLE:
+		case State::NONE:
 		{
+			// Switch to running as soon as the first client connects directly
+			if (!mPlayerConnections.empty())
+			{
+				mState = State::RUNNING;
+			}
+			break;
+		}
+
+		case State::CONNECT_TO_SERVER:
+		{
+			// Request game server connection
+			engineServerClient.connectToServer();
+
 			// Wait until the server connection is established, server features were queried, and the game socket's external address was retrieved
 			if (!engineServerClient.hasReceivedServerFeatures() || mGameplayConnector.getExternalAddressQuery().mOwnExternalIP.empty())
 				break;
@@ -88,6 +108,19 @@ void GameplayHost::updateConnection(float deltaSeconds)
 			break;
 		}
 
+		case State::PUNCHTHROUGH:
+		{
+			// TODO: Regularly send a new "PunchthroughConnectionlessPacket", until receiving an incoming connection, or timeout
+
+			// TODO: Support multiple clients here... we probably have to track a state for each client individually
+
+			if (!mPlayerConnections.empty())
+			{
+				mState = State::RUNNING;
+			}
+			break;
+		}
+
 		default:
 			break;
 	}
@@ -114,6 +147,7 @@ bool GameplayHost::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluati
 					punchthroughPacket.mSenderReceivedPackets = false;
 
 					mConnectionManager.sendConnectionlessLowLevelPacket(punchthroughPacket, SocketAddress(packet.mConnectToIP, packet.mConnectToPort), 0, 0);
+					mState = State::PUNCHTHROUGH;
 					break;
 				}
 			}

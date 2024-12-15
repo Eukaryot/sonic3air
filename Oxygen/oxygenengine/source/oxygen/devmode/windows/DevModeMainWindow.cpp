@@ -16,6 +16,7 @@
 #include "oxygen/devmode/windows/GameSimWindow.h"
 #include "oxygen/devmode/windows/GameVisualizationsWindow.h"
 #include "oxygen/devmode/windows/MemoryHexViewWindow.h"
+#include "oxygen/devmode/windows/NetworkingWindow.h"
 #include "oxygen/devmode/windows/PaletteBrowserWindow.h"
 #include "oxygen/devmode/windows/PaletteViewWindow.h"
 #include "oxygen/devmode/windows/RenderedGeometryWindow.h"
@@ -39,6 +40,9 @@ DevModeMainWindow::DevModeMainWindow() :
 		createWindow(mRenderedGeometryWindow);
 		createWindow(mPaletteViewWindow);
 		createWindow(mMemoryHexViewWindow);
+	#ifdef DEBUG
+		createWindow(mNetworkingWindow);
+	#endif
 		createWindow(mWatchesWindow);
 
 		createWindow(mScriptBuildWindow);
