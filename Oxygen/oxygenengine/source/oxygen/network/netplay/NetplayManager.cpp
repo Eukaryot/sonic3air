@@ -152,7 +152,7 @@ bool NetplayManager::onReceivedConnectionlessPacket(ConnectionlessPacketEvaluati
 
 			if (mExternalAddressQuery.mQueryID == packet.mQueryID)
 			{
-				mExternalAddressQuery.mOwnExternalIP = (packet.mIP == "::") ? "::1" : packet.mIP;
+				mExternalAddressQuery.mOwnExternalIP = packet.mIP;
 				mExternalAddressQuery.mOwnExternalPort = packet.mPort;
 			}
 			return true;

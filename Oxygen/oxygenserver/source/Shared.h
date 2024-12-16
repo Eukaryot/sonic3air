@@ -11,7 +11,7 @@
 #include "oxygen_netcore/network/ConnectionManager.h"
 
 
-static const Sockets::ProtocolFamily SERVER_PROTOCOL_FAMILY = Sockets::ProtocolFamily::IPv4;
+static const Sockets::ProtocolFamily SERVER_PROTOCOL_FAMILY = Sockets::ProtocolFamily::DualStack;
 static const bool CLIENT_USE_IPv6 = false;
 
 #if 1

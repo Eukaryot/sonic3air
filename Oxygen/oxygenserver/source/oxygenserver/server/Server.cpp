@@ -20,6 +20,25 @@
 #include <thread>
 
 
+namespace
+{
+	void processIP(std::string& ip)
+	{
+		// Localhost
+		if (ip == "::")
+		{
+			ip = "::1";
+		}
+
+		// Return an IPv6-encoded IPv4 address as actual IPv4
+		else if (rmx::startsWith(ip, "::ffff:"))
+		{
+			ip.erase(0, 7);
+		}
+	}
+}
+
+
 void Server::runServer()
 {
 	Configuration& config = Configuration::instance();
@@ -126,6 +145,7 @@ bool Server::onReceivedConnectionlessPacket(ConnectionlessPacketEvaluation& eval
 				reply.mPacketVersion = packet.mPacketVersion;
 				reply.mIP = evaluation.mSenderAddress.getIP();
 				reply.mPort = evaluation.mSenderAddress.getPort();
+				processIP(reply.mIP);
 				evaluation.mConnectionManager.sendConnectionlessLowLevelPacket(reply, evaluation.mSenderAddress, 0, 0);
 			}
 			else

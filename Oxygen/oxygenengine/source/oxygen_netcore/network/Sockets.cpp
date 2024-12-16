@@ -182,8 +182,20 @@ void SocketAddress::assureIpPort() const
 	{
 		if (mHasSockAddr)
 		{
+			const auto addressFamily = reinterpret_cast<sockaddr_storage&>(mSockAddr).ss_family;
 			char myIP[512];
-			inet_ntop(reinterpret_cast<sockaddr_storage&>(mSockAddr).ss_family, &(reinterpret_cast<sockaddr_in&>(mSockAddr).sin_addr), myIP, sizeof(myIP));
+			if (addressFamily == AF_INET)
+			{
+				// IPv4
+				inet_ntop(addressFamily, &(reinterpret_cast<sockaddr_in&>(mSockAddr).sin_addr), myIP, sizeof(myIP));
+			}
+		#if !defined(PLATFORM_SWITCH)	// The IPv6 part won't compile on Switch, but isn't really needed there anyways
+			else
+			{
+				// IPv6
+				inet_ntop(addressFamily, &(reinterpret_cast<sockaddr_in6&>(mSockAddr).sin6_addr), myIP, sizeof(myIP));
+			}
+		#endif
 			mIP = myIP;
 			mPort = ntohs(reinterpret_cast<sockaddr_in&>(mSockAddr).sin_port);
 		}
