@@ -28,12 +28,13 @@ public:
 	~NetplayManager();
 
 	inline ConnectionManager& getConnectionManager()		{ return mConnectionManager; }
+	inline bool isUsingIPv6() const							{ return mUseIPv6; }
 
 	inline const NetplayHost* getNetplayHost() const		{ return mNetplayHost; }
 	inline const NetplayClient* getNetplayClient() const	{ return mNetplayClient; }
 	inline const ExternalAddressQuery& getExternalAddressQuery() const  { return mExternalAddressQuery; }
 
-	bool setupAsHost(bool registerSessionAtServer, uint16 port = DEFAULT_PORT, bool useIPv6 = false);
+	bool setupAsHost(bool registerSessionAtServer, uint16 port = DEFAULT_PORT);
 	void startJoinViaServer();
 	void startJoinDirect(std::string_view ip, uint16 port);
 	void closeConnections();
@@ -52,12 +53,13 @@ protected:
 	virtual bool onReceivedPacket(ReceivedPacketEvaluation& evaluation) override;
 
 private:
-	bool restartConnection(bool asHost, uint16 hostPort = 0, bool useIPv6 = false);
+	bool restartConnection(bool asHost, uint16 hostPort = 0);
 	void retrieveSocketExternalAddress();
 
 private:
 	UDPSocket mUDPSocket;
 	ConnectionManager mConnectionManager;
+	bool mUseIPv6 = false;
 
 	NetplayHost* mNetplayHost = nullptr;
 	NetplayClient* mNetplayClient = nullptr;

@@ -29,19 +29,19 @@ EngineServerClient::SocketUsage EngineServerClient::getSocketUsage()
 #endif
 }
 
-bool EngineServerClient::resolveGameServerHostName(const std::string& hostName, std::string& outServerIP)
+bool EngineServerClient::resolveGameServerHostName(const std::string& hostName, std::string& outServerIP, bool useIPv6)
 {
-	if (getSocketUsage() != SocketUsage::WEBSOCKETS)
+	if (getSocketUsage() != SocketUsage::WEBSOCKETS && hostName != "localhost")
 	{
 		// For UDP/TCP, try the "gameserver" subdomain first
 		//  -> This does not work for emscripten websockets, see implementation of "resolveToIp"
 		//  -> It allows for having different servers for UDP/TCP, and websockets
-		if (Sockets::resolveToIP("gameserver." + hostName, outServerIP))
+		if (Sockets::resolveToIP("gameserver." + hostName, outServerIP, useIPv6))
 			return true;
 	}
 
 	// Use the host name itself
-	return Sockets::resolveToIP(hostName, outServerIP);
+	return Sockets::resolveToIP(hostName, outServerIP, useIPv6);
 }
 
 
@@ -59,18 +59,19 @@ EngineServerClient::~EngineServerClient()
 {
 }
 
-bool EngineServerClient::setupClient()
+bool EngineServerClient::setupClient(bool useIPv6)
 {
 	const Configuration::GameServerBase& config = Configuration::instance().mGameServerBase;
 	if (config.mServerHostName.empty())
 		return false;
 
+	mUseIPv6 = useIPv6;
 	Sockets::startupSockets();
 
 	if (getSocketUsage() == SocketUsage::UDP)
 	{
 		// Setup socket & connection manager
-		if (!mUDPSocket.bindToAnyPort())
+		if (!mUDPSocket.bindToAnyPort(mUseIPv6 ? Sockets::ProtocolFamily::IPv6 : Sockets::ProtocolFamily::IPv4))
 			RMX_ERROR("Socket bind to any port failed", return false);
 	}
 
@@ -182,7 +183,7 @@ void EngineServerClient::startConnectingToServer()
 	{
 		const Configuration::GameServerBase& config = Configuration::instance().mGameServerBase;
 		std::string serverIP;
-		if (!resolveGameServerHostName(config.mServerHostName, serverIP))
+		if (!resolveGameServerHostName(config.mServerHostName, serverIP, mUseIPv6))
 		{
 			mConnectionState = ConnectionState::FAILED;
 			return;

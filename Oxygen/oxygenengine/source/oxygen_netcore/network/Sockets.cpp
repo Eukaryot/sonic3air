@@ -38,6 +38,20 @@
 #endif
 
 
+namespace
+{
+	void configureSocket(SOCKET socket, Sockets::ProtocolFamily protocolFamily)
+	{
+		if (protocolFamily >= Sockets::ProtocolFamily::IPv6)
+		{
+			// Optionally allow IPv4 + IPv6 dual stack support on the socket
+			int option = (protocolFamily == Sockets::ProtocolFamily::DualStack) ? 0 : 1;
+			::setsockopt(socket, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&option, sizeof(option));
+		}
+	}
+}
+
+
 void Sockets::startupSockets()
 {
 	if (mIsInitialized)
@@ -62,7 +76,7 @@ void Sockets::shutdownSockets()
 	mIsInitialized = false;
 }
 
-bool Sockets::resolveToIP(const std::string& hostName, std::string& outIP)
+bool Sockets::resolveToIP(const std::string& hostName, std::string& outIP, bool useIPv6)
 {
 #if defined(__EMSCRIPTEN__) || defined(__vita__)
 	// Just return the input
@@ -77,21 +91,8 @@ bool Sockets::resolveToIP(const std::string& hostName, std::string& outIP)
 	{
 		addrinfo* firstAddrInfo = addrInfo;
 
-		// Prefer IPv4 if possible
-		bool ipv4 = false;
-		bool ipv6 = false;
-		for (; nullptr != addrInfo; addrInfo = addrInfo->ai_next)
-		{
-			if (AF_INET == addrInfo->ai_family)
-			{
-				ipv4 = true;
-			}
-			if (AF_INET6 == addrInfo->ai_family)
-			{
-				ipv6 = true;
-			}
-		}
-		const int aiFamily = ipv4 ? AF_INET : AF_INET6;
+		// Return either IPv4 or IPv6, depending on requested protocol family
+		const int aiFamily = useIPv6 ? AF_INET6 : AF_INET;
 
 		for (addrInfo = firstAddrInfo; nullptr != addrInfo; addrInfo = addrInfo->ai_next)
 		{
@@ -260,7 +261,7 @@ void TCPSocket::swapWith(TCPSocket& other)
 	std::swap(mInternal, other.mInternal);
 }
 
-bool TCPSocket::setupServer(uint16 serverPort, bool useIPv6)
+bool TCPSocket::setupServer(uint16 serverPort, Sockets::ProtocolFamily protocolFamily)
 {
 	if (nullptr == mInternal)
 	{
@@ -273,7 +274,7 @@ bool TCPSocket::setupServer(uint16 serverPort, bool useIPv6)
 
 	addrinfo hints;
 	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = useIPv6 ? AF_INET6 : AF_INET;
+	hints.ai_family = (protocolFamily >= Sockets::ProtocolFamily::IPv6) ? AF_INET6 : AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
@@ -303,6 +304,8 @@ bool TCPSocket::setupServer(uint16 serverPort, bool useIPv6)
 		close();
 		return false;
 	}
+
+	configureSocket(mInternal->mSocket, protocolFamily);
 
 	// Bind socket
 	result = ::bind(mInternal->mSocket, addr->ai_addr, (int)addr->ai_addrlen);
@@ -392,7 +395,7 @@ bool TCPSocket::acceptConnection(TCPSocket& outSocket)
 	return true;
 }
 
-bool TCPSocket::connectTo(const std::string& serverAddress, uint16 serverPort, bool useIPv6)
+bool TCPSocket::connectTo(const std::string& serverAddress, uint16 serverPort, Sockets::ProtocolFamily protocolFamily)
 {
 	if (nullptr == mInternal)
 	{
@@ -408,7 +411,7 @@ bool TCPSocket::connectTo(const std::string& serverAddress, uint16 serverPort, b
 	{
 		addrinfo hints;
 		memset(&hints, 0, sizeof(hints));
-		hints.ai_family = useIPv6 ? AF_INET6 : AF_INET;
+		hints.ai_family = (protocolFamily >= Sockets::ProtocolFamily::IPv6) ? AF_INET6 : AF_INET;
 		hints.ai_socktype = SOCK_STREAM;	// Needed for TCP
 		hints.ai_protocol = IPPROTO_TCP;	// Use TCP
 
@@ -423,6 +426,8 @@ bool TCPSocket::connectTo(const std::string& serverAddress, uint16 serverPort, b
 		int result = (int)::socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
 		RMX_CHECK(result >= 0, "socket failed with error: " << result, return false);
 		mInternal->mSocket = (SOCKET)result;
+
+		configureSocket(mInternal->mSocket, protocolFamily);
 
 		// Connect to server
 		result = ::connect(mInternal->mSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
@@ -598,7 +603,7 @@ void UDPSocket::close()
 	mInternal->mLocalPort = 0;
 }
 
-bool UDPSocket::bindToPort(uint16 port, bool useIPv6)
+bool UDPSocket::bindToPort(uint16 port, Sockets::ProtocolFamily protocolFamily)
 {
 	if (nullptr == mInternal)
 	{
@@ -611,7 +616,7 @@ bool UDPSocket::bindToPort(uint16 port, bool useIPv6)
 
 	addrinfo hints;
 	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = useIPv6 ? AF_INET6 : AF_INET;
+	hints.ai_family = (protocolFamily >= Sockets::ProtocolFamily::IPv6) ? AF_INET6 : AF_INET;
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_protocol = IPPROTO_UDP;
 	hints.ai_flags = AI_PASSIVE;
@@ -639,6 +644,8 @@ bool UDPSocket::bindToPort(uint16 port, bool useIPv6)
 	}
 	mInternal->mSocket = (SOCKET)result;
 
+	configureSocket(mInternal->mSocket, protocolFamily);
+
 	// Setup the socket
 	result = ::bind(mInternal->mSocket, addressInfo->ai_addr, (int)addressInfo->ai_addrlen);
 	if (result < 0)
@@ -663,7 +670,7 @@ bool UDPSocket::bindToPort(uint16 port, bool useIPv6)
 	return true;
 }
 
-bool UDPSocket::bindToAnyPort(bool useIPv6)
+bool UDPSocket::bindToAnyPort(Sockets::ProtocolFamily protocolFamily)
 {
 	if (nullptr == mInternal)
 	{
@@ -675,12 +682,14 @@ bool UDPSocket::bindToAnyPort(bool useIPv6)
 	}
 
 	// Create a socket
-	mInternal->mSocket = ::socket(useIPv6 ? AF_INET6 : AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	mInternal->mSocket = ::socket((protocolFamily >= Sockets::ProtocolFamily::IPv6) ? AF_INET6 : AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (mInternal->mSocket < 0)
 	{
 		RMX_ERROR("socket failed with error: " << mInternal->mSocket, );
 		return false;
 	}
+
+	configureSocket(mInternal->mSocket, protocolFamily);
 
 	// Note that the local port stays unknown this way
 	mInternal->mLocalPort = 0;

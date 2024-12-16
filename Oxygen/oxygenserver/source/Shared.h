@@ -11,10 +11,11 @@
 #include "oxygen_netcore/network/ConnectionManager.h"
 
 
-static const bool USE_IPV6 = false;
+static const Sockets::ProtocolFamily SERVER_PROTOCOL_FAMILY = Sockets::ProtocolFamily::IPv4;
+static const bool CLIENT_USE_IPv6 = false;
 
 #if 1
-	static const std::string SERVER_NAME = USE_IPV6 ? "::1" : "127.0.0.1";
+	static const std::string SERVER_NAME = (SERVER_PROTOCOL_FAMILY >= Sockets::ProtocolFamily::IPv6) ? "::1" : "127.0.0.1";
 #else
 	static const std::string SERVER_NAME = "gameserver.sonic3air.org";
 #endif

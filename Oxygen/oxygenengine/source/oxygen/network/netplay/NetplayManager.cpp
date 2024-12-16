@@ -19,6 +19,7 @@
 NetplayManager::NetplayManager() :
 	mConnectionManager(&mUDPSocket, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE)
 {
+	mUseIPv6 = false;
 }
 
 NetplayManager::~NetplayManager()
@@ -26,9 +27,9 @@ NetplayManager::~NetplayManager()
 	closeConnections();
 }
 
-bool NetplayManager::setupAsHost(bool registerSessionAtServer, uint16 port, bool useIPv6)
+bool NetplayManager::setupAsHost(bool registerSessionAtServer, uint16 port)
 {
-	if (!restartConnection(true, port, useIPv6) || nullptr == mNetplayHost)
+	if (!restartConnection(true, port) || nullptr == mNetplayHost)
 		return false;
 
 	if (registerSessionAtServer)
@@ -151,7 +152,7 @@ bool NetplayManager::onReceivedConnectionlessPacket(ConnectionlessPacketEvaluati
 
 			if (mExternalAddressQuery.mQueryID == packet.mQueryID)
 			{
-				mExternalAddressQuery.mOwnExternalIP = packet.mIP;
+				mExternalAddressQuery.mOwnExternalIP = (packet.mIP == "::") ? "::1" : packet.mIP;
 				mExternalAddressQuery.mOwnExternalPort = packet.mPort;
 			}
 			return true;
@@ -174,14 +175,15 @@ bool NetplayManager::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 	return false;
 }
 
-bool NetplayManager::restartConnection(bool asHost, uint16 hostPort, bool useIPv6)
+bool NetplayManager::restartConnection(bool asHost, uint16 hostPort)
 {
 	closeConnections();
 	Sockets::startupSockets();
 
+	const Sockets::ProtocolFamily protocolFamily = mUseIPv6 ? Sockets::ProtocolFamily::IPv6 : Sockets::ProtocolFamily::IPv4;
 	if (asHost && hostPort != 0)
 	{
-		if (!mUDPSocket.bindToPort(hostPort, useIPv6))
+		if (!mUDPSocket.bindToPort(hostPort, protocolFamily))
 		{
 			RMX_ASSERT(false, "UDP socket bind to port " << hostPort << " failed");
 			return false;
@@ -189,7 +191,7 @@ bool NetplayManager::restartConnection(bool asHost, uint16 hostPort, bool useIPv
 	}
 	else
 	{
-		if (!mUDPSocket.bindToAnyPort())
+		if (!mUDPSocket.bindToAnyPort(protocolFamily))
 		{
 			RMX_ERROR("Socket bind to any port failed", );
 			return false;
@@ -215,10 +217,10 @@ void NetplayManager::retrieveSocketExternalAddress()
 	mExternalAddressQuery.mQueryID = (uint64)(1 + rand()) + ((uint64)rand() << 16) + ((uint64)rand() << 32) + ((uint64)rand() << 48);
 
 	std::string serverIP;
-	if (!EngineServerClient::resolveGameServerHostName(Configuration::instance().mGameServerBase.mServerHostName, serverIP))
+	if (!EngineServerClient::resolveGameServerHostName(Configuration::instance().mGameServerBase.mServerHostName, serverIP, mUseIPv6))
 	{
 		// TODO: Error handling
-		RMX_ASSERT(false, "Failed to resolve game server host name");
+		RMX_ASSERT(false, "Failed to resolve game server host name: " << Configuration::instance().mGameServerBase.mServerHostName);
 		return;
 	}
 

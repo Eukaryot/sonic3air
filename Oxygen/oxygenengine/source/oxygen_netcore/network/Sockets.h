@@ -14,10 +14,18 @@
 class Sockets
 {
 public:
+	enum class ProtocolFamily
+	{
+		IPv4,
+		IPv6,
+		DualStack	// IPv6 socket that also supports IPv4
+	};
+
+public:
 	static void startupSockets();
 	static void shutdownSockets();
 
-	static bool resolveToIP(const std::string& hostName, std::string& outIP);
+	static bool resolveToIP(const std::string& hostName, std::string& outIP, bool useIPv6);
 
 public:
 	static inline rmx::ErrorHandling::LoggerInterface* mLogger = nullptr;
@@ -129,10 +137,10 @@ public:
 	const SocketAddress& getRemoteAddress();
 	void swapWith(TCPSocket& other);
 
-	bool setupServer(uint16 serverPort, bool useIPv6 = false);
+	bool setupServer(uint16 serverPort, Sockets::ProtocolFamily protocolFamily = Sockets::ProtocolFamily::IPv4);
 	bool acceptConnection(TCPSocket& outSocket);
 
-	bool connectTo(const std::string& serverAddress, uint16 serverPort, bool useIPv6 = false);
+	bool connectTo(const std::string& serverAddress, uint16 serverPort, Sockets::ProtocolFamily protocolFamily = Sockets::ProtocolFamily::IPv4);
 
 	bool sendData(const uint8* data, size_t length);
 	bool sendData(const std::vector<uint8>& data);
@@ -166,8 +174,8 @@ public:
 	bool isValid() const;
 	void close();
 
-	bool bindToPort(uint16 port, bool useIPv6 = false);
-	bool bindToAnyPort(bool useIPv6 = false);
+	bool bindToPort(uint16 port, Sockets::ProtocolFamily protocolFamily = Sockets::ProtocolFamily::IPv4);
+	bool bindToAnyPort(Sockets::ProtocolFamily protocolFamily = Sockets::ProtocolFamily::IPv4);
 
 	bool sendData(const uint8* data, size_t length, const SocketAddress& destinationAddress);
 	bool sendData(const std::vector<uint8>& data, const SocketAddress& destinationAddress);

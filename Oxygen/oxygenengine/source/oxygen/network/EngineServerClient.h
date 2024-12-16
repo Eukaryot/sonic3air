@@ -42,7 +42,7 @@ public:
 
 public:
 	static SocketUsage getSocketUsage();
-	static bool resolveGameServerHostName(const std::string& hostName, std::string& outServerIP);
+	static bool resolveGameServerHostName(const std::string& hostName, std::string& outServerIP, bool useIPv6);
 
 public:
 	EngineServerClient();
@@ -52,7 +52,7 @@ public:
 
 	void setListener(Listener* listener)  { mListener = listener; }
 
-	bool setupClient();
+	bool setupClient(bool useIPv6);
 	void updateClient(float timeElapsed);
 
 	inline ConnectionState getConnectionState() const  { return mConnectionState; }
@@ -87,6 +87,7 @@ private:
 	NetplayManager mNetplayManager;
 	Listener* mListener = nullptr;
 
+	bool mUseIPv6 = false;
 	ConnectionState mConnectionState = ConnectionState::NOT_CONNECTED;
 	uint64 mLastConnectionAttemptTimestamp = 0;
 

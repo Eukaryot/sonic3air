@@ -87,7 +87,7 @@ void TestClient::runClient()
 	// Switch between UDP and TCP usage
 #if 1
 	UDPSocket udpSocket;
-	if (!udpSocket.bindToAnyPort(USE_IPV6))
+	if (!udpSocket.bindToAnyPort(CLIENT_USE_IPv6 ? Sockets::ProtocolFamily::IPv6 : Sockets::ProtocolFamily::IPv4))
 		RMX_ERROR("Socket bind to any port failed", return);
 	ConnectionManager connectionManager(&udpSocket, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE);
 #else
@@ -102,7 +102,7 @@ void TestClient::runClient()
 	SocketAddress serverAddress;
 	{
 		std::string serverIP;
-		if (!Sockets::resolveToIP(SERVER_NAME, serverIP))
+		if (!Sockets::resolveToIP(SERVER_NAME, serverIP, CLIENT_USE_IPv6))
 			RMX_ERROR("Unable to resolve server name " << SERVER_NAME, return);
 		serverAddress.set(serverIP, connectionManager.hasUDPSocket() ? UDP_SERVER_PORT : TCP_SERVER_PORT);
 	}

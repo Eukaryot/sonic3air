@@ -56,24 +56,25 @@ void NetworkingWindow::buildContent()
 		
 		ImGui::BeginDisabled(nullptr != netplayManager.getNetplayHost());
 		{
-			const bool USE_IPV6 = false;	// TODO: IPv6 does not work, the the server doesn't support it
 			if (ImGui::Button("Host via server"))
 			{
-				netplayManager.setupAsHost(true, NetplayManager::DEFAULT_PORT, USE_IPV6);
+				netplayManager.setupAsHost(true, NetplayManager::DEFAULT_PORT);
 			}
 
 			ImGui::SameLine();
 			if (ImGui::Button("Host directly"))
 			{
-				netplayManager.setupAsHost(false, NetplayManager::DEFAULT_PORT, USE_IPV6);
+				netplayManager.setupAsHost(false, NetplayManager::DEFAULT_PORT);
 			}
 		}
 		ImGui::EndDisabled();
 
 		ImGui::BeginDisabled(nullptr != netplayManager.getNetplayClient());
 		{
-			static char ipBuffer[32] = "127.0.0.1";
+			static char ipBuffer[32] = { 0 };
 			static int port = NetplayManager::DEFAULT_PORT;
+			if (ipBuffer[0] == 0)
+				strcpy_s(ipBuffer, 32, netplayManager.isUsingIPv6() ? "::1" : "127.0.0.1");
 
 			if (ImGui::Button("Join via server"))
 			{

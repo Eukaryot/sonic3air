@@ -28,12 +28,12 @@ void Server::runServer()
 
 	// Setup sockets
 	UDPSocket udpSocket;
-	if (!udpSocket.bindToPort(udpPort, USE_IPV6))
+	if (!udpSocket.bindToPort(udpPort, SERVER_PROTOCOL_FAMILY))
 		RMX_ERROR("UDP socket bind to port " << udpPort << " failed", return);
 	RMX_LOG_INFO("UDP socket bound to port " << udpPort);
 
 	TCPSocket tcpListenSocket;
-	if (!tcpListenSocket.setupServer(tcpPort, USE_IPV6))
+	if (!tcpListenSocket.setupServer(tcpPort, SERVER_PROTOCOL_FAMILY))
 		RMX_ERROR("TCP socket bind to port " << tcpPort << " failed", return);
 	RMX_LOG_INFO("TCP socket bound to port " << tcpPort);
 
