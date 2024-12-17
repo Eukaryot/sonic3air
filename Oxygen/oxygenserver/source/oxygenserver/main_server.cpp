@@ -12,6 +12,24 @@
 #include "oxygenserver/Configuration.h"
 
 
+#if defined(PLATFORM_WINDOWS)
+
+	#include <windows.h>
+	#undef ERROR
+
+	BOOL WINAPI ConsoleHandler(DWORD CEvent)
+	{
+		if (CEvent == CTRL_C_EVENT || CEvent == CTRL_BREAK_EVENT)	// Unfortunately, this does not work with CTRL_CLOSE_EVENT, as it would lead to immediate shutdown in any case
+		{
+			Server::mReceivedCloseEvent = true;
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+#endif
+
+
 namespace
 {
 	// Copy of "PlatformFunctions::changeWorkingDirectory"
@@ -108,6 +126,10 @@ int main(int argc, char** argv)
 
 		rmx::ErrorHandling::mLogger = &mErrorLogger;
 	}
+
+#if defined(PLATFORM_WINDOWS)
+	SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler, TRUE);
+#endif
 
 #ifndef DEBUG
 	// To protect users' privacy, do not log IPs at all on production servers

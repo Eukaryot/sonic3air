@@ -37,6 +37,7 @@ public:
 
 public:
 	ConnectionManager(UDPSocket* udpSocket, TCPSocket* tcpListenSocket, ConnectionListenerInterface& listener, VersionRange<uint8> highLevelProtocolVersionRange);
+	~ConnectionManager();
 
 	inline bool hasUDPSocket() const			  { return (nullptr != mUDPSocket); }
 	inline UDPSocket* getUDPSocket() const		  { return mUDPSocket; }
@@ -53,6 +54,8 @@ public:
 	bool sendTCPPacketData(const std::vector<uint8>& data, TCPSocket& socket, bool isWebSocketServer);
 
 	bool sendConnectionlessLowLevelPacket(lowlevel::PacketBase& lowLevelPacket, const SocketAddress& remoteAddress, uint16 localConnectionID, uint16 remoteConnectionID);
+
+	void terminateAllConnections();
 
 protected:
 	// Only meant to be called from NetConnection

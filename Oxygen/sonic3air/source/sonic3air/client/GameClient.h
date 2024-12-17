@@ -30,6 +30,7 @@ public:
 	void updateClient(float timeElapsed);
 
 protected:
+	virtual void onShutdown() override;
 	virtual bool onReceivedPacket(ReceivedPacketEvaluation& evaluation) override;
 
 private:

@@ -28,7 +28,15 @@ NetConnection::NetConnection() :
 
 NetConnection::~NetConnection()
 {
-	clear();
+	if (nullptr != mConnectionManager)
+	{
+		disconnect(DisconnectReason::MANUAL_LOCAL);
+		// Note that this includes "clear" as well
+	}
+	else
+	{
+		clear();
+	}
 }
 
 void NetConnection::clear()
@@ -137,6 +145,13 @@ bool NetConnection::isConnectedTo(uint16 localConnectionID, uint16 remoteConnect
 
 void NetConnection::disconnect(DisconnectReason disconnectReason)
 {
+	if (disconnectReason == DisconnectReason::MANUAL_LOCAL && nullptr != mConnectionManager)
+	{
+		// Send a termination packet
+		lowlevel::TerminateConnectionPacket packet;
+		sendLowLevelPacket(packet, mSendBuffer);
+	}
+
 	clear();
 	mState = State::DISCONNECTED;
 	mDisconnectReason = disconnectReason;
@@ -295,8 +310,6 @@ void NetConnection::handleLowLevelPacket(const ReceivedPacket& receivedPacket)
 
 	VectorBinarySerializer serializer(true, receivedPacket.mContent);
 	serializer.skip(6);		// Skip low level signature and connection IDs, they got evaluated already
-	if (serializer.getRemaining() <= 0)
-		return;
 
 	// If this is the first packet that the server received after connection was accepted, this turn the connection into a fully connected one
 	if (mState == State::ACCEPTED)
@@ -337,6 +350,17 @@ void NetConnection::handleLowLevelPacket(const ReceivedPacket& receivedPacket)
 
 			// Stop resending the StartConnectionPacket
 			mSentPacketCache.onPacketReceiveConfirmed(0);
+			return;
+		}
+
+		case lowlevel::TerminateConnectionPacket::SIGNATURE:
+		{
+			lowlevel::TerminateConnectionPacket packet;
+			if (!packet.serializePacket(serializer, lowlevel::PacketBase::LOWLEVEL_PROTOCOL_VERSIONS.mMinimum))
+				return;
+
+			// Terminate this connection
+			disconnect(DisconnectReason::MANUAL_REMOTE);
 			return;
 		}
 

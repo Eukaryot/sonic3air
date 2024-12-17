@@ -65,6 +65,8 @@ Application::Application() :
 
 Application::~Application()
 {
+	EngineServerClient::instance().shutdownClient();
+
 	delete mGameLoader;
 	delete mSaveStateMenu;
 	delete mSimulation;

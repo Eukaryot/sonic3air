@@ -39,10 +39,11 @@ public:
 
 	enum class DisconnectReason
 	{
-		UNKNOWN,	// No reason given
-		MANUAL,		// Manually disconnected
-		TIMEOUT,	// Automatic disconnect after timeout (because a reliably sent packet was not confirmed for too long)
-		STALE,		// Automatic disconnect after connection was not used for a while
+		UNKNOWN,			// No reason given
+		MANUAL_LOCAL,		// Manually disconnected locally
+		MANUAL_REMOTE,		// Manually disconnected by remote
+		TIMEOUT,			// Automatic disconnect after timeout (because a reliably sent packet was not confirmed for too long)
+		STALE,				// Automatic disconnect after connection was not used for a while
 	};
 
 	struct SendFlags
@@ -85,7 +86,7 @@ public:
 	void setupWithTCPSocket(ConnectionManager& connectionManager, TCPSocket& socketToMove);
 	bool startConnectTo(ConnectionManager& connectionManager, const SocketAddress& remoteAddress);
 	bool isConnectedTo(uint16 localConnectionID, uint16 remoteConnectionID, uint64 senderKey) const;
-	void disconnect(DisconnectReason disconnectReason = DisconnectReason::MANUAL);
+	void disconnect(DisconnectReason disconnectReason);
 	bool receivedAnyUniquePacketIDs() const;
 
 	bool sendPacket(highlevel::PacketBase& packet, SendFlags::Flags flags = SendFlags::NONE);

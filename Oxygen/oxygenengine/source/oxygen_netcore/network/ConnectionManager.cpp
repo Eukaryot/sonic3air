@@ -64,6 +64,11 @@ ConnectionManager::ConnectionManager(UDPSocket* udpSocket, TCPSocket* tcpListenS
 	mActiveConnections.reserve(16);
 }
 
+ConnectionManager::~ConnectionManager()
+{
+	terminateAllConnections();
+}
+
 bool ConnectionManager::updateConnectionManager()
 {
 	// Check the socket for new packets (this could be done by a thread instead)
@@ -182,6 +187,14 @@ bool ConnectionManager::sendConnectionlessLowLevelPacket(lowlevel::PacketBase& l
 	lowLevelPacket.serializePacket(serializer, lowlevel::PacketBase::LOWLEVEL_PROTOCOL_VERSIONS.mMinimum);
 
 	return sendUDPPacketData(sendBuffer, remoteAddress);
+}
+
+void ConnectionManager::terminateAllConnections()
+{
+	while (!mActiveConnections.empty())
+	{
+		mActiveConnections.begin()->second->disconnect(NetConnection::DisconnectReason::MANUAL_LOCAL);
+	}
 }
 
 void ConnectionManager::addConnection(NetConnection& connection)
@@ -306,7 +319,7 @@ void ConnectionManager::receivedPacketInternal(const std::vector<uint8>& buffer,
 						case lowlevel::ErrorPacket::ErrorCode::CONNECTION_INVALID:
 						{
 							// Invalidate connection
-							connection->disconnect(NetConnection::DisconnectReason::UNKNOWN);
+							connection->disconnect(NetConnection::DisconnectReason::MANUAL_REMOTE);
 							return;
 						}
 

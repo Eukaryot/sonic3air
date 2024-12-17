@@ -79,7 +79,8 @@ void Server::runServer()
 	mLastCleanupTimestamp = lastTimestamp;
 
 	// Run the main loop
-	while (true)
+	mReceivedCloseEvent = false;
+	while (!mReceivedCloseEvent)
 	{
 		const uint64 currentTimestamp = ConnectionManager::getCurrentTimestamp();
 		const uint64 millisecondsElapsed = currentTimestamp - lastTimestamp;
@@ -99,6 +100,9 @@ void Server::runServer()
 			mLastCleanupTimestamp = currentTimestamp;
 		}
 	}
+
+	connectionManager.terminateAllConnections();
+	RMX_LOG_INFO("Server shutdown");
 }
 
 NetConnection* Server::createNetConnection(ConnectionManager& connectionManager, const SocketAddress& senderAddress)

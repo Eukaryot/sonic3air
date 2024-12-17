@@ -20,6 +20,7 @@ class EngineServerClient : public ConnectionListenerInterface, public SingleInst
 public:
 	struct Listener
 	{
+		virtual void onShutdown() {}
 		virtual bool onReceivedPacket(ReceivedPacketEvaluation& evaluation) = 0;
 	};
 
@@ -53,6 +54,7 @@ public:
 	void setListener(Listener* listener)  { mListener = listener; }
 
 	bool setupClient(bool useIPv6);
+	void shutdownClient();
 	void updateClient(float timeElapsed);
 
 	inline ConnectionState getConnectionState() const  { return mConnectionState; }

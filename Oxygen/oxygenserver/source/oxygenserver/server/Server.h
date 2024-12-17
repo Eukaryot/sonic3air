@@ -21,6 +21,9 @@
 class Server : public ConnectionListenerInterface
 {
 public:
+	static inline bool mReceivedCloseEvent = false;
+
+public:
 	void runServer();
 
 protected:

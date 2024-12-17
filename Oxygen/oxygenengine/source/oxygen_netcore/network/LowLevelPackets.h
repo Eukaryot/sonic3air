@@ -69,6 +69,17 @@ namespace lowlevel
 	};
 
 
+	struct TerminateConnectionPacket : public PacketBase
+	{
+		static const constexpr uint16 SIGNATURE = 0x7e75;
+		virtual uint16 getSignature() const override  { return SIGNATURE; }
+
+		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
+		{
+		}
+	};
+
+
 	struct ErrorPacket : public PacketBase
 	{
 		enum class ErrorCode : uint8

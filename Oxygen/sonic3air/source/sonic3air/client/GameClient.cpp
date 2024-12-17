@@ -45,6 +45,10 @@ void GameClient::updateClient(float timeElapsed)
 	mUpdateCheck.performUpdate();
 }
 
+void GameClient::onShutdown()
+{
+}
+
 bool GameClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 {
 	if (mGhostSync.onReceivedPacket(evaluation))

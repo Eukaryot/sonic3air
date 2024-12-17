@@ -19,7 +19,7 @@
 NetplayManager::NetplayManager() :
 	mConnectionManager(&mUDPSocket, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE)
 {
-	mUseIPv6 = false;
+	mUseIPv6 = true;
 }
 
 NetplayManager::~NetplayManager()

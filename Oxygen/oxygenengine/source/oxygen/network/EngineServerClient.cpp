@@ -79,6 +79,15 @@ bool EngineServerClient::setupClient(bool useIPv6)
 	return true;
 }
 
+void EngineServerClient::shutdownClient()
+{
+	if (nullptr != mListener)
+		mListener->onShutdown();
+
+	mNetplayManager.closeConnections();
+	mConnectionManager.terminateAllConnections();
+}
+
 void EngineServerClient::updateClient(float timeElapsed)
 {
 	// First update the server connection
