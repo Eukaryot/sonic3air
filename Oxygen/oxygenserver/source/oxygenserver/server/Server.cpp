@@ -127,6 +127,7 @@ void Server::destroyNetConnection(NetConnection& connection)
 	RMX_LOG_INFO("Removing connection with player ID " << serverNetConnection.getHexPlayerID() << " (now " << (mNetConnectionsByPlayerID.size() - 1) << " total connections)");
 
 	mChannels.removePlayerFromAllChannels(serverNetConnection);
+	mNetplaySetup.onDestroyConnection(serverNetConnection);
 
 	mNetConnectionsByPlayerID.erase(serverNetConnection.getPlayerID());
 	mNetConnectionPool.destroyObject(serverNetConnection);

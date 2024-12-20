@@ -84,6 +84,18 @@ bool NetplaySetup::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 	return false;
 }
 
+void NetplaySetup::onDestroyConnection(NetConnection& connection)
+{
+	for (auto it = mSessions.begin(); it != mSessions.end(); ++it)
+	{
+		if (it->second.mHostConnection.get() == &connection)
+		{
+			mSessions.erase(it);
+			return;
+		}
+	}
+}
+
 void NetplaySetup::connectHostAndClient(Session& session, const ParticipantInfo& host, const ParticipantInfo& client)
 {
 	// Inform the host and the client

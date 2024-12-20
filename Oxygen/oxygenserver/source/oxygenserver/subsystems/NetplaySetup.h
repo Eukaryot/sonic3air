@@ -16,6 +16,7 @@ class NetplaySetup
 public:
 	bool onReceivedPacket(ReceivedPacketEvaluation& evaluation);
 	bool onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation);
+	void onDestroyConnection(NetConnection& connection);
 
 private:
 	struct Session

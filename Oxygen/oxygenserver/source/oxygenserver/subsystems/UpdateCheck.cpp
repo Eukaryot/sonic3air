@@ -52,12 +52,13 @@ UpdateCheck::UpdateCheck()
 	}
 #endif
 
-	// Test build (Windows and Linux)
+	// Test build (Windows, Mac, Linux)
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
 		definition.mVersionNumber = 0x24120500;
 		definition.mReleaseChannel = ReleaseChannel::TEST;
 		definition.addPlatform(Platform::WINDOWS);
+		definition.addPlatform(Platform::MAC);
 		definition.addPlatform(Platform::LINUX);
 		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";
 	}

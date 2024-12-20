@@ -9,6 +9,11 @@ endif()
 project(Sonic3AIR)
 
 
+# Build options
+option(BUILD_OXYGEN_ENGINEAPP "Build the Oxygen App executable" ON)
+option(BUILD_OXYGEN_SERVER "Build the Oxygen server executable" OFF)
+
+
 # Determine whether to support discord integration
 set(USE_DISCORD true)
 if (UNIX AND CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
@@ -79,6 +84,7 @@ include_directories(${WORKSPACE_DIR}/librmx/source)
 include_directories(${WORKSPACE_DIR}/librmx/source/rmxmedia/_glew)
 include_directories(${WORKSPACE_DIR}/Oxygen/lemonscript/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/oxygenengine/source)
+include_directories(${WORKSPACE_DIR}/Oxygen/oxygenserver/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/sonic3air/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/sonic3air/source/external)
 
@@ -217,25 +223,48 @@ endif()
 
 
 # OxygenApp
+if (BUILD_OXYGEN_ENGINEAPP)
 
-file(GLOB_RECURSE ENGINEAPP_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/engineapp/*.cpp)
+	file(GLOB_RECURSE ENGINEAPP_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/engineapp/*.cpp)
 
-# TODO: CMake seems to use a different working directory for this, so "Oxygen" is intentionally missing here
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${WORKSPACE_DIR}/oxygenengine")
+	# TODO: CMake seems to use a different working directory for this, so "Oxygen" is intentionally missing here
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${WORKSPACE_DIR}/oxygenengine")
 
-add_executable(OxygenApp ${ENGINEAPP_SOURCES})
+	add_executable(OxygenApp ${ENGINEAPP_SOURCES})
 
-if (UNIX AND NOT APPLE)
-	# Different executable name on Linux
-	set_target_properties(OxygenApp PROPERTIES OUTPUT_NAME "oxygenapp_linux")
-endif ()
+	if (UNIX AND NOT APPLE)
+		# Different executable name on Linux
+		set_target_properties(OxygenApp PROPERTIES OUTPUT_NAME "oxygenapp_linux")
+	endif ()
 
-if (NOT CMAKE_VERSION VERSION_LESS "3.16.0")
-	target_precompile_headers(OxygenApp PRIVATE ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/engineapp/pch.h)
+	if (NOT CMAKE_VERSION VERSION_LESS "3.16.0")
+		target_precompile_headers(OxygenApp PRIVATE ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/engineapp/pch.h)
+	endif()
+
+	target_link_libraries(OxygenApp oxygen)
+
 endif()
 
-target_link_libraries(OxygenApp oxygen)
 
+
+# Oxygen Server
+if (BUILD_OXYGEN_SERVER)
+
+	file(GLOB_RECURSE OXYGENSERVER_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenserver/source/oxygenserver/*.cpp)
+
+	# TODO: CMake seems to use a different working directory for this, so "Oxygen" is intentionally missing here
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${WORKSPACE_DIR}/oxygenserver")
+
+	add_executable(OxygenServer ${OXYGENSERVER_SOURCES})
+	set_target_properties(OxygenServer PROPERTIES OUTPUT_NAME "oxygenserver")
+
+	if (NOT CMAKE_VERSION VERSION_LESS "3.16.0")
+		target_precompile_headers(OxygenServer PRIVATE ${WORKSPACE_DIR}/Oxygen/oxygenserver/source/oxygenserver/pch.h)
+	endif()
+
+	target_link_libraries(OxygenServer oxygen_netcore)
+
+endif()
 
 
 # discord_game_sdk

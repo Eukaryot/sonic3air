@@ -77,6 +77,9 @@ bool ConfigurationImpl::loadSettingsInternal(JsonSerializer& serializer, Setting
 {
 	serializeSettingsInternal(serializer);
 
+	if (mGameServerBase.mServerHostName == "sonic3air.org")
+		mGameServerBase.mServerHostName = "gameserver.sonic3air.org";
+
 	return true;
 }
 

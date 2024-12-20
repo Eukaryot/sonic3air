@@ -31,16 +31,6 @@ EngineServerClient::SocketUsage EngineServerClient::getSocketUsage()
 
 bool EngineServerClient::resolveGameServerHostName(const std::string& hostName, std::string& outServerIP, bool useIPv6)
 {
-	if (getSocketUsage() != SocketUsage::WEBSOCKETS && hostName != "localhost")
-	{
-		// For UDP/TCP, try the "gameserver" subdomain first
-		//  -> This does not work for emscripten websockets, see implementation of "resolveToIp"
-		//  -> It allows for having different servers for UDP/TCP, and websockets
-		if (Sockets::resolveToIP("gameserver." + hostName, outServerIP, useIPv6))
-			return true;
-	}
-
-	// Use the host name itself
 	return Sockets::resolveToIP(hostName, outServerIP, useIPv6);
 }
 
