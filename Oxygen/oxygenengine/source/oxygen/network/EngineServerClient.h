@@ -59,7 +59,9 @@ public:
 
 	inline ConnectionState getConnectionState() const  { return mConnectionState; }
 	inline bool isConnected() const					   { return (mConnectionState == ConnectionState::READY); }
+
 	void connectToServer();
+	void disconnectFromServer();
 
 	inline bool hasReceivedServerFeatures() const	   { return (mConnectionState == ConnectionState::READY); }
 	const network::GetServerFeaturesRequest::Response& getServerFeatures() const;

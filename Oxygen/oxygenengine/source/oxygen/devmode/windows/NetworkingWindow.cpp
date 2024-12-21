@@ -12,6 +12,7 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/devmode/ImGuiHelpers.h"
+#include "oxygen/network/EngineServerClient.h"
 #include "oxygen/network/netplay/NetplayClient.h"
 #include "oxygen/network/netplay/NetplayManager.h"
 #include "oxygen/network/netplay/NetplayHost.h"
@@ -27,9 +28,45 @@ void NetworkingWindow::buildContent()
 	ImGui::SetWindowPos(ImVec2(250.0f, 10.0f), ImGuiCond_FirstUseEver);
 	//ImGui::SetWindowSize(ImVec2(400.0f, 150.0f), ImGuiCond_FirstUseEver);
 
-	// Gameplay connection
+	// Engine server
 	{
-		ImGui::SeparatorText("Gameplay Connector");
+		ImGui::SeparatorText("Server");
+		ImGuiHelpers::ScopedIndent si;
+
+		EngineServerClient& engineServerClient = EngineServerClient::instance();
+
+		switch (engineServerClient.getServerConnection().getState())
+		{
+			case NetConnection::State::EMPTY:					ImGui::Text("Inactive");  break;
+			case NetConnection::State::TCP_READY:				ImGui::Text("TCP ready");  break;
+			case NetConnection::State::REQUESTED_CONNECTION:	ImGui::Text("Connecting...");  break;
+			case NetConnection::State::ACCEPTED:				ImGui::Text("Connection accepted");  break;
+			case NetConnection::State::CONNECTED:				ImGui::Text("Connected");  break;
+			case NetConnection::State::DISCONNECTED:			ImGui::Text("Disconnected");  break;
+		}
+
+		if (engineServerClient.getServerConnection().getState() == NetConnection::State::CONNECTED)
+		{
+			ImGui::SameLine();
+			ImGui::Text("|  Server IP = %s, port = %d", engineServerClient.getServerConnection().getRemoteAddress().getIP().c_str(), engineServerClient.getServerConnection().getRemoteAddress().getPort());
+
+			if (ImGui::Button("Disconnect"))
+			{
+				engineServerClient.disconnectFromServer();
+			}
+		}
+		else
+		{
+			if (ImGui::Button("Start connection"))
+			{
+				engineServerClient.connectToServer();
+			}
+		}
+	}
+
+	// Netplay
+	{
+		ImGui::SeparatorText("Netplay");
 		ImGuiHelpers::ScopedIndent si;
 
 		NetplayManager& netplayManager = NetplayManager::instance();
@@ -45,6 +82,7 @@ void NetworkingWindow::buildContent()
 				case NetConnection::State::EMPTY:				 ImGui::Text("Client: No connection");  break;
 				case NetConnection::State::TCP_READY:			 ImGui::Text("Client: TCP ready");  break;
 				case NetConnection::State::REQUESTED_CONNECTION: ImGui::Text("Client: Requested connection");  break;
+				case NetConnection::State::ACCEPTED:			 ImGui::Text("Client: Connection accepted");  break;
 				case NetConnection::State::CONNECTED:			 ImGui::Text("Client: Connected");  break;
 				case NetConnection::State::DISCONNECTED:		 ImGui::Text("Client: Disconnected");  break;
 			}

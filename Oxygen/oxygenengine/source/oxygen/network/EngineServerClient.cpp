@@ -154,6 +154,11 @@ void EngineServerClient::connectToServer()
 	}
 }
 
+void EngineServerClient::disconnectFromServer()
+{
+	mServerConnection.disconnect(NetConnection::DisconnectReason::MANUAL_LOCAL);
+}
+
 const network::GetServerFeaturesRequest::Response& EngineServerClient::getServerFeatures() const
 {
 	return mGetServerFeaturesRequest.mResponse;
