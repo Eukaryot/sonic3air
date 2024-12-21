@@ -12,10 +12,8 @@ PLEASE NOTE:
 
 >>> What you need
 
-Visual Studio 2019 (Community or Professional edition) with the "Desktop development with C++"
+Visual Studio 2022 (Community or Professional edition) with the "Desktop development with C++"
 workload installed.
-
-Visual Studio 2022 should work as well, but isn't tested yet.
 
 
 
@@ -32,8 +30,8 @@ The easiest way to do so is as follows:
 - Then execute the batch script.
 
 - If everything went fine, the "framework/lib" directory should now be populated with
-	sub-directories "x64", "x64d", "x86", "x86d" with each containing "libogg", "libvorbis",
-	"minizip", "sdl", "zlib" and the respective .lib files inside those.
+	sub-directories "x64", "x64d", "x86", "x86d" with each containing "curl", "imgui", "libogg",
+	"libvorbis", "minizip", "sdl", "zlib" and the respective .lib files inside those.
 
 Alternatively or in case of errors:
 

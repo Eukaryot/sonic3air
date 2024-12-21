@@ -6,9 +6,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\imgui\backends\imgui_impl_opengl2.cpp">
-      <Filter>backends</Filter>
-    </ClCompile>
     <ClCompile Include="..\imgui\backends\imgui_impl_opengl3.cpp">
       <Filter>backends</Filter>
     </ClCompile>
@@ -25,9 +22,6 @@
     <ClCompile Include="..\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\imgui\backends\imgui_impl_opengl2.h">
-      <Filter>backends</Filter>
-    </ClInclude>
     <ClInclude Include="..\imgui\backends\imgui_impl_opengl3.h">
       <Filter>backends</Filter>
     </ClInclude>
