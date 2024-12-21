@@ -149,6 +149,9 @@ bool NetplayHost::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluatio
 					mState = State::PUNCHTHROUGH;
 					break;
 				}
+
+                default:
+                    break;
 			}
 
 			return true;

@@ -73,7 +73,7 @@ void NetworkingWindow::buildContent()
 
 		if (nullptr != netplayManager.getNetplayHost())
 		{
-			ImGui::Text("Host: %d connections", netplayManager.getNetplayHost()->getPlayerConnections().size());
+			ImGui::Text("Host: %d connections", (int)netplayManager.getNetplayHost()->getPlayerConnections().size());
 		}
 		else if (nullptr != netplayManager.getNetplayClient())
 		{
