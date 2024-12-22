@@ -67,6 +67,7 @@
     <ClCompile Include="..\..\source\oxygen\devmode\windows\ScriptBuildWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\SettingsWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\SpriteBrowserWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\VRAMWritesWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\WatchesWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\download\Downloader.cpp" />
     <ClCompile Include="..\..\source\oxygen\download\DownloadManager.cpp" />
@@ -219,6 +220,7 @@
     <ClInclude Include="..\..\source\oxygen\devmode\windows\ScriptBuildWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\SettingsWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\SpriteBrowserWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\VRAMWritesWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\WatchesWindow.h" />
     <ClInclude Include="..\..\source\oxygen\download\Downloader.h" />
     <ClInclude Include="..\..\source\oxygen\download\DownloadManager.h" />

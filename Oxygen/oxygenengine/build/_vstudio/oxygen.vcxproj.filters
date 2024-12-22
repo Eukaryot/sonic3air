@@ -541,6 +541,9 @@
     <ClCompile Include="..\..\source\oxygen\devmode\DevModeWindowBase.cpp">
       <Filter>devmode</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\VRAMWritesWindow.cpp">
+      <Filter>devmode\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -1026,6 +1029,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\devmode\DevModeWindowBase.h">
       <Filter>devmode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\VRAMWritesWindow.h">
+      <Filter>devmode\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

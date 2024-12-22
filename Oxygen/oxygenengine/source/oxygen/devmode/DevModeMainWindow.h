@@ -25,6 +25,7 @@ class RenderedGeometryWindow;
 class ScriptBuildWindow;
 class SettingsWindow;
 class SpriteBrowserWindow;
+class VRAMWritesWindow;
 class WatchesWindow;
 
 
@@ -65,6 +66,7 @@ private:
 	ScriptBuildWindow* mScriptBuildWindow = nullptr;
 	SettingsWindow* mSettingsWindow = nullptr;
 	SpriteBrowserWindow* mSpriteBrowserWindow = nullptr;
+	VRAMWritesWindow* mVRAMWritesWindow = nullptr;
 	WatchesWindow* mWatchesWindow = nullptr;
 
 	bool mShowImGuiDemo = false;

@@ -23,6 +23,7 @@
 #include "oxygen/devmode/windows/ScriptBuildWindow.h"
 #include "oxygen/devmode/windows/SettingsWindow.h"
 #include "oxygen/devmode/windows/SpriteBrowserWindow.h"
+#include "oxygen/devmode/windows/VRAMWritesWindow.h"
 #include "oxygen/devmode/windows/WatchesWindow.h"
 
 
@@ -38,6 +39,7 @@ DevModeMainWindow::DevModeMainWindow() :
 
 		createWindow(mGameVisualizationsWindow);
 		createWindow(mRenderedGeometryWindow);
+		createWindow(mVRAMWritesWindow);
 		createWindow(mPaletteViewWindow);
 		createWindow(mMemoryHexViewWindow);
 		createWindow(mWatchesWindow);
