@@ -89,9 +89,11 @@ public:
 	void disconnect(DisconnectReason disconnectReason);
 	bool receivedAnyUniquePacketIDs() const;
 
-	bool sendPacket(highlevel::PacketBase& packet, SendFlags::Flags flags = SendFlags::NONE);
+	bool sendPacket(highlevel::PacketBase& packet, SendFlags::Flags flags = SendFlags::NONE, uint32* outUniquePacketID = nullptr);
 	bool sendRequest(highlevel::RequestBase& request);
 	bool respondToRequest(highlevel::RequestBase& request, uint32 uniqueRequestID);
+
+	bool wasPacketReceived(uint32 uniquePacketID) const;
 
 	bool readPacket(highlevel::PacketBase& packet, VectorBinarySerializer& serializer) const;
 

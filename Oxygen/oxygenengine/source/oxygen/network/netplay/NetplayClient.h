@@ -25,7 +25,8 @@ public:
 		CONNECT_TO_SERVER,	// Waiting for a game server connection
 		REGISTERED,			// Sent registration to game server, now waiting for a "ConnectToNetplayPacket"
 		CONNECT_TO_HOST,	// Waiting for connection to host
-		RUNNING,			// Connection to host established
+		CONNECTED,			// Connection to host established
+		GAME_RUNNING,		// Game running
 		FAILED
 	};
 

@@ -105,6 +105,10 @@ void EngineDelegate::onActiveModsChanged()
 {
 }
 
+void EngineDelegate::onStartNetplayGame()
+{
+}
+
 void EngineDelegate::onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer)
 {
 }

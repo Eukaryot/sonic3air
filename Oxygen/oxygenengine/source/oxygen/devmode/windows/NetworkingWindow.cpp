@@ -155,15 +155,32 @@ void NetworkingWindow::buildContent()
 
 		if (nullptr != netplayManager.getNetplayHost())
 		{
-			switch (netplayManager.getNetplayHost()->getState())
+			switch (netplayManager.getNetplayHost()->getHostState())
 			{
-				case NetplayHost::State::NONE:					ImGui::Text("Inactive");  break;
-				case NetplayHost::State::CONNECT_TO_SERVER:		ImGui::Text("Connecting to game server");  break;
-				case NetplayHost::State::REGISTERED:			ImGui::Text("Registered at game server");  break;
-				case NetplayHost::State::PUNCHTHROUGH:			ImGui::Text("NAT punchthrough");  break;
-				case NetplayHost::State::RUNNING:				ImGui::Text("Session running");  break;
-				case NetplayHost::State::FAILED:				ImGui::Text("Failed");  break;
+				case NetplayHost::HostState::NONE:					ImGui::Text("Inactive");  break;
+				case NetplayHost::HostState::CONNECT_TO_SERVER:		ImGui::Text("Connecting to game server");  break;
+				case NetplayHost::HostState::REGISTERED:			ImGui::Text("Registered at game server");  break;
+				case NetplayHost::HostState::GAME_RUNNING:			ImGui::Text("Game running");  break;
+				case NetplayHost::HostState::FAILED:				ImGui::Text("Failed");  break;
 			}
+
+			ImGui::BeginDisabled(netplayManager.getNetplayHost()->getHostState() < NetplayHost::HostState::REGISTERED || netplayManager.getNetplayHost()->getHostState() > NetplayHost::HostState::GAME_RUNNING);
+			if (netplayManager.getNetplayHost()->getHostState() == NetplayHost::HostState::REGISTERED)
+			{
+				if (ImGui::Button("Start game"))
+				{
+					netplayManager.getNetplayHost()->startGame();
+				}
+			}
+			else
+			{
+				if (ImGui::Button("Stop game"))
+				{
+					// TODO: This is not implemented yet
+					//netplayManager.getNetplayHost()->stopGame();
+				}
+			}
+			ImGui::EndDisabled();
 		}
 
 		if (nullptr != netplayManager.getNetplayClient())
@@ -174,7 +191,8 @@ void NetworkingWindow::buildContent()
 				case NetplayClient::State::CONNECT_TO_SERVER:	ImGui::Text("Connecting to game server");  break;
 				case NetplayClient::State::REGISTERED:			ImGui::Text("Registered at game server");  break;
 				case NetplayClient::State::CONNECT_TO_HOST:		ImGui::Text("Connecting to host");  break;
-				case NetplayClient::State::RUNNING:				ImGui::Text("Session running");  break;
+				case NetplayClient::State::CONNECTED:			ImGui::Text("Connected to host");  break;
+				case NetplayClient::State::GAME_RUNNING:		ImGui::Text("Game running");  break;
 				case NetplayClient::State::FAILED:				ImGui::Text("Failed");  break;
 			}
 		}

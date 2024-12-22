@@ -11,6 +11,7 @@
 #include "sonic3air/ConfigurationImpl.h"
 #include "sonic3air/audio/AudioOut.h"
 #include "sonic3air/menu/GameApp.h"
+#include "sonic3air/menu/MenuBackground.h"
 #include "sonic3air/menu/SharedResources.h"
 #include "sonic3air/version.inc"
 #if 0
@@ -203,6 +204,13 @@ bool EngineDelegate::useDeveloperFeatures()
 void EngineDelegate::onActiveModsChanged()
 {
 	mGame.onActiveModsChanged();
+}
+
+void EngineDelegate::onStartNetplayGame()
+{
+	mGame.startIntoDataSelect();
+	GameApp::instance().onStartGame();
+	GameApp::instance().getMenuBackground().setGameStartedMenu();
 }
 
 void EngineDelegate::onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer)

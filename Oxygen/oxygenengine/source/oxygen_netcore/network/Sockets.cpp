@@ -146,7 +146,7 @@ std::string SocketAddress::toLoggedString() const
 uint64 SocketAddress::getHash() const
 {
 	assureSockAddr();
-	return rmx::getMurmur2_64(mSockAddr, 16) ^ ((uint64)mPort << 48);
+	return rmx::getMurmur2_64(mSockAddr, 16);
 }
 
 void SocketAddress::assureSockAddr() const
@@ -182,22 +182,23 @@ void SocketAddress::assureIpPort() const
 	{
 		if (mHasSockAddr)
 		{
-			const auto addressFamily = reinterpret_cast<sockaddr_storage&>(mSockAddr).ss_family;
 			char myIP[512];
+			const auto addressFamily = reinterpret_cast<sockaddr_storage&>(mSockAddr).ss_family;
 			if (addressFamily == AF_INET)
 			{
 				// IPv4
 				inet_ntop(addressFamily, &(reinterpret_cast<sockaddr_in&>(mSockAddr).sin_addr), myIP, sizeof(myIP));
+				mPort = ntohs(reinterpret_cast<sockaddr_in&>(mSockAddr).sin_port);
 			}
 		#if !defined(PLATFORM_SWITCH)	// The IPv6 part won't compile on Switch, but isn't really needed there anyways
 			else
 			{
 				// IPv6
 				inet_ntop(addressFamily, &(reinterpret_cast<sockaddr_in6&>(mSockAddr).sin6_addr), myIP, sizeof(myIP));
+				mPort = ntohs(reinterpret_cast<sockaddr_in6&>(mSockAddr).sin6_port);
 			}
 		#endif
 			mIP = myIP;
-			mPort = ntohs(reinterpret_cast<sockaddr_in&>(mSockAddr).sin_port);
 		}
 		else
 		{

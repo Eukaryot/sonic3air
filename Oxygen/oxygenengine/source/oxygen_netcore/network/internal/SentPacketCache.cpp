@@ -54,9 +54,23 @@ void SentPacketCache::addPacket(SentPacket& sentPacket, uint64 currentTimestamp,
 	++mNextUniquePacketID;
 }
 
+bool SentPacketCache::wasPacketReceiveConfirmed(uint32 uniquePacketID) const
+{
+	// If the ID is not part of the queue any more, it counts as received
+	if (uniquePacketID < mQueueStartUniquePacketID)
+		return true;
+
+	// If the ID is invalid, it's not received, obviously
+	const size_t index = uniquePacketID - mQueueStartUniquePacketID;
+	if (index >= mQueue.size())
+		return false;
+
+	return (nullptr == mQueue[index]);
+}
+
 void SentPacketCache::onPacketReceiveConfirmed(uint32 uniquePacketID)
 {
-	// If the ID part is not part of the queue, ignore it
+	// If the ID is not part of the queue, ignore it
 	if (uniquePacketID < mQueueStartUniquePacketID)
 		return;
 	const size_t index = uniquePacketID - mQueueStartUniquePacketID;

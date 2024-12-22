@@ -19,6 +19,7 @@ public:
 
 	void addPacket(SentPacket& sentPacket, uint64 currentTimestamp, bool isStartConnectionPacket = false);
 
+	bool wasPacketReceiveConfirmed(uint32 uniquePacketID) const;
 	void onPacketReceiveConfirmed(uint32 uniquePacketID);
 
 	inline bool hasUnconfirmedPackets() const  { return !mQueue.empty(); }

@@ -30,8 +30,8 @@ public:
 	inline ConnectionManager& getConnectionManager()		{ return mConnectionManager; }
 	inline bool isUsingIPv6() const							{ return mUseIPv6; }
 
-	inline const NetplayHost* getNetplayHost() const		{ return mNetplayHost; }
-	inline const NetplayClient* getNetplayClient() const	{ return mNetplayClient; }
+	inline NetplayHost* getNetplayHost() 					{ return mNetplayHost; }
+	inline NetplayClient* getNetplayClient()				{ return mNetplayClient; }
 	inline const ExternalAddressQuery& getExternalAddressQuery() const  { return mExternalAddressQuery; }
 
 	bool setupAsHost(bool registerSessionAtServer, uint16 port = DEFAULT_PORT);

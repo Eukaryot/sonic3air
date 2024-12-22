@@ -35,11 +35,23 @@ void NetplayHost::registerAtServer()
 {
 	// Request game server connection
 	EngineServerClient::instance().connectToServer();
-	mState = State::CONNECT_TO_SERVER;
+	mHostState = HostState::CONNECT_TO_SERVER;
 }
 
 NetConnection* NetplayHost::createNetConnection(const SocketAddress& senderAddress)
 {
+	// Remove from connecting players
+	for (size_t k = 0; k < mConnectingPlayers.size(); ++k)
+	{
+		const ConnectingPlayer& player = mConnectingPlayers[k];
+		if (player.mRemoteAddress == senderAddress)
+		{
+			mConnectingPlayers.erase(mConnectingPlayers.begin() + k);
+			break;
+		}
+	}
+
+	// Create new connection
 	PlayerConnection* connection = new PlayerConnection();
 
 	// TODO: Set player index accordingly, it should take into account the other connections' player indices and use a free one
@@ -58,19 +70,12 @@ void NetplayHost::updateConnection(float deltaSeconds)
 {
 	EngineServerClient& engineServerClient = EngineServerClient::instance();
 
-	switch (mState)
+	switch (mHostState)
 	{
-		case State::NONE:
-		{
-			// Switch to running as soon as the first client connects directly
-			if (!mPlayerConnections.empty())
-			{
-				mState = State::RUNNING;
-			}
+		case HostState::NONE:
 			break;
-		}
 
-		case State::CONNECT_TO_SERVER:
+		case HostState::CONNECT_TO_SERVER:
 		{
 			// Request game server connection
 			engineServerClient.connectToServer();
@@ -89,39 +94,53 @@ void NetplayHost::updateConnection(float deltaSeconds)
 			mRegistrationRequest.mQuery.mGameSocketExternalPort = mNetplayManager.getExternalAddressQuery().mOwnExternalPort;
 			engineServerClient.getServerConnection().sendRequest(mRegistrationRequest);
 
-			mState = State::REGISTERED;
+			mHostState = HostState::REGISTERED;
 			break;
 		}
 
-		case State::REGISTERED:
+		case HostState::REGISTERED:
 		{
 			// Check registration
 			if (mRegistrationRequest.hasResponse())
 			{
 				if (!mRegistrationRequest.mResponse.mSuccess)
 				{
-					mState = State::FAILED;
+					mHostState = HostState::FAILED;
 					break;
 				}
 			}
-			break;
-		}
 
-		case State::PUNCHTHROUGH:
-		{
-			// TODO: Regularly send a new "PunchthroughConnectionlessPacket", until receiving an incoming connection, or timeout
-
-			// TODO: Support multiple clients here... we probably have to track a state for each client individually
-
-			if (!mPlayerConnections.empty())
+		#if 1
+			// Switch to running as soon as the first client connects directly
+			if (!mPlayerConnections.empty() && mPlayerConnections[0]->getState() == NetConnection::State::CONNECTED)
 			{
-				mState = State::RUNNING;
+				startGame();
 			}
+		#endif
 			break;
 		}
 
 		default:
 			break;
+	}
+
+	// Update connecting players
+	for (size_t k = 0; k < mConnectingPlayers.size(); ++k)
+	{
+		ConnectingPlayer& player = mConnectingPlayers[k];
+		player.mSendTimer += deltaSeconds;
+		if (player.mSendTimer < 0.1f)
+			continue;
+
+		if (player.mSentPackets < 20)
+		{
+			sendPunchthroughPacket(player);
+		}
+		else
+		{
+			mConnectingPlayers.erase(mConnectingPlayers.begin() + k);
+			--k;
+		}
 	}
 }
 
@@ -139,14 +158,11 @@ bool NetplayHost::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluatio
 			{
 				case network::NetplayConnectionType::PUNCHTHROUGH:
 				{
-					// Send some packets towards the client, until receiving a response
-					// TODO: This is just a single one... :/
-					network::PunchthroughConnectionlessPacket punchthroughPacket;
-					punchthroughPacket.mQueryID = (uint32)packet.mSessionID;
-					punchthroughPacket.mSenderReceivedPackets = false;
+					ConnectingPlayer& player = vectorAdd(mConnectingPlayers);
+					player.mRemoteAddress = SocketAddress(packet.mConnectToIP, packet.mConnectToPort);
+					player.mSessionID = packet.mSessionID;
 
-					mConnectionManager.sendConnectionlessLowLevelPacket(punchthroughPacket, SocketAddress(packet.mConnectToIP, packet.mConnectToPort), 0, 0);
-					mState = State::PUNCHTHROUGH;
+					sendPunchthroughPacket(player);
 					break;
 				}
 
@@ -159,6 +175,22 @@ bool NetplayHost::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluatio
 	}
 
 	return false;
+}
+
+void NetplayHost::startGame()
+{
+	for (PlayerConnection* connection : mPlayerConnections)
+	{
+		StartGamePacket packet;
+		// TODO: Fill this in, and the other values as well
+		//packet.mGameBuildVersion = BUILD_NUMBER;
+
+		connection->sendPacket(packet, NetConnection::SendFlags::NONE, &connection->mStartGamePacketID);
+	}
+
+	EngineMain::getDelegate().onStartNetplayGame();
+
+	mHostState = HostState::GAME_RUNNING;
 }
 
 void NetplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
@@ -274,4 +306,16 @@ bool NetplayHost::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 	}
 
 	return false;
+}
+
+void NetplayHost::sendPunchthroughPacket(ConnectingPlayer& player)
+{
+	network::PunchthroughConnectionlessPacket punchthroughPacket;
+	punchthroughPacket.mQueryID = (uint32)player.mSessionID;
+	punchthroughPacket.mSenderReceivedPackets = false;
+
+	mConnectionManager.sendConnectionlessLowLevelPacket(punchthroughPacket, player.mRemoteAddress, 0, 0);
+
+	++player.mSentPackets;
+	player.mSendTimer = 0.0f;
 }

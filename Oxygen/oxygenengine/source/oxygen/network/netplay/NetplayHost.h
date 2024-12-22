@@ -21,19 +21,27 @@ class NetplayManager;
 class NetplayHost
 {
 public:
-	enum class State
+	enum class HostState
 	{
 		NONE,				// Idle, but reacting to direct connections
 		CONNECT_TO_SERVER,	// Waiting for a game server connection
 		REGISTERED,			// Sent registration to game server, now waiting for a client to join with a "ConnectToNetplayPacket"
-		PUNCHTHROUGH,
-		RUNNING,			// Connection to client established
+		GAME_RUNNING,		// Game is running
 		FAILED
+	};
+
+	struct ConnectingPlayer
+	{
+		SocketAddress mRemoteAddress;
+		uint64 mSessionID = 0;
+		int mSentPackets = 0;
+		float mSendTimer = 0.0f;
 	};
 
 	struct PlayerConnection : public NetConnection
 	{
 		uint8 mPlayerIndex = 0;
+		uint32 mStartGamePacketID = 0;
 		uint32 mLastReceivedFrameNumber = 0;
 		uint16 mLastReceivedInput = 0;
 	};
@@ -47,7 +55,7 @@ public:
 	NetplayHost(ConnectionManager& connectionManager, NetplayManager& netplayManager);
 	~NetplayHost();
 
-	inline State getState() const  { return mState; }
+	inline HostState getHostState() const  { return mHostState; }
 	inline const std::vector<PlayerConnection*>& getPlayerConnections() const  { return mPlayerConnections; }
 
 	void registerAtServer();
@@ -58,16 +66,22 @@ public:
 	void updateConnection(float deltaSeconds);
 	bool onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluation);
 
+	void startGame();
+
 	void onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber);
 	bool onReceivedPacket(ReceivedPacketEvaluation& evaluation);
 
 private:
+	void sendPunchthroughPacket(ConnectingPlayer& player);
+
+private:
 	ConnectionManager& mConnectionManager;
 	NetplayManager& mNetplayManager;
-	State mState = State::NONE;
+	HostState mHostState = HostState::NONE;
 
 	network::RegisterForNetplayRequest mRegistrationRequest;
 
+	std::vector<ConnectingPlayer> mConnectingPlayers;
 	std::vector<PlayerConnection*> mPlayerConnections;
 	std::deque<InputFrame> mInputHistory;
 };

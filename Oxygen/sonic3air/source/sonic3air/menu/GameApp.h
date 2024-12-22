@@ -54,6 +54,7 @@ public:
 
 	inline GameView& getGameView() const { return *mGameView; }
 	inline GameMenuManager& getGameMenuManager() const  { return *mGameMenuManager; }
+	inline MenuBackground& getMenuBackground() const	{ return *mMenuBackground; }
 
 private:
 	void gotoPhase(int phaseNumber);

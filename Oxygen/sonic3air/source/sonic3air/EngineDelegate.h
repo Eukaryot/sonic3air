@@ -44,6 +44,8 @@ public:
 	bool useDeveloperFeatures() override;
 	void onActiveModsChanged() override;
 
+	void onStartNetplayGame() override;
+
 	void onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer) override;
 	void onGameRecordingHeaderSave(std::vector<uint8>& buffer) override;
 

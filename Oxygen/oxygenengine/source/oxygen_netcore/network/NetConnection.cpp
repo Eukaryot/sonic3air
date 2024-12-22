@@ -162,10 +162,17 @@ bool NetConnection::receivedAnyUniquePacketIDs() const
 	return (mReceivedPacketCache.getLastExtractedUniquePacketID() > 0);
 }
 
-bool NetConnection::sendPacket(highlevel::PacketBase& packet, SendFlags::Flags flags)
+bool NetConnection::sendPacket(highlevel::PacketBase& packet, SendFlags::Flags flags, uint32* outUniquePacketID)
 {
-	uint32 unused;
-	return sendHighLevelPacket(packet, flags, unused);
+	if (nullptr != outUniquePacketID)
+	{
+		return sendHighLevelPacket(packet, flags, *outUniquePacketID);
+	}
+	else
+	{
+		uint32 unused;
+		return sendHighLevelPacket(packet, flags, unused);
+	}
 }
 
 bool NetConnection::sendRequest(highlevel::RequestBase& request)
@@ -195,6 +202,11 @@ bool NetConnection::respondToRequest(highlevel::RequestBase& request, uint32 uni
 	highLevelPacket.mUniqueRequestID = uniqueRequestID;
 	uint32 unused;
 	return sendHighLevelPacket(highLevelPacket, request.getResponsePacket(), SendFlags::NONE, unused);
+}
+
+bool NetConnection::wasPacketReceived(uint32 uniquePacketID) const
+{
+	return mSentPacketCache.wasPacketReceiveConfirmed(uniquePacketID);
 }
 
 bool NetConnection::readPacket(highlevel::PacketBase& packet, VectorBinarySerializer& serializer) const

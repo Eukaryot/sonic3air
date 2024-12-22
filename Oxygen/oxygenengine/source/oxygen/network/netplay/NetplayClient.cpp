@@ -89,7 +89,7 @@ void NetplayClient::updateConnection(float deltaSeconds)
 		{
 			if (mHostConnection.getState() == NetConnection::State::CONNECTED)
 			{
-				mState = State::RUNNING;
+				mState = State::CONNECTED;
 			}
 			break;
 		}
@@ -165,6 +165,17 @@ bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 {
 	switch (evaluation.mPacketType)
 	{
+		case StartGamePacket::PACKET_TYPE:
+		{
+			GameStateIncrementPacket packet;
+			if (!evaluation.readPacket(packet))
+				return false;
+
+			EngineMain::getDelegate().onStartNetplayGame();
+			mState = State::GAME_RUNNING;
+			return true;
+		}
+
 		case GameStateIncrementPacket::PACKET_TYPE:
 		{
 			GameStateIncrementPacket packet;

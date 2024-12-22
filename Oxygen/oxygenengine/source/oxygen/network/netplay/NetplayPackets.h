@@ -12,6 +12,37 @@
 
 
 // Sent from host to clients
+struct StartGamePacket : public highlevel::PacketBase
+{
+	HIGHLEVEL_PACKET_DEFINE_PACKET_TYPE("StartGamePacket");
+
+	static const uint8 PACKET_VERSION = 1;
+
+	uint8 mPacketVersion = PACKET_VERSION;
+	uint32 mGameBuildVersion = 0;
+	uint8 mTransferMode = 0;
+	uint8 mGameMode = 0;
+	uint32 mFirstFrameNumber = 0;
+	// TODO: Add more, like game settings, persistent data, list of active mods incl. versions
+
+	virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
+	{
+		serializer.serialize(mPacketVersion);
+		if (serializer.isReading() && mPacketVersion != PACKET_VERSION)
+		{
+			serializer.setError();
+			return;
+		}
+
+		serializer.serialize(mGameBuildVersion);
+		serializer.serialize(mTransferMode);
+		serializer.serialize(mGameMode);
+		serializer.serialize(mFirstFrameNumber);
+	}
+};
+
+
+// Sent from host to clients
 struct GameStateIncrementPacket : public highlevel::PacketBase
 {
 	HIGHLEVEL_PACKET_DEFINE_PACKET_TYPE("GameStateIncrementPacket");
