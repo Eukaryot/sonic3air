@@ -9,7 +9,6 @@
 #include "sonic3air/pch.h"
 #include "sonic3air/data/PlayerProgress.h"
 #include "sonic3air/data/SharedDatabase.h"
-#include "sonic3air/version.inc"
 
 #include "oxygen/application/Configuration.h"
 #include "oxygen/simulation/PersistentData.h"
@@ -187,7 +186,7 @@ void PlayerProgress::save(bool force)
 bool PlayerProgress::loadLegacy(VectorBinarySerializer& serializer)
 {
 	const uint16 FORMAT_VERSION = 0x0101;		// General player progress file format version
-	const uint32 GAME_VERSION   = BUILD_NUMBER;	// Game build, just to have the information
+	const uint32 GAME_VERSION = EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber;	// Game build, just to have the information
 
 	// Identifier
 	char identifier[9] = "S3AIRPGR";

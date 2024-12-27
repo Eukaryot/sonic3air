@@ -11,7 +11,6 @@
 #include "sonic3air/helper/GameUtils.h"
 #include "sonic3air/data/SharedDatabase.h"
 #include "sonic3air/data/TimeAttackData.h"
-#include "sonic3air/version.inc"
 
 #include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/helper/JsonHelper.h"
@@ -30,9 +29,6 @@ namespace
 	//  - 0x0106 = Serialization of settings
 	const uint16 EARLIEST_FORMAT_VERSION = 0x0103;
 	const uint16 CURRENT_FORMAT_VERSION	 = 0x0106;
-
-	// Game build, so we can distinguish between recordings from older builds
-	const uint32 GAME_VERSION			 = BUILD_NUMBER;
 
 	const wchar_t* getLeadingZeroString(uint32 value)
 	{
@@ -145,7 +141,7 @@ void PlayerRecorder::initRecording(const std::wstring& filename, uint16 zoneAndA
 
 	mCurrentRecording.mFilename = filename;
 	mCurrentRecording.mFormatVersion = CURRENT_FORMAT_VERSION;
-	mCurrentRecording.mGameVersion = GAME_VERSION;
+	mCurrentRecording.mGameVersion = EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber;
 	mCurrentRecording.mZoneAndAct = zoneAndAct;
 	mCurrentRecording.mCategory = category;
 	mCurrentRecording.mFrames.clear();

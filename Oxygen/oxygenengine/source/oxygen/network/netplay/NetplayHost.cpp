@@ -185,7 +185,7 @@ void NetplayHost::startGame()
 	// Send start game packet
 	{
 		StartGamePacket packet;
-		packet.mGameBuildVersion = 0;	// TODO: Fill this in
+		packet.mGameBuildVersion = EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber;
 		packet.mTransferMode = 0;
 		packet.mGameMode = 0;
 		packet.mFirstFrameNumber = 0;

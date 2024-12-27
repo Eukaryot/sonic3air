@@ -17,7 +17,6 @@
 #include "sonic3air/audio/AudioOut.h"
 #include "sonic3air/ConfigurationImpl.h"
 #include "sonic3air/Game.h"
-#include "sonic3air/version.inc"
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
