@@ -544,6 +544,9 @@
     <ClCompile Include="..\..\source\oxygen\devmode\windows\VRAMWritesWindow.cpp">
       <Filter>devmode\windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\CallFramesWindow.cpp">
+      <Filter>devmode\windows</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\network\netplay\ExternalAddressQuery.cpp">
       <Filter>network\netplay</Filter>
     </ClCompile>
@@ -1034,6 +1037,9 @@
       <Filter>devmode</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\devmode\windows\VRAMWritesWindow.h">
+      <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\CallFramesWindow.h">
       <Filter>devmode\windows</Filter>
     </ClInclude>
   </ItemGroup>

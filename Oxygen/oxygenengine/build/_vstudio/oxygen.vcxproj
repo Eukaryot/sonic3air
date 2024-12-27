@@ -57,6 +57,7 @@
     <ClCompile Include="..\..\source\oxygen\devmode\ImGuiHelpers.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\ImGuiIntegration.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\AudioBrowserWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\CallFramesWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\GameSimWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\GameVisualizationsWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiHelpers.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiIntegration.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\AudioBrowserWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\CallFramesWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\GameSimWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\GameVisualizationsWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.h" />

@@ -13,6 +13,7 @@
 
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/devmode/windows/AudioBrowserWindow.h"
+#include "oxygen/devmode/windows/CallFramesWindow.h"
 #include "oxygen/devmode/windows/GameSimWindow.h"
 #include "oxygen/devmode/windows/GameVisualizationsWindow.h"
 #include "oxygen/devmode/windows/MemoryHexViewWindow.h"
@@ -43,6 +44,9 @@ DevModeMainWindow::DevModeMainWindow() :
 		createWindow(mPaletteViewWindow);
 		createWindow(mMemoryHexViewWindow);
 		createWindow(mWatchesWindow);
+	#ifdef DEBUG	// Still work-in-progress
+		createWindow(mCallFramesWindow);
+	#endif
 
 		createWindow(mScriptBuildWindow);
 
