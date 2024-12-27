@@ -200,9 +200,14 @@ void NetplayHost::startGame()
 		}
 	}
 
-	EngineMain::getDelegate().onStartNetplayGame();
+	// Setup input checksum tracking
+	mInputChecksum = rmx::startFNV1a_32();
+	mRegularInputChecksum = mInputChecksum;
+	mRegularChecksumFrameNumber = 0;
 
 	mHostState = HostState::GAME_RUNNING;
+
+	EngineMain::getDelegate().onStartNetplayGame();
 }
 
 void NetplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
@@ -228,9 +233,6 @@ void NetplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 		}
 	}
 
-	if (activeConnections.empty())
-		return;
-
 	// Add new frame to the history
 	{
 		mInputHistory.emplace_back();
@@ -249,6 +251,14 @@ void NetplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 			}
 		}
 
+		// Checksum for debugging
+		mInputChecksum = rmx::addToFNV1a_32(mInputChecksum, reinterpret_cast<uint8*>(newInputFrame.mInputsByPlayer), sizeof(newInputFrame.mInputsByPlayer));
+		if (frameNumber % 200 == 0)
+		{
+			mRegularInputChecksum = mInputChecksum;
+			mRegularChecksumFrameNumber = frameNumber;
+		}
+
 		// Limit inputs history to a reasonable number of frames
 		while (mInputHistory.size() > 30)
 			mInputHistory.pop_front();
@@ -262,6 +272,9 @@ void NetplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 			controlsIn.injectInput(playerIndex, inputFrame.mInputsByPlayer[playerIndex]);
 		}
 	}
+
+	if (activeConnections.empty())
+		return;
 
 	const size_t numPlayers = activeConnections.size() + 1;
 	const size_t numFrames = std::min<size_t>(mInputHistory.size(), 30);
@@ -320,6 +333,12 @@ bool NetplayHost::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 	}
 
 	return false;
+}
+
+uint32 NetplayHost::getRegularInputChecksum(int& outFrameNumber) const
+{
+	outFrameNumber = mRegularChecksumFrameNumber;
+	return mRegularInputChecksum;
 }
 
 void NetplayHost::sendPunchthroughPacket(ConnectingPlayer& player)

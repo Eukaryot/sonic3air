@@ -26,7 +26,6 @@ NetworkingWindow::NetworkingWindow() :
 void NetworkingWindow::buildContent()
 {
 	ImGui::SetWindowPos(ImVec2(250.0f, 10.0f), ImGuiCond_FirstUseEver);
-	//ImGui::SetWindowSize(ImVec2(400.0f, 150.0f), ImGuiCond_FirstUseEver);
 
 	// Engine server
 	{
@@ -70,14 +69,16 @@ void NetworkingWindow::buildContent()
 		ImGuiHelpers::ScopedIndent si;
 
 		NetplayManager& netplayManager = NetplayManager::instance();
+		NetplayHost* netplayHost = netplayManager.getNetplayHost();
+		NetplayClient* netplayClient = netplayManager.getNetplayClient();
 
-		if (nullptr != netplayManager.getNetplayHost())
+		if (nullptr != netplayHost)
 		{
-			ImGui::Text("Host: %d connections", (int)netplayManager.getNetplayHost()->getPlayerConnections().size());
+			ImGui::Text("Host: %d connections", (int)netplayHost->getPlayerConnections().size());
 		}
-		else if (nullptr != netplayManager.getNetplayClient())
+		else if (nullptr != netplayClient)
 		{
-			switch (netplayManager.getNetplayClient()->getHostConnection().getState())
+			switch (netplayClient->getHostConnection().getState())
 			{
 				case NetConnection::State::EMPTY:				 ImGui::Text("Client: No connection");  break;
 				case NetConnection::State::TCP_READY:			 ImGui::Text("Client: TCP ready");  break;
@@ -92,7 +93,7 @@ void NetworkingWindow::buildContent()
 			ImGui::Text("Inactive");
 		}
 		
-		ImGui::BeginDisabled(nullptr != netplayManager.getNetplayHost());
+		ImGui::BeginDisabled(nullptr != netplayHost);
 		{
 			if (ImGui::Button("Host via server"))
 			{
@@ -107,7 +108,7 @@ void NetworkingWindow::buildContent()
 		}
 		ImGui::EndDisabled();
 
-		ImGui::BeginDisabled(nullptr != netplayManager.getNetplayClient());
+		ImGui::BeginDisabled(nullptr != netplayClient);
 		{
 			static char ipBuffer[32] = { 0 };
 			static int port = NetplayManager::DEFAULT_PORT;
@@ -141,7 +142,7 @@ void NetworkingWindow::buildContent()
 		}
 		ImGui::EndDisabled();
 
-		ImGui::BeginDisabled(nullptr == netplayManager.getNetplayHost() && nullptr == netplayManager.getNetplayClient());
+		ImGui::BeginDisabled(nullptr == netplayHost && nullptr == netplayClient);
 		if (ImGui::Button("Close connection"))
 		{
 			netplayManager.closeConnections();
@@ -153,9 +154,10 @@ void NetworkingWindow::buildContent()
 			ImGui::Text("Retrieved own external address: IP = %s, port = %d", netplayManager.getExternalAddressQuery().mOwnExternalIP.c_str(), netplayManager.getExternalAddressQuery().mOwnExternalPort);
 		}
 
-		if (nullptr != netplayManager.getNetplayHost())
+		if (nullptr != netplayHost)
 		{
-			switch (netplayManager.getNetplayHost()->getHostState())
+			const NetplayHost::HostState state = netplayHost->getHostState();
+			switch (state)
 			{
 				case NetplayHost::HostState::NONE:					ImGui::Text("Inactive");  break;
 				case NetplayHost::HostState::CONNECT_TO_SERVER:		ImGui::Text("Connecting to game server");  break;
@@ -164,12 +166,12 @@ void NetworkingWindow::buildContent()
 				case NetplayHost::HostState::FAILED:				ImGui::Text("Failed");  break;
 			}
 
-			ImGui::BeginDisabled(netplayManager.getNetplayHost()->getHostState() < NetplayHost::HostState::REGISTERED || netplayManager.getNetplayHost()->getHostState() > NetplayHost::HostState::GAME_RUNNING);
-			if (netplayManager.getNetplayHost()->getHostState() == NetplayHost::HostState::REGISTERED)
+			ImGui::BeginDisabled(state < NetplayHost::HostState::REGISTERED || state > NetplayHost::HostState::GAME_RUNNING);
+			if (state == NetplayHost::HostState::REGISTERED)
 			{
 				if (ImGui::Button("Start game"))
 				{
-					netplayManager.getNetplayHost()->startGame();
+					netplayHost->startGame();
 				}
 			}
 			else
@@ -177,15 +179,23 @@ void NetworkingWindow::buildContent()
 				if (ImGui::Button("Stop game"))
 				{
 					// TODO: This is not implemented yet
-					//netplayManager.getNetplayHost()->stopGame();
+					//netplayHost->stopGame();
+				}
+
+				if (state == NetplayHost::HostState::GAME_RUNNING)
+				{
+					int frameNumber = 0;
+					const uint32 checksum = netplayHost->getRegularInputChecksum(frameNumber);
+					ImGui::Text("Input checksum:  %08x for frame #%d", checksum, frameNumber);
 				}
 			}
 			ImGui::EndDisabled();
 		}
 
-		if (nullptr != netplayManager.getNetplayClient())
+		if (nullptr != netplayClient)
 		{
-			switch (netplayManager.getNetplayClient()->getState())
+			const NetplayClient::State state = netplayClient->getState();
+			switch (state)
 			{
 				case NetplayClient::State::NONE:				ImGui::Text("Inactive");  break;
 				case NetplayClient::State::CONNECT_TO_SERVER:	ImGui::Text("Connecting to game server");  break;
@@ -194,6 +204,13 @@ void NetworkingWindow::buildContent()
 				case NetplayClient::State::CONNECTED:			ImGui::Text("Connected to host");  break;
 				case NetplayClient::State::GAME_RUNNING:		ImGui::Text("Game running");  break;
 				case NetplayClient::State::FAILED:				ImGui::Text("Failed");  break;
+			}
+
+			if (state == NetplayClient::State::GAME_RUNNING)
+			{
+				int frameNumber = 0;
+				const uint32 checksum = netplayClient->getRegularInputChecksum(frameNumber);
+				ImGui::Text("Input checksum:  %08x for frame #%d", checksum, frameNumber);
 			}
 		}
 	}

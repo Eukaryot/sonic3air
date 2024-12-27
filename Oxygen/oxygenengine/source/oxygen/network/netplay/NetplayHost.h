@@ -71,6 +71,8 @@ public:
 	void onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber);
 	bool onReceivedPacket(ReceivedPacketEvaluation& evaluation);
 
+	uint32 getRegularInputChecksum(int& outFrameNumber) const;
+
 private:
 	void sendPunchthroughPacket(ConnectingPlayer& player);
 
@@ -84,4 +86,8 @@ private:
 	std::vector<ConnectingPlayer> mConnectingPlayers;
 	std::vector<PlayerConnection*> mPlayerConnections;
 	std::deque<InputFrame> mInputHistory;
+
+	uint32 mInputChecksum = 0;
+	uint32 mRegularInputChecksum = 0;
+	int mRegularChecksumFrameNumber = 0;
 };

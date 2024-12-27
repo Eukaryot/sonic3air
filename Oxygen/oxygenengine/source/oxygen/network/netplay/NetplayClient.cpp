@@ -158,7 +158,7 @@ void NetplayClient::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 
 			for (int playerIndex = 0; playerIndex < 4; ++playerIndex)
 			{
-				controlsIn.injectInput(playerIndex, it->mInputByPlayer[playerIndex]);
+				controlsIn.injectInput(playerIndex, it->mInputsByPlayer[playerIndex]);
 			}
 		}
 	}
@@ -174,12 +174,7 @@ bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 			if (!evaluation.readPacket(packet))
 				return false;
 
-			uint64* rngState = Application::instance().getSimulation().getSimulationState().getRandomNumberGenerator().accessState();
-			for (int k = 0; k < 4; ++k)
-				rngState[k] = packet.mRNGState[k];
-
-			EngineMain::getDelegate().onStartNetplayGame();
-			mState = State::GAME_RUNNING;
+			startGame(packet);
 			return true;
 		}
 
@@ -197,11 +192,9 @@ bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 				if (numFramesToCopy < currentFramesGap)
 				{
 					// Throw away old frames, to not create an actual gap between frames in the queue
-					RMX_ASSERT(false, "Warning: Complete game state desync!");
+					RMX_ERROR("Warning: Complete game state desync!", );
 					mReceivedFrames.clear();
 				}
-
-				const size_t inputsBaseIndex = packet.mNumFrames - numFramesToCopy;
 
 				for (int k = 0; k < (int)numFramesToCopy; ++k)
 				{
@@ -210,10 +203,19 @@ bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 					const uint16* input = &packet.mInputs[packet.mNumPlayers * (packet.mNumFrames - numFramesToCopy + k)];
 					for (int playerIndex = 0; playerIndex < std::min<int>(packet.mNumPlayers, 4); ++playerIndex)
 					{
-						newFrame.mInputByPlayer[playerIndex] = *input;
+						newFrame.mInputsByPlayer[playerIndex] = *input;
 						++input;
 					}
 					// Player inputs not included in the packet stay at 0
+
+					// Checksum for debugging
+					mInputChecksum = rmx::addToFNV1a_32(mInputChecksum, reinterpret_cast<uint8*>(newFrame.mInputsByPlayer), sizeof(newFrame.mInputsByPlayer));
+					const int frameNumber = packet.mFrameNumber - numFramesToCopy + k + 1;
+					if (frameNumber % 200 == 0)
+					{
+						mRegularInputChecksum = mInputChecksum;
+						mRegularChecksumFrameNumber = frameNumber;
+					}
 				}
 
 				mLatestFrameNumber = packet.mFrameNumber;
@@ -224,4 +226,27 @@ bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 	}
 
 	return false;
+}
+
+uint32 NetplayClient::getRegularInputChecksum(int& outFrameNumber) const
+{
+	outFrameNumber = mRegularChecksumFrameNumber;
+	return mRegularInputChecksum;
+}
+
+void NetplayClient::startGame(const StartGamePacket& packet)
+{
+	// Read RNG state from packet
+	uint64* rngState = Application::instance().getSimulation().getSimulationState().getRandomNumberGenerator().accessState();
+	for (int k = 0; k < 4; ++k)
+		rngState[k] = packet.mRNGState[k];
+
+	// Setup input checksum tracking
+	mInputChecksum = rmx::startFNV1a_32();
+	mRegularInputChecksum = mInputChecksum;
+	mRegularChecksumFrameNumber = 0;
+
+	mState = State::GAME_RUNNING;
+
+	EngineMain::getDelegate().onStartNetplayGame();
 }

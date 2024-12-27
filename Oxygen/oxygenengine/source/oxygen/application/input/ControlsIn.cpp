@@ -71,7 +71,7 @@ uint16 ControlsIn::getInputFromController(uint32 padIndex) const
 {
 	uint16 inputFlags = 0;
 
-	const uint32 controllerIndex = mGamepadsSwitched ? (1 - padIndex) : padIndex;
+	const uint32 controllerIndex = mGamepadsSwitched ? (padIndex ^ 1) : padIndex;	// Swap gamepads 0 and 1, as well as 2 and 3
 	for (const auto& pair : inputFlagsLookup[controllerIndex])
 	{
 		if (pair.first->isPressed())

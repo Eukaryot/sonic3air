@@ -14,6 +14,7 @@
 
 class ControlsIn;
 class NetplayManager;
+struct StartGamePacket;
 
 
 class NetplayClient
@@ -52,11 +53,16 @@ public:
 	void onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber);
 	bool onReceivedPacket(ReceivedPacketEvaluation& evaluation);
 
+	uint32 getRegularInputChecksum(int& outFrameNumber) const;
+
 private:
 	struct ReceivedFrame
 	{
-		uint16 mInputByPlayer[4] = { 0 };
+		uint16 mInputsByPlayer[4] = { 0 };
 	};
+
+private:
+	void startGame(const StartGamePacket& packet);
 
 private:
 	ConnectionManager& mConnectionManager;
@@ -68,4 +74,8 @@ private:
 
 	std::deque<ReceivedFrame> mReceivedFrames;
 	uint32 mLatestFrameNumber = 0;
+
+	uint32 mInputChecksum = 0;
+	uint32 mRegularInputChecksum = 0;
+	int mRegularChecksumFrameNumber = 0;
 };
