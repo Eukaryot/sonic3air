@@ -37,7 +37,11 @@ public:
 			{
 				mDisplayIndex = (int)rmx::parseInteger(parameter.substr(9));;
 			}
-			else if (parameter[0] != '-')
+			else if (parameter[0] == '-')
+			{
+				readParameter(parameter);
+			}
+			else
 			{
 				std::wstring path = String(parameter).toStdWString();
 				FTX::FileSystem->normalizePath(path, true);
