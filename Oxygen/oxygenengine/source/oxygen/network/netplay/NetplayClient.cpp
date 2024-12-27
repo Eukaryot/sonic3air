@@ -11,7 +11,10 @@
 #include "oxygen/network/netplay/NetplayManager.h"
 #include "oxygen/network/netplay/NetplayPackets.h"
 #include "oxygen/network/EngineServerClient.h"
+#include "oxygen/application/Application.h"
 #include "oxygen/application/input/ControlsIn.h"
+#include "oxygen/simulation/Simulation.h"
+#include "oxygen/simulation/SimulationState.h"
 
 #include "oxygen_netcore/serverclient/NetplaySetupPackets.h"
 #include "oxygen_netcore/serverclient/Packets.h"
@@ -140,7 +143,7 @@ void NetplayClient::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 		packet.mNumFrames = 1;
 		packet.mInputs.push_back(controlsIn.getInputFromController(0));
 
-		mHostConnection.sendPacket(packet);
+		mHostConnection.sendPacket(packet, NetConnection::SendFlags::UNRELIABLE);
 	}
 
 	// Inject input from what we received from host
@@ -153,7 +156,7 @@ void NetplayClient::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 			for (int k = 0; k < indexFromBack; ++k)
 				++it;
 
-			for (int playerIndex = 0; playerIndex < 2; ++playerIndex)
+			for (int playerIndex = 0; playerIndex < 4; ++playerIndex)
 			{
 				controlsIn.injectInput(playerIndex, it->mInputByPlayer[playerIndex]);
 			}
@@ -167,9 +170,13 @@ bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 	{
 		case StartGamePacket::PACKET_TYPE:
 		{
-			GameStateIncrementPacket packet;
+			StartGamePacket packet;
 			if (!evaluation.readPacket(packet))
 				return false;
+
+			uint64* rngState = Application::instance().getSimulation().getSimulationState().getRandomNumberGenerator().accessState();
+			for (int k = 0; k < 4; ++k)
+				rngState[k] = packet.mRNGState[k];
 
 			EngineMain::getDelegate().onStartNetplayGame();
 			mState = State::GAME_RUNNING;
@@ -190,6 +197,7 @@ bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 				if (numFramesToCopy < currentFramesGap)
 				{
 					// Throw away old frames, to not create an actual gap between frames in the queue
+					RMX_ASSERT(false, "Warning: Complete game state desync!");
 					mReceivedFrames.clear();
 				}
 
@@ -199,8 +207,8 @@ bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 				{
 					mReceivedFrames.emplace_back();
 					ReceivedFrame& newFrame = mReceivedFrames.back();
-					const uint16* input = &packet.mInputs[0];
-					for (int playerIndex = 0; playerIndex < packet.mNumPlayers; ++playerIndex)
+					const uint16* input = &packet.mInputs[packet.mNumPlayers * (packet.mNumFrames - numFramesToCopy + k)];
+					for (int playerIndex = 0; playerIndex < std::min<int>(packet.mNumPlayers, 4); ++playerIndex)
 					{
 						newFrame.mInputByPlayer[playerIndex] = *input;
 						++input;

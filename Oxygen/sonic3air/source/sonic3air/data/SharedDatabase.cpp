@@ -13,15 +13,6 @@
 #include "oxygen/resources/SpriteCollection.h"
 
 
-bool SharedDatabase::mIsInitialized = false;
-std::vector<SharedDatabase::Zone> SharedDatabase::mAllZones;
-std::vector<SharedDatabase::Zone> SharedDatabase::mAvailableZones;
-std::unordered_map<uint32, SharedDatabase::Setting> SharedDatabase::mSettings;
-std::vector<SharedDatabase::Achievement> SharedDatabase::mAchievements;
-std::map<uint32, SharedDatabase::Achievement*> SharedDatabase::mAchievementMap;
-std::vector<SharedDatabase::Secret> SharedDatabase::mSecrets;
-
-
 void SharedDatabase::initialize()
 {
 	if (mIsInitialized)

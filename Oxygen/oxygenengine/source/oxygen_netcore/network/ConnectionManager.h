@@ -25,12 +25,16 @@ class ConnectionManager
 friend class NetConnection;
 
 public:
+#ifdef DEBUG
 	struct DebugSettings
 	{
-		float mSendingPacketLoss = 0.0f;	// Fraction of "lost" packets in sending
-		float mReceivingPacketLoss = 0.0f;	// Fraction of "lost" packets in receiving
+		float mSendingPacketLoss = 0.0f;		// Fraction of "lost" packets in sending
+		float mReceivingPacketLoss = 0.0f;		// Fraction of "lost" packets in receiving
+		float mReceivingDelayAverage = 0.0f;	// Average delay in seconds for received packets
+		float mReceivingDelayVariance = 0.0f;	// Variance of delay in seconds for received packets
 	};
 	DebugSettings mDebugSettings;
+#endif
 
 public:
 	static uint64 getCurrentTimestamp();
@@ -63,6 +67,7 @@ protected:
 	void removeConnection(NetConnection& connection);
 	SentPacket& rentSentPacket();
 
+	ReceivedPacket& createNewReceivedPacket(const std::vector<uint8>& buffer, uint16 lowLevelSignature, const SocketAddress& senderAddress, NetConnection* connection);
 	void receivedPacketInternal(const std::vector<uint8>& buffer, const SocketAddress& senderAddress, NetConnection* connection);
 
 private:

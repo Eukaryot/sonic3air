@@ -54,7 +54,6 @@ protected:
 
 private:
 	bool restartConnection(bool asHost, uint16 hostPort = 0);
-	void retrieveSocketExternalAddress();
 
 private:
 	UDPSocket mUDPSocket;

@@ -96,6 +96,7 @@
     <ClCompile Include="..\..\source\oxygen\helper\TextInputHandler.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Transform2D.cpp" />
     <ClCompile Include="..\..\source\oxygen\network\EngineServerClient.cpp" />
+    <ClCompile Include="..\..\source\oxygen\network\netplay\ExternalAddressQuery.cpp" />
     <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayClient.cpp" />
     <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayHost.cpp" />
     <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayManager.cpp" />

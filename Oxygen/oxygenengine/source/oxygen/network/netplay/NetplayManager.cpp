@@ -16,10 +16,22 @@
 #include "oxygen_netcore/serverclient/ProtocolVersion.h"
 
 
+#define USE_IPv6 true
+
+
 NetplayManager::NetplayManager() :
-	mConnectionManager(&mUDPSocket, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE)
+	mConnectionManager(&mUDPSocket, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE),
+	mExternalAddressQuery(mConnectionManager, USE_IPv6)
 {
-	mUseIPv6 = true;
+	mUseIPv6 = USE_IPv6;
+
+#if defined(DEBUG) && 0
+	// Just for testing / debugging
+	mConnectionManager.mDebugSettings.mSendingPacketLoss = 0.0f;
+	mConnectionManager.mDebugSettings.mReceivingPacketLoss = 0.0f;
+	mConnectionManager.mDebugSettings.mReceivingDelayAverage = 0.0f;
+	mConnectionManager.mDebugSettings.mReceivingDelayVariance = 0.0f;
+#endif
 }
 
 NetplayManager::~NetplayManager()
@@ -59,7 +71,7 @@ void NetplayManager::closeConnections()
 {
 	SAFE_DELETE(mNetplayHost);
 	SAFE_DELETE(mNetplayClient);
-	mExternalAddressQuery = ExternalAddressQuery();
+	mExternalAddressQuery.reset();
 	mUDPSocket.close();
 }
 
@@ -69,6 +81,8 @@ void NetplayManager::updateConnections(float deltaSeconds)
 		return;
 
 	mConnectionManager.updateConnectionManager();
+
+	mExternalAddressQuery.updateQuery(deltaSeconds);
 
 	if (nullptr != mNetplayHost)
 	{
@@ -142,22 +156,8 @@ void NetplayManager::destroyNetConnection(NetConnection& connection)
 
 bool NetplayManager::onReceivedConnectionlessPacket(ConnectionlessPacketEvaluation& evaluation)
 {
-	switch (evaluation.mLowLevelSignature)
-	{
-		case network::ReplyExternalAddressConnectionless::SIGNATURE:
-		{
-			network::ReplyExternalAddressConnectionless packet;
-			if (!packet.serializePacket(evaluation.mSerializer, 1))
-				return false;
-
-			if (mExternalAddressQuery.mQueryID == packet.mQueryID)
-			{
-				mExternalAddressQuery.mOwnExternalIP = packet.mIP;
-				mExternalAddressQuery.mOwnExternalPort = packet.mPort;
-			}
-			return true;
-		}
-	}
+	if (mExternalAddressQuery.onReceivedConnectionlessPacket(evaluation))
+		return true;
 
 	return false;
 }
@@ -207,26 +207,6 @@ bool NetplayManager::restartConnection(bool asHost, uint16 hostPort)
 		mNetplayClient = new NetplayClient(mConnectionManager, *this);
 	}
 
-	retrieveSocketExternalAddress();
+	mExternalAddressQuery.startQuery();
 	return true;
-}
-
-void NetplayManager::retrieveSocketExternalAddress()
-{
-	mExternalAddressQuery = ExternalAddressQuery();
-	mExternalAddressQuery.mQueryID = (uint64)(1 + rand()) + ((uint64)rand() << 16) + ((uint64)rand() << 32) + ((uint64)rand() << 48);
-
-	std::string serverIP;
-	if (!EngineServerClient::resolveGameServerHostName(Configuration::instance().mGameServerBase.mServerHostName, serverIP, mUseIPv6))
-	{
-		// TODO: Error handling
-		RMX_ASSERT(false, "Failed to resolve game server host name: " << Configuration::instance().mGameServerBase.mServerHostName);
-		return;
-	}
-
-	// Retrieve external address for the socket
-	// TODO: This needs to be repeated if necessary
-	network::GetExternalAddressConnectionless packet;
-	packet.mQueryID = mExternalAddressQuery.mQueryID;
-	mConnectionManager.sendConnectionlessLowLevelPacket(packet, SocketAddress(serverIP, Configuration::instance().mGameServerBase.mServerPortUDP), 0, 0);
 }

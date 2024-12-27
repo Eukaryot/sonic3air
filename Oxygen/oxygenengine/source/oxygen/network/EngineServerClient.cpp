@@ -42,6 +42,8 @@ EngineServerClient::EngineServerClient() :
 	// Just for testing / debugging
 	mConnectionManager.mDebugSettings.mSendingPacketLoss = 0.2f;
 	mConnectionManager.mDebugSettings.mReceivingPacketLoss = 0.2f;
+	mConnectionManager.mDebugSettings.mReceivingDelayAverage = 0.2f;
+	mConnectionManager.mDebugSettings.mReceivingDelayVariance = 0.2f;
 #endif
 }
 

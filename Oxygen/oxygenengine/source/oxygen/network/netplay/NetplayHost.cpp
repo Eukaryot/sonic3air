@@ -10,7 +10,10 @@
 #include "oxygen/network/netplay/NetplayHost.h"
 #include "oxygen/network/netplay/NetplayManager.h"
 #include "oxygen/network/EngineServerClient.h"
+#include "oxygen/application/Application.h"
 #include "oxygen/application/input/ControlsIn.h"
+#include "oxygen/simulation/Simulation.h"
+#include "oxygen/simulation/SimulationState.h"
 
 
 NetplayHost::NetplayHost(ConnectionManager& connectionManager, NetplayManager& netplayManager) :
@@ -179,13 +182,22 @@ bool NetplayHost::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluatio
 
 void NetplayHost::startGame()
 {
-	for (PlayerConnection* connection : mPlayerConnections)
+	// Send start game packet
 	{
 		StartGamePacket packet;
-		// TODO: Fill this in, and the other values as well
-		//packet.mGameBuildVersion = BUILD_NUMBER;
+		packet.mGameBuildVersion = 0;	// TODO: Fill this in
+		packet.mTransferMode = 0;
+		packet.mGameMode = 0;
+		packet.mFirstFrameNumber = 0;
 
-		connection->sendPacket(packet, NetConnection::SendFlags::NONE, &connection->mStartGamePacketID);
+		const uint64* rngState = Application::instance().getSimulation().getSimulationState().getRandomNumberGenerator().accessState();
+		for (int k = 0; k < 4; ++k)
+			packet.mRNGState[k] = rngState[k];
+
+		for (PlayerConnection* connection : mPlayerConnections)
+		{
+			connection->sendPacket(packet, NetConnection::SendFlags::NONE, &connection->mStartGamePacketID);
+		}
 	}
 
 	EngineMain::getDelegate().onStartNetplayGame();
@@ -263,20 +275,22 @@ void NetplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 
 	// Copy input data from players
 	{
-		uint16* input = &packet.mInputs[0];
+		int reverseFrameCount = 1;
 		for (auto it = mInputHistory.rbegin(); it != mInputHistory.rend(); ++it)
 		{
+			uint16* input = &packet.mInputs[(numFrames - reverseFrameCount) * numPlayers];
 			for (int playerIndex = 0; playerIndex < (int)numPlayers; ++playerIndex)
 			{
 				*input = it->mInputsByPlayer[playerIndex];
 				++input;
 			}
+			++reverseFrameCount;
 		}
 	}
 
 	for (PlayerConnection* playerConnection : activeConnections)
 	{
-		playerConnection->sendPacket(packet);
+		playerConnection->sendPacket(packet, NetConnection::SendFlags::UNRELIABLE);
 	}
 }
 

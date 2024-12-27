@@ -218,11 +218,11 @@ private:
 	static void setupSettings();
 
 private:
-	static bool mIsInitialized;
-	static std::vector<Zone> mAllZones;
-	static std::vector<Zone> mAvailableZones;
-	static std::unordered_map<uint32, Setting> mSettings;
-	static std::vector<Achievement> mAchievements;
-	static std::map<uint32, Achievement*> mAchievementMap;
-	static std::vector<Secret> mSecrets;
+	static inline bool mIsInitialized;
+	static inline std::vector<Zone> mAllZones;
+	static inline std::vector<Zone> mAvailableZones;
+	static inline std::unordered_map<uint32, Setting> mSettings;
+	static inline std::vector<Achievement> mAchievements;
+	static inline std::map<uint32, Achievement*> mAchievementMap;
+	static inline std::vector<Secret> mSecrets;
 };

@@ -55,7 +55,7 @@ public:
 private:
 	struct ReceivedFrame
 	{
-		uint16 mInputByPlayer[2] = { 0 };
+		uint16 mInputByPlayer[4] = { 0 };
 	};
 
 private:

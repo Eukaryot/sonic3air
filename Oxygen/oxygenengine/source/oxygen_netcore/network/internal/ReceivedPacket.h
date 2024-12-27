@@ -29,6 +29,11 @@ public:
 	uint16 mLowLevelSignature = 0;
 	NetConnection* mConnection = nullptr;
 
+#ifdef DEBUG
+	// Latency simulation
+	uint64 mDelayedDeliveryTime = 0;
+#endif
+
 public:
 	inline void initializeWithDump(Dump* dump)
 	{

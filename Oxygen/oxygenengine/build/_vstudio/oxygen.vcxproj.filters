@@ -544,6 +544,9 @@
     <ClCompile Include="..\..\source\oxygen\devmode\windows\VRAMWritesWindow.cpp">
       <Filter>devmode\windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\network\netplay\ExternalAddressQuery.cpp">
+      <Filter>network\netplay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">

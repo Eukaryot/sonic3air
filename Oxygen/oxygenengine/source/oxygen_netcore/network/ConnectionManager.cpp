@@ -247,6 +247,28 @@ SentPacket& ConnectionManager::rentSentPacket()
 	return sentPacket;
 }
 
+ReceivedPacket& ConnectionManager::createNewReceivedPacket(const std::vector<uint8>& buffer, uint16 lowLevelSignature, const SocketAddress& senderAddress, NetConnection* connection)
+{
+	ReceivedPacket& receivedPacket = mReceivedPacketPool.rentObject();
+	receivedPacket.mContent = buffer;
+	receivedPacket.mLowLevelSignature = lowLevelSignature;
+	receivedPacket.mSenderAddress = senderAddress;
+	receivedPacket.mConnection = connection;
+
+#ifdef DEBUG
+	receivedPacket.mDelayedDeliveryTime = 0;
+	if (mDebugSettings.mReceivingDelayAverage > 0.0f)
+	{
+		const float delay = mDebugSettings.mReceivingDelayAverage + (randomf() * 2.0f - 1.0f) * mDebugSettings.mReceivingDelayVariance;
+		if (delay > 0.0f)
+			receivedPacket.mDelayedDeliveryTime = getCurrentTimestamp() + roundToInt(delay * 1000.0f);
+	}
+#endif
+
+	mReceivedPackets.mWorkerQueue.emplace_back(&receivedPacket);
+	return receivedPacket;
+}
+
 void ConnectionManager::receivedPacketInternal(const std::vector<uint8>& buffer, const SocketAddress& senderAddress, NetConnection* connection)
 {
 	// Ignore too small packets
@@ -270,12 +292,7 @@ void ConnectionManager::receivedPacketInternal(const std::vector<uint8>& buffer,
 		// Connectionless packet (including start connection packet)
 
 		// Store for later evaluation (in "getNextReceivedPacket")
-		ReceivedPacket& receivedPacket = mReceivedPacketPool.rentObject();
-		receivedPacket.mContent = buffer;
-		receivedPacket.mLowLevelSignature = lowLevelSignature;
-		receivedPacket.mSenderAddress = senderAddress;
-		receivedPacket.mConnection = connection;
-		mReceivedPackets.mWorkerQueue.emplace_back(&receivedPacket);
+		createNewReceivedPacket(buffer, lowLevelSignature, senderAddress, connection);
 	}
 	else
 	{
@@ -337,12 +354,7 @@ void ConnectionManager::receivedPacketInternal(const std::vector<uint8>& buffer,
 			else
 			{
 				// Store for later evaluation (in "getNextReceivedPacket")
-				ReceivedPacket& receivedPacket = mReceivedPacketPool.rentObject();
-				receivedPacket.mContent = buffer;
-				receivedPacket.mLowLevelSignature = lowLevelSignature;
-				receivedPacket.mSenderAddress = senderAddress;
-				receivedPacket.mConnection = connection;
-				mReceivedPackets.mWorkerQueue.emplace_back(&receivedPacket);
+				createNewReceivedPacket(buffer, lowLevelSignature, senderAddress, connection);
 			}
 		}
 	}
@@ -459,6 +471,31 @@ void ConnectionManager::syncPacketQueues()
 	//  -> This is needed for the worker queue, and also for the "mReceivedPacketPool"
 
 	// First sync queues
+#if DEBUG
+	{
+		const uint64 currentTime = getCurrentTimestamp();
+		std::vector<ReceivedPacket*> delayedPackets;
+
+		while (!mReceivedPackets.mWorkerQueue.empty())
+		{
+			ReceivedPacket* receivedPacket = mReceivedPackets.mWorkerQueue.front();
+			if (receivedPacket->mDelayedDeliveryTime <= currentTime)
+			{
+				mReceivedPackets.mSyncedQueue.push_back(receivedPacket);
+			}
+			else
+			{
+				delayedPackets.push_back(receivedPacket);
+			}
+			mReceivedPackets.mWorkerQueue.pop_front();
+		}
+
+		for (ReceivedPacket* delayedPacket : delayedPackets)
+		{
+			mReceivedPackets.mWorkerQueue.push_back(delayedPacket);
+		}
+	}
+#else
 	{
 		while (!mReceivedPackets.mWorkerQueue.empty())
 		{
@@ -466,6 +503,7 @@ void ConnectionManager::syncPacketQueues()
 			mReceivedPackets.mWorkerQueue.pop_front();
 		}
 	}
+#endif
 
 	// Cleanup packets previously marked to be returned
 	{
