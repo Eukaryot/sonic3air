@@ -826,7 +826,8 @@ namespace lemon
 						const size_t index = variable->getID() & 0x0fffffff;
 						RMX_CHECK(index < numGlobals, "Invalid global variable index", continue);
 						const size_t offset = mProgram->getGlobalVariables()[index]->getStaticMemoryOffset();
-						memcpy(&mStaticMemory[offset], &value, sizeof(int64));
+						if (offset < mStaticMemory.size())
+							memcpy(&mStaticMemory[offset], &value, sizeof(int64));
 					}
 				}
 			}
@@ -838,7 +839,10 @@ namespace lemon
 					Variable* variable = mProgram->getGlobalVariables()[i];
 					serializer.write(variable->getName().getString());
 					const size_t offset = variable->getStaticMemoryOffset();
-					serializer.write(&mStaticMemory[offset], sizeof(int64));
+					if (offset < mStaticMemory.size())
+						serializer.write(&mStaticMemory[offset], sizeof(int64));
+					else
+						serializer.write<int64>(0);
 				}
 			}
 		}

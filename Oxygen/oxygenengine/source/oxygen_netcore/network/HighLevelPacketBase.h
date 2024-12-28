@@ -35,8 +35,6 @@ namespace highlevel
 	protected:
 		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) = 0;
 
-	private:
-		static inline std::unordered_map<uint32, std::string> mPacketTypeRegistry;
 	};
 
 
@@ -44,9 +42,12 @@ namespace highlevel
 	{
 		inline PacketTypeRegistration(uint32 packetType, const std::string& packetName)
 		{
-			RMX_ASSERT(PacketBase::mPacketTypeRegistry.count(packetType) == 0, "Multiple definition of packet type '" << packetName << "'");
-			PacketBase::mPacketTypeRegistry[packetType] = packetName;
+			RMX_ASSERT(mPacketTypeRegistry.count(packetType) == 0, "Multiple definitions of packet type '" << packetName << "'");
+			mPacketTypeRegistry[packetType] = packetName;
 		}
+
+	private:
+		static inline std::unordered_map<uint32, std::string> mPacketTypeRegistry;
 	};
 
 }
