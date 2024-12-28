@@ -125,7 +125,7 @@ bool NetplayClient::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluat
 bool NetplayClient::canBeginNextFrame(uint32 frameNumber)
 {
 	// Don't proceed beyond the latest received frame number
-	if (frameNumber > mLatestFrameNumber)
+	if (frameNumber >= mNextFrameNumber)
 		return false;
 
 	return true;
@@ -149,7 +149,7 @@ void NetplayClient::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 	// Inject input from what we received from host
 	if (!mReceivedFrames.empty())
 	{
-		const int indexFromBack = mLatestFrameNumber - frameNumber;
+		const int indexFromBack = mNextFrameNumber - frameNumber - 1;
 		if (indexFromBack >= 0 && indexFromBack < (int)mReceivedFrames.size())
 		{
 			auto it = mReceivedFrames.rbegin();
@@ -184,10 +184,10 @@ bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 			if (!evaluation.readPacket(packet))
 				return false;
 
-			if (packet.mFrameNumber > mLatestFrameNumber)
+			if (packet.mFrameNumber >= mNextFrameNumber)
 			{
 				// Evaluate the packet and store its input history for all players
-				const size_t currentFramesGap = packet.mFrameNumber - mLatestFrameNumber;
+				const size_t currentFramesGap = packet.mFrameNumber - mNextFrameNumber + 1;
 				const size_t numFramesToCopy = std::min<size_t>(currentFramesGap, packet.mNumFrames);
 				if (numFramesToCopy < currentFramesGap)
 				{
@@ -218,7 +218,7 @@ bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 					}
 				}
 
-				mLatestFrameNumber = packet.mFrameNumber;
+				mNextFrameNumber = packet.mFrameNumber + 1;
 			}
 
 			return true;

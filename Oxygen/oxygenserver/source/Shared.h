@@ -24,10 +24,10 @@ static const uint16 UDP_SERVER_PORT = 21094;	// Only used by test client, for th
 static const uint16 TCP_SERVER_PORT = 21095;	// Only used by test client, for the server see "config.json"
 
 
+#ifdef DEBUG
 static void setupDebugSettings(ConnectionManager::DebugSettings& debugSettings)
 {
-#ifdef DEBUG
 	debugSettings.mSendingPacketLoss = 0.0f;
 	debugSettings.mReceivingPacketLoss = 0.0f;
-#endif
 }
+#endif

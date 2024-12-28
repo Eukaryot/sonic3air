@@ -73,7 +73,7 @@ private:
 	network::RegisterForNetplayRequest mRegistrationRequest;
 
 	std::deque<ReceivedFrame> mReceivedFrames;
-	uint32 mLatestFrameNumber = 0;
+	uint32 mNextFrameNumber = 0;
 
 	uint32 mInputChecksum = 0;
 	uint32 mRegularInputChecksum = 0;

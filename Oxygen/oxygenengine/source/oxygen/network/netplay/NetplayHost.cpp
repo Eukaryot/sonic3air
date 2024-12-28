@@ -212,6 +212,9 @@ void NetplayHost::startGame()
 
 void NetplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 {
+	if (mHostState != HostState::GAME_RUNNING)
+		return;
+
 	std::vector<PlayerConnection*> activeConnections;
 	{
 		// First filter out connections that became invalid
