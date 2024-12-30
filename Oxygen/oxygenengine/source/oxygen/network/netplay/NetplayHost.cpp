@@ -284,6 +284,7 @@ void NetplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 
 	// Build packet to send to the clients
 	GameStateIncrementPacket packet;
+	packet.mGameplayState = 1;			// TODO: Set this to some other value during paused game
 	packet.mNumPlayers = (uint8)numPlayers;
 	packet.mNumFrames = (uint8)numFrames;
 	packet.mFrameNumber = frameNumber;
@@ -306,6 +307,9 @@ void NetplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 
 	for (PlayerConnection* playerConnection : activeConnections)
 	{
+		packet.mLastClientReceivedFrame = playerConnection->mLastReceivedFrameNumber;
+		playerConnection->mCurrentLatency = frameNumber - playerConnection->mLastReceivedFrameNumber;
+
 		playerConnection->sendPacket(packet, NetConnection::SendFlags::UNRELIABLE);
 	}
 }

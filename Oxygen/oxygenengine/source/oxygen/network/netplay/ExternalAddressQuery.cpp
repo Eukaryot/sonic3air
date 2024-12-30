@@ -50,7 +50,7 @@ bool ExternalAddressQuery::onReceivedConnectionlessPacket(ConnectionlessPacketEv
 	switch (evaluation.mLowLevelSignature)
 	{
 		case network::ReplyExternalAddressConnectionless::SIGNATURE:
-	{
+		{
 			network::ReplyExternalAddressConnectionless packet;
 			if (!packet.serializePacket(evaluation.mSerializer, 1))
 				return false;

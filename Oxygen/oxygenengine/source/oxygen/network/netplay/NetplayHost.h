@@ -44,6 +44,7 @@ public:
 		uint32 mStartGamePacketID = 0;
 		uint32 mLastReceivedFrameNumber = 0;
 		uint16 mLastReceivedInput = 0;
+		int mCurrentLatency = 0;
 	};
 
 	struct InputFrame

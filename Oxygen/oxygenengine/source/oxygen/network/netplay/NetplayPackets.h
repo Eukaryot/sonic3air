@@ -51,13 +51,16 @@ struct GameStateIncrementPacket : public highlevel::PacketBase
 {
 	HIGHLEVEL_PACKET_DEFINE_PACKET_TYPE("GameStateIncrementPacket");
 
+	uint8 mGameplayState = 0;
 	uint32 mFrameNumber = 0;		// Most recent frame number
 	uint8 mNumFrames = 0;
 	uint8 mNumPlayers = 0;
 	std::vector<uint16> mInputs;	// One input per player and frame (player inputs are packed together, forming one frame)
+	uint32 mLastClientReceivedFrame = 0;
 
 	virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
 	{
+		serializer.serialize(mGameplayState);
 		serializer.serialize(mFrameNumber);
 		serializer.serialize(mNumFrames);
 		serializer.serialize(mNumPlayers);
@@ -67,6 +70,8 @@ struct GameStateIncrementPacket : public highlevel::PacketBase
 
 		for (uint16& inputs : mInputs)
 			serializer.serialize(inputs);
+
+		serializer.serialize(mLastClientReceivedFrame);
 	}
 };
 

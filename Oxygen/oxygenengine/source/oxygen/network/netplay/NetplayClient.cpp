@@ -184,43 +184,64 @@ bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 			if (!evaluation.readPacket(packet))
 				return false;
 
-			if (packet.mFrameNumber >= mNextFrameNumber)
+			if (packet.mFrameNumber < mNextFrameNumber)
+				return true;
+
+			// Evaluate the packet and store its input history for all players
+			const size_t currentFramesGap = packet.mFrameNumber - mNextFrameNumber + 1;
+			const size_t numFramesToCopy = std::min<size_t>(currentFramesGap, packet.mNumFrames);
+			if (numFramesToCopy < currentFramesGap)
 			{
-				// Evaluate the packet and store its input history for all players
-				const size_t currentFramesGap = packet.mFrameNumber - mNextFrameNumber + 1;
-				const size_t numFramesToCopy = std::min<size_t>(currentFramesGap, packet.mNumFrames);
-				if (numFramesToCopy < currentFramesGap)
-				{
-					// Throw away old frames, to not create an actual gap between frames in the queue
-					RMX_ERROR("Warning: Complete game state desync!", );
-					mReceivedFrames.clear();
-				}
-
-				for (int k = 0; k < (int)numFramesToCopy; ++k)
-				{
-					mReceivedFrames.emplace_back();
-					ReceivedFrame& newFrame = mReceivedFrames.back();
-					const uint16* input = &packet.mInputs[packet.mNumPlayers * (packet.mNumFrames - numFramesToCopy + k)];
-					for (int playerIndex = 0; playerIndex < std::min<int>(packet.mNumPlayers, 4); ++playerIndex)
-					{
-						newFrame.mInputsByPlayer[playerIndex] = *input;
-						++input;
-					}
-					// Player inputs not included in the packet stay at 0
-
-					// Checksum for debugging
-					mInputChecksum = rmx::addToFNV1a_32(mInputChecksum, reinterpret_cast<uint8*>(newFrame.mInputsByPlayer), sizeof(newFrame.mInputsByPlayer));
-					const int frameNumber = packet.mFrameNumber - numFramesToCopy + k + 1;
-					if (frameNumber % 200 == 0)
-					{
-						mRegularInputChecksum = mInputChecksum;
-						mRegularChecksumFrameNumber = frameNumber;
-					}
-				}
-
-				mNextFrameNumber = packet.mFrameNumber + 1;
+				// Throw away old frames, to not create an actual gap between frames in the queue
+				RMX_ERROR("Warning: Complete game state desync!", );
+				mReceivedFrames.clear();
 			}
 
+			for (int k = 0; k < (int)numFramesToCopy; ++k)
+			{
+				mReceivedFrames.emplace_back();
+				ReceivedFrame& newFrame = mReceivedFrames.back();
+				const uint16* input = &packet.mInputs[packet.mNumPlayers * (packet.mNumFrames - numFramesToCopy + k)];
+				for (int playerIndex = 0; playerIndex < std::min<int>(packet.mNumPlayers, 4); ++playerIndex)
+				{
+					newFrame.mInputsByPlayer[playerIndex] = *input;
+					++input;
+				}
+				// Player inputs not included in the packet stay at 0
+
+				// Checksum for debugging
+				mInputChecksum = rmx::addToFNV1a_32(mInputChecksum, reinterpret_cast<uint8*>(newFrame.mInputsByPlayer), sizeof(newFrame.mInputsByPlayer));
+				const int frameNumber = packet.mFrameNumber - numFramesToCopy + k + 1;
+				if (frameNumber % 200 == 0)
+				{
+					mRegularInputChecksum = mInputChecksum;
+					mRegularChecksumFrameNumber = frameNumber;
+				}
+			}
+
+			mNextFrameNumber = packet.mFrameNumber + 1;
+
+			// Update latency
+			mCurrentLatency = packet.mFrameNumber - packet.mLastClientReceivedFrame;
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool NetplayClient::onReceivedConnectionlessPacket(ConnectionlessPacketEvaluation& evaluation)
+{
+	switch (evaluation.mLowLevelSignature)
+	{
+		case network::PunchthroughConnectionlessPacket::SIGNATURE:
+		{
+			network::PunchthroughConnectionlessPacket packet;
+			if (!packet.serializePacket(evaluation.mSerializer, 1))
+				return false;
+
+			mReceivedPunchthroughPacketSender = evaluation.mSenderAddress;
 			return true;
 		}
 	}

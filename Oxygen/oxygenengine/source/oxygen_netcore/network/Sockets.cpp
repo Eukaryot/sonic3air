@@ -40,13 +40,36 @@
 
 namespace
 {
+	void setSocketOptionGeneric(SOCKET socket, int level, int optname, void* ptr, size_t size)
+	{
+		const int result = ::setsockopt(socket, level, optname, (const char*)ptr, (int)size);
+	#ifdef _WIN32
+		RMX_ASSERT(result == 0, "setsockopt failed with error: " << WSAGetLastError());
+	#else
+		RMX_ASSERT(result == 0, "setsockopt failed with error: " << errno);
+	#endif
+	}
+
+	void setSocketOptionBool(SOCKET socket, int level, int optname, bool enable)
+	{
+		int option = enable ? 1 : 0;
+		setSocketOptionGeneric(socket, level, optname, &option, sizeof(option));
+	}
+
+	void setSocketOptionInt(SOCKET socket, int level, int optname, int value)
+	{
+		setSocketOptionGeneric(socket, level, optname, &value, sizeof(value));
+	}
+
 	void configureSocket(SOCKET socket, Sockets::ProtocolFamily protocolFamily)
 	{
+		// Allow re-use of the port
+		setSocketOptionBool(socket, SOL_SOCKET, SO_REUSEADDR, true);
+
 		if (protocolFamily >= Sockets::ProtocolFamily::IPv6)
 		{
 			// Optionally allow IPv4 + IPv6 dual stack support on the socket
-			int option = (protocolFamily == Sockets::ProtocolFamily::DualStack) ? 0 : 1;
-			::setsockopt(socket, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&option, sizeof(option));
+			setSocketOptionBool(socket, IPPROTO_IPV6, IPV6_V6ONLY, protocolFamily == Sockets::ProtocolFamily::DualStack);
 		}
 	}
 }
@@ -678,8 +701,8 @@ bool UDPSocket::bindToPort(uint16 port, Sockets::ProtocolFamily protocolFamily)
 
 	// Setup socket options
 	int bufsize = MAX_DATAGRAM_SIZE * 8;	// This would be 256 KB, enough to hold multiple large datagrams
-	::setsockopt(mInternal->mSocket, SOL_SOCKET, SO_SNDBUF, (const char*)&bufsize, sizeof(bufsize));
-	::setsockopt(mInternal->mSocket, SOL_SOCKET, SO_RCVBUF, (const char*)&bufsize, sizeof(bufsize));
+	setSocketOptionInt(mInternal->mSocket, SOL_SOCKET, SO_SNDBUF, bufsize);
+	setSocketOptionInt(mInternal->mSocket, SOL_SOCKET, SO_RCVBUF, bufsize);
 	return true;
 }
 
@@ -709,8 +732,8 @@ bool UDPSocket::bindToAnyPort(Sockets::ProtocolFamily protocolFamily)
 
 	// Setup socket options
 	int bufsize = 0x20000;
-	::setsockopt(mInternal->mSocket, SOL_SOCKET, SO_SNDBUF, (const char*)&bufsize, sizeof(bufsize));
-	::setsockopt(mInternal->mSocket, SOL_SOCKET, SO_RCVBUF, (const char*)&bufsize, sizeof(bufsize));
+	setSocketOptionInt(mInternal->mSocket, SOL_SOCKET, SO_SNDBUF, bufsize);
+	setSocketOptionInt(mInternal->mSocket, SOL_SOCKET, SO_RCVBUF, bufsize);
 	return true;
 }
 

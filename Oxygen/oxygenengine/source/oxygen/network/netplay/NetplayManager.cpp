@@ -159,6 +159,11 @@ bool NetplayManager::onReceivedConnectionlessPacket(ConnectionlessPacketEvaluati
 	if (mExternalAddressQuery.onReceivedConnectionlessPacket(evaluation))
 		return true;
 
+	if (nullptr != mNetplayClient)
+	{
+		mNetplayClient->onReceivedConnectionlessPacket(evaluation);
+	}
+
 	return false;
 }
 

@@ -75,6 +75,30 @@ void NetworkingWindow::buildContent()
 		if (nullptr != netplayHost)
 		{
 			ImGui::Text("Host: %d connections", (int)netplayHost->getPlayerConnections().size());
+
+			int index = 0;
+			for (NetplayHost::PlayerConnection* connection : netplayHost->getPlayerConnections())
+			{
+				ImGui::BulletText("Client %d (IP = %s, port = %d):", index + 1, connection->getRemoteAddress().getIP().c_str(), connection->getRemoteAddress().getPort());
+				ImGuiHelpers::ScopedIndent si2(28.0f);
+
+				switch (connection->getState())
+				{
+					case NetConnection::State::EMPTY:				 ImGui::Text("No connection");  break;
+					case NetConnection::State::TCP_READY:			 ImGui::Text("TCP ready");  break;
+					case NetConnection::State::REQUESTED_CONNECTION: ImGui::Text("Requested connection");  break;
+					case NetConnection::State::ACCEPTED:			 ImGui::Text("Connection accepted");  break;
+					case NetConnection::State::CONNECTED:			 ImGui::Text("Connected");  break;
+					case NetConnection::State::DISCONNECTED:		 ImGui::Text("Disconnected");  break;
+				}
+
+				if (connection->getState() == NetConnection::State::CONNECTED)
+				{
+					ImGui::SameLine();
+					ImGui::Text("-  Netplay latency:  %d frames", connection->mCurrentLatency);
+				}
+				++index;
+			}
 		}
 		else if (nullptr != netplayClient)
 		{
@@ -176,17 +200,17 @@ void NetworkingWindow::buildContent()
 			}
 			else
 			{
-				if (ImGui::Button("Stop game"))
-				{
-					// TODO: This is not implemented yet
-					//netplayHost->stopGame();
-				}
-
 				if (state == NetplayHost::HostState::GAME_RUNNING)
 				{
 					int frameNumber = 0;
 					const uint32 checksum = netplayHost->getRegularInputChecksum(frameNumber);
-					ImGui::Text("Input checksum:  %08x for frame #%d", checksum, frameNumber);
+					ImGui::BulletText("Input checksum:  %08x for frame #%d", checksum, frameNumber);
+				}
+
+				if (ImGui::Button("Stop game"))
+				{
+					// TODO: This is not implemented yet
+					//netplayHost->stopGame();
 				}
 			}
 			ImGui::EndDisabled();
@@ -206,11 +230,19 @@ void NetworkingWindow::buildContent()
 				case NetplayClient::State::FAILED:				ImGui::Text("Failed");  break;
 			}
 
-			if (state == NetplayClient::State::GAME_RUNNING)
+			if (state == NetplayClient::State::CONNECT_TO_HOST)
+			{
+				if (netplayClient->getReceivedPunchthroughPacketSender().isValid())
+					ImGui::Text("Received punchthrough packet from IP = %s, port = %d", netplayClient->getReceivedPunchthroughPacketSender().getIP().c_str(), netplayClient->getReceivedPunchthroughPacketSender().getPort());
+				else
+					ImGui::Text("No punchthrough packet received");
+			}
+			else if (state == NetplayClient::State::GAME_RUNNING)
 			{
 				int frameNumber = 0;
 				const uint32 checksum = netplayClient->getRegularInputChecksum(frameNumber);
-				ImGui::Text("Input checksum:  %08x for frame #%d", checksum, frameNumber);
+				ImGui::BulletText("Input checksum:  %08x for frame #%d", checksum, frameNumber);
+				ImGui::BulletText("Netplay latency:  %d frames", netplayClient->getCurrentLatency());
 			}
 		}
 	}

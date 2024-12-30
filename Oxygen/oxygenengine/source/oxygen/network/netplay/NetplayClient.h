@@ -40,8 +40,10 @@ public:
 	NetplayClient(ConnectionManager& connectionManager, NetplayManager& netplayManager);
 	~NetplayClient();
 
-	inline State getState() const  { return mState; }
-	inline const HostConnection& getHostConnection() const  { return mHostConnection; }
+	inline State getState() const											{ return mState; }
+	inline const HostConnection& getHostConnection() const					{ return mHostConnection; }
+	inline const SocketAddress& getReceivedPunchthroughPacketSender() const	{ return mReceivedPunchthroughPacketSender; }
+	inline int getCurrentLatency() const									{ return mCurrentLatency; }
 
 	void joinViaServer();
 	void connectDirectlyToHost(std::string_view ip, uint16 port);
@@ -52,6 +54,7 @@ public:
 	bool canBeginNextFrame(uint32 frameNumber);
 	void onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber);
 	bool onReceivedPacket(ReceivedPacketEvaluation& evaluation);
+	bool onReceivedConnectionlessPacket(ConnectionlessPacketEvaluation& evaluation);
 
 	uint32 getRegularInputChecksum(int& outFrameNumber) const;
 
@@ -71,9 +74,11 @@ private:
 	State mState = State::NONE;
 
 	network::RegisterForNetplayRequest mRegistrationRequest;
+	SocketAddress mReceivedPunchthroughPacketSender;
 
 	std::deque<ReceivedFrame> mReceivedFrames;
 	uint32 mNextFrameNumber = 0;
+	int mCurrentLatency = 0;
 
 	uint32 mInputChecksum = 0;
 	uint32 mRegularInputChecksum = 0;
