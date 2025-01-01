@@ -140,6 +140,9 @@ uint64 SharedDatabase::setupCharacterSprite(EmulatorInterface& emulatorInterface
 	}
 	else
 	{
+		if (animationSprite >= 0xfb)	// Filter out invalid sprite numbers that might lead to garbage and misbehavior
+			return 0;
+
 		SpriteCollection::ROMSpriteData romSpriteData;
 		switch (character)
 		{
