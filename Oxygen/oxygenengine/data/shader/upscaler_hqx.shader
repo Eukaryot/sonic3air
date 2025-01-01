@@ -1,7 +1,7 @@
 
 // Hq2x shader
 //   - Adapted for use in Oxygen Engine
-//  Copyright (C) 2018-2024 Eukaryot
+//  Copyright (C) 2018-2025 by Eukaryot
 //
 // This shader is derived from original "hq2x.glsl" from https://github.com/Armada651/hqx-shader/blob/master/glsl
 // Used under GNU General Public License v2, see additional license info below.
