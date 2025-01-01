@@ -72,6 +72,8 @@ constant u16 CONTROL_STARTMODE	= 0x0880	// Start + Mode
 	constant u8 BUTTON_BACK		= 0x0b		// Back button -- resembles MODE button on Genesis 6 Button pad
 
 	constant u8 BUTTON_PAD2		= 0x10		// Add to button ID for second controller
+	constant u8 BUTTON_PAD3		= 0x20		// Add to button ID for third controller
+	constant u8 BUTTON_PAD4		= 0x30		// Add to button ID for fourth controller
 
 	// Touch input modes for "Input.setTouchInputMode"
 	//  -> Only relevant when using a touch device, these do not affect keyboard / gamepad input

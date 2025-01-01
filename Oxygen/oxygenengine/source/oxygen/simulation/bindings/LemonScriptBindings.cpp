@@ -572,24 +572,58 @@ namespace
 		return ControlsIn::instance().getGamepad((size_t)controllerIndex).mPreviousInput;
 	}
 
-	bool getButtonState(int index, bool previousValue = false)
+	bool getCurrentButtonState(int playerIndex, int buttonIndex)
 	{
-		const size_t playerIndex = (index & 0x10) ? 1 : 0;
-		const ControlsIn::Gamepad& gamepad = ControlsIn::instance().getGamepad(playerIndex);
-		const uint16 bitmask = previousValue ? gamepad.mPreviousInput : gamepad.mCurrentInput;
-		return ((bitmask >> (index & 0x0f)) & 1) != 0;
+		const ControlsIn::Gamepad& gamepad = ControlsIn::instance().getGamepad((size_t)playerIndex);
+		return ((gamepad.mCurrentInput >> buttonIndex) & 1) != 0;
 	}
 
-	uint8 Input_buttonDown(uint8 index)
+	bool getPreviousButtonState(int playerIndex, int buttonIndex)
+	{
+		const ControlsIn::Gamepad& gamepad = ControlsIn::instance().getGamepad((size_t)playerIndex);
+		return ((gamepad.mPreviousInput >> buttonIndex) & 1) != 0;
+	}
+
+	bool Input_buttonDown(uint8 playerIndex, uint8 buttonIndex)
 	{
 		// Button down right now
-		return getButtonState((int)index) ? 1 : 0;
+		return getCurrentButtonState((int)playerIndex, (int)buttonIndex);
 	}
 
-	uint8 Input_buttonPressed(uint8 index)
+	bool Input_buttonPressed(uint8 playerIndex, uint8 buttonIndex)
 	{
 		// Button down now, but not in previous frame
-		return (getButtonState((int)index) && !getButtonState(index, true)) ? 1 : 0;
+		return (getCurrentButtonState((int)playerIndex, (int)buttonIndex) && !getPreviousButtonState((int)playerIndex, (int)buttonIndex));
+	}
+
+	bool Input_buttonReleased(uint8 playerIndex, uint8 buttonIndex)
+	{
+		// Button down in previous frame, but not any more now
+		return (!getCurrentButtonState((int)playerIndex, (int)buttonIndex) && getPreviousButtonState((int)playerIndex, (int)buttonIndex));
+	}
+
+	uint8 Input_buttonDown_old(uint8 index)
+	{
+		// Button down right now
+		const int playerIndex = (index & 0x30) >> 4;
+		const int buttonIndex = (index & 0x0f);
+		return Input_buttonDown(playerIndex, buttonIndex) ? 1 : 0;
+	}
+
+	uint8 Input_buttonPressed_old(uint8 index)
+	{
+		// Button down now, but not in previous frame
+		const int playerIndex = (index & 0x30) >> 4;
+		const int buttonIndex = (index & 0x0f);
+		return Input_buttonPressed(playerIndex, buttonIndex) ? 1 : 0;
+	}
+
+	uint8 Input_buttonReleased_old(uint8 index)
+	{
+		// Button down in previous frame, but not any more now
+		const int playerIndex = (index & 0x30) >> 4;
+		const int buttonIndex = (index & 0x0f);
+		return Input_buttonReleased(playerIndex, buttonIndex) ? 1 : 0;
 	}
 
 	void Input_setTouchInputMode(uint8 mode)
@@ -1087,16 +1121,28 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		builder.addNativeFunction("Input.getControllerPrevious", lemon::wrap(&Input_getControllerPrevious), defaultFlags)
 			.setParameters("controllerIndex");
 
-		builder.addNativeFunction("buttonDown", lemon::wrap(&Input_buttonDown), defaultFlags)			// Deprecated
+		builder.addNativeFunction("buttonDown", lemon::wrap(&Input_buttonDown_old), defaultFlags)			// Deprecated
 			.setParameters("index");
 
-		builder.addNativeFunction("buttonPressed", lemon::wrap(&Input_buttonPressed), defaultFlags)		// Deprecated
+		builder.addNativeFunction("buttonPressed", lemon::wrap(&Input_buttonPressed_old), defaultFlags)		// Deprecated
 			.setParameters("index");
 
 		builder.addNativeFunction("Input.buttonDown", lemon::wrap(&Input_buttonDown), defaultFlags)
-			.setParameters("index");
+			.setParameters("playerIndex", "buttonIndex");
 
 		builder.addNativeFunction("Input.buttonPressed", lemon::wrap(&Input_buttonPressed), defaultFlags)
+			.setParameters("playerIndex", "buttonIndex");
+
+		builder.addNativeFunction("Input.buttonReleased", lemon::wrap(&Input_buttonReleased), defaultFlags)
+			.setParameters("playerIndex", "buttonIndex");
+
+		builder.addNativeFunction("Input.buttonDown", lemon::wrap(&Input_buttonDown_old), defaultFlags)
+			.setParameters("index");
+
+		builder.addNativeFunction("Input.buttonPressed", lemon::wrap(&Input_buttonPressed_old), defaultFlags)
+			.setParameters("index");
+
+		builder.addNativeFunction("Input.buttonReleased", lemon::wrap(&Input_buttonReleased_old), defaultFlags)
 			.setParameters("index");
 
 		builder.addNativeFunction("Input.setTouchInputMode", lemon::wrap(&Input_setTouchInputMode), defaultFlags)
