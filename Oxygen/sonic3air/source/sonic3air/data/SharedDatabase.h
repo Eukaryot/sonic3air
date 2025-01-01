@@ -21,9 +21,9 @@ public:
 		std::string mInitials;
 		std::string mShortName;
 		std::string mDisplayName;
-		uint8 mInternalIndex;
-		int mActsNormal;
-		int mActsTimeAttack;
+		uint8 mInternalIndex = 0;
+		int mActsNormal = 0;
+		int mActsTimeAttack = 0;
 
 		inline Zone(const std::string& initials, const std::string& shortName, const std::string& displayName, uint8 index, int actsNormal, int actsTimeAttack) :
 			mInitials(initials), mShortName(shortName), mDisplayName(displayName), mInternalIndex(index), mActsNormal(actsNormal), mActsTimeAttack(actsTimeAttack) {}
@@ -123,7 +123,6 @@ public:
 
 		Type mSettingId;
 		std::string mIdentifier;
-		mutable uint32 mCurrentValue = 0;
 		uint32 mDefaultValue = 0;
 		bool mPurelyVisual = false;
 		bool mAllowInTimeAttack = false;
@@ -185,11 +184,11 @@ public:
 		std::string mName;
 		std::string mDescription;
 		std::string mImage;
-		uint32 mRequiredAchievements;
-		bool mUnlockedByAchievements;
-		bool mShownInMenu;
-		bool mHiddenUntilUnlocked;
-		bool mSerialized;
+		uint32 mRequiredAchievements = 0;
+		bool mUnlockedByAchievements = false;
+		bool mShownInMenu = false;
+		bool mHiddenUntilUnlocked = false;
+		bool mSerialized = false;
 	};
 
 public:

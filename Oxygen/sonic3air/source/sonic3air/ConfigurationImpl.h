@@ -10,6 +10,8 @@
 
 #include "oxygen/application/Configuration.h"
 
+#include "sonic3air/data/GameSettings.h"
+
 class GameProfile;
 class JsonSerializer;
 
@@ -84,4 +86,9 @@ public:
 		GhostSync mGhostSync;
 	};
 	GameServerImpl mGameServerImpl;
+
+	// Game settings
+	GameSettings mLocalGameSettings;			// Loaded from local settings
+	GameSettings mAlternativeGameSettings;		// Used in netplay and game recording playback
+	GameSettings* mActiveGameSettings = nullptr;
 };

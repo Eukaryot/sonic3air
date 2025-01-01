@@ -121,13 +121,13 @@ void NetworkingWindow::buildContent()
 		{
 			if (ImGui::Button("Host via server"))
 			{
-				netplayManager.setupAsHost(true, NetplayManager::DEFAULT_PORT);
+				netplayManager.setupAsHost(true, NetplayManager::DEFAULT_HOST_PORT);
 			}
 
 			ImGui::SameLine();
 			if (ImGui::Button("Host directly"))
 			{
-				netplayManager.setupAsHost(false, NetplayManager::DEFAULT_PORT);
+				netplayManager.setupAsHost(false, NetplayManager::DEFAULT_HOST_PORT);
 			}
 		}
 		ImGui::EndDisabled();
@@ -135,7 +135,7 @@ void NetworkingWindow::buildContent()
 		ImGui::BeginDisabled(nullptr != netplayClient);
 		{
 			static char ipBuffer[32] = { 0 };
-			static int port = NetplayManager::DEFAULT_PORT;
+			static int port = NetplayManager::DEFAULT_HOST_PORT;
 			if (ipBuffer[0] == 0)
 				strcpy_s(ipBuffer, 32, netplayManager.isUsingIPv6() ? "::1" : "127.0.0.1");
 
@@ -183,11 +183,11 @@ void NetworkingWindow::buildContent()
 			const NetplayHost::HostState state = netplayHost->getHostState();
 			switch (state)
 			{
-				case NetplayHost::HostState::NONE:					ImGui::Text("Inactive");  break;
-				case NetplayHost::HostState::CONNECT_TO_SERVER:		ImGui::Text("Connecting to game server");  break;
-				case NetplayHost::HostState::REGISTERED:			ImGui::Text("Registered at game server");  break;
-				case NetplayHost::HostState::GAME_RUNNING:			ImGui::Text("Game running");  break;
-				case NetplayHost::HostState::FAILED:				ImGui::Text("Failed");  break;
+				case NetplayHost::HostState::NONE:				ImGui::Text("Inactive");  break;
+				case NetplayHost::HostState::CONNECT_TO_SERVER:	ImGui::Text("Connecting to game server");  break;
+				case NetplayHost::HostState::REGISTERED:		ImGui::Text("Registered at game server");  break;
+				case NetplayHost::HostState::GAME_RUNNING:		ImGui::Text("Game running");  break;
+				case NetplayHost::HostState::FAILED:			ImGui::Text("Failed");  break;
 			}
 
 			ImGui::BeginDisabled(state < NetplayHost::HostState::REGISTERED || state > NetplayHost::HostState::GAME_RUNNING);
@@ -209,8 +209,8 @@ void NetworkingWindow::buildContent()
 
 				if (ImGui::Button("Stop game"))
 				{
-					// TODO: This is not implemented yet
-					//netplayHost->stopGame();
+					// TODO: Provide a better implementation
+					netplayManager.closeConnections();
 				}
 			}
 			ImGui::EndDisabled();

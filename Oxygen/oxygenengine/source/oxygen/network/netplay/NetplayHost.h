@@ -21,6 +21,8 @@ class NetplayManager;
 class NetplayHost
 {
 public:
+	static const int MAX_PLAYERS = 4;
+
 	enum class HostState
 	{
 		NONE,				// Idle, but reacting to direct connections
@@ -49,7 +51,7 @@ public:
 
 	struct InputFrame
 	{
-		uint16 mInputsByPlayer[4] = { 0 };
+		uint16 mInputsByPlayer[MAX_PLAYERS] = { 0 };
 	};
 
 public:

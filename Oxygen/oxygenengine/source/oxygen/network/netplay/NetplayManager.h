@@ -21,7 +21,7 @@ class NetplayHost;
 class NetplayManager : public ConnectionListenerInterface, public SingleInstance<NetplayManager>
 {
 public:
-	static const uint16 DEFAULT_PORT = 28840;
+	static const uint16 DEFAULT_HOST_PORT = 28840;
 
 public:
 	NetplayManager();
@@ -34,7 +34,7 @@ public:
 	inline NetplayClient* getNetplayClient()				{ return mNetplayClient; }
 	inline const ExternalAddressQuery& getExternalAddressQuery() const  { return mExternalAddressQuery; }
 
-	bool setupAsHost(bool registerSessionAtServer, uint16 port = DEFAULT_PORT);
+	bool setupAsHost(bool registerSessionAtServer, uint16 port = DEFAULT_HOST_PORT);
 	void startJoinViaServer();
 	void startJoinDirect(std::string_view ip, uint16 port);
 	void closeConnections();

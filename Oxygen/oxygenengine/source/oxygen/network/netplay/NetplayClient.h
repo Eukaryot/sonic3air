@@ -20,6 +20,8 @@ struct StartGamePacket;
 class NetplayClient
 {
 public:
+	static const int MAX_PLAYERS = 4;
+
 	enum class State
 	{
 		NONE,				// Not started anything yet
@@ -61,7 +63,7 @@ public:
 private:
 	struct ReceivedFrame
 	{
-		uint16 mInputsByPlayer[4] = { 0 };
+		uint16 mInputsByPlayer[MAX_PLAYERS] = { 0 };
 	};
 
 private:

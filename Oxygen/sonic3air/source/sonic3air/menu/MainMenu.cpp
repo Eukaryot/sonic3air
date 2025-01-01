@@ -11,9 +11,10 @@
 #include "sonic3air/menu/GameApp.h"
 #include "sonic3air/menu/MenuBackground.h"
 #include "sonic3air/menu/SharedResources.h"
-#include "sonic3air/Game.h"
 #include "sonic3air/audio/AudioOut.h"
 #include "sonic3air/data/SharedDatabase.h"
+#include "sonic3air/ConfigurationImpl.h"
+#include "sonic3air/Game.h"
 #include "sonic3air/version.inc"
 
 #include "oxygen/application/Application.h"
@@ -292,10 +293,10 @@ void MainMenu::render()
 		}
 		else
 		{
-			const SharedDatabase::Setting* setting = SharedDatabase::getSetting(SharedDatabase::Setting::SETTING_FIX_GLITCHES);
-			if (nullptr != setting && setting->mCurrentValue < 2)
+			const uint32& value = ConfigurationImpl::instance().mActiveGameSettings->mCurrentValues[(uint32)SharedDatabase::Setting::SETTING_FIX_GLITCHES];
+			if (value < 2)
 			{
-				const char* txt = (setting->mCurrentValue == 0) ? "NO GLITCH FIXES" : "ONLY BASIC FIXES";
+				const char* txt = (value == 0) ? "NO GLITCH FIXES" : "ONLY BASIC FIXES";
 				drawer.printText(global::mSmallfont, Vec2i(px, 1), txt, 3, Color(0.6f, 0.2f, 0.2f, mVisibility * 0.3f));
 			}
 		}

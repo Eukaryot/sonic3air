@@ -156,7 +156,7 @@ void NetplayClient::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 			for (int k = 0; k < indexFromBack; ++k)
 				++it;
 
-			for (int playerIndex = 0; playerIndex < 4; ++playerIndex)
+			for (int playerIndex = 0; playerIndex < MAX_PLAYERS; ++playerIndex)
 			{
 				controlsIn.injectInput(playerIndex, it->mInputsByPlayer[playerIndex]);
 			}
@@ -202,7 +202,7 @@ bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 				mReceivedFrames.emplace_back();
 				ReceivedFrame& newFrame = mReceivedFrames.back();
 				const uint16* input = &packet.mInputs[packet.mNumPlayers * (packet.mNumFrames - numFramesToCopy + k)];
-				for (int playerIndex = 0; playerIndex < std::min<int>(packet.mNumPlayers, 4); ++playerIndex)
+				for (int playerIndex = 0; playerIndex < std::min<int>(packet.mNumPlayers, MAX_PLAYERS); ++playerIndex)
 				{
 					newFrame.mInputsByPlayer[playerIndex] = *input;
 					++input;

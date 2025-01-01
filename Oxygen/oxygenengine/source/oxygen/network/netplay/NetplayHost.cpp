@@ -247,7 +247,7 @@ void NetplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 		// Apply last received input from the clients
 		for (PlayerConnection* playerConnection : activeConnections)
 		{
-			if (playerConnection->mPlayerIndex >= 0 && playerConnection->mPlayerIndex < 4)
+			if (playerConnection->mPlayerIndex >= 0 && playerConnection->mPlayerIndex < MAX_PLAYERS)
 			{
 				const uint16 input = playerConnection->mLastReceivedInput;
 				newInputFrame.mInputsByPlayer[playerConnection->mPlayerIndex] = input;
@@ -270,7 +270,7 @@ void NetplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 	// Apply input locally
 	{
 		const InputFrame& inputFrame = mInputHistory.back();
-		for (int playerIndex = 0; playerIndex < 2; ++playerIndex)
+		for (int playerIndex = 0; playerIndex < MAX_PLAYERS; ++playerIndex)
 		{
 			controlsIn.injectInput(playerIndex, inputFrame.mInputsByPlayer[playerIndex]);
 		}

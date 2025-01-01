@@ -273,16 +273,18 @@ uint32 Game::getSetting(uint32 settingId, bool ignoreGameMode) const
 
 	if (nullptr != setting)
 	{
+		const uint32 value = ConfigurationImpl::instance().mActiveGameSettings->getValue(settingId);
+
 		// Special handling for Debug Mode setting in dev mode
 		if (settingId == SharedDatabase::Setting::SETTING_DEBUG_MODE)
 		{
-			if (!setting->mCurrentValue)
+			if (value == 0)
 			{
 				if (EngineMain::getDelegate().useDeveloperFeatures() && ConfigurationImpl::instance().mDevModeImpl.mEnforceDebugMode)
 					return true;
 			}
 		}
-		return setting->mCurrentValue;
+		return value;
 	}
 	else
 	{
@@ -293,9 +295,8 @@ uint32 Game::getSetting(uint32 settingId, bool ignoreGameMode) const
 
 void Game::setSetting(uint32 settingId, uint32 value)
 {
-	const SharedDatabase::Setting* setting = SharedDatabase::getSetting(settingId);
-	RMX_CHECK(nullptr != setting, "Setting not found", return);
-	setting->mCurrentValue = value;
+	RMX_CHECK(nullptr != SharedDatabase::getSetting(settingId), "Setting not found", return);
+	ConfigurationImpl::instance().mActiveGameSettings->setValue(settingId, value);
 }
 
 void Game::checkForUnlockedSecrets()
@@ -800,6 +801,9 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 
 void Game::onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer)
 {
+	// Switch to using the alternative set of settings
+	ConfigurationImpl::instance().mActiveGameSettings = &ConfigurationImpl::instance().mAlternativeGameSettings;
+
 	const std::unordered_map<uint32, SharedDatabase::Setting>& settings = SharedDatabase::getSettings();
 	VectorBinarySerializer serializer(true, buffer);
 	const size_t numSettings = serializer.read<uint32>();
@@ -807,11 +811,7 @@ void Game::onGameRecordingHeaderLoaded(const std::string& buildString, const std
 	{
 		const uint32 settingId = serializer.read<uint32>();
 		const uint32 value = serializer.read<uint32>();
-		const auto it = settings.find(settingId);
-		if (it != settings.end())
-		{
-			it->second.mCurrentValue = value;
-		}
+		ConfigurationImpl::instance().mActiveGameSettings->setValue(settingId, value);
 	}
 }
 
@@ -833,8 +833,9 @@ void Game::onGameRecordingHeaderSave(std::vector<uint8>& buffer)
 	serializer.writeAs<uint32>(relevantSettings.size());
 	for (const SharedDatabase::Setting* setting : relevantSettings)
 	{
+		const uint32 value = ConfigurationImpl::instance().mLocalGameSettings.getValue(setting->mSettingId);
 		serializer.writeAs<uint32>(setting->mSettingId);
-		serializer.write(setting->mCurrentValue);
+		serializer.write(value);
 	}
 }
 

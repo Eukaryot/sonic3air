@@ -348,6 +348,9 @@
       <Filter>platform</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\GameArgumentsReader.h" />
+    <ClInclude Include="..\..\source\sonic3air\data\GameSettings.h">
+      <Filter>data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\config.json" />

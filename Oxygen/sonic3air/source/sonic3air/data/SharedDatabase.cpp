@@ -8,6 +8,7 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/data/SharedDatabase.h"
+#include "sonic3air/ConfigurationImpl.h"
 
 #include "oxygen/application/Configuration.h"
 #include "oxygen/resources/SpriteCollection.h"
@@ -215,14 +216,7 @@ const SharedDatabase::Setting* SharedDatabase::getSetting(uint32 settingId)
 
 uint32 SharedDatabase::getSettingValue(uint32 settingId)
 {
-	const SharedDatabase::Setting* setting = getSetting(settingId);
-	if (nullptr != setting)
-	{
-		return setting->mCurrentValue;
-	}
-
-	// Use default value
-	return (settingId & 0xff);
+	return ConfigurationImpl::instance().mActiveGameSettings->getValue(settingId);
 }
 
 SharedDatabase::Achievement* SharedDatabase::getAchievement(uint32 achievementId)
@@ -259,7 +253,6 @@ SharedDatabase::Setting& SharedDatabase::addSetting(SharedDatabase::Setting::Typ
 	SharedDatabase::Setting& setting = mSettings[(uint32)id];
 	setting.mSettingId = id;
 	setting.mIdentifier = std::string(identifier).substr(9);
-	setting.mCurrentValue = ((uint32)id & 0xff);
 	setting.mDefaultValue = ((uint32)id & 0xff);
 	setting.mSerializationType = serializationType;
 	setting.mPurelyVisual = ((uint32)id & 0x80000000) != 0;

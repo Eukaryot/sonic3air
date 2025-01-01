@@ -8,9 +8,10 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/data/PlayerRecorder.h"
-#include "sonic3air/helper/GameUtils.h"
 #include "sonic3air/data/SharedDatabase.h"
 #include "sonic3air/data/TimeAttackData.h"
+#include "sonic3air/helper/GameUtils.h"
+#include "sonic3air/ConfigurationImpl.h"
 
 #include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/helper/JsonHelper.h"
@@ -151,9 +152,10 @@ void PlayerRecorder::initRecording(const std::wstring& filename, uint16 zoneAndA
 	for (const auto& pair : settingsMap)
 	{
 		const SharedDatabase::Setting& setting = pair.second;
-		if (setting.mSerializationType != SharedDatabase::Setting::SerializationType::NONE && setting.mCurrentValue != setting.mDefaultValue)
+		const uint32 value = ConfigurationImpl::instance().mActiveGameSettings->getValue(pair.first);
+		if (setting.mSerializationType != SharedDatabase::Setting::SerializationType::NONE && value != setting.mDefaultValue)
 		{
-			mCurrentRecording.mSettings.emplace_back(pair.first, setting.mCurrentValue);
+			mCurrentRecording.mSettings.emplace_back(pair.first, value);
 		}
 	}
 }

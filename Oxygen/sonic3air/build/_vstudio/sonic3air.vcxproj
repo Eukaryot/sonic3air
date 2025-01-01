@@ -82,6 +82,7 @@
     <ClInclude Include="..\..\source\sonic3air\client\GhostSync.h" />
     <ClInclude Include="..\..\source\sonic3air\client\UpdateCheck.h" />
     <ClInclude Include="..\..\source\sonic3air\ConfigurationImpl.h" />
+    <ClInclude Include="..\..\source\sonic3air\data\GameSettings.h" />
     <ClInclude Include="..\..\source\sonic3air\data\PlayerProgress.h" />
     <ClInclude Include="..\..\source\sonic3air\data\PlayerRecorder.h" />
     <ClInclude Include="..\..\source\sonic3air\data\SharedDatabase.h" />

@@ -50,6 +50,8 @@ ConfigurationImpl::ConfigurationImpl()
 	// Setup defaults
 	mGameServerBase.mServerHostName = "sonic3air.org";
 	mGameServerImpl.mUpdateCheck.mReleaseChannel = getReleaseChannelValueForBuild();
+
+	mActiveGameSettings = &mLocalGameSettings;
 }
 
 void ConfigurationImpl::preLoadInitialization()
@@ -152,7 +154,7 @@ void ConfigurationImpl::serializeSettingsInternal(JsonSerializer& serializer)
 							int value = 0;
 							if (serializer.serialize(pair.second.mIdentifier.c_str(), value))
 							{
-								pair.second.mCurrentValue = (uint32)value;
+								mLocalGameSettings.setValue(pair.first, (uint32)value);
 							}
 						}
 					}
@@ -161,14 +163,13 @@ void ConfigurationImpl::serializeSettingsInternal(JsonSerializer& serializer)
 					if (mGameVersionInSettings < "22.12.17.0")
 					{
 						// Reset the SETTING_FIX_GLITCHES, after the default value changed
-						const SharedDatabase::Setting* setting = mapFind(settingsMap, (uint32)SharedDatabase::Setting::SETTING_FIX_GLITCHES);
-						if (nullptr != setting)
-							setting->mCurrentValue = 2;
+						mLocalGameSettings.setValue((uint32)SharedDatabase::Setting::SETTING_FIX_GLITCHES, 2);
 					}
 
-					const SharedDatabase::Setting* ghostsSetting = mapFind(settingsMap, (uint32)SharedDatabase::Setting::SETTING_TIME_ATTACK_GHOSTS);
-					if (nullptr != ghostsSetting)
-						ghostsSetting->mCurrentValue = (ghostsSetting->mCurrentValue >= 5) ? 5 : (ghostsSetting->mCurrentValue >= 3) ? 3 : (ghostsSetting->mCurrentValue >= 1) ? 1 : 0;
+					{
+						uint32& ghostSetting = mLocalGameSettings.mCurrentValues[(uint32)SharedDatabase::Setting::SETTING_TIME_ATTACK_GHOSTS];
+						ghostSetting = (ghostSetting >= 5) ? 5 : (ghostSetting >= 3) ? 3 : (ghostSetting >= 1) ? 1 : 0;
+					}
 
 					serializer.endObject();
 				}
@@ -197,10 +198,11 @@ void ConfigurationImpl::serializeSettingsInternal(JsonSerializer& serializer)
 				const SharedDatabase::Setting& setting = pair.second;
 				if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::NONE)
 					continue;
-				if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::HIDDEN && setting.mCurrentValue == setting.mDefaultValue)
+
+				int value = mLocalGameSettings.getValue(pair.first);
+				if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::HIDDEN && value == setting.mDefaultValue)
 					continue;
 
-				int value = setting.mCurrentValue;
 				serializer.serialize(setting.mIdentifier.c_str(), value);
 			}
 			serializer.endObject();
