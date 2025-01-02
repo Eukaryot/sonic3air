@@ -15,6 +15,24 @@
 namespace ImGuiHelpers
 {
 
+	static const ImVec4 COLOR_WHITE		  (1.0f, 1.0f, 1.0f, 1.0f);
+	static const ImVec4 COLOR_GRAY80	  (0.8f, 0.8f, 0.8f, 1.0f);
+	static const ImVec4 COLOR_GRAY60	  (0.6f, 0.6f, 0.6f, 1.0f);
+	static const ImVec4 COLOR_GRAY40	  (0.4f, 0.4f, 0.4f, 1.0f);
+	static const ImVec4 COLOR_GRAY30	  (0.3f, 0.3f, 0.3f, 1.0f);
+	static const ImVec4 COLOR_BLACK		  (0.0f, 0.0f, 0.0f, 1.0f);
+	static const ImVec4 COLOR_TRANSPARENT (0.0f, 0.0f, 0.0f, 0.0f);
+
+	static const ImVec4 COLOR_RED		  (1.0f, 0.0f, 0.0f, 1.0f);
+	static const ImVec4 COLOR_YELLOW	  (1.0f, 1.0f, 0.0f, 1.0f);
+	static const ImVec4 COLOR_LIGHT_YELLOW(1.0f, 1.0f, 0.5f, 1.0f);
+	static const ImVec4 COLOR_GREEN		  (0.0f, 1.0f, 0.0f, 1.0f);
+	static const ImVec4 COLOR_CYAN		  (0.0f, 1.0f, 1.0f, 1.0f);
+	static const ImVec4 COLOR_LIGHT_CYAN  (0.5f, 1.0f, 0.0f, 1.0f);
+	static const ImVec4 COLOR_BLUE		  (0.0f, 0.0f, 1.0f, 1.0f);
+	static const ImVec4 COLOR_MAGENTA	  (1.0f, 0.0f, 1.0f, 1.0f);
+
+
 	struct ScopedIndent
 	{
 	public:

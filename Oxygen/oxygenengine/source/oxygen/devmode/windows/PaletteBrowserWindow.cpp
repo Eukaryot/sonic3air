@@ -63,7 +63,7 @@ void PaletteBrowserWindow::buildContent()
 			if (!filterString.shouldInclude(palette->getIdentifier()))
 				continue;
 
-			const ImVec4 textColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);// (nullptr == palette->mSourceInfo.mMod) ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.5f, 1.0f, 1.0f, 1.0f);
+			const ImVec4 textColor = ImGuiHelpers::COLOR_WHITE;// (nullptr == palette->mSourceInfo.mMod) ? ImGuiHelpers::COLOR_WHITE : ImGuiHelpers::COLOR_LIGHT_CYAN;
 
 			ImGui::PushID(palette);
 

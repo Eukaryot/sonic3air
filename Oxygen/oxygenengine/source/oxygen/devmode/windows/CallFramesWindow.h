@@ -25,7 +25,9 @@ public:
 private:
 	bool mShowAllHitFunctions  = false;
 	bool mVisualizationSorting = false;
-	bool mShowOpcodesExecuted  = false;
+	bool mShowProfilingSamples = false;
+
+	std::unordered_map<uint64, bool> mOpenState;
 };
 
 #endif

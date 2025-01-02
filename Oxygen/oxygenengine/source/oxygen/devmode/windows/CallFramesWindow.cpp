@@ -20,7 +20,7 @@
 
 
 CallFramesWindow::CallFramesWindow() :
-	DevModeWindowBase("Call Frames", Category::DEBUGGING, 0)
+	DevModeWindowBase("Call Frames", Category::SCRIPTS, 0)
 {
 }
 
@@ -41,6 +41,7 @@ void CallFramesWindow::buildContent()
 	if (mShowAllHitFunctions)
 	{
 		ImGui::Checkbox("Sort by filename", &mVisualizationSorting);
+		ImGui::Spacing();
 		ImGui::Spacing();
 
 		std::map<uint32, const lemon::Function*> functions;
@@ -97,11 +98,59 @@ void CallFramesWindow::buildContent()
 	}
 	else
 	{
-		ImGui::Checkbox("Show profiling samples", &mShowOpcodesExecuted);
+		// TODO: Profiling samples are very imprecise and not really useful at all, so they're disabled
+	#ifdef DEBUG
+		ImGui::Checkbox("Show profiling samples", &mShowProfilingSamples);
+	#endif
+		ImGui::Spacing();
 		ImGui::Spacing();
 
-		int openTreeNodeDepth = -1;		// TODO: This is maybe somewhat redundant with "ignoreDepth"?
-		int ignoreDepth = 0;
+		// Help marker
+		ImGui::Text("Call frame hierarchy");
+		ImGui::SameLine();
+		ImGui::TextDisabled("(?)");
+		if (ImGui::BeginItemTooltip())
+		{
+			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			ImGui::Text("This is the call hierarchy of script functions that were executed in the last frame.");
+
+			if (mShowProfilingSamples)
+			{
+				ImGui::Text("Profiling samples count how long execution of a function took.");
+			}
+			else
+			{
+				ImGui::TextColored(ImGuiHelpers::COLOR_WHITE, "White: ");
+				ImGui::SameLine();
+				ImGui::Text("Function called directly by name.");
+
+				ImGui::TextColored(ImGuiHelpers::COLOR_LIGHT_YELLOW, "Yellow: ");
+				ImGui::SameLine();
+				ImGui::Text("Function called indirectly by address hook.");
+
+				ImGui::TextColored(ImGuiHelpers::COLOR_RED, "Red: ");
+				ImGui::SameLine();
+				ImGui::Text("Failed address hook call.");
+
+				ImGui::TextColored(ImGuiHelpers::COLOR_GRAY60, "Gray: ");
+				ImGui::SameLine();
+				ImGui::Text("Already called at the start of the last frame.");
+			}
+
+			ImGui::PopTextWrapPos();
+			ImGui::EndTooltip();
+		}
+		ImGui::Spacing();
+
+		// Display (arrow) buttons without frame and default background
+		ImGui::PushStyleColor(ImGuiCol_Button, ImGuiHelpers::COLOR_TRANSPARENT);
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8.0f, 3.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+
+		std::unordered_map<uint64, int> keyCounters;
+
+		int ignoreDepth = -1;
 		for (size_t callFrameIndex = 0; callFrameIndex < callFrames.size(); ++callFrameIndex)
 		{
 			const CodeExec::CallFrame& callFrame = callFrames[callFrameIndex];
@@ -110,53 +159,64 @@ void CallFramesWindow::buildContent()
 			if (nullptr != callFrame.mFunction && rmx::startsWith(callFrame.mFunction->getName().getString(), "debug"))
 				continue;
 
-			if (ignoreDepth != 0)
+			if (ignoreDepth != -1)
 			{
 				if (callFrame.mDepth > ignoreDepth)
 					continue;
 
-				ignoreDepth = 0;
+				ignoreDepth = -1;
 			}
 
-			if (openTreeNodeDepth >= 0 && callFrame.mDepth <= openTreeNodeDepth)
-			{
-				ImGui::TreePop();
-				--openTreeNodeDepth;
-			}
+			ImGuiHelpers::ScopedIndent si(4.0f + callFrame.mDepth * 16.0f);
 
-			const uint64 key = (nullptr == callFrame.mFunction) ? 0xffffffffffffffffULL : callFrame.mFunction->getID();
+			uint64 key = (nullptr == callFrame.mFunction) ? 0xffffffffffffffffULL : callFrame.mFunction->getID();
+			const int keyCount = ++keyCounters[key];
+			key += (uint64)(keyCount - 1) << 32;
 
 			bool isOpen = false;
 			const bool hasAnyChildren = (callFrameIndex + 1 < callFrames.size()) && (callFrames[callFrameIndex + 1].mDepth > callFrame.mDepth);
 			if (hasAnyChildren)
 			{
-				const bool defaultOpen = (callFrame.mAnyChildFailed || callFrame.mDepth < 1);
-				isOpen = ImGui::TreeNodeEx(("##" + std::to_string(key)).c_str(), defaultOpen ? ImGuiTreeNodeFlags_DefaultOpen : 0);
+				bool* openState = mapFind(mOpenState, key);
+				if (nullptr != openState)
+				{
+					isOpen = *openState;
+				}
+				else
+				{
+					const bool defaultOpen = (callFrame.mAnyChildFailed || callFrame.mDepth < 2);
+					isOpen = defaultOpen;
+				}
+
+				ImGui::PushStyleColor(ImGuiCol_Text, isOpen ? ImGuiHelpers::COLOR_GRAY60 : ImGuiHelpers::COLOR_WHITE);
+				if (ImGui::ArrowButton(("##" + std::to_string(key)).c_str(), isOpen ? ImGuiDir_Down : ImGuiDir_Right))
+				{
+					mOpenState[key] = !isOpen;
+				}
+				ImGui::PopStyleColor();
 			}
 			else
 			{
-				ImGui::BulletText(" ");
+				ImGui::PushStyleColor(ImGuiCol_Text, ImGuiHelpers::COLOR_GRAY30);
+				ImGui::Bullet();
+				ImGui::PopStyleColor();
 			}
 			ImGui::SameLine();
 
-			if (isOpen)
-			{
-				++openTreeNodeDepth;
-			}
-			else
+			if (!isOpen)
 			{
 				ignoreDepth = callFrame.mDepth;
 			}
 
 			if (callFrame.mType == CodeExec::CallFrame::Type::FAILED_HOOK)
 			{
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%06x", callFrame.mAddress);
+				ImGui::TextColored(ImGuiHelpers::COLOR_RED, "%06x", callFrame.mAddress);
 			}
 			else
 			{
-				ImVec4 color(1.0f, 1.0f, 1.0f, 1.0f);
+				ImVec4 color = ImGuiHelpers::COLOR_WHITE;
 				std::string postfix;
-				if (mShowOpcodesExecuted)
+				if (mShowProfilingSamples)
 				{
 					postfix = " <" + std::to_string(callFrame.mSteps) + ">";
 					const float log = log10f((float)clamp((int)callFrame.mSteps, 100, 1000000));
@@ -168,23 +228,20 @@ void CallFramesWindow::buildContent()
 				}
 				else
 				{
-					color = (callFrame.mType == CodeExec::CallFrame::Type::SCRIPT_STACK) ? ImVec4(0.6f, 0.6f, 0.6f, 1.0f) :
-							(callFrame.mType == CodeExec::CallFrame::Type::SCRIPT_DIRECT) ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
+					color = (callFrame.mType == CodeExec::CallFrame::Type::SCRIPT_STACK)  ? ImGuiHelpers::COLOR_GRAY60 :
+							(callFrame.mType == CodeExec::CallFrame::Type::SCRIPT_DIRECT) ? ImGuiHelpers::COLOR_WHITE : ImGuiHelpers::COLOR_LIGHT_YELLOW;
 				}
 				RMX_ASSERT(nullptr != callFrame.mFunction, "Invalid function pointer");
 				ImGui::TextColored(color, "%s%s", std::string(callFrame.mFunction->getName().getString()).c_str(), postfix.c_str());
 			}
 		}
 
-		while (openTreeNodeDepth >= 0)
-		{
-			ImGui::TreePop();
-			--openTreeNodeDepth;
-		}
+		ImGui::PopStyleVar(3);
+		ImGui::PopStyleColor(1);
 
 		if (callFrames.size() == CodeExec::CALL_FRAMES_LIMIT)
 		{
-			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "[!] Reached call frames limit");
+			ImGui::TextColored(ImGuiHelpers::COLOR_RED, "[!] Reached call frames limit");
 		}
 	}
 

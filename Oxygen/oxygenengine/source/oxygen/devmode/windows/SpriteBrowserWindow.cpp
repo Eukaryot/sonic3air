@@ -74,7 +74,7 @@ void SpriteBrowserWindow::buildContent()
 			if (!filterString.shouldInclude(item->mSourceInfo.mSourceIdentifier))
 				continue;
 
-			const ImVec4 textColor = (nullptr == item->mSourceInfo.mMod) ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.5f, 1.0f, 1.0f, 1.0f);
+			const ImVec4 textColor = (nullptr == item->mSourceInfo.mMod) ? ImGuiHelpers::COLOR_WHITE : ImGuiHelpers::COLOR_LIGHT_CYAN;
 
 			ImGui::PushID(item);
 

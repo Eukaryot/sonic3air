@@ -71,7 +71,7 @@ void ScriptBuildWindow::buildContent()
 			ImGui::TableSetColumnIndex(0);
 			ImGui::Spacing();
 
-			const ImVec4 textColor = (nullptr == mod) ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.5f, 1.0f, 1.0f, 1.0f);
+			const ImVec4 textColor = (nullptr == mod) ? ImGuiHelpers::COLOR_WHITE : ImGuiHelpers::COLOR_LIGHT_CYAN;
 
 			ImGui::PushID(module);
 

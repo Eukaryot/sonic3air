@@ -75,7 +75,7 @@ void MemoryHexViewWindow::buildContent()
 		static uint32 hoveredAddress = 0xffffffff;
 		uint32 newHoveredAddress = 0xffffffff;
 
-		const ImVec4 cellColorTitle     = ImVec4(0.8f, 0.8f, 0.8f, 1.0f);
+		const ImVec4 cellColorTitle     = ImGuiHelpers::COLOR_GRAY80;
 		const uint32 cellBGColorTitle   = ImGui::GetColorU32(ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
 		const uint32 cellBGColorNormal  = ImGui::GetColorU32(ImVec4(0.0f, 0.0f, 0.0f, 0.5f));
 		const uint32 cellBGColorHovered = ImGui::GetColorU32(ImVec4(0.5f, 0.5f, 0.0f, 0.6f) );

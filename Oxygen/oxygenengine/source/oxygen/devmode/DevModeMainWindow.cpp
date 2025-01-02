@@ -44,11 +44,9 @@ DevModeMainWindow::DevModeMainWindow() :
 		createWindow(mPaletteViewWindow);
 		createWindow(mMemoryHexViewWindow);
 		createWindow(mWatchesWindow);
-	#ifdef DEBUG	// Still work-in-progress
-		createWindow(mCallFramesWindow);
-	#endif
 
 		createWindow(mScriptBuildWindow);
+		createWindow(mCallFramesWindow);
 
 		createWindow(mAudioBrowserWindow);
 		createWindow(mSpriteBrowserWindow);
