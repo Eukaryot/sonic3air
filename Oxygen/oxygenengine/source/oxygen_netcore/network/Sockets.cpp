@@ -69,7 +69,7 @@ namespace
 		if (protocolFamily >= Sockets::ProtocolFamily::IPv6)
 		{
 			// Optionally allow IPv4 + IPv6 dual stack support on the socket
-			setSocketOptionBool(socket, IPPROTO_IPV6, IPV6_V6ONLY, protocolFamily == Sockets::ProtocolFamily::DualStack);
+			setSocketOptionBool(socket, IPPROTO_IPV6, IPV6_V6ONLY, protocolFamily != Sockets::ProtocolFamily::DualStack);
 		}
 	}
 }
@@ -835,6 +835,8 @@ bool UDPSocket::receiveInternal(ReceiveResult& outReceiveResult)
 			if (errorCode == WSAECONNRESET)		// Ignore this error, see https://stackoverflow.com/questions/30749423/is-winsock-error-10054-wsaeconnreset-normal-with-udp-to-from-localhost
 				return true;
 			RMX_ERROR("recv failed with error: " << errorCode, );
+			if (errorCode == WSAENETRESET)		// Ignore this error as well (it happens occasionally on the server)
+				return true;
 		#else
 			// This is only an error for blocking sockets
 			if (mInternal->mIsBlockingSocket)
