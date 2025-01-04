@@ -280,8 +280,8 @@ void TCPSocket::close()
 	}
 #endif
 
-	mInternal->mSocket = INVALID_SOCKET;
-	mInternal->mRemoteAddress.clear();
+	// Reset to defaults
+	*mInternal = Internal();
 }
 
 const SocketAddress& TCPSocket::getRemoteAddress()
@@ -414,7 +414,6 @@ bool TCPSocket::acceptConnection(TCPSocket& outSocket)
 	sockaddr_storage& senderAddr = *reinterpret_cast<sockaddr_storage*>(outSocket.mInternal->mRemoteAddress.accessSockAddr());
 	socklen_t senderAddrSize = sizeof(sockaddr_storage);
 
-	outSocket.mInternal->mSocket = INVALID_SOCKET;
 	outSocket.mInternal->mSocket = ::accept(mInternal->mSocket, (sockaddr*)&senderAddr, &senderAddrSize);
 	if (outSocket.mInternal->mSocket < 0)
 	{
@@ -635,8 +634,8 @@ void UDPSocket::close()
 	}
 #endif
 
-	mInternal->mSocket = INVALID_SOCKET;
-	mInternal->mLocalPort = 0;
+	// Reset to defaults
+	*mInternal = Internal();
 }
 
 bool UDPSocket::bindToPort(uint16 port, Sockets::ProtocolFamily protocolFamily)
