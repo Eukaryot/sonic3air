@@ -28,6 +28,9 @@ NetplayClient::NetplayClient(ConnectionManager& connectionManager, NetplayManage
 
 NetplayClient::~NetplayClient()
 {
+	// TODO: Call this only if netplay game was actually active
+	EngineMain::getDelegate().onStopNetplayGame(false);
+
 	// TODO: This just destroys the connection, but doesn't tell the host about it
 	mHostConnection.clear();
 }
@@ -262,6 +265,10 @@ void NetplayClient::startGame(const StartGamePacket& packet)
 	for (int k = 0; k < 4; ++k)
 		rngState[k] = packet.mRNGState[k];
 
+	// Load game settings
+	VectorBinarySerializer serializer(true, packet.mSerializedGameSettings);
+	EngineMain::getDelegate().serializeGameSettings(serializer);
+
 	// Setup input checksum tracking
 	mInputChecksum = rmx::startFNV1a_32();
 	mRegularInputChecksum = mInputChecksum;
@@ -269,5 +276,5 @@ void NetplayClient::startGame(const StartGamePacket& packet)
 
 	mState = State::GAME_RUNNING;
 
-	EngineMain::getDelegate().onStartNetplayGame();
+	EngineMain::getDelegate().onStartNetplayGame(false);
 }

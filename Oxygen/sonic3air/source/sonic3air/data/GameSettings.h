@@ -14,7 +14,7 @@
 class GameSettings : public SingleInstance<GameSettings>
 {
 public:
-	std::map<uint32, uint32> mCurrentValues;	// Using "SharedDatabase::Setting::Type" as keys
+	std::unordered_map<uint32, uint32> mCurrentValues;	// Using "SharedDatabase::Setting::Type" as keys
 
 public:
 	inline uint32 getValue(uint32 settingId) const

@@ -24,6 +24,9 @@ NetplayHost::NetplayHost(ConnectionManager& connectionManager, NetplayManager& n
 
 NetplayHost::~NetplayHost()
 {
+	// TODO: Call this only if netplay game was actually active
+	EngineMain::getDelegate().onStopNetplayGame(false);
+
 	// Destroy all connections to clients
 	for (size_t k = 0; k < mPlayerConnections.size(); ++k)
 	{
@@ -182,22 +185,28 @@ bool NetplayHost::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluatio
 
 void NetplayHost::startGame()
 {
-	// Send start game packet
+	// Fill in start game packet
+	StartGamePacket packet;
 	{
-		StartGamePacket packet;
 		packet.mGameBuildVersion = EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber;
 		packet.mTransferMode = 0;
 		packet.mGameMode = 0;
 		packet.mFirstFrameNumber = 0;
 
+		// Write RNG state
 		const uint64* rngState = Application::instance().getSimulation().getSimulationState().getRandomNumberGenerator().accessState();
 		for (int k = 0; k < 4; ++k)
 			packet.mRNGState[k] = rngState[k];
 
-		for (PlayerConnection* connection : mPlayerConnections)
-		{
-			connection->sendPacket(packet, NetConnection::SendFlags::NONE, &connection->mStartGamePacketID);
-		}
+		// Save game settings
+		VectorBinarySerializer serializer(false, packet.mSerializedGameSettings);
+		EngineMain::getDelegate().serializeGameSettings(serializer);
+	}
+
+	// Send to players
+	for (PlayerConnection* connection : mPlayerConnections)
+	{
+		connection->sendPacket(packet, NetConnection::SendFlags::NONE, &connection->mStartGamePacketID);
 	}
 
 	// Setup input checksum tracking
@@ -207,7 +216,7 @@ void NetplayHost::startGame()
 
 	mHostState = HostState::GAME_RUNNING;
 
-	EngineMain::getDelegate().onStartNetplayGame();
+	EngineMain::getDelegate().onStartNetplayGame(true);
 }
 
 void NetplayHost::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)

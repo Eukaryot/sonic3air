@@ -24,7 +24,9 @@ struct StartGamePacket : public highlevel::PacketBase
 	uint8 mGameMode = 0;
 	uint32 mFirstFrameNumber = 0;
 	uint64 mRNGState[4] = { 0 };
-	// TODO: Add more, like game settings, persistent data, list of active mods incl. versions
+
+	std::vector<uint8> mSerializedGameSettings;
+	// TODO: Add more, like persistent data, list of active mods incl. versions
 
 	virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
 	{
@@ -42,6 +44,8 @@ struct StartGamePacket : public highlevel::PacketBase
 
 		for (int k = 0; k < 4; ++k)
 			serializer.serialize(mRNGState[k]);
+
+		serializer.serializeData(mSerializedGameSettings);
 	}
 };
 

@@ -35,7 +35,9 @@ public:
 	bool useDeveloperFeatures() override;
 	void onActiveModsChanged() override;
 
-	void onStartNetplayGame() override;
+	void onStartNetplayGame(bool isHost) override;
+	void onStopNetplayGame(bool isHost) override;
+	void serializeGameSettings(VectorBinarySerializer& serializer) override;
 
 	void onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer) override;
 	void onGameRecordingHeaderSave(std::vector<uint8>& buffer) override;

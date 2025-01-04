@@ -105,7 +105,15 @@ void EngineDelegate::onActiveModsChanged()
 {
 }
 
-void EngineDelegate::onStartNetplayGame()
+void EngineDelegate::onStartNetplayGame(bool isHost)
+{
+}
+
+void EngineDelegate::onStopNetplayGame(bool isHost)
+{
+}
+
+void EngineDelegate::serializeGameSettings(VectorBinarySerializer& serializer)
 {
 }
 
