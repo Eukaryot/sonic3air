@@ -14,6 +14,7 @@
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/devmode/windows/AudioBrowserWindow.h"
 #include "oxygen/devmode/windows/CallFramesWindow.h"
+#include "oxygen/devmode/windows/DebugLogWindow.h"
 #include "oxygen/devmode/windows/GameSimWindow.h"
 #include "oxygen/devmode/windows/GameVisualizationsWindow.h"
 #include "oxygen/devmode/windows/MemoryHexViewWindow.h"
@@ -39,13 +40,15 @@ DevModeMainWindow::DevModeMainWindow() :
 		createWindow(mGameSimWindow);
 
 		createWindow(mGameVisualizationsWindow);
+		createWindow(mPaletteViewWindow);
 		createWindow(mRenderedGeometryWindow);
 		createWindow(mVRAMWritesWindow);
-		createWindow(mPaletteViewWindow);
+
 		createWindow(mMemoryHexViewWindow);
 		createWindow(mWatchesWindow);
 
 		createWindow(mScriptBuildWindow);
+		createWindow(mDebugLogWindow);
 		createWindow(mCallFramesWindow);
 
 		createWindow(mAudioBrowserWindow);
@@ -114,7 +117,8 @@ void DevModeMainWindow::buildContent()
 	const char* TEXT_BY_CATEGORY[] =
 	{
 		"Simulation",
-		"Debugging",
+		"Graphics",
+		"Memory",
 		"Scripts",
 		"Assets",
 		"Misc"
@@ -128,8 +132,8 @@ void DevModeMainWindow::buildContent()
 
 		for (int categoryIndex = 0; categoryIndex < NUM_CATEGORIES; ++categoryIndex)
 		{
-			if (categoryIndex == 0 || categoryIndex == 2)
-				ImGui::TableSetColumnIndex(categoryIndex / 2);
+			if (categoryIndex == 0 || categoryIndex == 3)
+				ImGui::TableSetColumnIndex(categoryIndex / 3);
 
 			ImGui::SeparatorText(TEXT_BY_CATEGORY[categoryIndex]);
 			for (DevModeWindowBase* window : mAllWindows)

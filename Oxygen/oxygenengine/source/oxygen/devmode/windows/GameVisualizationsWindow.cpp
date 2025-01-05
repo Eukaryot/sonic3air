@@ -20,7 +20,7 @@
 
 
 GameVisualizationsWindow::GameVisualizationsWindow() :
-	DevModeWindowBase("Visualizations", Category::GAME_CONTROLS, ImGuiWindowFlags_AlwaysAutoResize)
+	DevModeWindowBase("Visualizations", Category::GRAPHICS, ImGuiWindowFlags_AlwaysAutoResize)
 {
 }
 

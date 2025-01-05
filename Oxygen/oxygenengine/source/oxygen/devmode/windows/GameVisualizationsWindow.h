@@ -21,8 +21,6 @@ public:
 	GameVisualizationsWindow();
 
 	virtual void buildContent() override;
-
-private:
 };
 
 #endif

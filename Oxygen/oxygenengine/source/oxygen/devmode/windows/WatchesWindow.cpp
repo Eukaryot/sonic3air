@@ -14,7 +14,6 @@
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/devmode/DevModeMainWindow.h"
 #include "oxygen/application/Application.h"
-#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LemonScriptProgram.h"
@@ -24,7 +23,7 @@
 
 
 WatchesWindow::WatchesWindow() :
-	DevModeWindowBase("Watches", Category::DEBUGGING, 0)
+	DevModeWindowBase("Watches", Category::MEMORY, 0)
 {
 }
 
@@ -123,8 +122,6 @@ void WatchesWindow::buildContent()
 
 	ImGui::Spacing();
 
-	const ImVec4 grayColor(0.6f, 0.6f, 0.6f, 1.0f);
-	const ImVec4 lightGrayColor(0.75f, 0.75f, 0.75f, 1.0f);
 	uint64 nextHoveredKey = ~(uint64)0;
 
 	const std::vector<DebugTracking::Watch*>& watches = debugTracking.getWatches();
@@ -170,7 +167,7 @@ void WatchesWindow::buildContent()
 					if (watch->mBytes <= 4)
 					{
 						if (watch->mHits.empty())
-							ImGui::TextColored(grayColor, "       %s   (no changes this frame)", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str());
+							ImGui::TextColored(ImGuiHelpers::COLOR_GRAY60, "       %s   (no changes this frame)", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str());
 						else
 							ImGui::Text("       %s   initially", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str());
 					}
@@ -194,7 +191,7 @@ void WatchesWindow::buildContent()
 						ImGui::PushID((int)hitIndex);
 						if (ImGui::TreeNodeEx("Call Stack", 0, "%s", *hitTitle))
 						{
-							ImGui::TextColored(lightGrayColor, "   Call Stack:");
+							ImGui::TextColored(ImGuiHelpers::COLOR_GRAY80, "   Call Stack:");
 							std::vector<DebugTracking::Location> callStack;
 							debugTracking.getCallStackFromCallFrameIndex(callStack, hit.mCallFrameIndex, hit.mLocation.mProgramCounter);
 
@@ -204,7 +201,7 @@ void WatchesWindow::buildContent()
 								const std::string& functionName = loc.toString(debugTracking.getCodeExec());
 								if (loc.mLineNumber >= 0)
 								{
-									ImGui::TextColored(lightGrayColor, "        %s, line %d", functionName.c_str(), loc.mLineNumber);
+									ImGui::TextColored(ImGuiHelpers::COLOR_GRAY80, "        %s, line %d", functionName.c_str(), loc.mLineNumber);
 
 									if (loc.mProgramCounter.has_value())
 									{
@@ -223,7 +220,7 @@ void WatchesWindow::buildContent()
 								}
 								else
 								{
-									ImGui::TextColored(lightGrayColor, "        %s", functionName.c_str());
+									ImGui::TextColored(ImGuiHelpers::COLOR_GRAY80, "        %s", functionName.c_str());
 								}
 							}
 

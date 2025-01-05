@@ -23,7 +23,8 @@ public:
 	enum class Category
 	{
 		GAME_CONTROLS,
-		DEBUGGING,
+		GRAPHICS,
+		MEMORY,
 		SCRIPTS,
 		ASSET_BROWSERS,
 		MISC

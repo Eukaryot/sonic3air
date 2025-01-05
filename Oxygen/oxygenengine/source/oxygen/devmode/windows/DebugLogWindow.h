@@ -15,12 +15,15 @@
 #include "oxygen/devmode/DevModeWindowBase.h"
 
 
-class ScriptBuildWindow : public DevModeWindowBase
+class DebugLogWindow : public DevModeWindowBase
 {
 public:
-	ScriptBuildWindow();
+	DebugLogWindow();
 
 	virtual void buildContent() override;
+
+private:
+	bool mShowOldValues = true;
 };
 
 #endif

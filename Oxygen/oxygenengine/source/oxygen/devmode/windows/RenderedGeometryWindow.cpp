@@ -20,7 +20,7 @@
 
 
 RenderedGeometryWindow::RenderedGeometryWindow() :
-	DevModeWindowBase("Rendered Geometry", Category::DEBUGGING, 0)
+	DevModeWindowBase("Rendered Geometry", Category::GRAPHICS, 0)
 {
 }
 

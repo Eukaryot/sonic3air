@@ -18,7 +18,7 @@
 
 
 PaletteViewWindow::PaletteViewWindow() :
-	DevModeWindowBase("Palette View", Category::DEBUGGING, ImGuiWindowFlags_AlwaysAutoResize)
+	DevModeWindowBase("Palette View", Category::GRAPHICS, ImGuiWindowFlags_AlwaysAutoResize)
 {
 }
 

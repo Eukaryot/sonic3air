@@ -21,8 +21,6 @@ public:
 	GameSimWindow();
 
 	virtual void buildContent() override;
-
-private:
 };
 
 #endif

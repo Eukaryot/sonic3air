@@ -550,6 +550,9 @@
     <ClCompile Include="..\..\source\oxygen\network\netplay\ExternalAddressQuery.cpp">
       <Filter>network\netplay</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\DebugLogWindow.cpp">
+      <Filter>devmode\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -1040,6 +1043,9 @@
       <Filter>devmode\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\devmode\windows\CallFramesWindow.h">
+      <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\DebugLogWindow.h">
       <Filter>devmode\windows</Filter>
     </ClInclude>
   </ItemGroup>
