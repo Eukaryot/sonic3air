@@ -10,6 +10,7 @@
 
 #include "sonic3air/menu/GameMenuBase.h"
 #include "sonic3air/menu/mods/ModResources.h"
+#include "sonic3air/menu/mods/ModsStartPage.h"
 
 class MenuBackground;
 class Mod;
@@ -58,6 +59,7 @@ private:
 
 private:
 	MenuBackground* mMenuBackground = nullptr;
+	ModsStartPage mModsStartPage;
 	GameMenuControlsDisplay mGameMenuControlsDisplay;
 
 	std::map<Mod*, ModResources> mModResources;

@@ -200,6 +200,9 @@
     <ClCompile Include="..\..\source\sonic3air\platform\PlatformSpecifics.cpp">
       <Filter>platform</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\mods\ModsStartPage.cpp">
+      <Filter>menu\mods</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -350,6 +353,9 @@
     <ClInclude Include="..\..\source\sonic3air\GameArgumentsReader.h" />
     <ClInclude Include="..\..\source\sonic3air\data\GameSettings.h">
       <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\mods\ModsStartPage.h">
+      <Filter>menu\mods</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
