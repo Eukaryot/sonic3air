@@ -209,6 +209,9 @@ namespace rmx
 		{
 			for (const auto& element : value)
 			{
+				if (!element.isString())
+					return false;
+
 				output.push_back(element.asString());
 			}
 			return true;

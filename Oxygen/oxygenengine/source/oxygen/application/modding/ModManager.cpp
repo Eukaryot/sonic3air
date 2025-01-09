@@ -39,19 +39,22 @@ void ModManager::startup()
 		const int numMods = activeMods.isArray() ? (int)activeMods.size() : 0;
 		for (int i = 0; i < numMods; ++i)
 		{
+			if (!activeMods[i].isString())
+				continue;
+
 			const std::wstring localPath = String(activeMods[i].asString()).toStdWString();
+			const uint64 hash = rmx::getMurmur2_64(localPath);
 
 			// Search for this mod in the previously found mods
-			const uint64 hash = rmx::getMurmur2_64(localPath);
-			const auto it = mModsByLocalDirectoryHash.find(hash);
-			if (it == mModsByLocalDirectoryHash.end())
+			Mod** found = mapFind(mModsByLocalDirectoryHash, hash);
+			if (nullptr == found)
 			{
 				// Not found... we could make this an error / failed mod
 			}
 			else
 			{
 				// Make this mod active
-				Mod* mod = it->second;
+				Mod* mod = *found;
 				mod->mState = Mod::State::ACTIVE;
 				mActiveMods.emplace_back(mod);
 			}

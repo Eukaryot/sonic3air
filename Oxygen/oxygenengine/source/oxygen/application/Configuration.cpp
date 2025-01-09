@@ -53,13 +53,16 @@ namespace
 			{
 				for (Json::ArrayIndex i = 0; i < deviceNames.size(); ++i)
 				{
-					const std::string name = deviceNames[i].asString();
-					if (!name.empty())
+					if (deviceNames[i].isString())
 					{
-						String str(name);
-						str.lowerCase();
-						const uint64 hash = rmx::getMurmur2_64(str);
-						inputDeviceDefinition->mDeviceNames[hash] = *str;
+						const std::string name = deviceNames[i].asString();
+						if (!name.empty())
+						{
+							String str(name);
+							str.lowerCase();
+							const uint64 hash = rmx::getMurmur2_64(str);
+							inputDeviceDefinition->mDeviceNames[hash] = *str;
+						}
 					}
 				}
 			}
@@ -74,10 +77,13 @@ namespace
 				{
 					for (Json::ArrayIndex k = 0; k < mappingJson.size(); ++k)
 					{
-						InputConfig::Assignment assignment;
-						if (InputConfig::Assignment::setFromMappingString(assignment, mappingJson[k].asString(), inputDeviceDefinition->mDeviceType))
+						if (mappingJson[k].isString())
 						{
-							newAssignments.push_back(assignment);
+							InputConfig::Assignment assignment;
+							if (InputConfig::Assignment::setFromMappingString(assignment, mappingJson[k].asString(), inputDeviceDefinition->mDeviceType))
+							{
+								newAssignments.push_back(assignment);
+							}
 						}
 					}
 				}

@@ -67,7 +67,7 @@ TimeAttackData::Table& TimeAttackData::loadTable(uint16 zoneAndAct, uint8 catego
 		{
 			const Json::Value file = rec["File"];
 			const Json::Value time = rec["Time"];
-			if (file.isString())
+			if (file.isString() && time.isString())
 			{
 				Entry& entry = vectorAdd(timeAttackTable->mEntries);
 				entry.mFilename = *String(file.asString()).toWString();
