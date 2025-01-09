@@ -100,5 +100,6 @@ namespace rmx
 	public:
 		static inline LoggerInterface* mLogger = nullptr;
 		static inline MessageBoxInterface* mMessageBoxImplementation = nullptr;
+		static inline bool mShowAssertMessageBox = true;
 	};
 }

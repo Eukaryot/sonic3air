@@ -198,6 +198,9 @@ namespace rmx
 		if (gIgnoredAssertHashes.count(hash) != 0)
 			return false;
 
+		if (!mShowAssertMessageBox)
+			return false;
+
 		static bool isInsideAssertBreakHandler = false;
 		if (isInsideAssertBreakHandler)
 			return false;

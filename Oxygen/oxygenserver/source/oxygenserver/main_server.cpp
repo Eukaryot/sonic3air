@@ -125,6 +125,7 @@ int main(int argc, char** argv)
 	#endif
 
 		rmx::ErrorHandling::mLogger = &mErrorLogger;
+		rmx::ErrorHandling::mShowAssertMessageBox = false;	// Don't ever show assert message boxes for the server, just log the error
 	}
 
 #if defined(PLATFORM_WINDOWS)
