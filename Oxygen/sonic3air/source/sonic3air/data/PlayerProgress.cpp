@@ -152,7 +152,7 @@ void PlayerProgress::save(bool force)
 	PersistentData& persistentData = PersistentData::instance();
 
 	// Achievements
-	if (force || mAchievements.isEqual(mSavedAchievements))
+	if (force || !mAchievements.isEqual(mSavedAchievements))
 	{
 		std::vector<uint8> buffer;
 		VectorBinarySerializer serializer(false, buffer);
@@ -163,7 +163,7 @@ void PlayerProgress::save(bool force)
 	}
 
 	// Unlocks
-	if (force || mUnlocks.isEqual(mSavedUnlocks))
+	if (force || !mUnlocks.isEqual(mSavedUnlocks))
 	{
 		std::vector<uint8> buffer;
 		{
