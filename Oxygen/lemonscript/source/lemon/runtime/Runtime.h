@@ -170,6 +170,8 @@ namespace lemon
 		void executeSteps(ExecuteConnector& result, size_t stepsLimit, size_t minimumCallStackSize);
 		const Function* handleResultCall(const RuntimeOpcode& runtimeOpcode);
 
+		inline const RuntimeOpcode* getCurrentOpcode() const  { return *mCurrentOpcodePtr; }		// Warning: This is only valid during actual code execution
+
 		inline void triggerStopSignal()  { mReceivedStopSignal = true; }
 
 		bool serializeState(VectorBinarySerializer& serializer, std::string* outError = nullptr);
@@ -201,6 +203,7 @@ namespace lemon
 		ControlFlow* mSelectedControlFlow = nullptr;	// The currently selected control flow used by methods like "executeSteps" and "callFunction"; this must always be a valid pointer
 
 		bool mReceivedStopSignal = false;
+		const RuntimeOpcode*const* mCurrentOpcodePtr = nullptr;
 	};
 
 }

@@ -406,6 +406,7 @@ namespace lemon
 		RuntimeOpcodeContext context;
 		context.mControlFlow = mSelectedControlFlow;
 		mActiveControlFlow = mSelectedControlFlow;
+		mCurrentOpcodePtr = &context.mOpcode;
 
 		// Outer loop
 		//  -> Gets restarted whenever the currently running function changes

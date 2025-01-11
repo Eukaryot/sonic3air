@@ -328,7 +328,7 @@ void DebugTracking::onScriptLog(std::string_view key, std::string_view value)
 	scriptLogSingleEntry.mCallFrameIndex = getCurrentCallFrameIndex();
 
 	size_t pc;
-	mLemonScriptRuntime.getLastStepLocation(scriptLogSingleEntry.mLocation.mFunction, pc);
+	mLemonScriptRuntime.getCurrentExecutionLocation(scriptLogSingleEntry.mLocation.mFunction, pc);
 	scriptLogSingleEntry.mLocation.mProgramCounter = pc;
 
 	Application::instance().getSimulation().stopSingleStepContinue();
@@ -341,7 +341,7 @@ void DebugTracking::onWatchTriggered(size_t watchIndex, uint32 address, uint16 b
 
 	Location location;
 	size_t pc;
-	mLemonScriptRuntime.getLastStepLocation(location.mFunction, pc);
+	mLemonScriptRuntime.getCurrentExecutionLocation(location.mFunction, pc);
 	location.mProgramCounter = pc;
 
 	Watch& watch = *mWatches[watchIndex];
@@ -371,7 +371,7 @@ void DebugTracking::onVRAMWrite(uint16 address, uint16 bytes)
 
 	Location location;
 	size_t pc;
-	mLemonScriptRuntime.getLastStepLocation(location.mFunction, pc);
+	mLemonScriptRuntime.getCurrentExecutionLocation(location.mFunction, pc);
 	location.mProgramCounter = pc;
 
 	// Check if this can be merged with the VRAM write just before

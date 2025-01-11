@@ -67,7 +67,7 @@ bool LemonScriptRuntime::getCurrentScriptFunction(std::string_view* outFunctionN
 		return false;
 
 	lemon::ControlFlow::Location location;
-	controlFlow->getLastStepLocation(location);
+	controlFlow->getCurrentExecutionLocation(location);
 	if (nullptr == location.mFunction)
 		return false;
 
@@ -327,10 +327,10 @@ void LemonScriptRuntime::setGlobalVariableValue_int64(lemon::FlyweightString var
 	}
 }
 
-void LemonScriptRuntime::getLastStepLocation(const lemon::ScriptFunction*& outFunction, size_t& outProgramCounter) const
+void LemonScriptRuntime::getCurrentExecutionLocation(const lemon::ScriptFunction*& outFunction, size_t& outProgramCounter) const
 {
 	lemon::ControlFlow::Location location;
-	mInternal.mRuntime.getSelectedControlFlow().getLastStepLocation(location);
+	mInternal.mRuntime.getSelectedControlFlow().getCurrentExecutionLocation(location);
 	outFunction = location.mFunction;
 	outProgramCounter = location.mProgramCounter;
 }
@@ -343,7 +343,7 @@ std::string LemonScriptRuntime::getOwnCurrentScriptLocationString() const
 std::string LemonScriptRuntime::buildScriptLocationString(const lemon::ControlFlow& controlFlow)
 {
 	lemon::ControlFlow::Location location;
-	controlFlow.getLastStepLocation(location);
+	controlFlow.getCurrentExecutionLocation(location);
 	if (nullptr == location.mFunction)
 		return "";
 
@@ -358,5 +358,5 @@ uint32 LemonScriptRuntime::getLineNumberInFile(const lemon::ScriptFunction& func
 {
 	const auto& opcodes = function.mOpcodes;
 	const uint32 lineNumber = (programCounter < opcodes.size()) ? opcodes[programCounter].mLineNumber : opcodes.back().mLineNumber;
-	return (lineNumber < function.mSourceBaseLineOffset) ? 0 : (lineNumber - function.mSourceBaseLineOffset);
+	return (lineNumber < function.mSourceBaseLineOffset) ? 0 : (lineNumber - function.mSourceBaseLineOffset + 1);
 }

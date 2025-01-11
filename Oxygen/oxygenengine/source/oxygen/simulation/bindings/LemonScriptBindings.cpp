@@ -431,7 +431,7 @@ namespace
 		RMX_ASSERT(success, "Could not determine current script function during logging");
 
 		if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
-			LemonScriptBindings::mDebugNotificationInterface->onScriptLog(*String(0, "%04d", lineNumber), valueString);
+			LemonScriptBindings::mDebugNotificationInterface->onScriptLog(*String(0, "%04d", lineNumber + 1), valueString);
 	}
 
 	template<typename T>

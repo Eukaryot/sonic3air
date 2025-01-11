@@ -63,7 +63,7 @@ public:
 	int64 getGlobalVariableValue_int64(lemon::FlyweightString variableName);
 	void setGlobalVariableValue_int64(lemon::FlyweightString variableName, int64 value);
 
-	void getLastStepLocation(const lemon::ScriptFunction*& outFunction, size_t& outProgramCounter) const;
+	void getCurrentExecutionLocation(const lemon::ScriptFunction*& outFunction, size_t& outProgramCounter) const;
 	std::string getOwnCurrentScriptLocationString() const;
 
 private:
