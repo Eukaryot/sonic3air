@@ -16,7 +16,7 @@
 
 
 PaletteBrowserWindow::PaletteBrowserWindow() :
-	DevModeWindowBase("Palette Browser", Category::ASSET_BROWSERS, ImGuiWindowFlags_AlwaysAutoResize)
+	DevModeWindowBase("Palette Browser", Category::GRAPHICS, ImGuiWindowFlags_AlwaysAutoResize)
 {
 }
 

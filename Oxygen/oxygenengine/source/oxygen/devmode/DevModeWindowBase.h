@@ -22,11 +22,8 @@ friend class DevModeMainWindow;
 public:
 	enum class Category
 	{
-		GAME_CONTROLS,
+		SIMULATION,
 		GRAPHICS,
-		MEMORY,
-		SCRIPTS,
-		ASSET_BROWSERS,
 		MISC
 	};
 

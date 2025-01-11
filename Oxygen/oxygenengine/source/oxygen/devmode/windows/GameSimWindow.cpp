@@ -17,7 +17,7 @@
 
 
 GameSimWindow::GameSimWindow() :
-	DevModeWindowBase("Game", Category::GAME_CONTROLS, ImGuiWindowFlags_AlwaysAutoResize)
+	DevModeWindowBase("Game", Category::SIMULATION, ImGuiWindowFlags_AlwaysAutoResize)
 {
 }
 

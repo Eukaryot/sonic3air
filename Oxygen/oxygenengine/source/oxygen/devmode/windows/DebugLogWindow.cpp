@@ -21,7 +21,7 @@
 
 
 DebugLogWindow::DebugLogWindow() :
-	DevModeWindowBase("Debug Log", Category::SCRIPTS, 0)
+	DevModeWindowBase("Debug Log", Category::SIMULATION, 0)
 {
 }
 

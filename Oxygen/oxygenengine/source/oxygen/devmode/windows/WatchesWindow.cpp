@@ -23,7 +23,7 @@
 
 
 WatchesWindow::WatchesWindow() :
-	DevModeWindowBase("Watches", Category::MEMORY, 0)
+	DevModeWindowBase("Watches", Category::SIMULATION, 0)
 {
 }
 

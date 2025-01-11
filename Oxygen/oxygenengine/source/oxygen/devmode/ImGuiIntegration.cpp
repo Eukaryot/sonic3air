@@ -216,34 +216,39 @@ void ImGuiIntegration::refreshImGuiStyle()
 		return ImVec4(interpolate(grayValue, accentColor.x * accent, saturation), interpolate(grayValue, accentColor.y * accent, saturation), interpolate(grayValue, accentColor.z * accent, saturation), 1.0f);
 	};
 
-	style.Colors[ImGuiCol_Text]				= ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-	style.Colors[ImGuiCol_WindowBg]			= ImVec4(0.1f, 0.1f, 0.1f, 0.95f);
-	style.Colors[ImGuiCol_Border]			= ImVec4(0.8f, 0.8f, 0.8f, 0.15f);
+	style.Colors[ImGuiCol_Text]					= ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+	style.Colors[ImGuiCol_WindowBg]				= ImVec4(0.1f, 0.1f, 0.1f, 0.95f);
+	style.Colors[ImGuiCol_Border]				= ImVec4(0.8f, 0.8f, 0.8f, 0.15f);
 
-	style.Colors[ImGuiCol_TitleBg]			= GetAccentColorMix(0.5f, 0.6f, 0.2f);
-	style.Colors[ImGuiCol_TitleBgActive]	= GetAccentColorMix(0.6f, 1.0f, 0.3f);
-	style.Colors[ImGuiCol_TitleBgCollapsed]	= GetAccentColorMix(0.2f, 0.0f, 0.2f);
+	style.Colors[ImGuiCol_TitleBg]				= GetAccentColorMix(0.5f, 0.6f, 0.2f);
+	style.Colors[ImGuiCol_TitleBgActive]		= GetAccentColorMix(0.6f, 1.0f, 0.3f);
+	style.Colors[ImGuiCol_TitleBgCollapsed]		= GetAccentColorMix(0.2f, 0.0f, 0.2f);
 
-	style.Colors[ImGuiCol_FrameBg]			= GetAccentColorMix(0.3f);
-	style.Colors[ImGuiCol_FrameBgActive]	= GetAccentColorMix(0.8f);
-	style.Colors[ImGuiCol_FrameBgHovered]	= GetAccentColorMix(1.0f);
+	style.Colors[ImGuiCol_FrameBg]				= GetAccentColorMix(0.3f);
+	style.Colors[ImGuiCol_FrameBgActive]		= GetAccentColorMix(0.8f);
+	style.Colors[ImGuiCol_FrameBgHovered]		= GetAccentColorMix(1.0f);
 
-	style.Colors[ImGuiCol_CheckMark]		= GetAccentColorMix(1.0f, 0.3f, 1.0f);
+	style.Colors[ImGuiCol_CheckMark]			= GetAccentColorMix(1.0f, 0.3f, 1.0f);
 
-	style.Colors[ImGuiCol_Button]			= GetAccentColorMix(0.5f, 0.9f, 0.3f);
-	style.Colors[ImGuiCol_ButtonActive]		= GetAccentColorMix(0.8f, 0.9f, 0.4f);
-	style.Colors[ImGuiCol_ButtonHovered]	= GetAccentColorMix(1.0f, 0.9f, 0.5f);
+	style.Colors[ImGuiCol_Button]				= GetAccentColorMix(0.5f, 0.9f, 0.3f);
+	style.Colors[ImGuiCol_ButtonActive]			= GetAccentColorMix(0.8f, 0.9f, 0.4f);
+	style.Colors[ImGuiCol_ButtonHovered]		= GetAccentColorMix(1.0f, 0.9f, 0.5f);
 
-	style.Colors[ImGuiCol_Header]			= GetAccentColorMix(0.5f, 0.4f, 0.3f);
-	style.Colors[ImGuiCol_HeaderActive]		= GetAccentColorMix(0.5f, 0.4f, 0.4f);
-	style.Colors[ImGuiCol_HeaderHovered]	= GetAccentColorMix(0.5f, 0.4f, 0.5f);
+	style.Colors[ImGuiCol_Header]				= GetAccentColorMix(0.5f, 0.4f, 0.3f);
+	style.Colors[ImGuiCol_HeaderActive]			= GetAccentColorMix(0.5f, 0.4f, 0.4f);
+	style.Colors[ImGuiCol_HeaderHovered]		= GetAccentColorMix(0.5f, 0.4f, 0.5f);
 
-	style.Colors[ImGuiCol_ResizeGrip]		 = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
-	style.Colors[ImGuiCol_ResizeGripActive]	 = ImVec4(0.8f, 0.8f, 0.8f, 1.0f);
-	style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+	style.Colors[ImGuiCol_ResizeGrip]			= ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
+	style.Colors[ImGuiCol_ResizeGripActive]		= ImVec4(0.8f, 0.8f, 0.8f, 1.0f);
+	style.Colors[ImGuiCol_ResizeGripHovered]	= ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	style.Colors[ImGuiCol_SeparatorActive]	 = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
-	style.Colors[ImGuiCol_SeparatorHovered]	 = ImVec4(0.8f, 0.8f, 0.8f, 1.0f);
+	style.Colors[ImGuiCol_SeparatorActive]		= ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
+	style.Colors[ImGuiCol_SeparatorHovered]		= ImVec4(0.8f, 0.8f, 0.8f, 1.0f);
+
+	style.Colors[ImGuiCol_Tab]					= GetAccentColorMix(0.5f, 0.5f, 0.2f);
+	style.Colors[ImGuiCol_TabHovered]			= GetAccentColorMix(0.8f, 0.9f, 0.4f);
+	style.Colors[ImGuiCol_TabSelected]			= GetAccentColorMix(1.0f, 0.9f, 0.5f);
+	style.Colors[ImGuiCol_TabSelectedOverline]	= GetAccentColorMix(1.0f, 0.9f, 0.5f);
 }
 
 void ImGuiIntegration::toggleMainWindow()

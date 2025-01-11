@@ -23,7 +23,7 @@
 
 
 ScriptBuildWindow::ScriptBuildWindow() :
-	DevModeWindowBase("Script Build", Category::SCRIPTS, 0)
+	DevModeWindowBase("Script Build", Category::SIMULATION, 0)
 {
 }
 

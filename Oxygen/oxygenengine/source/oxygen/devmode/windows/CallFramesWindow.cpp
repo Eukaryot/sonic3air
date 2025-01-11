@@ -20,7 +20,7 @@
 
 
 CallFramesWindow::CallFramesWindow() :
-	DevModeWindowBase("Call Frames", Category::SCRIPTS, 0)
+	DevModeWindowBase("Call Frames", Category::SIMULATION, 0)
 {
 }
 

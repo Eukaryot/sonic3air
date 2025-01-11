@@ -17,7 +17,7 @@
 
 
 AudioBrowserWindow::AudioBrowserWindow() :
-	DevModeWindowBase("Audio Browser", Category::ASSET_BROWSERS, ImGuiWindowFlags_AlwaysAutoResize)
+	DevModeWindowBase("Audio Browser", Category::MISC, ImGuiWindowFlags_AlwaysAutoResize)
 {
 }
 

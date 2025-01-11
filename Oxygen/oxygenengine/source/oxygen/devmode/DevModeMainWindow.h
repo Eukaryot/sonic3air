@@ -74,6 +74,7 @@ private:
 	WatchesWindow* mWatchesWindow = nullptr;
 
 	bool mShowImGuiDemo = false;
+	int mActiveTab = -1;
 };
 
 #endif
