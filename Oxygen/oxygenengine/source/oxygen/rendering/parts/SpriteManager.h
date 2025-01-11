@@ -99,7 +99,6 @@ private:
 	renderitems::CustomSpriteInfoBase* addSpriteByKey(uint64 key);
 	void checkSpriteTag(renderitems::SpriteInfo& sprite);
 
-	bool checkRenderItemLimit();
 	void processSpriteHandles();
 	void grabAddedItems();
 	void collectLegacySprites();
@@ -117,7 +116,6 @@ private:
 
 	ItemSet mContexts[RenderItem::NUM_CONTEXTS];
 	ItemSet mAddedItems;
-	bool mLoggedLimitWarning = false;
 
 	uint32 mNextSpriteHandle = 1;
 	std::vector<SpriteHandleData> mSpriteHandles;

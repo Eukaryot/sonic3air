@@ -13,7 +13,6 @@
 #include "oxygen/resources/PaletteCollection.h"
 #include "oxygen/resources/SpriteCollection.h"
 #include "oxygen/simulation/EmulatorInterface.h"
-#include "oxygen/simulation/LogDisplay.h"
 
 
 SpriteManager::SpriteManager(PatternManager& patternManager, SpacesManager& spacesManager) :
@@ -39,7 +38,6 @@ void SpriteManager::preFrameUpdate()
 {
 	mCurrentContext = RenderItem::LifetimeContext::DEFAULT;
 	mLogicalSpriteSpace = Space::SCREEN;
-	mLoggedLimitWarning = false;
 	mSpriteTag = 0;
 	mTaggedSpritesLastFrame.swap(mTaggedSpritesThisFrame);
 	mTaggedSpritesThisFrame.clear();
@@ -103,9 +101,6 @@ void SpriteManager::postRefreshDebugging()
 
 void SpriteManager::drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, const Color& tintColor, const Color& addedColor)
 {
-	if (!checkRenderItemLimit())
-		return;
-
 	renderitems::VdpSpriteInfo& sprite = mPoolOfRenderItems.mVdpSprites.createObject();
 	sprite.mPosition = position;
 	sprite.mSize.x = 1 + ((encodedSize >> 2) & 3);
@@ -221,9 +216,6 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 
 void SpriteManager::addSpriteMask(const Vec2i& position, const Vec2i& size, uint16 renderQueue, bool priorityFlag, Space space)
 {
-	if (!checkRenderItemLimit())
-		return;
-
 	renderitems::SpriteMaskInfo& sprite = mPoolOfRenderItems.mSpriteMasks.createObject();
 	sprite.mPosition = position;
 	sprite.mSize = size;
@@ -236,9 +228,6 @@ void SpriteManager::addSpriteMask(const Vec2i& position, const Vec2i& size, uint
 
 void SpriteManager::addRectangle(const Recti& rect, const Color& color, uint16 renderQueue, Space space, bool useGlobalComponentTint)
 {
-	if (!checkRenderItemLimit())
-		return;
-
 	renderitems::Rectangle& newRect = mPoolOfRenderItems.mRectangles.createObject();
 	newRect.mPosition = rect.getPos();
 	newRect.mSize = rect.getSize();
@@ -252,9 +241,6 @@ void SpriteManager::addRectangle(const Recti& rect, const Color& color, uint16 r
 
 void SpriteManager::addText(std::string_view fontKeyString, uint64 fontKeyHash, const Vec2i& position, std::string_view textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space, bool useGlobalComponentTint)
 {
-	if (!checkRenderItemLimit())
-		return;
-
 	renderitems::Text& newText = mPoolOfRenderItems.mTexts.createObject();
 	newText.mFontKeyString = fontKeyString;
 	newText.mFontKeyHash = fontKeyHash;
@@ -402,30 +388,27 @@ renderitems::CustomSpriteInfoBase* SpriteManager::addSpriteByKey(uint64 key)
 	const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
 	if (nullptr != item)
 	{
-		if (checkRenderItemLimit())
+		if (item->mUsesComponentSprite)
 		{
-			if (item->mUsesComponentSprite)
-			{
-				renderitems::ComponentSpriteInfo& sprite = mPoolOfRenderItems.mComponentSprites.createObject();
-				sprite.mKey = key;
-				sprite.mCacheItem = item;
-				sprite.mPivotOffset = item->mSprite->mOffset;
-				sprite.mSize = static_cast<ComponentSprite*>(item->mSprite)->getBitmap().getSize();
-				sprite.mLogicalSpace = mLogicalSpriteSpace;
-				mAddedItems.mItems.push_back(&sprite);
-				return &sprite;
-			}
-			else
-			{
-				renderitems::PaletteSpriteInfo& sprite = mPoolOfRenderItems.mPaletteSprites.createObject();
-				sprite.mKey = key;
-				sprite.mCacheItem = item;
-				sprite.mPivotOffset = item->mSprite->mOffset;
-				sprite.mSize = static_cast<PaletteSprite*>(sprite.mCacheItem->mSprite)->getBitmap().getSize();
-				sprite.mLogicalSpace = mLogicalSpriteSpace;
-				mAddedItems.mItems.push_back(&sprite);
-				return &sprite;
-			}
+			renderitems::ComponentSpriteInfo& sprite = mPoolOfRenderItems.mComponentSprites.createObject();
+			sprite.mKey = key;
+			sprite.mCacheItem = item;
+			sprite.mPivotOffset = item->mSprite->mOffset;
+			sprite.mSize = static_cast<ComponentSprite*>(item->mSprite)->getBitmap().getSize();
+			sprite.mLogicalSpace = mLogicalSpriteSpace;
+			mAddedItems.mItems.push_back(&sprite);
+			return &sprite;
+		}
+		else
+		{
+			renderitems::PaletteSpriteInfo& sprite = mPoolOfRenderItems.mPaletteSprites.createObject();
+			sprite.mKey = key;
+			sprite.mCacheItem = item;
+			sprite.mPivotOffset = item->mSprite->mOffset;
+			sprite.mSize = static_cast<PaletteSprite*>(sprite.mCacheItem->mSprite)->getBitmap().getSize();
+			sprite.mLogicalSpace = mLogicalSpriteSpace;
+			mAddedItems.mItems.push_back(&sprite);
+			return &sprite;
 		}
 	}
 	return nullptr;
@@ -444,27 +427,6 @@ void SpriteManager::checkSpriteTag(renderitems::SpriteInfo& sprite)
 
 		TaggedSpriteData& taggedSpriteData = mTaggedSpritesThisFrame[mSpriteTag];
 		taggedSpriteData.mPosition = mTaggedSpritePosition;
-	}
-}
-
-bool SpriteManager::checkRenderItemLimit()
-{
-	const constexpr size_t LIMIT = 2048;
-	if (mAddedItems.mItems.size() < LIMIT)
-	{
-		// Everything's okay
-		return true;
-	}
-	else
-	{
-		// Reached the limit
-		if (!mLoggedLimitWarning)
-		{
-			if (EngineMain::getDelegate().useDeveloperFeatures())
-				LogDisplay::instance().setLogDisplay("Warning: Exceeded the upper limit of " + std::to_string(LIMIT) + " items to render, further ones will be ignored");
-			mLoggedLimitWarning = true;
-		}
-		return false;
 	}
 }
 

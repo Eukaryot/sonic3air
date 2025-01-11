@@ -182,6 +182,7 @@ void OpenGLRenderer::clearGameScreen()
 
 void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 {
+	startRendering();
 	internalRefresh();
 
 	// Start the actual rendering
@@ -219,15 +220,7 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 	}
 
 	// Check if sprite masking needed
-	bool usingSpriteMask = false;
-	for (Geometry* geometry : geometries)
-	{
-		if (geometry->getType() == Geometry::Type::SPRITE && static_cast<const SpriteGeometry*>(geometry)->mSpriteInfo.getType() == RenderItem::Type::SPRITE_MASK)
-		{
-			usingSpriteMask = true;
-			break;
-		}
-	}
+	const bool usingSpriteMask = isUsingSpriteMask(geometries);
 
 	// Render geometries
 	mLastRenderedGeometryType = Geometry::Type::UNDEFINED;
@@ -236,6 +229,9 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 		uint16 lastRenderQueue = 0xffff;
 		for (size_t i = 0; i < geometries.size(); ++i)
 		{
+			if (!progressRendering())
+				break;
+
 			const uint16 renderQueue = geometries[i]->mRenderQueue;
 			if (usingSpriteMask && lastRenderQueue < 0x8000 && renderQueue >= 0x8000)
 			{

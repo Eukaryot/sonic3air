@@ -150,6 +150,7 @@ void SoftwareRenderer::clearGameScreen()
 
 void SoftwareRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 {
+	startRendering();
 	Bitmap& gameScreenBitmap = mGameScreenTexture.accessBitmap();
 
 	// Clear the screen
@@ -166,23 +167,16 @@ void SoftwareRenderer::renderGameScreen(const std::vector<Geometry*>& geometries
 	}
 
 	// Check if sprite masking needed
-	bool usingSpriteMask = false;
-	{
-		for (const Geometry* geometry : geometries)
-		{
-			if (geometry->getType() == Geometry::Type::SPRITE && geometry->as<SpriteGeometry>().mSpriteInfo.getType() == RenderItem::Type::SPRITE_MASK)
-			{
-				usingSpriteMask = true;
-				break;
-			}
-		}
-	}
+	const bool usingSpriteMask = isUsingSpriteMask(geometries);
 
 	// Render geometries
 	{
 		uint16 lastRenderQueue = 0xffff;
 		for (size_t i = 0; i < geometries.size(); ++i)
 		{
+			if (!progressRendering())
+				break;
+
 			const uint16 renderQueue = geometries[i]->mRenderQueue;
 			if (usingSpriteMask && lastRenderQueue < 0x8000 && renderQueue >= 0x8000)
 			{
