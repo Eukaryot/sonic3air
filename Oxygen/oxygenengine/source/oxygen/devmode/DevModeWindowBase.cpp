@@ -48,4 +48,9 @@ bool DevModeWindowBase::buildWindow()
 	return true;
 }
 
+float DevModeWindowBase::getUIScale() const
+{
+	return Configuration::instance().mDevMode.mUIScale;
+}
+
 #endif

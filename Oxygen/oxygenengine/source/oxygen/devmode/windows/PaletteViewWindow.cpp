@@ -24,7 +24,7 @@ PaletteViewWindow::PaletteViewWindow() :
 
 void PaletteViewWindow::buildContent()
 {
-	ImGui::SetWindowPos(ImVec2(350.0f, 10.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowPos(ImVec2(5.0f, 180.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowSize(ImVec2(500.0f, 250.0f), ImGuiCond_FirstUseEver);
 
 	const PaletteManager& paletteManager = RenderParts::instance().getPaletteManager();
@@ -66,7 +66,7 @@ void PaletteViewWindow::buildContent()
 
 void PaletteViewWindow::drawPalette(const PaletteBase& palette)
 {
-	const float uiScale = ImGui::GetIO().FontGlobalScale;
+	const float uiScale = getUIScale();
 	const ImVec2 colorEntrySize(roundToFloat(14.0f * uiScale), roundToFloat(14.0f * uiScale));
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(roundToFloat(2.0f * uiScale), roundToFloat(2.0f * uiScale)));

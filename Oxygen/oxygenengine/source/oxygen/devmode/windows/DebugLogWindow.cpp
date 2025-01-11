@@ -27,10 +27,10 @@ DebugLogWindow::DebugLogWindow() :
 
 void DebugLogWindow::buildContent()
 {
-	ImGui::SetWindowPos(ImVec2(50.0f, 240.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowPos(ImVec2(350.0f, 240.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowSize(ImVec2(500.0f, 200.0f), ImGuiCond_FirstUseEver);
 
-	const float uiScale = ImGui::GetIO().FontGlobalScale;
+	const float uiScale = getUIScale();
 
 	CodeExec& codeExec = Application::instance().getSimulation().getCodeExec();
 	DebugTracking& debugTracking = codeExec.getDebugTracking();

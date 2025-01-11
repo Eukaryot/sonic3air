@@ -23,21 +23,22 @@ GameSimWindow::GameSimWindow() :
 
 void GameSimWindow::buildContent()
 {
-	ImGui::SetWindowPos(ImVec2(250.0f, 10.0f), ImGuiCond_FirstUseEver);
-	//ImGui::SetWindowSize(ImVec2(400.0f, 150.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowPos(ImVec2(300.0f, 5.0f), ImGuiCond_FirstUseEver);
+
+	const float uiScale = getUIScale();
 
 	Simulation& simulation = Application::instance().getSimulation();
 
 	if (simulation.getSpeed() == 0.0f)
 	{
-		if (ImGui::Button("Play", ImVec2(50, 0)))
+		if (ImGui::Button("Play", ImVec2(50 * uiScale, 0)))
 		{
 			simulation.setSpeed(1.0f);
 		}
 	}
 	else
 	{
-		if (ImGui::Button("Pause", ImVec2(50, 0)))
+		if (ImGui::Button("Pause", ImVec2(50 * uiScale, 0)))
 		{
 			simulation.setSpeed(0.0f);
 		}

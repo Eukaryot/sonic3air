@@ -31,6 +31,8 @@ public:
 
 	static void refreshImGuiStyle();
 
+	static void updateFontScale();
+
 	static void toggleMainWindow();
 
 private:

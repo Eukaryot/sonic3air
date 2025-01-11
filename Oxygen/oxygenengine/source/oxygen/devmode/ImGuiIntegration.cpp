@@ -21,7 +21,8 @@
 namespace
 {
 	DevModeMainWindow* mDevModeMainWindow = nullptr;
-	ImFont* mDefaultFont = nullptr;
+	ImFont* mDefaultFontx1 = nullptr;
+	ImFont* mDefaultFontx2 = nullptr;
 	std::wstring mIniFilePath;
 
 	bool loadFont(const char* filename, float size, ImFont*& outFont)
@@ -90,12 +91,13 @@ void ImGuiIntegration::startup()
 		}
 	}
 
-	ImGui::GetIO().FontGlobalScale = Configuration::instance().mDevMode.mUIScale;
+	updateFontScale();
 
 	mRunning = true;
 
 	// Configure default styles
-	loadFont("data/font/ttf/DroidSans.ttf", 15.0f, mDefaultFont);
+	loadFont("data/font/ttf/DroidSans.ttf", 15.0f, mDefaultFontx1);
+	loadFont("data/font/ttf/DroidSans.ttf", 30.0f, mDefaultFontx2);
 	refreshImGuiStyle();
 
 	mDevModeMainWindow = new DevModeMainWindow();
@@ -149,7 +151,8 @@ void ImGuiIntegration::showDebugWindow()
 	IM_ASSERT(ImGui::GetCurrentContext() != nullptr && "Missing Dear ImGui context. Refer to examples app!");
 	IMGUI_CHECKVERSION();
 
-	ImGui::PushFont(mDefaultFont);
+	ImFont* font = (Configuration::instance().mDevMode.mUIScale <= 1.0f) ? mDefaultFontx1 : mDefaultFontx2;
+	ImGui::PushFont(font);
 	mDevModeMainWindow->buildWindow();
 	ImGui::PopFont();
 }
@@ -249,6 +252,13 @@ void ImGuiIntegration::refreshImGuiStyle()
 	style.Colors[ImGuiCol_TabHovered]			= GetAccentColorMix(0.8f, 0.9f, 0.4f);
 	style.Colors[ImGuiCol_TabSelected]			= GetAccentColorMix(1.0f, 0.9f, 0.5f);
 	style.Colors[ImGuiCol_TabSelectedOverline]	= GetAccentColorMix(1.0f, 0.9f, 0.5f);
+}
+
+void ImGuiIntegration::updateFontScale()
+{
+	const float uiScale = Configuration::instance().mDevMode.mUIScale;
+	const float fontSize = (uiScale <= 1.0f) ? 1.0f : 2.0f;
+	ImGui::GetIO().FontGlobalScale = uiScale / fontSize;
 }
 
 void ImGuiIntegration::toggleMainWindow()

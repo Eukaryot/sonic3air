@@ -37,6 +37,8 @@ public:
 	virtual bool buildWindow();
 	virtual void buildContent() = 0;
 
+	float getUIScale() const;
+
 protected:
 	const std::string mTitle;
 	const Category mCategory = Category::MISC;

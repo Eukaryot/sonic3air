@@ -117,7 +117,7 @@ void SettingsWindow::buildContent()
 
 	if (ImGui::DragFloat("UI Scale", &config.mDevMode.mUIScale, 0.003f, 0.5f, 4.0f, "%.1f"))
 	{
-		ImGui::GetIO().FontGlobalScale = config.mDevMode.mUIScale;;
+		ImGuiIntegration::updateFontScale();
 	}
 
 	// External file editor settings

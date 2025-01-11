@@ -25,7 +25,7 @@ NetworkingWindow::NetworkingWindow() :
 
 void NetworkingWindow::buildContent()
 {
-	ImGui::SetWindowPos(ImVec2(250.0f, 10.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowPos(ImVec2(5.0f, 150.0f), ImGuiCond_FirstUseEver);
 
 	// Engine server
 	{

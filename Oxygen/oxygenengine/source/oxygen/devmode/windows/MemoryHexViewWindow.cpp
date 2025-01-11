@@ -26,10 +26,10 @@ MemoryHexViewWindow::MemoryHexViewWindow() :
 
 void MemoryHexViewWindow::buildContent()
 {
-	ImGui::SetWindowPos(ImVec2(50.0f, 450.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowPos(ImVec2(500.0f, 500.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowSize(ImVec2(520.0f, 270.0f), ImGuiCond_FirstUseEver);
 
-	const float uiScale = ImGui::GetIO().FontGlobalScale;
+	const float uiScale = getUIScale();
 
 	CodeExec& codeExec = Application::instance().getSimulation().getCodeExec();
 	EmulatorInterface& emulatorInterface = codeExec.getEmulatorInterface();

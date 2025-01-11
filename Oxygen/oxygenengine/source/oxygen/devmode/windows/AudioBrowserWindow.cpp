@@ -26,7 +26,7 @@ void AudioBrowserWindow::buildContent()
 	ImGui::SetWindowPos(ImVec2(350.0f, 10.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowSize(ImVec2(500.0f, 250.0f), ImGuiCond_FirstUseEver);
 
-	const float uiScale = ImGui::GetIO().FontGlobalScale;
+	const float uiScale = getUIScale();
 
 	AudioOutBase& audioOut = EngineMain::instance().getAudioOut();
 	AudioCollection& audioCollection = AudioCollection::instance();

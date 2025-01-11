@@ -26,10 +26,10 @@ GameVisualizationsWindow::GameVisualizationsWindow() :
 
 void GameVisualizationsWindow::buildContent()
 {
-	ImGui::SetWindowPos(ImVec2(250.0f, 10.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowPos(ImVec2(600.0f, 5.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowSize(ImVec2(400.0f, 150.0f), ImGuiCond_FirstUseEver);
 
-	const float uiScale = ImGui::GetIO().FontGlobalScale;
+	const float uiScale = getUIScale();
 	GameView& gameView = Application::instance().getGameView();
 	VideoOut& videoOut = VideoOut::instance();
 

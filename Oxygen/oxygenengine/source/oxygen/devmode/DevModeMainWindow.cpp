@@ -109,7 +109,7 @@ void DevModeMainWindow::buildContent()
 	ImGui::SetWindowSize(ImVec2(150.0f, 200.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowCollapsed(true, ImGuiCond_FirstUseEver);
 
-	const float uiScale = ImGui::GetIO().FontGlobalScale;
+	const float uiScale = getUIScale();
 
 	int& configActiveTab = Configuration::instance().mDevMode.mActiveMainWindowTab;
 	const bool firstRun = (mActiveTab == -1);

@@ -29,10 +29,10 @@ ScriptBuildWindow::ScriptBuildWindow() :
 
 void ScriptBuildWindow::buildContent()
 {
-	ImGui::SetWindowPos(ImVec2(350.0f, 10.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowPos(ImVec2(5.0f, 450.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowSize(ImVec2(500.0f, 250.0f), ImGuiCond_FirstUseEver);
 
-	const float uiScale = ImGui::GetIO().FontGlobalScale;
+	const float uiScale = getUIScale();
 
 	Simulation& simulation = Application::instance().getSimulation();
 	const LemonScriptProgram& program = simulation.getCodeExec().getLemonScriptProgram();

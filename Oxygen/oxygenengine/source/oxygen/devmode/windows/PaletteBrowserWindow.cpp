@@ -22,10 +22,10 @@ PaletteBrowserWindow::PaletteBrowserWindow() :
 
 void PaletteBrowserWindow::buildContent()
 {
-	ImGui::SetWindowPos(ImVec2(350.0f, 10.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetWindowPos(ImVec2(5.0f, 500.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowSize(ImVec2(500.0f, 250.0f), ImGuiCond_FirstUseEver);
 
-	const float uiScale = ImGui::GetIO().FontGlobalScale;
+	const float uiScale = getUIScale();
 
 	// Refresh list if needed
 	const PaletteCollection& paletteCollection = PaletteCollection::instance();
