@@ -34,11 +34,13 @@ public:
 	void destroyRenderer();
 	void setActiveRenderer(bool useOpenGLRenderer, bool reset);
 
-	inline uint32 getScreenWidth() const   { return mGameResolution.x; }
-	inline uint32 getScreenHeight() const  { return mGameResolution.y; }
-	inline Vec2i getScreenSize() const	   { return Vec2i(mGameResolution.x, mGameResolution.y); }
-	inline Recti getScreenRect() const	   { return Recti(0, 0, mGameResolution.x, mGameResolution.y); }
+	inline uint32 getScreenWidth() const	{ return mGameResolution.x; }
+	inline uint32 getScreenHeight() const	{ return mGameResolution.y; }
+	inline Vec2i getScreenSize() const		{ return Vec2i(mGameResolution.x, mGameResolution.y); }
+	inline Recti getScreenRect() const		{ return Recti(0, 0, mGameResolution.x, mGameResolution.y); }
+
 	void setScreenSize(uint32 width, uint32 height);
+	inline void setScreenSize(Vec2i size)	{ setScreenSize(size.x, size.y); }
 
 	Vec2i getInterpolatedWorldSpaceOffset() const;
 

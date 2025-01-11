@@ -29,8 +29,47 @@ void GameVisualizationsWindow::buildContent()
 	ImGui::SetWindowPos(ImVec2(250.0f, 10.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowSize(ImVec2(400.0f, 150.0f), ImGuiCond_FirstUseEver);
 
+	const float uiScale = ImGui::GetIO().FontGlobalScale;
 	GameView& gameView = Application::instance().getGameView();
 	VideoOut& videoOut = VideoOut::instance();
+
+	// Game view size
+	{
+		if (!mUnappliedScreenX)
+			mScreenSizeInput.x = videoOut.getScreenSize().x;
+		if (!mUnappliedScreenY)
+			mScreenSizeInput.y = videoOut.getScreenSize().y;
+
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Game Screen Size:  ");
+		ImGui::SameLine();
+
+		ImGui::PushItemWidth(40 * uiScale);
+		if (ImGui::InputInt("##x", &mScreenSizeInput.x, 0, 0, 0))
+		{
+			mUnappliedScreenX = true;
+		}
+		ImGui::SameLine();
+		ImGui::Text("x");
+		ImGui::SameLine();
+		if (ImGui::InputInt("##y", &mScreenSizeInput.y, 0, 0, 0))
+		{
+			mUnappliedScreenY = true;
+		}
+		ImGui::SameLine();
+		ImGui::Text("pixels ");
+		ImGui::PopItemWidth();
+
+		ImGui::SameLine();
+		if (ImGui::Button("Apply"))
+		{
+			mScreenSizeInput.x = clamp(mScreenSizeInput.x, 128, 1024);
+			mScreenSizeInput.y = clamp(mScreenSizeInput.y, 128, 1024);
+			videoOut.setScreenSize(mScreenSizeInput);
+			mUnappliedScreenX = false;
+			mUnappliedScreenY = false;
+		}
+	}
 
 	// Layer rendering
 	{
