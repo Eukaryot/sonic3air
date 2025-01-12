@@ -487,9 +487,22 @@ namespace
 				{
 					debugLogIntSigned(param.mValue.get<int64>());
 				}
-				else
+				else if (param.mType == &lemon::PredefinedDataTypes::UINT_64)
 				{
 					debugLogIntUnsigned(param.mValue.get<uint64>());
+				}
+				else
+				{
+					// Display depending on which is the smallest data type that can hold the data
+					const uint64 value = param.mValue.get<uint64>();
+					if (value == (uint8)value || (int64)value == (int8)value)
+						debugLogIntUnsigned((uint8)value);
+					else if (value == (uint16)value || (int64)value == (int16)value)
+						debugLogIntUnsigned((uint16)value);
+					else if (value == (uint32)value || (int64)value == (int32)value)
+						debugLogIntUnsigned((uint32)value);
+					else
+						debugLogIntUnsigned(value);
 				}
 				break;
 			}
