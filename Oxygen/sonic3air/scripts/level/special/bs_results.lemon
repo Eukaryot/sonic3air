@@ -870,7 +870,7 @@ function void fn02ebe8()
 
 
 
-// Super Emerald activation after Blue Spheres
+// Stage result HUD sprites while animated / flying away
 
 //# address-hook(0x02ec1e) end(0x02ec44)
 function void fn02ec1e()
@@ -893,6 +893,9 @@ function void fn02ec1e()
 	DrawObject()
 }
 
+
+
+// Super Emerald activation after Blue Spheres
 
 //# address-hook(0x02ec4a) end(0x02ec78)
 function void fn02ec4a()

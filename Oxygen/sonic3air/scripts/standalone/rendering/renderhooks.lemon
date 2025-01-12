@@ -731,7 +731,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 	if (gameMode == 0x48 || gameMode == 0x0c)	// Blue Spheres results + fade to main game afterwards
 	{
 		// Blue Spheres results texts
-		if (objA0.update_address == 0x02ea50)
+		if (objA0.update_address == 0x02ea50 || objA0.update_address == 0x02ec1e)
 		{
 			bool isSKStage = (global.lock_on_state == 0 && global.sk_bluespheres)
 			if (objA0.animation.sprite == 0x17 || objA0.animation.sprite == 0x31 || objA0.animation.sprite == 0x36)
@@ -785,6 +785,10 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// Continue icon
 		if (objA0.update_address == 0x02ebe8 && objA0.animation.sprite >= 0x29 && objA0.animation.sprite <= 0x2b)
 		{
+			// Enforce priority flag in special stage results screen for Super Emeralds, as it's supposed to be set, but is not part of "objA0.sprite_attributes"
+			if (global.game_mode == 0x48 && global.traded_emeralds)
+				prioFlag = true
+
 			string key = getCharacterContinueIcon(getMainCharacter())
 			Renderer.drawCustomSprite(key, px, py, 0x00, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
 			return true
