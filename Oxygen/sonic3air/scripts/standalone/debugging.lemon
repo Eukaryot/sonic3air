@@ -102,7 +102,7 @@ function void OxygenCallback.setupCustomSidePanelEntries()
 function void setupCharactersSidePanelEntry()
 {
 	// Characters panel
-	if (System.SidePanel.setupCustomCategory("C", "CHARACTERS"))
+	if (System.SidePanel.setupCustomCategory("C", "Characters"))
 	{
 		bool showCharacter1 = System.SidePanel.addOption("Show first character", true)
 		bool showCharacter2 = System.SidePanel.addOption("Show second character", false)
@@ -142,7 +142,7 @@ function void setupCharactersSidePanelEntry()
 function void setupGameObjectsSidePanelEntry()
 {
 	// Game Objects panel
-	if (System.SidePanel.setupCustomCategory("O", "GAME OBJECTS"))
+	if (System.SidePanel.setupCustomCategory("O", "Game Objects"))
 	{
 		bool showEmptySlots    = System.SidePanel.addOption("Show empty object slots", true)
 		bool showUpdateRoutine = System.SidePanel.addOption("Show update routine", true)

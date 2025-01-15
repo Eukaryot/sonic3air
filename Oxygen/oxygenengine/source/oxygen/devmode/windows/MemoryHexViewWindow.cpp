@@ -78,7 +78,7 @@ void MemoryHexViewWindow::buildContent()
 		const ImVec4 cellColorTitle     = ImGuiHelpers::COLOR_GRAY80;
 		const uint32 cellBGColorTitle   = ImGui::GetColorU32(ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
 		const uint32 cellBGColorNormal  = ImGui::GetColorU32(ImVec4(0.0f, 0.0f, 0.0f, 0.5f));
-		const uint32 cellBGColorHovered = ImGui::GetColorU32(ImVec4(0.5f, 0.5f, 0.0f, 0.6f) );
+		const uint32 cellBGColorHovered = ImGui::GetColorU32(ImVec4(0.5f, 0.5f, 0.0f, 0.6f));
 
 		ImGui::TableSetupColumn("Address", ImGuiTableColumnFlags_WidthFixed, 70.0f * uiScale);
 		for (int column = 1; column <= 16; ++column)

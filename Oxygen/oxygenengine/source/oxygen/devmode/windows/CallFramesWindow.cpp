@@ -103,6 +103,32 @@ void CallFramesWindow::buildContent()
 		ImGui::Checkbox("Show profiling samples", &mShowProfilingSamples);
 	#endif
 		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing();
+
+		const std::vector<uint32>& unknownAddresses = codeExec.getUnknownAddresses();
+		if (!unknownAddresses.empty())
+		{
+			if (ImGui::CollapsingHeader("Unknown called addresses"))
+			{
+				ImGuiHelpers::ScopedIndent si;
+				for (uint32 address : unknownAddresses)
+				{
+					ImGui::Bullet();
+					ImGui::SameLine();
+					ImGui::TextColored(ImGuiHelpers::COLOR_RED, *String(0, "0x%06x", address));
+					ImGui::SameLine();
+					ImGui::PushID(address);
+					if (ImGui::SmallButton("Copy"))
+					{
+						SDL_SetClipboardText(*String(0, "0x%06x", address));
+					}
+					ImGui::PopID();
+				}
+				ImGui::Separator();
+			}
+			ImGui::Spacing();
+		}
 		ImGui::Spacing();
 
 		// Help marker
@@ -144,7 +170,7 @@ void CallFramesWindow::buildContent()
 
 		// Display (arrow) buttons without frame and default background
 		ImGui::PushStyleColor(ImGuiCol_Button, ImGuiHelpers::COLOR_TRANSPARENT);
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8.0f, 3.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8.0f, 2.0f));
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
 		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
 

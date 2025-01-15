@@ -60,7 +60,7 @@ public:
 	virtual void update(float timeElapsed) override;
 	virtual void render() override;
 
-	DebugSidePanelCategory& createGameCategory(size_t identifier, const std::string& header, char shortCharacter, const std::function<void(DebugSidePanelCategory&,Builder&,uint64)>& callback);
+	inline const std::vector<CustomDebugSidePanelCategory*>& getCustomCategories() const  { return mCustomCategories; }
 
 	bool setupCustomCategory(std::string_view header, char shortCharacter);
 	bool addOption(std::string_view text, bool defaultValue);
@@ -75,7 +75,8 @@ private:
 private:
 	Font mSmallFont;
 
-	std::vector<DebugSidePanelCategory*> mCategories;
+	std::vector<DebugSidePanelCategory*> mCategories;			// All categories, including teh custom ones
+	std::vector<CustomDebugSidePanelCategory*> mCustomCategories;
 	size_t mActiveCategoryIndex = 0;
 
 	CustomDebugSidePanelCategory* mSetupCustomCategory = nullptr;

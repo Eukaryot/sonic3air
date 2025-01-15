@@ -14,6 +14,7 @@
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/devmode/windows/AudioBrowserWindow.h"
 #include "oxygen/devmode/windows/CallFramesWindow.h"
+#include "oxygen/devmode/windows/CustomSidePanelWindow.h"
 #include "oxygen/devmode/windows/DebugLogWindow.h"
 #include "oxygen/devmode/windows/GameSimWindow.h"
 #include "oxygen/devmode/windows/GameVisualizationsWindow.h"
@@ -52,6 +53,7 @@ DevModeMainWindow::DevModeMainWindow() :
 		createWindow(mPaletteBrowserWindow);
 
 		createWindow(mAudioBrowserWindow);
+		createWindow(mCustomSidePanelWindow);
 		createWindow(mSettingsWindow);
 	#ifdef DEBUG
 		createWindow(mNetworkingWindow);
@@ -132,7 +134,7 @@ void DevModeMainWindow::buildContent()
 			windows.clear();
 			for (DevModeWindowBase* window : mAllWindows)
 			{
-				if (window->mCategory == (DevModeWindowBase::Category)categoryIndex)
+				if (window->mCategory == (DevModeWindowBase::Category)categoryIndex && window->shouldBeAvailable())
 				{
 					windows.push_back(window);
 				}
