@@ -598,15 +598,17 @@ namespace lemon
 
 						if (result.handleExternalJump(targetAddress))
 						{
-							// Restart the outer loop now that the running function has changed
-							stayInsideInnerLoop = false;
-							break;
+							// Check stop conditions
+							if (mSelectedControlFlow->mCallStack.count > minimumCallStackSize && result.mStepsExecuted < stepsLimit)
+							{
+								// Restart the outer loop now that the running function has changed
+								stayInsideInnerLoop = false;
+								break;
+							}
 						}
-						else
-						{
-							mActiveControlFlow = nullptr;
-							return;
-						}
+
+						mActiveControlFlow = nullptr;
+						return;
 					}
 
 					default:

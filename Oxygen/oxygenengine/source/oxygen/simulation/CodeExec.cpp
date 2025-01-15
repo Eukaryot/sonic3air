@@ -119,9 +119,7 @@ struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
 	bool handleExternalCall(uint64 address) override
 	{
 		// Check for address hook at the target address
-		//  -> If it fails, we will just continue after the call
-		mCodeExec.tryCallAddressHook((uint32)address);
-		return true;
+		return mCodeExec.tryCallAddressHookDev((uint32)address);
 	}
 
 	bool handleExternalJump(uint64 address) override
@@ -161,9 +159,7 @@ struct RuntimeExecuteConnectorDev : public RuntimeExecuteConnector
 	bool handleExternalCall(uint64 address) override
 	{
 		// Check for address hook at the target address
-		//  -> If it fails, we will just continue after the call
-		mCodeExec.tryCallAddressHookDev((uint32)address);
-		return true;
+		return mCodeExec.tryCallAddressHookDev((uint32)address);
 	}
 
 	bool handleExternalJump(uint64 address) override
@@ -188,7 +184,7 @@ CodeExec::CallFrame& CodeExec::CallFrameTracking::pushCallFrame(CallFrame::Type 
 
 CodeExec::CallFrame& CodeExec::CallFrameTracking::pushCallFrameFailed(CallFrame::Type type)
 {
-	const int parentIndex = mCallFrames.empty() ? -1 : (int)mCallStack.back();
+	const int parentIndex = mCallStack.empty() ? -1 : (int)mCallStack.back();
 	CallFrame& callFrame = (mCallFrames.size() == CALL_FRAMES_LIMIT) ? mCallFrames.back() : vectorAdd(mCallFrames);
 	callFrame.mType = type;
 	callFrame.mParentIndex = parentIndex;
