@@ -38,6 +38,9 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS_DEBUG "-g2")		# Include debug information
 	set(CMAKE_CXX_FLAGS_RELEASE "-g0")		# Leave out debug information
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3")		# Full optimization
+
+	add_compile_options(-Wno-unused-function)	# Silence a warning in SDL2 build (unused function "xinput2_remove_device_info")
+	add_compile_options(-Wno-stringop-overflow)	# Silence a warning in rmxbase String class usage
 	add_compile_options(-Wno-psabi)
 
 	# Needed under Linux to avoid link error from minizip: "relocation r_x86_64_pc32 against symbol `_length_code' can not be used when making a shared object; recompile with -fpic"
@@ -111,6 +114,10 @@ file(GLOB MINIZIP_SOURCES ${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/
 add_library(minizip ${MINIZIP_SOURCES})
 
 target_link_libraries(minizip zlibstatic)
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	target_compile_options(minizip PRIVATE -Wno-implicit-function-declaration -Wno-int-conversion)	# Silence these warnings in minizip build
+endif()
 
 
 
