@@ -50,8 +50,6 @@ public:
 	virtual void shutdown();
 	virtual void reset() = 0;
 	virtual void resetGame() = 0;
-
-	virtual void update(float secondsPassed) = 0;
 	virtual void realtimeUpdate(float secondsPassed);
 
 	AudioCollection& getAudioCollection()  { return mAudioCollection; }

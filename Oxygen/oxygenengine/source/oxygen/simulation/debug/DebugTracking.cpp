@@ -146,7 +146,7 @@ void DebugTracking::addColorLogEntry(std::string_view name, uint32 startAddress,
 	}
 	addColorLogEntry(entry);
 
-	Application::instance().getSimulation().stopSingleStepContinue();
+	Application::instance().getSimulation().sendBreakSignal(Simulation::BreakCondition::DEBUG_LOG);
 }
 
 bool DebugTracking::hasWatch(uint32 address, uint16 bytes) const
@@ -331,7 +331,7 @@ void DebugTracking::onScriptLog(std::string_view key, std::string_view value)
 	mLemonScriptRuntime.getCurrentExecutionLocation(scriptLogSingleEntry.mLocation.mFunction, pc);
 	scriptLogSingleEntry.mLocation.mProgramCounter = pc;
 
-	Application::instance().getSimulation().stopSingleStepContinue();
+	Application::instance().getSimulation().sendBreakSignal(Simulation::BreakCondition::DEBUG_LOG);
 }
 
 void DebugTracking::onWatchTriggered(size_t watchIndex, uint32 address, uint16 bytes)
@@ -360,7 +360,7 @@ void DebugTracking::onWatchTriggered(size_t watchIndex, uint32 address, uint16 b
 	}
 	watch.mLastHitLocation = location;
 
-	Application::instance().getSimulation().stopSingleStepContinue();
+	Application::instance().getSimulation().sendBreakSignal(Simulation::BreakCondition::WATCH_HIT);
 }
 
 void DebugTracking::onVRAMWrite(uint16 address, uint16 bytes)

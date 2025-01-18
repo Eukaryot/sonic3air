@@ -13,7 +13,5 @@ public:
 	void shutdown() override;
 	void reset() override;
 	void resetGame() override;
-
-	void update(float secondsPassed) override;
 	void realtimeUpdate(float secondsPassed) override;
 };

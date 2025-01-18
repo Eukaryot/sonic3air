@@ -69,11 +69,6 @@ void AudioOut::resetGame()
 	mAudioPlayer.resetAudioModifiers();
 }
 
-void AudioOut::update(float secondsPassed)
-{
-	// This is an update once per frame -- currently not used
-}
-
 void AudioOut::realtimeUpdate(float secondsPassed)
 {
 	// Sync volumes

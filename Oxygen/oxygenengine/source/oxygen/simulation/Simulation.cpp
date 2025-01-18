@@ -182,8 +182,8 @@ void Simulation::resetIntoGame(const std::vector<std::pair<std::string, std::str
 
 	mFrameNumber = 0;
 	mCurrentTargetFrame = 0.0;
-	mNextSingleStep = false;
-	mSingleStepContinue = false;
+	mStepsLimit = -1;
+	mBreakConditions.clearAll();
 	mGameRecorder.clear();
 }
 
@@ -222,8 +222,8 @@ bool Simulation::loadState(const std::wstring& filename, bool showError)
 
 	mFrameNumber = 0;
 	mCurrentTargetFrame = 0.0;
-	mNextSingleStep = false;
-	mSingleStepContinue = false;
+	mStepsLimit = -1;
+	mBreakConditions.clearAll();
 
 	mGameRecorder.clear();
 	return true;
@@ -280,22 +280,21 @@ void Simulation::update(float timeElapsed)
 
 	// Do nothing as long as not enough time has passed
 	const double oldTargetFrame = mCurrentTargetFrame;
-	if (mSimulationSpeed <= 0.0f)
+	if (mStepsLimit < 0)
 	{
-		if (mNextSingleStep)
+		if (mSimulationSpeed > 0.0f)
 		{
-			mCurrentTargetFrame = roundToDouble(mCurrentTargetFrame + 1.0);
-			mNextSingleStep = mSingleStepContinue;
+			const float step = timeElapsed * mSimulationSpeed;
+			mCurrentTargetFrame += (double)step * (double)getSimulationFrequency();
 		}
 		else
 		{
 			mCurrentTargetFrame = roundToDouble(mCurrentTargetFrame);
 		}
 	}
-	else
+	else if (mStepsLimit > 0)
 	{
-		const float step = timeElapsed * mSimulationSpeed;
-		mCurrentTargetFrame += (double)step * (double)getSimulationFrequency();
+		mCurrentTargetFrame = roundToDouble(mCurrentTargetFrame + 1.0);
 	}
 
 	const bool useFrameInterpolation = (Configuration::instance().mFrameSync == Configuration::FrameSyncType::FRAME_INTERPOLATION);
@@ -415,23 +414,21 @@ bool Simulation::generateFrame()
 				}
 			}
 
-			controlsIn.injectInput(0, result.mInput->mInputs[0]);
-			controlsIn.injectInput(1, result.mInput->mInputs[1]);
+			controlsIn.injectInputs(result.mInput->mInputs);
+		}
+
+		// Input recorder playback
+		if (EngineMain::getDelegate().useDeveloperFeatures())
+		{
+			if (mInputRecorder.isPlaying())
+			{
+				const InputRecorder::InputState& inputState = mInputRecorder.updatePlayback(mFrameNumber);
+				controlsIn.injectInputs(inputState.mInputFlags);
+			}
 		}
 
 		// Update input state
 		{
-			if (EngineMain::getDelegate().useDeveloperFeatures())
-			{
-				// Input recorder playback
-				if (mInputRecorder.isPlaying())
-				{
-					const InputRecorder::InputState& inputState = mInputRecorder.updatePlayback(mFrameNumber);
-					controlsIn.injectInput(0, inputState.mInputFlags[0]);
-					controlsIn.injectInput(1, inputState.mInputFlags[1]);
-				}
-			}
-
 			controlsIn.endInputUpdate();
 
 			EngineMain::getDelegate().onControlsUpdate();
@@ -455,17 +452,14 @@ bool Simulation::generateFrame()
 		// Tell video that we begin a new frame
 		VideoOut::instance().postFrameUpdate();
 
-		// Update audio
-		EngineMain::instance().getAudioOut().update(tickLength);
-
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
 			// Update input recording
 			if (mInputRecorder.isRecording())
 			{
 				InputRecorder::InputState inputState;
-				inputState.mInputFlags[0] = controlsIn.getInputPad(0);
-				inputState.mInputFlags[1] = controlsIn.getInputPad(1);
+				controlsIn.writeCurrentState(inputState.mInputFlags);
+
 				mInputRecorder.updateRecording(inputState);
 			}
 		}
@@ -476,8 +470,7 @@ bool Simulation::generateFrame()
 			if (!mGameRecorder.hasFrameNumber(mFrameNumber + 1))
 			{
 				GameRecorder::InputData inputData;
-				inputData.mInputs[0] = controlsIn.getInputPad(0);
-				inputData.mInputs[1] = controlsIn.getInputPad(1);
+				controlsIn.writeCurrentState(inputData.mInputs);
 
 				// Keyframe every 3 seconds - except when dev mode is active, because rewinding requires more frequent keyframes
 				const int keyframeFrequency = EngineMain::getDelegate().useDeveloperFeatures() ? 10 : 180;
@@ -500,13 +493,16 @@ bool Simulation::generateFrame()
 			if (((mFrameNumber + 1) % keyframeFrequency) == 0 && !mGameRecorder.isKeyframe(mFrameNumber + 1))
 			{
 				GameRecorder::InputData inputData;
-				inputData.mInputs[0] = controlsIn.getInputPad(0);
-				inputData.mInputs[1] = controlsIn.getInputPad(1);
+				controlsIn.writeCurrentState(inputData.mInputs);
+
 				recordKeyFrame(mFrameNumber + 1, *this, mGameRecorder, inputData);
 			}
 		}
 
 		++mFrameNumber;
+
+		if (mStepsLimit > 0)
+			--mStepsLimit;
 	}
 
 	// Return false if frame got interrupted
@@ -547,8 +543,7 @@ bool Simulation::jumpToFrame(uint32 frameNumber, bool clearRecordingAfterwards)
 		if (success)
 		{
 			// Inject inputs for this frame, so that previous input will be set correctly in the next frame
-			ControlsIn::instance().injectInput(0, result.mInput->mInputs[0]);
-			ControlsIn::instance().injectInput(1, result.mInput->mInputs[1]);
+			ControlsIn::instance().injectInputs(result.mInput->mInputs);
 
 			mCodeExec.reinitRuntime(nullptr, (stateType == SaveStateSerializer::StateType::GENSX) ? CodeExec::CallStackInitPolicy::READ_FROM_ASM : CodeExec::CallStackInitPolicy::USE_EXISTING);
 			mFrameNumber = keyframeNumber;
@@ -574,23 +569,30 @@ float Simulation::getSimulationFrequency() const
 void Simulation::setSpeed(float emulatorSpeed)
 {
 	mSimulationSpeed = emulatorSpeed;
-	mNextSingleStep = false;
-	mSingleStepContinue = false;
+	mStepsLimit = -1;
+	mBreakConditions.clearAll();
 }
 
-void Simulation::setNextSingleStep(bool singleStep, bool continueToDebugEvent)
+void Simulation::setNextSingleStep()
 {
-	mSimulationSpeed = 0.0f;
-	mNextSingleStep = singleStep;
-	mSingleStepContinue = continueToDebugEvent;
+	mStepsLimit = 1;
 }
 
-void Simulation::stopSingleStepContinue()
+void Simulation::removeStepsLimit()
 {
-	if (mSingleStepContinue)
+	mStepsLimit = -1;
+}
+
+void Simulation::setBreakCondition(BreakCondition breakCondition, bool enable)
+{
+	mBreakConditions.set(breakCondition, enable);
+}
+
+void Simulation::sendBreakSignal(BreakCondition breakCondition)
+{
+	if (mBreakConditions.isSet(breakCondition))
 	{
-		mNextSingleStep = false;
-		mSingleStepContinue = false;
+		mStepsLimit = 0;
 	}
 }
 

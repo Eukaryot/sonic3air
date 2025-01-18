@@ -20,6 +20,13 @@ class SimulationState;
 class Simulation
 {
 public:
+	enum class BreakCondition
+	{
+		DEBUG_LOG	= 0x01,
+		WATCH_HIT	= 0x02,
+	};
+
+public:
 	Simulation();
 	~Simulation();
 
@@ -62,8 +69,14 @@ public:
 	void setSpeed(float emulatorSpeed);
 	inline float getDefaultSpeed() const  { return mDefaultSimulationSpeed; }
 	inline void setDefaultSpeed(float defaultSpeed)  { mDefaultSimulationSpeed = defaultSpeed; }
-	void setNextSingleStep(bool singleStep, bool continueToDebugEvent = false);
-	void stopSingleStepContinue();
+
+	inline bool hasStepsLimit() const  { return mStepsLimit >= 0; }
+	void setNextSingleStep();
+	void removeStepsLimit();
+
+	inline bool hasBreakCondition(BreakCondition breakCondition) const  { return mBreakConditions.isSet(breakCondition); }
+	void setBreakCondition(BreakCondition breakCondition, bool enable);
+	void sendBreakSignal(BreakCondition breakCondition);
 
 	void refreshDebugging();
 
@@ -80,8 +93,8 @@ private:
 	float	mSimulationFrequencyOverride = 0.0f;
 	float	mSimulationSpeed = 1.0f;
 	float	mDefaultSimulationSpeed = 1.0f;
-	bool	mNextSingleStep = false;
-	bool	mSingleStepContinue = false;
+	int		mStepsLimit = -1;
+	BitFlagSet<BreakCondition> mBreakConditions;
 
 	double	mCurrentTargetFrame = 0.0f;
 	uint32	mFrameNumber = 0;

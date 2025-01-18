@@ -94,27 +94,7 @@ void InputRecorder::updateRecording(const InputState& inputState)
 bool InputRecorder::loadRecording(const std::vector<uint8>& buffer)
 {
 	VectorBinarySerializer serializer(true, buffer);
-
-	// Version
-	uint32 version;
-	serializer & version;
-
-	const uint32 numberOfFrames = serializer.read<uint32>();
-	mFrames.resize(numberOfFrames);
-
-	for (uint32 i = 0; i < numberOfFrames; ++i)
-	{
-		Frame& frame = mFrames[i];
-
-		// Controller 1
-		serializer & frame.mInputState.mInputFlags[0];
-
-		if (version >= 3)
-		{
-			// Controller 2
-			serializer & frame.mInputState.mInputFlags[1];
-		}
-	}
+	serializeRecording(serializer);
 
 	mIsPlaying = true;
 	return true;
@@ -135,18 +115,7 @@ bool InputRecorder::loadRecording(const std::wstring& filename)
 void InputRecorder::saveRecording(std::vector<uint8>& buffer)
 {
 	VectorBinarySerializer serializer(false, buffer);
-
-	// Version
-	uint32 version = 3;
-	serializer & version;
-
-	serializer.writeAs<uint32>(mFrames.size());
-
-	for (Frame& frame : mFrames)
-	{
-		serializer & frame.mInputState.mInputFlags[0];
-		serializer & frame.mInputState.mInputFlags[1];
-	}
+	serializeRecording(serializer);
 }
 
 void InputRecorder::saveRecording(const std::wstring& filename)
@@ -158,4 +127,47 @@ void InputRecorder::saveRecording(const std::wstring& filename)
 
 	const std::wstring completeFilename = Configuration::instance().mSaveStatesDir + L"/" + filename + L".inputrec";
 	FTX::FileSystem->saveFile(completeFilename, dump);
+}
+
+void InputRecorder::serializeRecording(VectorBinarySerializer& serializer)
+{
+	// Version
+	uint32 version = 4;
+	serializer & version;
+
+	// Number of players
+	size_t numPlayers = InputManager::NUM_PLAYERS;
+	if (version >= 4)
+	{
+		serializer.serializeAs<uint8>(numPlayers);
+
+		if (serializer.isReading())
+		{
+			numPlayers = (size_t)clamp(serializer.read<uint8>(), 1, InputManager::NUM_PLAYERS);
+		}
+	}
+	else
+	{
+		numPlayers = (version >= 3) ? 2 : 1;
+	}
+
+	// Frames
+	serializer.serializeArraySize(mFrames);
+	for (Frame& frame : mFrames)
+	{
+		// Read inputs for each frame
+		for (size_t k = 0; k < numPlayers; ++k)
+		{
+			serializer & frame.mInputState.mInputFlags[k];
+		}
+
+		// Fill missing players with empty inputs
+		if (serializer.isReading())
+		{
+			for (size_t k = numPlayers; k < InputManager::NUM_PLAYERS; ++k)
+			{
+				frame.mInputState.mInputFlags[1] = 0;
+			}
+		}
+	}
 }
