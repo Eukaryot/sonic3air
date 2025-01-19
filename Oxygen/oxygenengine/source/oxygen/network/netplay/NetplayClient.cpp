@@ -159,10 +159,7 @@ void NetplayClient::onFrameUpdate(ControlsIn& controlsIn, uint32 frameNumber)
 			for (int k = 0; k < indexFromBack; ++k)
 				++it;
 
-			for (int playerIndex = 0; playerIndex < MAX_PLAYERS; ++playerIndex)
-			{
-				controlsIn.injectInput(playerIndex, it->mInputsByPlayer[playerIndex]);
-			}
+			controlsIn.injectInputs(it->mInputsByPlayer, MAX_PLAYERS);
 		}
 	}
 }

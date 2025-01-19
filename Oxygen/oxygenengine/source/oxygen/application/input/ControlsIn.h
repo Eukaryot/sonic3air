@@ -47,7 +47,10 @@ public:
 	void endInputUpdate();
 
 	uint16 getInputFromController(uint32 padIndex) const;
+
 	void injectInput(uint32 padIndex, uint16 inputFlags);
+	void injectInputs(const uint16* inputFlags, size_t numInputs = InputManager::NUM_PLAYERS);
+	void injectEmptyInputs(size_t numInputs = InputManager::NUM_PLAYERS);
 
 	void setIgnores(uint16 bitmask);
 	void setAllIgnores();
@@ -55,6 +58,7 @@ public:
 	Gamepad& getGamepad(size_t index);
 	const Gamepad& getGamepad(size_t index) const;
 	inline uint16 getInputPad(size_t index) const  { return getGamepad(index).mCurrentInput; }
+	void writeCurrentState(uint16* outInputFlags, size_t numInputs = InputManager::NUM_PLAYERS) const;
 
 	inline bool areGamepadsSwitched() const  { return mGamepadsSwitched; }
 	bool switchGamepads();

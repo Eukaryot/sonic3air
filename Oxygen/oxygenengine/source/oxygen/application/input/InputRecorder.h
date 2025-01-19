@@ -18,8 +18,7 @@ class InputRecorder
 public:
 	struct InputState
 	{
-		uint16 mInputFlags[2];    // For two gamepads
-		inline InputState() : mInputFlags { 0, 0 } {}
+		uint16 mInputFlags[InputManager::NUM_PLAYERS] = { 0 };
 	};
 
 public:
@@ -43,6 +42,9 @@ public:
 	bool loadRecording(const std::wstring& filename);
 	void saveRecording(std::vector<uint8>& buffer);
 	void saveRecording(const std::wstring& filename);
+
+private:
+	void serializeRecording(VectorBinarySerializer& serializer);
 
 private:
 	struct Frame

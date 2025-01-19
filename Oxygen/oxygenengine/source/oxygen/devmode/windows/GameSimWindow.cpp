@@ -29,7 +29,8 @@ void GameSimWindow::buildContent()
 
 	Simulation& simulation = Application::instance().getSimulation();
 
-	if (simulation.getSpeed() == 0.0f)
+	const bool paused = (simulation.getSpeed() <= 0.0f || simulation.hasStepsLimit());
+	if (paused)
 	{
 		if (ImGui::Button("Play", ImVec2(50 * uiScale, 0)))
 		{
@@ -45,7 +46,10 @@ void GameSimWindow::buildContent()
 	}
 
 	ImGui::SameLine();
-	ImGui::Text("Game Speed:   %.2fx", simulation.getSpeed());
+	if (paused)
+		ImGui::Text("Paused");
+	else
+		ImGui::Text("Game Speed:   %.2fx", simulation.getSpeed());
 
 	if (ImGui::Button("0.05x"))
 	{
@@ -104,7 +108,7 @@ void GameSimWindow::buildContent()
 	ImGui::SameLine();
 	if (ImGui::ArrowButton("Step Forward", ImGuiDir_Right))
 	{
-		simulation.setNextSingleStep(true, false);
+		simulation.setNextSingleStep();
 	}
 	ImGui::PopItemFlag();
 }

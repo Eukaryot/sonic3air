@@ -34,7 +34,6 @@ public:
 	void reset() override;
 	void resetGame() override;
 
-	void update(float secondsPassed) override;
 	void realtimeUpdate(float secondsPassed) override;
 
 	void playAudioDirect(uint64 sfxId, SoundRegType type, int contextBase = CONTEXT_INGAME, AudioReference* outAudioReference = nullptr);

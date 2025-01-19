@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <rmxbase.h>
+#include "oxygen/application/input/InputManager.h"
 
 class CodeExec;
 
@@ -18,7 +18,7 @@ class GameRecorder
 public:
 	struct InputData
 	{
-		uint16 mInputs[2] = { 0, 0 };
+		uint16 mInputs[InputManager::NUM_PLAYERS] = { 0 };
 	};
 
 	struct PlaybackResult
@@ -45,7 +45,7 @@ public:
 	bool getFrameData(uint32 frameNumber, PlaybackResult& outResult);
 
 	bool loadRecording(const std::wstring& filename);
-	bool saveRecording(const std::wstring& filename, uint32 minDistanceBetweenKeyframes = 0) const;
+	bool saveRecording(const std::wstring& filename, uint32 minDistanceBetweenKeyframes = 0);
 
 	inline void setIgnoreKeys(bool ignoreKeys)  { mIgnoreKeys = ignoreKeys; }
 
@@ -72,6 +72,8 @@ private:
 	Frame* getFrameInternal(uint32 frameNumber);
 	const Frame* getFrameInternal(uint32 frameNumber) const;
 	Frame& addFrameInternal(uint32 frameNumber, const InputData& input, Frame::Type frameType);
+	
+	bool serializeRecording(VectorBinarySerializer& serializer, uint32 minDistanceBetweenKeyframes);
 
 private:
 	std::vector<Frame*> mFrames;
