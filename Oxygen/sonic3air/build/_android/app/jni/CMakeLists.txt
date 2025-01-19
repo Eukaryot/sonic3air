@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
+
 project(Sonic3AIR)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -10,7 +11,13 @@ set(WORKSPACE_DIR ../../../../../..)
 add_definitions(-DIMGUI_IMPL_OPENGL_ES2)
 
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	add_compile_options(-Wno-switch)	# Silence warning "enumeration value ... not handled in switch"
+endif()
+
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
 
 # SDL2 sources as virtual subdirectory "SDL"
 add_subdirectory(${WORKSPACE_DIR}/framework/external/sdl/SDL2 SDL)
