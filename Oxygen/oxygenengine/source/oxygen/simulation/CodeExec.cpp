@@ -119,7 +119,7 @@ struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
 	bool handleExternalCall(uint64 address) override
 	{
 		// Check for address hook at the target address
-		return mCodeExec.tryCallAddressHookDev((uint32)address);
+		return mCodeExec.tryCallAddressHook((uint32)address);
 	}
 
 	bool handleExternalJump(uint64 address) override
