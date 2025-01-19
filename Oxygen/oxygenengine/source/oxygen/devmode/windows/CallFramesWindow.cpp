@@ -116,7 +116,7 @@ void CallFramesWindow::buildContent()
 				{
 					ImGui::Bullet();
 					ImGui::SameLine();
-					ImGui::TextColored(ImGuiHelpers::COLOR_RED, *String(0, "0x%06x", address));
+					ImGui::TextColored(ImGuiHelpers::COLOR_RED, "0x%06x", address);
 					ImGui::SameLine();
 					ImGui::PushID(address);
 					if (ImGui::SmallButton("Copy"))
