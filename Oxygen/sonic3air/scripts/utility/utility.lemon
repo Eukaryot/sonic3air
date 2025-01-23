@@ -776,6 +776,8 @@ function void Input.setControllerRumbleByAddress(u32 playerUpdateAddress, float 
 // Persistent data migration                             //
 //-------------------------------------------------------//
 
+#if STANDALONE
+
 // This helper function loads persistent data from the given location, but automatically falls back to old style loading from
 // "persistentdata.bin" if necessary. In that case, the data will be migrated to the new location and removed from "persistentdata.bin".
 // You can use this in mods as well in order to migrate player's existing save data to the new format.
@@ -796,6 +798,8 @@ function u32 loadAndMigratePersistentData(u32 targetAddress, u32 bytes, string f
 	}
 	return bytesRead
 }
+
+#endif
 
 
 

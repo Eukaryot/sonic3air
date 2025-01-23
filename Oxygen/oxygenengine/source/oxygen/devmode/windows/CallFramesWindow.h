@@ -28,6 +28,7 @@ private:
 	bool mShowProfilingSamples = false;
 
 	std::unordered_map<uint64, bool> mOpenState;
+	std::vector<uint32> mSortedUnknownAddressed;
 };
 
 #endif

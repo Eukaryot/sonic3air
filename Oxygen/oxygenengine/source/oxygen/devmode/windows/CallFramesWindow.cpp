@@ -107,12 +107,18 @@ void CallFramesWindow::buildContent()
 		ImGui::Spacing();
 
 		const std::vector<uint32>& unknownAddresses = codeExec.getUnknownAddresses();
-		if (!unknownAddresses.empty())
+		if (unknownAddresses.size() != mSortedUnknownAddressed.size())
+		{
+			mSortedUnknownAddressed = unknownAddresses;
+			std::sort(mSortedUnknownAddressed.begin(), mSortedUnknownAddressed.end(), [](uint32 a, uint32 b) { return a < b; } );
+		}
+
+		if (!mSortedUnknownAddressed.empty())
 		{
 			if (ImGui::CollapsingHeader("Unknown called addresses"))
 			{
 				ImGuiHelpers::ScopedIndent si;
-				for (uint32 address : unknownAddresses)
+				for (uint32 address : mSortedUnknownAddressed)
 				{
 					ImGui::Bullet();
 					ImGui::SameLine();
