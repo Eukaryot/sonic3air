@@ -37,13 +37,20 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			return false
 		return Standalone.drawCharacterSprite(char.character, (A0 == 0xffffb04a) ? 1 : 0, px, py, false)
 	}
-
+	
+	// Miles Prower's fluffy rear parts
+	if (objA0.mapping_offset == 0x344bb8)
+	{
+		return Standalone.drawCharacterSprite(CHARACTER_TAILS, 2, px, py, false)
+	}
+	
+	// Other objects that use the character art
 	if (objA0.mapping_offset == 0x146620 || objA0.mapping_offset == 0x146816 || objA0.mapping_offset == 0x148eb8 || objA0.mapping_offset == 0x14a8d6 && ((objA0.update_address == 0x063a6a) || (objA0.update_address == 0x063de0 && u16[A0 + 0x44] == 0) || (objA0.update_address == 0x0656da && (objA0.flags38 & 0x40) == 0) || (objA0.update_address == 0x063466 && objA0.value42 == 0x02) || (objA0.update_address == 0x05e0d6) || (objA0.update_address == 0x05f46a)) == 0)
 	{
 		u8 c = (objA0.mapping_offset == 0x14a8d6) ? CHARACTER_KNUCKLES : (objA0.mapping_offset == 0x148eb8) ? CHARACTER_TAILS : CHARACTER_SONIC
 		return Standalone.drawCharacterSprite(c, (A0 == 0xffffb04a) ? 1 : 0, px, py, false)
 	}
-
+	
 	if (gameMode == 0x0c || gameMode == 0x08)
 	{
 		// Main game or rolling demo
