@@ -30,6 +30,35 @@ namespace lemon
 			node.setLineNumber(lineNumber);
 			return node;
 		}
+
+		bool negateBaseTypeValue(AnyBaseValue& value, const DataTypeDefinition* dataType)
+		{
+			switch (dataType->getClass())
+			{
+				case DataTypeDefinition::Class::INTEGER:
+				{
+					switch (dataType->getBytes())
+					{
+						case 1:  value.set<int8>(-value.get<int8>());    return true;
+						case 2:  value.set<int16>(-value.get<int16>());  return true;
+						case 4:  value.set<int32>(-value.get<int32>());  return true;
+						case 8:  value.set<int64>(-value.get<int64>());  return true;
+					}
+					break;
+				}
+
+				case DataTypeDefinition::Class::FLOAT:
+				{
+					switch (dataType->getBytes())
+					{
+						case 4:  value.set<float>(-value.get<float>());    return true;
+						case 8:  value.set<double>(-value.get<double>());  return true;
+					}
+					break;
+				}
+			}
+			return false;
+		}
 	}
 
 
@@ -846,25 +875,44 @@ namespace lemon
 			values.clear();
 			values.reserve(0x20);
 
-			const auto readNextContentToken = [this, arrayDataType](const Token& token, bool& expectingComma, uint32 lineNumber, std::vector<AnyBaseValue>& values)
+			bool expectingComma = false;
+			const auto parseContentTokens = [this, arrayDataType, &expectingComma](const TokenList& tokens, size_t firstIndex, size_t endIndex, uint32 lineNumber, std::vector<AnyBaseValue>& values)
 			{
-				if (expectingComma)
+				for (size_t i = firstIndex; i < endIndex; ++i)
 				{
-					CHECK_ERROR(isOperator(token, Operator::COMMA_SEPARATOR), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
-					expectingComma = false;
-				}
-				else
-				{
-					CHECK_ERROR(token.isA<ConstantToken>(), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
+					Token* token = &tokens[i];
+					if (expectingComma)
+					{
+						CHECK_ERROR(isOperator(*token, Operator::COMMA_SEPARATOR), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
+						expectingComma = false;
+					}
+					else
+					{
+						bool negative = false;
+						if (isOperator(*token, Operator::BINARY_MINUS) || isOperator(*token, Operator::BINARY_PLUS))
+						{
+							negative = isOperator(*token, Operator::BINARY_MINUS);
+							++i;
+							CHECK_ERROR(i < endIndex, "List of constants inside constant array list of values ended with a single sign", lineNumber);
+							token = &tokens[i];
+						}
 
-					// Cast the value as needed, because the constant might have a different type than the constant array
-					const ConstantToken& ct = token.as<ConstantToken>();
-					AnyBaseValue value;
-					const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(ct.mValue, ct.mDataType, value, arrayDataType);
-					const bool castSuccessful = (castHandling.mResult == TypeCasting::CastHandling::Result::NO_CAST || castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST);
-					CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << ct.mDataType->getName().getString() << " to constant array type " << arrayDataType->getName().getString(), lineNumber);
-					values.emplace_back(value);
-					expectingComma = true;
+						CHECK_ERROR(token->isA<ConstantToken>(), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
+
+						// Cast the value as needed, because the constant might have a different type than the constant array
+						const ConstantToken& ct = token->as<ConstantToken>();
+						AnyBaseValue value;
+						const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(ct.mValue, ct.mDataType, value, arrayDataType);
+						const bool castSuccessful = (castHandling.mResult == TypeCasting::CastHandling::Result::NO_CAST || castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST);
+						CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << ct.mDataType->getName().getString() << " to constant array type " << arrayDataType->getName().getString(), lineNumber);
+						if (negative)
+						{
+							if (!negateBaseTypeValue(value, arrayDataType))
+								CHECK_ERROR(false, "Can't apply negative sign to constant array value", lineNumber);
+						}
+						values.emplace_back(value);
+						expectingComma = true;
+					}
 				}
 			};
 
@@ -876,11 +924,7 @@ namespace lemon
 				CHECK_ERROR(isKeyword(tokens.back(), Keyword::BLOCK_END), "Expected } at the end of constant array definition", lineNumber);
 
 				// Handle one-liner definition of constant array
-				bool expectingComma = false;
-				for (size_t i = 8; i < tokens.size() - 1; ++i)
-				{
-					readNextContentToken(tokens[i], expectingComma, lineNumber, values);
-				}
+				parseContentTokens(tokens, 8, tokens.size() - 1, lineNumber, values);
 			}
 			else
 			{
@@ -890,15 +934,11 @@ namespace lemon
 
 				// Go through the block node and collect the values
 				BlockNode& content = nextNode->as<BlockNode>();
-				bool expectingComma = false;
 				for (size_t n = 0; n < content.mNodes.size(); ++n)
 				{
 					CHECK_ERROR(content.mNodes[n].isA<UndefinedNode>(), "Syntax error inside constant array list of values", content.mNodes[n].getLineNumber());
 					UndefinedNode& listNode = content.mNodes[n].as<UndefinedNode>();
-					for (size_t i = 0; i < listNode.mTokenList.size(); ++i)
-					{
-						readNextContentToken(listNode.mTokenList[i], expectingComma, listNode.getLineNumber(), values);
-					}
+					parseContentTokens(listNode.mTokenList, 0, listNode.mTokenList.size(), listNode.getLineNumber(), values);
 				}
 
 				removeNextNode = true;
