@@ -876,8 +876,7 @@ namespace lemon
 						break;
 					}
 				}
-				if (nullptr == matchingFunction)
-					continue;
+				CHECK_ERROR(nullptr != matchingFunction, "Could not find fitting type implementation for constant array " << identifierToken.mName.getString(), mLineNumber);
 
 			#ifdef DEBUG
 				const Function::ParameterList& parameterList = matchingFunction->getParameters();

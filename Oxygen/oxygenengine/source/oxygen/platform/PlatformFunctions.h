@@ -61,6 +61,7 @@ public:
 	static bool openApplicationExternal(const std::wstring& path, const std::wstring& arguments, const std::wstring& directory = L"");
 
 	static bool hasClipboardSupport();
+	static bool copyToClipboard(const std::string& string);
 	static bool copyToClipboard(std::wstring_view string);
 	static bool pasteFromClipboard(WString& outString);
 

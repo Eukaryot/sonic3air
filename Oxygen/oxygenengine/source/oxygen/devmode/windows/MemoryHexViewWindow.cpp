@@ -14,6 +14,7 @@
 #include "oxygen/devmode/DevModeMainWindow.h"
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/application/Application.h"
+#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/Simulation.h"
@@ -75,7 +76,7 @@ void MemoryHexViewWindow::buildContent()
 		static uint32 hoveredAddress = 0xffffffff;
 		uint32 newHoveredAddress = 0xffffffff;
 
-		const ImVec4 cellColorTitle     = ImGuiHelpers::COLOR_GRAY80;
+		const ImVec4 cellColorTitle     = ImVec4(0.7f, 0.7f, 0.7f, 1.0f);
 		const uint32 cellBGColorTitle   = ImGui::GetColorU32(ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
 		const uint32 cellBGColorNormal  = ImGui::GetColorU32(ImVec4(0.0f, 0.0f, 0.0f, 0.5f));
 		const uint32 cellBGColorHovered = ImGui::GetColorU32(ImVec4(0.5f, 0.5f, 0.0f, 0.6f));
@@ -149,8 +150,12 @@ void MemoryHexViewWindow::buildContent()
 	}
 	else
 	{
-		if (ImGui::BeginTable("Clicked Address", 3, ImGuiTableFlags_BordersH | ImGuiTableFlags_BordersOuterV | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_SizingStretchProp, ImVec2(300.0f * uiScale, 0.0f)))
+		if (ImGui::BeginTable("Clicked Address", 3, ImGuiTableFlags_BordersH | ImGuiTableFlags_BordersOuterV | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_SizingStretchProp, ImVec2(335.0f * uiScale, 0.0f)))
 		{
+			ImGui::TableSetupColumn("Address", ImGuiTableColumnFlags_WidthFixed, 100.0f * uiScale);
+			ImGui::TableSetupColumn("Value",   ImGuiTableColumnFlags_WidthFixed, 90.0f * uiScale);
+			ImGui::TableSetupColumn("Buttons");
+
 			for (int size = 0; size < 3; ++size)
 			{
 				ImGui::TableNextRow();
@@ -168,12 +173,25 @@ void MemoryHexViewWindow::buildContent()
 				ImGui::TableSetColumnIndex(1);
 				switch (size)
 				{
-					case 0:  ImGui::Text("0x%02x", emulatorInterface.readMemory8(mClickedAddress));  break;
+					case 0:  ImGui::Text("0x%02x", emulatorInterface.readMemory8 (mClickedAddress));  break;
 					case 1:  ImGui::Text("0x%04x", emulatorInterface.readMemory16(mClickedAddress));  break;
 					case 2:  ImGui::Text("0x%08x", emulatorInterface.readMemory32(mClickedAddress));  break;
 				}
 
 				ImGui::TableSetColumnIndex(2);
+				if (PlatformFunctions::hasClipboardSupport())
+				{
+					if (ImGui::SmallButton("Copy"))
+					{
+						switch (size)
+						{
+							case 0:  PlatformFunctions::copyToClipboard(rmx::hexString(emulatorInterface.readMemory8 (mClickedAddress), 2));  break;
+							case 1:  PlatformFunctions::copyToClipboard(rmx::hexString(emulatorInterface.readMemory16(mClickedAddress), 4));  break;
+							case 2:  PlatformFunctions::copyToClipboard(rmx::hexString(emulatorInterface.readMemory32(mClickedAddress), 8));  break;
+						}
+					}
+					ImGui::SameLine();
+				}
 				if (debugTracking.hasWatch(mClickedAddress, bytes))
 				{
 					if (ImGui::SmallButton("Remove Watch"))

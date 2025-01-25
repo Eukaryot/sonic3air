@@ -401,7 +401,7 @@ namespace lemon
 		return constant;
 	}
 
-	ConstantArray& Module::addConstantArray(FlyweightString name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size, bool isGlobalDefinition)
+	ConstantArray& Module::addConstantArray(FlyweightString name, const DataTypeDefinition* elementDataType, const AnyBaseValue* values, size_t size, bool isGlobalDefinition)
 	{
 		ConstantArray& constantArray = mConstantArrayPool.createObject();
 		constantArray.mName = name;

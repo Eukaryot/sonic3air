@@ -29,6 +29,11 @@
 #include "oxygen/devmode/windows/VRAMWritesWindow.h"
 #include "oxygen/devmode/windows/WatchesWindow.h"
 
+#if defined(PLATFORM_ANDROID)
+	// Just for testing
+	#include "oxygen/platform/AndroidJavaInterface.h"
+#endif
+
 
 DevModeMainWindow::DevModeMainWindow() :
 	DevModeWindowBase("Dev Mode (F1)", Category::MISC, ImGuiWindowFlags_AlwaysAutoResize)
@@ -195,6 +200,79 @@ void DevModeMainWindow::buildContent()
 	// Just for debugging
 	ImGui::Separator();
 	ImGui::Text("ImGui Capture:   %s %s", ImGui::GetIO().WantCaptureMouse ? "[M]" : "      ", ImGui::GetIO().WantCaptureKeyboard ? "[K]" : "");
+#endif
+
+#if defined(PLATFORM_ANDROID) && 0
+	// Test for Android folder picker
+	if (ImGui::Button("Select Folder"))
+	{
+		AndroidJavaInterface::instance().openFolderAccessDialog();
+	}
+
+	static bool useSDL = true;
+	static std::string outputText;
+
+	const std::string path = "/tree/primary:S3AIR_Savedata";	// TODO: Use the picked result instead
+	if (ImGui::Button("Write File"))
+	{
+		if (useSDL)
+		{
+			SDL_RWops* file = SDL_RWFromFile((path + "/written_by_cpp.txt").c_str(), "w");
+			if (nullptr != file)
+			{
+				const size_t bytesWritten = SDL_RWwrite(file, "Hello SDL!", 11, 1);
+				SDL_RWclose(file);
+				outputText = "File write successful, " + std::to_string(bytesWritten) + " bytes written";
+			}
+			else
+				outputText = "File write failed!";
+		}
+		else
+		{
+			String str = "Hello World!";
+			if (str.saveFile(path + "/written_by_cpp.txt"))
+				outputText = "File write successful";
+			else
+				outputText = "File write failed!";
+		}
+	}
+
+	std::string filenameToRead;
+	ImGui::SameLine();
+	if (ImGui::Button("Read File"))
+		filenameToRead = "written_by_cpp.txt";
+	ImGui::SameLine();
+	if (ImGui::Button("Read Custom"))
+		filenameToRead = "custom.txt";
+
+	if (!filenameToRead.empty())
+	{
+		if (useSDL)
+		{
+			SDL_RWops* file = SDL_RWFromFile((path + "/" + filenameToRead).c_str(), "r");
+			if (nullptr != file)
+			{
+				char buffer[1024];
+				const size_t bytesRead = SDL_RWread(file, &buffer, 1023, 1);
+				buffer[bytesRead] = 0;
+				SDL_RWclose(file);
+				outputText = std::string("File read with content: ") + buffer;
+			}
+			else
+				outputText = "File read failed!";
+		}
+		else
+		{
+			String str;
+			if (str.loadFile(path + "/custom.txt", UnicodeEncoding::AUTO))
+				outputText = "File read with content: " + str.toStdString();
+			else
+				outputText = "File read failed!";
+		}
+	}
+
+	ImGui::Checkbox("Use SDL RW", &useSDL);
+	ImGui::Text("%s", outputText.c_str());
 #endif
 }
 

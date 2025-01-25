@@ -58,7 +58,7 @@ namespace lemon
 
 	void ControlFlow::getCurrentExecutionLocation(Location& outLocation) const
 	{
-		if (!mCallStack.empty())
+		if (!mCallStack.empty() && &mRuntime == Runtime::getActiveRuntime())
 		{
 			const State& state = mCallStack.back();
 			outLocation.mFunction = state.mRuntimeFunction->mFunction;

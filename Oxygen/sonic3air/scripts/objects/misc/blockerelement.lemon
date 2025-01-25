@@ -26,6 +26,7 @@ function void fn01ec18()
 	if (competition_mode.active)
 	{
 		objA0.update_address = 0x01ecaa
+		fn01ecaa()
 	}
 	else
 	{

@@ -109,7 +109,7 @@ void TextInputHandler::keyboard(const rmx::KeyboardEvent& ev)
 				{
 					const size_t rangeStart = std::min(*mMarkedRangeStart, mCursorPosition);
 					const size_t rangeEnd = std::max(*mMarkedRangeStart, mCursorPosition);
-					const std::wstring markedText = std::wstring(mText).substr(rangeStart, rangeEnd - rangeStart);
+					const std::wstring_view markedText = std::wstring_view(mText).substr(rangeStart, rangeEnd - rangeStart);
 					PlatformFunctions::copyToClipboard(markedText);
 
 					if (ev.key == 'x')

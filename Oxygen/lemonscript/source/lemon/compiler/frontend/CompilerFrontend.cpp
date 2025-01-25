@@ -840,9 +840,33 @@ namespace lemon
 			CHECK_ERROR(tokens[5].isA<IdentifierToken>(), "Expected identifier in constant array definition", lineNumber);
 			CHECK_ERROR(isOperator(tokens[6], Operator::ASSIGN), "Expected assignment at the end of constant array definition", lineNumber);
 
-			static std::vector<uint64> values;
+			const DataTypeDefinition* arrayDataType = tokens[3].as<VarTypeToken>().mDataType;
+
+			static std::vector<AnyBaseValue> values;
 			values.clear();
 			values.reserve(0x20);
+
+			const auto readNextContentToken = [this, arrayDataType](const Token& token, bool& expectingComma, uint32 lineNumber, std::vector<AnyBaseValue>& values)
+			{
+				if (expectingComma)
+				{
+					CHECK_ERROR(isOperator(token, Operator::COMMA_SEPARATOR), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
+					expectingComma = false;
+				}
+				else
+				{
+					CHECK_ERROR(token.isA<ConstantToken>(), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
+
+					// Cast the value as needed, because the constant might have a different type than the constant array
+					const ConstantToken& ct = token.as<ConstantToken>();
+					AnyBaseValue value;
+					const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(ct.mValue, ct.mDataType, value, arrayDataType);
+					const bool castSuccessful = (castHandling.mResult == TypeCasting::CastHandling::Result::NO_CAST || castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST);
+					CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << ct.mDataType->getName().getString() << " to constant array type " << arrayDataType->getName().getString(), lineNumber);
+					values.emplace_back(value);
+					expectingComma = true;
+				}
+			};
 
 			bool removeNextNode = false;
 			if (tokens.size() >= 8)
@@ -855,18 +879,7 @@ namespace lemon
 				bool expectingComma = false;
 				for (size_t i = 8; i < tokens.size() - 1; ++i)
 				{
-					Token& token = tokens[i];
-					if (expectingComma)
-					{
-						CHECK_ERROR(isOperator(token, Operator::COMMA_SEPARATOR), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
-						expectingComma = false;
-					}
-					else
-					{
-						CHECK_ERROR(token.isA<ConstantToken>(), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
-						values.push_back(token.as<ConstantToken>().mValue.get<uint64>());
-						expectingComma = true;
-					}
+					readNextContentToken(tokens[i], expectingComma, lineNumber, values);
 				}
 			}
 			else
@@ -884,25 +897,14 @@ namespace lemon
 					UndefinedNode& listNode = content.mNodes[n].as<UndefinedNode>();
 					for (size_t i = 0; i < listNode.mTokenList.size(); ++i)
 					{
-						Token& token = listNode.mTokenList[i];
-						if (expectingComma)
-						{
-							CHECK_ERROR(isOperator(token, Operator::COMMA_SEPARATOR), "Expected a comma-separated list of constants inside constant array list of values", listNode.getLineNumber());
-							expectingComma = false;
-						}
-						else
-						{
-							CHECK_ERROR(token.isA<ConstantToken>(), "Expected a comma-separated list of constants inside constant array list of values", listNode.getLineNumber());
-							values.push_back(token.as<ConstantToken>().mValue.get<uint64>());
-							expectingComma = true;
-						}
+						readNextContentToken(listNode.mTokenList[i], expectingComma, listNode.getLineNumber(), values);
 					}
 				}
 
 				removeNextNode = true;
 			}
 
-			ConstantArray& constantArray = mModule.addConstantArray(tokens[5].as<IdentifierToken>().mName.getString(), tokens[3].as<VarTypeToken>().mDataType, &values[0], values.size(), isGlobalDefinition);
+			ConstantArray& constantArray = mModule.addConstantArray(tokens[5].as<IdentifierToken>().mName.getString(), arrayDataType, &values[0], values.size(), isGlobalDefinition);
 			if (isGlobalDefinition)
 			{
 				mGlobalsLookup.registerConstantArray(constantArray);

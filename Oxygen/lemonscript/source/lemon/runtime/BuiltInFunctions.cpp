@@ -25,7 +25,7 @@ namespace lemon
 			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
 			const std::vector<ConstantArray*>& constantArrays = runtime->getProgram().getConstantArrays();
 			RMX_CHECK(id < constantArrays.size(), "Invalid constant array ID " << id << " (must be below " << constantArrays.size() << ")", return 0);
-			return (T)constantArrays[id]->getElement(index);
+			return constantArrays[id]->getElement(index).get<T>();
 		}
 
 		template<>
@@ -35,7 +35,7 @@ namespace lemon
 			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
 			const std::vector<ConstantArray*>& constantArrays = runtime->getProgram().getConstantArrays();
 			RMX_CHECK(id < constantArrays.size(), "Invalid constant array ID " << id << " (must be below " << constantArrays.size() << ")", return StringRef());
-			return StringRef(constantArrays[id]->getElement(index));
+			return StringRef(constantArrays[id]->getElement(index).get<uint64>());
 		}
 
 		StringRef string_operator_plus(StringRef str1, StringRef str2)
@@ -132,6 +132,8 @@ namespace lemon
 		module.addNativeFunction(CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint32>), defaultFlags);
 		module.addNativeFunction(CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int64>), defaultFlags);
 		module.addNativeFunction(CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint64>), defaultFlags);
+		module.addNativeFunction(CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<float>), defaultFlags);
+		module.addNativeFunction(CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<double>), defaultFlags);
 		module.addNativeFunction(CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<StringRef>), defaultFlags);
 
 		module.addNativeFunction(STRING_OPERATOR_PLUS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus), defaultFlags);
