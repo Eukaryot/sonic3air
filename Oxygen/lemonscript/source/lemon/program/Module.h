@@ -81,7 +81,7 @@ namespace lemon
 		Constant& addConstant(FlyweightString name, const DataTypeDefinition* dataType, AnyBaseValue value);
 
 		// Constant arrays
-		ConstantArray& addConstantArray(FlyweightString name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size, bool isGlobalDefinition);
+		ConstantArray& addConstantArray(FlyweightString name, const DataTypeDefinition* elementDataType, const AnyBaseValue* values, size_t size, bool isGlobalDefinition);
 
 		// Defines
 		const std::vector<Define*>& getDefines() const { return mDefines; }

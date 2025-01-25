@@ -18,19 +18,20 @@ namespace lemon
 		mData.resize(size);
 	}
 
-	void ConstantArray::setContent(const uint64* values, size_t size)
+	void ConstantArray::setContent(const AnyBaseValue* values, size_t size)
 	{
 		setSize(size);
 		for (size_t i = 0; i < size; ++i)
 			mData[i] = values[i];
 	}
 
-	uint64 ConstantArray::getElement(size_t index) const
+	const AnyBaseValue& ConstantArray::getElement(size_t index) const
 	{
-		return (index < mData.size()) ? mData[index] : 0;
+		static AnyBaseValue EMPTY;
+		return (index < mData.size()) ? mData[index] : EMPTY;
 	}
 
-	void ConstantArray::setElement(size_t index, uint64 value)
+	void ConstantArray::setElement(size_t index, const AnyBaseValue& value)
 	{
 		if (index < mData.size())
 		{
@@ -43,61 +44,103 @@ namespace lemon
 		serializer.serializeArraySize(mData);
 		if (serializer.isReading())
 		{
-			switch (mElementDataType->getBytes())
+			if (mElementDataType->getClass() == DataTypeDefinition::Class::FLOAT)
 			{
-				case 1:
+				switch (mElementDataType->getBytes())
 				{
-					for (uint64& value : mData)
-						value = (uint64)serializer.read<uint8>();
-					break;
+					case 4:
+					{
+						for (AnyBaseValue& value : mData)
+							value.set(serializer.read<float>());
+						break;
+					}
+					case 8:
+					{
+						for (AnyBaseValue& value : mData)
+							value.set(serializer.read<double>());
+						break;
+					}
 				}
-				case 2:
+			}
+			else
+			{
+				switch (mElementDataType->getBytes())
 				{
-					for (uint64& value : mData)
-						value = (uint64)serializer.read<uint16>();
-					break;
-				}
-				case 4:
-				{
-					for (uint64& value : mData)
-						value = (uint64)serializer.read<uint32>();
-					break;
-				}
-				case 8:
-				{
-					for (uint64& value : mData)
-						value = serializer.read<uint64>();
-					break;
+					case 1:
+					{
+						for (AnyBaseValue& value : mData)
+							value.set(serializer.read<uint8>());
+						break;
+					}
+					case 2:
+					{
+						for (AnyBaseValue& value : mData)
+							value.set(serializer.read<uint16>());
+						break;
+					}
+					case 4:
+					{
+						for (AnyBaseValue& value : mData)
+							value.set(serializer.read<uint32>());
+						break;
+					}
+					case 8:
+					{
+						for (AnyBaseValue& value : mData)
+							value.set(serializer.read<uint64>());
+						break;
+					}
 				}
 			}
 		}
 		else
 		{
-			switch (mElementDataType->getBytes())
+			if (mElementDataType->getClass() == DataTypeDefinition::Class::FLOAT)
 			{
-				case 1:
+				switch (mElementDataType->getBytes())
 				{
-					for (uint64& value : mData)
-						serializer.write<uint8>((uint8)value);
-					break;
+					case 4:
+					{
+						for (const AnyBaseValue& value : mData)
+							serializer.write(value.get<float>());
+						break;
+					}
+					case 8:
+					{
+						for (const AnyBaseValue& value : mData)
+							serializer.write(value.get<double>());
+						break;
+					}
 				}
-				case 2:
+			}
+			else
+			{
+				switch (mElementDataType->getBytes())
 				{
-					for (uint64& value : mData)
-						serializer.write<uint16>((uint16)value);
-					break;
-				}
-				case 4:
-				{
-					for (uint64& value : mData)
-						serializer.write<uint32>((uint32)value);
-					break;
-				}
-				case 8:
-				{
-					for (uint64& value : mData)
-						serializer.write(value);
-					break;
+					case 1:
+					{
+						for (const AnyBaseValue& value : mData)
+							serializer.write(value.get<uint8>());
+						break;
+					}
+					case 2:
+					{
+						for (const AnyBaseValue& value : mData)
+							serializer.write(value.get<uint16>());
+						break;
+					}
+					case 4:
+					{
+						for (const AnyBaseValue& value : mData)
+							serializer.write(value.get<uint32>());
+						break;
+					}
+					case 8:
+					{
+						for (const AnyBaseValue& value : mData)
+							serializer.write(value.get<uint64>());
+						break;
+					}
 				}
 			}
 		}
