@@ -129,7 +129,12 @@ bool LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsL
 		{
 			for (const lemon::Compiler::ErrorMessage& error : compiler.getErrors())
 			{
-				LogDisplay::instance().addLogError(String(0, "Compile error: %s (in '%s', line %d)", error.mMessage.c_str(), *WString(error.mSourceFileInfo->mFilename).toString(), error.mError.mLineNumber));
+				String errorMessage;
+				if (nullptr != error.mSourceFileInfo)
+					errorMessage.format("Script error in file '%s', line %d: %s", *WString(error.mSourceFileInfo->mFilename).toString(), error.mError.mLineNumber, error.mMessage.c_str());
+				else
+					errorMessage.format("Script error: %s", error.mMessage.c_str());
+				LogDisplay::instance().addLogError(errorMessage);
 			}
 
 			const lemon::Compiler::ErrorMessage& error = compiler.getErrors().front();
@@ -145,7 +150,7 @@ bool LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsL
 					break;
 			}
 			text = "Script compile error:\n" + text + "\n\n";
-			if (error.mSourceFileInfo->mFilename.empty())
+			if (nullptr == error.mSourceFileInfo ||error.mSourceFileInfo->mFilename.empty())
 				text += "Caused in module " + module.getModuleName() + ".";
 			else
 				text += "Caused in file '" + WString(error.mSourceFileInfo->mFilename).toStdString() + "', line " + std::to_string(error.mError.mLineNumber) + ", of module '" + module.getModuleName() + "'.";
