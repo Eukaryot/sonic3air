@@ -13,6 +13,7 @@
 
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/application/Application.h"
+#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/Simulation.h"
 
@@ -123,13 +124,17 @@ void CallFramesWindow::buildContent()
 					ImGui::Bullet();
 					ImGui::SameLine();
 					ImGui::TextColored(ImGuiHelpers::COLOR_RED, "0x%06x", address);
-					ImGui::SameLine();
-					ImGui::PushID(address);
-					if (ImGui::SmallButton("Copy"))
+
+					if (PlatformFunctions::hasClipboardSupport())
 					{
-						SDL_SetClipboardText(*String(0, "0x%06x", address));
+						ImGui::SameLine();
+						ImGui::PushID(address);
+						if (ImGui::SmallButton("Copy"))
+						{
+							PlatformFunctions::copyToClipboard(*String(0, "0x%06x", address));
+						}
+						ImGui::PopID();
 					}
-					ImGui::PopID();
 				}
 				ImGui::Separator();
 			}
