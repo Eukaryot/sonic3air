@@ -60,6 +60,7 @@ function void fn02acdc()
 			u16[A0 + 0x3c] = A1.u16
 		}
 		objA0.update_address = 0x02ae70
+		fn02ae70()
 	}
 	else
 	{
