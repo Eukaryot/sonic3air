@@ -19,11 +19,18 @@ function void fn02b928()
 	objA0.render_flags |= render_flag.WORLD
 	objA0.animation.sprite = objA0.subtype2c
 
-	A1 = 0x02b968 + objA0.subtype2c * 6
-	objA0.sprite_attributes = u16[A1]
-	objA0.sprite_priority = u16[A1+2]
-	objA0.box_size.x = u8[A1+4]
-	objA0.box_size.y = u8[A1+5]
+#if STANDALONE
+	// Original S3&K uses subtypes 0x00 to 0x32, the others are free to use by S3AIR and mods
+	//  -> The actual rendering logic happens in renderhooks
+	if (objA0.subtype2c <= 0x32)
+#endif
+	{
+		A1 = 0x02b968 + objA0.subtype2c * 6
+		objA0.sprite_attributes = u16[A1]
+		objA0.sprite_priority = u16[A1+2]
+		objA0.box_size.x = u8[A1+4]
+		objA0.box_size.y = u8[A1+5]
+	}
 
 	objA0.update_address = 0x02b962
 	fn02b962()
