@@ -12,11 +12,25 @@
 #include "oxygen/application/audio/AudioSourceManager.h"
 #include "oxygen/application/audio/AudioCollection.h"
 
+#include <optional>
+
 
 class AudioPlayer
 {
 public:
 	using SourceRegistration = AudioCollection::SourceRegistration;
+
+	struct SavedAudioState
+	{
+		uint64 mSfxId = 0;
+		int mChannelId = -1;
+		int mContextId = -1;
+	};
+
+	struct SavedPlaybackState
+	{
+		std::vector<SavedAudioState> mAudioStates;
+	};
 
 public:
 	inline AudioPlayer(AudioCollection& audioCollection) : mAudioCollection(audioCollection) {}
@@ -26,6 +40,7 @@ public:
 	void clearPlayback();
 
 	bool playAudio(uint64 sfxId, int contextId);
+	bool playAudio(uint64 sfxId, int contextId, int channelId);
 	void playOverride(uint64 sfxId, int contextId, int channelId, int overriddenChannel);
 
 	void updatePlayback(float timeElapsed);
@@ -58,6 +73,9 @@ public:
 	inline size_t getNumPlayingSounds() const  { return mPlayingSounds.size(); }
 	size_t getMemoryUsage() const;
 
+	void loadPlaybackState(const SavedPlaybackState& playbackState);
+	void savePlaybackState(SavedPlaybackState& outPlaybackState) const;
+
 private:
 	struct PlayingSound
 	{
@@ -70,6 +88,7 @@ private:
 
 		uint32 mUniqueId = 0;
 		AudioReference mAudioRef;
+		uint64 mSfxId = 0;
 		SourceRegistration* mSourceReg = nullptr;
 		SourceRegistration* mBaseSourceReg = nullptr;	// Original non-modified source registration
 		AudioSourceBase* mAudioSource = nullptr;
@@ -126,6 +145,7 @@ private:
 	};
 
 private:
+	PlayingSound* playAudioInternal(SourceRegistration* sourceReg, int contextId);
 	PlayingSound* playAudioInternal(SourceRegistration* sourceReg, int channelId, int contextId);
 	PlayingSound* startPlayback(SourceRegistration& sourceReg, float time, float volume, int contextId = -1, int channelId = -1);
 	PlayingSound* startOrContinuePlayback(SourceRegistration& sourceReg, float volume, uint64 soundId, int contextId = -1, int channelId = -1);

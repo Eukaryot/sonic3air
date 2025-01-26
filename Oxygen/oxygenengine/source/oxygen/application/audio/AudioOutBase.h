@@ -75,6 +75,7 @@ public:
 
 	void handleGameLoaded();
 	void handleActiveModsChanged();
+	void reloadAudioCollection();
 
 protected:
 	virtual void determineActiveSourceRegistrations();
