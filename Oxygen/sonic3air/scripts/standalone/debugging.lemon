@@ -184,7 +184,9 @@ function void setupGameObjectsSidePanelEntry()
 
 			if (System.SidePanel.isEntryHovered(address))
 			{
-				debugDrawRect(px - 15, py - 15, 31, 31, 0xc00080ff)
+				u16 boxSizeX = max(u8[address + 0x07], 1)
+				u16 boxSizeY = max(u8[address + 0x06], 1)
+				debugDrawRect(px - boxSizeX, py - boxSizeY, boxSizeX * 2, boxSizeY * 2, 0xc00080ff)
 			}
 		}
 	}
