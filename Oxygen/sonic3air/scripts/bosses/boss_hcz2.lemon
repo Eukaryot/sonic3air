@@ -345,6 +345,9 @@ function void fn06b1a8()
 function void fn06b1ce()
 {
 	setupObjectAttributesBasic(0x06bd32)
+#if STANDALONE
+	objA0.box_size.y = 10
+#endif
 }
 
 
