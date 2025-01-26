@@ -968,15 +968,34 @@ namespace lemon
 			CHECK_ERROR(isOperator(tokens[3], Operator::ASSIGN), "Missing assignment in constant definition", lineNumber);
 
 			// TODO: Support all statements that result in a compile-time constant
-			CHECK_ERROR(tokens[4].isA<ConstantToken>(), "", lineNumber);
+			int pos = 4;
+			bool negative = false;
+			if (isOperator(tokens[pos], Operator::BINARY_MINUS) || isOperator(tokens[pos], Operator::BINARY_PLUS))
+			{
+				negative = isOperator(tokens[pos], Operator::BINARY_MINUS);
+				++pos;
+			}
+			CHECK_ERROR(tokens[pos].isA<ConstantToken>(), "Expected constant value in constant declaration", lineNumber);
 
 			const DataTypeDefinition* dataType = tokens[1].as<VarTypeToken>().mDataType;
 			const FlyweightString identifier = tokens[2].as<IdentifierToken>().mName;
-			const AnyBaseValue constantValue = tokens[4].as<ConstantToken>().mValue;
+			const ConstantToken& ct = tokens[pos].as<ConstantToken>();
+
+			// Cast the value as needed, because the constant might have a different type than the constant array
+			AnyBaseValue value;
+			const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(ct.mValue, ct.mDataType, value, dataType);
+			const bool castSuccessful = (castHandling.mResult == TypeCasting::CastHandling::Result::NO_CAST || castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST);
+			CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << ct.mDataType->getName().getString() << " to type " << dataType->getName().getString(), lineNumber);
+
+			if (negative)
+			{
+				if (!negateBaseTypeValue(value, dataType))
+					CHECK_ERROR(false, "Can't apply negative sign to constant value", lineNumber);
+			}
 
 			if (isGlobalDefinition)
 			{
-				Constant& constant = mModule.addConstant(identifier, dataType, constantValue);
+				Constant& constant = mModule.addConstant(identifier, dataType, value);
 				mGlobalsLookup.registerConstant(constant);
 			}
 			else
@@ -984,7 +1003,7 @@ namespace lemon
 				Constant& constant = vectorAdd(scopeContext->mLocalConstants);
 				constant.mName = identifier;
 				constant.mDataType = dataType;
-				constant.mValue = constantValue;
+				constant.mValue = value;
 			}
 		}
 	}
