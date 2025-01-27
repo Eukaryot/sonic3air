@@ -621,7 +621,6 @@ function void fn0626f4()
 	// "spawnChildObjects(0x066584)" replaced by:
 	spawnChildObject(0x06282a, 0x00, -8, -16)
 
-
 	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 }
 
@@ -667,8 +666,12 @@ function void fn06273e()
 	objA0.countdown_value = 0x5f
 	objA0.countdown_callback = 0x062760
 
+#if STANDALONE
+	spawnSimpleChildObjects(0x06285a, 4 + getScreenExtend() / 0x20)		// More explosion spawners in widescreen
+#else
 	// "spawnSimpleChildObjects(0x06658c)" replaced by:
 	spawnSimpleChildObjects(0x06285a, 4)
+#endif
 }
 
 
@@ -688,10 +691,15 @@ function void fn06285a()
 	objA0.update_address = 0x0628a0
 	objA0.countdown_callback = 0x083e70
 
-	D0 = objA0.subtype2c * 2
-	A1 = 0x062890 + D0.u16
-	objA0.position.x.u16 = u16[(A1+=2)-2]
-	objA0.position.y.u16 = u16[(A1+=2)-2]
+#if STANDALONE
+	objA0.position.x.u16 = 0x3bc0 - objA0.subtype2c * 0x20
+	objA0.position.y.u16 = 0x01a0
+#else
+	A1 = 0x062890 + objA0.subtype2c * 2
+	objA0.position.x.u16 = u16[A1]		// That's the following x positions: 0x3bc0, 0x3b80, 0x3b40, 0x3b00
+	objA0.position.y.u16 = u16[A1+2]	// That's an y position of 0x01a0 for all 4 explosion spawners
+#endif
+
 	objA0.value39 = 0x20
 	objA0.value3a = 0x20
 	objA0.value3b = 0x20

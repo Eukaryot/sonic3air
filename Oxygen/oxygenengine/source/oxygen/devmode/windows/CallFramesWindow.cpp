@@ -13,6 +13,7 @@
 
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/application/Application.h"
+#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/Simulation.h"
 
@@ -103,6 +104,42 @@ void CallFramesWindow::buildContent()
 		ImGui::Checkbox("Show profiling samples", &mShowProfilingSamples);
 	#endif
 		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing();
+
+		const std::vector<uint32>& unknownAddresses = codeExec.getUnknownAddresses();
+		if (unknownAddresses.size() != mSortedUnknownAddressed.size())
+		{
+			mSortedUnknownAddressed = unknownAddresses;
+			std::sort(mSortedUnknownAddressed.begin(), mSortedUnknownAddressed.end(), [](uint32 a, uint32 b) { return a < b; } );
+		}
+
+		if (!mSortedUnknownAddressed.empty())
+		{
+			if (ImGui::CollapsingHeader("Unknown called addresses"))
+			{
+				ImGuiHelpers::ScopedIndent si;
+				for (uint32 address : mSortedUnknownAddressed)
+				{
+					ImGui::Bullet();
+					ImGui::SameLine();
+					ImGui::TextColored(ImGuiHelpers::COLOR_RED, "0x%06x", address);
+
+					if (PlatformFunctions::hasClipboardSupport())
+					{
+						ImGui::SameLine();
+						ImGui::PushID(address);
+						if (ImGui::SmallButton("Copy"))
+						{
+							PlatformFunctions::copyToClipboard(*String(0, "0x%06x", address));
+						}
+						ImGui::PopID();
+					}
+				}
+				ImGui::Separator();
+			}
+			ImGui::Spacing();
+		}
 		ImGui::Spacing();
 
 		// Help marker
@@ -144,7 +181,7 @@ void CallFramesWindow::buildContent()
 
 		// Display (arrow) buttons without frame and default background
 		ImGui::PushStyleColor(ImGuiCol_Button, ImGuiHelpers::COLOR_TRANSPARENT);
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8.0f, 3.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8.0f, 2.0f));
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
 		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
 

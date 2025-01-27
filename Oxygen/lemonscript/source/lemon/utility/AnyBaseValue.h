@@ -59,12 +59,12 @@ namespace lemon
 	template<> FORCE_INLINE double AnyBaseValue::get() const		{ return mDouble; }
 	template<> FORCE_INLINE AnyBaseValue AnyBaseValue::get() const  { return *this; }
 
-	template<> FORCE_INLINE void AnyBaseValue::set(int8 value)			{ mUint64 = (uint64)value; }
-	template<> FORCE_INLINE void AnyBaseValue::set(uint8 value)			{ mUint64 = (int64)value; }
-	template<> FORCE_INLINE void AnyBaseValue::set(int16 value)			{ mUint64 = (uint64)value; }
-	template<> FORCE_INLINE void AnyBaseValue::set(uint16 value)		{ mUint64 = (int64)value; }
-	template<> FORCE_INLINE void AnyBaseValue::set(int32 value)			{ mUint64 = (uint64)value; }
-	template<> FORCE_INLINE void AnyBaseValue::set(uint32 value)		{ mUint64 = (int64)value; }
+	template<> FORCE_INLINE void AnyBaseValue::set(int8 value)			{ mUint64 = (int64)value; }
+	template<> FORCE_INLINE void AnyBaseValue::set(uint8 value)			{ mUint64 = (uint64)value; }
+	template<> FORCE_INLINE void AnyBaseValue::set(int16 value)			{ mUint64 = (int64)value; }
+	template<> FORCE_INLINE void AnyBaseValue::set(uint16 value)		{ mUint64 = (uint64)value; }
+	template<> FORCE_INLINE void AnyBaseValue::set(int32 value)			{ mUint64 = (int64)value; }
+	template<> FORCE_INLINE void AnyBaseValue::set(uint32 value)		{ mUint64 = (uint64)value; }
 	template<> FORCE_INLINE void AnyBaseValue::set(int64 value)			{ mUint64 = value; }
 	template<> FORCE_INLINE void AnyBaseValue::set(uint64 value)		{ mUint64 = value; }
 	template<> FORCE_INLINE void AnyBaseValue::set(bool value)			{ mUint64 = (uint64)value; }

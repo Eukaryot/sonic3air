@@ -30,10 +30,6 @@ void AudioOut::resetGame()
 {
 }
 
-void AudioOut::update(float secondsPassed)
-{
-}
-
 void AudioOut::realtimeUpdate(float secondsPassed)
 {
 	// Call base implementation

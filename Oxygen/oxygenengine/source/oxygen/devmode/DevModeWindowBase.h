@@ -31,9 +31,11 @@ public:
 	DevModeWindowBase(std::string_view title, Category category, ImGuiWindowFlags windowFlags);
 	virtual ~DevModeWindowBase() {}
 
-	bool getIsWindowOpen() const  { return mIsWindowOpen; }
-	void toggleIsWindowOpen()	  { toggle(mIsWindowOpen); }
+	inline bool getIsWindowOpen() const  { return mIsWindowOpen; }
+	void setIsWindowOpen(bool open);
 
+	virtual bool shouldBeAvailable()  { return true; }
+	virtual void onChangedIsWindowOpen(bool open)  {}
 	virtual bool buildWindow();
 	virtual void buildContent() = 0;
 

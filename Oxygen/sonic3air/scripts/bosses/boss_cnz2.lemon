@@ -288,6 +288,11 @@ function void fn06e6c6()
 	// "spawnChildObjects(0x06ee00)" replaced by:
 	spawnChildObject(0x06ebac, 0x00, -20, 0)
 	spawnChildObject(0x06ebac, 0x02, 20, 0)
+
+#if STANDALONE
+	// Boss completed now
+	AddScoreForBossEnemy()
+#endif
 }
 
 
@@ -837,6 +842,11 @@ function void fn06ec1e()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if ((u8[A1 + 0x38] & 0x80) || (u8[A1 + 0x2a] & 0x80))
 	{
+	#if STANDALONE
+		// Disable collision right away
+		objA0.collision_attributes = 0
+	#endif
+
 		Object.TriggerUnloading()
 	}
 }
@@ -882,7 +892,11 @@ function void fn06ec9e()
 	{
 		objA0.update_address = 0x085668
 		objA0.countdown_callback = 0x06e6c6
+
+		// In standalone, complete the boss just a little bit later, when the electricity is disabled and transforming back from a super form is safe again
+	#if !STANDALONE
 		AddScoreForBossEnemy()
+	#endif
 		return
 	}
 

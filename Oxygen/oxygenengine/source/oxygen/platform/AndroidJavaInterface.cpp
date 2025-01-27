@@ -46,6 +46,16 @@
 			FileHelper::extractZipFile(String(str).toStdWString(), Configuration::instance().mAppDataPath + L"apkContent/");
 			env->ReleaseStringUTFChars(path, str);
 		}
+
+		JNIEXPORT void JNICALL Java_org_eukaryot_sonic3air_GameActivity_grantedFolderAccess(JNIEnv* env, jclass jclazz, jboolean success, jstring path)
+		{
+			const char* str = env->GetStringUTFChars(path, 0);
+			RMX_LOG_INFO("C++ folder access path = " << str);
+
+			// Example result: "/tree/primary:S3AIR_Savedata" (the path does not include a trailing slash)
+
+			// TODO: Store the path somewhere, or call whoever might be interested in the result
+		}
 	}
 
 
@@ -193,6 +203,11 @@
 			// Finished
 			outCurrentBytes = outTotalBytes;
 		}
+	}
+
+	void AndroidJavaInterface::openFolderAccessDialog()
+	{
+		JNICallHelper().callVoidMethod("openFolderAccessDialog");
 	}
 
 #endif

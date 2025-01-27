@@ -21,7 +21,6 @@ public:
 	{
 		INTERNAL,	// Provided by Oxygen Engine
 		CUSTOM,		// Provided by scripts
-		GAME		// Provided by game-specific C++ code
 	};
 
 public:
@@ -33,7 +32,6 @@ public:
 	std::string mHeader;
 	char mShortCharacter = 0;
 	Type mType = Type::INTERNAL;
-	std::function<void(DebugSidePanelCategory&, DebugSidePanel::Builder&, uint64)> mCallback;
 
 	// Runtime data
 	int mScrollSize = 0;
@@ -45,6 +43,8 @@ public:
 
 class CustomDebugSidePanelCategory : public DebugSidePanelCategory
 {
+friend class CustomSidePanelWindow;
+
 public:
 	struct Option
 	{
@@ -79,6 +79,9 @@ public:
 	void addLine(std::string_view text, int indent, const Color& color);
 	bool isEntryHovered(uint64 key);
 
+	inline bool isVisibleInDevModeWindow() const		 { return mVisibleInDevModeWindow; }
+	inline void setVisibleInDevModeWindow(bool visible)	 { mVisibleInDevModeWindow = visible; }
+
 	void buildCategoryContent(DebugSidePanel::Builder& builder, Drawer& drawer, uint64 mouseOverKey);
 
 private:
@@ -87,4 +90,5 @@ private:
 
 	Entry* mCurrentEntry = nullptr;
 	bool mEntriesNeedSorting = false;
+	bool mVisibleInDevModeWindow = false;
 };

@@ -19,6 +19,15 @@ DevModeWindowBase::DevModeWindowBase(std::string_view title, Category category, 
 {
 }
 
+void DevModeWindowBase::setIsWindowOpen(bool open)
+{
+	if (mIsWindowOpen == open)
+		return;
+
+	mIsWindowOpen = open;
+	onChangedIsWindowOpen(open);
+}
+
 bool DevModeWindowBase::buildWindow()
 {
 	if (!mIsWindowOpen)

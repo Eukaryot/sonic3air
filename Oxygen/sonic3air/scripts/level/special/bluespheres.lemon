@@ -37,7 +37,7 @@ function void SpecialStage()
 
 #if STANDALONE
 	// Add a small artificial delay here
-	for (u8 i = 0; i < 12; ++i)
+	for (u8 i = 0; i < 24; ++i)
 		yieldInWhiteScreen()
 #else
 	set_status_register(0x2700)

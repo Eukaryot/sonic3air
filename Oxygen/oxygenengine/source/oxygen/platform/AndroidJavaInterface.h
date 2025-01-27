@@ -40,6 +40,8 @@
 		bool stopFileDownload(uint64 downloadId);
 		void getDownloadStatus(uint64 downloadId, int& outStatus, uint64& outCurrentBytes, uint64& outTotalBytes);
 
+		void openFolderAccessDialog();
+
 	private:
 		RomFileInjection mRomFileInjection;
 	};

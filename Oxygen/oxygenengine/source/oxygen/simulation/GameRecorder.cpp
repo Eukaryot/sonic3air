@@ -120,86 +120,10 @@ bool GameRecorder::loadRecording(const std::wstring& filename)
 		return false;
 
 	VectorBinarySerializer serializer(true, dump);
-
-	// Signature
-	char signature[4];
-	serializer.read(signature, 4);
-	int formatVersion = 0;
-	if (memcmp(signature, "GRC1", 4) == 0)
-	{
-		formatVersion = 1;
-	}
-	else if (memcmp(signature, "GRC0", 4) == 0)
-	{
-		formatVersion = 0;
-	}
-	else
-	{
-		return false;
-	}
-
-	char buildString[11] = "..........";
-	serializer.read(buildString, 10);
-
-	// Game-specific
-	if (std::string(buildString) >= "19.08.11.0")
-	{
-		const uint32 bufferSize = serializer.read<uint32>();
-		if (bufferSize > 0)
-		{
-			std::vector<uint8> buffer;
-			buffer.resize((size_t)bufferSize);
-			serializer.read((char*)&buffer[0], bufferSize);
-			EngineMain::getDelegate().onGameRecordingHeaderLoaded(buildString, buffer);
-		}
-	}
-
-	// Load all frames
-	const uint32 frameCount = serializer.read<uint32>();
-	for (uint32 index = 0; index < frameCount; ++index)
-	{
-		const Frame::Type frameType = (Frame::Type)serializer.read<uint8>();
-		Frame& frame = createFrameInternal(frameType, index);
-		mFrames.push_back(&frame);
-
-		serializer.serialize(frame.mInput.mInputs[0]);
-		serializer.serialize(frame.mInput.mInputs[1]);
-
-		if (frameType == Frame::Type::KEYFRAME)
-		{
-			frame.mCompressedData = false;
-			const uint32 dataSize = serializer.read<uint32>();
-			if (dataSize > 0)
-			{
-				if (formatVersion >= 1)
-				{
-					// Newer versions use zlib deflate, including the two zlib header bytes
-					ZlibDeflate::decode(frame.mData, serializer.peek(), dataSize);
-					serializer.skip(dataSize);
-				}
-				else
-				{
-					// Older version using own (slower) deflate implementation, lacking the two zlib header bytes
-					frame.mData.resize(dataSize);
-					serializer.read((char*)&frame.mData[0], dataSize);
-
-					// Uncompress data
-					int size = 0;
-					uint8* decoded = Deflate::decode(size, (void*)&frame.mData[0], (uint32)frame.mData.size());
-					frame.mData.resize(size);
-					frame.mData.shrink_to_fit();
-					memcpy(frame.mData.data(), decoded, size);
-					delete[] decoded;
-				}
-			}
-		}
-	}
-
-	mRangeEnd = (uint32)mFrames.size();
-	return true;
+	return serializeRecording(serializer, 0);
 }
 
-bool GameRecorder::saveRecording(const std::wstring& filename, uint32 minDistanceBetweenKeyframes) const
+bool GameRecorder::saveRecording(const std::wstring& filename, uint32 minDistanceBetweenKeyframes)
 {
 	// Create directory if needed
 	const size_t slashPosition = filename.find_last_of(L"/\\");
@@ -210,69 +134,8 @@ bool GameRecorder::saveRecording(const std::wstring& filename, uint32 minDistanc
 
 	std::vector<uint8> dump;
 	VectorBinarySerializer serializer(false, dump);
-
-	// Signature
-	const EngineDelegateInterface::AppMetaData& appMetaData = EngineMain::getDelegate().getAppMetaData();
-	const char SIGNATURE[] = "GRC1";
-	serializer.write(SIGNATURE, 4);
-	serializer.write(appMetaData.mBuildVersionString.c_str(), 10);
-
-	// Game-specific
-	std::vector<uint8> buffer;
-	{
-		EngineMain::getDelegate().onGameRecordingHeaderSave(buffer);
-		const uint32 bufferSize = (uint32)buffer.size();
-		serializer.write(bufferSize);
-		if (bufferSize > 0)
-		{
-			serializer.write(&buffer[0], bufferSize);
-		}
-	}
-
-	// Save all frames
-	const uint32 frameCount = (uint32)mFrames.size();
-	serializer.write(frameCount);
-
-	size_t lastKeyframeIndex = 0;
-	for (size_t index = 0; index < mFrames.size(); ++index)
-	{
-		Frame& frame = *mFrames[index];
-		Frame::Type frameType = frame.mType;
-		if (frameType == Frame::Type::KEYFRAME)
-		{
-			if (index == 0 || index - lastKeyframeIndex >= minDistanceBetweenKeyframes)
-			{
-				// Save as keyframe
-				lastKeyframeIndex = index;
-			}
-			else
-			{
-				// Treat as input-only frame
-				frameType = Frame::Type::INPUT_ONLY;
-			}
-		}
-
-		serializer.writeAs<uint8>(frameType);
-		serializer.write(frame.mInput.mInputs[0]);
-		serializer.write(frame.mInput.mInputs[1]);
-
-		if (frameType == Frame::Type::KEYFRAME)
-		{
-			if (!frame.mCompressedData)
-			{
-				// Compress data
-				buffer.clear();
-				ZlibDeflate::encode(buffer, &frame.mData[0], frame.mData.size());
-				frame.mData.swap(buffer);
-				frame.mData.shrink_to_fit();
-				frame.mCompressedData = true;
-			}
-
-			const uint32 dataSize = (uint32)frame.mData.size();
-			serializer.write(dataSize);
-			serializer.write(&frame.mData[0], dataSize);
-		}
-	}
+	if (!serializeRecording(serializer, minDistanceBetweenKeyframes))
+		return false;
 
 	return FTX::FileSystem->saveFile(filename, dump);
 }
@@ -322,4 +185,194 @@ GameRecorder::Frame& GameRecorder::addFrameInternal(uint32 frameNumber, const In
 		mFrames[frameNumber - mRangeStart] = &frame;
 	}
 	return frame;
+}
+
+bool GameRecorder::serializeRecording(VectorBinarySerializer& serializer, uint32 minDistanceBetweenKeyframes)
+{
+	std::vector<uint8> buffer;
+
+	// Signature and format version
+	int formatVersion = 2;
+	if (serializer.isReading())
+	{
+		char signature[4];
+		serializer.read(signature, 4);
+		if (memcmp(signature, "GRC2", 4) == 0)
+		{
+			formatVersion = 2;
+		}
+		else if (memcmp(signature, "GRC1", 4) == 0)
+		{
+			formatVersion = 1;
+		}
+		else if (memcmp(signature, "GRC0", 4) == 0)
+		{
+			formatVersion = 0;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		const char SIGNATURE[] = "GRC2";
+		serializer.write(SIGNATURE, 4);
+	}
+
+	// Build string
+	char buildString[11] = "..........";
+	if (!serializer.isReading())
+	{
+		const EngineDelegateInterface::AppMetaData& appMetaData = EngineMain::getDelegate().getAppMetaData();
+		memcpy(buildString, appMetaData.mBuildVersionString.c_str(), 10);
+	}
+	serializer.serialize(buildString, 10);
+
+	// Number of players
+	size_t numPlayers = InputManager::NUM_PLAYERS;
+	if (serializer.isReading())
+	{
+		if (formatVersion >= 2)
+		{
+			numPlayers = (size_t)clamp(serializer.read<uint8>(), 1, InputManager::NUM_PLAYERS);
+		}
+		else
+		{
+			numPlayers = 2;
+		}
+	}
+	else
+	{
+		serializer.serializeAs<uint8>(numPlayers);
+	}
+
+	// Game-specific
+	if (serializer.isReading())
+	{
+		if (std::string(buildString) >= "19.08.11.0")
+		{
+			const uint32 bufferSize = serializer.read<uint32>();
+			if (bufferSize > 0)
+			{
+				std::vector<uint8> buffer;
+				buffer.resize((size_t)bufferSize);
+				serializer.read((char*)&buffer[0], bufferSize);
+				EngineMain::getDelegate().onGameRecordingHeaderLoaded(buildString, buffer);
+			}
+		}
+	}
+	else
+	{
+		EngineMain::getDelegate().onGameRecordingHeaderSave(buffer);
+		const uint32 bufferSize = (uint32)buffer.size();
+		serializer.write(bufferSize);
+		if (bufferSize > 0)
+		{
+			serializer.write(&buffer[0], bufferSize);
+		}
+	}
+
+	// Serialize frames
+	uint32 frameCount = (uint32)mFrames.size();;
+	serializer.serialize(frameCount);
+
+	size_t lastKeyframeIndex = 0;
+	for (uint32 index = 0; index < frameCount; ++index)
+	{
+		Frame* frame = nullptr;
+		Frame::Type frameType = Frame::Type::INPUT_ONLY;
+
+		// Create / save frame depending on its type
+		if (serializer.isReading())
+		{
+			serializer.serializeAs<uint8>(frameType);
+			frame = &createFrameInternal(frameType, index);
+			mFrames.push_back(frame);
+		}
+		else
+		{
+			frame = mFrames[index];
+			frameType = frame->mType;
+			if (frameType == Frame::Type::KEYFRAME)
+			{
+				if (index == 0 || index - lastKeyframeIndex >= minDistanceBetweenKeyframes)
+				{
+					// Save as keyframe
+					lastKeyframeIndex = index;
+				}
+				else
+				{
+					// Treat as input-only frame
+					frameType = Frame::Type::INPUT_ONLY;
+				}
+			}
+			serializer.serializeAs<uint8>(frameType);
+		}
+
+		// Inputs
+		for (size_t k = 0; k < numPlayers; ++k)
+			serializer.serialize(frame->mInput.mInputs[k]);
+
+		if (serializer.isReading())
+		{
+			for (size_t k = numPlayers; k < InputManager::NUM_PLAYERS; ++k)
+				frame->mInput.mInputs[k] = 0;
+		}
+
+		// Keyframe data
+		if (frameType == Frame::Type::KEYFRAME)
+		{
+			if (serializer.isReading())
+			{
+				frame->mCompressedData = false;
+				const uint32 dataSize = serializer.read<uint32>();
+				if (dataSize > 0)
+				{
+					if (formatVersion >= 1)
+					{
+						// Newer versions use zlib deflate, including the two zlib header bytes
+						ZlibDeflate::decode(frame->mData, serializer.peek(), dataSize);
+						serializer.skip(dataSize);
+					}
+					else
+					{
+						// Older version using own (slower) deflate implementation, lacking the two zlib header bytes
+						frame->mData.resize(dataSize);
+						serializer.read((char*)&frame->mData[0], dataSize);
+
+						// Uncompress data
+						int size = 0;
+						uint8* decoded = Deflate::decode(size, (void*)&frame->mData[0], (uint32)frame->mData.size());
+						frame->mData.resize(size);
+						frame->mData.shrink_to_fit();
+						memcpy(frame->mData.data(), decoded, size);
+						delete[] decoded;
+					}
+				}
+			}
+			else
+			{
+				if (!frame->mCompressedData)
+				{
+					// Compress data
+					buffer.clear();
+					ZlibDeflate::encode(buffer, &frame->mData[0], frame->mData.size());
+					frame->mData.swap(buffer);
+					frame->mData.shrink_to_fit();
+					frame->mCompressedData = true;
+				}
+
+				const uint32 dataSize = (uint32)frame->mData.size();
+				serializer.write(dataSize);
+				serializer.write(&frame->mData[0], dataSize);
+			}
+		}
+	}
+
+	if (serializer.isReading())
+	{
+		mRangeEnd = (uint32)mFrames.size();
+	}
+	return true;
 }

@@ -98,6 +98,24 @@ void ControlsIn::injectInput(uint32 padIndex, uint16 inputFlags)
 	mGamepad[padIndex].mInputWasInjected = true;
 }
 
+void ControlsIn::injectInputs(const uint16* inputFlags, size_t numInputs)
+{
+	RMX_ASSERT(numInputs <= InputManager::NUM_PLAYERS, "Invalid number of inputs: " << numInputs);
+	for (size_t k = 0; k < numInputs; ++k)
+	{
+		injectInput((uint32)k, inputFlags[k]);
+	}
+}
+
+void ControlsIn::injectEmptyInputs(size_t numInputs)
+{
+	RMX_ASSERT(numInputs <= InputManager::NUM_PLAYERS, "Invalid number of inputs: " << numInputs);
+	for (size_t k = 0; k < numInputs; ++k)
+	{
+		injectInput((uint32)k, 0);
+	}
+}
+
 void ControlsIn::setIgnores(uint16 bitmask)
 {
 	for (int padIndex = 0; padIndex < NUM_GAMEPADS; ++padIndex)
@@ -127,6 +145,15 @@ ControlsIn::Gamepad& ControlsIn::getGamepad(size_t index)
 const ControlsIn::Gamepad& ControlsIn::getGamepad(size_t index) const
 {
 	return const_cast<ControlsIn*>(this)->getGamepad(index);
+}
+
+void ControlsIn::writeCurrentState(uint16* outInputFlags, size_t numInputs) const
+{
+	RMX_ASSERT(numInputs <= InputManager::NUM_PLAYERS, "Invalid number of inputs: " << numInputs);
+	for (size_t k = 0; k < numInputs; ++k)
+	{
+		outInputFlags[k] = mGamepad[k].mCurrentInput;
+	}
 }
 
 bool ControlsIn::switchGamepads()

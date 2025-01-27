@@ -124,11 +124,19 @@ void logValueStr(ControlFlow& controlFlow)
 
 void debugLog(AnyTypeWrapper param)
 {
-	if (param.mType == &PredefinedDataTypes::UINT_8)
+	if (param.mType == &PredefinedDataTypes::UINT_8 || param.mType == &PredefinedDataTypes::INT_8)
 	{
 		std::cout << rmx::hexString(param.mValue.get<uint8>(), 2) << std::endl;
 	}
-	else if (param.mType == &PredefinedDataTypes::UINT_64)
+	else if (param.mType == &PredefinedDataTypes::UINT_16 || param.mType == &PredefinedDataTypes::INT_16)
+	{
+		std::cout << rmx::hexString(param.mValue.get<uint16>(), 4) << std::endl;
+	}
+	else if (param.mType == &PredefinedDataTypes::UINT_32 || param.mType == &PredefinedDataTypes::INT_32)
+	{
+		std::cout << rmx::hexString(param.mValue.get<uint32>(), 8) << std::endl;
+	}
+	else if (param.mType == &PredefinedDataTypes::UINT_64 || param.mType == &PredefinedDataTypes::INT_64 || param.mType == &PredefinedDataTypes::CONST_INT)
 	{
 		std::cout << rmx::hexString(param.mValue.get<uint64>(), 8) << std::endl;
 	}

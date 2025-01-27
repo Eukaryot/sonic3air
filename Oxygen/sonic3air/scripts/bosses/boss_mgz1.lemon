@@ -144,6 +144,12 @@ function void fn08867e()
 	GetRandomNumber()
 	D0.u16 &= 0x0e
 	D1.u16 = u16[0x0886da + D0.u16]
+
+#if STANDALONE
+	// Factor in screen extend as well, #contributed by HazelSpooder
+	D1.u16 += ((getScreenExtend() * 2) % (D1.u16 / 2))
+#endif
+
 	objA0.position.x.u16 += D1.u16
 	objA0.position.y.u16 -= 0x40
 

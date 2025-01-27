@@ -131,14 +131,28 @@ Font& EngineDelegate::getDebugFont(int size)
 	{
 		static Font font10;
 		if (font10.getLineHeight() == 0)
+		{
 			font10.loadFromFile("data/font/oxyfont_regular.json", 0.0f);
+			if (font10.getLineHeight() != 0)
+			{
+				font10.addFontProcessor(std::make_shared<OutlineFontProcessor>());
+				font10.addFontProcessor(std::make_shared<GradientFontProcessor>());
+				font10.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2i(1, 1), 0.5f, 0.8f));
+			}
+		}
 		return font10;
 	}
 	else
 	{
 		static Font font3;
 		if (font3.getLineHeight() == 0)
+		{
 			font3.loadFromFile("data/font/smallfont.json", 0.0f);
+			if (font3.getLineHeight() != 0)
+			{
+				font3.addFontProcessor(std::make_shared<OutlineFontProcessor>(Color(0.0f, 0.0f, 0.0f, 0.5f)));
+			}
+		}
 		return font3;
 	}
 }

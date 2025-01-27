@@ -11,6 +11,7 @@
 #include "oxygen/application/Application.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
+#include "oxygen/application/audio/AudioOutBase.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/drawing/DrawerTexture.h"
 #include "oxygen/helper/FileHelper.h"
@@ -318,6 +319,7 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 						{
 							HighResolutionTimer timer;
 							timer.start();
+							EngineMain::instance().getAudioOut().reloadAudioCollection();
 							RenderResources::instance().loadSprites();
 							ResourcesCache::instance().loadAllResources();
 							FontCollection::instance().reloadAll();
@@ -433,11 +435,21 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 				{
 					case SDLK_KP_PERIOD:
 					{
-						// Supporting both Shift and Ctrl, as the Shift + Peroid combination does not seem to work for all keyboards
+						// Supporting both Shift and Ctrl, as the Shift + Period combination does not seem to work for all keyboards
 						const bool continueToDebugEvent = FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_LCTRL);
-						mSimulation.setNextSingleStep(true, continueToDebugEvent);
-						if (!continueToDebugEvent)
+						if (continueToDebugEvent)
+						{
+							if (mSimulation.getSpeed() == 0.0f)
+								mSimulation.setSpeed(1.0f);		// Note that this resets break conditions and steps limit, so order of calls is important here
+							mSimulation.removeStepsLimit();
+						}
+						else
+						{
+							mSimulation.setNextSingleStep();
 							setLogDisplay(String(0, "Single step | Frame: %d", mSimulation.getFrameNumber() + 1));
+						}
+						mSimulation.setBreakCondition(Simulation::BreakCondition::DEBUG_LOG, continueToDebugEvent);
+						mSimulation.setBreakCondition(Simulation::BreakCondition::WATCH_HIT, continueToDebugEvent);
 						break;
 					}
 				}

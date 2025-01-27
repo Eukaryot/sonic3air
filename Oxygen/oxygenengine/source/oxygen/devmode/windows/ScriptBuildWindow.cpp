@@ -14,6 +14,7 @@
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/application/Application.h"
 #include "oxygen/application/modding/Mod.h"
+#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/LemonScriptProgram.h"
 #include "oxygen/simulation/LogDisplay.h"
@@ -91,19 +92,20 @@ void ScriptBuildWindow::buildContent()
 					{
 						if (ImGui::TreeNodeEx(&warning, ImGuiTreeNodeFlags_DefaultOpen, "%s", warning.mMessage.c_str()))
 						{
-						#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MAC) || defined(PLATFORM_LINUX)
-							// Context menu
-							if (ImGui::BeginPopupContextItem())
+							if (PlatformFunctions::hasClipboardSupport())
 							{
-								if (ImGui::Button("Copy warning text to clipboard"))
+								// Context menu
+								if (ImGui::BeginPopupContextItem())
 								{
-									SDL_SetClipboardText(warning.mMessage.c_str());
-									ImGui::CloseCurrentPopup();
+									if (ImGui::Button("Copy warning text to clipboard"))
+									{
+										PlatformFunctions::copyToClipboard(warning.mMessage);
+										ImGui::CloseCurrentPopup();
+									}
+									ImGui::EndPopup();
 								}
-								ImGui::EndPopup();
+								ImGui::SetItemTooltip("Right-click for options");
 							}
-							ImGui::SetItemTooltip("Right-click for options");
-						#endif
 
 							// List of occurences
 							for (const lemon::CompilerWarning::Occurrence& occurrence : warning.mOccurrences)

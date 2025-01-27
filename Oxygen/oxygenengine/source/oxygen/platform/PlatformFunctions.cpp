@@ -605,61 +605,30 @@ bool PlatformFunctions::isDebuggerPresent()
 
 bool PlatformFunctions::hasClipboardSupport()
 {
-#ifdef PLATFORM_WINDOWS
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MAC) || defined(PLATFORM_LINUX)
 	return true;
 #else
 	return false;
 #endif
 }
 
-bool PlatformFunctions::copyToClipboard(std::wstring_view string)
+bool PlatformFunctions::copyToClipboard(const std::string& string)
 {
-#ifdef PLATFORM_WINDOWS
-	if (OpenClipboard(nullptr))
-	{
-		const std::string str = WString(string).toStdString();
-		HGLOBAL handle = GlobalAlloc(GMEM_MOVEABLE, str.length() + 1);
-		if (nullptr != handle)
-		{
-			LPTSTR lockedText = (LPTSTR)GlobalLock(handle);
-			if (nullptr != lockedText)
-			{
-				memcpy(lockedText, (LPCTSTR)str.c_str(), str.length() + 1);
-				GlobalUnlock(handle);
-
-				EmptyClipboard();
-				SetClipboardData(CF_TEXT, handle);
-				CloseClipboard();
-				return true;
-			}
-		}
-	}
-#endif
-	return false;
+	return (SDL_SetClipboardText(string.c_str()) == 0);
 }
 
+bool PlatformFunctions::copyToClipboard(std::wstring_view string)
+{
+	return (SDL_SetClipboardText(*WString(string).toUTF8()) == 0);
+}
 
 bool PlatformFunctions::pasteFromClipboard(WString& outString)
 {
-#ifdef PLATFORM_WINDOWS
-	bool result = false;
-	if (IsClipboardFormatAvailable(CF_TEXT) && OpenClipboard(nullptr))
-	{
-		HGLOBAL handle = GetClipboardData(CF_TEXT);
-		if (nullptr != handle)
-		{
-			char* text = static_cast<char*>(GlobalLock(handle));
-			if (nullptr != text)
-			{
-				outString = WString(text);
-				GlobalUnlock(handle);
-				result = true;
-			}
-		}
-		CloseClipboard();
-	}
-	return result;
-#else
-	return false;
-#endif
+	if (!SDL_HasClipboardText())
+		return false;
+
+	char* utf8String = SDL_GetClipboardText();
+	outString.fromUTF8(std::string(utf8String));
+	SDL_free(utf8String);
+	return !outString.empty();
 }

@@ -564,8 +564,7 @@ void Game::onUpdateControls()
 		mButtonYPressedDuringSkippableCutscene = (ControlsIn::instance().getInputPad(0) & (int)ControlsIn::Button::Y);
 		if (mButtonYPressedDuringSkippableCutscene)
 		{
-			ControlsIn::instance().injectInput(0, 0);
-			ControlsIn::instance().injectInput(1, 0);
+			ControlsIn::instance().injectEmptyInputs();
 		}
 	}
 }

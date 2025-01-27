@@ -556,6 +556,9 @@
     <ClCompile Include="..\..\source\oxygen\rendering\Renderer.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\CustomSidePanelWindow.cpp">
+      <Filter>devmode\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -1049,6 +1052,9 @@
       <Filter>devmode\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\devmode\windows\DebugLogWindow.h">
+      <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\CustomSidePanelWindow.h">
       <Filter>devmode\windows</Filter>
     </ClInclude>
   </ItemGroup>

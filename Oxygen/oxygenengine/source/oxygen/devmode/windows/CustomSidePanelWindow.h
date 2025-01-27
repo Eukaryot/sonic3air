@@ -15,20 +15,14 @@
 #include "oxygen/devmode/DevModeWindowBase.h"
 
 
-class CallFramesWindow : public DevModeWindowBase
+class CustomSidePanelWindow : public DevModeWindowBase
 {
 public:
-	CallFramesWindow();
+	CustomSidePanelWindow();
 
+	virtual bool shouldBeAvailable() override;
+	virtual void onChangedIsWindowOpen(bool open) override;
 	virtual void buildContent() override;
-
-private:
-	bool mShowAllHitFunctions  = false;
-	bool mVisualizationSorting = false;
-	bool mShowProfilingSamples = false;
-
-	std::unordered_map<uint64, bool> mOpenState;
-	std::vector<uint32> mSortedUnknownAddressed;
 };
 
 #endif

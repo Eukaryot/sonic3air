@@ -100,27 +100,22 @@ function void fn0321e2()
 //# address-hook(0x032208) end(0x0322ee)
 function void fn032208()
 {
-	D1.u16 = u16[A0 + 0x3c]
-	D0.u16 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
-	if (D0.u16 != D1.u16)
+	u16 oldFlags = u16[A0 + 0x3c]
+	u16 newFlags = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
+	u16[A0 + 0x3c] = newFlags
+
+	if (newFlags > oldFlags)
 	{
-		u16[A0 + 0x3c] = D0.u16
-		D0.u16 -= D1.u16
-		if (D0.s16 >= 0)
+		// To push the barrel down, two conditions have to be met:
+		//  - The barrel must not go too fast
+		//  - It must not be too high or low
+		// Without these checks, even the Barrel of Doom is actually beatable, though this can lead to glitchy behavior when going too far down with the barrel
+		if (abs(objA0.velocity.y) < 0x0200)
 		{
-			D0.u16 = abs(objA0.velocity.y)
-			if (D0.u16 < 0x0200)
+			D0.u16 = objA0.position.y.u16 - u16[A0 + 0x30] + 0x40
+			if (D0.u16 < 0x80)
 			{
-				D0.u16 = objA0.position.y.u16 - u16[A0 + 0x30] + 0x40
-				if (D0.u16 < 0x80)
-				{
-					objA0.velocity.y += 0x0400
-					D0.u16 = objA0.value3e
-					if (D0.s16 <= objA0.velocity.y)
-					{
-						objA0.velocity.y = D0.u16
-					}
-				}
+				objA0.velocity.y = min(objA0.velocity.y + 0x400, s16(objA0.value3e))
 			}
 		}
 	}
@@ -161,8 +156,7 @@ function void fn032208()
 	}
 	else if (offset < 0)
 	{
-		D0.u16 = objA0.value3e
-		if (D0.s16 <= objA0.velocity.y)
+		if (objA0.velocity.y >= objA0.value3e)
 			return
 
 		objA0.velocity.y += 0x20
@@ -184,8 +178,7 @@ function void fn032208()
 	}
 	else
 	{
-		D0.s16 = -s16(objA0.value3e)
-		if (D0.s16 >= objA0.velocity.y)
+		if (objA0.velocity.y <= -s16(objA0.value3e))
 			return
 
 		objA0.velocity.y -= 0x20

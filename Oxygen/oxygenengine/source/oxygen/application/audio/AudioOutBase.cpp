@@ -132,7 +132,7 @@ void AudioOutBase::handleGameLoaded()
 void AudioOutBase::handleActiveModsChanged()
 {
 	// First of all, stop all playing sounds immediately
-	mAudioPlayer.stopAllSounds();
+	mAudioPlayer.stopAllSounds(true);
 	FTX::Audio->removeAllSounds();
 
 	// Reload of modded audio definitions
@@ -146,6 +146,17 @@ void AudioOutBase::handleActiveModsChanged()
 	// We could now remove all audio sources that won't be used any more, but there's no actual need to do this
 	//  -> They will receive an unload due to not being actively used sooner or later
 	//  -> Their instances won't get deleted, but most of their memory will get freed then
+}
+
+void AudioOutBase::reloadAudioCollection()
+{
+	AudioPlayer::SavedPlaybackState playbackState;
+	mAudioPlayer.savePlaybackState(playbackState);
+
+	// Reload audio definitions (only modded audio definitions, but that should be fine)
+	handleActiveModsChanged();
+
+	mAudioPlayer.loadPlaybackState(playbackState);
 }
 
 void AudioOutBase::determineActiveSourceRegistrations()

@@ -34,6 +34,7 @@ function void fn031d90()
 	if (D0.s8 >= 0)
 	{
 		objA0.update_address = 0x031e68
+		fn031e68()
 		return
 	}
 
