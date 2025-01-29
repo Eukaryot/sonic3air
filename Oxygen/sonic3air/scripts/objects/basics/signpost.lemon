@@ -456,16 +456,6 @@ function void fn083ac6()
 
 
 
-//# address-hook(0x085a5a) end(0x085a78)
-function void fn085a5a()
-{
-	A1 = 0xffff0000 + u16[A0 + 0x46]
-	u8[A0 + 0x0a] = (u8[A0 + 0x0a] & ~0x80) | (u8[A1 + 0x0a] & 0x80)
-	objA0.sprite_priority = objA1.sprite_priority
-}
-
-
-
 // Animal capsule unlock button
 
 //# address-hook(0x08671c) end(0x086726)

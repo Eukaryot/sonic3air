@@ -475,18 +475,18 @@ function void fn05df48()
 
 
 
-// Unknown object
+// Master Emerald
 
 //# address-hook(0x05df58) end(0x05df7e)
 function void fn05df58()
 {
 	if (outro.ending_type > 0)
 	{
-		D0.u8 = u8[0xfffffac1]
-		if (D0.u8 != 0)
+		// Update glowing
+		if (u8[0xfffffac1] != 0)
 		{
 			A1 = 0x07dd5a
-			A2 = (D0.s8 < 0) ? 0xfffffc3c : 0xfffffc5c
+			A2 = (u8[0xfffffac1] & 0x80) ? 0xfffffc3c : 0xfffffc5c
 			fn085a1a()
 		}
 	}

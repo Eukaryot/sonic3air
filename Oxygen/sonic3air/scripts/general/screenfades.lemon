@@ -33,64 +33,63 @@ function u16 makeExtendedPackedColor(u16 color)
 #endif
 
 
-function void SetPaletteFadedOut(u16 range)
+//# address-hook(0x003af0) end(0x003b12)
+function void Menu.FadeInAfterInit()
 {
-	palette_fade.range = range
-	SetPaletteFadedOut()
-}
+	u8 lastGameMode = global.game_mode
 
-
-//# address-hook(0x003b80) end(0x003b94)
-function void SetPaletteFadedOut()
-{
-	if (global.zone_act == 0x0d01 || global.zone_act == 0x1701)
+	SetPaletteFadedOut(0x003f)
+	D4.u16 = 0x15
+	while (D4.s16 >= 0)
 	{
+		global.frame_state = 0x12
+		waitForNextFrame()
+
+		FadeInPalette()
+		LoadRequiredSpritePatterns()
+		--D4.s16
+
 	#if STANDALONE
-		// Avoid brief glitches while fading in from white into the HPZ emerald cave
-		if (global.zone_act == 0x1701)
+		// SEGA logo
+		if (global.game_mode == 0x04)
 		{
-			palette_fade.range = 0x003f
+			Renderer.resetSprites()
+			Renderer.drawCustomSprite("original_game_by", getScreenWidth() / 2 - 85, 60, 0x00, 0, 0x2000, 0, u16(u8[0xfffffc01] & 0x0e) * 96 / 0x0e)
+		}
+
+		// Data Select
+		if (global.game_mode == 0x4c || lastGameMode == 0x4c)
+		{
+			// Draw our own widescreen version of the background
+			//  -> For this to work, we need to update the sprites as well
+			u16 backupD4 = D4.u16
+			UpdateGameObjects()
+			RenderSprites()
+
+			// Update scroll offset (if the player scrolls during fade-in already)
+			u16[0xffffe002] = -camera.foreground.x.u16
+
+			DataSelect.drawCustomPlanes()
+			D4.u16 = backupD4
 		}
 	#endif
-
-		SetPaletteToWhite()
-	}
-	else
-	{
-		SetPaletteToBlack()
 	}
 }
 
-
-//-------------------------------------------------------//
-// Fade Colors in from and out of black screen           //
-//-------------------------------------------------------//
-
-//# address-hook(0x003b94) end(0x003bb6)
-function void SetPaletteToBlack()
-{
-	zeroMemory(0xfffffc00 + u32(palette_fade.offset), (palette_fade.count + 1) * 2)
-	if (level.water_present)
-		zeroMemory(0xfffff080 + u32(palette_fade.offset), (palette_fade.count + 1) * 2)
 
 #if STANDALONE
-	if (EXTENDED_CHARACTER_PALETTES && palette_fade.range < 0x2000)
+function void Menu.fadeInImmediatelyAfterInit()
+{
+	SetPaletteFadedOut(0x003f)
+	D4.u16 = 0x15
+	while (D4.s16 >= 0)
 	{
-		zeroMemory(0x802000, 0x180)
-		if (level.water_present)
-		{
-			zeroMemory(0x802300, 0x180)
-		}
+		FadeInPalette()
+		LoadRequiredSpritePatterns()
+		--D4.s16
 	}
-
-	globalComponentTintColorR = 0
-	globalComponentTintColorG = 0
-	globalComponentTintColorB = 0
-	globalComponentAddedColorR = 0
-	globalComponentAddedColorG = 0
-	globalComponentAddedColorB = 0
-#endif
 }
+#endif
 
 
 //# address-hook(0x003b14) end(0x003b52)
@@ -185,6 +184,89 @@ function void FadeInColor()
 	}
 	A0 += 2
 	A1 += 2
+}
+
+
+function void SetPaletteFadedOut(u16 range)
+{
+	palette_fade.range = range
+	SetPaletteFadedOut()
+}
+
+
+//# address-hook(0x003b80) end(0x003b94)
+function void SetPaletteFadedOut()
+{
+	if (global.zone_act == 0x0d01 || global.zone_act == 0x1701)
+	{
+	#if STANDALONE
+		// Avoid brief glitches while fading in from white into the HPZ emerald cave
+		if (global.zone_act == 0x1701)
+		{
+			palette_fade.range = 0x003f
+		}
+	#endif
+
+		SetPaletteToWhite()
+	}
+	else
+	{
+		SetPaletteToBlack()
+	}
+}
+
+
+//-------------------------------------------------------//
+// Fade Colors in from and out of black screen           //
+//-------------------------------------------------------//
+
+//# address-hook(0x003b94) end(0x003bb6)
+function void SetPaletteToBlack()
+{
+	zeroMemory(0xfffffc00 + u32(palette_fade.offset), (palette_fade.count + 1) * 2)
+	if (level.water_present)
+		zeroMemory(0xfffff080 + u32(palette_fade.offset), (palette_fade.count + 1) * 2)
+
+#if STANDALONE
+	if (EXTENDED_CHARACTER_PALETTES && palette_fade.range < 0x2000)
+	{
+		zeroMemory(0x802000, 0x180)
+		if (level.water_present)
+		{
+			zeroMemory(0x802300, 0x180)
+		}
+	}
+
+	globalComponentTintColorR = 0
+	globalComponentTintColorG = 0
+	globalComponentTintColorB = 0
+	globalComponentAddedColorR = 0
+	globalComponentAddedColorG = 0
+	globalComponentAddedColorB = 0
+#endif
+}
+
+
+//# address-hook(0x003bb8) end(0x003be2)
+function void UpdatePaletteEffects()
+{
+	if (global.fade_timer == 0)
+	{
+		UpdatePaletteEffects.Default()
+	}
+	else if (global.fade_timer > 0)
+	{
+		--global.fade_timer
+
+		if (global.zone_act == 0x0d01 || global.zone_act == 0x1701)
+		{
+			FadeInFromWhite()
+		}
+		else
+		{
+			FadeInPalette()
+		}
+	}
 }
 
 
