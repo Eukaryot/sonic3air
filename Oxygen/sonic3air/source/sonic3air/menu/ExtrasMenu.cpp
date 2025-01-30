@@ -17,8 +17,8 @@
 
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/InputManager.h"
-#include "oxygen/application/mainview/GameView.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/Utils.h"
 
@@ -167,7 +167,7 @@ void ExtrasMenu::onFadeIn()
 		entries.addEntry("Back", BACK);
 	}
 
-	mMenuBackground->showPreview(false);
+	mMenuBackground->showPreview(false, false);
 	mMenuBackground->startTransition(MenuBackground::Target::BLUE);
 
 	for (size_t k = 0; k < 3; ++k)
@@ -648,6 +648,6 @@ void ExtrasMenu::startLevelSelect()
 void ExtrasMenu::goBack()
 {
 	playMenuSound(0xad);
-	GameApp::instance().onExitExtras();
+	mMenuBackground->openMainMenu();
 	mState = State::FADE_TO_MENU;
 }

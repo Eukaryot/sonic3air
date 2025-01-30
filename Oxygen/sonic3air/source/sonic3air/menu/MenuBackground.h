@@ -52,9 +52,8 @@ public:
 	void openOptions(bool enteredInGame = false);
 	void openExtras();
 	void openMods();
-	void openGameStartedMenu();
-	void fadeToExit();
 
+	void openGameStartedMenu();
 	void setGameStartedMenu();
 
 private:

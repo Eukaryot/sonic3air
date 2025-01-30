@@ -31,12 +31,12 @@
     <ClCompile Include="..\..\source\oxygen\application\EngineMain.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\GameLoader.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\GameProfile.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\gameview\GameView.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\ControlsIn.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\InputConfig.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\InputManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\InputRecorder.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\RumbleEffectQueue.cpp" />
-    <ClCompile Include="..\..\source\oxygen\application\mainview\GameView.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\GameSetupScreen.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\MenuItems.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\OxygenMenu.cpp" />
@@ -188,12 +188,12 @@
     <ClInclude Include="..\..\source\oxygen\application\EngineMain.h" />
     <ClInclude Include="..\..\source\oxygen\application\GameLoader.h" />
     <ClInclude Include="..\..\source\oxygen\application\GameProfile.h" />
+    <ClInclude Include="..\..\source\oxygen\application\gameview\GameView.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\ControlsIn.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\InputConfig.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\InputManager.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\InputRecorder.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\RumbleEffectQueue.h" />
-    <ClInclude Include="..\..\source\oxygen\application\mainview\GameView.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\GameSetupScreen.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\MenuItems.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\OxygenMenu.h" />

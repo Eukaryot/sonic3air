@@ -17,8 +17,8 @@
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/InputManager.h"
-#include "oxygen/application/mainview/GameView.h"
 #include "oxygen/simulation/Simulation.h"
 
 

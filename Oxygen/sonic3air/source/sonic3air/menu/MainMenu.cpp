@@ -19,8 +19,8 @@
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/InputManager.h"
-#include "oxygen/application/mainview/GameView.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/helper/Utils.h"
 
@@ -367,6 +367,6 @@ void MainMenu::exitGame()
 {
 	AudioOut::instance().fadeOutChannel(0, 0.25f);
 	GameApp::instance().getGameView().startFadingOut(0.25f);
-	mMenuBackground->fadeToExit();
+	mMenuBackground->startTransition(MenuBackground::Target::TITLE);
 	mState = State::FADE_TO_EXIT;
 }

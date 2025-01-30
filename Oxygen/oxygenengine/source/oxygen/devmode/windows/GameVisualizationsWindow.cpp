@@ -12,7 +12,7 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/application/Application.h"
-#include "oxygen/application/mainview/GameView.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/rendering/parts/RenderParts.h"

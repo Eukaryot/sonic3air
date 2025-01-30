@@ -23,8 +23,8 @@
 #include "oxygen/application/Application.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/InputManager.h"
-#include "oxygen/application/mainview/GameView.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/rendering/utils/RenderUtils.h"
@@ -235,19 +235,6 @@ void GameApp::openOptionsMenuInGame()
 	mMenuBackground->openOptions(true);
 }
 
-void GameApp::onExitOptions()
-{
-	if (mCurrentState == State::INGAME_OPTIONS)
-	{
-		// Only start fading to black - see "onFadedOutOptions" for the actual change of state after complete fade-out
-		GameApp::instance().getGameView().startFadingOut(0.1666f);
-	}
-	else
-	{
-		mMenuBackground->openMainMenu();
-	}
-}
-
 void GameApp::onFadedOutOptions()
 {
 	if (mCurrentState == State::INGAME_OPTIONS)
@@ -266,16 +253,6 @@ void GameApp::onFadedOutOptions()
 
 		mCurrentState = State::INGAME;
 	}
-}
-
-void GameApp::onExitExtras()
-{
-	mMenuBackground->openMainMenu();
-}
-
-void GameApp::onExitMods()
-{
-	mMenuBackground->openMainMenu();
 }
 
 void GameApp::onGamePaused(bool canRestart)

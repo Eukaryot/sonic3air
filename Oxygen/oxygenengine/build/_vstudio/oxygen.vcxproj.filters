@@ -153,9 +153,6 @@
     <ClCompile Include="..\..\source\oxygen\application\Application.cpp">
       <Filter>application</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\application\mainview\GameView.cpp">
-      <Filter>application\gameview</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\overlays\DebugLogView.cpp">
       <Filter>application\overlays</Filter>
     </ClCompile>
@@ -559,6 +556,9 @@
     <ClCompile Include="..\..\source\oxygen\devmode\windows\CustomSidePanelWindow.cpp">
       <Filter>devmode\windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\gameview\GameView.cpp">
+      <Filter>application\gameview</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -611,9 +611,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\Application.h">
       <Filter>application</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\application\mainview\GameView.h">
-      <Filter>application\gameview</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\overlays\DebugLogView.h">
       <Filter>application\overlays</Filter>
@@ -1056,6 +1053,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\devmode\windows\CustomSidePanelWindow.h">
       <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\gameview\GameView.h">
+      <Filter>application\gameview</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

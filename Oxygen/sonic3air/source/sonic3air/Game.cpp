@@ -20,9 +20,9 @@
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/Configuration.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/application/input/InputManager.h"
-#include "oxygen/application/mainview/GameView.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/drawing/software/Blitter.h"
