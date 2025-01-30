@@ -4,36 +4,40 @@ Mastering Packaged Builds
 
 
 Preparations for all versions
-	- Scripts
-		- Review scripts to make sure that debugging stuff and similar is out
-		- Build scripts once by starting S3AIR as a Release build
-	- Update version in "source/version.inc"
-	- Execute "mastering_build_data.bat" under Windows
-	- Commit the results, especially in master image template
+	- Build S3AIR for your current working platform (e.g. when you're on Windows and intend to build for Android, first build S3AIR for Windows)
+		- See the respective "how-to-build.txt" file inside your platform's subfolder of "Oxygen/sonic3air/build" (e.g. "_vstudio" for Windows, "_cmake" for Linux)
+	- After that, build the game scripts once by starting S3AIR as a Release build
+	- Review the version number in "Oxygen/sonic3air/source/sonic3air/version.inc"
 
 
-Windows
-	- Do the preparation steps above, incl. "mastering_build_data.bat"
-	- Execute "mastering_windows_32bit.bat"
-	- Test the resulting package
+Windows (using Visual Studio)
+	- Do the preparation steps above
+	- For a 32-bit build: Execute "mastering_windows_32bit.bat"
+	- For a 64-bit build: Execute "mastering_windows_64bit.bat"
+	- The resulting package can be found inside "Oxygen/_MASTER"
 
 
 Linux
-	- Do the preparation steps above, incl. "mastering_build_data.bat"
-	- Execute "mastering_linux.sh" (e.g. in WSL)
-	- Test the resulting package (in a real Linux installation)
+	- Do the preparation steps above
+	- Execute "mastering_linux.sh" (can be done in a VM, in WSL, or of course on a real Linux installation)
+	- The resulting package can be found inside "Oxygen/_MASTER" (testing should definitely be done in a real Linux installation)
 
 
 Android
-	- Do the preparation steps above, incl. "mastering_build_data.bat"
-	- Execute "mastering_android.bat" under Windows
-	- Open in Android Studio
-	- Review "source\_android\app\build.gradle"
+	- Do the preparation steps above, incl. building S3AIR for your current working platform (Windows, Linux) first
+	- Build the package data
+		- On Windows: Execute one of the "mastering_build_data_*.bat" scripts (both produce the same results)
+		- On Linux: You can the "mastering_linux.sh" script, though it does a bit more than just creating the package data
+		- In any case, the resulting data will be written to "Oxygen/sonic3air/_master_image_template/data"
+	- Copy all required data to the Android data folder
+		- See "source/_android/readme_how-to-build.txt" for what to copy
+		- On Windows, you can use the "mastering_android.bat" script to do the copying
+	- Open the project at "Oxygen/sonic3air/build/_android" in Android Studio
+	- Review "source/_android/app/build.gradle"
 		- Update the version number here as well
 		- Make sure the abiFilters and other settings are correct
 	- Build a signed APK via Menu -> Build -> "Generate Signed Bundle / APK..."
 		- APK
-		- Use keystore in "___internal\keys\android_keystore.jks" (not versioned in Git)
+		- Use your keystore (the official S3AIR one is not publicly available)
 		- Build as "release" with both signature versions enabled
-	- More info on how to build in general see "source\_android\readme_how-to-build.txt"
 
