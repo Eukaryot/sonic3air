@@ -24,19 +24,19 @@ SpriteManager::SpriteManager(PatternManager& patternManager, SpacesManager& spac
 
 void SpriteManager::clear()
 {
-	mResetRenderItems = false;
-	clearAllContexts();
+	mResetRenderItemsBitmask = 0;
+	clearAllLifetimeContexts();
 	clearItemSet(mAddedItems);
 }
 
 void SpriteManager::clearLifetimeContext(RenderItem::LifetimeContext lifetimeContext)
 {
-	clearItemSet(mContexts[(int)lifetimeContext]);
+	clearItemSet(mLifetimeContexts[(int)lifetimeContext]);
 }
 
 void SpriteManager::preFrameUpdate()
 {
-	mCurrentContext = RenderItem::LifetimeContext::DEFAULT;
+	mCurrentLifetimeContext = RenderItem::LifetimeContext::DEFAULT;
 	mLogicalSpriteSpace = Space::SCREEN;
 	mSpriteTag = 0;
 	mTaggedSpritesLastFrame.swap(mTaggedSpritesThisFrame);
@@ -50,38 +50,31 @@ void SpriteManager::postFrameUpdate()
 
 	// Process render items
 	{
-		if (mResetRenderItems)
-		{
-			clearAllContexts();
-		}
+		clearLifetimeContextsByBitmask(mResetRenderItemsBitmask);
 
 		// Apply added render items
 		grabAddedItems();
 
 		clearLifetimeContext(RenderItem::LifetimeContext::OUTSIDE_FRAME);
-		mCurrentContext = RenderItem::LifetimeContext::OUTSIDE_FRAME;
+		mCurrentLifetimeContext = RenderItem::LifetimeContext::OUTSIDE_FRAME;
 
-		if (mResetRenderItems)
+		if (EngineMain::getDelegate().useDeveloperFeatures() && (mResetRenderItemsBitmask & 0x01))
 		{
-			if (EngineMain::getDelegate().useDeveloperFeatures())
-			{
-				mLegacyVdpSpriteMode = FTX::keyState('u') && (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT));
+			mLegacyVdpSpriteMode = FTX::keyState('u') && (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT));
 
-				// In legacy mode, we collect current sprites from VRAM, instead of the usual methods via script calls like "Renderer.drawVdpSprite"
-				if (mLegacyVdpSpriteMode)
-				{
-					collectLegacySprites();
-				}
+			// In legacy mode, we collect current sprites from VRAM, instead of the usual methods via script calls like "Renderer.drawVdpSprite"
+			if (mLegacyVdpSpriteMode)
+			{
+				collectLegacySprites();
 			}
-
-			mResetRenderItems = false;
 		}
-		else
+
+		// When maintaining sprites, make sure to reset sprite interpolation
+		for (int contextIndex = 0; contextIndex < RenderItem::NUM_LIFETIME_CONTEXTS; ++contextIndex)
 		{
-			// When maintaining sprites, make sure to reset sprite interpolation
-			for (int contextIndex = 0; contextIndex < RenderItem::NUM_CONTEXTS; ++contextIndex)
+			if (((mResetRenderItemsBitmask >> contextIndex) & 1) == 0)
 			{
-				for (RenderItem* renderItem : mContexts[contextIndex].mItems)
+				for (RenderItem* renderItem : mLifetimeContexts[contextIndex].mItems)
 				{
 					if (renderItem->isSprite())
 					{
@@ -91,12 +84,19 @@ void SpriteManager::postFrameUpdate()
 				}
 			}
 		}
+
+		mResetRenderItemsBitmask = 0;
 	}
 }
 
 void SpriteManager::postRefreshDebugging()
 {
 	grabAddedItems();
+}
+
+void SpriteManager::setCurrentLifetimeContext(RenderItem::LifetimeContext lifetimeContext)
+{
+	mCurrentLifetimeContext = lifetimeContext;
 }
 
 void SpriteManager::drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, const Color& tintColor, const Color& addedColor)
@@ -106,14 +106,13 @@ void SpriteManager::drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint
 	sprite.mSize.x = 1 + ((encodedSize >> 2) & 3);
 	sprite.mSize.y = 1 + (encodedSize & 3);
 	sprite.mFirstPattern = patternIndex;
-	sprite.mRenderQueue = renderQueue;
 	sprite.mPriorityFlag = (patternIndex & 0x8000) != 0;
 	sprite.mTintColor = tintColor;
 	sprite.mAddedColor = addedColor;
 	sprite.mCoordinatesSpace = Space::SCREEN;
 	sprite.mLogicalSpace = mLogicalSpriteSpace;
-	sprite.mUseGlobalComponentTint = false;;
-	mAddedItems.mItems.push_back(&sprite);
+	sprite.mUseGlobalComponentTint = false;
+	pushAddedItem(sprite, renderQueue);
 
 	if (EngineMain::getDelegate().useDeveloperFeatures())
 	{
@@ -164,7 +163,7 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 	//  - 0x40 = Priority flag
 	//  - 0x80 = Ignore global component tint (note this gets set automatically for palette sprites; to draw a palette sprite with global component tint, you need to use a sprite handle)
 
-	renderitems::CustomSpriteInfoBase* spritePtr = addSpriteByKey(key);
+	renderitems::CustomSpriteInfoBase* spritePtr = addSpriteByKey(key, renderQueue);
 	if (nullptr == spritePtr)
 		return;
 
@@ -175,7 +174,6 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 	}
 
 	sprite.mPosition = position;
-	sprite.mRenderQueue = renderQueue;
 	sprite.mTransformation = transformation;
 	sprite.mTintColor = tintColor;
 
@@ -219,11 +217,10 @@ void SpriteManager::addSpriteMask(const Vec2i& position, const Vec2i& size, uint
 	renderitems::SpriteMaskInfo& sprite = mPoolOfRenderItems.mSpriteMasks.createObject();
 	sprite.mPosition = position;
 	sprite.mSize = size;
-	sprite.mRenderQueue = renderQueue;
 	sprite.mDepth = priorityFlag ? 0.6f : 0.1f;
 	sprite.mCoordinatesSpace = space;
 	sprite.mLogicalSpace = mLogicalSpriteSpace;
-	mAddedItems.mItems.push_back(&sprite);
+	pushAddedItem(sprite, renderQueue);
 }
 
 void SpriteManager::addRectangle(const Recti& rect, const Color& color, uint16 renderQueue, Space space, bool useGlobalComponentTint)
@@ -232,11 +229,10 @@ void SpriteManager::addRectangle(const Recti& rect, const Color& color, uint16 r
 	newRect.mPosition = rect.getPos();
 	newRect.mSize = rect.getSize();
 	newRect.mColor = color;
-	newRect.mRenderQueue = renderQueue;
 	newRect.mCoordinatesSpace = space;
-	newRect.mLifetimeContext = mCurrentContext;
+	newRect.mLifetimeContext = mCurrentLifetimeContext;
 	newRect.mUseGlobalComponentTint = useGlobalComponentTint;
-	mAddedItems.mItems.push_back(&newRect);
+	pushAddedItem(newRect, renderQueue);
 }
 
 void SpriteManager::addText(std::string_view fontKeyString, uint64 fontKeyHash, const Vec2i& position, std::string_view textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space, bool useGlobalComponentTint)
@@ -250,11 +246,10 @@ void SpriteManager::addText(std::string_view fontKeyString, uint64 fontKeyHash, 
 	newText.mColor = color;
 	newText.mAlignment = alignment;
 	newText.mSpacing = spacing;
-	newText.mRenderQueue = renderQueue;
 	newText.mCoordinatesSpace = space;
-	newText.mLifetimeContext = mCurrentContext;
+	newText.mLifetimeContext = mCurrentLifetimeContext;
 	newText.mUseGlobalComponentTint = useGlobalComponentTint;
-	mAddedItems.mItems.push_back(&newText);
+	pushAddedItem(newText, renderQueue);
 }
 
 void SpriteManager::addViewport(const Recti& rect, uint16 renderQueue)
@@ -262,9 +257,8 @@ void SpriteManager::addViewport(const Recti& rect, uint16 renderQueue)
 	renderitems::Viewport& newViewport = mPoolOfRenderItems.mViewports.createObject();
 	newViewport.mPosition = rect.getPos();
 	newViewport.mSize = rect.getSize();
-	newViewport.mRenderQueue = renderQueue;
 	newViewport.mCoordinatesSpace = Space::SCREEN;
-	mAddedItems.mItems.push_back(&newViewport);
+	pushAddedItem(newViewport, renderQueue);
 }
 
 uint32 SpriteManager::addSpriteHandle(uint64 key, const Vec2i& position, uint16 renderQueue)
@@ -335,11 +329,25 @@ void SpriteManager::clearItemSet(ItemSet& itemSet)
 	itemSet.mItems.clear();
 }
 
-void SpriteManager::clearAllContexts()
+void SpriteManager::clearAllLifetimeContexts()
 {
-	for (int contextIndex = 0; contextIndex < RenderItem::NUM_CONTEXTS; ++contextIndex)
+	for (int contextIndex = 0; contextIndex < RenderItem::NUM_LIFETIME_CONTEXTS; ++contextIndex)
 	{
-		clearItemSet(mContexts[contextIndex]);
+		clearItemSet(mLifetimeContexts[contextIndex]);
+	}
+}
+
+void SpriteManager::clearLifetimeContextsByBitmask(uint8 bitmask)
+{
+	if (mResetRenderItemsBitmask == 0)
+		return;
+
+	for (int contextIndex = 0; contextIndex < RenderItem::NUM_LIFETIME_CONTEXTS; ++contextIndex)
+	{
+		if ((mResetRenderItemsBitmask >> contextIndex) & 1)
+		{
+			clearItemSet(mLifetimeContexts[contextIndex]);
+		}
 	}
 }
 
@@ -352,9 +360,9 @@ void SpriteManager::serializeSaveState(VectorBinarySerializer& serializer, uint8
 
 	if (formatVersion >= 4)
 	{
-		for (int contextIndex = 0; contextIndex < RenderItem::NUM_CONTEXTS; ++contextIndex)
+		for (int contextIndex = 0; contextIndex < RenderItem::NUM_LIFETIME_CONTEXTS; ++contextIndex)
 		{
-			std::vector<RenderItem*>& renderItems = mContexts[contextIndex].mItems;
+			std::vector<RenderItem*>& renderItems = mLifetimeContexts[contextIndex].mItems;
 			serializer.serializeArraySize(renderItems);
 			if (serializer.isReading())
 			{
@@ -379,11 +387,11 @@ void SpriteManager::serializeSaveState(VectorBinarySerializer& serializer, uint8
 
 SpriteManager::ItemSet& SpriteManager::getItemsByContext(RenderItem::LifetimeContext lifetimeContext)
 {
-	RMX_ASSERT((int)lifetimeContext < RenderItem::NUM_CONTEXTS, "Invalid lifetime context " << (int)lifetimeContext);
-	return mContexts[(int)lifetimeContext];
+	RMX_ASSERT((int)lifetimeContext < RenderItem::NUM_LIFETIME_CONTEXTS, "Invalid lifetime context " << (int)lifetimeContext);
+	return mLifetimeContexts[(int)lifetimeContext];
 }
 
-renderitems::CustomSpriteInfoBase* SpriteManager::addSpriteByKey(uint64 key)
+renderitems::CustomSpriteInfoBase* SpriteManager::addSpriteByKey(uint64 key, uint16 renderQueue)
 {
 	const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
 	if (nullptr != item)
@@ -396,7 +404,7 @@ renderitems::CustomSpriteInfoBase* SpriteManager::addSpriteByKey(uint64 key)
 			sprite.mPivotOffset = item->mSprite->mOffset;
 			sprite.mSize = static_cast<ComponentSprite*>(item->mSprite)->getBitmap().getSize();
 			sprite.mLogicalSpace = mLogicalSpriteSpace;
-			mAddedItems.mItems.push_back(&sprite);
+			pushAddedItem(sprite, renderQueue);
 			return &sprite;
 		}
 		else
@@ -407,7 +415,7 @@ renderitems::CustomSpriteInfoBase* SpriteManager::addSpriteByKey(uint64 key)
 			sprite.mPivotOffset = item->mSprite->mOffset;
 			sprite.mSize = static_cast<PaletteSprite*>(sprite.mCacheItem->mSprite)->getBitmap().getSize();
 			sprite.mLogicalSpace = mLogicalSpriteSpace;
-			mAddedItems.mItems.push_back(&sprite);
+			pushAddedItem(sprite, renderQueue);
 			return &sprite;
 		}
 	}
@@ -436,14 +444,13 @@ void SpriteManager::processSpriteHandles()
 
 	for (const SpriteHandleData& data : mSpriteHandles)
 	{
-		renderitems::CustomSpriteInfoBase* spritePtr = addSpriteByKey(data.mKey);
+		renderitems::CustomSpriteInfoBase* spritePtr = addSpriteByKey(data.mKey, data.mRenderQueue);
 		if (nullptr == spritePtr)
 			continue;
 
 		renderitems::CustomSpriteInfoBase& sprite = *spritePtr;
 
 		sprite.mPosition = data.mPosition;
-		sprite.mRenderQueue = data.mRenderQueue;
 		sprite.mPriorityFlag = data.mPriorityFlag;
 		sprite.mTintColor = data.mTintColor;
 		sprite.mAddedColor = data.mAddedColor;
@@ -496,6 +503,13 @@ void SpriteManager::processSpriteHandles()
 	mSpriteHandles.clear();
 }
 
+void SpriteManager::pushAddedItem(RenderItem& item, uint16 renderQueue)
+{
+	item.mRenderQueue = renderQueue;
+	item.mLifetimeContext = mCurrentLifetimeContext;
+	mAddedItems.mItems.push_back(&item);
+}
+
 void SpriteManager::grabAddedItems()
 {
 	const Vec2i worldSpaceOffset = mSpacesManager.getWorldSpaceOffset();
@@ -524,6 +538,7 @@ void SpriteManager::grabAddedItems()
 void SpriteManager::collectLegacySprites()
 {
 	// Collect sprites to render
+	std::vector<RenderItem*>& items = getItemsByContext(RenderItem::LifetimeContext::DEFAULT).mItems;
 	int numSpritesAdded = 0;
 	for (int link = 0;;)
 	{
@@ -545,7 +560,7 @@ void SpriteManager::collectLegacySprites()
 
 		sprite.mFirstPattern = data[2];
 
-		mContexts[(int)RenderItem::LifetimeContext::DEFAULT].mItems.push_back(&sprite);
+		items.push_back(&sprite);
 		++numSpritesAdded;
 
 		// Update "last used atex" of patterns in cache (actually that's only needed for debug output)
