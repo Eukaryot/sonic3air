@@ -193,6 +193,7 @@
     <None Include="..\..\source\rmxmedia\font\StdFontData.inc">
       <Filter>font</Filter>
     </None>
+    <None Include="librmx.natstepfilter" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="librmx.natvis" />
