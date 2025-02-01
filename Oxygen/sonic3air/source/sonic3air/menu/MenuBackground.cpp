@@ -8,7 +8,6 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/menu/MenuBackground.h"
-#include "sonic3air/menu/ActSelectMenu.h"
 #include "sonic3air/menu/ExtrasMenu.h"
 #include "sonic3air/menu/GameApp.h"
 #include "sonic3air/menu/GameMenuManager.h"
@@ -87,7 +86,6 @@ namespace detail
 MenuBackground::MenuBackground()
 {
 	detail::createGameMenuInstance(mMainMenu,		mAllChildren, *this);
-	detail::createGameMenuInstance(mActSelectMenu,	mAllChildren, *this);
 	detail::createGameMenuInstance(mTimeAttackMenu,	mAllChildren, *this);
 	detail::createGameMenuInstance(mOptionsMenu,	mAllChildren, *this);
 	detail::createGameMenuInstance(mExtrasMenu,		mAllChildren, *this);
@@ -387,11 +385,6 @@ void MenuBackground::showPreview(bool show, bool useTransition)
 void MenuBackground::openMainMenu()
 {
 	openMenu(*mMainMenu);
-}
-
-void MenuBackground::openActSelectMenu()
-{
-	openMenu(*mActSelectMenu);
 }
 
 void MenuBackground::openTimeAttackMenu()

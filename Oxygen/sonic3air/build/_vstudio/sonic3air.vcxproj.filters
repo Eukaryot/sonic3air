@@ -118,9 +118,6 @@
     <ClCompile Include="..\..\source\sonic3air\EngineDelegate.cpp" />
     <ClCompile Include="..\..\source\sonic3air\Game.cpp" />
     <ClCompile Include="..\..\source\sonic3air\main.cpp" />
-    <ClCompile Include="..\..\source\sonic3air\menu\ActSelectMenu.cpp">
-      <Filter>menu</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.cpp">
       <Filter>menu\context</Filter>
     </ClCompile>
@@ -269,9 +266,6 @@
     <ClInclude Include="..\..\source\sonic3air\EngineDelegate.h" />
     <ClInclude Include="..\..\source\sonic3air\Game.h" />
     <ClInclude Include="..\..\source\sonic3air\pch.h" />
-    <ClInclude Include="..\..\source\sonic3air\menu\ActSelectMenu.h">
-      <Filter>menu</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.h">
       <Filter>menu\context</Filter>
     </ClInclude>
