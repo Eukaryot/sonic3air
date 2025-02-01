@@ -150,26 +150,34 @@ function void GamePause.Menu()
 
 	// Simple test for a script implementation of game pause
 
+	// Pause game music and sounds
+	Game.pauseGameAudio()
+
+	// Handle skippable cutscene
+	bool wasInSkippableCutscene = Game.isInSkippableCutscene()
+	Game.endSkippableCutscene()
+
 	// TODO: Restart and Options must be made optional
 	constant array<string> ENTRY_TEXTS = { "Continue", "Restart", "Options", "Exit Game" }
 	constant u16 LINE_HEIGHT = 26
 
-	// TODO: Pause game music (and afterwards resume it again)
-
 	u8 selected = 0
+	float visibility = 0.0f
 	while (true)
 	{
 		// Inner loop will be exited once the player selected an entry in the menu
 		while (true)
 		{
-			// TODO: Add fade-in
+			// Fade-in
+			if (visibility < 1.0f)
+				visibility = min(visibility + 0.2f, 1.0f)
 
 			// Use lifetime context 1 for everything rendered by the pause menu
 			//  -> This allows for selectively clearing these sprites, texts, etc. in each frame without touching the game's rendered content
 			Renderer.resetLifetimeContext(1)
 			Renderer.setLifetimeContext(1)
 
-			u16 rightAnchor = getScreenWidth()
+			u16 rightAnchor = getScreenWidth() + Math.roundToInt((1.0f - visibility) * 160)
 			u16 py = getScreenHeight() - ENTRY_TEXTS.length() * LINE_HEIGHT
 
 			Renderer.drawSprite("pause_screen_upper", rightAnchor - 210, 0, 0, 0x40, 0xff00)
@@ -185,19 +193,23 @@ function void GamePause.Menu()
 
 			waitForNextFrame()
 
-			if (control.pad1.pressed & CONTROL_START)
+			if (Input.buttonPressed(0, BUTTON_START) || Input.buttonPressed(0, BUTTON_A) || Input.buttonPressed(0, BUTTON_X))
 				break
 
-			if (control.pad1.pressed & CONTROL_UP)
+			// TODO: Support key repeat
+			// TODO: Add button sounds
+			if (Input.buttonPressed(0, BUTTON_UP))
 			{
-				// TODO: Support key repeat
-				// TODO: Add sound
+				playSound(0x5b)
 				selected = (selected + ENTRY_TEXTS.length() - 1) % ENTRY_TEXTS.length()
 			}
-			else if (control.pad1.pressed & CONTROL_DOWN)
+			else if (Input.buttonPressed(0, BUTTON_DOWN))
 			{
+				playSound(0x5b)
 				selected = (selected + 1) % ENTRY_TEXTS.length()
 			}
+
+			// TODO: Add screenshot mode
 		}
 
 		if (selected == 0)
@@ -208,7 +220,7 @@ function void GamePause.Menu()
 		}
 		else if (selected == 1)
 		{
-			// TODO: First the sub-menu for Restart
+			// TODO: First open the dialog menu for Restart
 
 			if (false)
 			{
@@ -222,17 +234,25 @@ function void GamePause.Menu()
 		}
 		else if (selected == 2)
 		{
-			// TODO: Open Options (requires a new C++ call)
+			// Open in-game options
+			// TODO: How about a quick fade-out here as well?
+			Game.openOptionsMenu()
 		}
 		else if (selected == 3)
 		{
-			// TODO: First open the sub-menu for Exit Game
+			// TODO: First open the dialog menu for Exit Game
 
 			// TODO: Properly fade-out the game
 			Game.returnToMainMenu()
 			yieldExecution()
 		}
 	}
+
+	// Resume game audio
+	Game.resumeGameAudio()
+
+	if (wasInSkippableCutscene)
+		Game.startSkippableCutscene()
 
 #endif
 }

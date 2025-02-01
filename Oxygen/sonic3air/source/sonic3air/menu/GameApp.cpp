@@ -257,6 +257,8 @@ void GameApp::onFadedOutOptions()
 
 void GameApp::onGamePaused(bool canRestart)
 {
+	showSkippableCutsceneWindow(false);
+
 	Application::instance().getSimulation().setSpeed(0.0f);
 	AudioOut::instance().pauseSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
 	AudioOut::instance().pauseSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
@@ -267,11 +269,6 @@ void GameApp::onGamePaused(bool canRestart)
 	{
 		mGameView->addChild(*mPauseMenu);
 	}
-}
-
-void GameApp::onGameResumed()
-{
-	// Not used at the moment
 }
 
 void GameApp::restartTimeAttack()

@@ -379,7 +379,6 @@ void PauseMenu::resumeGame()
 	ControlsIn::instance().setIgnores(0x0ff3);		// Ignore most key presses, except for left/right
 	AudioOut::instance().resumeSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
 	AudioOut::instance().resumeSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
-	GameApp::instance().onGameResumed();
 }
 
 void PauseMenu::exitGame()

@@ -106,6 +106,8 @@ private:
 	void setSecretUnlocked(uint32 secretId);
 
 	void triggerRestart();
+	void pauseGameAudio();
+	void resumeGameAudio();
 	void onGamePause(uint8 canRestart);
 	void allowRestartInGamePause(uint8 canRestart);
 	void onLevelStart();
@@ -114,6 +116,7 @@ private:
 	uint16 onFadedOutLoadingZone(uint16 zoneAndAct);
 	bool onCharacterDied(uint8 playerIndex);
 	void returnToMainMenu();
+	void openOptionsMenu();
 
 	inline bool isNormalGame()	{ return isInNormalGameMode(); }
 	inline bool isTimeAttack()	{ return isInTimeAttackMode(); }
@@ -126,6 +129,7 @@ private:
 
 	void startSkippableCutscene();
 	void endSkippableCutscene();
+	bool isInSkippableCutscene();
 
 private:
 	EmulatorInterface* mEmulatorInterface = nullptr;

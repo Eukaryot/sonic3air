@@ -163,6 +163,10 @@ void Game::registerScriptBindings(lemon::Module& module)
 
 		module.addNativeFunction("Game.triggerRestart", lemon::wrap(*this, &Game::triggerRestart), defaultFlags);
 
+		module.addNativeFunction("Game.pauseGameAudio", lemon::wrap(*this, &Game::pauseGameAudio), defaultFlags);
+
+		module.addNativeFunction("Game.resumeGameAudio", lemon::wrap(*this, &Game::resumeGameAudio), defaultFlags);
+
 		module.addNativeFunction("Game.onGamePause", lemon::wrap(*this, &Game::onGamePause), defaultFlags)
 			.setParameterInfo(0, "canRestart");
 
@@ -184,6 +188,8 @@ void Game::registerScriptBindings(lemon::Module& module)
 			.setParameterInfo(0, "playerIndex");
 
 		module.addNativeFunction("Game.returnToMainMenu", lemon::wrap(*this, &Game::returnToMainMenu), defaultFlags);
+		module.addNativeFunction("Game.openOptionsMenu", lemon::wrap(*this, &Game::openOptionsMenu), defaultFlags);
+
 		module.addNativeFunction("Game.isNormalGame", lemon::wrap(*this, &Game::isNormalGame), defaultFlags);
 		module.addNativeFunction("Game.isTimeAttack", lemon::wrap(*this, &Game::isTimeAttack), defaultFlags);
 		module.addNativeFunction("Game.onTimeAttackFinish", lemon::wrap(*this, &Game::onTimeAttackFinish), defaultFlags);
@@ -220,6 +226,7 @@ void Game::registerScriptBindings(lemon::Module& module)
 
 		module.addNativeFunction("Game.startSkippableCutscene", lemon::wrap(*this, &Game::startSkippableCutscene), defaultFlags);
 		module.addNativeFunction("Game.endSkippableCutscene", lemon::wrap(*this, &Game::endSkippableCutscene), defaultFlags);
+		module.addNativeFunction("Game.isInSkippableCutscene", lemon::wrap(*this, &Game::isInSkippableCutscene), defaultFlags);
 	}
 
 	// Discord
@@ -962,9 +969,20 @@ void Game::triggerRestart()
 	mRestartTriggered = true;
 }
 
+void Game::pauseGameAudio()
+{
+	AudioOut::instance().pauseSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
+	AudioOut::instance().pauseSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
+}
+
+void Game::resumeGameAudio()
+{
+	AudioOut::instance().resumeSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
+	AudioOut::instance().resumeSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
+}
+
 void Game::onGamePause(uint8 canRestart)
 {
-	GameApp::instance().showSkippableCutsceneWindow(false);
 	GameApp::instance().onGamePaused(canRestart != 0);
 }
 
@@ -1033,6 +1051,12 @@ void Game::returnToMainMenu()
 	mTimeoutUntilDiscordRefresh = 0.0f;
 }
 
+void Game::openOptionsMenu()
+{
+	//mRestoreGameResolution = VideoOut::instance().getScreenRect().getSize();
+	GameApp::instance().openOptionsMenuInGame();
+}
+
 bool Game::onTimeAttackFinish()
 {
 	if (!isInTimeAttackMode() || mReceivedTimeAttackFinished)
@@ -1073,4 +1097,9 @@ void Game::endSkippableCutscene()
 		simulation.setSpeed(simulation.getDefaultSpeed());
 
 	GameApp::instance().showSkippableCutsceneWindow(false);
+}
+
+bool Game::isInSkippableCutscene()
+{
+	return mSkippableCutsceneFrames > 0;
 }
