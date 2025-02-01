@@ -92,7 +92,6 @@ private:
 	InfoOverlay mInfoOverlay;
 
 	State mState = State::INACTIVE;
-	float mVisibility = 0.0f;
 	float mFadeInDelay = 0.0f;
 	uint32 mApplyingChangesFrameCounter = 0;
 	bool mInMovementMode = false;

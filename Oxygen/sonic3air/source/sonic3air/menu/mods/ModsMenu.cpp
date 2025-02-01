@@ -554,8 +554,7 @@ void ModsMenu::update(float timeElapsed)
 		}
 		else
 		{
-			mVisibility = saturate(mVisibility + timeElapsed * 3.0f);
-			if (mVisibility >= 1.0f)
+			if (updateFadeIn(timeElapsed * 3.0f))
 			{
 				mState = State::SHOW;
 			}
@@ -579,8 +578,7 @@ void ModsMenu::update(float timeElapsed)
 	}
 	else if (mState > State::APPLYING_CHANGES)
 	{
-		mVisibility = saturate(mVisibility - timeElapsed * 3.0f);
-		if (mVisibility <= 0.0f)
+		if (updateFadeOut(timeElapsed * 3.0f))
 		{
 			mState = State::INACTIVE;
 		}

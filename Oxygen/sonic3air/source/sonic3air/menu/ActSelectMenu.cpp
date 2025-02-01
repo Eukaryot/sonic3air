@@ -196,16 +196,14 @@ void ActSelectMenu::update(float timeElapsed)
 
 	if (mState == State::APPEAR)
 	{
-		mVisibility = saturate(mVisibility + timeElapsed * 6.0f);
-		if (mVisibility >= 1.0f)
+		if (updateFadeIn(timeElapsed * 6.0f))
 		{
 			mState = State::SHOW;
 		}
 	}
 	else if (mState > State::SHOW)
 	{
-		mVisibility = saturate(mVisibility - timeElapsed * 6.0f);
-		if (mVisibility <= 0.0f)
+		if (updateFadeOut(timeElapsed * 6.0f))
 		{
 			if (mState == State::FADE_TO_GAME)
 			{

@@ -52,7 +52,6 @@ private:
 	GameMenuEntries mDialogEntries;
 
 	State mState = State::INACTIVE;
-	float mVisibility = 0.0f;
 	float mDialogVisibility = 0.0f;
 	float mTimeShown = 0.0f;
 	bool mIsEnabled = true;

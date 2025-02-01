@@ -533,3 +533,15 @@ void GameMenuBase::update(float timeElapsed)
 {
 	GuiBase::update(timeElapsed);
 }
+
+bool GameMenuBase::updateFadeIn(float timeStep)
+{
+	mVisibility = saturate(mVisibility + timeStep);
+	return (mVisibility >= 1.0f);
+}
+
+bool GameMenuBase::updateFadeOut(float timeStep)
+{
+	mVisibility = saturate(mVisibility - timeStep);
+	return (mVisibility <= 0.0f);
+}
