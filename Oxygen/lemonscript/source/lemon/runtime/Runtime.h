@@ -143,6 +143,8 @@ namespace lemon
 		inline RuntimeDetailHandler* getRuntimeDetailHandler() const  { return mRuntimeDetailHandler; }
 		void setRuntimeDetailHandler(RuntimeDetailHandler* handler);
 
+		void resetRuntimeState();
+
 		void buildAllRuntimeFunctions();
 
 		RuntimeFunction* getRuntimeFunction(const ScriptFunction& scriptFunction);

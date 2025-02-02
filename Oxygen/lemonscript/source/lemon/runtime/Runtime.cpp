@@ -187,6 +187,12 @@ namespace lemon
 		mRuntimeDetailHandler = handler;
 	}
 
+	void Runtime::resetRuntimeState()
+	{
+		// Reset global variables back to defaults
+		setupGlobalVariables();
+	}
+
 	void Runtime::buildAllRuntimeFunctions()
 	{
 		for (Function* function : mProgram->getFunctions())

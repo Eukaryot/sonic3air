@@ -300,6 +300,9 @@ void CodeExec::reset()
 	{
 		mEmulatorInterface.applyRomInjections();
 	}
+
+	// Reset lemon script runtime (especially global variables)
+	mLemonScriptRuntime.getInternalLemonRuntime().resetRuntimeState();
 }
 
 void CodeExec::cleanScriptDebug()
