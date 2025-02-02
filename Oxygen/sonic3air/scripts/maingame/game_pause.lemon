@@ -14,19 +14,16 @@
 
 global float GamePause.visibility = 0.0f
 global u8 GamePause.selectedEntry = 0
+global bool GamePause.hasRestart = false
+global bool GamePause.hasOptions = false
 
-constant array<string> GamePause.ENTRY_TEXTS = { "Continue", "Restart", "Options", "Exit Game" }
-constant u16 GamePause.LINE_HEIGHT = 26
+constant u16 GamePause.NUM_ENTRIES = 4
 
 
 //# address-hook(0x0013e4) end(0x0014e4)
 function void UpdateGamePause()
 {
-#if !STANDALONE
-	// This is only used in outro; and there's no actual need to prevent game pause there
-	if (global.pause_disabled)
-		return
-#endif
+#if STANDALONE
 
 	if (lives_counter <= 0)
 	{
@@ -34,12 +31,10 @@ function void UpdateGamePause()
 		return
 	}
 
-#if STANDALONE
-
 	// Start button pressed?
 	if (control.pad1.pressed & CONTROL_START)
 	{
-		if (!BeginGamePause())
+		if (!GamePause.BeginPause())
 			return
 
 		global.game.paused = true
@@ -59,16 +54,21 @@ function void UpdateGamePause()
 
 #else
 
+	// This is only used in outro; and there's no actual need to prevent game pause there
+	if (global.pause_disabled)
+		return
+
+	if (lives_counter <= 0)
+	{
+		global.game.paused = false
+		return
+	}
+
 	if (!global.game.paused)
 	{
 		// Start button pressed?
 		if ((control.pad1.pressed & CONTROL_START) == 0)
 			return
-
-	#if STANDALONE
-		if (!BeginGamePause())
-			return
-	#endif
 
 		// Entering game pause
 		global.game.paused = true
@@ -122,7 +122,17 @@ function void UpdateGamePause()
 
 #if STANDALONE
 
-function bool BeginGamePause()
+function bool GamePause.IsValidEntry(u8 selected)
+{
+	if (selected == 1 && !GamePause.hasRestart)
+		return false
+	if (selected == 2 && !GamePause.hasOptions)
+		return false
+	return true
+}
+
+
+function bool GamePause.BeginPause()
 {
 	if (global.game_mode == 0x0c && isSonicIntro() && global.level_started == 0)
 	{
@@ -145,6 +155,7 @@ function bool BeginGamePause()
 	return true
 }
 
+
 function void GamePause.Menu()
 {
 	bool canRestart = !global.pause_disabled && (global.game_mode == 0x0c && global.stage_type == 0 && u8[0xffffb000 + 0x05] <= base_state.HURT) && !competition_mode.active
@@ -157,6 +168,8 @@ function void GamePause.Menu()
 #else
 
 	// Script implementation of game pause
+	GamePause.hasRestart = canRestart
+	GamePause.hasOptions = !Game.isTimeAttack()
 
 	// Pause currently playing game music and sounds
 	Audio.pauseContext(AudioContext.CONTEXT_MUSIC)
@@ -167,8 +180,6 @@ function void GamePause.Menu()
 	bool wasInSkippableCutscene = Game.isInSkippableCutscene()
 	Game.endSkippableCutscene()
 #endif
-
-	// TODO: Restart and Options must be made optional
 
 	constant float KEY_REPEAT_TIMEOUT = 0.4f
 	constant float KEY_REPEAT_DELAY   = 0.125f
@@ -188,11 +199,6 @@ function void GamePause.Menu()
 			// Fade-in
 			if (GamePause.visibility < 1.0f)
 				GamePause.visibility = min(GamePause.visibility + deltaSeconds * 12.0f, 1.0f)
-
-			// Use lifetime context 1 for everything rendered by the pause menu
-			//  -> This allows for selectively clearing these sprites, texts, etc. in each frame without touching the game's rendered content
-			Renderer.resetLifetimeContext(1)
-			Renderer.setLifetimeContext(1)
 
 			GamePause.DrawMenu()
 
@@ -238,7 +244,12 @@ function void GamePause.Menu()
 			if (entryChange != 0)
 			{
 				Audio.playAudio(0x5b)
-				GamePause.selectedEntry = (GamePause.selectedEntry + GamePause.ENTRY_TEXTS.length() + entryChange) % GamePause.ENTRY_TEXTS.length()
+				while (true)
+				{
+					GamePause.selectedEntry = (GamePause.selectedEntry + GamePause.NUM_ENTRIES + entryChange) % GamePause.NUM_ENTRIES
+					if (GamePause.IsValidEntry(GamePause.selectedEntry))
+						break
+				}
 			}
 
 			// TODO: Add screenshot mode
@@ -252,15 +263,25 @@ function void GamePause.Menu()
 		}
 		else if (GamePause.selectedEntry == 1)
 		{
-			// TODO: First open the dialog menu for Restart
-
-			if (false)
+			if (Game.isTimeAttack())
 			{
-				restartLevel()
+				global.game.paused = false	// Done here already so the menu can fade out during the following screen fade
+				Audio.resumeContext(AudioContext.CONTEXT_MUSIC)
+				Audio.resumeContext(AudioContext.CONTEXT_SOUND)
+				restartTimeAttack()
 			}
 			else
 			{
-				restartAtCheckpoint()
+				// TODO: First open the dialog menu for Restart
+
+				if (false)
+				{
+					restartLevel()
+				}
+				else
+				{
+					restartAtCheckpoint()
+				}
 			}
 			break
 		}
@@ -277,7 +298,7 @@ function void GamePause.Menu()
 			// TODO: First open the dialog menu for Exit Game
 
 		#if GAMEAPP
-			// TODO: Properly fade-out the game
+			// TODO: Properly fade out the game
 			Game.returnToMainMenu()
 			yieldExecution()
 		#endif
@@ -317,25 +338,43 @@ function void GamePause.UpdateFadeOut()
 	{
 		GamePause.DrawMenu()
 	}
+	else
+	{
+		Renderer.resetLifetimeContext(1)
+	}
 }
 
 
 function void GamePause.DrawMenu()
 {
+	constant array<string> ENTRY_TEXTS = { "Continue", "Restart", "Options", "Exit Game" }
+	constant u16 LINE_HEIGHT = 26
+
+	u8 numEntries = 2 + u8(GamePause.hasRestart) + u8(GamePause.hasOptions)
+
 	u16 rightAnchor = getScreenWidth() + Math.roundToInt((1.0f - GamePause.visibility) * 160)
-	u16 py = getScreenHeight() - GamePause.ENTRY_TEXTS.length() * GamePause.LINE_HEIGHT
+	u16 py = getScreenHeight() - numEntries * LINE_HEIGHT
+
+	// Use lifetime context 1 for everything rendered by the pause menu
+	//  -> This allows for selectively clearing these sprites, texts, etc. in each frame without touching the game's rendered content
+	Renderer.resetLifetimeContext(1)
+	Renderer.setLifetimeContext(1)
 
 	Renderer.drawSprite("pause_screen_upper", rightAnchor - 210, 0, 0, 0x40, 0xff00)
 	Renderer.drawSprite("pause_screen_lower", rightAnchor - 190, py - 8, 0, 0x40, 0xff00)
 
-	for (u8 k = 0; k < GamePause.ENTRY_TEXTS.length(); ++k)
+	for (u8 k = 0; k < GamePause.NUM_ENTRIES; ++k)
 	{
+		if (!GamePause.IsValidEntry(k))
+			continue
+
 		u32 color = 0xb0b0b0e0
 		if (GamePause.selectedEntry == k)
 			color = (global.framecounter % 30 < 15) ? 0xffff00ff : 0xffffffff
 
-		Renderer.drawText(ActSelect.TITLE_FONT, rightAnchor - 16, py + 11, GamePause.ENTRY_TEXTS[k], color, 6, 0, 0xff01, false)
-		py += GamePause.LINE_HEIGHT
+		Renderer.drawText(ActSelect.TITLE_FONT, rightAnchor - 16, py + 11, ENTRY_TEXTS[k], color, 6, 0, 0xff01, false)
+
+		py += LINE_HEIGHT
 	}
 }
 
