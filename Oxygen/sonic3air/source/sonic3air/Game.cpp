@@ -163,10 +163,6 @@ void Game::registerScriptBindings(lemon::Module& module)
 
 		module.addNativeFunction("Game.triggerRestart", lemon::wrap(*this, &Game::triggerRestart), defaultFlags);
 
-		module.addNativeFunction("Game.pauseGameAudio", lemon::wrap(*this, &Game::pauseGameAudio), defaultFlags);
-
-		module.addNativeFunction("Game.resumeGameAudio", lemon::wrap(*this, &Game::resumeGameAudio), defaultFlags);
-
 		module.addNativeFunction("Game.onGamePause", lemon::wrap(*this, &Game::onGamePause), defaultFlags)
 			.setParameterInfo(0, "canRestart");
 
@@ -967,18 +963,6 @@ void Game::setSecretUnlocked(uint32 secretId)
 void Game::triggerRestart()
 {
 	mRestartTriggered = true;
-}
-
-void Game::pauseGameAudio()
-{
-	AudioOut::instance().pauseSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
-	AudioOut::instance().pauseSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
-}
-
-void Game::resumeGameAudio()
-{
-	AudioOut::instance().resumeSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
-	AudioOut::instance().resumeSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
 }
 
 void Game::onGamePause(uint8 canRestart)

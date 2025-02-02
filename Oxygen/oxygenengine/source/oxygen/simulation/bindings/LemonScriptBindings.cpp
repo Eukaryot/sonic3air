@@ -731,9 +731,34 @@ namespace
 		Audio_playAudio1(sfxId, 0x01);	// In-game sound effect context
 	}
 
+	void Audio_pauseChannel(uint8 channel)
+	{
+		EngineMain::instance().getAudioOut().getAudioPlayer().pauseAllSoundsByChannel(channel);
+	}
+
+	void Audio_resumeChannel(uint8 channel)
+	{
+		EngineMain::instance().getAudioOut().getAudioPlayer().resumeAllSoundsByChannel(channel);
+	}
+
 	void Audio_stopChannel(uint8 channel)
 	{
-		EngineMain::instance().getAudioOut().stopChannel(channel);
+		EngineMain::instance().getAudioOut().getAudioPlayer().stopAllSoundsByChannel(channel);
+	}
+
+	void Audio_pauseContext(uint8 context)
+	{
+		EngineMain::instance().getAudioOut().getAudioPlayer().pauseAllSoundsByContext(context);
+	}
+
+	void Audio_resumeContext(uint8 context)
+	{
+		EngineMain::instance().getAudioOut().getAudioPlayer().resumeAllSoundsByContext(context);
+	}
+
+	void Audio_stopContext(uint8 context)
+	{
+		EngineMain::instance().getAudioOut().getAudioPlayer().stopAllSoundsByContext(context);
 	}
 
 	void Audio_fadeInChannel(uint8 channel, float seconds)
@@ -1191,7 +1216,22 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		builder.addNativeFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio2), defaultFlags)
 			.setParameters("sfxId");
 
+		builder.addNativeFunction("Audio.pauseChannel", lemon::wrap(&Audio_pauseChannel), defaultFlags)
+			.setParameters("channel");
+
+		builder.addNativeFunction("Audio.resumeChannel", lemon::wrap(&Audio_resumeChannel), defaultFlags)
+			.setParameters("channel");
+
 		builder.addNativeFunction("Audio.stopChannel", lemon::wrap(&Audio_stopChannel), defaultFlags)
+			.setParameters("channel");
+
+		builder.addNativeFunction("Audio.pauseContext", lemon::wrap(&Audio_pauseContext), defaultFlags)
+			.setParameters("channel");
+
+		builder.addNativeFunction("Audio.resumeContext", lemon::wrap(&Audio_resumeContext), defaultFlags)
+			.setParameters("channel");
+
+		builder.addNativeFunction("Audio.stopContext", lemon::wrap(&Audio_stopContext), defaultFlags)
 			.setParameters("channel");
 
 		builder.addNativeFunction("Audio.fadeInChannel", lemon::wrap(&Audio_fadeInChannel), defaultFlags)

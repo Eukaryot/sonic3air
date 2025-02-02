@@ -12,10 +12,17 @@
 // Game pause                                            //
 //-------------------------------------------------------//
 
+global float GamePause.visibility = 0.0f
+global u8 GamePause.selectedEntry = 0
+
+constant array<string> GamePause.ENTRY_TEXTS = { "Continue", "Restart", "Options", "Exit Game" }
+constant u16 GamePause.LINE_HEIGHT = 26
+
+
 //# address-hook(0x0013e4) end(0x0014e4)
 function void UpdateGamePause()
 {
-#if !GAMEAPP
+#if !STANDALONE
 	// This is only used in outro; and there's no actual need to prevent game pause there
 	if (global.pause_disabled)
 		return
@@ -27,7 +34,7 @@ function void UpdateGamePause()
 		return
 	}
 
-#if GAMEAPP
+#if STANDALONE
 
 	// Start button pressed?
 	if (control.pad1.pressed & CONTROL_START)
@@ -36,17 +43,18 @@ function void UpdateGamePause()
 			return
 
 		global.game.paused = true
-		GamePause.Menu()
-
 		global.frame_state = 0x10
-		waitForNextFrame()
+
+		GamePause.Menu()
 
 		Standalone.onResumeAfterPause()
 		global.game.paused = false
 
+	#if GAMEAPP
 		// Fix for brief glitch in Blue Spheres special stage
 		if (global.game_mode == 0x34)
 			BlueSpheres.replacePlaneRendering()
+	#endif
 	}
 
 #else
@@ -148,77 +156,101 @@ function void GamePause.Menu()
 
 #else
 
-	// Simple test for a script implementation of game pause
+	// Script implementation of game pause
 
-	// Pause game music and sounds
-	Game.pauseGameAudio()
+	// Pause currently playing game music and sounds
+	Audio.pauseContext(AudioContext.CONTEXT_MUSIC)
+	Audio.pauseContext(AudioContext.CONTEXT_SOUND)
 
+#if GAMEAPP
 	// Handle skippable cutscene
 	bool wasInSkippableCutscene = Game.isInSkippableCutscene()
 	Game.endSkippableCutscene()
+#endif
 
 	// TODO: Restart and Options must be made optional
-	constant array<string> ENTRY_TEXTS = { "Continue", "Restart", "Options", "Exit Game" }
-	constant u16 LINE_HEIGHT = 26
 
-	u8 selected = 0
-	float visibility = 0.0f
+	constant float KEY_REPEAT_TIMEOUT = 0.4f
+	constant float KEY_REPEAT_DELAY   = 0.125f
+	float keyRepeatTimer = KEY_REPEAT_TIMEOUT
+	s8 lastPressedInput = -1
+
+	GamePause.selectedEntry = 0
+	GamePause.visibility = 0.0f
+
 	while (true)
 	{
 		// Inner loop will be exited once the player selected an entry in the menu
 		while (true)
 		{
+			float deltaSeconds = 1.0f / 60.0f
+
 			// Fade-in
-			if (visibility < 1.0f)
-				visibility = min(visibility + 0.2f, 1.0f)
+			if (GamePause.visibility < 1.0f)
+				GamePause.visibility = min(GamePause.visibility + deltaSeconds * 12.0f, 1.0f)
 
 			// Use lifetime context 1 for everything rendered by the pause menu
 			//  -> This allows for selectively clearing these sprites, texts, etc. in each frame without touching the game's rendered content
 			Renderer.resetLifetimeContext(1)
 			Renderer.setLifetimeContext(1)
 
-			u16 rightAnchor = getScreenWidth() + Math.roundToInt((1.0f - visibility) * 160)
-			u16 py = getScreenHeight() - ENTRY_TEXTS.length() * LINE_HEIGHT
-
-			Renderer.drawSprite("pause_screen_upper", rightAnchor - 210, 0, 0, 0x40, 0xff00)
-			Renderer.drawSprite("pause_screen_lower", rightAnchor - 190, py - 8, 0, 0x40, 0xff00)
-
-			for (u8 k = 0; k < ENTRY_TEXTS.length(); ++k)
-			{
-				// TODO: Add color animation
-				u32 color = (selected == k) ? 0xffff00ff : 0xb0b0b0e0
-				Renderer.drawText(ActSelect.TITLE_FONT, rightAnchor - 16, py + 11, ENTRY_TEXTS[k], color, 6, 0, 0xff01, false)
-				py += LINE_HEIGHT
-			}
+			GamePause.DrawMenu()
 
 			waitForNextFrame()
 
 			if (Input.buttonPressed(0, BUTTON_START) || Input.buttonPressed(0, BUTTON_A) || Input.buttonPressed(0, BUTTON_X))
 				break
 
-			// TODO: Support key repeat
-			// TODO: Add button sounds
-			if (Input.buttonPressed(0, BUTTON_UP))
+			// Handle key repeat
+			s8 currentInput = -1
 			{
-				playSound(0x5b)
-				selected = (selected + ENTRY_TEXTS.length() - 1) % ENTRY_TEXTS.length()
+				if (Input.buttonPressed(BUTTON_UP))
+					currentInput = BUTTON_UP
+				else if (Input.buttonPressed(BUTTON_DOWN))
+					currentInput = BUTTON_DOWN
+				else if (lastPressedInput >= 0 && Input.buttonDown(lastPressedInput))
+					currentInput = lastPressedInput
+
+				lastPressedInput = currentInput
+
+				if (currentInput == -1)
+				{
+					// No input at all, so reset key repeat
+					keyRepeatTimer = KEY_REPEAT_TIMEOUT
+				}
+				else if (Input.buttonPressed(currentInput))
+				{
+					// Input pressed for the first frame now
+					keyRepeatTimer = KEY_REPEAT_TIMEOUT
+				}
+				else
+				{
+					// Input held down
+					keyRepeatTimer -= deltaSeconds
+					if (keyRepeatTimer <= 0.001f)
+						keyRepeatTimer = KEY_REPEAT_DELAY
+					else
+						currentInput = -1
+				}
 			}
-			else if (Input.buttonPressed(0, BUTTON_DOWN))
+
+			s8 entryChange = (currentInput == BUTTON_UP) ? -1 : (currentInput == BUTTON_DOWN) ? 1 : 0
+			if (entryChange != 0)
 			{
-				playSound(0x5b)
-				selected = (selected + 1) % ENTRY_TEXTS.length()
+				Audio.playAudio(0x5b)
+				GamePause.selectedEntry = (GamePause.selectedEntry + GamePause.ENTRY_TEXTS.length() + entryChange) % GamePause.ENTRY_TEXTS.length()
 			}
 
 			// TODO: Add screenshot mode
 		}
 
-		if (selected == 0)
+		if (GamePause.selectedEntry == 0)
 		{
 			// Leave this menu again and continue gameplay
 			// TODO: Handle fade-out - this requires rendering the pause menu while the game is running again
 			break
 		}
-		else if (selected == 1)
+		else if (GamePause.selectedEntry == 1)
 		{
 			// TODO: First open the dialog menu for Restart
 
@@ -232,29 +264,79 @@ function void GamePause.Menu()
 			}
 			break
 		}
-		else if (selected == 2)
+		else if (GamePause.selectedEntry == 2)
 		{
+		#if GAMEAPP
 			// Open in-game options
 			// TODO: How about a quick fade-out here as well?
 			Game.openOptionsMenu()
+		#endif
 		}
-		else if (selected == 3)
+		else if (GamePause.selectedEntry == 3)
 		{
 			// TODO: First open the dialog menu for Exit Game
 
+		#if GAMEAPP
 			// TODO: Properly fade-out the game
 			Game.returnToMainMenu()
 			yieldExecution()
+		#endif
 		}
 	}
 
-	// Resume game audio
-	Game.resumeGameAudio()
+	Renderer.resetLifetimeContext(1)
 
+	// Resume game audio
+	Audio.resumeContext(AudioContext.CONTEXT_MUSIC)
+	Audio.resumeContext(AudioContext.CONTEXT_SOUND)
+
+#if GAMEAPP
 	if (wasInSkippableCutscene)
 		Game.startSkippableCutscene()
+#endif
 
 #endif
+}
+
+
+function void GamePause.UpdateFadeOut()
+{
+	// Fading already done?
+	if (GamePause.visibility <= 0.0f)
+		return
+
+	// Don't fade out during pause, only afterwards
+	if (global.game.paused)
+		return
+
+	// Fade-out
+	float deltaSeconds = 1.0f / 60.0f
+	GamePause.visibility = max(GamePause.visibility - deltaSeconds * 12.0f, 0.0f)
+
+	if (GamePause.visibility > 0.0f)
+	{
+		GamePause.DrawMenu()
+	}
+}
+
+
+function void GamePause.DrawMenu()
+{
+	u16 rightAnchor = getScreenWidth() + Math.roundToInt((1.0f - GamePause.visibility) * 160)
+	u16 py = getScreenHeight() - GamePause.ENTRY_TEXTS.length() * GamePause.LINE_HEIGHT
+
+	Renderer.drawSprite("pause_screen_upper", rightAnchor - 210, 0, 0, 0x40, 0xff00)
+	Renderer.drawSprite("pause_screen_lower", rightAnchor - 190, py - 8, 0, 0x40, 0xff00)
+
+	for (u8 k = 0; k < GamePause.ENTRY_TEXTS.length(); ++k)
+	{
+		u32 color = 0xb0b0b0e0
+		if (GamePause.selectedEntry == k)
+			color = (global.framecounter % 30 < 15) ? 0xffff00ff : 0xffffffff
+
+		Renderer.drawText(ActSelect.TITLE_FONT, rightAnchor - 16, py + 11, GamePause.ENTRY_TEXTS[k], color, 6, 0, 0xff01, false)
+		py += GamePause.LINE_HEIGHT
+	}
 }
 
 #endif

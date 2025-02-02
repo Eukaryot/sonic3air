@@ -50,16 +50,19 @@ public:
 	bool getAudioRefByContext(int contextId, AudioReference& outAudioRef) const;
 	void changeSoundContext(AudioReference& audioRef, int contextId);
 
+	void pauseAllSoundsByChannel(int channelId);
+	void resumeAllSoundsByChannel(int channelId);
+
+	void pauseAllSoundsByContext(int contextId);
+	void resumeAllSoundsByContext(int contextId);
+
 	void stopAllSounds(bool immediately = false);
 	void stopAllSoundsByChannel(int channelId);
+	void stopAllSoundsByContext(int contextId);
 	void stopAllSoundsByChannelAndContext(int channelId, int contextId);
 
 	void fadeInChannel(int channelId, float length);
 	void fadeOutChannel(int channelId, float length);
-
-	void pauseAllSoundsByContext(int contextId);
-	void resumeAllSoundsByContext(int contextId);
-	void stopAllSoundsByContext(int contextId);
 
 	AudioSourceBase* findAudioSourceByRef(AudioReference& audioRef) const;
 	float getAudioPlaybackPosition(AudioReference& audioRef) const;

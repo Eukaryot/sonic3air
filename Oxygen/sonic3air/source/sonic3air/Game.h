@@ -106,8 +106,6 @@ private:
 	void setSecretUnlocked(uint32 secretId);
 
 	void triggerRestart();
-	void pauseGameAudio();
-	void resumeGameAudio();
 	void onGamePause(uint8 canRestart);
 	void allowRestartInGamePause(uint8 canRestart);
 	void onLevelStart();

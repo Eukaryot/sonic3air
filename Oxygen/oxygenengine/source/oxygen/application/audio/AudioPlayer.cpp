@@ -314,6 +314,69 @@ void AudioPlayer::changeSoundContext(AudioReference& audioRef, int contextId)
 	}
 }
 
+void AudioPlayer::pauseAllSoundsByChannel(int channelId)
+{
+	SoundIterator iterator(mPlayingSounds);
+	iterator.filterChannel(channelId);
+	iterator.filterState(PlayingSound::State::PLAYING);
+	while (PlayingSound* soundPtr = iterator.getNext())
+	{
+		soundPtr->mAudioRef.setPause(true);
+	}
+}
+
+void AudioPlayer::resumeAllSoundsByChannel(int channelId)
+{
+	SoundIterator iterator(mPlayingSounds);
+	iterator.filterChannel(channelId);
+	iterator.filterState(PlayingSound::State::PLAYING);
+	while (PlayingSound* soundPtr = iterator.getNext())
+	{
+		soundPtr->mAudioRef.setPause(false);
+	}
+}
+
+void AudioPlayer::pauseAllSoundsByContext(int contextId)
+{
+	SoundIterator iterator(mPlayingSounds);
+	iterator.filterContext(contextId);
+	iterator.filterState(PlayingSound::State::PLAYING);
+	while (PlayingSound* soundPtr = iterator.getNext())
+	{
+		soundPtr->mAudioRef.setPause(true);
+	}
+}
+
+void AudioPlayer::resumeAllSoundsByContext(int contextId)
+{
+	SoundIterator iterator(mPlayingSounds);
+	iterator.filterContext(contextId);
+	iterator.filterState(PlayingSound::State::PLAYING);
+	while (PlayingSound* soundPtr = iterator.getNext())
+	{
+		soundPtr->mAudioRef.setPause(false);
+	}
+}
+
+void AudioPlayer::stopAllSoundsByContext(int contextId)
+{
+	SoundIterator iterator(mPlayingSounds);
+	iterator.filterContext(contextId);
+	iterator.filterState(PlayingSound::State::PLAYING);
+	while (PlayingSound* soundPtr = iterator.getNext())
+	{
+		if (soundPtr->mAudioRef.isPaused())
+		{
+			// No need for quick fade-out if it's paused anyways
+			soundPtr->mAudioRef.stop();
+		}
+		else
+		{
+			soundPtr->mAudioRef.setVolumeChange(-20.0f);
+		}
+	}
+}
+
 void AudioPlayer::stopAllSounds(bool immediately)
 {
 	if (immediately)
@@ -378,47 +441,6 @@ void AudioPlayer::fadeOutChannel(int channelId, float length)
 	while (PlayingSound* soundPtr = iterator.getNext())
 	{
 		soundPtr->mRelativeVolumeChange = (length > 0.0f) ? (-1.0f / length) : 0.1f;
-	}
-}
-
-void AudioPlayer::pauseAllSoundsByContext(int contextId)
-{
-	SoundIterator iterator(mPlayingSounds);
-	iterator.filterContext(contextId);
-	iterator.filterState(PlayingSound::State::PLAYING);
-	while (PlayingSound* soundPtr = iterator.getNext())
-	{
-		soundPtr->mAudioRef.setPause(true);
-	}
-}
-
-void AudioPlayer::resumeAllSoundsByContext(int contextId)
-{
-	SoundIterator iterator(mPlayingSounds);
-	iterator.filterContext(contextId);
-	iterator.filterState(PlayingSound::State::PLAYING);
-	while (PlayingSound* soundPtr = iterator.getNext())
-	{
-		soundPtr->mAudioRef.setPause(false);
-	}
-}
-
-void AudioPlayer::stopAllSoundsByContext(int contextId)
-{
-	SoundIterator iterator(mPlayingSounds);
-	iterator.filterContext(contextId);
-	iterator.filterState(PlayingSound::State::PLAYING);
-	while (PlayingSound* soundPtr = iterator.getNext())
-	{
-		if (soundPtr->mAudioRef.isPaused())
-		{
-			// No need for quick fade-out if it's paused anyways
-			soundPtr->mAudioRef.stop();
-		}
-		else
-		{
-			soundPtr->mAudioRef.setVolumeChange(-20.0f);
-		}
 	}
 }
 

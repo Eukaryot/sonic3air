@@ -103,7 +103,7 @@ void AudioBrowserWindow::buildContent()
 					const bool isSound = (audioDefinition->mType != AudioCollection::AudioDefinition::Type::SOUND);
 					if (!isSound)
 					{
-						audioOut.stopChannel(0);
+						audioOut.getAudioPlayer().stopAllSoundsByChannel(0);
 					}
 
 					//mPlayingAudio = ...

@@ -98,11 +98,6 @@ void AudioOutBase::playOverride(uint64 sfxId, uint8 contextId, uint8 channelId, 
 	mAudioPlayer.playOverride(sfxId, contextId, channelId, overriddenChannelId);
 }
 
-void AudioOutBase::stopChannel(uint8 channelId)
-{
-	mAudioPlayer.stopAllSoundsByChannel(channelId);
-}
-
 void AudioOutBase::fadeInChannel(uint8 channelId, float length)
 {
 	mAudioPlayer.fadeInChannel(channelId, length);
