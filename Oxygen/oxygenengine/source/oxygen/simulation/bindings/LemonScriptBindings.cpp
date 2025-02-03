@@ -746,19 +746,19 @@ namespace
 		EngineMain::instance().getAudioOut().getAudioPlayer().stopAllSoundsByChannel(channel);
 	}
 
-	void Audio_pauseContext(uint8 context)
+	void Audio_pauseContext(uint8 contextId)
 	{
-		EngineMain::instance().getAudioOut().getAudioPlayer().pauseAllSoundsByContext(context);
+		EngineMain::instance().getAudioOut().getAudioPlayer().pauseAllSoundsByContext(contextId);
 	}
 
-	void Audio_resumeContext(uint8 context)
+	void Audio_resumeContext(uint8 contextId)
 	{
-		EngineMain::instance().getAudioOut().getAudioPlayer().resumeAllSoundsByContext(context);
+		EngineMain::instance().getAudioOut().getAudioPlayer().resumeAllSoundsByContext(contextId);
 	}
 
-	void Audio_stopContext(uint8 context)
+	void Audio_stopContext(uint8 contextId)
 	{
-		EngineMain::instance().getAudioOut().getAudioPlayer().stopAllSoundsByContext(context);
+		EngineMain::instance().getAudioOut().getAudioPlayer().stopAllSoundsByContext(contextId);
 	}
 
 	void Audio_fadeInChannel(uint8 channel, float seconds)
@@ -786,25 +786,25 @@ namespace
 		EngineMain::instance().getAudioOut().playOverride(sfxId, contextId, channelId, overriddenChannelId);
 	}
 
-	void Audio_enableAudioModifier(uint8 channel, uint8 context, lemon::StringRef postfix, float relativeSpeed)
+	void Audio_enableAudioModifier(uint8 channel, uint8 contextId, lemon::StringRef postfix, float relativeSpeed)
 	{
 		if (postfix.isValid())
 		{
-			EngineMain::instance().getAudioOut().enableAudioModifier(channel, context, postfix.getString(), relativeSpeed);
+			EngineMain::instance().getAudioOut().enableAudioModifier(channel, contextId, postfix.getString(), relativeSpeed);
 		}
 	}
 
-	void Audio_enableAudioModifier2(uint8 channel, uint8 context, lemon::StringRef postfix, uint32 relativeSpeed)
+	void Audio_enableAudioModifier2(uint8 channel, uint8 contextId, lemon::StringRef postfix, uint32 relativeSpeed)
 	{
 		if (postfix.isValid())
 		{
-			EngineMain::instance().getAudioOut().enableAudioModifier(channel, context, postfix.getString(), (float)relativeSpeed / 65536.0f);
+			EngineMain::instance().getAudioOut().enableAudioModifier(channel, contextId, postfix.getString(), (float)relativeSpeed / 65536.0f);
 		}
 	}
 
-	void Audio_disableAudioModifier(uint8 channel, uint8 context)
+	void Audio_disableAudioModifier(uint8 channel, uint8 contextId)
 	{
-		EngineMain::instance().getAudioOut().disableAudioModifier(channel, context);
+		EngineMain::instance().getAudioOut().disableAudioModifier(channel, contextId);
 	}
 
 
@@ -1226,13 +1226,13 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameters("channel");
 
 		builder.addNativeFunction("Audio.pauseContext", lemon::wrap(&Audio_pauseContext), defaultFlags)
-			.setParameters("channel");
+			.setParameters("contextId");
 
 		builder.addNativeFunction("Audio.resumeContext", lemon::wrap(&Audio_resumeContext), defaultFlags)
-			.setParameters("channel");
+			.setParameters("contextId");
 
 		builder.addNativeFunction("Audio.stopContext", lemon::wrap(&Audio_stopContext), defaultFlags)
-			.setParameters("channel");
+			.setParameters("contextId");
 
 		builder.addNativeFunction("Audio.fadeInChannel", lemon::wrap(&Audio_fadeInChannel), defaultFlags)
 			.setParameters("channel", "seconds");
@@ -1250,10 +1250,10 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameters("sfxId", "contextId", "channelId", "overriddenChannelId");
 
 		builder.addNativeFunction("Audio.enableAudioModifier", lemon::wrap(&Audio_enableAudioModifier), defaultFlags)
-			.setParameters("channel", "context", "postfix", "relativeSpeed");
+			.setParameters("channel", "contextId", "postfix", "relativeSpeed");
 
 		builder.addNativeFunction("Audio.enableAudioModifier", lemon::wrap(&Audio_enableAudioModifier2), defaultFlags)
-			.setParameters("channel", "context", "postfix", "relativeSpeed");
+			.setParameters("channel", "contextId", "postfix", "relativeSpeed");
 
 		builder.addNativeFunction("Audio.disableAudioModifier", lemon::wrap(&Audio_disableAudioModifier), defaultFlags)
 			.setParameters("channel", "context");
