@@ -156,6 +156,7 @@ function void GamePause.Menu()
 				Renderer.resetLifetimeContext(1)
 			}
 
+			enableCustomPlaneReset = false	// Maintain custom planes that were set before the pause
 			waitForNextFrame()
 
 			// Undo increase of global framecounter (see "VInt.InnerUpdate"), to avoid messing up animations that rely on it
