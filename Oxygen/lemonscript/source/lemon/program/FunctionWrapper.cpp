@@ -14,6 +14,12 @@
 namespace lemon
 {
 
+	AnyTypeWrapper::AnyTypeWrapper(uint64 value) :
+		mValue(value),
+		mType(traits::getDataType<uint64>())
+	{
+	}
+
 	void AnyTypeWrapper::pushToStack(ControlFlow& controlFlow) const
 	{
 		controlFlow.pushValueStack(mValue);

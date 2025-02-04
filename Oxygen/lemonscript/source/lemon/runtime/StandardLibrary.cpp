@@ -13,6 +13,7 @@
 #include "lemon/program/Program.h"
 #include "lemon/utility/FastStringStream.h"
 #include "lemon/utility/StringFormatter.h"
+#include "lemon/utility/StringFormatterLegacy.h"
 
 
 namespace lemon
@@ -109,7 +110,8 @@ namespace lemon
 		template<typename T> T Math_invlerp(T a, T b, T value)			{ return (a == b) ? 0.0f : (value - a) / (b - a); }
 		template<typename T> float Math_invlerp_int(T a, T b, T value)	{ return (a == b) ? 0.0f : (float)(value - a) / (float)(b - a); }
 
-		StringRef stringformat(StringRef format, int numArguments, const uint64* args)
+
+		StringRef stringformat(StringRef format, int numArguments, const AnyTypeWrapper* args)
 		{
 			Runtime* runtime = Runtime::getActiveRuntime();
 			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
@@ -117,57 +119,103 @@ namespace lemon
 
 			static detail::FastStringStream result;
 			result.clear();
-			StringFormatter::buildFormattedString_Legacy(result, format.getString(), numArguments, args);
+			StringFormatterLegacy::buildFormattedString(result, format.getString(), numArguments, args);
 
 			return StringRef(runtime->addString(std::string_view(result.mBuffer, result.mLength)));
 		}
 
-		StringRef stringformat1(StringRef format, uint64 arg1)
+		StringRef stringformat1(StringRef format, AnyTypeWrapper arg1)
 		{
 			return stringformat(format, 1, &arg1);
 		}
 
-		StringRef stringformat2(StringRef format, uint64 arg1, uint64 arg2)
+		StringRef stringformat2(StringRef format, AnyTypeWrapper arg1, AnyTypeWrapper arg2)
 		{
-			uint64 args[] = { arg1, arg2 };
+			AnyTypeWrapper args[] = { arg1, arg2 };
 			return stringformat(format, 2, args);
 		}
 
-		StringRef stringformat3(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3)
+		StringRef stringformat3(StringRef format, AnyTypeWrapper arg1, AnyTypeWrapper arg2, AnyTypeWrapper arg3)
 		{
-			uint64 args[] = { arg1, arg2, arg3 };
+			AnyTypeWrapper args[] = { arg1, arg2, arg3 };
 			return stringformat(format, 3, args);
 		}
 
-		StringRef stringformat4(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4)
+		StringRef stringformat4(StringRef format, AnyTypeWrapper arg1, AnyTypeWrapper arg2, AnyTypeWrapper arg3, AnyTypeWrapper arg4)
 		{
-			uint64 args[] = { arg1, arg2, arg3, arg4 };
+			AnyTypeWrapper args[] = { arg1, arg2, arg3, arg4 };
 			return stringformat(format, 4, args);
 		}
 
-		StringRef stringformat5(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5)
+		StringRef stringformat5(StringRef format, AnyTypeWrapper arg1, AnyTypeWrapper arg2, AnyTypeWrapper arg3, AnyTypeWrapper arg4, AnyTypeWrapper arg5)
 		{
-			uint64 args[] = { arg1, arg2, arg3, arg4, arg5 };
+			AnyTypeWrapper args[] = { arg1, arg2, arg3, arg4, arg5 };
 			return stringformat(format, 5, args);
 		}
 
-		StringRef stringformat6(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6)
+		StringRef stringformat6(StringRef format, AnyTypeWrapper arg1, AnyTypeWrapper arg2, AnyTypeWrapper arg3, AnyTypeWrapper arg4, AnyTypeWrapper arg5, AnyTypeWrapper arg6)
 		{
-			uint64 args[] = { arg1, arg2, arg3, arg4, arg5, arg6 };
+			AnyTypeWrapper args[] = { arg1, arg2, arg3, arg4, arg5, arg6 };
 			return stringformat(format, 6, args);
 		}
 
-		StringRef stringformat7(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7)
+		StringRef stringformat7(StringRef format, AnyTypeWrapper arg1, AnyTypeWrapper arg2, AnyTypeWrapper arg3, AnyTypeWrapper arg4, AnyTypeWrapper arg5, AnyTypeWrapper arg6, AnyTypeWrapper arg7)
 		{
-			uint64 args[] = { arg1, arg2, arg3, arg4, arg5, arg6, arg7 };
+			AnyTypeWrapper args[] = { arg1, arg2, arg3, arg4, arg5, arg6, arg7 };
 			return stringformat(format, 7, args);
 		}
 
-		StringRef stringformat8(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7, uint64 arg8)
+		StringRef stringformat8(StringRef format, AnyTypeWrapper arg1, AnyTypeWrapper arg2, AnyTypeWrapper arg3, AnyTypeWrapper arg4, AnyTypeWrapper arg5, AnyTypeWrapper arg6, AnyTypeWrapper arg7, AnyTypeWrapper arg8)
 		{
-			uint64 args[] = { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 };
+			AnyTypeWrapper args[] = { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 };
 			return stringformat(format, 8, args);
 		}
+
+
+		// Legacy stringformat functions only exist for compatibility with script overloads
+		namespace
+		{
+			StringRef stringformat1_u64(StringRef format, uint64 arg1)
+			{
+				return stringformat1(format, AnyTypeWrapper(arg1));
+			}
+
+			StringRef stringformat2_u64(StringRef format, uint64 arg1, uint64 arg2)
+			{
+				return stringformat2(format, AnyTypeWrapper(arg1), AnyTypeWrapper(arg2));
+			}
+
+			StringRef stringformat3_u64(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3)
+			{
+				return stringformat3(format, AnyTypeWrapper(arg1), AnyTypeWrapper(arg2), AnyTypeWrapper(arg3));
+			}
+
+			StringRef stringformat4_u64(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4)
+			{
+				return stringformat4(format, AnyTypeWrapper(arg1), AnyTypeWrapper(arg2), AnyTypeWrapper(arg3), AnyTypeWrapper(arg4));
+			}
+
+			StringRef stringformat5_u64(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5)
+			{
+				return stringformat5(format, AnyTypeWrapper(arg1), AnyTypeWrapper(arg2), AnyTypeWrapper(arg3), AnyTypeWrapper(arg4), AnyTypeWrapper(arg5));
+			}
+
+			StringRef stringformat6_u64(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6)
+			{
+				return stringformat6(format, AnyTypeWrapper(arg1), AnyTypeWrapper(arg2), AnyTypeWrapper(arg3), AnyTypeWrapper(arg4), AnyTypeWrapper(arg5), AnyTypeWrapper(arg6));
+			}
+
+			StringRef stringformat7_u64(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7)
+			{
+				return stringformat7(format, AnyTypeWrapper(arg1), AnyTypeWrapper(arg2), AnyTypeWrapper(arg3), AnyTypeWrapper(arg4), AnyTypeWrapper(arg5), AnyTypeWrapper(arg6), AnyTypeWrapper(arg7));
+			}
+
+			StringRef stringformat8_u64(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7, uint64 arg8)
+			{
+				return stringformat8(format, AnyTypeWrapper(arg1), AnyTypeWrapper(arg2), AnyTypeWrapper(arg3), AnyTypeWrapper(arg4), AnyTypeWrapper(arg5), AnyTypeWrapper(arg6), AnyTypeWrapper(arg7), AnyTypeWrapper(arg8));
+			}
+		}
+
 
 		StringRef string_build(StringRef format, size_t numArguments, const AnyTypeWrapper* args)
 		{
@@ -506,6 +554,30 @@ namespace lemon
 			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5", "arg6", "arg7");
 
 		builder.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat8), defaultFlags)
+			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5", "arg6", "arg7", "arg8");
+
+		builder.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat1_u64), defaultFlags | excludeFromDefinitions)
+			.setParameters("format", "arg1");
+
+		builder.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat2_u64), defaultFlags | excludeFromDefinitions)
+			.setParameters("format", "arg1", "arg2");
+
+		builder.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat3_u64), defaultFlags | excludeFromDefinitions)
+			.setParameters("format", "arg1", "arg2", "arg3");
+
+		builder.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat4_u64), defaultFlags | excludeFromDefinitions)
+			.setParameters("format", "arg1", "arg2", "arg3", "arg4");
+
+		builder.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat5_u64), defaultFlags | excludeFromDefinitions)
+			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5");
+
+		builder.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat6_u64), defaultFlags | excludeFromDefinitions)
+			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5", "arg6");
+
+		builder.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat7_u64), defaultFlags | excludeFromDefinitions)
+			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5", "arg6", "arg7");
+
+		builder.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat8_u64), defaultFlags | excludeFromDefinitions)
 			.setParameters("format", "arg1", "arg2", "arg3", "arg4", "arg5", "arg6", "arg7", "arg8");
 
 		builder.addNativeFunction("string.build", lemon::wrap(&functions::string_build1), defaultFlags | excludeFromDefinitions)

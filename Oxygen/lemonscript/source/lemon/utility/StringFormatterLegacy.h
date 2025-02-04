@@ -20,7 +20,7 @@ namespace lemon
 	}
 
 
-	struct StringFormatter
+	struct StringFormatterLegacy
 	{
 		static void buildFormattedString(detail::FastStringStream& output, std::string_view formatString, size_t numArguments, const AnyTypeWrapper* args);
 	};

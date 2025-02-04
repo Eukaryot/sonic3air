@@ -886,6 +886,9 @@ namespace lemon
 
 	void Runtime::setupGlobalVariables()
 	{
+		if (nullptr == mProgram)
+			return;
+
 		// Setup memory offsets and sizes
 		size_t totalSize = 0;
 		for (size_t index = 0; index < mProgram->getGlobalVariables().size(); ++index)
