@@ -274,6 +274,7 @@ uint32 SpriteManager::addSpriteHandle(uint64 key, const Vec2i& position, uint16 
 	data.mPosition = position;
 	data.mRenderQueue = renderQueue;
 	data.mSpriteTag = mSpriteTag;
+	data.mLifetimeContext = mCurrentLifetimeContext;
 
 	mLatestSpriteHandle = std::make_pair(spriteHandle, &data);
 	return spriteHandle;
@@ -458,6 +459,7 @@ void SpriteManager::processSpriteHandles()
 		sprite.mBlendMode = data.mBlendMode;
 		sprite.mCoordinatesSpace = data.mCoordinatesSpace;
 		sprite.mUseUpscaledSprite = data.mUseUpscaledSprite;
+		sprite.mLifetimeContext = data.mLifetimeContext;
 
 		if (data.mRotation != 0.0f || data.mScale != Vec2f(1.0f, 1.0f))
 		{

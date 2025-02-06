@@ -42,6 +42,7 @@ public:
 		uint16 mAtex = 0;							// Only supported for palette sprites
 		uint64 mSpriteTag = 0;
 		Vec2i  mTaggedSpritePosition;
+		RenderItem::LifetimeContext mLifetimeContext = RenderItem::LifetimeContext::DEFAULT;
 	};
 
 public:
