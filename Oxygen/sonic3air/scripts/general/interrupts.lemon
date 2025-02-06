@@ -350,7 +350,7 @@ function void VInt.Update.LevelLoading()
 
 	Renderer.configureHInt()
 
-	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, 0x380)
+	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, getScreenHeight() * 4)
 
 	if (competition_mode.active)
 	{
@@ -412,7 +412,7 @@ function void VInt.Update.LevelSelect()
 	VDP.copyToVRAMbyDMA(0xfffff800, 0xf800, 0x280)
 	u16[0xfffff640] = 0x83
 
-	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, 0x380)
+	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, getScreenHeight() * 4)
 	u16[0xfffff640] = 0x83
 
 	ProcessDMAQueue()
@@ -583,7 +583,7 @@ function void fn000c50()
 	VDP.copyToVRAMbyDMA(0xfffff800, 0xf800, 0x280)
 	u16[0xfffff640] = 0x83
 
-	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, 0x380)
+	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, getScreenHeight() * 4)
 	u16[0xfffff640] = 0x83
 
 	ProcessDMAQueue()
