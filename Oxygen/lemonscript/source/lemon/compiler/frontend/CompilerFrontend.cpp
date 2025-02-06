@@ -289,14 +289,16 @@ namespace lemon
 				// Check for keywords
 				if (tokens[0].isA<KeywordToken>())
 				{
+					const uint32 lineNumber = node.getLineNumber();
+
 					switch (tokens[0].as<KeywordToken>().mKeyword)
 					{
 						case Keyword::FUNCTION:
 						{
 							// Next node must be a block node
 							const size_t nodeIndex = nodesIterator.mCurrentIndex;
-							CHECK_ERROR(nodeIndex+1 < nodes.size(), "Function definition as last node is not allowed", node.getLineNumber());
-							CHECK_ERROR(nodes[nodeIndex+1].isA<BlockNode>(), "Expected block node after function header", node.getLineNumber());
+							CHECK_ERROR(nodeIndex+1 < nodes.size(), "Function definition as last node is not allowed", lineNumber);
+							CHECK_ERROR(nodes[nodeIndex+1].isA<BlockNode>(), "Expected block node after function header", lineNumber);
 
 							// Process tokens
 							ScriptFunction& function = processFunctionHeader(node, tokens);
@@ -305,7 +307,7 @@ namespace lemon
 							FunctionNode& newNode = nodes.createReplaceAt<FunctionNode>(nodeIndex);
 							newNode.mFunction = &function;
 							newNode.mContent = nodes[nodeIndex+1].as<BlockNode>();
-							newNode.setLineNumber(node.getLineNumber());
+							newNode.setLineNumber(lineNumber);
 
 							mFunctionNodes.push_back(&newNode);
 
@@ -327,11 +329,11 @@ namespace lemon
 						case Keyword::GLOBAL:
 						{
 							size_t offset = 1;
-							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<VarTypeToken>(), "Expected a typename after 'global' keyword", node.getLineNumber());
+							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<VarTypeToken>(), "Expected a typename after 'global' keyword", lineNumber);
 							const DataTypeDefinition* dataType = tokens[offset].as<VarTypeToken>().mDataType;
 							++offset;
 
-							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier in global variable definition", node.getLineNumber());
+							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier in global variable definition", lineNumber);
 							const FlyweightString identifier = tokens[offset].as<IdentifierToken>().mName;
 							++offset;
 
@@ -341,8 +343,28 @@ namespace lemon
 
 							if (offset+2 <= tokens.size() && isOperator(tokens[offset], Operator::ASSIGN))
 							{
-								CHECK_ERROR(offset+2 == tokens.size() && tokens[offset+1].isA<ConstantToken>(), "Expected a constant value for initializing the global variable", node.getLineNumber());
-								variable.mInitialValue = tokens[offset+1].as<ConstantToken>().mValue.get<int64>();
+								int pos = offset + 1;
+								bool negative = false;
+								if (isOperator(tokens[pos], Operator::BINARY_MINUS) || isOperator(tokens[pos], Operator::BINARY_PLUS))
+								{
+									negative = isOperator(tokens[pos], Operator::BINARY_MINUS);
+									++pos;
+								}
+								CHECK_ERROR(tokens[pos].isA<ConstantToken>(), "Expected constant value as default for global variable", lineNumber);
+								const ConstantToken& ct = tokens[pos].as<ConstantToken>();
+
+								// Cast the value as needed, because the constant might have a different type than the constant array
+								AnyBaseValue value;
+								const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(ct.mValue, ct.mDataType, value, dataType);
+								const bool castSuccessful = (castHandling.mResult == TypeCasting::CastHandling::Result::NO_CAST || castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST);
+								CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << ct.mDataType->getName().getString() << " to type " << dataType->getName().getString(), lineNumber);
+
+								if (negative)
+								{
+									if (!negateBaseTypeValue(value, dataType))
+										CHECK_ERROR(false, "Can't apply negative sign to constant value", lineNumber);
+								}
+								variable.mInitialValue = value;
 							}
 							break;
 						}
@@ -365,15 +387,15 @@ namespace lemon
 								++offset;
 							}
 
-							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier for define", node.getLineNumber());
+							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier for define", lineNumber);
 							const FlyweightString identifier = tokens[offset].as<IdentifierToken>().mName;
 							++offset;
 
-							CHECK_ERROR(offset < tokens.size() && isOperator(tokens[offset], Operator::ASSIGN), "Expected '=' in define", node.getLineNumber());
+							CHECK_ERROR(offset < tokens.size() && isOperator(tokens[offset], Operator::ASSIGN), "Expected '=' in define", lineNumber);
 							++offset;
 
 							// Rest is define content
-							CHECK_ERROR(offset < tokens.size(), "Missing define content", node.getLineNumber());
+							CHECK_ERROR(offset < tokens.size(), "Missing define content", lineNumber);
 
 							// Find out the data type if not specified yet
 							if (nullptr == dataType)
@@ -384,7 +406,7 @@ namespace lemon
 								}
 								else
 								{
-									CHECK_ERROR(false, "Data type of define could not be determined", node.getLineNumber());
+									CHECK_ERROR(false, "Data type of define could not be determined", lineNumber);
 								}
 							}
 

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "lemon/program/DataType.h"
+#include "lemon/utility/AnyBaseValue.h"
 #include "lemon/utility/FlyweightString.h"
 
 #include <functional>
@@ -74,7 +75,7 @@ namespace lemon
 		// Global variables get accessed via the runtime's global variables list
 
 	public:
-		int64 mInitialValue = 0;
+		AnyBaseValue mInitialValue;
 	};
 
 

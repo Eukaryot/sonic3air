@@ -911,7 +911,7 @@ namespace lemon
 			Variable& variable = *mProgram->getGlobalVariables()[index];
 			if (variable.getStaticMemorySize() > 0)
 			{
-				const int64 value = (variable.getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable&>(variable).mInitialValue : 0;
+				const int64 value = (variable.getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable&>(variable).mInitialValue.get<int64>() : 0;
 				*(int64*)&mStaticMemory[variable.getStaticMemoryOffset()] = value;
 			}
 		}
