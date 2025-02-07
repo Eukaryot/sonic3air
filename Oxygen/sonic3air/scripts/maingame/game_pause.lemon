@@ -180,7 +180,10 @@ function void GamePause.Menu()
 				{
 					// Return from dialog
 					if (Input.buttonPressed(0, BUTTON_B) || Input.buttonPressed(0, BUTTON_BACK))
+					{
+						Audio.playAudio(0x5b)
 						GamePause.isDialogOpen = false
+					}
 				}
 
 				// Handle key repeat
@@ -301,6 +304,7 @@ function void GamePause.Menu()
 				{
 					// First open the dialog menu for Restart
 					GamePause.isDialogOpen = true
+					Audio.playAudio(0x5b)
 				}
 			}
 			else if (GamePause.selectedEntry == 2)
@@ -315,6 +319,7 @@ function void GamePause.Menu()
 			{
 				// First open the dialog menu for Exit Game
 				GamePause.isDialogOpen = true
+				Audio.playAudio(0x5b)
 			}
 		}
 	}
@@ -375,8 +380,8 @@ function void GamePause.DrawMenu(float time)
 	Renderer.resetLifetimeContext(1)
 	Renderer.setLifetimeContext(1)
 
-	Renderer.drawSprite("pause_screen_upper", rightAnchor - 210, 0, 0, SPRITE_FLAG_PRIO, 0xff00)
-	Renderer.drawSprite("pause_screen_lower", rightAnchor - 190, py - 8, 0, SPRITE_FLAG_PRIO, 0xff00)
+	Renderer.drawSprite("pause_screen_upper", rightAnchor - 210, 0, 0, SPRITE_FLAG_PRIO | SPRITE_FLAG_NO_GLOBAL_TINT, 0xff00)
+	Renderer.drawSprite("pause_screen_lower", rightAnchor - 190, py - 8, 0, SPRITE_FLAG_PRIO | SPRITE_FLAG_NO_GLOBAL_TINT, 0xff00)
 
 	for (u8 k = 0; k < GamePause.NUM_ENTRIES; ++k)
 	{
@@ -402,12 +407,12 @@ function void GamePause.DrawMenu(float time)
 
 			if (numDialogEntries <= 2)
 			{
-				Renderer.drawSprite("pause_screen_dialog", px - 66, py - 8, 0, SPRITE_FLAG_PRIO, 0xff00, 0, Math.roundToInt(GamePause.dialogVisibility * 255.0f))
+				Renderer.drawSprite("pause_screen_dialog", px - 66, py - 8, 0, SPRITE_FLAG_PRIO | SPRITE_FLAG_NO_GLOBAL_TINT, 0xff00, 0, Math.roundToInt(GamePause.dialogVisibility * 255.0f))
 			}
 			else
 			{
 				py -= 15
-				Renderer.drawSprite("pause_screen_dialog3", px - 68, py - 8, 0, SPRITE_FLAG_PRIO, 0xff00, 0, Math.roundToInt(GamePause.dialogVisibility * 255.0f))
+				Renderer.drawSprite("pause_screen_dialog3", px - 68, py - 8, 0, SPRITE_FLAG_PRIO | SPRITE_FLAG_NO_GLOBAL_TINT, 0xff00, 0, Math.roundToInt(GamePause.dialogVisibility * 255.0f))
 				px += 5
 			}
 
@@ -434,7 +439,7 @@ function void GamePause.DrawMenu(float time)
 		py = getScreenHeight() - 5 + Math.roundToInt(Math.lerp(20, -2, hintVisibility))
 
 		Renderer.drawRect(0, py - 9, 175, 20, 0x000000d0, 0xff00, false)
-		Renderer.drawSprite("@input_icon_button_Y", 12, py - 1, 0, SPRITE_FLAG_PRIO, 0xff01)
+		Renderer.drawSprite("@input_icon_button_Y", 12, py - 1, 0, SPRITE_FLAG_PRIO | SPRITE_FLAG_NO_GLOBAL_TINT, 0xff01)
 		Renderer.drawText(GamePause.TINY_FONT, 24, py, "Hide menu for clean screenshots", 0xa0d0ffff, 4, 0, 0xff01, false)
 	}
 }

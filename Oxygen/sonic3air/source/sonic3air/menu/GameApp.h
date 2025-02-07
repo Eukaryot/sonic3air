@@ -82,4 +82,6 @@ private:
 	ApplicationContextMenu* mApplicationContextMenu = nullptr;
 
 	GuiBase* mRemoveChild = nullptr;
+
+	Vec2i mRestoreGameResolution;
 };
