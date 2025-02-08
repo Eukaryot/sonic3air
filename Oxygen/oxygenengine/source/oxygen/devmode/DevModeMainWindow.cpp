@@ -122,6 +122,7 @@ void DevModeMainWindow::buildContent()
 
 	const float uiScale = getUIScale();
 
+	const bool useTabs = Configuration::instance().mDevMode.mUseTabsInMainWindow;
 	int& configActiveTab = Configuration::instance().mDevMode.mActiveMainWindowTab;
 	const bool firstRun = (mActiveTab == -1);
 
@@ -134,7 +135,7 @@ void DevModeMainWindow::buildContent()
 	constexpr int NUM_CATEGORIES = (int)DevModeWindowBase::Category::MISC + 1;
 	static_assert(sizeof(TEXT_BY_CATEGORY) / sizeof(const char*) == NUM_CATEGORIES);
 
-	if (ImGui::BeginTabBar("Tab Bar", 0))
+	if (!useTabs || ImGui::BeginTabBar("Tab Bar", 0))
 	{
 		std::vector<DevModeWindowBase*> windows;
 
@@ -163,11 +164,14 @@ void DevModeMainWindow::buildContent()
 				const size_t numColumns = (windows.size() + itemsPerColumn - 1) / itemsPerColumn;
 				const int flags = (firstRun && configActiveTab == categoryIndex) ? ImGuiTabItemFlags_SetSelected : 0;
 
-				if (ImGui::BeginTabItem(TEXT_BY_CATEGORY[categoryIndex], nullptr, flags))
+				if (!useTabs)
+					ImGui::SeparatorText(TEXT_BY_CATEGORY[categoryIndex]);
+				
+				if (!useTabs || ImGui::BeginTabItem(TEXT_BY_CATEGORY[categoryIndex], nullptr, flags))
 				{
 					mActiveTab = categoryIndex;
 
-					if (ImGui::BeginTable("Table", numColumns, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchProp, ImVec2(270 * uiScale, 0)))
+					if (ImGui::BeginTable("Table", numColumns, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchProp, ImVec2(280 * uiScale, 0)))
 					{
 						ImGui::TableNextRow();
 
@@ -191,11 +195,15 @@ void DevModeMainWindow::buildContent()
 
 						ImGui::EndTable();
 					}
-					ImGui::EndTabItem();
+
+					if (useTabs)
+						ImGui::EndTabItem();
 				}
 			}
 		}
-		ImGui::EndTabBar();
+		
+		if (useTabs)
+			ImGui::EndTabBar();
 	}
 
 	configActiveTab = mActiveTab;
