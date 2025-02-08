@@ -308,7 +308,7 @@ void PlayerRecorder::updateRecording(Recording& recording, uint16 frameNumber)
 		Frame& frame = recording.mFrames.back();
 
 		// Collect data
-		frame.mInput = ControlsIn::instance().getInputPad(0);
+		frame.mInput = ControlsIn::instance().getGamepad(0).mCurrentInput;
 		frame.mPosition.x = emulatorInterface.readMemory16(0xffffb010);
 		frame.mPosition.y = emulatorInterface.readMemory16(0xffffb014);
 		frame.mSprite = emulatorInterface.readMemory16(0x801002);

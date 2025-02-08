@@ -564,7 +564,7 @@ void Game::onUpdateControls()
 	if (mSkippableCutsceneFrames > 0 || mButtonYPressedDuringSkippableCutscene)	// Last check makes sure we'll ignore the press until it gets released
 	{
 		// Block input to the game
-		mButtonYPressedDuringSkippableCutscene = (ControlsIn::instance().getInputPad(0) & (int)ControlsIn::Button::Y);
+		mButtonYPressedDuringSkippableCutscene = ControlsIn::instance().getGamepad(0).isPressed(ControlsIn::Button::Y);
 		if (mButtonYPressedDuringSkippableCutscene)
 		{
 			ControlsIn::instance().injectEmptyInputs();
