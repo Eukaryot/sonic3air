@@ -896,6 +896,12 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			Renderer.drawCustomSprite("mgz_missingtile", px, py, 0x00, 0x00, 0x9e00)
 		}
 
+		// MGZ level chunk to cover a black area that can be visible in widescreen, but is difficult to replace with an actual chunk
+		else if (objA0.animation.sprite == 0x34)
+		{
+			Renderer.drawCustomSprite("mgz_wallchunk", px, py, 0x00, 0x00, 0x9e00)
+		}
+
 		// Return true for unknown subtypes as well, to avoid drawing junk
 		return true
 	}
