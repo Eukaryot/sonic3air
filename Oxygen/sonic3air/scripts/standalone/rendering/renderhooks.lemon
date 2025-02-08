@@ -990,7 +990,7 @@ function bool Standalone.onDrawVdpSprite(s16 px, s16 py, u8 size, u16 index, u16
 	// Super Emerald when active
 	if (objA0.update_address == 0x09089e && Game.getSetting(SETTING_GFX_ANTIFLICKER) >= 1)
 	{
-		if (global.framecounter.low & 0x01)
+		if ((global.framecounter.low & 0x01) || global.game_mode == 0x0c)	// Second check makes sure that the glow won't be added in the frame just before screen fade-out, as it would look broken
 		{
 			Renderer.drawVdpSprite(px, py, size, index, renderQueue)
 		}
