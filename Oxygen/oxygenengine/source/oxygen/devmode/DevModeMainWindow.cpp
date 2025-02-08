@@ -38,7 +38,8 @@
 DevModeMainWindow::DevModeMainWindow() :
 	DevModeWindowBase("Dev Mode (F1)", Category::MISC, ImGuiWindowFlags_AlwaysAutoResize)
 {
-	mIsWindowOpen = true;
+	const Configuration::DevModeSettings& config = Configuration::instance().mDevMode;
+	mIsWindowOpen = config.mMainWindowOpen;
 
 	// Create windows
 	//  -> Note that the order of creation defines the listing order inside each category
@@ -66,7 +67,7 @@ DevModeMainWindow::DevModeMainWindow() :
 	}
 
 	// Open windows depending on what was saved in settings
-	for (const std::string& windowTitle : Configuration::instance().mDevMode.mOpenUIWindows)
+	for (const std::string& windowTitle : config.mOpenUIWindows)
 	{
 		DevModeWindowBase* window = findWindowByTitle(windowTitle);
 		if (nullptr != window)
@@ -78,7 +79,10 @@ DevModeMainWindow::~DevModeMainWindow()
 {
 	// Save which windows are open
 	{
-		std::vector<std::string>& windowTitles = Configuration::instance().mDevMode.mOpenUIWindows;
+		Configuration::DevModeSettings& config = Configuration::instance().mDevMode;
+		config.mMainWindowOpen = mIsWindowOpen;
+
+		std::vector<std::string>& windowTitles = config.mOpenUIWindows;
 		windowTitles.clear();
 		for (DevModeWindowBase* window : mAllWindows)
 		{

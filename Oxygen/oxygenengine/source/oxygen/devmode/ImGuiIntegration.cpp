@@ -115,6 +115,8 @@ void ImGuiIntegration::shutdown()
 	if (!mRunning)
 		return;
 
+	saveIniSettings();
+
 	SAFE_DELETE(mDevModeMainWindow);
 
 	ImGui_ImplOpenGL3_Shutdown();
@@ -172,9 +174,7 @@ void ImGuiIntegration::endFrame()
 	if (ImGui::GetIO().WantSaveIniSettings)
 	{
 		ImGui::GetIO().WantSaveIniSettings = false;
-		size_t contentSize = 0;
-		const char* content = ImGui::SaveIniSettingsToMemory(&contentSize);
-		FTX::FileSystem->saveFile(mIniFilePath, content, contentSize);
+		saveIniSettings();
 	}
 }
 
@@ -269,6 +269,13 @@ void ImGuiIntegration::toggleMainWindow()
 	{
 		mDevModeMainWindow->setIsWindowOpen(!mDevModeMainWindow->getIsWindowOpen());
 	}
+}
+
+void ImGuiIntegration::saveIniSettings()
+{
+	size_t contentSize = 0;
+	const char* content = ImGui::SaveIniSettingsToMemory(&contentSize);
+	FTX::FileSystem->saveFile(mIniFilePath, content, contentSize);
 }
 
 #else
