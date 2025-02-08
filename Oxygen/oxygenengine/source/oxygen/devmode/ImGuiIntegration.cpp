@@ -70,6 +70,8 @@ void ImGuiIntegration::startup()
 	ImGui_ImplSDL2_InitForOpenGL(window, SDL_GL_GetCurrentContext());
 	ImGui_ImplOpenGL3_Init();
 
+	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+
 	// Configure paths
 	{
 		ImGui::GetIO().IniFilename = nullptr;	// Disable automatic load & save by ImGui, we're handling that ourselves
