@@ -67,6 +67,10 @@ function void fn072b96()
 	if (!level.results_done)
 		return
 
+#if STANDALONE
+	Game.startSkippableCutscene()
+#endif
+
 	objA0.update_address = 0x072bbc
 	PlayMusicAfterLevelResults()
 	objA0.countdown_value = 0x1f

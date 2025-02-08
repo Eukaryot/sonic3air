@@ -282,28 +282,34 @@ function void fn048534()
 	//  - u8[A4 + 0x01] = Number of frames until start
 
 	--s8[A4 + 0x01]
-	if (s8[A4 + 0x01] < 0)
+	if (s8[A4 + 0x01] >= 0)
+		return
+
+	u8[A4] += 2
+
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	u16[A1 + 0x1c] = 0x0800
+	objA1.state = char.state.ROLLING
+	u16[A1 + 0x26] = 0
+	objA1.flags2a |= char.flag.IN_AIR
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
+	u8[A1 + 0x40] = 0
+
+	fn04872c()
+
+	if (objA1.update_address != 0x0487e4 && objA1.update_address != 0x0487f0)		// Is target a character?
 	{
-		u8[A4] += 2
-
-		objA1.velocity.x = 0
-		objA1.velocity.y = 0
-		u16[A1 + 0x1c] = 0x0800
-		objA1.state = char.state.ROLLING
-		u16[A1 + 0x26] = 0
-		objA1.flags2a |= char.flag.IN_AIR
-		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
-		u8[A1 + 0x40] = 0
-
-		fn04872c()
-
-		if (objA1.update_address != 0x0487e4 && objA1.update_address != 0x0487f0)		// Is target a character?
-		{
-			objA1.animation.sprite = 0x96		// Player characters' jumping sprite
-			D0 = objA1.animation.sprite
-			SetCharacterSpritePatterns()
-		}
+		objA1.animation.sprite = 0x96		// Player characters' jumping sprite
+		D0 = objA1.animation.sprite
+		SetCharacterSpritePatterns()
 	}
+
+#if STANDALONE
+	// Make this a skippable cutscene for player 1
+	if (A1 == 0xffffb000)
+		Game.startSkippableCutscene()
+#endif
 }
 
 
@@ -342,6 +348,11 @@ function void fn0485ae()
 		// Reached the end of the tunnel
 		u8[A1 + 0x2e] = 0	// Reset control flags for characters
 		u8[A4] = 0
+
+	#if STANDALONE
+		if (A1 == 0xffffb000)
+			Game.endSkippableCutscene()
+	#endif
 		return
 	}
 
