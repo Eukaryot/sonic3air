@@ -30,6 +30,35 @@ namespace lemon
 			node.setLineNumber(lineNumber);
 			return node;
 		}
+
+		bool negateBaseTypeValue(AnyBaseValue& value, const DataTypeDefinition* dataType)
+		{
+			switch (dataType->getClass())
+			{
+				case DataTypeDefinition::Class::INTEGER:
+				{
+					switch (dataType->getBytes())
+					{
+						case 1:  value.set<int8>(-value.get<int8>());    return true;
+						case 2:  value.set<int16>(-value.get<int16>());  return true;
+						case 4:  value.set<int32>(-value.get<int32>());  return true;
+						case 8:  value.set<int64>(-value.get<int64>());  return true;
+					}
+					break;
+				}
+
+				case DataTypeDefinition::Class::FLOAT:
+				{
+					switch (dataType->getBytes())
+					{
+						case 4:  value.set<float>(-value.get<float>());    return true;
+						case 8:  value.set<double>(-value.get<double>());  return true;
+					}
+					break;
+				}
+			}
+			return false;
+		}
 	}
 
 
@@ -260,14 +289,16 @@ namespace lemon
 				// Check for keywords
 				if (tokens[0].isA<KeywordToken>())
 				{
+					const uint32 lineNumber = node.getLineNumber();
+
 					switch (tokens[0].as<KeywordToken>().mKeyword)
 					{
 						case Keyword::FUNCTION:
 						{
 							// Next node must be a block node
 							const size_t nodeIndex = nodesIterator.mCurrentIndex;
-							CHECK_ERROR(nodeIndex+1 < nodes.size(), "Function definition as last node is not allowed", node.getLineNumber());
-							CHECK_ERROR(nodes[nodeIndex+1].isA<BlockNode>(), "Expected block node after function header", node.getLineNumber());
+							CHECK_ERROR(nodeIndex+1 < nodes.size(), "Function definition as last node is not allowed", lineNumber);
+							CHECK_ERROR(nodes[nodeIndex+1].isA<BlockNode>(), "Expected block node after function header", lineNumber);
 
 							// Process tokens
 							ScriptFunction& function = processFunctionHeader(node, tokens);
@@ -276,7 +307,7 @@ namespace lemon
 							FunctionNode& newNode = nodes.createReplaceAt<FunctionNode>(nodeIndex);
 							newNode.mFunction = &function;
 							newNode.mContent = nodes[nodeIndex+1].as<BlockNode>();
-							newNode.setLineNumber(node.getLineNumber());
+							newNode.setLineNumber(lineNumber);
 
 							mFunctionNodes.push_back(&newNode);
 
@@ -298,11 +329,11 @@ namespace lemon
 						case Keyword::GLOBAL:
 						{
 							size_t offset = 1;
-							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<VarTypeToken>(), "Expected a typename after 'global' keyword", node.getLineNumber());
+							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<VarTypeToken>(), "Expected a typename after 'global' keyword", lineNumber);
 							const DataTypeDefinition* dataType = tokens[offset].as<VarTypeToken>().mDataType;
 							++offset;
 
-							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier in global variable definition", node.getLineNumber());
+							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier in global variable definition", lineNumber);
 							const FlyweightString identifier = tokens[offset].as<IdentifierToken>().mName;
 							++offset;
 
@@ -312,8 +343,28 @@ namespace lemon
 
 							if (offset+2 <= tokens.size() && isOperator(tokens[offset], Operator::ASSIGN))
 							{
-								CHECK_ERROR(offset+2 == tokens.size() && tokens[offset+1].isA<ConstantToken>(), "Expected a constant value for initializing the global variable", node.getLineNumber());
-								variable.mInitialValue = tokens[offset+1].as<ConstantToken>().mValue.get<int64>();
+								int pos = offset + 1;
+								bool negative = false;
+								if (isOperator(tokens[pos], Operator::BINARY_MINUS) || isOperator(tokens[pos], Operator::BINARY_PLUS))
+								{
+									negative = isOperator(tokens[pos], Operator::BINARY_MINUS);
+									++pos;
+								}
+								CHECK_ERROR(tokens[pos].isA<ConstantToken>(), "Expected constant value as default for global variable", lineNumber);
+								const ConstantToken& ct = tokens[pos].as<ConstantToken>();
+
+								// Cast the value as needed, because the constant might have a different type than the constant array
+								AnyBaseValue value;
+								const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(ct.mValue, ct.mDataType, value, dataType);
+								const bool castSuccessful = (castHandling.mResult == TypeCasting::CastHandling::Result::NO_CAST || castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST);
+								CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << ct.mDataType->getName().getString() << " to type " << dataType->getName().getString(), lineNumber);
+
+								if (negative)
+								{
+									if (!negateBaseTypeValue(value, dataType))
+										CHECK_ERROR(false, "Can't apply negative sign to constant value", lineNumber);
+								}
+								variable.mInitialValue = value;
 							}
 							break;
 						}
@@ -336,15 +387,15 @@ namespace lemon
 								++offset;
 							}
 
-							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier for define", node.getLineNumber());
+							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier for define", lineNumber);
 							const FlyweightString identifier = tokens[offset].as<IdentifierToken>().mName;
 							++offset;
 
-							CHECK_ERROR(offset < tokens.size() && isOperator(tokens[offset], Operator::ASSIGN), "Expected '=' in define", node.getLineNumber());
+							CHECK_ERROR(offset < tokens.size() && isOperator(tokens[offset], Operator::ASSIGN), "Expected '=' in define", lineNumber);
 							++offset;
 
 							// Rest is define content
-							CHECK_ERROR(offset < tokens.size(), "Missing define content", node.getLineNumber());
+							CHECK_ERROR(offset < tokens.size(), "Missing define content", lineNumber);
 
 							// Find out the data type if not specified yet
 							if (nullptr == dataType)
@@ -355,7 +406,7 @@ namespace lemon
 								}
 								else
 								{
-									CHECK_ERROR(false, "Data type of define could not be determined", node.getLineNumber());
+									CHECK_ERROR(false, "Data type of define could not be determined", lineNumber);
 								}
 							}
 
@@ -846,25 +897,44 @@ namespace lemon
 			values.clear();
 			values.reserve(0x20);
 
-			const auto readNextContentToken = [this, arrayDataType](const Token& token, bool& expectingComma, uint32 lineNumber, std::vector<AnyBaseValue>& values)
+			bool expectingComma = false;
+			const auto parseContentTokens = [this, arrayDataType, &expectingComma](const TokenList& tokens, size_t firstIndex, size_t endIndex, uint32 lineNumber, std::vector<AnyBaseValue>& values)
 			{
-				if (expectingComma)
+				for (size_t i = firstIndex; i < endIndex; ++i)
 				{
-					CHECK_ERROR(isOperator(token, Operator::COMMA_SEPARATOR), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
-					expectingComma = false;
-				}
-				else
-				{
-					CHECK_ERROR(token.isA<ConstantToken>(), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
+					Token* token = &tokens[i];
+					if (expectingComma)
+					{
+						CHECK_ERROR(isOperator(*token, Operator::COMMA_SEPARATOR), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
+						expectingComma = false;
+					}
+					else
+					{
+						bool negative = false;
+						if (isOperator(*token, Operator::BINARY_MINUS) || isOperator(*token, Operator::BINARY_PLUS))
+						{
+							negative = isOperator(*token, Operator::BINARY_MINUS);
+							++i;
+							CHECK_ERROR(i < endIndex, "List of constants inside constant array list of values ended with a single sign", lineNumber);
+							token = &tokens[i];
+						}
 
-					// Cast the value as needed, because the constant might have a different type than the constant array
-					const ConstantToken& ct = token.as<ConstantToken>();
-					AnyBaseValue value;
-					const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(ct.mValue, ct.mDataType, value, arrayDataType);
-					const bool castSuccessful = (castHandling.mResult == TypeCasting::CastHandling::Result::NO_CAST || castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST);
-					CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << ct.mDataType->getName().getString() << " to constant array type " << arrayDataType->getName().getString(), lineNumber);
-					values.emplace_back(value);
-					expectingComma = true;
+						CHECK_ERROR(token->isA<ConstantToken>(), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
+
+						// Cast the value as needed, because the constant might have a different type than the constant array
+						const ConstantToken& ct = token->as<ConstantToken>();
+						AnyBaseValue value;
+						const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(ct.mValue, ct.mDataType, value, arrayDataType);
+						const bool castSuccessful = (castHandling.mResult == TypeCasting::CastHandling::Result::NO_CAST || castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST);
+						CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << ct.mDataType->getName().getString() << " to constant array type " << arrayDataType->getName().getString(), lineNumber);
+						if (negative)
+						{
+							if (!negateBaseTypeValue(value, arrayDataType))
+								CHECK_ERROR(false, "Can't apply negative sign to constant array value", lineNumber);
+						}
+						values.emplace_back(value);
+						expectingComma = true;
+					}
 				}
 			};
 
@@ -876,11 +946,7 @@ namespace lemon
 				CHECK_ERROR(isKeyword(tokens.back(), Keyword::BLOCK_END), "Expected } at the end of constant array definition", lineNumber);
 
 				// Handle one-liner definition of constant array
-				bool expectingComma = false;
-				for (size_t i = 8; i < tokens.size() - 1; ++i)
-				{
-					readNextContentToken(tokens[i], expectingComma, lineNumber, values);
-				}
+				parseContentTokens(tokens, 8, tokens.size() - 1, lineNumber, values);
 			}
 			else
 			{
@@ -890,15 +956,11 @@ namespace lemon
 
 				// Go through the block node and collect the values
 				BlockNode& content = nextNode->as<BlockNode>();
-				bool expectingComma = false;
 				for (size_t n = 0; n < content.mNodes.size(); ++n)
 				{
 					CHECK_ERROR(content.mNodes[n].isA<UndefinedNode>(), "Syntax error inside constant array list of values", content.mNodes[n].getLineNumber());
 					UndefinedNode& listNode = content.mNodes[n].as<UndefinedNode>();
-					for (size_t i = 0; i < listNode.mTokenList.size(); ++i)
-					{
-						readNextContentToken(listNode.mTokenList[i], expectingComma, listNode.getLineNumber(), values);
-					}
+					parseContentTokens(listNode.mTokenList, 0, listNode.mTokenList.size(), listNode.getLineNumber(), values);
 				}
 
 				removeNextNode = true;
@@ -928,15 +990,34 @@ namespace lemon
 			CHECK_ERROR(isOperator(tokens[3], Operator::ASSIGN), "Missing assignment in constant definition", lineNumber);
 
 			// TODO: Support all statements that result in a compile-time constant
-			CHECK_ERROR(tokens[4].isA<ConstantToken>(), "", lineNumber);
+			int pos = 4;
+			bool negative = false;
+			if (isOperator(tokens[pos], Operator::BINARY_MINUS) || isOperator(tokens[pos], Operator::BINARY_PLUS))
+			{
+				negative = isOperator(tokens[pos], Operator::BINARY_MINUS);
+				++pos;
+			}
+			CHECK_ERROR(tokens[pos].isA<ConstantToken>(), "Expected constant value in constant declaration", lineNumber);
 
 			const DataTypeDefinition* dataType = tokens[1].as<VarTypeToken>().mDataType;
 			const FlyweightString identifier = tokens[2].as<IdentifierToken>().mName;
-			const AnyBaseValue constantValue = tokens[4].as<ConstantToken>().mValue;
+			const ConstantToken& ct = tokens[pos].as<ConstantToken>();
+
+			// Cast the value as needed, because the constant might have a different type than the constant array
+			AnyBaseValue value;
+			const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(ct.mValue, ct.mDataType, value, dataType);
+			const bool castSuccessful = (castHandling.mResult == TypeCasting::CastHandling::Result::NO_CAST || castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST);
+			CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << ct.mDataType->getName().getString() << " to type " << dataType->getName().getString(), lineNumber);
+
+			if (negative)
+			{
+				if (!negateBaseTypeValue(value, dataType))
+					CHECK_ERROR(false, "Can't apply negative sign to constant value", lineNumber);
+			}
 
 			if (isGlobalDefinition)
 			{
-				Constant& constant = mModule.addConstant(identifier, dataType, constantValue);
+				Constant& constant = mModule.addConstant(identifier, dataType, value);
 				mGlobalsLookup.registerConstant(constant);
 			}
 			else
@@ -944,7 +1025,7 @@ namespace lemon
 				Constant& constant = vectorAdd(scopeContext->mLocalConstants);
 				constant.mName = identifier;
 				constant.mDataType = dataType;
-				constant.mValue = constantValue;
+				constant.mValue = value;
 			}
 		}
 	}

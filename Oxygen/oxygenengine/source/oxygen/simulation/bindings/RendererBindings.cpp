@@ -396,7 +396,19 @@ namespace
 
 	void Renderer_resetSprites()
 	{
-		RenderParts::instance().getSpriteManager().setResetRenderItems(true);
+		RenderParts::instance().getSpriteManager().setResetRenderItems(0x07);	// All of first three bits
+	}
+
+	void Renderer_resetLifetimeContext(uint8 lifetimeContext)
+	{
+		RMX_CHECK(lifetimeContext <= 2, "Lifetime context must be between 0 and 2", return);
+		RenderParts::instance().getSpriteManager().setResetRenderItems(1 << lifetimeContext);
+	}
+
+	void Renderer_setLifetimeContext(uint8 lifetimeContext)
+	{
+		RMX_CHECK(lifetimeContext <= 2, "Lifetime context must be between 0 and 2", return);
+		RenderParts::instance().getSpriteManager().setCurrentLifetimeContext((RenderItem::LifetimeContext)lifetimeContext);
 	}
 
 	void Renderer_drawVdpSprite(int16 px, int16 py, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue)
@@ -917,13 +929,15 @@ void RendererBindings::registerBindings(lemon::Module& module)
 	SpriteHandleWrapper::mDataType = module.addDataType("SpriteHandle", lemon::BaseType::UINT_32);
 
 	// Constants
-	builder.addConstant<uint8>("BlendMode.OPAQUE",		   BlendMode::OPAQUE);
-	builder.addConstant<uint8>("BlendMode.ALPHA",		   BlendMode::ALPHA);
-	builder.addConstant<uint8>("BlendMode.ADDITIVE",	   BlendMode::ADDITIVE);
-	builder.addConstant<uint8>("BlendMode.SUBTRACTIVE",	   BlendMode::SUBTRACTIVE);
-	builder.addConstant<uint8>("BlendMode.MULTIPLICATIVE", BlendMode::MULTIPLICATIVE);
-	builder.addConstant<uint8>("BlendMode.MINIMUM",		   BlendMode::MINIMUM);
-	builder.addConstant<uint8>("BlendMode.MAXIMUM",		   BlendMode::MAXIMUM);
+	{
+		builder.addConstant<uint8>("BlendMode.OPAQUE",		   BlendMode::OPAQUE);
+		builder.addConstant<uint8>("BlendMode.ALPHA",		   BlendMode::ALPHA);
+		builder.addConstant<uint8>("BlendMode.ADDITIVE",	   BlendMode::ADDITIVE);
+		builder.addConstant<uint8>("BlendMode.SUBTRACTIVE",	   BlendMode::SUBTRACTIVE);
+		builder.addConstant<uint8>("BlendMode.MULTIPLICATIVE", BlendMode::MULTIPLICATIVE);
+		builder.addConstant<uint8>("BlendMode.MINIMUM",		   BlendMode::MINIMUM);
+		builder.addConstant<uint8>("BlendMode.MAXIMUM",		   BlendMode::MAXIMUM);
+	}
 
 	// Functions
 	{
@@ -1081,6 +1095,12 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		builder.addNativeFunction("Renderer.resetCustomPlaneConfigurations", lemon::wrap(&Renderer_resetCustomPlaneConfigurations), defaultFlags);
 
 		builder.addNativeFunction("Renderer.resetSprites", lemon::wrap(&Renderer_resetSprites), defaultFlags);
+
+		builder.addNativeFunction("Renderer.resetLifetimeContext", lemon::wrap(&Renderer_resetLifetimeContext), defaultFlags)
+			.setParameters("lifetimeContext");
+
+		builder.addNativeFunction("Renderer.setLifetimeContext", lemon::wrap(&Renderer_setLifetimeContext), defaultFlags)
+			.setParameters("lifetimeContext");
 
 		builder.addNativeFunction("Renderer.drawVdpSprite", lemon::wrap(&Renderer_drawVdpSprite), defaultFlags)
 			.setParameters("px", "py", "encodedSize", "patternIndex", "renderQueue");

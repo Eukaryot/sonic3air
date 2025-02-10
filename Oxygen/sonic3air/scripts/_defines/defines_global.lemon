@@ -56,6 +56,13 @@ define level.num_background_chunks_y = u16[0xffff8006]
 //  - Buffer for decompressed Kosinski data that should be copied to VRAM
 
 
+// 0xffffe000 .. 0xffffe37f
+// Linewise scroll offsets
+// 224 entries (one per screen line) of 4 bytes each:
+//  - first word:  plane B scroll offset
+//  - second word: plane A scroll offset
+
+
 // 0xffffe380 .. 0xffffe3ff
 // Table of dynamic objects in range
 //  - First word ("size") is twice the number of objects in the table

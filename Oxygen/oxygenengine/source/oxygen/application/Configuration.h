@@ -67,6 +67,8 @@ public:
 		float mUIScale = 1.0f;
 		Color mUIAccentColor = Color(0.2f, 0.5f, 0.8f);
 		std::vector<std::string> mOpenUIWindows;
+		bool mMainWindowOpen = true;
+		bool mUseTabsInMainWindow = true;
 		int mActiveMainWindowTab = 0;
 		ExternalCodeEditor mExternalCodeEditor;
 	};

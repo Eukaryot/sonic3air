@@ -1,5 +1,7 @@
 
 constant u8 ONE = 1
+constant float MINUS_ONE = -1
+global float GLOBAL_NEGATIVE_VALUE = -1.2345f
 
 constant array<u8> fibonacci =
 {
@@ -24,6 +26,8 @@ function void script01()
 	debugLog(two)
 	debugLog(two + (two / 5))	// Result: 2.4
 #endif
+
+	debugLog(GLOBAL_NEGATIVE_VALUE)
 
 	debugLog(Math.degreesToRadians(90.0f))
 	debugLog(Math.degreesToRadians(90.0))

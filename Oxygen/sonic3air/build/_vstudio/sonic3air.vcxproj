@@ -46,7 +46,6 @@
     <ClCompile Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\entries\GeneralMenuEntries.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\ExtrasMenu.cpp" />
-    <ClCompile Include="..\..\source\sonic3air\menu\ActSelectMenu.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\GameApp.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\GameMenuBase.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\GameMenuManager.cpp" />
@@ -101,7 +100,6 @@
     <ClInclude Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\entries\GeneralMenuEntries.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\ExtrasMenu.h" />
-    <ClInclude Include="..\..\source\sonic3air\menu\ActSelectMenu.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\GameApp.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\GameMenuBase.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\GameMenuManager.h" />

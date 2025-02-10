@@ -39,7 +39,7 @@ public:
 		CUSTOM_2 = 2,		// Custom usage by scripts
 		OUTSIDE_FRAME = 3,	// Debug output rendered outside of frame simulation
 	};
-	static const uint8 NUM_CONTEXTS = 4;
+	static const uint8 NUM_LIFETIME_CONTEXTS = 4;
 
 public:
 	inline Type getType() const   { return mRenderItemType; }

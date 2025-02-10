@@ -18,8 +18,11 @@ namespace lemon
 
 	struct AnyTypeWrapper
 	{
-		const DataTypeDefinition* mType = nullptr;
 		AnyBaseValue mValue;
+		const DataTypeDefinition* mType = nullptr;
+
+		inline AnyTypeWrapper() {}
+		explicit AnyTypeWrapper(uint64 value);
 
 		void pushToStack(ControlFlow& controlFlow) const;
 		void popFromStack(ControlFlow& controlFlow);

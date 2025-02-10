@@ -36,6 +36,9 @@ public:
 		uint16 mPreviousInput = 0;
 		uint16 mIgnoreInput = 0;
 		bool mInputWasInjected = false;
+
+		inline bool isPressed(Button button) const		{ return (mCurrentInput & (uint16)button); }
+		inline bool justPressed(Button button) const	{ return ((mCurrentInput ^ mPreviousInput) & (uint16)button); }
 	};
 
 	static const size_t NUM_GAMEPADS = InputManager::NUM_PLAYERS;
@@ -57,7 +60,6 @@ public:
 
 	Gamepad& getGamepad(size_t index);
 	const Gamepad& getGamepad(size_t index) const;
-	inline uint16 getInputPad(size_t index) const  { return getGamepad(index).mCurrentInput; }
 	void writeCurrentState(uint16* outInputFlags, size_t numInputs = InputManager::NUM_PLAYERS) const;
 
 	inline bool areGamepadsSwitched() const  { return mGamepadsSwitched; }

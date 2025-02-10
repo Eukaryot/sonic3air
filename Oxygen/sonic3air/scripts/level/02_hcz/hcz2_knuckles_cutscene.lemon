@@ -72,7 +72,7 @@ function void fn06215e()
 
 	screenmover_target.top = level.vertical_wrap
 	screenmover_target.right = move_area.right
-	move_area.right = 0x3940	// Could be moved right, but then you can see bricks with broken palette
+	move_area.right = 0x3940 + min(getScreenExtend(), 0x5a)		// Can't go further, or you see parts of Knuckles standing there
 
 	// "spawnChildObjects(0x0665a2)" replaced by:
 	spawnChildObject(0x065bd4, 0x00, 0, 12)		// Button for Cutscene Knuckles
@@ -116,7 +116,12 @@ function void fn0621d6()
 	objA0.countdown_value = 0x1f
 	objA0.countdown_callback = 0x062216
 	level.vertical_wrap = 0x05c0
+
+#if !STANDALONE
+	// Don't load palette for Knuckles
+	//  -> It's not needed in S3AIR, and would mess with the color of some blocks that are only visible in widescreen
 	CutsceneKnuckles.loadPalette()
+#endif
 }
 
 

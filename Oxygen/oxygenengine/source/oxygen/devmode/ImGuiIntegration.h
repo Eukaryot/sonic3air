@@ -36,6 +36,9 @@ public:
 	static void toggleMainWindow();
 
 private:
+	static void saveIniSettings();
+
+private:
 	static inline bool mEnabled = false;
 	static inline bool mRunning = false;
 };

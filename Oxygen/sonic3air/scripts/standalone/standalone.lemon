@@ -115,3 +115,15 @@ function void yieldInWhiteScreen()
 	Renderer.setGlobalComponentTint(0, 0, 0, 0xff, 0xff, 0xff)	// Needed so the HUD won't briefly flash for one frame now
 	yieldExecution()
 }
+
+
+
+//-------------------------------------------------------//
+// Draw stuff that might be shown in any situation       //
+//-------------------------------------------------------//
+
+function void Standalone.drawGameOverlay()
+{
+	// Game pause menu while fading out
+	GamePause.UpdateFadeOut()
+}

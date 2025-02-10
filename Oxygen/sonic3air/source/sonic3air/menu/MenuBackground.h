@@ -47,14 +47,12 @@ public:
 	void showPreview(bool show, bool useTransition = true);
 
 	void openMainMenu();
-	void openActSelectMenu();
 	void openTimeAttackMenu();
 	void openOptions(bool enteredInGame = false);
 	void openExtras();
 	void openMods();
-	void openGameStartedMenu();
-	void fadeToExit();
 
+	void openGameStartedMenu();
 	void setGameStartedMenu();
 
 private:
@@ -85,11 +83,11 @@ private:
 	// Children
 	std::vector<GameMenuBase*> mAllChildren;
 	MainMenu* mMainMenu = nullptr;
-	ActSelectMenu* mActSelectMenu = nullptr;
 	TimeAttackMenu* mTimeAttackMenu = nullptr;
 	OptionsMenu* mOptionsMenu = nullptr;
 	ExtrasMenu* mExtrasMenu = nullptr;
 	ModsMenu* mModsMenu = nullptr;
+
 	GameMenuBase* mLastOpenedMenu = nullptr;
 	GameMenuBase* mGameStartedMenu = nullptr;
 

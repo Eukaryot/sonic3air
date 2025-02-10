@@ -8,7 +8,6 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/menu/MenuBackground.h"
-#include "sonic3air/menu/ActSelectMenu.h"
 #include "sonic3air/menu/ExtrasMenu.h"
 #include "sonic3air/menu/GameApp.h"
 #include "sonic3air/menu/GameMenuManager.h"
@@ -21,7 +20,7 @@
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
-#include "oxygen/application/mainview/GameView.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/Simulation.h"
@@ -87,7 +86,6 @@ namespace detail
 MenuBackground::MenuBackground()
 {
 	detail::createGameMenuInstance(mMainMenu,		mAllChildren, *this);
-	detail::createGameMenuInstance(mActSelectMenu,	mAllChildren, *this);
 	detail::createGameMenuInstance(mTimeAttackMenu,	mAllChildren, *this);
 	detail::createGameMenuInstance(mOptionsMenu,	mAllChildren, *this);
 	detail::createGameMenuInstance(mExtrasMenu,		mAllChildren, *this);
@@ -389,11 +387,6 @@ void MenuBackground::openMainMenu()
 	openMenu(*mMainMenu);
 }
 
-void MenuBackground::openActSelectMenu()
-{
-	openMenu(*mActSelectMenu);
-}
-
 void MenuBackground::openTimeAttackMenu()
 {
 	openMenu(*mTimeAttackMenu);
@@ -439,11 +432,6 @@ void MenuBackground::openGameStartedMenu()
 	}
 }
 
-void MenuBackground::fadeToExit()
-{
-	startTransition(MenuBackground::Target::TITLE);
-}
-
 void MenuBackground::setGameStartedMenu()
 {
 	mGameStartedMenu = mLastOpenedMenu;
@@ -454,12 +442,7 @@ void MenuBackground::openMenu(GameMenuBase& menu)
 	// The menus only really work in a fixed resolution, so make sure that one is set
 	VideoOut::instance().setScreenSize(400, 224);
 
-	GameApp::instance().getGameMenuManager().addMenu(menu);
-
-	if (&menu == mOptionsMenu || &menu == mExtrasMenu || &menu == mModsMenu)
-	{
-		showPreview(false, false);
-	}
+	GameMenuManager::instance().addMenu(menu);
 
 	mLastOpenedMenu = &menu;
 }

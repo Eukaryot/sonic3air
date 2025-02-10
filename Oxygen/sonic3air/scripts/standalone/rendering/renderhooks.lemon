@@ -858,6 +858,27 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		return true
 	}
 
+	// Custom decorative object
+	//  -> obA0.animation.sprite is the object subtype here
+	//  -> Note that subtypes 0x00 to 0x32 are used by original S3&K, while 0x33 to 0x3f are used / reserved by vanilla S3AIR; mods should use 0x40 and above
+	if (objA0.update_address == 0x02b962 && objA0.animation.sprite >= 0x33)
+	{
+		// Small tile in MGZ to fill a gap in foreground
+		if (objA0.animation.sprite == 0x33)
+		{
+			Renderer.drawCustomSprite("mgz_missingtile", px, py, 0x00, 0x00, 0x9e00)
+		}
+
+		// MGZ level chunk to cover a black area that can be visible in widescreen, but is difficult to replace with an actual chunk
+		else if (objA0.animation.sprite == 0x34)
+		{
+			Renderer.drawCustomSprite("mgz_wallchunk", px, py, 0x00, 0x00, 0x9e00)
+		}
+
+		// Return true for unknown subtypes as well, to avoid drawing junk
+		return true
+	}
+
 	return false
 }
 

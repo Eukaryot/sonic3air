@@ -18,8 +18,8 @@
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/InputManager.h"
-#include "oxygen/application/mainview/GameView.h"
 #include "oxygen/simulation/Simulation.h"
 
 
@@ -233,16 +233,14 @@ void TimeAttackMenu::update(float timeElapsed)
 
 	if (mState == State::APPEAR)
 	{
-		mVisibility = saturate(mVisibility + timeElapsed * 6.0f);
-		if (mVisibility >= 1.0f)
+		if (updateFadeIn(timeElapsed * 6.0f))
 		{
 			mState = State::SHOW;
 		}
 	}
 	else if (mState > State::SHOW)
 	{
-		mVisibility = saturate(mVisibility - timeElapsed * 6.0f);
-		if (mVisibility <= 0.0f)
+		if (updateFadeOut(timeElapsed * 6.0f))
 		{
 			if (mState == State::FADE_TO_GAME)
 			{

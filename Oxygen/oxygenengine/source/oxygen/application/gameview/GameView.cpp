@@ -7,10 +7,11 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/application/mainview/GameView.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/Application.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
+#include "oxygen/application/audio/AudioOutBase.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/drawing/DrawerTexture.h"
 #include "oxygen/helper/FileHelper.h"
@@ -318,6 +319,7 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 						{
 							HighResolutionTimer timer;
 							timer.start();
+							EngineMain::instance().getAudioOut().reloadAudioCollection();
 							RenderResources::instance().loadSprites();
 							ResourcesCache::instance().loadAllResources();
 							FontCollection::instance().reloadAll();

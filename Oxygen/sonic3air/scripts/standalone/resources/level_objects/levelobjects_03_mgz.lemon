@@ -182,6 +182,10 @@ function void LevelObjectTableBuilder.buildObjects_MGZ1()
 	LevelObjectTableBuilder.addObject(0x11ce, 0x0350, OBJECTTABLE1_08, 0x50, LVLOBJ_FLIP_X)
 	LevelObjectTableBuilder.addObject(0x11e0, 0x05a4, OBJECTTABLE1_9c, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x11f0, 0x0190, OBJECTTABLE1_51, 0x04, LVLOBJ_FLIP_X)
+
+	// Fix for a small gap in foreground, using a decorative sprite object with custom subtype 0x33
+	LevelObjectTableBuilder.addObject(0x1200, 0x0d80, OBJECTTABLE1_2f, 0x33, 0)
+
 	LevelObjectTableBuilder.addObject(0x1200, 0x0e68, OBJECTTABLE1_0d, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x1210, 0x07c3, OBJECTTABLE1_9c, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x1218, 0x00b0, OBJECTTABLE1_51, 0x02, 0)
@@ -943,6 +947,9 @@ function void LevelObjectTableBuilder.buildObjects_MGZ2()
 	{
 		LevelObjectTableBuilder.addObject(0x33a0, 0x05b4, OBJECTTABLE1_2f, 0x0d, 0)
 	}
+
+	// Added for S3AIR to cover a black area that can be visible in widescreen
+	LevelObjectTableBuilder.addObject(0x3380, 0x0b80, OBJECTTABLE1_2f, 0x34, 0)
 
 	LevelObjectTableBuilder.addObject(0x3450, 0x09c0, OBJECTTABLE1_07, 0x20, LVLOBJ_FLIP_Y)
 	LevelObjectTableBuilder.addObject(0x3460, 0x06bc, OBJECTTABLE1_57, 0x2a, LVLOBJ_FLIP_Y)

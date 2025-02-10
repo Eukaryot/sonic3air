@@ -141,7 +141,6 @@ function void fn0572ba()
 	camera.screenshake.state.hi = 0xff
 	gfx.plane_update_routine = 0x04		// Enter vertical scroll mode
 #if STANDALONE
-	Game.startSkippableCutscene()
 	verticalScrollOffsetBias = getScreenExtend() & 0x0f
 #endif
 	u16[0xffffeec0] += 4

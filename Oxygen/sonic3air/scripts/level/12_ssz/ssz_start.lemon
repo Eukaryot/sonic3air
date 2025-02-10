@@ -50,6 +50,10 @@ function void fn057c1e()
 	objA1.state = char.state.RUNNING
 	u8[A1 + 0x22] = 0
 	u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
+
+#if STANDALONE
+	Game.startSkippableCutscene()
+#endif
 }
 
 

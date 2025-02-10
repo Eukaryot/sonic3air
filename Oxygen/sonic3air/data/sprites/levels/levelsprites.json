@@ -1,4 +1,10 @@
 {
+	// Sprite to fill up a small gap in foreground plane in MGZ 1 at location 0x1200, 0x0d80
+	"mgz_missingtile": { "File": "mgz_missingtile.bmp" },
+
+	// MGZ level chunk to cover a black area that can be visible in widescreen, but is difficult to replace with an actual chunk
+	"mgz_wallchunk": { "File": "mgz_wallchunk.bmp" },
+
 	// DEZ backgrounds
 	"bg_dez1": { "File": "dez1_background.bmp" },
 	"bg_dez2": { "File": "dez2_background.bmp" }

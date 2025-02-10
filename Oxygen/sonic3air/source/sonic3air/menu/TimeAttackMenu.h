@@ -54,7 +54,6 @@ private:
 	GameMenuEntry* mCharacterEntry = nullptr;
 
 	State mState = State::INACTIVE;
-	float mVisibility = 0.0f;
 	int mPreferredAct = 0;	// 0 or 1
 
 	std::vector<std::string> mBestTimes;

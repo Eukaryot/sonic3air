@@ -70,6 +70,8 @@ void ImGuiIntegration::startup()
 	ImGui_ImplSDL2_InitForOpenGL(window, SDL_GL_GetCurrentContext());
 	ImGui_ImplOpenGL3_Init();
 
+	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+
 	// Configure paths
 	{
 		ImGui::GetIO().IniFilename = nullptr;	// Disable automatic load & save by ImGui, we're handling that ourselves
@@ -112,6 +114,8 @@ void ImGuiIntegration::shutdown()
 {
 	if (!mRunning)
 		return;
+
+	saveIniSettings();
 
 	SAFE_DELETE(mDevModeMainWindow);
 
@@ -170,9 +174,7 @@ void ImGuiIntegration::endFrame()
 	if (ImGui::GetIO().WantSaveIniSettings)
 	{
 		ImGui::GetIO().WantSaveIniSettings = false;
-		size_t contentSize = 0;
-		const char* content = ImGui::SaveIniSettingsToMemory(&contentSize);
-		FTX::FileSystem->saveFile(mIniFilePath, content, contentSize);
+		saveIniSettings();
 	}
 }
 
@@ -267,6 +269,13 @@ void ImGuiIntegration::toggleMainWindow()
 	{
 		mDevModeMainWindow->setIsWindowOpen(!mDevModeMainWindow->getIsWindowOpen());
 	}
+}
+
+void ImGuiIntegration::saveIniSettings()
+{
+	size_t contentSize = 0;
+	const char* content = ImGui::SaveIniSettingsToMemory(&contentSize);
+	FTX::FileSystem->saveFile(mIniFilePath, content, contentSize);
 }
 
 #else

@@ -14,7 +14,7 @@ class GuiBase;
 class GameMenuBase;
 
 
-class GameMenuManager final
+class GameMenuManager : public SingleInstance<GameMenuManager>
 {
 public:
 	void initWithRoot(GuiBase& root);

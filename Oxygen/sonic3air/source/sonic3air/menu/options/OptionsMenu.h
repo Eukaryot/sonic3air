@@ -111,7 +111,6 @@ private:
 	const AudioCollection::AudioDefinition* mPlayingSoundTest = nullptr;
 
 	State mState = State::INACTIVE;
-	float mVisibility = 0.0f;
 	float mDeltaSecondsForRendering = 0.0f;
 	GameMenuScrolling mScrolling;
 	GameMenuControlsDisplay mGameMenuControlsDisplay;

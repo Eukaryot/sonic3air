@@ -340,7 +340,7 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 		const Vec2i worldSpaceOffset = mRenderParts->getSpacesManager().getWorldSpaceOffset();
 		FontCollection& fontCollection = FontCollection::instance();
 
-		for (int index = 0; index < RenderItem::NUM_CONTEXTS; ++index)
+		for (int index = 0; index < RenderItem::NUM_LIFETIME_CONTEXTS; ++index)
 		{
 			const RenderItem::LifetimeContext lifetimeContext = (RenderItem::LifetimeContext)index;
 			const std::vector<RenderItem*>& renderItems = spriteManager.getRenderItems(lifetimeContext);

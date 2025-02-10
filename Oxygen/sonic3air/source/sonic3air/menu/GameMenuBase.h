@@ -201,4 +201,11 @@ public:
 	virtual void setBaseState(BaseState baseState) {}
 	virtual void onFadeIn() {}
 	virtual bool canBeRemoved() { return false; }
+
+protected:
+	bool updateFadeIn(float timeStep);
+	bool updateFadeOut(float timeStep);
+
+protected:
+	float mVisibility = 0.0f;
 };

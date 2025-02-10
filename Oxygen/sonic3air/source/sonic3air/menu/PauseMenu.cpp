@@ -241,16 +241,14 @@ void PauseMenu::update(float timeElapsed)
 
 	if (mState == State::APPEAR)
 	{
-		mVisibility = saturate(mVisibility + timeElapsed * 12.0f);
-		if (mVisibility >= 1.0f)
+		if (updateFadeIn(timeElapsed * 12.0f))
 		{
 			mState = State::SHOW;
 		}
 	}
 	else if (mState >= State::DISAPPEAR_RESUME)
 	{
-		mVisibility = saturate(mVisibility - timeElapsed * ((mState == State::DISAPPEAR_RESUME) ? 12.0f : 8.0f));
-		if (mVisibility <= 0.0f)
+		if (updateFadeOut(timeElapsed * ((mState == State::DISAPPEAR_RESUME) ? 12.0f : 8.0f)))
 		{
 			switch (mState)
 			{
@@ -381,7 +379,6 @@ void PauseMenu::resumeGame()
 	ControlsIn::instance().setIgnores(0x0ff3);		// Ignore most key presses, except for left/right
 	AudioOut::instance().resumeSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
 	AudioOut::instance().resumeSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
-	GameApp::instance().onGameResumed();
 }
 
 void PauseMenu::exitGame()

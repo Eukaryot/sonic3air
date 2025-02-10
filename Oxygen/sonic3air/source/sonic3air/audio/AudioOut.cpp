@@ -59,7 +59,6 @@ void AudioOut::shutdown()
 void AudioOut::reset()
 {
 	mAudioPlayer.stopAllSounds();
-	mPausedContexts.clear();
 	resetGame();
 }
 
@@ -138,13 +137,11 @@ void AudioOut::moveIngameMusicToMenu()
 void AudioOut::pauseSoundContext(int contextId)
 {
 	mAudioPlayer.pauseAllSoundsByContext(contextId);
-	mPausedContexts.insert(contextId);
 }
 
 void AudioOut::resumeSoundContext(int contextId)
 {
 	mAudioPlayer.resumeAllSoundsByContext(contextId);
-	mPausedContexts.erase(contextId);
 }
 
 void AudioOut::stopSoundContext(int contextId)

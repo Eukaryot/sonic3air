@@ -63,6 +63,7 @@
     <ClCompile Include="..\..\source\lemon\utility\FlyweightString.cpp" />
     <ClCompile Include="..\..\source\lemon\utility\PragmaSplitter.cpp" />
     <ClCompile Include="..\..\source\lemon\utility\StringFormatter.cpp" />
+    <ClCompile Include="..\..\source\lemon\utility\StringFormatterLegacy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\backend\FunctionCompiler.h" />
@@ -125,6 +126,7 @@
     <ClInclude Include="..\..\source\lemon\utility\PragmaSplitter.h" />
     <ClInclude Include="..\..\source\lemon\utility\QuickDataHasher.h" />
     <ClInclude Include="..\..\source\lemon\utility\StringFormatter.h" />
+    <ClInclude Include="..\..\source\lemon\utility\StringFormatterLegacy.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="lemonscript.natvis" />

@@ -20,6 +20,9 @@ if (UNIX AND CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
 	link_directories(/opt/vc/lib)	# Needed when building on Raspberry Pi
 	set(USE_DISCORD false)
 endif()
+if (USE_DISCORD)
+	add_definitions(-DUSE_DISCORD)
+endif()
 message(STATUS "USE_DISCORD = ${USE_DISCORD}")
 
 
@@ -272,6 +275,7 @@ if (BUILD_OXYGEN_SERVER)
 	target_link_libraries(OxygenServer oxygen_netcore)
 
 endif()
+
 
 
 # discord_game_sdk

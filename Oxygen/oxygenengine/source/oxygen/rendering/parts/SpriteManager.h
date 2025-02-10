@@ -42,6 +42,7 @@ public:
 		uint16 mAtex = 0;							// Only supported for palette sprites
 		uint64 mSpriteTag = 0;
 		Vec2i  mTaggedSpritePosition;
+		RenderItem::LifetimeContext mLifetimeContext = RenderItem::LifetimeContext::DEFAULT;
 	};
 
 public:
@@ -55,7 +56,8 @@ public:
 	void postFrameUpdate();
 	void postRefreshDebugging();
 
-	inline void setResetRenderItems(bool reset)  { mResetRenderItems = reset; }
+	inline void setResetRenderItems(uint8 bitmask)  { mResetRenderItemsBitmask |= bitmask; }
+	void setCurrentLifetimeContext(RenderItem::LifetimeContext lifetimeContext);
 
 	void drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, const Color& tintColor = Color::WHITE, const Color& addedColor = Color::TRANSPARENT);
 	void drawCustomSprite(uint64 key, const Vec2i& position, uint16 atex, uint8 flags, uint16 renderQueue, const Color& tintColor = Color::WHITE, float angle = 0.0f, float scale = 1.0f);
@@ -74,7 +76,7 @@ public:
 	void clearSpriteTag();
 	void setSpriteTagWithPosition(uint64 spriteTag, const Vec2i& position);
 
-	inline const std::vector<RenderItem*>& getRenderItems(RenderItem::LifetimeContext context) const  { return mContexts[(int)context].mItems; }
+	inline const std::vector<RenderItem*>& getRenderItems(RenderItem::LifetimeContext context) const  { return mLifetimeContexts[(int)context].mItems; }
 	inline const std::vector<RenderItem*>& getAddedItems() const  { return mAddedItems.mItems; }
 
 	inline uint16 getSpriteAttributeTableBase() const  { return mSpriteAttributeTableBase; }
@@ -93,13 +95,15 @@ private:
 
 private:
 	void clearItemSet(ItemSet& itemSet);
-	void clearAllContexts();
+	void clearAllLifetimeContexts();
+	void clearLifetimeContextsByBitmask(uint8 bitmask);
 	ItemSet& getItemsByContext(RenderItem::LifetimeContext lifetimeContext);
 
-	renderitems::CustomSpriteInfoBase* addSpriteByKey(uint64 key);
+	renderitems::CustomSpriteInfoBase* addSpriteByKey(uint64 key, uint16 renderQueue);
 	void checkSpriteTag(renderitems::SpriteInfo& sprite);
-
 	void processSpriteHandles();
+
+	void pushAddedItem(RenderItem& item, uint16 renderQueue);
 	void grabAddedItems();
 	void collectLegacySprites();
 
@@ -107,14 +111,14 @@ private:
 	PatternManager& mPatternManager;
 	SpacesManager& mSpacesManager;
 
-	RenderItem::LifetimeContext mCurrentContext = RenderItem::LifetimeContext::OUTSIDE_FRAME;
+	RenderItem::LifetimeContext mCurrentLifetimeContext = RenderItem::LifetimeContext::OUTSIDE_FRAME;
 	Space mLogicalSpriteSpace = Space::SCREEN;
-	bool mResetRenderItems = false;
+	uint8 mResetRenderItemsBitmask = 0;
 	uint16 mSpriteAttributeTableBase = 0xf800;	// Only used in legacy VDP sprite mode
 
 	PoolOfRenderItems mPoolOfRenderItems;
 
-	ItemSet mContexts[RenderItem::NUM_CONTEXTS];
+	ItemSet mLifetimeContexts[RenderItem::NUM_LIFETIME_CONTEXTS];
 	ItemSet mAddedItems;
 
 	uint32 mNextSpriteHandle = 1;

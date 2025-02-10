@@ -13,7 +13,7 @@
 
 #include "oxygen/devmode/ImGuiHelpers.h"
 #include "oxygen/application/Application.h"
-#include "oxygen/application/mainview/GameView.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/Simulation.h"
@@ -34,11 +34,12 @@ void RenderedGeometryWindow::buildContent()
 	CodeExec& codeExec = Application::instance().getSimulation().getCodeExec();
 	Drawer& drawer = EngineMain::instance().getDrawer();
 
-	if (ImGui::BeginTable("Rendered Geometry Table", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_ScrollY))
+	if (ImGui::BeginTable("Rendered Geometry Table", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_ScrollY))
 	{
 		ImGui::TableSetupColumn("Render Queue", 0, 120);
 		ImGui::TableSetupColumn("Geometry Type", 0, 200);
 		ImGui::TableSetupColumn("Position", 0, 100);
+		ImGui::TableSetupColumn("Size", 0, 100);
 		ImGui::TableSetupColumn("Name", 0, 180);
 
 		ImGui::TableSetupScrollFreeze(0, 1);
@@ -52,9 +53,10 @@ void RenderedGeometryWindow::buildContent()
 			ImGui::TableNextRow();
 
 			String typeString;
-			String positionString;
 			String nameString;
 			Color color = Color::WHITE;
+			Vec2i position;
+			Vec2i size;
 			Recti highlightRect;
 
 			switch (geometry->getType())
@@ -63,6 +65,9 @@ void RenderedGeometryWindow::buildContent()
 				{
 					const PlaneGeometry& pg = *static_cast<const PlaneGeometry*>(geometry);
 					typeString.formatString("Plane %d%s", pg.mPlaneIndex, pg.mPriorityFlag ? " (Prio)" : "");
+					position = pg.mActiveRect.getPos();
+					size = pg.mActiveRect.getSize();
+					highlightRect = pg.mActiveRect;
 					break;
 				}
 
@@ -71,6 +76,7 @@ void RenderedGeometryWindow::buildContent()
 					const renderitems::SpriteInfo& info = static_cast<const SpriteGeometry*>(geometry)->mSpriteInfo;
 					const char* spriteType = nullptr;
 					color = Color::fromABGR32(0xffa0a0a0);
+					position = info.mPosition;
 					highlightRect.set(info.mPosition.x, info.mPosition.y, 32, 32);
 					switch (info.getType())
 					{
@@ -79,8 +85,8 @@ void RenderedGeometryWindow::buildContent()
 							spriteType = "VDP sprite";
 							color.setABGR32(0xffffffc0);
 							renderitems::VdpSpriteInfo& vsi = (renderitems::VdpSpriteInfo&)info;
-							highlightRect.width = vsi.mSize.x * 8;
-							highlightRect.height = vsi.mSize.y * 8;
+							size = vsi.mSize * 8;
+							highlightRect.setSize(size);
 							break;
 						}
 
@@ -89,9 +95,9 @@ void RenderedGeometryWindow::buildContent()
 							spriteType = "Palette sprite";
 							color.setABGR32(0xffffc0ff);
 							renderitems::PaletteSpriteInfo& psi = (renderitems::PaletteSpriteInfo&)info;
+							size = psi.mSize;
 							highlightRect.setPos(highlightRect.getPos() + psi.mPivotOffset);
-							highlightRect.width = psi.mSize.x;
-							highlightRect.height = psi.mSize.y;
+							highlightRect.setSize(size);
 							const lemon::FlyweightString* str = codeExec.getLemonScriptRuntime().getInternalLemonRuntime().resolveStringByKey(psi.mKey);
 							if (nullptr != str)
 								nameString = str->getString();
@@ -103,9 +109,9 @@ void RenderedGeometryWindow::buildContent()
 							spriteType = "Component sprite";
 							color.setABGR32(0xffffc0e0);
 							renderitems::ComponentSpriteInfo& csi = (renderitems::ComponentSpriteInfo&)info;
+							size = csi.mSize;
 							highlightRect.setPos(highlightRect.getPos() + csi.mPivotOffset);
-							highlightRect.width = csi.mSize.x;
-							highlightRect.height = csi.mSize.y;
+							highlightRect.setSize(size);
 							const lemon::FlyweightString* str = codeExec.getLemonScriptRuntime().getInternalLemonRuntime().resolveStringByKey(csi.mKey);
 							if (nullptr != str)
 								nameString = str->getString();
@@ -117,8 +123,8 @@ void RenderedGeometryWindow::buildContent()
 							spriteType = "Sprite mask";
 							color.setABGR32(0xffc0ffff);
 							renderitems::SpriteMaskInfo& smi = (renderitems::SpriteMaskInfo&)info;
-							highlightRect.width = smi.mSize.x;
-							highlightRect.height = smi.mSize.y;
+							size = smi.mSize;
+							highlightRect.setSize(size);
 							break;
 						}
 
@@ -129,7 +135,6 @@ void RenderedGeometryWindow::buildContent()
 					if (nullptr != spriteType)
 					{
 						typeString.formatString("%s%s", spriteType, info.mPriorityFlag ? " (Prio)" : "");
-						positionString.formatString("%d, %d", info.mPosition.x, info.mPosition.y);
 					}
 
 					break;
@@ -137,15 +142,23 @@ void RenderedGeometryWindow::buildContent()
 
 				case Geometry::Type::RECT:
 				{
+					const RectGeometry& rg = static_cast<const RectGeometry&>(*geometry);
 					typeString = "Rect";
 					color.setABGR32(0xffc0ffff);
+					position = rg.mRect.getPos();
+					size = rg.mRect.getSize();
+					highlightRect = rg.mRect;
 					break;
 				}
 
 				case Geometry::Type::TEXTURED_RECT:
 				{
+					const TexturedRectGeometry& tg = static_cast<const TexturedRectGeometry&>(*geometry);
 					typeString = "Textured rect / Text";
 					color.setABGR32(0xffc0ffff);
+					position = tg.mRect.getPos();
+					size = tg.mRect.getSize();
+					highlightRect = tg.mRect;
 					break;
 				}
 
@@ -160,8 +173,10 @@ void RenderedGeometryWindow::buildContent()
 				{
 					const ViewportGeometry& vg = *static_cast<const ViewportGeometry*>(geometry);
 					typeString = "Viewport";
-					positionString.formatString("%d, %d   (%d x %d)", vg.mRect.x, vg.mRect.y, vg.mRect.width, vg.mRect.height);
 					color.setABGR32(0xffc0ffff);
+					position = vg.mRect.getPos();
+					size = vg.mRect.getSize();
+					highlightRect = vg.mRect;
 					break;
 				}
 
@@ -182,9 +197,12 @@ void RenderedGeometryWindow::buildContent()
 			ImGui::TextColored(textColor, "%s", *typeString);
 
 			ImGui::TableSetColumnIndex(2);
-			ImGui::TextColored(textColor, "%s", *positionString);
+			ImGui::TextColored(textColor, "%d, %d", position.x, position.y);
 
 			ImGui::TableSetColumnIndex(3);
+			ImGui::TextColored(textColor, "%d, %d", size.x, size.y);
+
+			ImGui::TableSetColumnIndex(4);
 			ImGui::TextColored(textColor, "%s", *nameString);
 
 			ImGui::SameLine();

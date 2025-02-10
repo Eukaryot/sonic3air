@@ -31,6 +31,18 @@ void AudioBrowserWindow::buildContent()
 	AudioOutBase& audioOut = EngineMain::instance().getAudioOut();
 	AudioCollection& audioCollection = AudioCollection::instance();
 
+	ImGui::SliderFloat("Master Volume", &Configuration::instance().mAudioVolume, 0.0f, 1.0f, "%.2f");
+
+	if (ImGui::Button("Reload Modded Audio"))
+	{
+		mPlayingAudio.stop();
+		audioOut.reloadAudioCollection();
+	}
+
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+
 	// Refresh if there's any changes
 	if (mLastAudioCollectionChangeCounter != audioCollection.getChangeCounter())
 	{
@@ -46,9 +58,6 @@ void AudioBrowserWindow::buildContent()
 
 		mLastAudioCollectionChangeCounter = audioCollection.getChangeCounter();
 	}
-	
-	ImGui::SliderFloat("Master Volume", &Configuration::instance().mAudioVolume, 0.0f, 1.0f, "%.2f");
-	ImGui::Spacing();
 
 	// TODO: Cache filter results
 	static ImGuiHelpers::FilterString filterString;
@@ -94,7 +103,7 @@ void AudioBrowserWindow::buildContent()
 					const bool isSound = (audioDefinition->mType != AudioCollection::AudioDefinition::Type::SOUND);
 					if (!isSound)
 					{
-						audioOut.stopChannel(0);
+						audioOut.getAudioPlayer().stopAllSoundsByChannel(0);
 					}
 
 					//mPlayingAudio = ...

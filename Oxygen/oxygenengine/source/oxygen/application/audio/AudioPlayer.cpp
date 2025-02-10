@@ -96,11 +96,13 @@ void AudioPlayer::clearPlayback()
 
 bool AudioPlayer::playAudio(uint64 sfxId, int contextId)
 {
-	SourceRegistration* sourceReg = mAudioCollection.getSourceRegistration(sfxId);
-	if (nullptr == sourceReg)
-		return false;
+	PlayingSound* playingSound = playAudioInternal(mAudioCollection.getSourceRegistration(sfxId), contextId);
+	return (nullptr != playingSound);
+}
 
-	PlayingSound* playingSound = playAudioInternal(sourceReg, sourceReg->mAudioDefinition->mChannel, contextId);
+bool AudioPlayer::playAudio(uint64 sfxId, int contextId, int channelId)
+{
+	PlayingSound* playingSound = playAudioInternal(mAudioCollection.getSourceRegistration(sfxId), channelId, contextId);
 	return (nullptr != playingSound);
 }
 
@@ -115,16 +117,8 @@ void AudioPlayer::playOverride(uint64 sfxId, int contextId, int channelId, int o
 		}
 	}
 
-	PlayingSound* playingSound = nullptr;
-	{
-		SourceRegistration* sourceReg = mAudioCollection.getSourceRegistration(sfxId);
-		if (nullptr != sourceReg)
-		{
-			// Start playback of new sound
-			playingSound = playAudioInternal(sourceReg, channelId, contextId);
-		}
-	}
-
+	// Start playback of new sound
+	PlayingSound* playingSound = playAudioInternal(mAudioCollection.getSourceRegistration(sfxId), channelId, contextId);
 	if (nullptr != playingSound)
 	{
 		// Create new channel override
@@ -320,6 +314,69 @@ void AudioPlayer::changeSoundContext(AudioReference& audioRef, int contextId)
 	}
 }
 
+void AudioPlayer::pauseAllSoundsByChannel(int channelId)
+{
+	SoundIterator iterator(mPlayingSounds);
+	iterator.filterChannel(channelId);
+	iterator.filterState(PlayingSound::State::PLAYING);
+	while (PlayingSound* soundPtr = iterator.getNext())
+	{
+		soundPtr->mAudioRef.setPause(true);
+	}
+}
+
+void AudioPlayer::resumeAllSoundsByChannel(int channelId)
+{
+	SoundIterator iterator(mPlayingSounds);
+	iterator.filterChannel(channelId);
+	iterator.filterState(PlayingSound::State::PLAYING);
+	while (PlayingSound* soundPtr = iterator.getNext())
+	{
+		soundPtr->mAudioRef.setPause(false);
+	}
+}
+
+void AudioPlayer::pauseAllSoundsByContext(int contextId)
+{
+	SoundIterator iterator(mPlayingSounds);
+	iterator.filterContext(contextId);
+	iterator.filterState(PlayingSound::State::PLAYING);
+	while (PlayingSound* soundPtr = iterator.getNext())
+	{
+		soundPtr->mAudioRef.setPause(true);
+	}
+}
+
+void AudioPlayer::resumeAllSoundsByContext(int contextId)
+{
+	SoundIterator iterator(mPlayingSounds);
+	iterator.filterContext(contextId);
+	iterator.filterState(PlayingSound::State::PLAYING);
+	while (PlayingSound* soundPtr = iterator.getNext())
+	{
+		soundPtr->mAudioRef.setPause(false);
+	}
+}
+
+void AudioPlayer::stopAllSoundsByContext(int contextId)
+{
+	SoundIterator iterator(mPlayingSounds);
+	iterator.filterContext(contextId);
+	iterator.filterState(PlayingSound::State::PLAYING);
+	while (PlayingSound* soundPtr = iterator.getNext())
+	{
+		if (soundPtr->mAudioRef.isPaused())
+		{
+			// No need for quick fade-out if it's paused anyways
+			soundPtr->mAudioRef.stop();
+		}
+		else
+		{
+			soundPtr->mAudioRef.setVolumeChange(-20.0f);
+		}
+	}
+}
+
 void AudioPlayer::stopAllSounds(bool immediately)
 {
 	if (immediately)
@@ -384,47 +441,6 @@ void AudioPlayer::fadeOutChannel(int channelId, float length)
 	while (PlayingSound* soundPtr = iterator.getNext())
 	{
 		soundPtr->mRelativeVolumeChange = (length > 0.0f) ? (-1.0f / length) : 0.1f;
-	}
-}
-
-void AudioPlayer::pauseAllSoundsByContext(int contextId)
-{
-	SoundIterator iterator(mPlayingSounds);
-	iterator.filterContext(contextId);
-	iterator.filterState(PlayingSound::State::PLAYING);
-	while (PlayingSound* soundPtr = iterator.getNext())
-	{
-		soundPtr->mAudioRef.setPause(true);
-	}
-}
-
-void AudioPlayer::resumeAllSoundsByContext(int contextId)
-{
-	SoundIterator iterator(mPlayingSounds);
-	iterator.filterContext(contextId);
-	iterator.filterState(PlayingSound::State::PLAYING);
-	while (PlayingSound* soundPtr = iterator.getNext())
-	{
-		soundPtr->mAudioRef.setPause(false);
-	}
-}
-
-void AudioPlayer::stopAllSoundsByContext(int contextId)
-{
-	SoundIterator iterator(mPlayingSounds);
-	iterator.filterContext(contextId);
-	iterator.filterState(PlayingSound::State::PLAYING);
-	while (PlayingSound* soundPtr = iterator.getNext())
-	{
-		if (soundPtr->mAudioRef.isPaused())
-		{
-			// No need for quick fade-out if it's paused anyways
-			soundPtr->mAudioRef.stop();
-		}
-		else
-		{
-			soundPtr->mAudioRef.setVolumeChange(-20.0f);
-		}
 	}
 }
 
@@ -511,9 +527,47 @@ size_t AudioPlayer::getMemoryUsage() const
 	return mAudioSourceManager.getMemoryUsage();
 }
 
+void AudioPlayer::loadPlaybackState(const SavedPlaybackState& playbackState)
+{
+	stopAllSounds();
+
+	for (const SavedAudioState& audioState : playbackState.mAudioStates)
+	{
+		playAudio(audioState.mSfxId, audioState.mChannelId, audioState.mContextId);
+	}
+}
+
+void AudioPlayer::savePlaybackState(SavedPlaybackState& outPlaybackState) const
+{
+	outPlaybackState = SavedPlaybackState();
+
+	for (const PlayingSound& playingSound : mPlayingSounds)
+	{
+		if (nullptr == playingSound.mSourceReg || nullptr == playingSound.mSourceReg->mAudioDefinition)
+		{
+			RMX_ASSERT(false, "Invalid playing sound source registration");
+			continue;
+		}
+
+		SavedAudioState& audioState = vectorAdd(outPlaybackState.mAudioStates);
+		audioState.mSfxId = playingSound.mSourceReg->mAudioDefinition->mKeyId;
+		audioState.mChannelId = playingSound.mChannelId;
+		audioState.mContextId = playingSound.mContextId;
+	}
+}
+
+AudioPlayer::PlayingSound* AudioPlayer::playAudioInternal(SourceRegistration* sourceReg, int contextId)
+{
+	if (nullptr == sourceReg)
+		return nullptr;
+
+	return playAudioInternal(sourceReg, sourceReg->mAudioDefinition->mChannel, contextId);
+}
+
 AudioPlayer::PlayingSound* AudioPlayer::playAudioInternal(SourceRegistration* sourceReg, int channelId, int contextId)
 {
-	RMX_ASSERT(nullptr != sourceReg, "Got a null pointer for sourceReg");
+	if (nullptr == sourceReg)
+		return nullptr;
 
 	// Stop all old sounds of this channel
 	if (channelId != 0xff && sourceReg->mType != SourceRegistration::Type::EMULATION_CONTINUOUS)

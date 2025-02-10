@@ -5,10 +5,14 @@ function void runTests()
 
 	runIntegerArithmeticTests()
 	runFloatArithmeticTests()
+	runConstantArraysTest()
 
 	debugLog("Done with all tests")
 }
 
+
+
+// ----- Integer arithmetic -----
 
 function void runIntegerArithmeticTests()
 {
@@ -71,6 +75,9 @@ function bool integerArithmeticTestF()
 }
 
 
+
+// ----- Float arithmetic -----
+
 function void runFloatArithmeticTests()
 {
 	if (!floatArithmeticTestA())
@@ -89,4 +96,50 @@ function bool floatArithmeticTestA()
 function bool floatArithmeticTestB()
 {
 	return (Math.sin(Math.degreesToRadians(90.0)) == 1.0)
+}
+
+
+
+// ----- Constant arrays -----
+
+function void runConstantArraysTest()
+{
+	if (!constantArraysTestA())
+		debugLog("Constant arrays test A failed")
+	if (!constantArraysTestB())
+		debugLog("Constant arrays test B failed")
+	if (!constantArraysTestC())
+		debugLog("Constant arrays test C failed")
+}
+
+constant array<s16> CONSTANT_ARRAY_S16 =
+{
+	-8, 30008,
+	-20000
+}
+
+function bool constantArraysTestA()
+{
+	s16 sum = 0
+	for (u8 k = 0; k < CONSTANT_ARRAY_S16.length(); ++k)
+		sum += CONSTANT_ARRAY_S16[k]
+	return (sum == 10000)
+}
+
+function bool constantArraysTestB()
+{
+	constant array<double> CONSTANT_ARRAY_LOCAL = { 0.567, 1300, -66.0f }
+	double sum = 0
+	for (u8 k = 0; k < CONSTANT_ARRAY_LOCAL.length(); ++k)
+		sum += CONSTANT_ARRAY_LOCAL[k]
+	return (sum == 1234.567)
+}
+
+function bool constantArraysTestC()
+{
+	constant array<string> CONSTANT_ARRAY_LOCAL = { "Hel", "lo W", "", "orld!" }
+	string sum = ""
+	for (u8 k = 0; k < CONSTANT_ARRAY_LOCAL.length(); ++k)
+		sum = sum + CONSTANT_ARRAY_LOCAL[k]
+	return (sum == "Hello World!")
 }

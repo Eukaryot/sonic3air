@@ -159,6 +159,9 @@
     <ClCompile Include="..\..\source\lemon\program\SourceFileInfo.cpp">
       <Filter>lemon\program</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\lemon\utility\StringFormatterLegacy.cpp">
+      <Filter>lemon\utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h">
@@ -339,6 +342,9 @@
       <Filter>lemon\utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\utility\FastStringStream.h">
+      <Filter>lemon\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\utility\StringFormatterLegacy.h">
       <Filter>lemon\utility</Filter>
     </ClInclude>
   </ItemGroup>

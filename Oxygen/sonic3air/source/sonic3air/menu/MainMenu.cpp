@@ -19,8 +19,8 @@
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/InputManager.h"
-#include "oxygen/application/mainview/GameView.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/helper/Utils.h"
 
@@ -200,16 +200,14 @@ void MainMenu::update(float timeElapsed)
 
 	if (mState == State::APPEAR)
 	{
-		mVisibility = saturate(mVisibility + timeElapsed * 4.0f);
-		if (mVisibility >= 1.0f)
+		if (updateFadeIn(timeElapsed * 4.0f))
 		{
 			mState = State::SHOW;
 		}
 	}
 	else if (mState > State::SHOW)
 	{
-		mVisibility = saturate(mVisibility - timeElapsed * 4.0f);
-		if (mVisibility <= 0.0f)
+		if (updateFadeOut(timeElapsed * 4.0f))
 		{
 			switch (mState)
 			{
@@ -367,6 +365,6 @@ void MainMenu::exitGame()
 {
 	AudioOut::instance().fadeOutChannel(0, 0.25f);
 	GameApp::instance().getGameView().startFadingOut(0.25f);
-	mMenuBackground->fadeToExit();
+	mMenuBackground->startTransition(MenuBackground::Target::TITLE);
 	mState = State::FADE_TO_EXIT;
 }

@@ -37,12 +37,8 @@ public:
 	void openTitleScreen();
 	void openMainMenu();
 	void openOptionsMenuInGame();
-	void onExitOptions();
 	void onFadedOutOptions();
-	void onExitExtras();
-	void onExitMods();
 	void onGamePaused(bool canRestart);
-	void onGameResumed();
 	void restartTimeAttack();
 	void returnToMenu();
 
@@ -86,4 +82,6 @@ private:
 	ApplicationContextMenu* mApplicationContextMenu = nullptr;
 
 	GuiBase* mRemoveChild = nullptr;
+
+	Vec2i mRestoreGameResolution;
 };

@@ -68,7 +68,6 @@ private:
 	GameMenuEntries* mActiveMenu = &mTabMenuEntries;
 
 	State mState = State::INACTIVE;
-	float mVisibility = 0.0f;
 	GameMenuScrolling mScrolling;
 
 	std::map<uint32, std::vector<std::string_view>> mDescriptionLinesCache;

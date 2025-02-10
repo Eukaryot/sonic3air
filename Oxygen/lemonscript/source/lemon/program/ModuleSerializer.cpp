@@ -223,7 +223,7 @@ namespace lemon
 				const DataTypeDefinition* dataType = globalsLookup.readDataType(serializer);
 				const int64 initialValue = serializer.read<int64>();
 				GlobalVariable& globalVariable = module.addGlobalVariable(name, dataType);
-				globalVariable.mInitialValue = initialValue;
+				globalVariable.mInitialValue.set(initialValue);
 			}
 		}
 		else
@@ -248,7 +248,7 @@ namespace lemon
 
 				variable.getName().serialize(serializer);
 				serializer.write(variable.getDataType()->getID());
-				serializer.writeAs<int64>(globalVariable.mInitialValue);
+				serializer.write(globalVariable.mInitialValue.get<int64>());
 			}
 		}
 

@@ -187,6 +187,12 @@ namespace lemon
 		mRuntimeDetailHandler = handler;
 	}
 
+	void Runtime::resetRuntimeState()
+	{
+		// Reset global variables back to defaults
+		setupGlobalVariables();
+	}
+
 	void Runtime::buildAllRuntimeFunctions()
 	{
 		for (Function* function : mProgram->getFunctions())
@@ -880,6 +886,9 @@ namespace lemon
 
 	void Runtime::setupGlobalVariables()
 	{
+		if (nullptr == mProgram)
+			return;
+
 		// Setup memory offsets and sizes
 		size_t totalSize = 0;
 		for (size_t index = 0; index < mProgram->getGlobalVariables().size(); ++index)
@@ -902,7 +911,7 @@ namespace lemon
 			Variable& variable = *mProgram->getGlobalVariables()[index];
 			if (variable.getStaticMemorySize() > 0)
 			{
-				const int64 value = (variable.getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable&>(variable).mInitialValue : 0;
+				const int64 value = (variable.getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable&>(variable).mInitialValue.get<int64>() : 0;
 				*(int64*)&mStaticMemory[variable.getStaticMemoryOffset()] = value;
 			}
 		}

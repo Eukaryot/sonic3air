@@ -66,7 +66,7 @@ public:
 
 	bool playAudioBase(uint64 sfxId, uint8 contextId);
 	void playOverride(uint64 sfxId, uint8 contextId, uint8 channelId, uint8 overriddenChannelId);
-	void stopChannel(uint8 channelId);
+
 	void fadeInChannel(uint8 channelId, float length);
 	void fadeOutChannel(uint8 channelId, float length);
 
@@ -75,6 +75,7 @@ public:
 
 	void handleGameLoaded();
 	void handleActiveModsChanged();
+	void reloadAudioCollection();
 
 protected:
 	virtual void determineActiveSourceRegistrations();

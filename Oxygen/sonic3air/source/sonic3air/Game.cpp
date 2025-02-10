@@ -20,9 +20,9 @@
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/Configuration.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/application/input/InputManager.h"
-#include "oxygen/application/mainview/GameView.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/drawing/software/Blitter.h"
@@ -184,6 +184,8 @@ void Game::registerScriptBindings(lemon::Module& module)
 			.setParameterInfo(0, "playerIndex");
 
 		module.addNativeFunction("Game.returnToMainMenu", lemon::wrap(*this, &Game::returnToMainMenu), defaultFlags);
+		module.addNativeFunction("Game.openOptionsMenu", lemon::wrap(*this, &Game::openOptionsMenu), defaultFlags);
+
 		module.addNativeFunction("Game.isNormalGame", lemon::wrap(*this, &Game::isNormalGame), defaultFlags);
 		module.addNativeFunction("Game.isTimeAttack", lemon::wrap(*this, &Game::isTimeAttack), defaultFlags);
 		module.addNativeFunction("Game.onTimeAttackFinish", lemon::wrap(*this, &Game::onTimeAttackFinish), defaultFlags);
@@ -220,6 +222,7 @@ void Game::registerScriptBindings(lemon::Module& module)
 
 		module.addNativeFunction("Game.startSkippableCutscene", lemon::wrap(*this, &Game::startSkippableCutscene), defaultFlags);
 		module.addNativeFunction("Game.endSkippableCutscene", lemon::wrap(*this, &Game::endSkippableCutscene), defaultFlags);
+		module.addNativeFunction("Game.isInSkippableCutscene", lemon::wrap(*this, &Game::isInSkippableCutscene), defaultFlags);
 	}
 
 	// Discord
@@ -561,7 +564,7 @@ void Game::onUpdateControls()
 	if (mSkippableCutsceneFrames > 0 || mButtonYPressedDuringSkippableCutscene)	// Last check makes sure we'll ignore the press until it gets released
 	{
 		// Block input to the game
-		mButtonYPressedDuringSkippableCutscene = (ControlsIn::instance().getInputPad(0) & (int)ControlsIn::Button::Y);
+		mButtonYPressedDuringSkippableCutscene = ControlsIn::instance().getGamepad(0).isPressed(ControlsIn::Button::Y);
 		if (mButtonYPressedDuringSkippableCutscene)
 		{
 			ControlsIn::instance().injectEmptyInputs();
@@ -964,7 +967,6 @@ void Game::triggerRestart()
 
 void Game::onGamePause(uint8 canRestart)
 {
-	GameApp::instance().showSkippableCutsceneWindow(false);
 	GameApp::instance().onGamePaused(canRestart != 0);
 }
 
@@ -1033,6 +1035,11 @@ void Game::returnToMainMenu()
 	mTimeoutUntilDiscordRefresh = 0.0f;
 }
 
+void Game::openOptionsMenu()
+{
+	GameApp::instance().openOptionsMenuInGame();
+}
+
 bool Game::onTimeAttackFinish()
 {
 	if (!isInTimeAttackMode() || mReceivedTimeAttackFinished)
@@ -1073,4 +1080,9 @@ void Game::endSkippableCutscene()
 		simulation.setSpeed(simulation.getDefaultSpeed());
 
 	GameApp::instance().showSkippableCutsceneWindow(false);
+}
+
+bool Game::isInSkippableCutscene()
+{
+	return mSkippableCutsceneFrames > 0;
 }

@@ -33,17 +33,22 @@ function void fn04539e()
 	D0.u16 += objA0.velocity.y
 	objA0.position.y.u16 = D0.u16
 
-	A1 = 0xffffb000
-	A2 = A0 + 0x38
-	D0.u16 = control.player1
-	D1 = isMainCharacter(CHARACTER_TAILS) ? 0x11 : 0x14
-	fn0453e6()
+#if STANDALONE	
+	if (debug_mode.state == 0)
+#endif	
+	{
+		A1 = 0xffffb000
+		A2 = A0 + 0x38
+		D0.u16 = control.player1
+		D1 = isMainCharacter(CHARACTER_TAILS) ? 0x11 : 0x14
+		fn0453e6()
 
-	A1 = 0xffffb04a
-	A2 = A0 + 0x39
-	D0.u16 = control.tails
-	D1 = 0x11
-	fn0453e6()
+		A1 = 0xffffb04a
+		A2 = A0 + 0x39
+		D0.u16 = control.tails
+		D1 = 0x11
+		fn0453e6()
+	}
 
 #if STANDALONE
 	// If unloaded, "free" characters still attached (2nd player Tails usually)

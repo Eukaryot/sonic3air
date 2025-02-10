@@ -23,8 +23,10 @@
 #include "oxygen/application/Application.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
+#include "oxygen/application/gameview/GameView.h"
+#include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/application/input/InputManager.h"
-#include "oxygen/application/mainview/GameView.h"
+#include "oxygen/application/video/VideoOut.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/rendering/utils/RenderUtils.h"
@@ -227,25 +229,15 @@ void GameApp::openMainMenu()
 
 void GameApp::openOptionsMenuInGame()
 {
+	mRestoreGameResolution = VideoOut::instance().getScreenRect().getSize();
+	Application::instance().getSimulation().setSpeed(0.0f);
+
 	mCurrentState = State::INGAME_OPTIONS;
 
 	mPauseMenu->setEnabled(false);
 	mGameView->addChild(*mMenuBackground);
 	mGameView->startFadingIn();
 	mMenuBackground->openOptions(true);
-}
-
-void GameApp::onExitOptions()
-{
-	if (mCurrentState == State::INGAME_OPTIONS)
-	{
-		// Only start fading to black - see "onFadedOutOptions" for the actual change of state after complete fade-out
-		GameApp::instance().getGameView().startFadingOut(0.1666f);
-	}
-	else
-	{
-		mMenuBackground->openMainMenu();
-	}
 }
 
 void GameApp::onFadedOutOptions()
@@ -259,27 +251,25 @@ void GameApp::onFadedOutOptions()
 		mPauseMenu->setEnabled(true);
 		mPauseMenu->onReturnFromOptions();
 
+		ControlsIn::instance().setAllIgnores();
+
+		VideoOut::instance().setScreenSize(mRestoreGameResolution);
+
 		GameApp::instance().getGameView().startFadingIn(0.1f);
 
 		// TODO: Fade out the context instead
 		AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
 
+		Application::instance().getSimulation().setSpeed(1.0f);
+
 		mCurrentState = State::INGAME;
 	}
 }
 
-void GameApp::onExitExtras()
-{
-	mMenuBackground->openMainMenu();
-}
-
-void GameApp::onExitMods()
-{
-	mMenuBackground->openMainMenu();
-}
-
 void GameApp::onGamePaused(bool canRestart)
 {
+	showSkippableCutsceneWindow(false);
+
 	Application::instance().getSimulation().setSpeed(0.0f);
 	AudioOut::instance().pauseSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
 	AudioOut::instance().pauseSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
@@ -290,11 +280,6 @@ void GameApp::onGamePaused(bool canRestart)
 	{
 		mGameView->addChild(*mPauseMenu);
 	}
-}
-
-void GameApp::onGameResumed()
-{
-	// Not used at the moment
 }
 
 void GameApp::restartTimeAttack()
