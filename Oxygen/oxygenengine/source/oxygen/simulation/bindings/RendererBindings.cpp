@@ -392,6 +392,7 @@ namespace
 	void Renderer_resetCustomPlaneConfigurations()
 	{
 		RenderParts::instance().getPlaneManager().resetCustomPlanes();
+		RenderParts::instance().getScrollOffsetsManager().resetOverwriteFlags();
 	}
 
 	void Renderer_resetSprites()

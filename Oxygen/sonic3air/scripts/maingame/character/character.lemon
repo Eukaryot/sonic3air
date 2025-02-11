@@ -6938,12 +6938,19 @@ function void Character.UpdateRestartDelay()
 		--char.spindash_charge
 		if (char.spindash_charge == 0)
 		{
-		#if STANDALONE
+			#if STANDALONE
 			Standalone.onDeath()
-		#endif
-
+			#endif
+			
 			// Signal restart (from last checkpoint)
 			level.restart = 1
 		}
+	#if STANDALONE
+		else if (char.spindash_charge == 1)
+		{
+			// Preserve former custom plane setup during the fade-out starting in the next frame
+			enableCustomPlaneReset = false
+		}
+	#endif
 	}
 }

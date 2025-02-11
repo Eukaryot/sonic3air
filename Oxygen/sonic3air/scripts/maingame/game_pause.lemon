@@ -158,6 +158,7 @@ function void GamePause.Menu()
 
 			enableCustomPlaneReset = false	// Maintain custom planes that were set before the pause
 			waitForNextFrame()
+			enableCustomPlaneReset = false	// ...also for the next frame (relevant in case of e.g. restart)
 
 			// Undo increase of global framecounter (see "VInt.InnerUpdate"), to avoid messing up animations that rely on it
 			--global.framecounter
