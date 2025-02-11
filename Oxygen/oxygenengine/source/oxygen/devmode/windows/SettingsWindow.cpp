@@ -91,6 +91,25 @@ void SettingsWindow::buildContent()
 	ImGui::SetWindowSize(ImVec2(500.0f, 250.0f), ImGuiCond_FirstUseEver);
 
 	Configuration& config = Configuration::instance();
+	const float uiScale = getUIScale();
+
+	if (ImGui::CollapsingHeader("UI Style", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGuiHelpers::ScopedIndent si;
+
+		Color& accentColor = config.mDevMode.mUIAccentColor;
+		if (ImGui::ColorEdit3("<- Dev Mode UI Accent Color", accentColor.data, ImGuiColorEditFlags_NoInputs))
+		{
+			ImGuiIntegration::refreshImGuiStyle();
+		}
+
+		ImGui::Checkbox("Use Tabs in Main Window", &config.mDevMode.mUseTabsInMainWindow);
+
+		if (ImGui::DragFloat("UI Scale", &config.mDevMode.mUIScale, 0.003f, 0.5f, 4.0f, "%.1f"))
+		{
+			ImGuiIntegration::updateFontScale();
+		}
+	}
 
 	if (ImGui::CollapsingHeader("Game View Window", 0))
 	{
@@ -109,25 +128,12 @@ void SettingsWindow::buildContent()
 			config.mDevMode.mGameViewAlignment.y = 0.0f;
 	}
 
-	Color& accentColor = config.mDevMode.mUIAccentColor;
-	if (ImGui::ColorEdit3("Dev Mode UI Accent Color", accentColor.data, ImGuiColorEditFlags_NoInputs))
-	{
-		ImGuiIntegration::refreshImGuiStyle();
-	}
-
-	ImGui::Checkbox("Use Tabs in Main Window", &config.mDevMode.mUseTabsInMainWindow);
-
-	if (ImGui::DragFloat("UI Scale", &config.mDevMode.mUIScale, 0.003f, 0.5f, 4.0f, "%.1f"))
-	{
-		ImGuiIntegration::updateFontScale();
-	}
-
 	// External file editor settings
 	//  -> Only really makes sense on desktop platforms
 #if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS)
 	if (ImGui::CollapsingHeader("External Code Editor"))
 	{
-		ImGuiHelpers::ScopedIndent si(8);
+		ImGuiHelpers::ScopedIndent si;
 
 		Configuration::ExternalCodeEditor& editorConfig = config.mDevMode.mExternalCodeEditor;
 
@@ -219,6 +225,21 @@ void SettingsWindow::buildContent()
 		}
 	}
 #endif
+
+	if (ImGui::CollapsingHeader("Misc", 0))
+	{
+		ImGuiHelpers::ScopedIndent si;
+
+		ImGui::Text("When loading a save state, use mod settings...");
+		{
+			ImGuiHelpers::ScopedIndent si2;
+			if (ImGui::RadioButton("from the save state", !config.mDevMode.mApplyModSettingsAfterLoadState))
+				config.mDevMode.mApplyModSettingsAfterLoadState = false;
+			ImGui::SameLine();
+			if (ImGui::RadioButton("from mod options", config.mDevMode.mApplyModSettingsAfterLoadState))
+				config.mDevMode.mApplyModSettingsAfterLoadState = true;
+		}
+	}
 }
 
 #endif

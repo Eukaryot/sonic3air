@@ -83,6 +83,9 @@ public:
 	uint32 saveGameRecording(WString* outFilename = nullptr);
 
 private:
+	void applyModSettingsToGlobals();
+
+private:
 	CodeExec& mCodeExec;
 	SimulationState& mSimulationState;
 	GameRecorder& mGameRecorder;
