@@ -1,5 +1,3 @@
-This is a fork of 3air for minor script changes, the rest of the file is the same as the regular version.
-
 # Sonic 3 A.I.R.
 
 Source code incl. dependencies for "Sonic 3 - Angel Island Revisited", a fan-made remaster of Sonic 3 & Knuckles.
