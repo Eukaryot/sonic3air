@@ -118,9 +118,6 @@ function void MainMenuBG.Update(u16 cameraForegroundX, u16 cameraBackgroundX)
 		D3.u16 = camera.foreground.x.u16
 		fn04f0de()
 
-		// Manual correction for two lines with broken scrolling (also in outro)
-		u16[0xffffe0ee] = u16[0xffffe0f2]
-		u16[0xffffe16e] = u16[0xffffe172]
 		VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, getScreenHeight() * 4)
 	}
 

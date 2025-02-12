@@ -794,11 +794,17 @@ function void fn04f0de()
 {
 	// This function writes scroll offsets
 	//  - Destination is A1, which is usually 0xffffe000 here
+	//  - A4 is a ROM address with the sizes of blocks of lines that all get assigned either the same scroll offset value, or get assigned individual scroll offsets for each line of that block (if uppermost bit of the u16 is set)
+	//  - A5 is a RAM address with the actual scroll offsets to be assigned using the patterns from A4 - this is usually 0xffffa800 or maybe a few bytes afterwards (like 0xffffa804 or 0xffffa808)
+	//  - D0.u16 is the camera y-position for the background (plane B)
+	//  - D1.u16 is the number of scroll offsets to fill minus one; should be "getScreenHeight() - 1" in all cases
+	//  - D3.u16 is the camera x-position for the foreground (plane A)
 
 	// For the plane A scroll offsets (in the upper 16 bits of each u32 of the destination at A1), use the input in D3.s16
 	//  -> These scroll offsets are going to be the same for all lines in this routine
 	D3 = (-D3.s16) << 16
 
+	// This first part is supposedly meant to skip over all the data meant for scroll offsets above the currently visible part of the background
 	bool flag = false
 	while (true)
 	{
@@ -806,12 +812,13 @@ function void fn04f0de()
 		A4 += 2
 		flag = (D2.u16 & 0x8000) != 0
 		D2.u16 &= 0x7fff
+
 		D0.s16 -= D2.u16
 		if (D0.s16 < 0)
 			break
 
 		if (flag)
-			A5.u16 += D2.u16 * 2
+			A5 += D2.u16 * 2
 		else
 			A5 += 2
 	}
@@ -829,7 +836,7 @@ function void fn04f0de()
 	else
 		D0.u16 = D1.u16
 
-	// Then go through all lines: Calculate the plane B scroll offset (in the lower 16 bits) and assign the combined value
+	// Now go through all lines: Calculate the plane B scroll offset (in the lower 16 bits) and assign the combined value
 	while (true)
 	{
 		if (flag)
@@ -856,11 +863,10 @@ function void fn04f0de()
 				D3.s16 += getScreenExtend()
 		#endif
 
-			while (D0.s16 >= 0)
+			for (; D0.s16 >= 0; --D0.s16)
 			{
 				u32[A1] = D3
 				A1 += 4
-				--D0.s16
 			}
 		}
 
@@ -871,6 +877,7 @@ function void fn04f0de()
 		A4 += 2
 		flag = (D0.u16 & 0x8000) != 0
 		D0.u16 &= 0x7fff
+
 		D3.u16 = D2.u16
 		D2.s16 -= D0.s16
 		if (D2.s16 >= 0)

@@ -28,6 +28,12 @@ define level.num_foreground_chunks_y = u16[0xffff8004]
 define level.num_background_chunks_y = u16[0xffff8006]
 
 
+// 0xffffa800 .. 0xffffa9ff
+// Unapplied background scroll offsets
+//  -> Note that these don't get directly copied as plane B scroll offsets, but depending on how the background scrolling works
+//     for the current level, many of them will likely get used multiple times (i.e. for multiple screen lines in a row)
+
+
 // 0xffffb000 .. 0xffffcfcb
 // Game objects (up to 110 of them), including some reserved slots:
 //  - 0xffffb000 = main character
