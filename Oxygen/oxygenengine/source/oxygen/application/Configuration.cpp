@@ -658,6 +658,7 @@ void Configuration::serializeDevMode(JsonSerializer& serializer)
 			serializer.serialize("MainWindowOpen", mDevMode.mMainWindowOpen);
 			serializer.serialize("UseTabsInMainWindow", mDevMode.mUseTabsInMainWindow);
 			serializer.serialize("ActiveMainWindowTab", mDevMode.mActiveMainWindowTab);
+			serializer.serialize("ApplyModSettingsAfterLoadState", mDevMode.mApplyModSettingsAfterLoadState);
 			serializer.endObject();
 		}
 

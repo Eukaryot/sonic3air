@@ -68,12 +68,6 @@ void ScrollOffsetsManager::refresh(const RefreshParameters& refreshParameters)
 					}
 				}
 			}
-
-			// Reset overwrite flags
-			for (int k = 0; k < 0x100; ++k)
-			{
-				overwriteFlags[k] = false;
-			}
 		}
 
 		// Vertical scrolling
@@ -104,12 +98,6 @@ void ScrollOffsetsManager::refresh(const RefreshParameters& refreshParameters)
 						buffer[k] = mSets[index - 2].mScrollOffsetsV[k];
 					}
 				}
-			}
-
-			// Reset overwrite flags
-			for (int k = 0; k < 0x20; ++k)
-			{
-				overwriteFlags[k] = false;
 			}
 		}
 
@@ -190,6 +178,26 @@ void ScrollOffsetsManager::preFrameUpdate()
 
 void ScrollOffsetsManager::postFrameUpdate()
 {
+}
+
+void ScrollOffsetsManager::resetOverwriteFlags()
+{
+	for (int index = 0; index < 4; ++index)
+	{
+		// Horizontal scrolling
+		bool* overwriteFlags = mSets[index].mExplicitOverwriteH;
+		for (int k = 0; k < 0x100; ++k)
+		{
+			overwriteFlags[k] = false;
+		}
+
+		// Vertical scrolling
+		overwriteFlags = mSets[index].mExplicitOverwriteV;
+		for (int k = 0; k < 0x20; ++k)
+		{
+			overwriteFlags[k] = false;
+		}
+	}
 }
 
 bool ScrollOffsetsManager::getHorizontalScrollNoRepeat(int setIndex) const

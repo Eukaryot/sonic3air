@@ -71,6 +71,7 @@ public:
 		bool mUseTabsInMainWindow = true;
 		int mActiveMainWindowTab = 0;
 		ExternalCodeEditor mExternalCodeEditor;
+		bool mApplyModSettingsAfterLoadState = false;
 	};
 
 	struct GameRecorder

@@ -169,16 +169,7 @@ void Simulation::resetIntoGame(const std::vector<std::pair<std::string, std::str
 	}
 
 	// Apply mod settings
-	for (Mod* mod : ModManager::instance().getActiveMods())
-	{
-		for (Mod::SettingCategory& modSettingCategory : mod->mSettingCategories)
-		{
-			for (Mod::Setting& modSetting : modSettingCategory.mSettings)
-			{
-				mCodeExec.getLemonScriptRuntime().setGlobalVariableValue_int64(modSetting.mBinding, modSetting.mCurrentValue);
-			}
-		}
-	}
+	applyModSettingsToGlobals();
 
 	mFrameNumber = 0;
 	mCurrentTargetFrame = 0.0;
@@ -219,6 +210,11 @@ bool Simulation::loadState(const std::wstring& filename, bool showError)
 
 	mStateLoaded = filename;
 	mCodeExec.reinitRuntime(nullptr, (stateType == SaveStateSerializer::StateType::GENSX) ? CodeExec::CallStackInitPolicy::READ_FROM_ASM : CodeExec::CallStackInitPolicy::USE_EXISTING);
+
+	if (Configuration::instance().mDevMode.mApplyModSettingsAfterLoadState)
+	{
+		applyModSettingsToGlobals();
+	}
 
 	mFrameNumber = 0;
 	mCurrentTargetFrame = 0.0;
@@ -620,4 +616,19 @@ uint32 Simulation::saveGameRecording(WString* outFilename)
 		*outFilename = filename;
 
 	return mGameRecorder.getCurrentNumberOfFrames();
+}
+
+void Simulation::applyModSettingsToGlobals()
+{
+	// Apply mod settings
+	for (Mod* mod : ModManager::instance().getActiveMods())
+	{
+		for (Mod::SettingCategory& modSettingCategory : mod->mSettingCategories)
+		{
+			for (Mod::Setting& modSetting : modSettingCategory.mSettings)
+			{
+				mCodeExec.getLemonScriptRuntime().setGlobalVariableValue_int64(modSetting.mBinding, modSetting.mCurrentValue);
+			}
+		}
+	}
 }

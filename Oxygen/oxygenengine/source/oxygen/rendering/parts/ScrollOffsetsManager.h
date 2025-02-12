@@ -23,6 +23,8 @@ public:
 	void preFrameUpdate();
 	void postFrameUpdate();
 
+	void resetOverwriteFlags();
+
 	inline bool getVerticalScrolling() const				{ return mVerticalScrolling; }
 	inline void setVerticalScrolling(bool enable)			{ mVerticalScrolling = enable; }
 

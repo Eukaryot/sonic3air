@@ -36,9 +36,17 @@ namespace ImGuiHelpers
 	struct ScopedIndent
 	{
 	public:
-		inline ScopedIndent(float indent = 12.0f) :
+		inline ScopedIndent() :
+			mIndent(12.0f * Configuration::instance().mDevMode.mUIScale)
+		{
+			ImGui::Indent(mIndent);
+		}
+
+		inline explicit ScopedIndent(float indent, bool applyUIScale = true) :
 			mIndent(indent)
 		{
+			if (applyUIScale)
+				mIndent *= Configuration::instance().mDevMode.mUIScale;
 			ImGui::Indent(mIndent);
 		}
 
