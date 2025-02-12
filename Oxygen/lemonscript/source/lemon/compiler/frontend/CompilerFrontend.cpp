@@ -343,7 +343,7 @@ namespace lemon
 
 							if (offset+2 <= tokens.size() && isOperator(tokens[offset], Operator::ASSIGN))
 							{
-								int pos = offset + 1;
+								int pos = (int)offset + 1;
 								bool negative = false;
 								if (isOperator(tokens[pos], Operator::BINARY_MINUS) || isOperator(tokens[pos], Operator::BINARY_PLUS))
 								{
