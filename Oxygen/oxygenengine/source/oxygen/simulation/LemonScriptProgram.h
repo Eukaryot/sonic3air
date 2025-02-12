@@ -108,7 +108,16 @@ public:
 	static void resolveLocation(ResolvedLocation& outResolvedLocation, const lemon::Function& function, uint32 programCounter);
 
 private:
+	enum class LoadingResult
+	{
+		SUCCESS,
+		FAILED_CONTINUE,
+		FAILED_RETRY
+	};
+
+private:
 	bool loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename);
+	LoadingResult tryLoadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename);
 	void evaluateFunctionPragmas();
 	void evaluateDefines();
 

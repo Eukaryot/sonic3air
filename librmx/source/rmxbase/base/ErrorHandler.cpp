@@ -36,7 +36,7 @@
 namespace
 {
 
-	static std::set<uint32> gIgnoredAssertHashes;
+	static std::set<uint64> gIgnoredAssertHashes;
 
 #ifdef PLATFORM_WINDOWS
 #ifdef USE_VISTA_STYLE
@@ -118,8 +118,8 @@ namespace
 		std::stringstream stringBuilder;
 		stringBuilder << message << "\n\n";
 
-		const uint32 type = (dialogType == rmx::ErrorHandling::MessageBoxInterface::DialogType::ALL_OPTIONS) ? MB_YESNOCANCEL :
-							(dialogType == rmx::ErrorHandling::MessageBoxInterface::DialogType::ACCEPT_OR_CANCEL) ? MB_OKCANCEL : MB_OK;
+		const uint32 type = (dialogType == rmx::ErrorHandling::MessageBoxInterface::DialogType::YES_NO_CANCEL) ? MB_YESNOCANCEL :
+							(dialogType == rmx::ErrorHandling::MessageBoxInterface::DialogType::OK_CANCEL) ? MB_OKCANCEL : MB_OK;
 		const uint32 icon = (errorSeverity == rmx::ErrorSeverity::ERROR) ? MB_ICONERROR : MB_ICONWARNING;
 
 		std::string caption;
@@ -194,8 +194,8 @@ namespace rmx
 		printToLog(errorSeverity, message);
 
 		// Check if ignored
-		const uint32 hash = (uint32)getMurmur2_64(filename) ^ (uint32)line;
-		if (gIgnoredAssertHashes.count(hash) != 0)
+		const uint64 hash = getMurmur2_64(filename) ^ (uint64)line;
+		if (isIgnoringAssertsWithHash(hash))
 			return false;
 
 		if (!mShowAssertMessageBox)
@@ -206,10 +206,10 @@ namespace rmx
 			return false;
 		isInsideAssertBreakHandler = true;
 
-		MessageBoxInterface::DialogType dialogType = MessageBoxInterface::DialogType::ACCEPT_OR_CANCEL;
+		MessageBoxInterface::DialogType dialogType = MessageBoxInterface::DialogType::OK_CANCEL;
 		if (isDebuggerAttached())
 		{
-			dialogType = MessageBoxInterface::DialogType::ALL_OPTIONS;
+			dialogType = MessageBoxInterface::DialogType::YES_NO_CANCEL;
 		}
 
 		MessageBoxInterface::Result result = MessageBoxInterface::Result::ABORT;
@@ -230,12 +230,25 @@ namespace rmx
 		// Ignore from now on?
 		if (result == MessageBoxInterface::Result::IGNORE)
 		{
-			gIgnoredAssertHashes.insert(hash);
+			setIgnoreAssertsWithHash(hash, true);
 		}
 
 		isInsideAssertBreakHandler = false;
 
 		// If aborted, break now
 		return (result == MessageBoxInterface::Result::ACCEPT && isDebuggerAttached());
+	}
+
+	bool ErrorHandling::isIgnoringAssertsWithHash(uint64 hash)
+	{
+		return (gIgnoredAssertHashes.count(hash) != 0);
+	}
+
+	void ErrorHandling::setIgnoreAssertsWithHash(uint64 hash, bool ignore)
+	{
+		if (ignore)
+			gIgnoredAssertHashes.insert(hash);
+		else
+			gIgnoredAssertHashes.erase(hash);
 	}
 }

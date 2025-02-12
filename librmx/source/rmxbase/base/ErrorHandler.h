@@ -77,9 +77,9 @@ namespace rmx
 		public:
 			enum class DialogType
 			{
-				ACCEPT_ONLY,
-				ACCEPT_OR_CANCEL,
-				ALL_OPTIONS
+				OK,
+				OK_CANCEL,
+				YES_NO_CANCEL
 			};
 			enum class Result
 			{
@@ -96,6 +96,8 @@ namespace rmx
 		static bool isDebuggerAttached();
 		static void printToLog(ErrorSeverity errorSeverity, const std::string& message);
 		static bool handleAssertBreak(ErrorSeverity errorSeverity, const std::string& message, const char* filename, int line);
+		static bool isIgnoringAssertsWithHash(uint64 hash);
+		static void setIgnoreAssertsWithHash(uint64 hash, bool ignore);
 
 	public:
 		static inline LoggerInterface* mLogger = nullptr;

@@ -69,9 +69,9 @@ namespace
 			PlatformFunctions::DialogButtons dialogButtons = PlatformFunctions::DialogButtons::OK_CANCEL;
 			switch (dialogType)
 			{
-				case rmx::ErrorHandling::MessageBoxInterface::DialogType::ACCEPT_ONLY:		dialogButtons = PlatformFunctions::DialogButtons::OK;			  break;
-				case rmx::ErrorHandling::MessageBoxInterface::DialogType::ACCEPT_OR_CANCEL:	dialogButtons = PlatformFunctions::DialogButtons::OK_CANCEL;	  break;
-				case rmx::ErrorHandling::MessageBoxInterface::DialogType::ALL_OPTIONS:		dialogButtons = PlatformFunctions::DialogButtons::YES_NO_CANCEL;  break;
+				case rmx::ErrorHandling::MessageBoxInterface::DialogType::OK:			 dialogButtons = PlatformFunctions::DialogButtons::OK;			  break;
+				case rmx::ErrorHandling::MessageBoxInterface::DialogType::OK_CANCEL:	 dialogButtons = PlatformFunctions::DialogButtons::OK_CANCEL;	  break;
+				case rmx::ErrorHandling::MessageBoxInterface::DialogType::YES_NO_CANCEL: dialogButtons = PlatformFunctions::DialogButtons::YES_NO_CANCEL;  break;
 			}
 			const PlatformFunctions::DialogResult result = PlatformFunctions::showDialogBox(errorSeverity, dialogButtons, caption, text);
 			return (result == PlatformFunctions::DialogResult::CANCEL) ? Result::IGNORE : (result == PlatformFunctions::DialogResult::OK) ? Result::ACCEPT : Result::ABORT;
