@@ -166,13 +166,16 @@ void DevModeMainWindow::buildContent()
 
 				if (!useTabs)
 					ImGui::SeparatorText(TEXT_BY_CATEGORY[categoryIndex]);
-				
+
 				if (!useTabs || ImGui::BeginTabItem(TEXT_BY_CATEGORY[categoryIndex], nullptr, flags))
 				{
 					mActiveTab = categoryIndex;
 
-					if (ImGui::BeginTable("Table", numColumns, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchProp, ImVec2(280 * uiScale, 0)))
+					if (ImGui::BeginTable("Table", numColumns, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchProp, ImVec2(300 * uiScale, 0)))
 					{
+						for (size_t k = 0; k < numColumns; ++k)
+							ImGui::TableSetupColumn("", 0, 1.0f);
+
 						ImGui::TableNextRow();
 
 						for (size_t k = 0; k < windows.size(); ++k)
