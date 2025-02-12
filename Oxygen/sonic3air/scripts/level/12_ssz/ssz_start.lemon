@@ -41,6 +41,10 @@ function void fn057c1e()
 		{
 			objA1.update_address = 0x057e34
 			u16[A1 + 0x2c] = 0x60
+
+		#if STANDALONE
+			Game.startSkippableCutscene()
+		#endif
 		}
 	}
 
@@ -50,10 +54,6 @@ function void fn057c1e()
 	objA1.state = char.state.RUNNING
 	u8[A1 + 0x22] = 0
 	u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
-
-#if STANDALONE
-	Game.startSkippableCutscene()
-#endif
 }
 
 
@@ -271,6 +271,7 @@ function void fn065730()
 		// Activate the bridge und unload cutscene Knuckles
 		u8[0xffffeeda] = 0xff
 		UnloadObject()
+		Game.endSkippableCutscene()
 		return
 	}
 #endif
