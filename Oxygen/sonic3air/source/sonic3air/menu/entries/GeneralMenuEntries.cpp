@@ -16,8 +16,10 @@ InputFieldMenuEntry::InputFieldMenuEntry()
 	mMenuEntryType = MENU_ENTRY_TYPE;
 }
 
-InputFieldMenuEntry& InputFieldMenuEntry::initEntry(std::wstring_view defaultText)
+InputFieldMenuEntry& InputFieldMenuEntry::initEntry(Vec2i size, std::wstring_view defaultText, std::wstring_view placeholderText)
 {
+	mSize = size;
+	mPlaceholderText = placeholderText;
 	mTextInputHandler.setText(defaultText, true);
 	return *this;
 }
@@ -34,18 +36,22 @@ void InputFieldMenuEntry::textinput(const rmx::TextInputEvent& ev)
 
 void InputFieldMenuEntry::renderEntry(RenderContext& renderContext)
 {
-	const Recti textRect(renderContext.mCurrentPosition, Vec2i(200, 11));
+	const Recti outerRect(renderContext.mCurrentPosition - Vec2i(3, 0), mSize);
+	const Recti textRect(outerRect.getPos() + Vec2i(5, 1), outerRect.getSize() - Vec2i(10, 2));
+
 	Drawer& drawer = *renderContext.mDrawer;
 	Font& font = global::mOxyfontSmall;
 	const int cursorOffset = font.getWidth(mTextInputHandler.getText(), 0, (int)mTextInputHandler.getCursorPosition());
 
 	if (renderContext.mIsSelected)
 	{
-		drawer.printText(font, textRect, std::wstring_view(mTextInputHandler.getText()).substr(0, mTextInputHandler.getCursorPosition()));
-		drawer.printText(font, textRect + Vec2i(cursorOffset+2, 0), std::wstring_view(mTextInputHandler.getText()).substr(mTextInputHandler.getCursorPosition()));
+		drawer.drawRect(outerRect, Color(0.0f, 0.0f, 0.0f, 0.2f));
+
+		drawer.printText(font, textRect, std::wstring_view(mTextInputHandler.getText()).substr(0, mTextInputHandler.getCursorPosition()), 4);
+		drawer.printText(font, textRect + Vec2i(cursorOffset+2, 0), std::wstring_view(mTextInputHandler.getText()).substr(mTextInputHandler.getCursorPosition()), 4);
 		if (std::fmod(FTX::getTime(), 1.0f) < 0.6f)
 		{
-			drawer.printText(font, textRect + Vec2i(cursorOffset-2, font.getLineHeight()-2), "^", 1, Color(1.0f, 1.0f, 0.0f));
+			drawer.printText(font, textRect + Vec2i(cursorOffset-2, font.getLineHeight()-2), "^", 4, Color(1.0f, 1.0f, 0.0f));
 		}
 
 		if (mTextInputHandler.getMarkedRangeStart().has_value())
@@ -67,8 +73,17 @@ void InputFieldMenuEntry::renderEntry(RenderContext& renderContext)
 	}
 	else
 	{
-		drawer.printText(font, textRect, mTextInputHandler.getText());
+		drawer.drawRect(outerRect, Color(0.0f, 0.0f, 0.0f, 0.1f));
+
+		if (mTextInputHandler.getText().empty())
+		{
+			drawer.printText(global::mOxyfontSmallNoOutline, textRect, mPlaceholderText, 4, Color(0.4f, 0.6f, 0.6f, 1.0f));
+		}
+		else
+		{
+			drawer.printText(font, textRect, mTextInputHandler.getText(), 4);
+		}
 	}
 
-	renderContext.mCurrentPosition.y += 14;
+	renderContext.mCurrentPosition.y += 6;
 }

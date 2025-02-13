@@ -20,12 +20,15 @@ public:
 
 public:
 	InputFieldMenuEntry();
-	InputFieldMenuEntry& initEntry(std::wstring_view defaultText);
+	InputFieldMenuEntry& initEntry(Vec2i size, std::wstring_view defaultText, std::wstring_view placeholderText);
 
 	void keyboard(const rmx::KeyboardEvent& ev) override;
 	void textinput(const rmx::TextInputEvent& ev) override;
 	void renderEntry(RenderContext& renderContext) override;
 
 private:
+	Vec2i mSize;
+	std::wstring mPlaceholderText;
+
 	TextInputHandler mTextInputHandler;
 };

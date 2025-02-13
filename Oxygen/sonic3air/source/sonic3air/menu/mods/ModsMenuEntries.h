@@ -25,7 +25,6 @@ struct ModsMenuRenderContext : public GameMenuEntry::RenderContext
 
 	Recti mVisualRect;
 	Color mBaseColor;
-	bool mIsSelected = false;
 	bool mIsActiveModsTab = false;
 	bool mInMovementMode = false;
 	size_t mNumModsInTab = 0;
