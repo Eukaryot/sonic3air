@@ -79,8 +79,8 @@ void DebugLogWindow::buildContent()
 
 					if (!hasCurrent)
 					{
-						ImGui::PushStyleColor(ImGuiCol_Text, color);
 						ImGui::Bullet();
+						ImGui::PushStyleColor(ImGuiCol_Text, color);
 						ImGui::Text("  %s", singleEntry.mValue.c_str());
 						ImGui::PopStyleColor();
 						continue;
@@ -89,10 +89,9 @@ void DebugLogWindow::buildContent()
 					const uint32 key = (((uint32)entry.mEntries.size() << 16) + ((uint32)i << 24)) ^ (uint32)rmx::getMurmur2_64(singleEntry.mValue) ^ (uint32)(rmx::getMurmur2_64(pair.first) << 1);
 
 					ImGui::PushID(key);
-					const bool isOpen = ImGui::TreeNodeEx("Call Stack", 0, "");
-
-					ImGui::SameLine();
-					ImGui::TextColored(color, "%s", singleEntry.mValue.c_str());
+					ImGui::PushStyleColor(ImGuiCol_Text, color);
+					const bool isOpen = ImGui::TreeNodeEx("Call Stack", 0, "%s", singleEntry.mValue.c_str());
+					ImGui::PopStyleColor();
 
 					if (isOpen)
 					{
