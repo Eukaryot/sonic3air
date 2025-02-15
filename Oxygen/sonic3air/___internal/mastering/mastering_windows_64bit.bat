@@ -6,7 +6,7 @@ pushd ..\..
 
 set destDir=..\_MASTER
 set outputDir=%destDir%\sonic3air_game
-call ../../../../framework/external/get_msbuild_path.bat
+call ..\..\..\..\framework\external\get_msbuild_path.bat
 
 
 

@@ -1,7 +1,7 @@
 @echo on
 
 set outputDir=_master_image_template
-call ../../../../framework/external/get_msbuild_path.bat
+call ..\..\..\..\framework\external\get_msbuild_path.bat
 
 
 pushd ..\..
