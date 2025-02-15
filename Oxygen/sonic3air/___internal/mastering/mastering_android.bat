@@ -1,6 +1,7 @@
 @echo on
 
-call mastering_build_data.bat no_pause
+:: You can replace this with "mastering_build_data_64bit.bat" if you like
+call mastering_build_data_32bit.bat no_pause
 
 pushd ..\..
 
