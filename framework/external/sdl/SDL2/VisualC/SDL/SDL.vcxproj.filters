@@ -501,6 +501,9 @@
     <ClInclude Include="..\..\src\joystick\SDL_joystick_c.h">
       <Filter>joystick</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\joystick\SDL_steam_virtual_gamepad.h">
+      <Filter>joystick</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\joystick\SDL_sysjoystick.h">
       <Filter>joystick</Filter>
     </ClInclude>
@@ -777,9 +780,6 @@
     <ClInclude Include="..\..\src\video\khronos\vulkan\vulkan.h">
       <Filter>video\khronos\vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\video\khronos\vulkan\vulkan.hpp">
-      <Filter>video\khronos\vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\video\khronos\vulkan\vulkan_android.h">
       <Filter>video\khronos\vulkan</Filter>
     </ClInclude>
@@ -830,6 +830,12 @@
       <Filter>render\direct3d12</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\hidapi\SDL_hidapi_c.h" />
+    <ClInclude Include="..\..\src\video\yuv2rgb\yuv_rgb_common.h" />
+    <ClInclude Include="..\..\src\video\yuv2rgb\yuv_rgb_internal.h" />
+    <ClInclude Include="..\..\src\video\yuv2rgb\yuv_rgb_lsx.h" />
+    <ClInclude Include="..\..\src\video\yuv2rgb\yuv_rgb_lsx_func.h" />
+    <ClInclude Include="..\..\src\video\yuv2rgb\yuv_rgb_sse.h" />
+    <ClInclude Include="..\..\src\video\yuv2rgb\yuv_rgb_std.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\audio\wasapi\SDL_wasapi.c" />
@@ -932,6 +938,9 @@
       <Filter>joystick</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\joystick\SDL_joystick.c">
+      <Filter>joystick</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\joystick\SDL_steam_virtual_gamepad.c">
       <Filter>joystick</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\libm\e_atan2.c">
@@ -1072,6 +1081,9 @@
     <ClCompile Include="..\..\src\joystick\hidapi\SDL_hidapi_steam.c">
       <Filter>joystick\hidapi</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\joystick\hidapi\SDL_hidapi_steamdeck.c">
+      <Filter>joystick\hidapi</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\joystick\hidapi\SDL_hidapi_switch.c">
       <Filter>joystick\hidapi</Filter>
     </ClCompile>
@@ -1179,9 +1191,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\video\dummy\SDL_nullvideo.c">
       <Filter>video\dummy</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\video\yuv2rgb\yuv_rgb.c">
-      <Filter>video\yuv2rgb</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\video\windows\SDL_windowsclipboard.c">
       <Filter>video\windows</Filter>
@@ -1356,6 +1365,9 @@
       <Filter>render\direct3d12</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\stdlib\SDL_mslibc.c" />
+    <ClCompile Include="..\..\src\video\yuv2rgb\yuv_rgb_lsx.c" />
+    <ClCompile Include="..\..\src\video\yuv2rgb\yuv_rgb_sse.c" />
+    <ClCompile Include="..\..\src\video\yuv2rgb\yuv_rgb_std.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\main\windows\version.rc" />

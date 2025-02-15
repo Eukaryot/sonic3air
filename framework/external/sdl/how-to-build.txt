@@ -8,20 +8,20 @@ Using the build script
 
 Alternative: Manual build
 	- Open the Visual Studio Solution at "SDL2\VisualC\SDL.sln"
-	- Changes needed after download
-		1.) Switch to static library build for project SDL2 (all configurations):
-			 General -> Configuration Type = "Static library (.lib)"
-		2.) Link statically against the VC++ runtime, for projects SDL2 and SDL2main:
-			 C/C++ -> Code Generation -> Runtime Library = "Multi-threaded (/MT)" (yes, also for Debug)
+	- If you got a fresh copy of SDL from its repo (e.g. updating to a newer version), go through the steps under "Fixes to apply after updating" first
 	- Build as Debug + Release, both Win32 + x64
 	- Without further adjustments, all other projects except SDL2 and SDL2main will fail to build, but we only need those anyway
 	- Afterwards execute "copy_sdl.bat" to copy headers and libs in place
 
 
 Fixes to apply after updating
-	- For static Windows builds, add the HAVE_LIBC definition into "SDL2\include\SDL_config_windows."
-	- Include fix for Android audio when plugging in/out headphones
-	- From the "Changes needed after download", apply at least the first one
+	- Optional: Build SDL for static linking
+		- Switch to static library build for project SDL2 (all configurations):
+			General -> Configuration Type = "Static library (.lib)"
+		- Link statically against the VC++ runtime, for projects SDL2 and SDL2main:
+			C/C++ -> Code Generation -> Runtime Library = "Multi-threaded (/MT)" (yes, also for Debug)
+		- Add the HAVE_LIBC definition into "SDL2\include\SDL_config_windows"
+	- That's all... as of SDL 2.30.14, no further fixes are known tor be applied
 
 
 Notes on SDL2 static builds

@@ -27,6 +27,7 @@ LDFLAGS = @BUILD_LDFLAGS@
 EXTRA_LDFLAGS = @EXTRA_LDFLAGS@
 LIBTOOL = @LIBTOOL@
 INSTALL = @INSTALL@
+FGREP	= @FGREP@
 AR	= @AR@
 RANLIB	= @RANLIB@
 RC	= @RC@
@@ -51,7 +52,7 @@ WAYLAND_SCANNER_CODE_MODE = @WAYLAND_SCANNER_CODE_MODE@
 
 INSTALL_SDL2_CONFIG = @INSTALL_SDL2_CONFIG@
 
-SRC_DIST = *.md *.txt acinclude Android.mk autogen.sh android-project build-scripts cmake cmake_uninstall.cmake.in configure configure.ac docs include Makefile.* mingw sdl2-config.cmake.in sdl2-config-version.cmake.in sdl2-config.in sdl2.m4 sdl2.pc.in SDL2.spec.in SDL2Config.cmake.in src test VisualC VisualC-WinRT Xcode Xcode-iOS wayland-protocols
+SRC_DIST = *.md *.txt acinclude Android.mk autogen.sh android-project build-scripts cmake cmake_uninstall.cmake.in configure configure.ac docs include Makefile.* mingw sdl2-config.cmake.in sdl2-config-version.cmake.in sdl2-config.in sdl2.m4 sdl2.pc.in SDL2.spec.in SDL2Config.cmake.in src test VisualC VisualC-GDK VisualC-WinRT Xcode Xcode-iOS wayland-protocols
 GEN_DIST = SDL2.spec
 
 ifneq ($V,1)
@@ -130,7 +131,7 @@ HDRS = \
 	begin_code.h \
 	close_code.h
 
-SDLTEST_HDRS = $(shell ls $(srcdir)/include | fgrep SDL_test)
+SDLTEST_HDRS = $(shell ls $(srcdir)/include | $(FGREP) SDL_test)
 
 LT_AGE      = @LT_AGE@
 LT_CURRENT  = @LT_CURRENT@

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -169,13 +169,13 @@ typedef void (SDLCALL * SDL_AudioCallback) (void *userdata, Uint8 * stream,
  *  The calculated values in this structure are calculated by SDL_OpenAudio().
  *
  *  For multi-channel audio, the default SDL channel mapping is:
- *  2:  FL FR                       (stereo)
- *  3:  FL FR LFE                   (2.1 surround)
- *  4:  FL FR BL BR                 (quad)
- *  5:  FL FR LFE BL BR             (4.1 surround)
- *  6:  FL FR FC LFE SL SR          (5.1 surround - last two can also be BL BR)
- *  7:  FL FR FC LFE BC SL SR       (6.1 surround)
- *  8:  FL FR FC LFE BL BR SL SR    (7.1 surround)
+ *  2:  FL  FR                          (stereo)
+ *  3:  FL  FR LFE                      (2.1 surround)
+ *  4:  FL  FR  BL  BR                  (quad)
+ *  5:  FL  FR LFE  BL  BR              (4.1 surround)
+ *  6:  FL  FR  FC LFE  SL  SR          (5.1 surround - last two can also be BL BR)
+ *  7:  FL  FR  FC LFE  BC  SL  SR      (6.1 surround)
+ *  8:  FL  FR  FC LFE  BL  BR  SL  SR  (7.1 surround)
  */
 typedef struct SDL_AudioSpec
 {
@@ -594,7 +594,7 @@ extern DECLSPEC int SDLCALL SDL_GetDefaultAudioInfo(char **name,
  *   frames_ (with stereo output, two samples--left and right--would make a
  *   single sample frame). This number should be a power of two, and may be
  *   adjusted by the audio driver to a value more suitable for the hardware.
- *   Good values seem to range between 512 and 8096 inclusive, depending on
+ *   Good values seem to range between 512 and 4096 inclusive, depending on
  *   the application and CPU speed. Smaller values reduce latency, but can
  *   lead to underflow if the application is doing heavy processing and cannot
  *   fill the audio buffer in time. Note that the number of sample frames is

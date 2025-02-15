@@ -1,7 +1,7 @@
 # SDL2 CMake configuration file:
 # This file is meant to be placed in a cmake subfolder of SDL2-devel-2.x.y-VC
 
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.0...3.28)
 
 include(FeatureSummary)
 set_package_properties(SDL2 PROPERTIES
@@ -68,6 +68,8 @@ if(EXISTS "${_sdl2_library}" AND EXISTS "${_sdl2_dll_library}")
                 IMPORTED_LOCATION "${_sdl2_dll_library}"
                 COMPATIBLE_INTERFACE_BOOL "SDL2_SHARED"
                 INTERFACE_SDL2_SHARED "ON"
+                COMPATIBLE_INTERFACE_STRING "SDL_VERSION"
+                INTERFACE_SDL_VERSION "SDL2"
         )
     endif()
     set(SDL2_SDL2_FOUND TRUE)
@@ -77,6 +79,8 @@ endif()
 unset(_sdl2_library)
 unset(_sdl2_dll_library)
 
+set(SDL2_SDL2-static_FOUND FALSE)
+
 set(_sdl2main_library "${SDL2_LIBDIR}/SDL2main.lib")
 if(EXISTS "${_sdl2main_library}")
     if(NOT TARGET SDL2::SDL2main)
@@ -84,11 +88,13 @@ if(EXISTS "${_sdl2main_library}")
         set_target_properties(SDL2::SDL2main
         PROPERTIES
             IMPORTED_LOCATION "${_sdl2main_library}"
+            COMPATIBLE_INTERFACE_STRING "SDL_VERSION"
+            INTERFACE_SDL_VERSION "SDL2"
         )
     endif()
     set(SDL2_SDL2main_FOUND TRUE)
 else()
-    set(SDL2_SDL2_FOUND FALSE)
+    set(SDL2_SDL2main_FOUND FALSE)
 endif()
 unset(_sdl2main_library)
 
@@ -100,11 +106,13 @@ if(EXISTS "${_sdl2test_library}")
             PROPERTIES
                 INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIRS}"
                 IMPORTED_LOCATION "${_sdl2test_library}"
+                COMPATIBLE_INTERFACE_STRING "SDL_VERSION"
+                INTERFACE_SDL_VERSION "SDL2"
         )
     endif()
     set(SDL2_SDL2test_FOUND TRUE)
 else()
-    set(SDL2_SDL2_FOUND FALSE)
+    set(SDL2_SDL2test_FOUND FALSE)
 endif()
 unset(_sdl2test_library)
 

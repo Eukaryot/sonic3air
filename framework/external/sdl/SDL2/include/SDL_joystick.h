@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -44,6 +44,7 @@
 #include "SDL_stdinc.h"
 #include "SDL_error.h"
 #include "SDL_guid.h"
+#include "SDL_mutex.h"
 
 #include "begin_code.h"
 /* Set up for C function definitions, even when using C++ */
@@ -66,6 +67,9 @@ extern "C" {
 /**
  * The joystick structure used to identify an SDL joystick
  */
+#ifdef SDL_THREAD_SAFETY_ANALYSIS
+extern SDL_mutex *SDL_joystick_lock;
+#endif
 struct _SDL_Joystick;
 typedef struct _SDL_Joystick SDL_Joystick;
 
@@ -131,7 +135,7 @@ typedef enum
  *
  * \since This function is available since SDL 2.0.7.
  */
-extern DECLSPEC void SDLCALL SDL_LockJoysticks(void);
+extern DECLSPEC void SDLCALL SDL_LockJoysticks(void) SDL_ACQUIRE(SDL_joystick_lock);
 
 
 /**
@@ -146,7 +150,7 @@ extern DECLSPEC void SDLCALL SDL_LockJoysticks(void);
  *
  * \since This function is available since SDL 2.0.7.
  */
-extern DECLSPEC void SDLCALL SDL_UnlockJoysticks(void);
+extern DECLSPEC void SDLCALL SDL_UnlockJoysticks(void) SDL_RELEASE(SDL_joystick_lock);
 
 /**
  * Count the number of joysticks attached to the system.
@@ -284,13 +288,12 @@ extern DECLSPEC SDL_JoystickType SDLCALL SDL_JoystickGetDeviceType(int device_in
 /**
  * Get the instance ID of a joystick.
  *
- * This can be called before any joysticks are opened. If the index is out of
- * range, this function will return -1.
+ * This can be called before any joysticks are opened.
  *
  * \param device_index the index of the joystick to query (the N'th joystick
  *                     on the system
  * \returns the instance id of the selected joystick. If called on an invalid
- *          index, this function returns zero
+ *          index, this function returns -1.
  *
  * \since This function is available since SDL 2.0.6.
  */
@@ -787,12 +790,17 @@ extern DECLSPEC void SDLCALL SDL_JoystickUpdate(void);
  * **WARNING**: Calling this function may delete all events currently in SDL's
  * event queue.
  *
- * \param state can be one of `SDL_QUERY`, `SDL_IGNORE`, or `SDL_ENABLE`
- * \returns 1 if enabled, 0 if disabled, or a negative error code on failure;
- *          call SDL_GetError() for more information.
+ * While `param` is meant to be one of `SDL_QUERY`, `SDL_IGNORE`, or
+ * `SDL_ENABLE`, this function accepts any value, with any non-zero value that
+ * isn't `SDL_QUERY` being treated as `SDL_ENABLE`.
  *
- *          If `state` is `SDL_QUERY` then the current state is returned,
- *          otherwise the new processing state is returned.
+ * If SDL was built with events disabled (extremely uncommon!), this will
+ * do nothing and always return `SDL_IGNORE`.
+ *
+ * \param state can be one of `SDL_QUERY`, `SDL_IGNORE`, or `SDL_ENABLE`
+ * \returns If `state` is `SDL_QUERY` then the current state is returned,
+ *          otherwise `state` is returned (even if it was not one of the
+ *          allowed values).
  *
  * \since This function is available since SDL 2.0.0.
  *
