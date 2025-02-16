@@ -211,7 +211,7 @@ bool NetplayClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 
 				// Checksum for debugging
 				mInputChecksum = rmx::addToFNV1a_32(mInputChecksum, reinterpret_cast<uint8*>(newFrame.mInputsByPlayer), sizeof(newFrame.mInputsByPlayer));
-				const int frameNumber = packet.mFrameNumber - numFramesToCopy + k + 1;
+				const int frameNumber = packet.mFrameNumber - (int)numFramesToCopy + k + 1;
 				if (frameNumber % 200 == 0)
 				{
 					mRegularInputChecksum = mInputChecksum;

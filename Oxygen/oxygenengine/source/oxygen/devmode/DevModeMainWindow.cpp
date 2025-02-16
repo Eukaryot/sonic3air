@@ -171,7 +171,7 @@ void DevModeMainWindow::buildContent()
 				{
 					mActiveTab = categoryIndex;
 
-					if (ImGui::BeginTable("Table", numColumns, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchProp, ImVec2(300 * uiScale, 0)))
+					if (ImGui::BeginTable("Table", (int)numColumns, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchProp, ImVec2(300 * uiScale, 0)))
 					{
 						for (size_t k = 0; k < numColumns; ++k)
 							ImGui::TableSetupColumn("", 0, 1.0f);
@@ -181,7 +181,7 @@ void DevModeMainWindow::buildContent()
 						for (size_t k = 0; k < windows.size(); ++k)
 						{
 							if ((k % itemsPerColumn) == 0)
-							ImGui::TableSetColumnIndex(k / itemsPerColumn);
+								ImGui::TableSetColumnIndex((int)(k / itemsPerColumn));
 
 							DevModeWindowBase* window = windows[k];
 							if (nullptr != window)
