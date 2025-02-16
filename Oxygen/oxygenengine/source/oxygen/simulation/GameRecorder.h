@@ -28,12 +28,19 @@ public:
 	};
 
 public:
+	GameRecorder();
+
+	void updateFromConfig();
+
 	void clear();
 	void addFrame(uint32 frameNumber, const InputData& input);
 	void addKeyFrame(uint32 frameNumber, const InputData& input, const std::vector<uint8>& data);
 
 	void discardOldFrames(uint32 minKeepNumber = 3600);
 	void discardFramesAfter(uint32 frameNumber);	// Discards all frames from the given frame number on, including that frame itself
+
+	inline bool isRecording() const  { return mIsRecording; }
+	inline bool isPlaying() const	 { return mIsPlaying; }
 
 	inline uint32 getCurrentNumberOfFrames() const  { return mRangeEnd - mRangeStart; }
 	inline uint32 getRangeStart() const	 { return mRangeStart; }
@@ -76,6 +83,9 @@ private:
 	bool serializeRecording(VectorBinarySerializer& serializer, uint32 minDistanceBetweenKeyframes);
 
 private:
+	bool mIsRecording = false;
+	bool mIsPlaying = false;
+
 	std::vector<Frame*> mFrames;
 	RentableObjectPool<Frame> mFrameNoDataPool;
 	RentableObjectPool<Frame> mFrameWithDataPool;

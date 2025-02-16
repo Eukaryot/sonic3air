@@ -27,6 +27,7 @@
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/helper/Utils.h"
 #include "oxygen/platform/PlatformFunctions.h"
+#include "oxygen/simulation/GameRecorder.h"
 #include "oxygen/simulation/Simulation.h"
 
 
@@ -570,7 +571,7 @@ void OptionsMenu::update(float timeElapsed)
 							case option::GAME_RECORDING_MODE:
 							{
 								mOptionEntries[selectedData].applyValue();
-								Configuration::instance().evaluateGameRecording();
+								Application::instance().getSimulation().getGameRecorder().updateFromConfig();
 								break;
 							}
 

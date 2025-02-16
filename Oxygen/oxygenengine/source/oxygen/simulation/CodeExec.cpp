@@ -17,6 +17,7 @@
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/GameProfile.h"
 #include "oxygen/platform/PlatformFunctions.h"
+#include "oxygen/simulation/GameRecorder.h"
 
 #include <lemon/program/Function.h>
 #include <lemon/runtime/Runtime.h>
@@ -690,7 +691,7 @@ void CodeExec::runScript(bool executeSingleFunction, CallFrameTracking* callFram
 				if (showMessageBox)
 				{
 					bool gameRecordingSaved = false;
-					if (Configuration::instance().mGameRecorder.mIsRecording)
+					if (Application::instance().getSimulation().getGameRecorder().isRecording())
 					{
 						gameRecordingSaved = (Application::instance().getSimulation().saveGameRecording() != 0);
 					}

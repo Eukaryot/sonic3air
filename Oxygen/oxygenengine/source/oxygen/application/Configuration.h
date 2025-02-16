@@ -77,8 +77,7 @@ public:
 	struct GameRecorder
 	{
 		int mRecordingMode = -1;		// -1 = Auto, 0 = Recording disabled, 1 = Recording enabled
-		bool mIsRecording = false;
-		bool mIsPlayback = false;
+		bool mEnablePlayback = false;
 		int mPlaybackStartFrame = 0;
 		bool mPlaybackIgnoreKeys = false;
 	};
@@ -132,8 +131,6 @@ public:
 	void saveSettings();
 
 	inline void setSettingsReadOnly(bool enable)  { mSettingsReadOnly = enable; }
-
-	void evaluateGameRecording();
 
 protected:
 	virtual void preLoadInitialization() = 0;

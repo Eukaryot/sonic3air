@@ -538,8 +538,8 @@ void GameView::update(float timeElapsed)
 
 		if (rewindSteps > 0)
 		{
-			setLogDisplay(String(0, "  Rewinding | Frame: %d", mSimulation.getFrameNumber() - rewindSteps));
-			mSimulation.setRewind(rewindSteps);
+			const int actualRewindSteps = mSimulation.setRewind(rewindSteps);
+			setLogDisplay(String(0, "  Rewinding | Frame: %d", mSimulation.getFrameNumber() - actualRewindSteps));
 			++mRewindCounter;
 		}
 	}

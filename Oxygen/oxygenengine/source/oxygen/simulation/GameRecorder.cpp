@@ -13,6 +13,35 @@
 #include "oxygen/helper/FileHelper.h"
 
 
+GameRecorder::GameRecorder()
+{
+	updateFromConfig();
+}
+
+void GameRecorder::updateFromConfig()
+{
+	Configuration& config = Configuration::instance();
+	if (config.mGameRecorder.mRecordingMode == 0 || config.mGameRecorder.mEnablePlayback)
+	{
+		mIsRecording = false;
+	}
+	else if (config.mGameRecorder.mRecordingMode == 1)
+	{
+		mIsRecording = true;
+	}
+	else
+	{
+	#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WEB)
+		// Disable game recording unless explicitly enabled, as it can be really slow on mobile devices
+		mIsRecording = false;
+	#else
+		mIsRecording = !config.mFailSafeMode;
+	#endif
+	}
+
+	mIsPlaying = Configuration::instance().mGameRecorder.mEnablePlayback;
+}
+
 void GameRecorder::clear()
 {
 	mFrames.clear();

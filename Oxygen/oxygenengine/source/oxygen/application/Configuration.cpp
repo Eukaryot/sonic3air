@@ -444,27 +444,6 @@ void Configuration::saveSettings()
 	}
 }
 
-void Configuration::evaluateGameRecording()
-{
-	if (mGameRecorder.mRecordingMode == 0 || mGameRecorder.mIsPlayback)
-	{
-		mGameRecorder.mIsRecording = false;
-	}
-	else if (mGameRecorder.mRecordingMode == 1)
-	{
-		mGameRecorder.mIsRecording = true;
-	}
-	else
-	{
-		#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WEB)
-			// Disable game recording unless explicitly enabled, as it can be really slow on mobile devices
-			mGameRecorder.mIsRecording = false;
-		#else
-			mGameRecorder.mIsRecording = !mFailSafeMode;
-		#endif
-	}
-}
-
 void Configuration::loadConfigurationProperties(JsonSerializer& serializer)
 {
 	// Read dev mode setting first, as other settings rely on it
@@ -501,8 +480,8 @@ void Configuration::loadConfigurationProperties(JsonSerializer& serializer)
 	// Game recorder
 	if (serializer.beginObject("GameRecording"))
 	{
-		serializer.serialize("EnablePlayback", mGameRecorder.mIsPlayback);
-		if (mGameRecorder.mIsPlayback)
+		serializer.serialize("EnablePlayback", mGameRecorder.mEnablePlayback);
+		if (mGameRecorder.mEnablePlayback)
 		{
 			serializer.serialize("PlaybackStartFrame", mGameRecorder.mPlaybackStartFrame);
 			serializer.serialize("PlaybackIgnoreKeys", mGameRecorder.mPlaybackIgnoreKeys);
@@ -510,7 +489,7 @@ void Configuration::loadConfigurationProperties(JsonSerializer& serializer)
 		serializer.endObject();
 	}
 
-	if (mLoadLevel != -1 || mGameRecorder.mIsPlayback)
+	if (mLoadLevel != -1 || mGameRecorder.mEnablePlayback)
 	{
 		// Enforce start phase 3 (in-game) when a level to load directly is defined, and in game recording playback mode
 		mStartPhase = 3;

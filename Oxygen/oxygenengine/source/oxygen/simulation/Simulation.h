@@ -40,6 +40,7 @@ public:
 
 	CodeExec& getCodeExec()				  { return mCodeExec; }
 	SimulationState& getSimulationState() { return mSimulationState; }
+	GameRecorder& getGameRecorder()		  { return mGameRecorder; }
 	ROMDataAnalyser* getROMDataAnalyser() { return mROMDataAnalyser; }
 	EmulatorInterface& getEmulatorInterface();
 
@@ -59,7 +60,7 @@ public:
 	bool generateFrame();
 	bool jumpToFrame(uint32 frameNumber, bool clearRecordingAfterwards = true);
 
-	inline void setRewind(int rewindSteps) { mRewindSteps = rewindSteps; }
+	int setRewind(int rewindSteps);
 
 	float getSimulationFrequency() const;
 	void setSimulationFrequencyOverride(float frequency) { mSimulationFrequencyOverride = frequency; }

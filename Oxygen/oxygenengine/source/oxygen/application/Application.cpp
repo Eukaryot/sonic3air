@@ -32,6 +32,7 @@
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/network/EngineServerClient.h"
 #include "oxygen/platform/PlatformFunctions.h"
+#include "oxygen/simulation/GameRecorder.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/PersistentData.h"
 #include "oxygen/simulation/Simulation.h"
@@ -788,7 +789,7 @@ void Application::enablePauseOnFocusLoss()
 
 void Application::triggerGameRecordingSave()
 {
-	if (Configuration::instance().mGameRecorder.mIsRecording)
+	if (mSimulation->getGameRecorder().isRecording())
 	{
 		WString filename;
 		const uint32 numFrames = mSimulation->saveGameRecording(&filename);

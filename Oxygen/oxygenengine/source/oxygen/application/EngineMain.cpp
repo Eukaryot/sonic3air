@@ -473,8 +473,6 @@ bool EngineMain::initConfigAndSettings()
 	config.mWindowMode = Configuration::WindowMode::EXCLUSIVE_FULLSCREEN;
 #endif
 
-	config.evaluateGameRecording();
-
 	RMX_LOG_INFO(((config.mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Using pure software renderer" :
 				  (config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Using opengl-soft renderer" : "Using opengl-full renderer"));
 	return true;
