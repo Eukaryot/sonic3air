@@ -291,7 +291,7 @@ void MainMenu::render()
 		}
 		else
 		{
-			const uint32& value = ConfigurationImpl::instance().mActiveGameSettings->mCurrentValues[(uint32)SharedDatabase::Setting::SETTING_FIX_GLITCHES];
+			const uint32 value = ConfigurationImpl::instance().mActiveGameSettings->getValue((uint32)SharedDatabase::Setting::SETTING_FIX_GLITCHES);
 			if (value < 2)
 			{
 				const char* txt = (value == 0) ? "NO GLITCH FIXES" : "ONLY BASIC FIXES";
