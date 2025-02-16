@@ -167,7 +167,7 @@ void ConfigurationImpl::serializeSettingsInternal(JsonSerializer& serializer)
 					}
 
 					{
-						uint32& ghostSetting = mLocalGameSettings.mCurrentValues[(uint32)SharedDatabase::Setting::SETTING_TIME_ATTACK_GHOSTS];
+						uint32& ghostSetting = mLocalGameSettings.accessValue((uint32)SharedDatabase::Setting::SETTING_TIME_ATTACK_GHOSTS);
 						ghostSetting = (ghostSetting >= 5) ? 5 : (ghostSetting >= 3) ? 3 : (ghostSetting >= 1) ? 1 : 0;
 					}
 

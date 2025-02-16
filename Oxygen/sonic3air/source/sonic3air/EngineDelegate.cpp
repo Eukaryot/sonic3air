@@ -226,28 +226,13 @@ void EngineDelegate::serializeGameSettings(VectorBinarySerializer& serializer)
 {
 	if (serializer.isReading())
 	{
-		GameSettings& gameSettings = mConfiguration.mAlternativeGameSettings;
-
-		const size_t numValues = (size_t)serializer.read<uint16>();
-		gameSettings.mCurrentValues.clear();
-		gameSettings.mCurrentValues.reserve(numValues);
-		for (size_t k = 0; k < numValues; ++k)
-		{
-			const uint32 key = serializer.read<uint32>();
-			const uint32 value = serializer.read<uint32>();
-			gameSettings.setValue(key, value);
-		}
+		// Always read into alternative game settings
+		mConfiguration.mAlternativeGameSettings.serialize(serializer);
 	}
 	else
 	{
-		const GameSettings& gameSettings = *mConfiguration.mActiveGameSettings;
-
-		serializer.writeAs<uint16>(gameSettings.mCurrentValues.size());
-		for (const auto& pair : gameSettings.mCurrentValues)
-		{
-			serializer.write(pair.first);
-			serializer.write(pair.second);
-		}
+		// Save whatever is the current game settings
+		mConfiguration.mActiveGameSettings->serialize(serializer);
 	}
 }
 
