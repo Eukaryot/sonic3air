@@ -173,6 +173,7 @@ void Simulation::resetIntoGame(const std::vector<std::pair<std::string, std::str
 
 	mFrameNumber = 0;
 	mCurrentTargetFrame = 0.0;
+	mLastCorrectionFrame = 0;
 	mStepsLimit = -1;
 	mBreakConditions.clearAll();
 	mGameRecorder.clear();
@@ -218,6 +219,7 @@ bool Simulation::loadState(const std::wstring& filename, bool showError)
 
 	mFrameNumber = 0;
 	mCurrentTargetFrame = 0.0;
+	mLastCorrectionFrame = 0;
 	mStepsLimit = -1;
 	mBreakConditions.clearAll();
 
@@ -318,7 +320,7 @@ void Simulation::update(float timeElapsed)
 		}
 
 		// Each second, a small correction to the accumulated time gets applied
-		if ((int)(mFrameNumber - mLastCorrectionFrame) >= (int)getSimulationFrequency())
+		if ((int)(mFrameNumber - mLastCorrectionFrame) >= (int)getSimulationFrequency() || mFrameNumber < mLastCorrectionFrame)
 		{
 			// The idea here is to bring the accumulated time towards the midpoint, where it's most stable against unintentional double frames or frame skips (which might happen otherwise)
 			//  -> This is most useful for 60 Hz displays with V-sync on, but should have a similar effect on e.g. 75 Hz, 90 Hz, 120 Hz
