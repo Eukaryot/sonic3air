@@ -283,6 +283,7 @@ namespace lemon
 		state.mBaseCallIndex = baseCallIndex;
 		state.mProgramCounter = runtimeFunction.getFirstRuntimeOpcode();
 		state.mLocalVariablesStart = mSelectedControlFlow->mLocalVariablesSize;
+		RMX_ASSERT(nullptr != state.mProgramCounter, "Invalid program counter in function " << runtimeFunction.mFunction->getName());
 	}
 
 	void Runtime::callFunction(const Function& function, size_t baseCallIndex)

@@ -357,6 +357,9 @@ std::string LemonScriptRuntime::buildScriptLocationString(const lemon::ControlFl
 uint32 LemonScriptRuntime::getLineNumberInFile(const lemon::ScriptFunction& function, size_t programCounter)
 {
 	const auto& opcodes = function.mOpcodes;
+	if (opcodes.empty())
+		return 0;
+
 	const uint32 lineNumber = (programCounter < opcodes.size()) ? opcodes[programCounter].mLineNumber : opcodes.back().mLineNumber;
 	return (lineNumber < function.mSourceBaseLineOffset) ? 0 : (lineNumber - function.mSourceBaseLineOffset + 1);
 }

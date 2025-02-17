@@ -12,6 +12,7 @@
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/helper/Utils.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 #include <lemon/compiler/Compiler.h>
 #include <lemon/compiler/TokenHelper.h>
@@ -472,6 +473,10 @@ LemonScriptProgram::LoadingResult LemonScriptProgram::tryLoadScriptModule(lemon:
 	else
 		text += "Caused in file '" + WString(error.mSourceFileInfo->mFilename).toStdString() + "', line " + std::to_string(error.mError.mLineNumber) + ", of module '" + module.getModuleName() + "'.";
 
+	// Clear module to get rid of invalid content built during the compilation attempt
+	//  -> This is particularly relevant if the user choses to retry the script compilation
+	module.clear();
+
 	// Don't show an assert break message box again during debugging, because LEMON_DEBUG_BREAK already brought one up
 	if (!rmx::ErrorHandling::isDebuggerAttached())
 	{
@@ -482,16 +487,18 @@ LemonScriptProgram::LoadingResult LemonScriptProgram::tryLoadScriptModule(lemon:
 			if (!rmx::ErrorHandling::isIgnoringAssertsWithHash(hash))
 			{
 				text += "\n\n> Retry compilation right away?";
-				const rmx::ErrorHandling::MessageBoxInterface::Result result = rmx::ErrorHandling::mMessageBoxImplementation->showMessageBox(rmx::ErrorHandling::MessageBoxInterface::DialogType::YES_NO_CANCEL, rmx::ErrorSeverity::ERROR, text, nullptr, 0);
+
+				const PlatformFunctions::DialogButtons dialogButtons = PlatformFunctions::DialogButtons::YES_NO_CANCEL;
+				const PlatformFunctions::DialogResult result = PlatformFunctions::showDialogBox(rmx::ErrorSeverity::ERROR, dialogButtons, "Script compilation error", text);
 				switch (result)
 				{
-					case rmx::ErrorHandling::MessageBoxInterface::Result::ACCEPT:
+					case PlatformFunctions::DialogResult::OK:
 					{
 						// Retry loading (supposed after the user made some fixes before pressing the button)
 						return LoadingResult::FAILED_RETRY;
 					}
 
-					case rmx::ErrorHandling::MessageBoxInterface::Result::IGNORE:
+					case PlatformFunctions::DialogResult::CANCEL:
 					{
 						// Suppress this message box from now on
 						rmx::ErrorHandling::setIgnoreAssertsWithHash(hash, true);
