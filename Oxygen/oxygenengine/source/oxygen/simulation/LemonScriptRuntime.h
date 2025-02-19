@@ -11,6 +11,7 @@
 #include "oxygen/simulation/bindings/LemonScriptBindings.h"
 
 #include <lemon/compiler/PreprocessorDefinition.h>
+#include <lemon/program/FunctionWrapper.h>
 
 
 class EmulatorInterface;
@@ -60,8 +61,22 @@ public:
 	void getCallStackWithLabels(CallStackWithLabels& outCallStack) const;
 	const lemon::Function* getCurrentFunction() const;
 
-	int64 getGlobalVariableValue_int64(lemon::FlyweightString variableName);
-	void setGlobalVariableValue_int64(lemon::FlyweightString variableName, int64 value);
+	lemon::AnyBaseValue getGlobalVariableValue(lemon::FlyweightString variableName, const lemon::DataTypeDefinition* dataType);
+	void setGlobalVariableValue(lemon::FlyweightString variableName, lemon::AnyBaseValue value, const lemon::DataTypeDefinition* dataType);
+
+	template<typename T>
+	T getGlobalVariableValue(lemon::FlyweightString variableName)
+	{
+		return getGlobalVariableValue(variableName, lemon::traits::getDataType<T>()).get<T>();
+	}
+
+	template<typename T>
+	void setGlobalVariableValue(lemon::FlyweightString variableName, T value)
+	{
+		lemon::AnyBaseValue valueToSet;
+		valueToSet.set<T>(value);
+		setGlobalVariableValue(variableName, valueToSet, lemon::traits::getDataType<T>());
+	}
 
 	void getCurrentExecutionLocation(const lemon::ScriptFunction*& outFunction, size_t& outProgramCounter) const;
 	std::string getOwnCurrentScriptLocationString() const;

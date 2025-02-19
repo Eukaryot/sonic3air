@@ -19,6 +19,7 @@
 #include "oxygen/helper/Utils.h"
 
 #include <lemon/compiler/TokenManager.h>
+#include <lemon/compiler/TypeCasting.h>
 #include <lemon/program/GlobalsLookup.h>
 #include <lemon/program/Module.h>
 #include <lemon/program/Program.h>
@@ -308,22 +309,34 @@ const lemon::Function* LemonScriptRuntime::getCurrentFunction() const
 	return (nullptr == runtimeFunction) ? nullptr : runtimeFunction->mFunction;
 }
 
-int64 LemonScriptRuntime::getGlobalVariableValue_int64(lemon::FlyweightString variableName)
+lemon::AnyBaseValue LemonScriptRuntime::getGlobalVariableValue(lemon::FlyweightString variableName, const lemon::DataTypeDefinition* dataType)
 {
+	lemon::AnyBaseValue outValue;
 	lemon::Variable* variable = mProgram.getGlobalVariableByHash(variableName.getHash());
 	if (nullptr != variable)
 	{
-		return mInternal.mRuntime.getGlobalVariableValue_int64(*variable);
+		const lemon::AnyBaseValue inValue = mInternal.mRuntime.getGlobalVariableValue(*variable);
+		lemon::CompileOptions compileOptions;
+		compileOptions.mScriptFeatureLevel = 2;
+		const lemon::TypeCasting::CastHandling castHandling = lemon::TypeCasting(compileOptions).castBaseValue(inValue, variable->getDataType(), outValue, dataType, true);
+		if (castHandling.mResult == lemon::TypeCasting::CastHandling::Result::INVALID)
+			outValue.reset();
 	}
-	return 0;
+	return outValue;
 }
 
-void LemonScriptRuntime::setGlobalVariableValue_int64(lemon::FlyweightString variableName, int64 value)
+void LemonScriptRuntime::setGlobalVariableValue(lemon::FlyweightString variableName, lemon::AnyBaseValue value, const lemon::DataTypeDefinition* dataType)
 {
 	lemon::Variable* variable = mProgram.getGlobalVariableByHash(variableName.getHash());
 	if (nullptr != variable)
 	{
-		mInternal.mRuntime.setGlobalVariableValue_int64(*variable, value);
+		lemon::AnyBaseValue valueToSet;
+		lemon::CompileOptions compileOptions;
+		compileOptions.mScriptFeatureLevel = 2;
+		const lemon::TypeCasting::CastHandling castHandling = lemon::TypeCasting(compileOptions).castBaseValue(value, dataType, valueToSet, variable->getDataType(), true);
+		if (castHandling.mResult == lemon::TypeCasting::CastHandling::Result::INVALID)
+			valueToSet.reset();
+		mInternal.mRuntime.setGlobalVariableValue(*variable, valueToSet);
 	}
 }
 

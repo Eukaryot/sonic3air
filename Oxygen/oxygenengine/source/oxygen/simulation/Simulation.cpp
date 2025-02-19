@@ -631,7 +631,7 @@ void Simulation::applyModSettingsToGlobals()
 		{
 			for (Mod::Setting& modSetting : modSettingCategory.mSettings)
 			{
-				mCodeExec.getLemonScriptRuntime().setGlobalVariableValue_int64(modSetting.mBinding, modSetting.mCurrentValue);
+				mCodeExec.getLemonScriptRuntime().setGlobalVariableValue<int64>(modSetting.mBinding, modSetting.mCurrentValue);
 			}
 		}
 	}

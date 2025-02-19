@@ -215,7 +215,7 @@ namespace lemon
 						const IntegerDataType& targetInt = target->as<IntegerDataType>();
 						uint8 castTypeBits = 0x30 + targetInt.mSizeBits;
 						castTypeBits += targetInt.mIsSigned ? 0x04 : 0;
-						castTypeBits += (original->getBytes() == 8) ? 0x08 : 0;
+						castTypeBits += (original->getBytes() == 8) ? 0x18 : 0;
 						return CastHandling((BaseCastType)castTypeBits, 0x54 - targetInt.mSizeBits);
 					}
 				}
@@ -237,11 +237,11 @@ namespace lemon
 		return CastHandling(CastHandling::Result::INVALID, 0xff);
 	}
 
-	TypeCasting::CastHandling TypeCasting::castBaseValue(const AnyBaseValue& originalValue, const DataTypeDefinition* originalType, AnyBaseValue& outTargetValue, const DataTypeDefinition* targetType) const
+	TypeCasting::CastHandling TypeCasting::castBaseValue(const AnyBaseValue& originalValue, const DataTypeDefinition* originalType, AnyBaseValue& outTargetValue, const DataTypeDefinition* targetType, bool explicitCast) const
 	{
 		outTargetValue = originalValue;
 
-		const CastHandling castHandling = getCastHandling(originalType, targetType, false);
+		const CastHandling castHandling = getCastHandling(originalType, targetType, explicitCast);
 		if (castHandling.mResult == CastHandling::Result::BASE_CAST)
 		{
 			switch (castHandling.mBaseCastType)

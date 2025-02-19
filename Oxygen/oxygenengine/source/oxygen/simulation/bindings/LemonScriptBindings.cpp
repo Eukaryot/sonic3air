@@ -309,18 +309,63 @@ namespace
 		System_setupCallFrame2(functionName, lemon::StringRef());
 	}
 
-	int64 System_getGlobalVariableValueByName(lemon::StringRef variableName)
+	int64 System_getGlobalVariableValueByNameInt(lemon::StringRef variableName)
 	{
 		CodeExec* codeExec = CodeExec::getActiveInstance();
 		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return 0);
-		return codeExec->getLemonScriptRuntime().getGlobalVariableValue_int64(variableName);
+		return codeExec->getLemonScriptRuntime().getGlobalVariableValue<int64>(variableName);
 	}
 
-	void System_setGlobalVariableValueByName(lemon::StringRef variableName, int64 value)
+	float System_getGlobalVariableValueByNameFloat(lemon::StringRef variableName)
+	{
+		CodeExec* codeExec = CodeExec::getActiveInstance();
+		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return 0.0f);
+		return codeExec->getLemonScriptRuntime().getGlobalVariableValue<float>(variableName);
+	}
+
+	double System_getGlobalVariableValueByNameDouble(lemon::StringRef variableName)
+	{
+		CodeExec* codeExec = CodeExec::getActiveInstance();
+		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return 0.0);
+		return codeExec->getLemonScriptRuntime().getGlobalVariableValue<double>(variableName);
+	}
+
+	lemon::StringRef System_getGlobalVariableValueByNameString(lemon::StringRef variableName)
+	{
+		CodeExec* codeExec = CodeExec::getActiveInstance();
+		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return lemon::StringRef());
+		const lemon::AnyBaseValue value = codeExec->getLemonScriptRuntime().getGlobalVariableValue(variableName, &lemon::PredefinedDataTypes::STRING);
+		return lemon::StringRef(value.get<uint64>());
+	}
+
+	void System_setGlobalVariableValueByNameInt(lemon::StringRef variableName, int64 value)
 	{
 		CodeExec* codeExec = CodeExec::getActiveInstance();
 		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return);
-		codeExec->getLemonScriptRuntime().setGlobalVariableValue_int64(variableName, value);
+		codeExec->getLemonScriptRuntime().setGlobalVariableValue<int64>(variableName, value);
+	}
+
+	void System_setGlobalVariableValueByNameFloat(lemon::StringRef variableName, float value)
+	{
+		CodeExec* codeExec = CodeExec::getActiveInstance();
+		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return);
+		codeExec->getLemonScriptRuntime().setGlobalVariableValue<float>(variableName, value);
+	}
+
+	void System_setGlobalVariableValueByNameDouble(lemon::StringRef variableName, double value)
+	{
+		CodeExec* codeExec = CodeExec::getActiveInstance();
+		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return);
+		codeExec->getLemonScriptRuntime().setGlobalVariableValue<double>(variableName, value);
+	}
+
+	void System_setGlobalVariableValueByNameString(lemon::StringRef variableName, lemon::StringRef value)
+	{
+		CodeExec* codeExec = CodeExec::getActiveInstance();
+		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return);
+		lemon::AnyBaseValue valueToSet;
+		valueToSet.set<uint64>(value.getHash());
+		codeExec->getLemonScriptRuntime().setGlobalVariableValue(variableName, valueToSet, &lemon::PredefinedDataTypes::STRING);
 	}
 
 	uint32 System_rand()
@@ -1109,10 +1154,28 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		builder.addNativeFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame2))		// Should not get inline executed
 			.setParameters("functionName", "labelName");
 
-		builder.addNativeFunction("System.getGlobalVariableValueByName", lemon::wrap(&System_getGlobalVariableValueByName), defaultFlags)
+		builder.addNativeFunction("System.getGlobalVariableValueByName", lemon::wrap(&System_getGlobalVariableValueByNameInt), defaultFlags)
 			.setParameters("variableName");
 
-		builder.addNativeFunction("System.setGlobalVariableValueByName", lemon::wrap(&System_setGlobalVariableValueByName), defaultFlags)
+		builder.addNativeFunction("System.getGlobalVariableValueByNameFloat", lemon::wrap(&System_getGlobalVariableValueByNameFloat), defaultFlags)
+			.setParameters("variableName");
+
+		builder.addNativeFunction("System.getGlobalVariableValueByNameDouble", lemon::wrap(&System_getGlobalVariableValueByNameDouble), defaultFlags)
+			.setParameters("variableName");
+
+		builder.addNativeFunction("System.getGlobalVariableValueByNameString", lemon::wrap(&System_getGlobalVariableValueByNameString), defaultFlags)
+			.setParameters("variableName");
+
+		builder.addNativeFunction("System.setGlobalVariableValueByName", lemon::wrap(&System_setGlobalVariableValueByNameInt), defaultFlags)
+			.setParameters("variableName", "value");
+
+		builder.addNativeFunction("System.setGlobalVariableValueByName", lemon::wrap(&System_setGlobalVariableValueByNameFloat), defaultFlags)
+			.setParameters("variableName", "value");
+
+		builder.addNativeFunction("System.setGlobalVariableValueByName", lemon::wrap(&System_setGlobalVariableValueByNameDouble), defaultFlags)
+			.setParameters("variableName", "value");
+
+		builder.addNativeFunction("System.setGlobalVariableValueByName", lemon::wrap(&System_setGlobalVariableValueByNameString), defaultFlags)
 			.setParameters("variableName", "value");
 
 		builder.addNativeFunction("System.rand", lemon::wrap(&System_rand), defaultFlags);

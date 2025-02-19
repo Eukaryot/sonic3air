@@ -62,7 +62,7 @@ namespace lemon
 		bool canExplicitlyCastTypes(const DataTypeDefinition& original, const DataTypeDefinition& target) const;
 		CastHandling getCastHandling(const DataTypeDefinition* original, const DataTypeDefinition* target, bool explicitCast) const;
 
-		CastHandling castBaseValue(const AnyBaseValue& originalValue, const DataTypeDefinition* originalType, AnyBaseValue& outTargetValue, const DataTypeDefinition* targetType) const;
+		CastHandling castBaseValue(const AnyBaseValue& originalValue, const DataTypeDefinition* originalType, AnyBaseValue& outTargetValue, const DataTypeDefinition* targetType, bool explicitCast = false) const;
 
 		bool canMatchSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target, size_t* outFailedIndex = nullptr) const;
 		uint16 getPriorityOfSignature(const BinaryOperatorSignature& signature, const DataTypeDefinition* left, const DataTypeDefinition* right) const;

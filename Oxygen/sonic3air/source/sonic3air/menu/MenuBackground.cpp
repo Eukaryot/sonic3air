@@ -204,8 +204,8 @@ void MenuBackground::render()
 			LemonScriptRuntime& runtime = Application::instance().getSimulation().getCodeExec().getLemonScriptRuntime();
 			static const lemon::FlyweightString SCROLL_OFFSET_NAME("MainMenuBG.scrollOffset");
 			static const lemon::FlyweightString LOGO_POSITION_NAME("MainMenuBG.logoPosition");
-			runtime.setGlobalVariableValue_int64(SCROLL_OFFSET_NAME, roundToInt(-mBackgroundLayer.mCurrentPosition * 150.0f));
-			runtime.setGlobalVariableValue_int64(LOGO_POSITION_NAME, roundToInt(interpolate(splitMin, splitMax, normalizedTitleRight) - 91.0f));
+			runtime.setGlobalVariableValue<int64>(SCROLL_OFFSET_NAME, roundToInt(-mBackgroundLayer.mCurrentPosition * 150.0f));
+			runtime.setGlobalVariableValue<int64>(LOGO_POSITION_NAME, roundToInt(interpolate(splitMin, splitMax, normalizedTitleRight) - 91.0f));
 			mAnimatedBackgroundActive = true;
 		}
 		else
