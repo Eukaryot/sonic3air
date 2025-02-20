@@ -86,13 +86,16 @@ function void System.removePersistentData(string key)
 	System.removePersistentData("persistentdata", key, false)
 }
 
-function u32 SRAM.load(u32 address, u16 offset, u16 bytes)
+//# deprecated
+function u32 SRAM.load(u32 targetAddress, u16 offset, u16 bytes)
 {
-	return bytes
+	return System.loadPersistentData(targetAddress, offset, bytes, "legacy_sram", "sram", false)
 }
 
-function void SRAM.save(u32 address, u16 offset, u16 bytes)
+//# deprecated
+function void SRAM.save(u32 sourceAddress, u16 offset, u16 bytes)
 {
+	System.savePersistentData(sourceAddress, offset, bytes, "legacy_sram", "sram", false)
 }
 
 

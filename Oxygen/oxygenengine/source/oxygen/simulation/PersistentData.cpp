@@ -67,6 +67,20 @@ void PersistentData::loadFromBasePath(const std::wstring& basePath)
 			continue;
 		}
 	}
+
+	// Migrate sram.bin
+	if (FTX::FileSystem->exists(mBasePath + L"../sram.bin") && nullptr == mapFind(mFiles, rmx::constMurmur2_64("legacy_sram")))
+	{
+		std::vector<uint8> sramData;
+		if (FTX::FileSystem->readFile(mBasePath + L"../sram.bin", sramData))
+		{
+			setData("legacy_sram", "sram", sramData);
+			updatePersistentData();		// Save immediately
+		}
+
+		// Rename the old file
+		FTX::FileSystem->renameFile(mBasePath + L"../sram.bin", mBasePath + L"../sram.bin.backup");
+	}
 }
 
 void PersistentData::updatePersistentData()
@@ -101,42 +115,42 @@ const std::vector<uint8>& PersistentData::getData(uint64 filePathHash, uint64 ke
 void PersistentData::setData(std::string_view filePath, std::string_view key, const std::vector<uint8>& data)
 {
 	const uint64 filePathHash = rmx::getMurmur2_64(filePath);
-	File* file = mapFind(mFiles, filePathHash);
-	if (nullptr == file)
-	{
-		// Sanity checks
-		{
-			const WString path = String(filePath).toWString();
-			RMX_CHECK(rmx::FileIO::isValidFileName(path), "Persistent data file path '" << filePath << "' contains illegal characters for file names (like \" < > : | ? * )", return);
-			RMX_CHECK(path.findString(L"..") == -1, "Persistent data file path '" << filePath << "' must not contain \"..\"", return);
-		}
-
-		file = &mFiles[filePathHash];
-		file->mFilePath = filePath;
-	}
-
 	const uint64 keyHash = rmx::getMurmur2_64(key);
-	Entry* entry = findEntry(*file, keyHash);
-	if (nullptr == entry)
+
+	setDataInternal(filePath, filePathHash, key, keyHash, data);
+}
+
+void PersistentData::setDataPartial(std::string_view filePath, std::string_view key, const std::vector<uint8>& data, size_t offset)
+{
+	// Sanity check
+	const size_t dataEnd = offset + data.size();
+	RMX_CHECK(dataEnd < 0x100000, "Persistent data save is too large (" << dataEnd << " bytes including offset", return);
+
+	const uint64 filePathHash = rmx::getMurmur2_64(filePath);
+	const uint64 keyHash = rmx::getMurmur2_64(key);
+
+	const std::vector<uint8>& existingData = getData(filePathHash, keyHash);
+	const bool overwriteAll = (offset == 0 && existingData.size() <= data.size());
+	if (overwriteAll)
 	{
-		// Create new entry
-		entry = &vectorAdd(file->mEntries);
-		entry->mKey = key;
-		entry->mKeyHash = keyHash;
-		entry->mData = data;
-		mPendingFileSaves.insert(filePathHash);
+		// Overwrite complete entry
+		setDataInternal(filePath, filePathHash, key, keyHash, data);
 	}
 	else
 	{
-		// Check for changes
-		const bool anyChange = (entry->mData.size() != data.size()) || (memcmp(&entry->mData[0], &data[0], data.size()) != 0);
-		if (!anyChange)
-			return;
-		entry->mData = data;
-	}
+		std::vector<uint8> newData = existingData;
+		if (dataEnd > existingData.size())
+		{
+			// Extend so that there's enough space for the new data to fit in
+			//  -> Note that the offset could even be higher than the existing size; the zeroes we fill in won't get overwritten in that case
+			newData.resize(dataEnd, 0);
+		}
 
-	// Don't save file immediately, but wait until the end of frame (call to "PersistentData::updatePersistentData"), as there might be multiple writes in the same frame
-	mPendingFileSaves.insert(filePathHash);
+		if (!data.empty())
+			memcpy(&newData[offset], &data[0], data.size());
+
+		setDataInternal(filePath, filePathHash, key, keyHash, newData);
+	}
 }
 
 void PersistentData::removeKey(uint64 filePathHash, uint64 keyHash)
@@ -203,6 +217,45 @@ bool PersistentData::removeEntry(File& file, uint64 keyHash)
 
 	file.mEntries.erase(it);
 	return true;
+}
+
+void PersistentData::setDataInternal(std::string_view filePath, uint64 filePathHash, std::string_view key, uint64 keyHash, const std::vector<uint8>& data)
+{
+	File* file = mapFind(mFiles, filePathHash);
+	if (nullptr == file)
+	{
+		// Sanity checks
+		{
+			const WString path = String(filePath).toWString();
+			RMX_CHECK(rmx::FileIO::isValidFileName(path), "Persistent data file path '" << filePath << "' contains illegal characters for file names (like \" < > : | ? * )", return);
+			RMX_CHECK(path.findString(L"..") == -1, "Persistent data file path '" << filePath << "' must not contain \"..\"", return);
+		}
+
+		file = &mFiles[filePathHash];
+		file->mFilePath = filePath;
+	}
+
+	Entry* entry = findEntry(*file, keyHash);
+	if (nullptr == entry)
+	{
+		// Create new entry
+		entry = &vectorAdd(file->mEntries);
+		entry->mKey = key;
+		entry->mKeyHash = keyHash;
+		entry->mData = data;
+		mPendingFileSaves.insert(filePathHash);
+	}
+	else
+	{
+		// Check for changes
+		const bool anyChange = (entry->mData.size() != data.size()) || (memcmp(&entry->mData[0], &data[0], data.size()) != 0);
+		if (!anyChange)
+			return;
+		entry->mData = data;
+	}
+
+	// Don't save file immediately, but wait until the end of frame (call to "PersistentData::updatePersistentData"), as there might be multiple writes in the same frame
+	mPendingFileSaves.insert(filePathHash);
 }
 
 std::wstring PersistentData::getFullFilePath(const File& file) const

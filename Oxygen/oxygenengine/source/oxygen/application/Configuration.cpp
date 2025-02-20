@@ -145,7 +145,7 @@ namespace
 		{
 			if (renderMethodString.startsWith("opengl"))
 			{
-				outRenderMethod = (renderMethodString.endsWith("soft") | renderMethodString.endsWith("software")) ? Configuration::RenderMethod::OPENGL_SOFT : Configuration::RenderMethod::OPENGL_FULL;
+				outRenderMethod = (renderMethodString.endsWith("soft") || renderMethodString.endsWith("software")) ? Configuration::RenderMethod::OPENGL_SOFT : Configuration::RenderMethod::OPENGL_FULL;
 			}
 			else if (renderMethodString == "software")
 			{

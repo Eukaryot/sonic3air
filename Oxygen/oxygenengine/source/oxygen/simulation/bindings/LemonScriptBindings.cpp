@@ -222,7 +222,7 @@ namespace
 	}
 
 
-	uint32 System_loadPersistentData(uint32 targetAddress, uint32 bytes, lemon::StringRef file, lemon::StringRef key, bool localFile)
+	uint32 System_loadPersistentData_withOffset(uint32 targetAddress, uint32 offset, uint32 bytes, lemon::StringRef file, lemon::StringRef key, bool localFile)
 	{
 		if (!key.isValid() || key.isEmpty() || !file.isValid())
 			return 0;
@@ -237,10 +237,15 @@ namespace
 			fileHash = file.getHash();
 
 		const std::vector<uint8>& data = PersistentData::instance().getData(fileHash, key.getHash());
-		return detail::loadData(getEmulatorInterface(), targetAddress, data, 0, bytes);
+		return detail::loadData(getEmulatorInterface(), targetAddress, data, offset, bytes);
 	}
 
-	void System_savePersistentData(uint32 sourceAddress, uint32 bytes, lemon::StringRef file, lemon::StringRef key, bool localFile)
+	uint32 System_loadPersistentData_noOffset(uint32 targetAddress, uint32 bytes, lemon::StringRef file, lemon::StringRef key, bool localFile)
+	{
+		return System_loadPersistentData_withOffset(targetAddress, 0, bytes, file, key, localFile);
+	}
+
+	void System_savePersistentData_shared(uint32 sourceAddress, uint32 bytes, lemon::StringRef file, lemon::StringRef key, bool localFile, std::optional<uint32> offset)
 	{
 		if (!key.isValid() || key.isEmpty() || !file.isValid())
 			return;
@@ -259,12 +264,37 @@ namespace
 		const Mod* mod = localFile ? detail::getModForCurrentFunction() : nullptr;
 		if (nullptr != mod)
 		{
-			PersistentData::instance().setData(mod->mUniqueID + "/" + std::string(file.getString()), key.getString(), data);
+			const std::string filePath = mod->mUniqueID + "/" + std::string(file.getString());
+			if (offset.has_value())
+			{
+				PersistentData::instance().setDataPartial(filePath, key.getString(), data, *offset);
+			}
+			else
+			{
+				PersistentData::instance().setData(filePath, key.getString(), data);
+			}
 		}
 		else
 		{
-			PersistentData::instance().setData(file.getString(), key.getString(), data);
+			if (offset.has_value())
+			{
+				PersistentData::instance().setDataPartial(file.getString(), key.getString(), data, *offset);
+			}
+			else
+			{
+				PersistentData::instance().setData(file.getString(), key.getString(), data);
+			}
 		}
+	}
+
+	void System_savePersistentData_noOffset(uint32 sourceAddress, uint32 bytes, lemon::StringRef file, lemon::StringRef key, bool localFile)
+	{
+		System_savePersistentData_shared(sourceAddress, bytes, file, key, localFile, std::optional<uint32>());
+	}
+
+	void System_savePersistentData_withOffset(uint32 sourceAddress, uint32 offset, uint32 bytes, lemon::StringRef file, lemon::StringRef key, bool localFile)
+	{
+		System_savePersistentData_shared(sourceAddress, bytes, file, key, localFile, offset);
 	}
 
 	void System_removePersistentData(lemon::StringRef file, lemon::StringRef key, bool localFile)
@@ -1134,11 +1164,17 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 
 		// Persistent data
-		builder.addNativeFunction("System.loadPersistentData", lemon::wrap(&System_loadPersistentData), defaultFlags)
+		builder.addNativeFunction("System.loadPersistentData", lemon::wrap(&System_loadPersistentData_noOffset), defaultFlags)
 			.setParameters("targetAddress", "bytes", "file", "key", "localFile");
 
-		builder.addNativeFunction("System.savePersistentData", lemon::wrap(&System_savePersistentData), defaultFlags)
+		builder.addNativeFunction("System.loadPersistentData", lemon::wrap(&System_loadPersistentData_withOffset), defaultFlags)
+			.setParameters("targetAddress", "offset", "bytes", "file", "key", "localFile");
+
+		builder.addNativeFunction("System.savePersistentData", lemon::wrap(&System_savePersistentData_noOffset), defaultFlags)
 			.setParameters("sourceAddress", "bytes", "file", "key", "localFile");
+
+		builder.addNativeFunction("System.savePersistentData", lemon::wrap(&System_savePersistentData_withOffset), defaultFlags)
+			.setParameters("sourceAddress", "offset", "bytes", "file", "key", "localFile");
 
 		builder.addNativeFunction("System.removePersistentData", lemon::wrap(&System_removePersistentData), defaultFlags)
 			.setParameters("file", "key", "localFile");
