@@ -19,6 +19,7 @@ Type=Application
 Encoding=UTF-8
 Exec=$basepath2/sonic3air_linux
 Icon=$basepath1/data/icon.png
+StartupWMClass=sonic3air_linux
 Terminal=false
 Categories=Game;
 EOM
