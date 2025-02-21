@@ -16,7 +16,7 @@ global u8 oldRotationPlayer1
 global u8 oldRotationPlayer2
 
 constant u16 CHAR_ANIMSPRITE_SONIC_DROPDASH = 0x100
-constant u16 CHAR_ANIMSPRITE_SONIC_PEELOUT  = 0x102
+constant u16 CHAR_ANIMSPRITE_SONIC_PEELOUT  = 0x105
 
 
 // This function is here only for script mods that want to change or extend the character sprites
@@ -130,7 +130,10 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 			// Special handling for Drop Dash & Super Peel-Out
 			if (char.state == char.state.SONIC_DROPDASH)
 			{
-				animationSpriteEx = CHAR_ANIMSPRITE_SONIC_DROPDASH + ((level.framecounter >> 1) & 0x01)
+				if ((level.framecounter % 2) == 0) // Is this an even frame?
+					animationSpriteEx = CHAR_ANIMSPRITE_SONIC_DROPDASH
+				else
+					animationSpriteEx = CHAR_ANIMSPRITE_SONIC_DROPDASH + ((level.framecounter >> 1) % 4) + 1
 			}
 			else if (!super.active && animationSprite >= 0x21 && animationSprite <= 0x30)
 			{
