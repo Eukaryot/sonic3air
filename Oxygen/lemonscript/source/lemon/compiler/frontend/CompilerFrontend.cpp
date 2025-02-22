@@ -59,6 +59,22 @@ namespace lemon
 			}
 			return false;
 		}
+
+		bool isInsideIntegerRange(int64 value, const IntegerDataType& dataType)
+		{
+			size_t bits = dataType.getBytes() * 8;
+			if (dataType.mIsSigned)
+			{
+				if (value >= 0)
+					return (value >> bits) == 0;			// Note this does allow for something like "constant s16 a = 0xf000"
+				else
+					return (value >> (bits - 1)) == ~0ull;
+			}
+			else
+			{
+				return (value >> bits) == 0;
+			}
+		}
 	}
 
 
@@ -343,28 +359,8 @@ namespace lemon
 
 							if (offset+2 <= tokens.size() && isOperator(tokens[offset], Operator::ASSIGN))
 							{
-								int pos = (int)offset + 1;
-								bool negative = false;
-								if (isOperator(tokens[pos], Operator::BINARY_MINUS) || isOperator(tokens[pos], Operator::BINARY_PLUS))
-								{
-									negative = isOperator(tokens[pos], Operator::BINARY_MINUS);
-									++pos;
-								}
-								CHECK_ERROR(tokens[pos].isA<ConstantToken>(), "Expected constant value as default for global variable", lineNumber);
-								const ConstantToken& ct = tokens[pos].as<ConstantToken>();
-
-								// Cast the value as needed, because the constant might have a different type than the constant array
-								AnyBaseValue value;
-								const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(ct.mValue, ct.mDataType, value, dataType);
-								const bool castSuccessful = (castHandling.mResult == TypeCasting::CastHandling::Result::NO_CAST || castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST);
-								CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << ct.mDataType->getName().getString() << " to type " << dataType->getName().getString(), lineNumber);
-
-								if (negative)
-								{
-									if (!negateBaseTypeValue(value, dataType))
-										CHECK_ERROR(false, "Can't apply negative sign to constant value", lineNumber);
-								}
-								variable.mInitialValue = value;
+								++offset;
+								variable.mInitialValue = readConstantExpression(tokens, offset, tokens.size(), dataType, lineNumber);
 							}
 							break;
 						}
@@ -910,29 +906,9 @@ namespace lemon
 					}
 					else
 					{
-						bool negative = false;
-						if (isOperator(*token, Operator::BINARY_MINUS) || isOperator(*token, Operator::BINARY_PLUS))
-						{
-							negative = isOperator(*token, Operator::BINARY_MINUS);
-							++i;
-							CHECK_ERROR(i < endIndex, "List of constants inside constant array list of values ended with a single sign", lineNumber);
-							token = &tokens[i];
-						}
-
-						CHECK_ERROR(token->isA<ConstantToken>(), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
-
-						// Cast the value as needed, because the constant might have a different type than the constant array
-						const ConstantToken& ct = token->as<ConstantToken>();
-						AnyBaseValue value;
-						const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(ct.mValue, ct.mDataType, value, arrayDataType);
-						const bool castSuccessful = (castHandling.mResult == TypeCasting::CastHandling::Result::NO_CAST || castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST);
-						CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << ct.mDataType->getName().getString() << " to constant array type " << arrayDataType->getName().getString(), lineNumber);
-						if (negative)
-						{
-							if (!negateBaseTypeValue(value, arrayDataType))
-								CHECK_ERROR(false, "Can't apply negative sign to constant array value", lineNumber);
-						}
+						const AnyBaseValue value = readConstantExpression(tokens, i, endIndex, arrayDataType, lineNumber);
 						values.emplace_back(value);
+						--i;		// Undo last increase of i, as the for-loop will increase it once more
 						expectingComma = true;
 					}
 				}
@@ -989,31 +965,11 @@ namespace lemon
 			CHECK_ERROR(tokens[2].isA<IdentifierToken>(), "Expected an identifier for constant definition", lineNumber);
 			CHECK_ERROR(isOperator(tokens[3], Operator::ASSIGN), "Missing assignment in constant definition", lineNumber);
 
-			// TODO: Support all statements that result in a compile-time constant
-			int pos = 4;
-			bool negative = false;
-			if (isOperator(tokens[pos], Operator::BINARY_MINUS) || isOperator(tokens[pos], Operator::BINARY_PLUS))
-			{
-				negative = isOperator(tokens[pos], Operator::BINARY_MINUS);
-				++pos;
-			}
-			CHECK_ERROR(tokens[pos].isA<ConstantToken>(), "Expected constant value in constant declaration", lineNumber);
-
 			const DataTypeDefinition* dataType = tokens[1].as<VarTypeToken>().mDataType;
 			const FlyweightString identifier = tokens[2].as<IdentifierToken>().mName;
-			const ConstantToken& ct = tokens[pos].as<ConstantToken>();
 
-			// Cast the value as needed, because the constant might have a different type than the constant array
-			AnyBaseValue value;
-			const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(ct.mValue, ct.mDataType, value, dataType);
-			const bool castSuccessful = (castHandling.mResult == TypeCasting::CastHandling::Result::NO_CAST || castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST);
-			CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << ct.mDataType->getName().getString() << " to type " << dataType->getName().getString(), lineNumber);
-
-			if (negative)
-			{
-				if (!negateBaseTypeValue(value, dataType))
-					CHECK_ERROR(false, "Can't apply negative sign to constant value", lineNumber);
-			}
+			size_t pos = 4;
+			const AnyBaseValue value = readConstantExpression(tokens, pos, tokens.size(), dataType, lineNumber);
 
 			if (isGlobalDefinition)
 			{
@@ -1163,6 +1119,47 @@ namespace lemon
 			return true;
 		}
 		return false;
+	}
+
+	AnyBaseValue CompilerFrontend::readConstantExpression(const TokenList& tokens, size_t& pos, size_t endPos, const DataTypeDefinition* dataType, uint32 lineNumber)
+	{
+		// TODO: Support all statements that result in a compile-time constant
+		CHECK_ERROR(pos < endPos, "Expected constant value", lineNumber);
+
+		bool negative = false;
+		if (isOperator(tokens[pos], Operator::BINARY_MINUS) || isOperator(tokens[pos], Operator::BINARY_PLUS))
+		{
+			negative = isOperator(tokens[pos], Operator::BINARY_MINUS);
+			++pos;
+			CHECK_ERROR(pos < endPos, "Expected constant value after minus sign", lineNumber);
+		}
+
+		CHECK_ERROR(tokens[pos].isA<ConstantToken>(), "Expected constant value", lineNumber);
+		const ConstantToken& ct = tokens[pos].as<ConstantToken>();
+		++pos;
+
+		// Negate value if needed
+		AnyBaseValue constantValue = ct.mValue;
+		if (negative)
+		{
+			if (!negateBaseTypeValue(constantValue, ct.mDataType))
+				CHECK_ERROR(false, "Can't apply negative sign to constant value of type " << dataType->getName(), lineNumber);
+		}
+
+		// For integers, check if data gets lost by the cast
+		if (ct.mDataType->getClass() == DataTypeDefinition::Class::INTEGER && dataType->getClass() == DataTypeDefinition::Class::INTEGER)
+		{
+			if (!isInsideIntegerRange(constantValue.get<int64>(), dataType->as<IntegerDataType>()))
+				CHECK_ERROR(false, "Constant " << constantValue.get<int64>() << " (" << rmx::hexString(constantValue.get<int64>()) << ") can't fit into data type " << dataType->getName().getString() << ", data would get lost", lineNumber);
+		}
+
+		// Cast the value as needed, because the constant might have a different type than the constant array
+		AnyBaseValue finalValue;
+		const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(constantValue, ct.mDataType, finalValue, dataType);
+		const bool castSuccessful = (castHandling.mResult == TypeCasting::CastHandling::Result::NO_CAST || castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST);
+		CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << ct.mDataType->getName().getString() << " to type " << dataType->getName().getString(), lineNumber);
+
+		return finalValue;
 	}
 
 }
