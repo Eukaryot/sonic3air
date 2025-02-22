@@ -17,6 +17,7 @@ namespace lemon
 	class Node;
 	class BlockNode;
 	class StatementToken;
+	class UnaryOperationToken;
 	class BinaryOperationToken;
 	class LabelToken;
 	class GlobalsLookup;
@@ -51,6 +52,7 @@ namespace lemon
 		void buildOpcodesForNode(const Node& node, NodeContext& context);
 
 		void compileTokenTreeToOpcodes(const StatementToken& token, bool consumeResult = false, bool isLValue = false);
+		void compileUnaryDecIncToOpcodes(const UnaryOperationToken& uot);
 		void compileBinaryAssignmentToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType);
 		void compileBinaryOperationToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType);
 

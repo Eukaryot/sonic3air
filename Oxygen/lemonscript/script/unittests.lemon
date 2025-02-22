@@ -28,6 +28,8 @@ function void runIntegerArithmeticTests()
 		debugLog("Integer arithmetic test E failed")
 	if (!integerArithmeticTestF())
 		debugLog("Integer arithmetic test F failed")
+	if (!integerArithmeticTestG())
+		debugLog("Integer arithmetic test G failed")
 }
 
 function bool integerArithmeticTestA()
@@ -72,6 +74,13 @@ function bool integerArithmeticTestF()
 	s16 value = -20
 	s16 result = clamp(value, -range, range)
 	return (result == -2)
+}
+
+function bool integerArithmeticTestG()
+{
+	u8 a = 0
+	++u8[++a]
+	return (a == 1)
 }
 
 
