@@ -851,15 +851,6 @@ function void HInt_050056()
 
 	#if STANDALONE
 	{
-		// Replace both layers of plane A with two rects each
-		Renderer.enableDefaultPlane(1, false)
-		Renderer.enableDefaultPlane(3, false)
-		Renderer.setupPlane(0, 0, getScreenWidth(), h_int.line, 0x01, 1, 0x2000)
-		Renderer.setupPlane(0, 0, getScreenWidth(), h_int.line, 0x11, 1, 0x4000)
-		Renderer.setupPlane(0, h_int.line, getScreenWidth(), getScreenHeight() - h_int.line, 0x01, 3, 0x2000)
-		Renderer.setupPlane(0, h_int.line, getScreenWidth(), getScreenHeight() - h_int.line, 0x11, 3, 0x4000)
-		Renderer.setScrollOffsetV(3, 0, camera.foreground.y.u16)
-
 		// To fix an issue in MHZ 2 zone transition with Knuckles
 		//  -> The screen moves up there...
 		A0 = 0xffffb000

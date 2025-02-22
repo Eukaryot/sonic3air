@@ -94,6 +94,10 @@ function void fn054f64()
 	D5 = 2
 	D6.u16 = camera.foreground.y.old
 	fn04ee20()
+
+#if STANDALONE
+	setupPlaneASplit()
+#endif
 }
 
 

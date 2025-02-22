@@ -1184,6 +1184,19 @@ function void fn04ef64()
 
 #if STANDALONE
 
+function void setupPlaneASplit()
+{
+	// Replace both layers of plane A with two rects each
+	Renderer.enableDefaultPlane(1, false)
+	Renderer.enableDefaultPlane(3, false)
+	Renderer.setupPlane(0, 0, getScreenWidth(), h_int.line, 0x01, 1, 0x2000)
+	Renderer.setupPlane(0, 0, getScreenWidth(), h_int.line, 0x11, 1, 0x4000)
+	Renderer.setupPlane(0, h_int.line, getScreenWidth(), getScreenHeight() - h_int.line, 0x01, 3, 0x2000)
+	Renderer.setupPlane(0, h_int.line, getScreenWidth(), getScreenHeight() - h_int.line, 0x11, 3, 0x4000)
+	Renderer.setScrollOffsetV(3, 0, camera.foreground.y.u16)
+}
+
+
 // Helper functions to fill parts of a plane (A or B) with foreground chunk content
 //  -> For the whole visible screen, call e.g.:
 //      fillPlaneA_Default(camera.foreground.x.u16, camera.foreground.y.u16, getScreenWidth(), getScreenHeight())
