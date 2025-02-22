@@ -708,7 +708,7 @@ void Application::setWindowMode(WindowMode windowMode, bool force)
 		default:
 		case WindowMode::WINDOWED:
 		{
-			if (mWindowMode == WindowMode::EXCLUSIVE_FULLSCREEN)
+			if (mWindowMode >= WindowMode::FULLSCREEN_DESKTOP)
 			{
 				SDL_SetWindowFullscreen(window, 0);
 			}
@@ -719,11 +719,11 @@ void Application::setWindowMode(WindowMode windowMode, bool force)
 			break;
 		}
 
-		case WindowMode::BORDERLESS_FULLSCREEN:
+		case WindowMode::FULLSCREEN_BORDERLESS:
 		{
-			if (mWindowMode == WindowMode::EXCLUSIVE_FULLSCREEN)
+			if (mWindowMode >= WindowMode::FULLSCREEN_DESKTOP)
 			{
-				// Exit exclusive fullscreen first
+				// Exit fullscreen first
 				SDL_SetWindowFullscreen(window, 0);
 			}
 
@@ -749,9 +749,15 @@ void Application::setWindowMode(WindowMode windowMode, bool force)
 			break;
 		}
 
-		case WindowMode::EXCLUSIVE_FULLSCREEN:
+		case WindowMode::FULLSCREEN_DESKTOP:
 		{
 			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+			break;
+		}
+
+		case WindowMode::FULLSCREEN_EXCLUSIVE:
+		{
+			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 			break;
 		}
 	}
@@ -770,10 +776,10 @@ void Application::toggleFullscreen()
 	if (getWindowMode() == WindowMode::WINDOWED)
 	{
 	#if defined(PLATFORM_LINUX)
-		// Under Linux, the exclusive fullscreen works better, so that's the default
-		setWindowMode(WindowMode::EXCLUSIVE_FULLSCREEN);
+		// Under Linux, the fullscreen with desktop resolution works better, so that's the default
+		setWindowMode(WindowMode::FULLSCREEN_DESKTOP);
 	#else
-		setWindowMode(WindowMode::BORDERLESS_FULLSCREEN);
+		setWindowMode(WindowMode::FULLSCREEN_BORDERLESS);
 	#endif
 	}
 	else

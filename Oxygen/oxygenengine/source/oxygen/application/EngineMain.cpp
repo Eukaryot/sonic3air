@@ -647,7 +647,7 @@ bool EngineMain::createWindow()
 				break;
 			}
 
-			case Configuration::WindowMode::BORDERLESS_FULLSCREEN:
+			case Configuration::WindowMode::FULLSCREEN_BORDERLESS:
 			{
 				// Borderless maximized window
 				SDL_Rect rect;
@@ -669,11 +669,18 @@ bool EngineMain::createWindow()
 				break;
 			}
 
-			case Configuration::WindowMode::EXCLUSIVE_FULLSCREEN:
+			case Configuration::WindowMode::FULLSCREEN_DESKTOP:
 			{
 				// Fullscreen window at desktop resolution
 				//  -> According to https://wiki.libsdl.org/SDL_SetWindowFullscreen, this is not really an exclusive fullscreen mode, but that's fine
 				flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+				break;
+			}
+
+			case Configuration::WindowMode::FULLSCREEN_EXCLUSIVE:
+			{
+				// Real exclusive fullscreen with custom resolution
+				flags |= SDL_WINDOW_FULLSCREEN;
 				break;
 			}
 		}

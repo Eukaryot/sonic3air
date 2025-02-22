@@ -28,9 +28,10 @@ public:
 
 	enum class WindowMode
 	{
-		WINDOWED,
-		BORDERLESS_FULLSCREEN,
-		EXCLUSIVE_FULLSCREEN
+		WINDOWED,					// Windowed mode
+		FULLSCREEN_BORDERLESS,		// Borderless fullscreen window
+		FULLSCREEN_DESKTOP,			// Fullscreen window with Desktop resolution
+		FULLSCREEN_EXCLUSIVE		// Real exclusive fullscreen
 	};
 
 	enum class FrameSyncType
