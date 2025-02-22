@@ -89,7 +89,7 @@ public:
 	lemon::Program& getInternalLemonProgram();
 
 	bool hasValidProgram() const;
-	LoadScriptsResult loadScripts(const std::string& filename, const LoadOptions& loadOptions);
+	LoadScriptsResult loadScripts(std::string_view baseScriptFilename, const LoadOptions& loadOptions);
 
 	const Hook* checkForUpdateHook(bool post);
 	const Hook* checkForAddressHook(uint32 address);
@@ -116,8 +116,8 @@ private:
 	};
 
 private:
-	bool loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename);
-	LoadingResult tryLoadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename);
+	LoadingResult loadAllScriptModules(const LoadOptions& loadOptions, std::string_view baseScriptFilename, const std::vector<const Mod*>& modsToLoad);
+	LoadingResult loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename);
 	void evaluateFunctionPragmas();
 	void evaluateDefines();
 
