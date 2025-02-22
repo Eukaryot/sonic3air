@@ -27,6 +27,37 @@ function void fn23a04a()
 {
 	u16[0xfffff61e] = camera.foreground.y.u16.player2 - 0x70
 	u16[0xfffff620] = camera.background.y.u16.player2 - 0x70
+
+#if STANDALONE
+	if (h_int.line < 0xdf)
+	{
+		// Replace both layers of plane A & B with two rects each
+		Renderer.enableDefaultPlane(0, false)
+		Renderer.enableDefaultPlane(1, false)
+		Renderer.enableDefaultPlane(2, false)
+		Renderer.enableDefaultPlane(3, false)
+
+		// Upper screen
+		Renderer.setupPlane(0, 0, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_UPPER, 0x00, 0, 0x1000)
+		Renderer.setupPlane(0, 0, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_UPPER, 0x01, 1, 0x2000)
+		Renderer.setupPlane(0, 0, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_UPPER, 0x10, 0, 0x3000)
+		Renderer.setupPlane(0, 0, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_UPPER, 0x11, 1, 0x4000)
+		Renderer.setScrollOffsetV(1, 0, camera.foreground.y.u16)
+
+		// Lower screen
+		u8 splitScreen2Start = getScreenHeight() - COMPMODE_VIEWPORT_HEIGHT_LOWER
+		Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_LOWER, 0x00, 2, 0x1000)
+		Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_LOWER, 0x01, 3, 0x2000)
+		Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_LOWER, 0x10, 2, 0x3000)
+		Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_LOWER, 0x11, 3, 0x4000)
+		Renderer.setScrollOffsetV(2, 0, u16[0xffffee3c])
+		Renderer.setScrollOffsetV(3, 0, u16[0xffffee3a])
+
+		// TODO: Rewrite this
+		VDP.copyToVRAMbyDMA((u16[0xffffef3c] != 0) ? 0xffff7b00 : 0xffff7d80, 0xf800, 0x0280)
+		u16[0xfffff640] = 0x83
+	}
+#endif
 }
 
 
