@@ -765,6 +765,36 @@ namespace lemon
 				break;
 			}
 
+			case Token::Type::BRACKET_ACCESS:
+			{
+				const BracketAccessToken& bat = token.as<BracketAccessToken>();
+				const DataTypeDefinition::BracketOperator& bracket = bat.mVariable->getDataType()->getBracketOperator();
+
+				// First parameter is the parameter inside the brackets
+				compileTokenTreeToOpcodes(*bat.mParameter);
+				addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+				// Second parameter is the variable ID
+				addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
+
+				// Choose the right function depending on isLValue
+				if (isLValue)
+				{
+					addOpcode(Opcode::Type::CALL, 0, bracket.mSetterNameAndSignatureHash);
+
+					// TODO: We actually need the value to assign to as third parameter here already
+					//  -> It's not sufficient to just add it afterwards as for memory access
+					//  -> See "case Operator::ASSIGN:" above for the place where to add that
+
+					// TODO: Also this probably requires a special case inside "compileBinaryAssignmentToOpcodes" as well
+				}
+				else
+				{
+					addOpcode(Opcode::Type::CALL, 0, bracket.mGetterNameAndSignatureHash);
+				}
+				break;
+			}
+
 			case Token::Type::VALUE_CAST:
 			{
 				CHECK_ERROR(!isLValue, "Cannot assign value to a type cast", mLineNumber);

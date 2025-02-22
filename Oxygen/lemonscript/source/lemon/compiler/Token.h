@@ -38,6 +38,7 @@ namespace lemon
 			BINARY_OPERATION,
 			VARIABLE,
 			FUNCTION,
+			BRACKET_ACCESS,
 			MEMORY_ACCESS,
 			VALUE_CAST
 		};

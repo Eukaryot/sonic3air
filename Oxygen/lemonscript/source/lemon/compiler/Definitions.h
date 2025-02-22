@@ -25,6 +25,7 @@ namespace lemon
 		bool mConsumeProcessedPragmas = true;
 
 		// Set during compilation
+		static const uint32 MAX_SCRIPT_FEATURE_LEVEL = 2;
 		uint32 mScriptFeatureLevel = 1;
 	};
 

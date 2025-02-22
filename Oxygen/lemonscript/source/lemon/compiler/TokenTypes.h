@@ -195,6 +195,20 @@ namespace lemon
 	};
 
 
+	class BracketAccessToken : public StatementToken
+	{
+	public:
+		static const Type TYPE = Type::BRACKET_ACCESS;
+
+	public:
+		inline BracketAccessToken() : StatementToken(TYPE) {}
+
+	public:
+		const Variable* mVariable = nullptr;
+		TokenPtr<StatementToken> mParameter;
+	};
+
+
 	class MemoryAccessToken : public StatementToken
 	{
 	public:

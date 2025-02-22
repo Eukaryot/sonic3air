@@ -760,51 +760,87 @@ namespace lemon
 			{
 				// Check the identifier
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+
+				// Could be a constant array, or a variable with bracket operator
 				const ConstantArray* constantArray = nullptr;
-				if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT_ARRAY)
+				const Variable* variable = nullptr;
+				if (nullptr != identifierToken.mResolved)
 				{
-					constantArray = &identifierToken.mResolved->as<ConstantArray>();
+					if (identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT_ARRAY)
+					{
+						constantArray = &identifierToken.mResolved->as<ConstantArray>();
+					}
+					else if (identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::VARIABLE)
+					{
+						variable = &identifierToken.mResolved->as<Variable>();
+					}
 				}
-				else
+
+				if (nullptr == constantArray && nullptr == variable)
 				{
 					// Check for local constant array
 					constantArray = findInList(*mContext.mLocalConstantArrays, identifierToken.mName.getHash());
-					CHECK_ERROR(nullptr != constantArray, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
+					if (nullptr == constantArray)
+					{
+						// Check for local variables
+						variable = findInList(*mContext.mLocalVariables, identifierToken.mName.getHash());
+						CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
+					}
+				}
+
+				if (nullptr != variable)
+				{
+					// Check if variable's data type supports the bracket operator
+					const DataTypeDefinition* parameterType = variable->getDataType()->getBracketOperator().mParameterType;
+					CHECK_ERROR(nullptr != parameterType, "Variable " << variable->getName().getString() << " can't be followed by the brackets []", mLineNumber);
 				}
 
 				TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
 				CHECK_ERROR(content.size() == 1, "Expected exactly one token inside brackets", mLineNumber);
 				CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
 
-				const Function* matchingFunction = nullptr;
-				for (const Function* function : mBuiltinConstantArrayAccess.mFunctions)
+				if (nullptr != constantArray)
 				{
-					if (function->getReturnType() == constantArray->getElementDataType())
+					const Function* matchingFunction = nullptr;
+					for (const Function* function : mBuiltinConstantArrayAccess.mFunctions)
 					{
-						matchingFunction = function;
-						break;
+						if (function->getReturnType() == constantArray->getElementDataType())
+						{
+							matchingFunction = function;
+							break;
+						}
 					}
+					CHECK_ERROR(nullptr != matchingFunction, "Could not find fitting type implementation for constant array " << identifierToken.mName.getString(), mLineNumber);
+
+				#ifdef DEBUG
+					const Function::ParameterList& parameterList = matchingFunction->getParameters();
+					RMX_ASSERT(parameterList.size() == 2 && parameterList[0].mDataType == &PredefinedDataTypes::UINT_32 && parameterList[1].mDataType == &PredefinedDataTypes::UINT_32, "Function signature for constant array access does not fit");
+				#endif
+
+					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
+					token.mFunction = matchingFunction;
+					token.mParameters.resize(2);
+					ConstantToken& idToken = token.mParameters[0].create<ConstantToken>();
+					idToken.mValue.set(constantArray->getID());
+					idToken.mDataType = &PredefinedDataTypes::UINT_32;
+					token.mParameters[1] = content[0].as<StatementToken>();		// Array index
+					token.mDataType = matchingFunction->getReturnType();
+
+					assignStatementDataType(*token.mParameters[0], matchingFunction->getParameters()[0].mDataType);
+					assignStatementDataType(*token.mParameters[1], matchingFunction->getParameters()[1].mDataType);
 				}
-				CHECK_ERROR(nullptr != matchingFunction, "Could not find fitting type implementation for constant array " << identifierToken.mName.getString(), mLineNumber);
+				else
+				{
+					RMX_ASSERT(nullptr != variable, "Variable must be valid at this point");
 
-			#ifdef DEBUG
-				const Function::ParameterList& parameterList = matchingFunction->getParameters();
-				RMX_ASSERT(parameterList.size() == 2 && parameterList[0].mDataType == &PredefinedDataTypes::UINT_32 && parameterList[1].mDataType == &PredefinedDataTypes::UINT_32, "Function signature for constant array access does not fit");
-			#endif
+					BracketAccessToken& token = tokens.createReplaceAt<BracketAccessToken>(i);
+					token.mVariable = variable;
+					token.mParameter = content[0].as<StatementToken>();
+					token.mDataType = variable->getDataType()->getBracketOperator().mValueType;
 
-				FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
-				token.mFunction = matchingFunction;
-				token.mParameters.resize(2);
-				ConstantToken& idToken = token.mParameters[0].create<ConstantToken>();
-				idToken.mValue.set(constantArray->getID());
-				idToken.mDataType = &PredefinedDataTypes::UINT_32;
-				token.mParameters[1] = content[0].as<StatementToken>();		// Array index
-				token.mDataType = matchingFunction->getReturnType();
+				}
 
-				assignStatementDataType(*token.mParameters[0], matchingFunction->getParameters()[0].mDataType);
-				assignStatementDataType(*token.mParameters[1], matchingFunction->getParameters()[1].mDataType);
-
-				tokens.erase(i+1);
+				tokens.erase(i+1);	// Remove parenthesis token
 			}
 		}
 	}
