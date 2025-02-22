@@ -67,7 +67,7 @@ public:
 	template<typename T>
 	T getGlobalVariableValue(lemon::FlyweightString variableName)
 	{
-		return getGlobalVariableValue(variableName, lemon::traits::getDataType<T>()).get<T>();
+		return getGlobalVariableValue(variableName, lemon::traits::getDataType<T>()).template get<T>();
 	}
 
 	template<typename T>
