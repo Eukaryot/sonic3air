@@ -125,7 +125,10 @@ namespace lemon
 		const uint64 nameHash = function.getName().getHash();
 		if (function.getContext().isEmpty())
 		{
-			vectorAdd(mFunctionsByName[nameHash]).mFunction = &function;
+			FunctionReference& ref = vectorAdd(mFunctionsByName[nameHash]);
+			ref.mFunction = &function;
+			ref.mIsDeprecated = function.getFlags().isSet(Function::Flag::DEPRECATED);
+
 			for (const Function::AliasName& aliasName : function.getAliasNames())
 			{
 				FunctionReference& ref = vectorAdd(mFunctionsByName[aliasName.mName.getHash()]);
@@ -136,7 +139,11 @@ namespace lemon
 		else
 		{
 			const uint64 contextHash = function.getContext().getHash();
-			vectorAdd(mMethodsByName[contextHash + nameHash]).mFunction = &function;
+
+			FunctionReference& ref = vectorAdd(mMethodsByName[contextHash + nameHash]);
+			ref.mFunction = &function;
+			ref.mIsDeprecated = function.getFlags().isSet(Function::Flag::DEPRECATED);
+
 			for (const Function::AliasName& aliasName : function.getAliasNames())
 			{
 				FunctionReference& ref = vectorAdd(mMethodsByName[contextHash + aliasName.mName.getHash()]);

@@ -714,7 +714,10 @@ namespace lemon
 							function = bestFit->mFunction;
 							if (bestFit->mIsDeprecated)
 							{
-								ADD_WARNING(CompilerWarning::Code::DEPRECATED_FUNCTION_ALIAS, "Function name '" << identifierToken.mName << "' is deprecated, consider using the new name '" << function->getName() << "' instead", mLineNumber);
+								if (identifierToken.mName == function->getName())
+									ADD_WARNING(CompilerWarning::Code::DEPRECATED_FUNCTION, "Function '" << identifierToken.mName << "' is deprecated and might be removed in the future", mLineNumber)
+								else
+									ADD_WARNING(CompilerWarning::Code::DEPRECATED_FUNCTION_ALIAS, "Function name '" << identifierToken.mName << "' is deprecated, consider using the new name '" << function->getName() << "' instead", mLineNumber);
 							}
 						}
 					}

@@ -164,6 +164,7 @@ namespace lemon
 			{
 				if (entry.mArgument == "alias")
 				{
+					// Add alias for this function
 					vectorAdd(mAliasNames).mName = entry.mValue;
 					hadAlias = true;
 				}
@@ -184,7 +185,13 @@ namespace lemon
 				{
 					if (hadAlias)
 					{
+						// Mark alias as deprecated
 						mAliasNames.back().mIsDeprecated = true;
+					}
+					else
+					{
+						// Mark function itself as deprecated
+						mFlags.set(Flag::DEPRECATED);
 					}
 				}
 			}
