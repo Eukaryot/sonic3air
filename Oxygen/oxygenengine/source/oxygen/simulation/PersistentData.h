@@ -14,17 +14,6 @@
 class PersistentData : public SingleInstance<PersistentData>
 {
 public:
-	void clear();
-	void loadFromBasePath(const std::wstring& basePath);
-
-	void updatePersistentData();
-
-	const std::vector<uint8>& getData(uint64 filePathHash, uint64 keyHash) const;
-	void setData(std::string_view filePath, std::string_view key, const std::vector<uint8>& data);
-	void setDataPartial(std::string_view filePath, std::string_view key, const std::vector<uint8>& data, size_t offset);
-	void removeKey(uint64 filePathHash, uint64 keyHash);
-
-private:
 	struct Entry
 	{
 		std::string mKey;
@@ -37,6 +26,19 @@ private:
 		std::string mFilePath;
 		std::vector<Entry> mEntries;
 	};
+
+public:
+	void clear();
+	void loadFromBasePath(const std::wstring& basePath);
+
+	void updatePersistentData();
+
+	const std::vector<uint8>& getData(uint64 filePathHash, uint64 keyHash) const;
+	void setData(std::string_view filePath, std::string_view key, const std::vector<uint8>& data);
+	void setDataPartial(std::string_view filePath, std::string_view key, const std::vector<uint8>& data, size_t offset);
+	void removeKey(uint64 filePathHash, uint64 keyHash);
+
+	inline const std::unordered_map<uint64, File>& getFiles() const  { return mFiles; }
 
 private:
 	void initialSetup();
@@ -56,4 +58,5 @@ private:
 	std::wstring mBasePath;
 	std::unordered_map<uint64, File> mFiles;
 	std::unordered_set<uint64> mPendingFileSaves;
+	uint32 mChangeCounter = 0;
 };

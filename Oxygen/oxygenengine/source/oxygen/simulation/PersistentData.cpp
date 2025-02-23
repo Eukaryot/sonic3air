@@ -21,6 +21,7 @@ namespace
 void PersistentData::clear()
 {
 	mFiles.clear();
+	++mChangeCounter;
 }
 
 void PersistentData::loadFromBasePath(const std::wstring& basePath)
@@ -216,6 +217,7 @@ bool PersistentData::removeEntry(File& file, uint64 keyHash)
 		return false;
 
 	file.mEntries.erase(it);
+	++mChangeCounter;
 	return true;
 }
 
@@ -256,6 +258,7 @@ void PersistentData::setDataInternal(std::string_view filePath, uint64 filePathH
 
 	// Don't save file immediately, but wait until the end of frame (call to "PersistentData::updatePersistentData"), as there might be multiple writes in the same frame
 	mPendingFileSaves.insert(filePathHash);
+	++mChangeCounter;
 }
 
 std::wstring PersistentData::getFullFilePath(const File& file) const

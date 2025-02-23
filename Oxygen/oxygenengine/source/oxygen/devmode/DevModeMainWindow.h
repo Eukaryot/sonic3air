@@ -24,6 +24,7 @@ class MemoryHexViewWindow;
 class NetworkingWindow;
 class PaletteBrowserWindow;
 class PaletteViewWindow;
+class PersistentDataWindow;
 class RenderedGeometryWindow;
 class ScriptBuildWindow;
 class SettingsWindow;
@@ -68,6 +69,7 @@ private:
 	NetworkingWindow* mNetworkingWindow = nullptr;
 	PaletteBrowserWindow* mPaletteBrowserWindow = nullptr;
 	PaletteViewWindow* mPaletteViewWindow = nullptr;
+	PersistentDataWindow* mPersistentDataWindow = nullptr;
 	RenderedGeometryWindow* mRenderedGeometryWindow = nullptr;
 	ScriptBuildWindow* mScriptBuildWindow = nullptr;
 	SettingsWindow* mSettingsWindow = nullptr;

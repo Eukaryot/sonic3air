@@ -22,6 +22,7 @@
 #include "oxygen/devmode/windows/NetworkingWindow.h"
 #include "oxygen/devmode/windows/PaletteBrowserWindow.h"
 #include "oxygen/devmode/windows/PaletteViewWindow.h"
+#include "oxygen/devmode/windows/PersistentDataWindow.h"
 #include "oxygen/devmode/windows/RenderedGeometryWindow.h"
 #include "oxygen/devmode/windows/ScriptBuildWindow.h"
 #include "oxygen/devmode/windows/SettingsWindow.h"
@@ -60,6 +61,7 @@ DevModeMainWindow::DevModeMainWindow() :
 
 		createWindow(mAudioBrowserWindow);
 		createWindow(mCustomSidePanelWindow);
+		createWindow(mPersistentDataWindow);
 		createWindow(mSettingsWindow);
 	#ifdef DEBUG
 		createWindow(mNetworkingWindow);

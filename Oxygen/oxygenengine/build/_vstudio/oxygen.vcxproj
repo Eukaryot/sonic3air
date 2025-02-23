@@ -66,6 +66,7 @@
     <ClCompile Include="..\..\source\oxygen\devmode\windows\NetworkingWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\PaletteBrowserWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\PaletteViewWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\PersistentDataWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\RenderedGeometryWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\ScriptBuildWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\SettingsWindow.cpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="..\..\source\oxygen\devmode\windows\NetworkingWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\PaletteBrowserWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\PaletteViewWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\PersistentDataWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\RenderedGeometryWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\ScriptBuildWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\SettingsWindow.h" />

@@ -559,6 +559,9 @@
     <ClCompile Include="..\..\source\oxygen\application\gameview\GameView.cpp">
       <Filter>application\gameview</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\PersistentDataWindow.cpp">
+      <Filter>devmode\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -1056,6 +1059,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\gameview\GameView.h">
       <Filter>application\gameview</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\PersistentDataWindow.h">
+      <Filter>devmode\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
