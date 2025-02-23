@@ -32,7 +32,7 @@ constant array<string> ActSelect.ZONES =
 	"Launch Base Zone",
 	"Mushroom Hill Zone",
 	"Flying Battery Zone",
-	"Sandopolis Zone",	
+	"Sandopolis Zone",
 	"Lava Reef Zone",
 	"Hidden Palace Zone",
 	"Sky Sanctuary Zone",

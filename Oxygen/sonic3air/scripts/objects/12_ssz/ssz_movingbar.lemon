@@ -35,7 +35,7 @@ function void fn04539e()
 
 #if STANDALONE	
 	if (debug_mode.state == 0)
-#endif	
+#endif
 	{
 		A1 = 0xffffb000
 		A2 = A0 + 0x38

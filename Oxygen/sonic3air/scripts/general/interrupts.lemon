@@ -602,7 +602,7 @@ function void HInt_000d10()
 		u16[0xfffff644] = 0
 
 	#if !STANDALONE
-		
+
 		push(A5)
 		push(D0)
 
