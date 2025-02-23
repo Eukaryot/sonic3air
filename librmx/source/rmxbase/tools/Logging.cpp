@@ -60,7 +60,7 @@ namespace rmx
 
 	void StdCoutLogger::log(LogLevel logLevel, const std::string& string)
 	{
-	#if !defined(PLATFORM_VITA)		
+	#if !defined(PLATFORM_VITA)
 	#if defined(PLATFORM_WINDOWS)
 		// Use different color in console output on Windows
 		const HANDLE handle = ::GetStdHandle(STD_OUTPUT_HANDLE);

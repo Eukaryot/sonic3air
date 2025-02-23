@@ -11,7 +11,7 @@
 
 namespace rmx
 {
-	
+
 	class WeakPtrBase;
 
 	class API_EXPORT WeakPtrTarget
@@ -67,7 +67,7 @@ public:
 
 	inline void operator=(T& target)  { setTarget(target); }
 	inline void operator=(T* target)  { setTarget(target); }
-	
+
 	inline operator T*() const    { return static_cast<T*>(mTarget); }
 
 	inline T& operator*() const   { RMX_ASSERT(nullptr != mTarget, "Dereferencing invalid weak pointer"); return *mTarget; }

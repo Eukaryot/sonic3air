@@ -173,7 +173,7 @@ namespace lemon
 		setupGlobalVariables();
 	}
 
-    void Runtime::setMemoryAccessHandler(MemoryAccessHandler* handler)
+	void Runtime::setMemoryAccessHandler(MemoryAccessHandler* handler)
 	{
 		mMemoryAccessHandler = handler;
 		for (ControlFlow* controlFlow : mControlFlows)

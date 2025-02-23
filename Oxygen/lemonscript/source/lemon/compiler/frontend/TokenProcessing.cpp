@@ -418,8 +418,8 @@ namespace lemon
 					break;
 				}
 
-                default:
-                    break;
+				default:
+					break;
 			}
 		}
 

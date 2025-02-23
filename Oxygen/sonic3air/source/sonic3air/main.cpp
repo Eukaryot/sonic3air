@@ -39,7 +39,7 @@ extern "C"
 {
 	// Any value higher than 324 MB will make the game either boot without sound or just crash the PSVITA due to lack of physical RAM
 	int _newlib_heap_size_user = 324 * 1024 * 1024;
-	unsigned int sceUserMainThreadStackSize = 4 * 1024 * 1024;	
+	unsigned int sceUserMainThreadStackSize = 4 * 1024 * 1024;
 }
 #endif
 

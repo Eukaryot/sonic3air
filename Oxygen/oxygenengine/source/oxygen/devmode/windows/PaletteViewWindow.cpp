@@ -32,7 +32,7 @@ void PaletteViewWindow::buildContent()
 	if (ImGui::CollapsingHeader("Options"))
 	{
 		ImGui::Checkbox("Show secondary", &mShowSecondary);
-		
+
 		if (ImGui::Button("Save palette as BMP"))
 		{
 			const std::wstring filepath = Configuration::instance().mAppDataPath + L"devmode/output/main_palette.bmp";

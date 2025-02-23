@@ -96,7 +96,7 @@ struct PlayerInputIncrementPacket : public highlevel::PacketBase
 
 		if (serializer.isReading())
 			mInputs.resize(mNumFrames);
-		
+
 		for (uint16& inputs : mInputs)
 			serializer.serialize(inputs);
 	}

@@ -600,7 +600,7 @@ namespace rmx
 	{
 	#ifdef USE_STD_FILESYSTEM
 		return std_filesystem::current_path().wstring();
-    #else
+	#else
 		return L"";
 	#endif
 	}

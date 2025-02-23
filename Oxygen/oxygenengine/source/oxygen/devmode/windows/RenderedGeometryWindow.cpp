@@ -44,7 +44,7 @@ void RenderedGeometryWindow::buildContent()
 
 		ImGui::TableSetupScrollFreeze(0, 1);
 		ImGui::TableHeadersRow();
-		
+
 		const auto& geometries = VideoOut::instance().getGeometries();
 		int index = 0;
 		for (const Geometry* geometry : geometries)

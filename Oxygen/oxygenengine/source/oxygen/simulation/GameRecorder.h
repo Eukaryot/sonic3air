@@ -79,7 +79,7 @@ private:
 	Frame* getFrameInternal(uint32 frameNumber);
 	const Frame* getFrameInternal(uint32 frameNumber) const;
 	Frame& addFrameInternal(uint32 frameNumber, const InputData& input, Frame::Type frameType);
-	
+
 	bool serializeRecording(VectorBinarySerializer& serializer, uint32 minDistanceBetweenKeyframes);
 
 private:

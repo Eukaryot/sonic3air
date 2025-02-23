@@ -55,7 +55,7 @@
 #elif __vita__
 	#define PLATFORM_VITA
 	#define USE_UTF8_PATHS
-	
+
 #else
 	#error "Unsupported platform"
 #endif

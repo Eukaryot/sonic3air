@@ -370,7 +370,7 @@ namespace lemon
 		switch (opcode.mType)
 		{
 			case Opcode::Type::MOVE_STACK:
-                parameterSize = (opcode.mParameter == -1) ? 0 : 8;
+				parameterSize = (opcode.mParameter == -1) ? 0 : 8;
 				break;
 			case Opcode::Type::NOP:
 			case Opcode::Type::READ_MEMORY:
@@ -404,10 +404,10 @@ namespace lemon
 			case Opcode::Type::JUMP_CONDITIONAL:
 				parameterSize = 16;
 				break;
-        #endif
-            default:
-                parameterSize = 8;
-                break;
+		#endif
+			default:
+				parameterSize = 8;
+				break;
 		}
 
 		RuntimeOpcode& runtimeOpcode = buffer.addOpcode(parameterSize);

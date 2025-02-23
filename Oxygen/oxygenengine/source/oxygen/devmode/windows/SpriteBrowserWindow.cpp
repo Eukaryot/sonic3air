@@ -52,7 +52,7 @@ void SpriteBrowserWindow::buildContent()
 		mPreviewItem = nullptr;
 		mPreviewTexture = Texture();
 	}
-	
+
 	// TODO: Cache filter results
 	static ImGuiHelpers::FilterString filterString;
 	filterString.draw();
@@ -79,7 +79,7 @@ void SpriteBrowserWindow::buildContent()
 			ImGui::PushID(item);
 
 			ImGui::TableNextRow();
-			
+
 			ImGui::TableSetColumnIndex(0);
 			ImGui::TextColored(textColor, "%s", item->mSourceInfo.mSourceIdentifier.c_str());
 

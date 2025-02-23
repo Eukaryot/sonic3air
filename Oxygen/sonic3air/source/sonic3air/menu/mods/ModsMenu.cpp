@@ -283,7 +283,7 @@ void ModsMenu::update(float timeElapsed)
 	if (mState == State::SHOW)
 	{
 		const InputManager::ControllerScheme& keys = InputManager::instance().getController(0);
-		
+
 		if (mHasAnyMods)
 		{
 			GameMenuEntries& menuEntries = mTabs[mActiveTab].mMenuEntries;

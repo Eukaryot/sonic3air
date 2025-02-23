@@ -53,7 +53,7 @@ void SimpleRectTexturedShader::setup(GLuint textureHandle, const Vec4f& transfor
 	// Update uniforms
 	{
 		mShader.setParam(mLocTransform, transform);
-	
+
 		if (mSupportsTintColor)
 		{
 			mShader.setParam(mLocTintColor, tintColor);

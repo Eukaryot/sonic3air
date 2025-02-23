@@ -204,7 +204,7 @@ void DevModeMainWindow::buildContent()
 				}
 			}
 		}
-		
+
 		if (useTabs)
 			ImGui::EndTabBar();
 	}

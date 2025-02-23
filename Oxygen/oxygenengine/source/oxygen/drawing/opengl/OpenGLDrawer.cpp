@@ -550,7 +550,7 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 					const PaletteBase* palette = PaletteCollection::instance().getPalette(sc.mPaletteKey, 0);
 					if (nullptr == palette)
 						break;
-						
+
 					const OpenGLTexture& paletteTexture = mInternal.mResources.getCustomPaletteTexture(*palette, *palette);
 					mInternal.drawIndexed(targetRect, *texture, paletteTexture, sc.mTintColor);
 				}

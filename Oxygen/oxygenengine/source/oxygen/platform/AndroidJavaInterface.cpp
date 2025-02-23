@@ -110,7 +110,7 @@
 		int callIntMethod(const char* methodName, uint64 a)
 		{
 			jmethodID methodId = mEnv->GetMethodID(mActivityClass, methodName, "(J)I");
-            return mEnv->CallIntMethod(mActivity, methodId, (jlong)a);
+			return mEnv->CallIntMethod(mActivity, methodId, (jlong)a);
 		}
 
 		uint64 callLongMethod(const char* methodName, uint64 a)

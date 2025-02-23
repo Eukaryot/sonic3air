@@ -172,8 +172,8 @@ bool NetplayHost::onReceivedGameServerPacket(ReceivedPacketEvaluation& evaluatio
 					break;
 				}
 
-                default:
-                    break;
+				default:
+					break;
 			}
 
 			return true;

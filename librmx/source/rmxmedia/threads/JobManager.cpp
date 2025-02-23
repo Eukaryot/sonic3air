@@ -250,8 +250,8 @@ namespace rmx
 		}
 	}
 
-    void JobBase::setJobDelayUntilTicks(uint32 sdlTicks)
-    {
+	void JobBase::setJobDelayUntilTicks(uint32 sdlTicks)
+	{
 		// If the job delay gets reduced (possibly to zero, i.e. deactivating the delay), a thread possibly needs to be woken up
 		const bool wakeUpThread = (sdlTicks < mJobDelayUntilTicks);
 		mJobDelayUntilTicks = sdlTicks;

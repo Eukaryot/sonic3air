@@ -93,7 +93,7 @@ namespace FTX
 {
 	int   screenWidth()			{ return FTX::Video->getScreenWidth(); }
 	int   screenHeight()		{ return FTX::Video->getScreenHeight(); }
-    Vec2i screenSize()		    { return FTX::Video->getScreenSize(); }
+	Vec2i screenSize()			{ return FTX::Video->getScreenSize(); }
 	const Recti& screenRect()	{ return FTX::Video->getScreenRect(); }
 	bool  reshaped()			{ return FTX::Video->reshaped(); }
 
@@ -105,10 +105,10 @@ namespace FTX
 	bool keyState(int key)		{ return FTX::System->getKeyState(key); }
 	bool keyChange(int key)		{ return FTX::System->getKeyChange(key); }
 
-	const Vec2i& mousePos()			{ return FTX::System->getMousePos(); }
-	const Vec2i& mouseRel()			{ return FTX::System->getMouseRel(); }
-	int mouseWheel()				{ return FTX::System->getMouseWheel(); }
+	const Vec2i& mousePos()						{ return FTX::System->getMousePos(); }
+	const Vec2i& mouseRel()						{ return FTX::System->getMouseRel(); }
+	int mouseWheel()							{ return FTX::System->getMouseWheel(); }
 	bool mouseState(rmx::MouseButton button)	{ return FTX::System->getMouseState((int)button); }
 	bool mouseChange(rmx::MouseButton button)	{ return FTX::System->getMouseChange((int)button); }
-	bool mouseIn(const Recti& rect)	{ return rect.contains(FTX::System->getMousePos()); }
+	bool mouseIn(const Recti& rect)				{ return rect.contains(FTX::System->getMousePos()); }
 }

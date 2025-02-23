@@ -102,8 +102,8 @@ namespace rmx
 		return false;
 	}
 
-    InputStream::StreamingState FileInputStreamSDL::getStreamingState()
-    {
+	InputStream::StreamingState FileInputStreamSDL::getStreamingState()
+	{
 		StreamingState result = StreamingState::BLOCKED;
 		if (mLastStreamingState == StreamingState::BLOCKED)
 		{
@@ -127,6 +127,6 @@ namespace rmx
 		}
 		mLastStreamingState = StreamingState::BLOCKED;
 		return result;
-    }
+	}
 
 }

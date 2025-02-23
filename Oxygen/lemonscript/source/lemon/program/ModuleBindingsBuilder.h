@@ -159,7 +159,7 @@ namespace lemon
 		{
 			mModule.addConstant(name, traits::getDataType<T>(), AnyBaseValue((T)value));
 		}
-		
+
 		inline NativeFunctionBinding addNativeFunction(FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, BitFlagSet<Function::Flag> flags = BitFlagSet<Function::Flag>())
 		{
 			NativeFunction& function = mModule.addNativeFunction(name, functionWrapper, flags);

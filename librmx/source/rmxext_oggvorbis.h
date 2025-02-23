@@ -15,9 +15,9 @@
 // Library linking via pragma
 #if defined(PLATFORM_WINDOWS) && defined(RMX_LIB)
 	#pragma comment(lib, "rmxext_oggvorbis.lib")
-    #pragma comment(lib, "libogg.lib")
-    #pragma comment(lib, "libvorbis_static.lib")
-    #pragma comment(lib, "libvorbisfile_static.lib")
+	#pragma comment(lib, "libogg.lib")
+	#pragma comment(lib, "libvorbis_static.lib")
+	#pragma comment(lib, "libvorbisfile_static.lib")
 #endif
 
 // General includes
@@ -31,7 +31,7 @@
 // Initialization
 namespace rmxext_oggvorbis
 {
-    void initialize();
+	void initialize();
 }
 
 #undef INIT_RMXEXT_OGGVORBIS

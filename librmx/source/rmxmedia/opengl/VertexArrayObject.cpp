@@ -24,7 +24,7 @@ namespace opengl
 		if (mVertexArrayObjectHandle != 0)
 			glDeleteVertexArrays(1, &mVertexArrayObjectHandle);
 	#endif
-	
+
 		if (mVertexBufferObjectHandle != 0)
 			glDeleteBuffers(1, &mVertexBufferObjectHandle);
 	}

@@ -116,7 +116,7 @@ void NetworkingWindow::buildContent()
 		{
 			ImGui::Text("Inactive");
 		}
-		
+
 		ImGui::BeginDisabled(nullptr != netplayHost);
 		{
 			if (ImGui::Button("Host via server"))
