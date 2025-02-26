@@ -304,7 +304,7 @@ function void fn065cac()
 #if STANDALONE
 	// Refresh on-screen part of the tube
 	//  -> We can't do this earlier, e.g. on button press already, because this conflicts with Knuckles' palette
-	fillPlaneA_Default(0x4720, 0x09d0, 0x40, 0x20)
+	fillPlaneA_Default(0x4720, 0x09c0, 0x40, 0x30)
 #endif
 }
 
