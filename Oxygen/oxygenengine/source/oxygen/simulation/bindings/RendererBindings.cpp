@@ -335,6 +335,9 @@ namespace
 
 	void setVRAM(uint16 vramAddress, uint16 value)
 	{
+		if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
+			LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(vramAddress, 2);
+
 		getEmulatorInterface().writeVRam16(vramAddress, value);
 	}
 
