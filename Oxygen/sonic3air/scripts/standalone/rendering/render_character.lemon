@@ -169,7 +169,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 			}
 			if (animationSpriteEx >= 0x55 && animationSpriteEx <= 0x5b) // Turntable for CNZ barrels and whatnot
 			{
-				bool isPlayer1 = (A0 == 0xffffb000)
+				isPlayer1 = (A0 == 0xffffb000)
 				
 				s8 anim = 0
 				if (isPlayer1)
