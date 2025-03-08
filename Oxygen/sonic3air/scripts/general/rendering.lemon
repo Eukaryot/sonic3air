@@ -648,6 +648,7 @@ function void RenderSprites_CompetitionMode()
 	// Setup viewports, to be used in render queue ranges for the sprites
 	Renderer.setViewport(0, 0, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_UPPER, 0x97ff)
 	Renderer.setViewport(0, getScreenHeight() - COMPMODE_VIEWPORT_HEIGHT_LOWER, getScreenWidth(), COMPMODE_VIEWPORT_HEIGHT_LOWER, 0x9bff)
+	Renderer.resetViewport(0xa000)
 #endif
 
 	// Upper screen
