@@ -12,12 +12,16 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/devmode/ImGuiHelpers.h"
-#include "oxygen/simulation/PersistentData.h"
 
 
 PersistentDataWindow::PersistentDataWindow() :
 	DevModeWindowBase("Persistent Data", Category::MISC, 0)
 {
+}
+
+PersistentDataWindow::~PersistentDataWindow()
+{
+	clearNode(mRootNode);
 }
 
 void PersistentDataWindow::buildContent()
@@ -27,26 +31,113 @@ void PersistentDataWindow::buildContent()
 
 	const float uiScale = getUIScale();
 
+	// Update cached data if needed
 	const PersistentData& persistentData = PersistentData::instance();
-
-	// TODO: Add some caching
-
-	for (const auto& pair : persistentData.getFiles())
+	if (mCachedChangeCounter != persistentData.getChangeCounter())
 	{
-		const PersistentData::File& file = pair.second;
+		mCachedChangeCounter = persistentData.getChangeCounter();
+		clearNode(mRootNode);
 
-		const bool isOpen = ImGui::TreeNodeEx(&file, 0, "%s (%d %s)", file.mFilePath.c_str(), file.mEntries.size(), (file.mEntries.size() == 1) ? "entry" : "entries");
-		if (isOpen)
+		std::unordered_map<uint64, Node*> nodesByPath;
+		for (const auto& pair : persistentData.getFiles())
 		{
+			const PersistentData::File& file = pair.second;
+			const size_t slashPos = file.mFilePath.find_last_of('/');
+			const std::string_view path = (slashPos == std::string::npos) ? "" : std::string_view(file.mFilePath).substr(0, slashPos);
+			const std::string_view name = (slashPos == std::string::npos) ? std::string_view(file.mFilePath) : std::string_view(file.mFilePath).substr(slashPos + 1);
+
+			// Get or create parent node representing the path
+			Node* parentNode;
+			if (path.empty())
+			{
+				parentNode = &mRootNode;
+			}
+			else
+			{
+				const uint64 pathHash = rmx::getMurmur2_64(path);
+				Node*& foundNodeRef = nodesByPath[pathHash];
+				if (nullptr == foundNodeRef)
+				{
+					foundNodeRef = &mNodePool.rentObject();
+					foundNodeRef->mName = '[' + std::string(path) + ']';
+					mRootNode.mChildNodes.push_back(foundNodeRef);
+				}
+				parentNode = foundNodeRef;
+			}
+
+			// Create a child node there
+			Node& childNode = mNodePool.rentObject();
+			childNode.mName = name;
+			childNode.mFile = &file;
+			parentNode->mChildNodes.push_back(&childNode);
+		}
+
+		// Sort entries
+		sortNodeChildren(mRootNode);
+	}
+
+	buildContentForNode(mRootNode);
+}
+
+void PersistentDataWindow::clearNode(Node& node)
+{
+	node.mFile = nullptr;
+	for (Node* child : node.mChildNodes)
+	{
+		clearNode(*child);
+		mNodePool.returnObject(*child);
+	}
+	node.mChildNodes.clear();
+}
+
+void PersistentDataWindow::sortNodeChildren(Node& node)
+{
+	std::sort(node.mChildNodes.begin(), node.mChildNodes.end(),
+		[](const Node* a, const Node* b)
+		{
+			if ((nullptr == a->mFile) != (nullptr == b->mFile))
+				return (nullptr == a->mFile);
+			else
+				return a->mName < b->mName;
+		});
+
+	for (Node* childNode : node.mChildNodes)
+	{
+		sortNodeChildren(*childNode);
+	}
+}
+
+void PersistentDataWindow::buildContentForNode(const Node& node)
+{
+	if (nullptr != node.mFile)
+	{
+		// List entries in the file
+		const PersistentData::File& file = *node.mFile;
+		if (!file.mEntries.empty())
+		{
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.8f, 1.0f, 1.0f));
 			for (const PersistentData::Entry& entry : file.mEntries)
 			{
 				ImGui::BulletText("%s:   %d bytes", entry.mKey.c_str(), entry.mData.size());
 			}
-
-			ImGui::TreePop();
+			ImGui::PopStyleColor();
 		}
 	}
 
+	// List child nodes recursively
+	for (const Node* childNode : node.mChildNodes)
+	{
+		const bool isFolder = (nullptr == childNode->mFile);
+		ImGui::PushStyleColor(ImGuiCol_Text, isFolder ? ImVec4(1.0f, 1.0f, 0.0f, 1.0f) : ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+		const bool isOpen = ImGui::TreeNodeEx(childNode, 0, "%s", childNode->mName.c_str());
+		ImGui::PopStyleColor();
+
+		if (isOpen)
+		{
+			buildContentForNode(*childNode);
+			ImGui::TreePop();
+		}
+	}
 }
 
 #endif

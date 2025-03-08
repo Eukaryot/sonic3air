@@ -13,16 +13,34 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/devmode/DevModeWindowBase.h"
+#include "oxygen/simulation/PersistentData.h"
 
 
 class PersistentDataWindow : public DevModeWindowBase
 {
 public:
 	PersistentDataWindow();
+	~PersistentDataWindow();
 
 	virtual void buildContent() override;
 
 private:
+	struct Node
+	{
+		std::string mName;
+		const PersistentData::File* mFile = nullptr;
+		std::vector<Node*> mChildNodes;
+	};
+
+private:
+	void clearNode(Node& node);
+	void sortNodeChildren(Node& node);
+	void buildContentForNode(const Node& node);
+
+private:
+	Node mRootNode;
+	RentableObjectPool<Node> mNodePool;
+	uint32 mCachedChangeCounter = 0;
 };
 
 #endif

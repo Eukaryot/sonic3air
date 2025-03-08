@@ -39,6 +39,7 @@ public:
 	void removeKey(uint64 filePathHash, uint64 keyHash);
 
 	inline const std::unordered_map<uint64, File>& getFiles() const  { return mFiles; }
+	inline uint32 getChangeCounter() const  { return mChangeCounter; }
 
 private:
 	void initialSetup();
