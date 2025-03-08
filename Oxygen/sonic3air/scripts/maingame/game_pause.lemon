@@ -380,9 +380,10 @@ function void GamePause.DrawMenu(float time)
 	//  -> This allows for selectively clearing these sprites, texts, etc. in each frame without touching the game's rendered content
 	Renderer.resetLifetimeContext(1)
 	Renderer.setLifetimeContext(1)
-	
-	Renderer.setViewport(0, 0, getScreenWidth(), getScreenHeight(), 0xfeff) // Fix for Competition Mode not having the upper bar visible
-	
+
+	// Ensure that the game pause menu always renders onto the full screen, #contributed by nabbup / Raine
+	Renderer.resetViewport(0xfeff)
+
 	Renderer.drawSprite("pause_screen_upper", rightAnchor - 210, 0, 0, SPRITE_FLAG_PRIO | SPRITE_FLAG_NO_GLOBAL_TINT, 0xff00)
 	Renderer.drawSprite("pause_screen_lower", rightAnchor - 190, py - 8, 0, SPRITE_FLAG_PRIO | SPRITE_FLAG_NO_GLOBAL_TINT, 0xff00)
 
