@@ -276,7 +276,7 @@ declare function void setVRAM(u16 vramAddress, u16 value)
 
 declare function void Renderer.setPaletteColor(u16 index, u32 color)
 declare function void Renderer.setPaletteColorPacked(u16 index, u16 color)
-declare function void Renderer.enableSecondaryPalette(u8 line)
+declare function void Renderer.enableSecondaryPalette(u16 line)
 declare function void Renderer.setSecondaryPaletteColorPacked(u16 index, u16 color)
 declare function void Renderer.setScrollOffsetH(u8 setIndex, u16 lineNumber, u16 value)
 declare function void Renderer.setScrollOffsetV(u8 setIndex, u16 rowNumber, u16 value)

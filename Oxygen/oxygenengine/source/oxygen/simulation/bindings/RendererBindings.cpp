@@ -352,7 +352,7 @@ namespace
 		RenderParts::instance().getPaletteManager().writePaletteEntryPacked(0, index, color);
 	}
 
-	void Renderer_enableSecondaryPalette(uint8 line)
+	void Renderer_enableSecondaryPalette(uint16 line)
 	{
 		RenderParts::instance().getPaletteManager().setPaletteSplitPositionY(line);
 	}
