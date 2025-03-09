@@ -12,13 +12,6 @@
 
 
 static const Sockets::ProtocolFamily SERVER_PROTOCOL_FAMILY = Sockets::ProtocolFamily::DualStack;
-static const bool CLIENT_USE_IPv6 = false;
-
-#if 1
-	static const std::string SERVER_NAME = (SERVER_PROTOCOL_FAMILY >= Sockets::ProtocolFamily::IPv6) ? "::1" : "127.0.0.1";
-#else
-	static const std::string SERVER_NAME = "gameserver.sonic3air.org";
-#endif
 
 static const uint16 UDP_SERVER_PORT = 21094;	// Only used by test client, for the server see "config.json"
 static const uint16 TCP_SERVER_PORT = 21095;	// Only used by test client, for the server see "config.json"
