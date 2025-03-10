@@ -15,6 +15,7 @@ function void ApplyROMManipulations()
 	ROMManipulation.RepairSpriteMappings()
 	ROMManipulation.RepairAnimations()
 	ROMManipulation.CutsceneKnucklesPalette()
+	ROMManipulation.AIZ.MusicFix()
 	ROMManipulation.AIZ1.KnucklesIntroCritters()
 	ROMManipulation.AIZ2.StartPosition()
 	ROMManipulation.AIZ2.BlimpSequenceBombs()
@@ -125,6 +126,19 @@ function void ROMManipulation.CutsceneKnucklesPalette()
 	u16[0x066912 + 0x06] = 0x020c
 	u16[0x066912 + 0x08] = 0x0206
 	//u16[0x066912 + 0x0a] = 0x0080		// TODO: This entry is also used for the rings, should not be changed to green
+}
+
+
+function void ROMManipulation.AIZ.MusicFix()
+{
+	// Fix for bugged PSG data in the AIZ 1 and 2 emulated music data, #contributed by Legobouwer
+	//  -> The issue is caused by the music using smpsFMAlterVol (E5, E6) instead of smpsPSGAlterVol (EC); this code corrects this for both acts
+	u8[0x2c9a0b] = 0xec
+	u8[0x2c9a35] = 0xec
+	u8[0x2cadba] = 0xec
+	u8[0x2cadd3] = 0xec
+	u8[0x2cafc3] = 0xec
+	u8[0x2cafdc] = 0xec
 }
 
 
