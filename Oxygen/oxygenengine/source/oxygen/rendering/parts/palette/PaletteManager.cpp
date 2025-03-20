@@ -122,7 +122,7 @@ void PaletteManager::writePaletteEntryPacked(int paletteIndex, uint16 colorIndex
 	mMainPalette[1].setPaletteEntryPacked(colorIndex, color, packedColor);
 }
 
-void PaletteManager::setPaletteSplitPositionY(uint8 py)
+void PaletteManager::setPaletteSplitPositionY(int py)
 {
 	mSplitPositionY = py;
 }
