@@ -241,7 +241,7 @@ namespace lemon
 								{
 									++pos;
 								}
-								while (input[pos] == ' ' || input[pos] == '\t');
+								while (pos < input.size() && (input[pos] == ' ' || input[pos] == '\t'));
 
 								PragmaParserToken& token = outTokens.create<PragmaParserToken>();
 								token.mContent = input.substr(pos);

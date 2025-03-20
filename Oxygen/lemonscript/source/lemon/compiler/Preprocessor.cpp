@@ -106,17 +106,11 @@ namespace lemon
 						{
 							if (rmx::startsWith(rest, "define ") && rest.length() >= 8)
 							{
-								if (blockStack.shouldConsiderContent())
-								{
-									processDefinition(rest.substr(7), parser);
-								}
+								processDefinition(rest.substr(7), parser);
 							}
 							else if (rmx::startsWith(rest, "error ") && rest.length() >= 7)
 							{
-								if (blockStack.shouldConsiderContent())
-								{
-									CHECK_ERROR(false, rest.substr(6), mLineNumber);
-								}
+								CHECK_ERROR(false, rest.substr(6), mLineNumber);
 							}
 							else
 							{
