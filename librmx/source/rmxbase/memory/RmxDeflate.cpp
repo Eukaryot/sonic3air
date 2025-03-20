@@ -108,7 +108,7 @@ DeflateCodec::DeflateCodec()
 		// Invert order of bits
 		int value = i;
 		int newValue = 0;
-		for (int i = 0; i < 9; ++i)
+		for (int k = 0; k < 9; ++k)
 		{
 			newValue = (newValue << 1) + (value & 1);
 			value >>= 1;
@@ -412,11 +412,11 @@ uint8* DeflateCodec::decode(int& outputSize, const void* input, int length)
 	while (!finished)
 	{
 		// Block header
-		const int bits = readBits(3);
-		if (bits & 0x01)		// "bfinal" flag
+		const int headerBits = readBits(3);
+		if (headerBits & 0x01)	// "bfinal" flag
 			finished = true;
 
-		const int btype = bits >> 1;
+		const int btype = headerBits >> 1;
 		if (btype == 3)			// Invalid value for btype
 			RETURN_ERROR;
 
@@ -487,9 +487,9 @@ uint8* DeflateCodec::decode(int& outputSize, const void* input, int length)
 			{
 				// Look up length in table
 				int extra_bits = LIT_TABLE[lit_code-257][0];
-				int length = LIT_TABLE[lit_code-257][1];
+				int len = LIT_TABLE[lit_code-257][1];
 				if (extra_bits)
-					length += readBits(extra_bits);
+					len += readBits(extra_bits);
 
 				// Get distance
 				const int dist_code = (btype == 1) ? readBits(5, true) : readFromTree(dist_tree);
@@ -502,22 +502,22 @@ uint8* DeflateCodec::decode(int& outputSize, const void* input, int length)
 					distance += readBits(extra_bits);
 
 				// Copy output from further behind
-				expandOutput(outpos + length);
+				expandOutput(outpos + len);
 				const uint8* src = &output[outpos - distance];
-				if (length > distance)
+				if (len > distance)
 				{
 					memcpy(buffer, src, distance);
 					int fill = distance;
-					while (fill < length)
+					while (fill < len)
 					{
-						const int copy_len = std::min(fill, length - fill);
+						const int copy_len = std::min(fill, len - fill);
 						memcpy(&buffer[fill], buffer, copy_len);
 						fill += copy_len;
 					}
 					src = buffer;
 				}
-				memcpy(&output[outpos], src, length);
-				outpos += length;
+				memcpy(&output[outpos], src, len);
+				outpos += len;
 			}
 			else  // lit_code >= 286
 			{

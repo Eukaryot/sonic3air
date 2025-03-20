@@ -75,9 +75,9 @@ public:
 
 	inline bool operator==(const WeakPtr<T>& ptr) const  { return mTarget == ptr.mTarget; }
 	inline bool operator!=(const WeakPtr<T>& ptr) const  { return mTarget != ptr.mTarget; }
-	inline bool operator==(T* target) const  { return mTarget == target; }
-	inline bool operator!=(T* target) const  { return mTarget != target; }
-	inline bool operator==(T& target) const  { return mTarget == &target; }
-	inline bool operator!=(T& target) const  { return mTarget != &target; }
+	inline bool operator==(const T* target) const  { return mTarget == target; }
+	inline bool operator!=(const T* target) const  { return mTarget != target; }
+	inline bool operator==(const T& target) const  { return mTarget == &target; }
+	inline bool operator!=(const T& target) const  { return mTarget != &target; }
 };
 

@@ -63,7 +63,7 @@ public:
 	inline PaletteBitmap& operator=(const PaletteBitmap& toCopy)	{ copy(toCopy); return *this; }
 
 private:
-	void memcpyRect(uint8* dst, int dwid, uint8* src, int swid, int wid, int hgt);
+	void memcpyRect(uint8* dst, int dwid, const uint8* src, int swid, int wid, int hgt);
 
 private:
 	uint8* mData = nullptr;

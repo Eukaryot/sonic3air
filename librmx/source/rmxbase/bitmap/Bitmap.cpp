@@ -74,7 +74,7 @@ void Bitmap::copy(const Bitmap& source, const Recti& rect)
 	memcpyRect(mData, mWidth, &source.mData[px+py*source.mWidth], source.mWidth, mWidth, mHeight);
 }
 
-void Bitmap::copy(void* source, int wid, int hgt)
+void Bitmap::copy(const void* source, int wid, int hgt)
 {
 	clear();
 	if (nullptr == source)
@@ -417,6 +417,9 @@ bool Bitmap::save(const WString& filename)
 	// Save file
 	MemOutputStream s0(stream.getPosition());
 	result = stream.saveTo(s0);
+	if (!result)
+		return false;
+
 	result = s0.saveToFile(filename.toString());
 	return result;
 }
@@ -601,7 +604,7 @@ void Bitmap::gaussianBlur(const Bitmap& source, float sigma)
 			{
 				float value = 0.0f;
 				float sum = 0.0f;
-				float* factor = (c < 3) ? &factors_alpha[size] : &factors[size];
+				const float* factor = (c < 3) ? &factors_alpha[size] : &factors[size];
 				for (int j = min_j; j <= max_j; ++j)
 				{
 					value += factor[j] * (float)src[j*swid+c];
@@ -657,7 +660,7 @@ void Bitmap::gaussianBlur(const Bitmap& source, float sigma, int channel)
 			int max_j = (z < maxz-size) ? +size : maxz-z-1;
 			float value = 0.0f;
 			float sum = 0.0f;
-			float* factor = &factors[size];
+			const float* factor = &factors[size];
 			for (int j = min_j; j <= max_j; ++j)
 			{
 				value += factor[j] * (float)src[j*swid+channel];
@@ -773,8 +776,8 @@ void Bitmap::rescale(const Bitmap& source, int wid, int hgt)
 					int iz = (int)fz;
 					fz -= (float)iz;
 					int offset = iz*mulz + w*mulw;
-					uint8* color1 = (uint8*)&source.mData[offset];
-					uint8* color2 = (uint8*)&source.mData[offset+mulz];
+					const uint8* color1 = (uint8*)&source.mData[offset];
+					const uint8* color2 = (uint8*)&source.mData[offset+mulz];
 					for (int c = 0; c < 4; ++c)
 					{
 						((uint8*)dst)[c] = (uint8)((float)color1[c] * (1.0f - fz) + (float)color2[c] * fz + 0.5f);
@@ -799,8 +802,11 @@ void Bitmap::rescale(const Bitmap& source, int wid, int hgt)
 				int i1 = (int)f1;  f1 -= (float)i1;
 				int i2 = (int)f2;  f2 -= (float)i2;
 				if (i2 >= srcsize)
-					{ i2 = srcsize-1;  f2 = 1.0f; }
-				uint8* src = (uint8*)&source.mData[w*mulw];
+				{
+					i2 = srcsize - 1;
+					f2 = 1.0f;
+				}
+				const uint8* src = (uint8*)&source.mData[w*mulw];
 				for (int c = 0; c < 4; ++c)
 				{
 					float value = 0.0f;
@@ -828,21 +834,21 @@ void Bitmap::swap(Bitmap& other)
 	std::swap(mHeight, other.mHeight);
 }
 
-inline void Bitmap::memcpyRect(uint32* dst, int dwid, uint32* src, int swid, int wid, int hgt)
+inline void Bitmap::memcpyRect(uint32* dst, int dwid, const uint32* src, int swid, int wid, int hgt)
 {
 	wid *= 4;			// 4 Bytes per pixel
 	for (int y = 0; y < hgt; ++y)
 		memcpy(&dst[y*dwid], &src[y*swid], wid);
 }
 
-inline void Bitmap::memcpyBlend(uint32* dst, int dwid, uint32* src, int swid, int wid, int hgt)
+inline void Bitmap::memcpyBlend(uint32* dst, int dwid, const uint32* src, int swid, int wid, int hgt)
 {
 	for (int y = 0; y < hgt; ++y)
 	{
 		for (int x = 0; x < wid; ++x)
 		{
 			uint8* dstPtr = (uint8*)(&dst[x+y*dwid]);
-			uint8* srcPtr = (uint8*)(&src[x+y*swid]);
+			const uint8* srcPtr = (const uint8*)(&src[x+y*swid]);
 			float alpha = (float)srcPtr[3] / 255.0f;
 			float alpha_dst = (float)dstPtr[3] / 255.0f;
 			float A = 1.0f - (1.0f - alpha) * (1.0f - alpha_dst);

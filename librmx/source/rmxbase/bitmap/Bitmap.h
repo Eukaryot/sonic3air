@@ -47,7 +47,7 @@ public:
 	// Create as copy
 	void copy(const Bitmap& source);
 	void copy(const Bitmap& source, const Recti& rect);
-	void copy(void* source, int wid, int hgt);
+	void copy(const void* source, int wid, int hgt);
 
 	// Create a bitmap
 	void create(int wid, int hgt);
@@ -140,8 +140,8 @@ public:
 	inline Bitmap& operator=(const Bitmap& bmp)			{ copy(bmp); return *this; }
 
 private:
-	void memcpyRect(uint32* dst, int dwid, uint32* src, int swid, int wid, int hgt);
-	void memcpyBlend(uint32* dst, int dwid, uint32* src, int swid, int wid, int hgt);
+	void memcpyRect(uint32* dst, int dwid, const uint32* src, int swid, int wid, int hgt);
+	void memcpyBlend(uint32* dst, int dwid, const uint32* src, int swid, int wid, int hgt);
 	void convert2palette(uint8* output, int colors, uint32* palette);
 
 private:

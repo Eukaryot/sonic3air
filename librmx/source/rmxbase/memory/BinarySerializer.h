@@ -76,7 +76,7 @@ public:
 	};
 
 public:
-	BinarySerializer(std::istream& stream);
+	explicit BinarySerializer(std::istream& stream);
 	BinarySerializer(std::ostream& stream, TokenMode tokenMode);
 	~BinarySerializer();
 

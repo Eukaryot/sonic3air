@@ -116,7 +116,6 @@ namespace rmx
 
 		if (renameExisting && FTX::FileSystem->exists(filename))
 		{
-			const time_t time = FTX::FileSystem->getFileTime(filename);
 			std::wstring directory;
 			std::wstring name;
 			std::wstring extension;

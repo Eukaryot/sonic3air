@@ -71,7 +71,6 @@ bool ZlibDeflate::encode(std::vector<uint8>& output, const void* inputData, size
 		return false;
 
 	output.resize(inputSize + (inputSize + 999) / 1000 + 12);
-	size_t outputLeft = output.size();
 
 	stream.next_out = &output[0];
 	stream.avail_out = (uInt)output.size();
