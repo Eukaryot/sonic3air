@@ -62,7 +62,10 @@ namespace lemon
 
 		bool isInsideIntegerRange(int64 value, const IntegerDataType& dataType)
 		{
-			size_t bits = dataType.getBytes() * 8;
+			const size_t bits = dataType.getBytes() * 8;
+			if (bits >= 64)
+				return true;
+
 			if (dataType.mIsSigned)
 			{
 				if (value >= 0)
