@@ -108,19 +108,18 @@ function void fn083708()
 				if (u8[A0 + 0x49] == 0)
 				{
 					s16 diff = objA1.position.x.u16 - objA0.position.x.u16
-					debugLog(diff)
 					if (diff >= -56 && diff < 56 && abs(objA1.velocity.x) < 0x100 && allocDynamicObjectStd())
 					{
 						objA1.update_address = 0x01a64a
 						objA1.position.x.u16 = objA0.position.x.u16 + (getRandomNumber() % 33) - 16
 						objA1.position.y.u16 = objA0.position.y.u16 + (getRandomNumber() % 33) - 16
-						
+
 						objA1.sprite_priority = 0x80
 						objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06bc)
 						objA1.mapping_offset = 0x01a99a
 						objA1.base_state = 0x06
 						objA1.render_flags = render_flag.WORLD
-						
+
 						u32 A0_o = A0
 						u32 A1_o = A1
 						A0 = A1_o
@@ -128,12 +127,14 @@ function void fn083708()
 						Object.animationUpdate(0x01a992)
 						A0 = A0_o
 						A1 = A1_o
-						
+
 						u8[A0 + 0x49] = getRandomNumber() % 90
 					}
 				}
 				else
+				{
 					--u8[A0 + 0x49]
+				}
 			}
 		#endif
 		}
