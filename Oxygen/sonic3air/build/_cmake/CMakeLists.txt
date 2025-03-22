@@ -12,6 +12,7 @@ project(Sonic3AIR)
 # Build options
 option(BUILD_OXYGEN_ENGINEAPP "Build the Oxygen App executable" ON)
 option(BUILD_OXYGEN_SERVER "Build the Oxygen server executable" OFF)
+option(BUILD_SDL_STATIC "Build SDL as a static library instead of a shared / dynamic one" ON)
 option(USE_GLES "Use OpenGLESv2" OFF)
 option(USE_DISCORD "Use Discord API" ON)
 
@@ -79,9 +80,16 @@ find_package(OpenGL REQUIRED)
 
 
 # SDL2 sources as virtual subdirectory "SDL"
-set(SDL_STATIC ON)
-set(SDL_SHARED OFF)
+if (BUILD_SDL_STATIC)
+	set(SDL_STATIC ON)
+	set(SDL_SHARED OFF)
+else()
+	set(SDL_STATIC OFF)
+	set(SDL_SHARED ON)
+endif()
+
 add_subdirectory(${WORKSPACE_DIR}/framework/external/sdl/SDL2 SDL)
+
 
 # zlib sources as virtual subdirectory "zlib"
 include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib)		# Included before add_subdirectory so that the examples will build
@@ -140,7 +148,11 @@ file(GLOB_RECURSE IMGUI_SOURCES ${WORKSPACE_DIR}/framework/external/imgui/imgui/
 
 add_library(imgui ${IMGUI_SOURCES})
 
-target_link_libraries(imgui SDL2-static)
+if (BUILD_SDL_STATIC)
+	target_link_libraries(imgui SDL2-static)
+else()
+	target_link_libraries(imgui SDL2)
+endif()
 if (USE_GLES)
 	target_link_libraries(imgui GLESv2)
 else()
@@ -172,16 +184,19 @@ file(GLOB_RECURSE RMXMEDIA_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxmedia/*.cpp
 add_library(rmxmedia ${RMXMEDIA_SOURCES})
 
 target_link_libraries(rmxmedia rmxbase)
-target_link_libraries(rmxmedia SDL2-static)
+if (BUILD_SDL_STATIC)
+	target_link_libraries(rmxmedia SDL2-static)
+	target_link_libraries(rmxmedia ${SDL2_STATIC_LIBRARIES})
+	target_link_options(rmxmedia PRIVATE ${SDL2_STATIC_LDLIBS_OTHER})
+	target_compile_options(rmxmedia PRIVATE ${SDL2_STATIC_CFLAGS})
+else()
+	target_link_libraries(rmxmedia SDL2)
+endif()
 if (USE_GLES)
 	target_link_libraries(rmxmedia GLESv2)
 else()
 	target_link_libraries(rmxmedia OpenGL::GL)
 endif()
-
-target_link_libraries(rmxmedia ${SDL2_STATIC_LIBRARIES})
-target_link_options(rmxmedia PRIVATE ${SDL2_STATIC_LDLIBS_OTHER})
-target_compile_options(rmxmedia PRIVATE ${SDL2_STATIC_CFLAGS})
 
 
 
