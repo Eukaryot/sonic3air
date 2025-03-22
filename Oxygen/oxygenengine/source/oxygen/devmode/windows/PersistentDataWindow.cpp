@@ -118,7 +118,7 @@ void PersistentDataWindow::buildContentForNode(const Node& node)
 			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.8f, 1.0f, 1.0f));
 			for (const PersistentData::Entry& entry : file.mEntries)
 			{
-				ImGui::BulletText("%s:   %d bytes", entry.mKey.c_str(), entry.mData.size());
+				ImGui::BulletText("%s:   %d bytes", entry.mKey.c_str(), (int)entry.mData.size());
 			}
 			ImGui::PopStyleColor();
 		}

@@ -83,7 +83,7 @@ void ScriptBuildWindow::buildContent()
 			if (!module->getWarnings().empty())
 			{
 				ImGui::SameLine();
-				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d warning%s", module->getWarnings().size(), (module->getWarnings().size() == 1) ? "" : "s");
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d warning%s", (int)module->getWarnings().size(), (module->getWarnings().size() == 1) ? "" : "s");
 			}
 
 			if (isOpen)
