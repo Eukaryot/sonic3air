@@ -12,16 +12,26 @@ project(Sonic3AIR)
 # Build options
 option(BUILD_OXYGEN_ENGINEAPP "Build the Oxygen App executable" ON)
 option(BUILD_OXYGEN_SERVER "Build the Oxygen server executable" OFF)
+option(USE_GLES "Use OpenGLESv2" OFF)
+option(USE_DISCORD "Use Discord API" ON)
+
+
+if (USE_GLES)
+	add_definitions(-DRMX_LINUX_ENFORCE_GLES2)
+endif()
+message(STATUS "USE_GLES = ${USE_GLES}")
 
 
 # Determine whether to support discord integration
-set(USE_DISCORD true)
-if (UNIX AND CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
-	link_directories(/opt/vc/lib)	# Needed when building on Raspberry Pi
-	set(USE_DISCORD false)
-endif()
 if (USE_DISCORD)
-	add_definitions(-DUSE_DISCORD)
+	set(USE_DISCORD ON)
+	if (UNIX AND CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
+		link_directories(/opt/vc/lib)	# Needed when building on Raspberry Pi
+		set(USE_DISCORD OFF)
+	endif()
+else()
+	link_directories(/opt/vc/lib)	# Needed when building on Raspberry Pi
+	set(USE_DISCORD OFF)
 endif()
 message(STATUS "USE_DISCORD = ${USE_DISCORD}")
 
@@ -131,7 +141,11 @@ file(GLOB_RECURSE IMGUI_SOURCES ${WORKSPACE_DIR}/framework/external/imgui/imgui/
 add_library(imgui ${IMGUI_SOURCES})
 
 target_link_libraries(imgui SDL2-static)
-target_link_libraries(imgui OpenGL::GL)
+if (USE_GLES)
+	target_link_libraries(imgui GLESv2)
+else()
+	target_link_libraries(imgui OpenGL::GL)
+endif()
 
 
 
@@ -159,7 +173,15 @@ add_library(rmxmedia ${RMXMEDIA_SOURCES})
 
 target_link_libraries(rmxmedia rmxbase)
 target_link_libraries(rmxmedia SDL2-static)
-target_link_libraries(rmxmedia OpenGL::GL)
+if (USE_GLES)
+	target_link_libraries(rmxmedia GLESv2)
+else()
+	target_link_libraries(rmxmedia OpenGL::GL)
+endif()
+
+target_link_libraries(rmxmedia ${SDL2_STATIC_LIBRARIES})
+target_link_options(rmxmedia PRIVATE ${SDL2_STATIC_LDLIBS_OTHER})
+target_compile_options(rmxmedia PRIVATE ${SDL2_STATIC_CFLAGS})
 
 
 
