@@ -624,6 +624,10 @@ void OptionsConfig::buildTweaks()
 		configBuilder.addSetting("Monitor Behavior:", option::MONITOR_BEHAVIOR)
 			.addOption("Default", 0)
 			.addOption("Fall down when hit", 1);
+
+		configBuilder.addSetting("Hidden Monitors:", option::HIDDEN_MONITOR_HINT)
+			.addOption("No hint", 0)
+			.addOption("Sparkle near signpost", 1);
 	}
 
 	CATEGORY("Special Stages")
@@ -650,6 +654,45 @@ void OptionsConfig::buildTweaks()
 			.addOption("No glitch fixes", 0)
 			.addOption("Only basic fixes", 1)
 			.addOption("All (recommended)", 2);
+	}
+
+	CATEGORY("Other Enhancements")
+	{
+		configBuilder.addSetting("Object Pushing Speed:", option::FASTER_PUSH)
+			.addOption("Original", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("Score Tally Speed-Up:", option::LEVELRESULT_SCORE)
+			.addOption("Off", 0)
+			.addOption("On", 1);
+
+		configBuilder.addSetting("LBZ Tube Transport:", option::LBZ_TUBETRANSPORT)
+			.addOption("Original Speed", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("MHZ Elevator:", option::MHZ_ELEVATOR)
+			.addOption("Original Speed", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("FBZ Door Opening:", option::FBZ_SCREWDOORS)
+			.addOption("Original Speed", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("SOZ Pyramid Rising:", option::SOZ_PYRAMID)
+			.addOption("Original Speed", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("AIZ Knuckles Intro:", option::AIZ_INTRO_KNUCKLES)
+			.addOption("Off", 0)
+			.addOption("On", 1);
+
+		configBuilder.addSetting("FBZ Cylinder Behavior:", option::FBZ_ENTERCYLINDER)
+			.addOption("Original", 0)
+			.addOption("Can enter from top", 1);
+
+		configBuilder.addSetting("Offscreen Player 2:", option::PLAYER2_OFFSCREEN)
+			.addOption("Not shown", 0)
+			.addOption("Show at border", 1);
 	}
 }
 
