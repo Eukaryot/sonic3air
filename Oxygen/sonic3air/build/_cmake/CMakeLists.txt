@@ -15,26 +15,31 @@ option(BUILD_OXYGEN_SERVER "Build the Oxygen server executable" OFF)
 option(BUILD_SDL_STATIC "Build SDL as a static library instead of a shared / dynamic one" ON)
 option(USE_GLES "Use OpenGLESv2" OFF)
 option(USE_DISCORD "Use Discord API" ON)
+option(USE_IMGUI "Use ImGui for scripts development" ON)
 
 
 if (USE_GLES)
 	add_definitions(-DRMX_LINUX_ENFORCE_GLES2)
 endif()
-message(STATUS "USE_GLES = ${USE_GLES}")
 
 
 # Determine whether to support discord integration
 if (USE_DISCORD)
 	set(USE_DISCORD ON)
-	if (UNIX AND CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
-		link_directories(/opt/vc/lib)	# Needed when building on Raspberry Pi
-		set(USE_DISCORD OFF)
-	endif()
-else()
+endif()
+if (UNIX AND CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
 	link_directories(/opt/vc/lib)	# Needed when building on Raspberry Pi
 	set(USE_DISCORD OFF)
 endif()
+
+
+
+message(STATUS "BUILD_OXYGEN_ENGINEAPP = ${BUILD_OXYGEN_ENGINEAPP}")
+message(STATUS "BUILD_OXYGEN_SERVER = ${BUILD_OXYGEN_SERVER}")
+message(STATUS "BUILD_SDL_STATIC = ${BUILD_SDL_STATIC}")
+message(STATUS "USE_GLES = ${USE_GLES}")
 message(STATUS "USE_DISCORD = ${USE_DISCORD}")
+message(STATUS "USE_IMGUI = ${USE_IMGUI}")
 
 
 
@@ -76,6 +81,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 
+find_package(Threads REQUIRED)
 find_package(OpenGL REQUIRED)
 
 
@@ -83,9 +89,14 @@ find_package(OpenGL REQUIRED)
 if (BUILD_SDL_STATIC)
 	set(SDL_STATIC ON)
 	set(SDL_SHARED OFF)
+	include_directories(SDL/include)
 else()
 	set(SDL_STATIC OFF)
 	set(SDL_SHARED ON)
+	if (UNIX AND CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
+		include(FindPkgConfig)
+		pkg_check_modules(SDL2 sdl2 REQUIRED)
+	endif()
 endif()
 
 add_subdirectory(${WORKSPACE_DIR}/framework/external/sdl/SDL2 SDL)
@@ -97,13 +108,14 @@ add_subdirectory(${WORKSPACE_DIR}/framework/external/zlib/zlib zlib)
 
 
 
-include_directories(SDL/include)
 include_directories(${WORKSPACE_DIR}/framework/external/ogg-vorbis/libogg/include)
 include_directories(${WORKSPACE_DIR}/framework/external/ogg-vorbis/libvorbis/include)
 include_directories(${WORKSPACE_DIR}/framework/external/ogg-vorbis/libvorbis/lib)
 include_directories(build/zlib)		# Needed for zconf.h
 include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizip)
-include_directories(${WORKSPACE_DIR}/framework/external/imgui/imgui)
+if (USE_IMGUI)
+	include_directories(${WORKSPACE_DIR}/framework/external/imgui/imgui)
+endif()
 include_directories(${WORKSPACE_DIR}/librmx/source)
 include_directories(${WORKSPACE_DIR}/librmx/source/rmxmedia/_glew)
 include_directories(${WORKSPACE_DIR}/Oxygen/lemonscript/source)
@@ -143,20 +155,25 @@ endif()
 
 
 # imgui
+if (USE_IMGUI)
+	file(GLOB_RECURSE IMGUI_SOURCES ${WORKSPACE_DIR}/framework/external/imgui/imgui/*.cpp)
 
-file(GLOB_RECURSE IMGUI_SOURCES ${WORKSPACE_DIR}/framework/external/imgui/imgui/*.cpp)
+	add_library(imgui ${IMGUI_SOURCES})
 
-add_library(imgui ${IMGUI_SOURCES})
-
-if (BUILD_SDL_STATIC)
-	target_link_libraries(imgui SDL2-static)
-else()
-	target_link_libraries(imgui SDL2)
-endif()
-if (USE_GLES)
-	target_link_libraries(imgui GLESv2)
-else()
-	target_link_libraries(imgui OpenGL::GL)
+	if (BUILD_SDL_STATIC)
+		target_link_libraries(imgui SDL2-static)
+	else()
+		target_link_libraries(imgui SDL2)
+		if (UNIX AND CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
+			target_link_libraries(imgui pthread)
+			target_link_libraries(imgui dl)
+		endif()
+	endif()
+	if (USE_GLES)
+		target_link_libraries(imgui GLESv2)
+	else()
+		target_link_libraries(imgui OpenGL::GL)
+	endif()
 endif()
 
 
@@ -255,7 +272,9 @@ target_link_libraries(oxygen minizip)
 target_link_libraries(oxygen rmxmedia)
 target_link_libraries(oxygen rmxext_oggvorbis)
 target_link_libraries(oxygen lemonscript)
-target_link_libraries(oxygen imgui)
+if (USE_IMGUI)
+	target_link_libraries(oxygen imgui)
+endif()
 target_link_libraries(oxygen oxygen_netcore)
 
 if (UNIX AND CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
@@ -288,6 +307,7 @@ if (BUILD_OXYGEN_ENGINEAPP)
 		target_precompile_headers(OxygenApp PRIVATE ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/engineapp/pch.h)
 	endif()
 
+	target_link_libraries(OxygenApp Threads::Threads)
 	target_link_libraries(OxygenApp oxygen)
 
 endif()
@@ -349,6 +369,7 @@ if (NOT CMAKE_VERSION VERSION_LESS "3.16.0")
 	target_precompile_headers(Sonic3AIR PRIVATE ${WORKSPACE_DIR}/Oxygen/sonic3air/source/sonic3air/pch.h)
 endif()
 
+target_link_libraries(Sonic3AIR Threads::Threads)
 target_link_libraries(Sonic3AIR oxygen)
 if (USE_DISCORD)
 	target_link_libraries(Sonic3AIR discord_game_sdk_source)
