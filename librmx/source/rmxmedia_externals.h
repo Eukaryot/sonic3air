@@ -34,6 +34,10 @@
 	#else
 		#include <SDL/SDL.h>
 	#endif
+
+#elif defined(PLATFORM_LINUX)
+	#include <SDL2/SDL.h>
+
 #else
 	#include <SDL.h>
 #endif
@@ -46,10 +50,10 @@
 
 #elif defined(PLATFORM_LINUX)
 	#if defined(RMX_LINUX_ENFORCE_GLES2)	// Build option: Use OpenGL ES 2
-		#define ALLOW_LEGACY_OPENGL
 		#define RMX_USE_GLES2
-		#include <GLES3/gl3.h>		// We need the ES 3 headers for e.g. glBindVertexArray
-		#include <GLES3/gl3ext.h>
+		#define GL_GLEXT_PROTOTYPES
+		#include <GLES2/gl2.h>
+		#include <GLES2/gl2ext.h>
 	#else
 		#define RMX_USE_GLEW
 	#endif
