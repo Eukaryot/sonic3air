@@ -11,7 +11,7 @@
 #include <rmxbase.h>
 
 // Enable or disable ImGui support, depending on the platform to build for
-#if defined(USE_IMGUI) && (defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_MAC))
+#if defined(PLATFORM_WINDOWS) || (defined(PLATFORM_LINUX) && defined(USE_IMGUI)) || defined(PLATFORM_ANDROID) || defined(PLATFORM_MAC)
 	#define SUPPORT_IMGUI
 #endif
 
