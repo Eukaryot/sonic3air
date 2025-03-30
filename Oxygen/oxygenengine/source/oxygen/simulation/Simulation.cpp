@@ -485,7 +485,7 @@ bool Simulation::generateFrame()
 		{
 			// Generate a keyframe every 10 frames, to allow for quick rewinds during game recording playback as well
 			const int keyframeFrequency = 10;
-			if (((mFrameNumber + 1) % keyframeFrequency) == 0 && !mGameRecorder.isKeyframe(mFrameNumber + 1))
+			if (((mFrameNumber + 1) % keyframeFrequency) == 0 && !mGameRecorder.isKeyframe(mFrameNumber + 1) && mGameRecorder.canAddFrame(mFrameNumber + 1))
 			{
 				GameRecorder::InputData inputData;
 				controlsIn.writeCurrentState(inputData.mInputs);

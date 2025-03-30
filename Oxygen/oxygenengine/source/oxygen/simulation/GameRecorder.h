@@ -47,6 +47,7 @@ public:
 	inline uint32 getRangeEnd() const	 { return mRangeEnd; }
 
 	inline bool hasFrameNumber(uint32 frameNumber) const  { return frameNumber >= mRangeStart && frameNumber < mRangeEnd; }
+	inline bool canAddFrame(uint32 frameNumber) const	  { return frameNumber >= mRangeStart && frameNumber <= mRangeEnd; }
 	bool isKeyframe(uint32 frameNumber) const;
 
 	bool getFrameData(uint32 frameNumber, PlaybackResult& outResult);
