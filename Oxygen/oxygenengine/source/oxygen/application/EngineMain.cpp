@@ -408,18 +408,7 @@ bool EngineMain::initConfigAndSettings()
 	config.initialization();
 
 	RMX_LOG_INFO("Loading configuration");
-	if (FTX::FileSystem->exists(config.mAppDataPath + L"config.json"))
-	{
-		config.loadConfiguration(config.mAppDataPath + L"config.json");
-	}
-	else
-	{
-#if (defined(PLATFORM_MAC) || defined(PLATFORM_IOS)) && defined(ENDUSER)
-		config.loadConfiguration(config.mGameDataPath + L"/config.json");
-#else
-		config.loadConfiguration(L"config.json");
-#endif
-	}
+	loadConfigJson();
 
 	// Setup a custom game profile (like S3AIR does) or load the "oxygenproject.json"
 	const bool hasCustomGameProfile = mDelegate.setupCustomGameProfile();
@@ -440,7 +429,14 @@ bool EngineMain::initConfigAndSettings()
 	const bool loadedSettings = config.loadSettings(config.mAppDataPath + L"settings.json", Configuration::SettingsType::STANDARD);
 	config.loadSettings(config.mAppDataPath + L"settings_input.json", Configuration::SettingsType::INPUT);
 	config.loadSettings(config.mAppDataPath + L"settings_global.json", Configuration::SettingsType::GLOBAL);
-	if (!loadedSettings)
+	if (loadedSettings)
+	{
+	#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX) || defined(PLATFORM_MAC)
+		// Load config.json once again on top, so that config.json is preferred over settings.json
+		loadConfigJson();
+	#endif
+	}
+	else
 	{
 		// Save default settings once immediately
 		config.saveSettings();
@@ -476,6 +472,23 @@ bool EngineMain::initConfigAndSettings()
 	RMX_LOG_INFO(((config.mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Using pure software renderer" :
 				  (config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Using opengl-soft renderer" : "Using opengl-full renderer"));
 	return true;
+}
+
+void EngineMain::loadConfigJson()
+{
+	Configuration& config = Configuration::instance();
+	if (FTX::FileSystem->exists(config.mAppDataPath + L"config.json"))
+	{
+		config.loadConfiguration(config.mAppDataPath + L"config.json");
+	}
+	else
+	{
+	#if (defined(PLATFORM_MAC) || defined(PLATFORM_IOS)) && defined(ENDUSER)
+		config.loadConfiguration(config.mGameDataPath + L"/config.json");
+	#else
+		config.loadConfiguration(L"config.json");
+	#endif
+	}
 }
 
 bool EngineMain::initFileSystem()

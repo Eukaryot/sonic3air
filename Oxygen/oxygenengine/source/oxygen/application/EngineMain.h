@@ -110,6 +110,8 @@ private:
 
 	void initDirectories();
 	bool initConfigAndSettings();
+	void loadConfigJson();
+
 	bool initFileSystem();
 	bool loadFilePackages(bool forceReload);
 	bool loadFilePackageByIndex(size_t index, bool forceReload);

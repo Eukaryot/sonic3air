@@ -613,8 +613,6 @@ void Configuration::serializeStandardSettings(JsonSerializer& serializer)
 
 void Configuration::serializeDevMode(JsonSerializer& serializer)
 {
-	const bool devModeWasEnabled = mDevMode.mEnabled;
-
 	if (serializer.beginObject("DevMode"))
 	{
 		serializer.serialize("Enabled", mDevMode.mEnabled);
@@ -652,12 +650,6 @@ void Configuration::serializeDevMode(JsonSerializer& serializer)
 		}
 
 		serializer.endObject();
-	}
-
-	if (serializer.isReading())
-	{
-		// If either config or settings set this to true, then it stays true
-		mDevMode.mEnabled |= devModeWasEnabled;
 	}
 }
 
