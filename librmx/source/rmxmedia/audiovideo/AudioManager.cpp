@@ -240,6 +240,7 @@ namespace rmx
 		instance.mPosition = roundToInt(playbackOptions.mPosition * (float)playbackOptions.mAudioBuffer->getFrequency());
 		instance.mLoop = playbackOptions.mLoop;
 		instance.mStreaming = playbackOptions.mStreaming;
+		instance.mPaused = playbackOptions.mStartPaused;
 
 		lockAudio();
 		audioMixer->addAudioInstance(instance);
