@@ -779,8 +779,6 @@ function void fn0048dc()
 	#endif
 	}
 
-	Renderer.drawCustomSprite("title_screen_cr", getScreenWidth() - 88, 204, 0x00, 0, 0x9f7e)
-
 	// Clear "Sonic The Hedgehog" text in VRAM
 	for (u16 x = 0xb000; x < 0xb700; x += 0x80)
 		for (u16 y = 0; y < 0x40; y += 2)

@@ -30,9 +30,13 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 	u8 gameMode = global.game_mode & 0x7f
 	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 
+	// Many character related renderhooks #contributed by Vinegar
+	
+	// Tweaked player renderhooks (and various other small changes) #contributed by Dynamic Lemons
 	// Check for characters first
 	if (objA0.update_address == 0x010a94 || objA0.update_address == 0x01365c || objA0.update_address == 0x016444)
 	{
+		// exclude debug mode so the object graphics still render
 		if (debug_mode.state && debug_mode.state != 2 && A0 == 0xffffb000)
 			return false
 		return Standalone.drawCharacterSprite(char.character, (A0 == 0xffffb04a) ? 1 : 0, px, py, false)
@@ -838,7 +842,21 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			objA0.animation.sprite = 0
 		}
 	}
-
+	
+	// Credits on the titlescreens #contributed by Dynamic Lemons
+	// S3
+	if (objA0.update_address == 0x004a56)
+	{
+		Renderer.drawCustomSprite("title_screen_cr", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+		return true
+	}
+	// SK
+	if (objA0.update_address == 0x005ce2)
+	{
+		Renderer.drawCustomSprite("title_screen_cr", px - 45, py - 4, 0, SPRITE_FLAG_PRIO, renderQueue)
+		return true
+	}
+	
 	// Text in Data Select screen that literally says "DATA SELECT", #contributed by iCloudius
 	if (objA0.mapping_offset == 0x00ce0e && A0 == 0xffffb000)
 	{

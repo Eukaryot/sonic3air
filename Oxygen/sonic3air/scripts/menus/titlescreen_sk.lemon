@@ -982,10 +982,6 @@ function void fn005cb0()
 function void fn005ce2()
 {
 	DrawObject()
-
-#if STANDALONE
-	Renderer.drawCustomSprite("title_screen_cr", getScreenWidth() - 88, 204, 0x00, SPRITE_FLAG_PRIO, 0x9fff)
-#endif
 }
 
 
