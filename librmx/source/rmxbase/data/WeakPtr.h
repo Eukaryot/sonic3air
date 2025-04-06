@@ -70,7 +70,7 @@ public:
 
 	inline operator T*() const    { return static_cast<T*>(mTarget); }
 
-	inline T& operator*() const   { RMX_ASSERT(nullptr != mTarget, "Dereferencing invalid weak pointer"); return *mTarget; }
+	inline T& operator*() const   { RMX_ASSERT(nullptr != mTarget, "Dereferencing invalid weak pointer"); return static_cast<T&>(*mTarget); }
 	inline T* operator->() const  { return static_cast<T*>(mTarget); }
 
 	inline bool operator==(const WeakPtr<T>& ptr) const  { return mTarget == ptr.mTarget; }

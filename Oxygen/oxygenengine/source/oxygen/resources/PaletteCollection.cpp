@@ -63,12 +63,15 @@ void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool i
 
 		std::vector<uint8> content;
 		if (!FTX::FileSystem->readFile(fileEntry.mPath + fileEntry.mFilename, content))
+		{
+			RMX_ERROR("Failed to load PNG at '" << *WString(fileEntry.mPath + fileEntry.mFilename).toString() << "': File loading failed", );
 			continue;
+		}
 
 		Bitmap bitmap;
 		if (!bitmap.load(fileEntry.mPath + fileEntry.mFilename))
 		{
-			RMX_ERROR("Failed to load PNG at '" << *WString(fileEntry.mPath + fileEntry.mFilename).toString() << "'", );
+			RMX_ERROR("Failed to load PNG at '" << *WString(fileEntry.mPath + fileEntry.mFilename).toString() << "': Format not supported", );
 			continue;
 		}
 
