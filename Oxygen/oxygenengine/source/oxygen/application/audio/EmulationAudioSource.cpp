@@ -58,7 +58,7 @@ bool EmulationAudioSource::initWithCustomContent(uint8 soundId, const std::wstri
 	{
 		if (!FTX::FileSystem->readFile(filename, mCompressedContent))
 		{
-			RMX_ERROR("Failed to load audio file '" << *WString(filename).toString() << "'", );
+			RMX_ERROR("Failed to load audio file '" << *WString(filename).toString() << "': File not found", );
 			return false;
 		}
 		mSoundDriver.setFixedContent(&mCompressedContent[0], (uint32)mCompressedContent.size(), contentOffset);
