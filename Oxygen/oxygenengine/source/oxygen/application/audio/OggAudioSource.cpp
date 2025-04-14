@@ -47,7 +47,7 @@ bool OggAudioSource::load(const std::wstring& filename)
 	mInputStream = FTX::FileSystem->createInputStream(filename);
 	if (nullptr == mInputStream)
 	{
-		RMX_ERROR("Failed to load audio file '" << *WString(filename).toString() << "'", );
+		RMX_ERROR("Failed to load audio file '" << *WString(filename).toString() << "': File not found", );
 		return false;
 	}
 	return true;

@@ -87,11 +87,25 @@ bool FontSourceStd::fillGlyphInfo(FontSource::GlyphInfo& info)
 
 /* ----- FontSourceBitmap ------------------------------------------------------------------------------------------- */
 
-FontSourceBitmap::FontSourceBitmap(const std::wstring& jsonFilename)
+FontSourceBitmap::FontSourceBitmap(const std::wstring& jsonFilename, bool showErrors)
 {
 	// Read JSON file
-	Json::Value root = rmx::JsonHelper::loadFile(jsonFilename);
-	RMX_CHECK(!root.isNull(), "Failed to load bitmap font JSON file at '" << WString(jsonFilename).toStdString() << "'", return);
+	Json::Value root;
+	{
+		std::vector<uint8> content;
+		if (!FTX::FileSystem->readFile(jsonFilename, content))
+		{
+			RMX_CHECK(showErrors, "Failed to load bitmap font JSON file at '" << WString(jsonFilename).toStdString() << "': File not found", );
+			return;
+		}
+
+		root = rmx::JsonHelper::loadFromMemory(content);
+		if (root.isNull())
+		{
+			RMX_CHECK(showErrors, "Failed to load bitmap font JSON file at '" << WString(jsonFilename).toStdString() << "': Error loading JSON content", );
+			return;
+		}
+	}
 
 	rmx::JsonHelper rootHelper(root);
 	rootHelper.tryReadInt("ascender", mAscender);
@@ -110,7 +124,7 @@ FontSourceBitmap::FontSourceBitmap(const std::wstring& jsonFilename)
 	Bitmap bitmap;
 	if (!bitmap.load(parentPath + L"/" + String(textureName).toStdWString()))
 	{
-		RMX_ERROR("Failed to load font bitmap from '" << WString(parentPath).toStdString() << "/" << textureName << "' (referenced in '" << WString(jsonFilename).toStdString() << "')", );
+		RMX_CHECK(showErrors, "Failed to load font bitmap from '" << WString(parentPath).toStdString() << "/" << textureName << "' (referenced in '" << WString(jsonFilename).toStdString() << "')", );
 		return;
 	}
 
