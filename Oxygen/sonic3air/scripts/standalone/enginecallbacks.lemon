@@ -151,6 +151,45 @@ function void PostFrameUpdate()
 	// Debug output
 	Debugging.debugDraw()
 	setWorldSpaceOffset(s32(s16(camera.position.x.u16)), s32(s16(camera.position.y.u16)))
+
+#if STANDALONE
+	// We need to set the underwater colors for Lightning Shield's white effect in a good spot. Here seemed fine
+	A1 = 0
+	u32 address = 0xffffb000
+	// First find which slot address is using the object
+	while (address <= 0xffffcf82)
+	{
+		if (u32[address] == addressof(LightningShield.ResetWaterPalette))
+		{
+			A1 = address
+			break
+		}
+		address += 0x4a
+	}
+	if (A1 == 0 || (objA1.update_address == addressof(LightningShield.ResetWaterPalette) && s8(objA1.animation.timer) < 0))
+		return
+	// Set underwater level colors
+	for (u8 i = 0; i < 0x40; i++)
+	{
+		if (i % 0x10 == 0)
+			continue
+		if (water.fullscreen)
+			Renderer.setPaletteEntryPacked(i, 0x0eee)
+		Renderer.setSecondaryPaletteColorPacked(i, 0x0eee)
+	}
+	if (EXTENDED_CHARACTER_PALETTES)
+	{
+		// Set underwater extended colors
+		for (u8 i = 0x00; i < 0xc0; i++)
+		{
+			if (i % 0x10 == 0)
+				continue
+			if (water.fullscreen)
+				Renderer.setPaletteEntryPacked(i + 0x40, 0x0eee)
+			Renderer.setSecondaryPaletteColorPacked(i + 0x40, 0x0eee)
+		}
+	}
+#endif
 }
 
 
