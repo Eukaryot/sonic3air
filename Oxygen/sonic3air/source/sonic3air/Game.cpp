@@ -355,6 +355,16 @@ void Game::startIntoActSelect()
 	startIntoGameInternal();
 }
 
+void Game::startIntoExtras()
+{
+	mMode = Mode::EXTRAS;
+
+	Simulation& simulation = Application::instance().getSimulation();
+	simulation.resetIntoGame("EntryFunctions.extrasMenu");
+
+	startIntoGameInternal();
+}
+
 void Game::startIntoLevel(Mode mode, uint32 submode, uint16 zoneAndAct, uint8 characters)
 {
 	mMode = mode;

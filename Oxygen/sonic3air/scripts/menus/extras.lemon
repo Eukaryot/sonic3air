@@ -1,0 +1,467 @@
+//-------------------------------------------------------//
+// Extras Screen (new menu for S3AIR)                    //
+//-------------------------------------------------------//
+
+global u8 Extras.extrasEntryList
+global u8 Extras.secretsEntryList
+global u8 Extras.achievementsEntryList
+
+global bool Extras.addedOpenAchievementsToEntryList
+
+global u8 Extras.opacityExtras
+global u8 Extras.opacitySecrets
+global u8 Extras.opacityAchievements
+
+global u32 Extras.tintG
+
+#if STANDALONE
+
+function void Extras.initExtrasEntries()
+{
+	//Name, image, function to call
+	
+	Extras.addExtrasEntry("Competition Mode", "secret_competitionmode", "EntryFunctions.competitionMode")
+	if (Game.isSecretUnlocked(0x04))
+		Extras.addExtrasEntry("Blue Sphere", "secret_bluesphere", "EntryFunctions.blueSphereGame")
+	if (Game.isSecretUnlocked(0x10))
+		Extras.addExtrasEntry("Level Select", "secret_levelselect", "EntryFunctions.levelSelect")
+}
+
+function void Extras.initSecretsEntries()
+{
+	//Name (ALL UPPERCASE), description, image, id, hide until unlocked, achievements needed to unlock
+	
+	Extras.addSecretsEntry("SONIC DROP DASH", "In the Options menu (in Controls), you can now activate\nSonic's Drop Dash move for Normal Game and Act Select.", "secret_dropdash", 0x01, false, 3)
+	Extras.addSecretsEntry("KNUCKLES & TAILS MODE", "Play as Knuckles & Tails character combination in Normal\nGame and Act Select.", "secret_knuckles_tails", 0x00, false, 5)
+	Extras.addSecretsEntry("SONIC SUPER PEEL-OUT", "The Super Peel-Out move is available in the Options menu.\nThis also unlocks \"Max Control\" Time Attack.", "secret_superpeelout", 0x03, false, 7)
+	Extras.addSecretsEntry("DEBUG MODE", "Debug Mode can be activated in the Options menu (in\nTweaks), and is available in Normal Game and Act Select.", "secret_debugmode", 0x02, false, 10)
+	Extras.addSecretsEntry("BLUE SPHERE", "Adds the Blue Sphere game to Extras that is known from\nSonic 1 locked on to Sonic & Knuckles.", "secret_bluesphere", 0x04, false, 12)
+	//if (Game.isSecretUnlocked(0x10))
+		Extras.addSecretsEntry("LEVEL SELECT", "Adds the original Sonic 3 & Knuckles Level Select menu to\nExtras.", "secret_levelselect", 0x10, true, 0)
+	//if (Game.isSecretUnlocked(0x11))
+		Extras.addSecretsEntry("SONIC & KNUCKLES TITLE", "You can now select the Sonic & Knuckles title screen in\nthe Options menu.", "secret_title_sk", 0x11, true, 0)
+	//if (Game.isSecretUnlocked(0x12))
+		Extras.addSecretsEntry("GAME SPEED SETTING", "Ready for a new challenge? Make the game faster (or\nslower) in the Options menu.", "secret_gamespeed", 0x12, true, 0)
+}
+
+function void Extras.initAchievementsEntries()
+{
+	//Name, description, sprite, id
+	
+	Extras.addAchievementsEntry("ATTRACTED TO SHINY THINGS", "Collect 300 rings without losing them.", "achievement_rings", 0x0001)
+	Extras.addAchievementsEntry("DOUBLE DOSE OF STARS", "Open another invincibility monitor while still being invincible\nfrom the last one.", "achievement_invincibility", 0x0002)
+	Extras.addAchievementsEntry("OLD-FASHIONED LIFE INSURANCE", "Have 5 continues in one game.", "achievement_continues", 0x0010)
+	Extras.addAchievementsEntry("GOING HYPER", "Collect all 14 emeralds and transform to a Hyper form.", "achievement_hyperform", 0x0011)
+	Extras.addAchievementsEntry("SCORE MILLIONAIRE", "Reach a score of 1,000,000 points.", "achievement_score", 0x0012)
+	Extras.addAchievementsEntry("ELECTROFISHING", "Defeat an underwater enemy by electrocution.", "achievement_electrocution", 0x0013)
+	Extras.addAchievementsEntry("LONGPLAY", "Beat the game with any character.", "achievement_gamebeaten", 0x0020)
+	Extras.addAchievementsEntry("TIDIED UP THE PLACE", "Complete a Blue Spheres stage with Perfect.", "achievement_perfect", 0x1601)
+	Extras.addAchievementsEntry("IS THERE AN EXIT UP THERE", "Reach the top of the Glowing Spheres bonus stage.", "achievement_glowingspheres", 0x1401)
+	Extras.addAchievementsEntry("JACKPOT", "Win the Jackpot in the Slot Machines bonus stage.", "achievement_jackpot", 0x1501)
+	Extras.addAchievementsEntry("BURSTING THROUGH THE JUNGLE", "Finish Angel Island Zone Act 1 in Time Attack in under 45\nseconds.", "achievement_timeattack_aiz1", 0x0101)
+	Extras.addAchievementsEntry("ATTRACTED TO GIANT SHINY THINGS", "Enter or collect 6 giant rings in Marble Garden Zone Act 1\nin a single run without dying in between.", "achievement_giantrings_mgz1", 0x0301)
+	Extras.addAchievementsEntry("GREEDY SNOWBOARDER", "Collect all 50 rings in the snow boarding section of IceCap\nZone Act 1.", "achievement_snowboarding", 0x0501)
+	Extras.addAchievementsEntry("ONCE SEE THE SUNRISE", "Defeat the upper boss in IceCap Zone Act 1 with Knuckles\n(you may need a buddy for this).", "achievement_icecap1boss", 0x0502)
+	Extras.addAchievementsEntry("FLUFFY FUR MUST NOT GET WET", "Get through Launch Base Zone Act 2 without touching any\nwater (requires A.I.R. level layouts).", "achievement_staydry", 0x0601)
+	Extras.addAchievementsEntry("DISPLAY SMASHER", "Open 18 monitors in Mushroom Hill Zone Act 1 with Knuckles.", "achievement_monitors", 0x0701)
+	Extras.addAchievementsEntry("SQUIRRELS ON A PLANE", "Free 35 animals in Flying Battery Zone Act 1 before the\nboss.", "achievement_animals", 0x0801)
+	Extras.addAchievementsEntry("NO TOUCHY", "Fight the second boss in Sonic's Sky Sanctuary but pop at\nmost one of the inflatable Mechas.", "achievement_decoys", 0x0c01)
+}
+
+function void Extras.DrawBackground()
+{
+	// Background
+	SpriteHandle spr = Renderer.addSpriteHandle("bg_levelselect", s16(getScreenWidth() - 512) / 2, 0, 0x5000)
+	spr.setBlendMode(BlendMode.OPAQUE)
+	SpriteHandle spr2 = Renderer.addSpriteHandle("bg_levelselect_top", s16(getScreenWidth() - 512) / 2, 0, 0x7000)
+	spr2.setBlendMode(BlendMode.OPAQUE)
+
+	Renderer.enableDefaultPlane(0, false)
+	Renderer.enableDefaultPlane(1, false)
+	Renderer.enableDefaultPlane(2, false)
+	Renderer.enableDefaultPlane(3, false)
+}
+
+function void Extras.DrawMenu(u8 selectedTab, u8 selectedEntry)
+{
+	constant u32 SELECTED = 0xffffffff
+	constant u32 SELECTED_RED = 0xffccccff
+	constant u32 SELECTED_HIGHLIGHTED = 0xffff00ff
+	constant u32 SELECTED_HIGHLIGHTED_RED = 0xff4400ff
+	constant u32 NOT_SELECTED = 0xe0e0e0ff
+	
+	constant string TAB_TEXT = "sonic3_fontC:gradient:outline(0x000000ff,1,false):shadow(1,1,0.5f,1.0f)"
+	constant string REGULAR_TEXT  = "oxyfont_regular:gradient:outline(0x000000ff,1,false):shadow(1,1,0.5f,1.0f)"
+	constant string SMALL_TEXT  = "oxyfont_tiny:gradient:outline(0x000000ff,1,false):shadow(1,1,0.5f,1.0f)"
+	constant string SLIGHTLY_SMALL_TEXT  = "oxyfont_small:gradient:outline(0x000000ff,1,false):shadow(1,1,0.5f,1.0f)"
+	constant string BLUE_TEXT  = "sonic3_fontB:gradient:outline(0x000000ff,1,false):shadow(1,1,0.5f,1.0f)"
+	
+	s16 widescreenOffset = getScreenExtend() - 40
+	
+	Renderer.drawSprite("options_topbar_bg", s16(getScreenWidth() - 512) / 2, -6, 0, 0x00, 0x7001)
+	
+	Renderer.drawText(TAB_TEXT, s16(getScreenWidth() / 2 - camera.foreground.x.u16), 13, "EXTRAS", (selectedTab == 0 && !selectedEntry) ? SELECTED_HIGHLIGHTED : (selectedTab == 0) ? SELECTED : NOT_SELECTED, 5, 0, 0xf000, false, true)
+	Renderer.drawText(TAB_TEXT, s16(getScreenWidth() / 2 - camera.foreground.x.u16 + 219), 13, "SECRETS", (selectedTab == 1 && !selectedEntry) ? SELECTED_HIGHLIGHTED : (selectedTab == 1) ? SELECTED : NOT_SELECTED, 5, 0, 0xf000, false, true)
+	Renderer.drawText(TAB_TEXT, s16(getScreenWidth() / 2 - camera.foreground.x.u16 + 440), 13, "ACHIEVEMENTS", (selectedTab == 2 && !selectedEntry) ? SELECTED_HIGHLIGHTED : (selectedTab == 2) ? SELECTED : NOT_SELECTED, 5, 0, 0xf000, false, true)
+	
+	u8 arrowOffset
+	if ((global.framecounter / 10) % 6) >= 3
+		arrowOffset = 3 - (global.framecounter / 10) % 3
+	else arrowOffset = (global.framecounter / 10) % 3
+	
+	if (selectedEntry > 0)
+		arrowOffset = 0
+	
+	if (selectedTab < 2)
+		Renderer.drawText(REGULAR_TEXT, s16(getScreenWidth() / 2) + 100 + arrowOffset, 15, ">", (selectedEntry == 0) ? SELECTED_HIGHLIGHTED : SELECTED, 5, 0, 0xf000, false, true)
+	if (selectedTab > 0)
+		Renderer.drawText(REGULAR_TEXT, s16(getScreenWidth() / 2) - 100 - arrowOffset, 15, "<", (selectedEntry == 0) ? SELECTED_HIGHLIGHTED : SELECTED, 5, 0, 0xf000, false, true)
+	
+	if (Extras.opacityExtras > 0 && selectedTab == 0)
+		Extras.opacityExtras -= 0x0f
+	else if (Extras.opacityExtras < 0xff && selectedTab != 0)
+		Extras.opacityExtras += 0x0f
+	
+	if (Extras.opacitySecrets > 0 && selectedTab == 1)
+		Extras.opacitySecrets -= 0x0f
+	else if (Extras.opacitySecrets < 0xff && selectedTab != 1)
+		Extras.opacitySecrets += 0x0f
+	
+	if (Extras.opacityAchievements > 0 && selectedTab == 2)
+		Extras.opacityAchievements -= 0x0f
+	else if (Extras.opacityAchievements < 0xff && selectedTab != 2)
+		Extras.opacityAchievements += 0x0f
+	
+	if (global.framecounter % 40 > 20 && Extras.tintG < 0x00ff0000)
+		Extras.tintG += 0x000f0000
+	else if (global.framecounter % 40 <= 20 && Extras.tintG > 0x00010000)
+		Extras.tintG -= 0x000f0000
+	
+	if (Extras.tintG < 0x00010000)
+		Extras.tintG = 0x00010000
+	
+	if (Extras.tintG > 0x00ff0000)
+		Extras.tintG = 0x00ff0000
+	
+	for (u16 i; i < Extras.extrasEntryList; ++i)
+	{
+		//Rendering optimization
+		if (Extras.opacityExtras == 0xff)
+			break
+		
+		string name = stringformat("%s", u64[0x870000 + (i * 48)])
+		u64 key = u64[0x870010 + (i * 48)]
+		
+		Renderer.drawSpriteTinted(key, 29 - Math.roundToInt(camera.foreground.x.u16 * 1.7) - ((selectedEntry == i + 1) * 12) + widescreenOffset, (52 + i * 56) - camera.foreground.y.u16, 0, 0x00, 0x6001, 0, u32(0xffffffff - Extras.opacityExtras), 0x10000)
+		Renderer.drawSpriteTinted("extras_frame", 27 - Math.roundToInt(camera.foreground.x.u16 * 1.5) - ((selectedEntry == i + 1) * 12) + widescreenOffset, (50 + i * 56) - camera.foreground.y.u16, 0, 0x00, 0x6000, 0, u32(0xffffffff - Extras.opacityExtras), 0x10000)
+		Renderer.drawText(TAB_TEXT, s16(109 - Math.roundToInt(camera.foreground.x.u16 * 1.5)) - ((selectedEntry == i + 1) * 12) + widescreenOffset, (76 + i * 56) - camera.foreground.y.u16, name, ((selectedEntry == i + 1) ? SELECTED_HIGHLIGHTED : SELECTED) - Extras.opacityExtras, 4, 0, 0x6010, false, true)
+		if (selectedEntry == i + 1)
+			Renderer.drawText(SLIGHTLY_SMALL_TEXT, s16(109 - Math.roundToInt(camera.foreground.x.u16 * 1.5)) + 47 - ((selectedEntry == i + 1) * 12) + widescreenOffset, (76 + i * 56) - camera.foreground.y.u16 + 23, "Press Enter to start", ((selectedEntry == i + 1) ? SELECTED_HIGHLIGHTED : SELECTED) - Extras.opacityExtras - Extras.tintG, 4, 0, 0x6010, false, true)
+		if (i == Extras.extrasEntryList - 1)
+		{
+			Renderer.drawText(REGULAR_TEXT , 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + widescreenOffset, (76 + i * 56) + 45 - camera.foreground.y.u16, "Back", ((selectedEntry == i + 2) ? SELECTED_HIGHLIGHTED : SELECTED) - Extras.opacityExtras, 5, 0, 0x6010, false, true)
+			if (selectedEntry == i + 2)
+			{
+				if ((global.framecounter / 10) % 6) >= 3
+					arrowOffset = 3 - (global.framecounter / 10) % 3
+				else arrowOffset = (global.framecounter / 10) % 3
+				
+				Renderer.drawText(REGULAR_TEXT, 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) - 32 + arrowOffset + widescreenOffset, (76 + i * 56) + 45 - camera.foreground.y.u16, ">>", SELECTED_HIGHLIGHTED, 5, 0, 0xf000, false, true)
+				Renderer.drawText(REGULAR_TEXT, 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 32 - arrowOffset + widescreenOffset, (76 + i * 56) + 45 - camera.foreground.y.u16, "<<", SELECTED_HIGHLIGHTED, 5, 0, 0xf000, false, true)
+			}
+		}
+	}
+	
+	for (u16 j; j < Extras.secretsEntryList; ++j)
+	{
+		//Rendering optimization
+		if (Extras.opacitySecrets == 0xff)
+			break
+		
+		string name = stringformat("%s", u64[0x890000 + (j * 96)])
+		string description = stringformat("%s", u64[0x890010 + (j * 96)])
+		u64 key = u64[0x890020 + (j * 96)]
+		u32 id = u64[0x890030 + (j * 96)]
+		bool hidden_until_unlocked = u64[0x890040 + (j * 96)] //Not needed
+		u8 required_achievements = u64[0x890050 + (j * 96)]
+		
+		bool isLocked = !Game.isSecretUnlocked(id)
+		
+		if (isLocked == true)
+		{
+			name = "???"
+			key = stringformat("%s_locked", key)
+			if (required_achievements > 0)
+			{
+				description = stringformat("Complete %d achievements to unlock", required_achievements)
+			}
+		}
+		
+		Renderer.drawSpriteTinted(key, 29 - Math.roundToInt(camera.foreground.x.u16 * 1.7) + 374 - ((selectedEntry == j + 1) * 12) + widescreenOffset, (52 + j * 64) - camera.foreground.y.u16 + 31, 0, 0x00, 0x6001, 0, u32(0xffffffff - Extras.opacitySecrets), 0x10000)
+		Renderer.drawSpriteTinted("achievements_frame", 27 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 330 - ((selectedEntry == j + 1) * 12) + widescreenOffset, (50 + j * 64) - camera.foreground.y.u16 + 31, 0, 0x00, 0x6000, 0, u32(0xffffffff - Extras.opacitySecrets), 0x10000)
+		Renderer.drawText(REGULAR_TEXT, s16(102 - Math.roundToInt(camera.foreground.x.u16 * 1.5)) + 330 - ((selectedEntry == j + 1) * 12) + widescreenOffset, (63 + j * 64) - camera.foreground.y.u16 + 31, name, ((selectedEntry == j + 1) ? SELECTED_HIGHLIGHTED : SELECTED) - Extras.opacitySecrets, 4, 0, 0x6010, false, true)
+		Renderer.drawText(SMALL_TEXT, s16(107 - Math.roundToInt(camera.foreground.x.u16 * 1.5)) + 330 - ((selectedEntry == j + 1) * 12) + widescreenOffset, (80 + j * 64) - camera.foreground.y.u16 + 31, description, ((selectedEntry == j + 1) ? SELECTED_HIGHLIGHTED : NOT_SELECTED) - Extras.opacitySecrets, 4, 0, 0x6010, false, true)
+		if (j == Extras.secretsEntryList - 1)
+		{
+			Renderer.drawText(REGULAR_TEXT , 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 330 + widescreenOffset, (76 + j * 64) + 45 - camera.foreground.y.u16 + 31, "Back", ((selectedEntry == j + 2) ? SELECTED_HIGHLIGHTED : SELECTED) - Extras.opacitySecrets, 5, 0, 0x6010, false, true)
+			if (selectedEntry == j + 2)
+			{
+				if ((global.framecounter / 10) % 6) >= 3
+					arrowOffset = 3 - (global.framecounter / 10) % 3
+				else arrowOffset = (global.framecounter / 10) % 3
+				
+				Renderer.drawText(REGULAR_TEXT, 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 330 - 32 + arrowOffset + widescreenOffset, (76 + j * 64) + 45 - camera.foreground.y.u16 + 31, ">>", SELECTED_HIGHLIGHTED, 5, 0, 0xf000, false, true)
+				Renderer.drawText(REGULAR_TEXT, 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 330 + 32 - arrowOffset + widescreenOffset, (76 + j * 64) + 45 - camera.foreground.y.u16 + 31, "<<", SELECTED_HIGHLIGHTED, 5, 0, 0xf000, false, true)
+			}
+		}
+	}
+	
+	u8 unlockedAchievements
+	u8 openAchievements
+	for (u16 k; k < 0xff; ++k)
+	{
+		if (Game.isAchievementComplete(u32[0x8b0030 + (k * 64)]))
+			++unlockedAchievements
+	}
+	openAchievements = Extras.achievementsEntryList - unlockedAchievements
+	
+	Renderer.drawText(BLUE_TEXT , 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 330 + widescreenOffset, 61 - camera.foreground.y.u16, stringformat("%d of %d achievements completed", unlockedAchievements, Extras.achievementsEntryList), u32(0x99ccffff - Extras.opacitySecrets), 5, 0, 0x6010, false, true)
+	
+	if (Game.getSetting(SETTING_DEBUG_MODE) && System.isDevModeActive() == false)
+	{
+		Renderer.drawText(BLUE_TEXT, 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 660 + widescreenOffset, 64 - camera.foreground.y.u16, "Achievements are locked", u32(0xffc080ff - Extras.opacityAchievements), 5, 0, 0xff00, false, true)
+		Renderer.drawText(BLUE_TEXT, 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 660 + widescreenOffset, 77 - camera.foreground.y.u16, "because Debug Mode is active", u32(0xffc080ff - Extras.opacityAchievements), 5, 0, 0xff00, false, true)
+		Renderer.drawSprite("tails_yawning", 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 660 - 18 + widescreenOffset, 92, 0, 0, 0xff00)
+	}
+	else
+	{
+		for (u16 l; l < Extras.achievementsEntryList; ++l)
+		{
+			//Rendering optimization
+			if (Extras.opacityAchievements == 0xff)
+				break
+			
+			string name = stringformat("%s", u64[0x8b0000 + (l * 64)])
+			string description = stringformat("%s", u64[0x8b0010 + (l * 64)])
+			u64 key = u64[0x8b0020 + (l * 64)]
+			u32 id = u32[0x8b0030 + (l * 64)]
+			if (!Game.isAchievementComplete(id) && selectedEntry != l + 1)
+				key = stringformat("%s_locked", key)
+			
+			s16 additional_offset
+			if (openAchievements > 0 && Game.isAchievementComplete(id))
+				additional_offset = 41
+			else additional_offset = 0
+			
+			if (unlockedAchievements > 0)
+			{
+				if (openAchievements > 0 && l == openAchievements - 1)
+					Renderer.drawText(BLUE_TEXT, 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 660 + widescreenOffset, 61 - camera.foreground.y.u16 + (52 + l * 56) + 41, "* completed achievements *", u32(0x99ccffff - Extras.opacityAchievements), 5, 0, 0x5fff, false, true)
+				else if (openAchievements == 0 && l == 0)
+					Renderer.drawText(BLUE_TEXT, 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 660 + widescreenOffset, 61 - camera.foreground.y.u16, "* completed achievements *", u32(0x99ccffff - Extras.opacityAchievements), 5, 0, 0x5fff, false, true)
+			}
+			
+			Renderer.drawSpriteTinted(key, 29 - Math.roundToInt(camera.foreground.x.u16 * 1.7) + 748 - ((selectedEntry == l + 1) * 12) + widescreenOffset, (52 + l * 56) - camera.foreground.y.u16 + 31 + additional_offset, 0, 0x00, 0x6001, 0, u32(0xffffffff - Extras.opacityAchievements), 0x10000)
+			Renderer.drawSpriteTinted("achievements_frame", 27 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 660 - ((selectedEntry == l + 1) * 12) + widescreenOffset, (50 + l * 56) - camera.foreground.y.u16 + 31 + additional_offset, 0, 0x00, 0x6000, 0, u32(0xffffffff - Extras.opacityAchievements), 0x10000)
+			Renderer.drawText(REGULAR_TEXT, s16(102 - Math.roundToInt(camera.foreground.x.u16 * 1.5)) + 660 - ((selectedEntry == l + 1) * 12) + widescreenOffset, (63 + l * 56) - camera.foreground.y.u16 + 31 + additional_offset, name, ((selectedEntry == l + 1) ? SELECTED_HIGHLIGHTED : SELECTED) - Extras.opacityAchievements, 4, 0, 0x6010, false, true)
+			Renderer.drawText(SMALL_TEXT, s16(107 - Math.roundToInt(camera.foreground.x.u16 * 1.5)) + 660 - ((selectedEntry == l + 1) * 12) + widescreenOffset, (80 + l * 56) - camera.foreground.y.u16 + 31 + additional_offset, description, ((selectedEntry == l + 1) ? SELECTED_HIGHLIGHTED : NOT_SELECTED) - Extras.opacityAchievements, 4, 0, 0x6010, false, true)
+			if (l == Extras.achievementsEntryList - 1)
+			{
+				Renderer.drawText(REGULAR_TEXT , 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 660 + widescreenOffset, (76 + l * 56) + 72 - camera.foreground.y.u16 + additional_offset, "Back", ((selectedEntry == l + 2) ? SELECTED_HIGHLIGHTED : SELECTED) - Extras.opacityAchievements, 5, 0, 0x6010, false, true)
+				if (selectedEntry == l + 2)
+				{
+					if ((global.framecounter / 10) % 6) >= 3
+						arrowOffset = 3 - (global.framecounter / 10) % 3
+					else arrowOffset = (global.framecounter / 10) % 3
+					
+					Renderer.drawText(REGULAR_TEXT, 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 660 - 32 + arrowOffset + widescreenOffset, (76 + l * 56) + 72 - camera.foreground.y.u16 + additional_offset, ">>", SELECTED_HIGHLIGHTED, 5, 0, 0xf000, false, true)
+					Renderer.drawText(REGULAR_TEXT, 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 660 + 32 - arrowOffset + widescreenOffset, (76 + l * 56) + 72 - camera.foreground.y.u16 + additional_offset, "<<", SELECTED_HIGHLIGHTED, 5, 0, 0xf000, false, true)
+				}
+			}
+		}
+		
+		if (openAchievements > 0)
+			Renderer.drawText(BLUE_TEXT, 200 - Math.roundToInt(camera.foreground.x.u16 * 1.5) + 660 + widescreenOffset, 61 - camera.foreground.y.u16, "* open achievements *", u32(0x99ccffff - Extras.opacityAchievements), 5, 0, 0x6010, false, true)
+	}
+}
+
+function void Extras.Menu(u8 fadeInMethod)
+{
+	// Load palette for the background
+	{
+		copyMemory(0xfffffc00, 0x0a8adc, 0x20)
+		copyMemory(0xfffffc80, 0xfffffc00, 0x20)
+	}
+	
+	u8 selectedTab = 0
+	u8 selectedEntry = 0
+	u8 lastEntry = 0
+	u8 entryList = 0
+	Extras.addedOpenAchievementsToEntryList = 0
+	Extras.opacityExtras = 0
+	Extras.opacitySecrets = 0xff
+	Extras.opacityAchievements = 0xff
+	
+	Extras.extrasEntryList = 0
+	Extras.secretsEntryList = 0
+	Extras.achievementsEntryList = 0
+	
+	Extras.initExtrasEntries()
+	Extras.initSecretsEntries()
+	
+	Extras.initAchievementsEntries()
+	Extras.addedOpenAchievementsToEntryList = 1
+	Extras.initAchievementsEntries()
+
+	playMusic(MUSIC_DATASELECT)
+	u32 frameCounter = 0
+
+	constant u8 RESULT_NONE			= 0
+	constant u8 RESULT_START_GAME	= 1
+	constant u8 RESULT_GO_BACK		= 2
+
+	u8 result = RESULT_NONE
+	while (result == RESULT_NONE)
+	{
+		Renderer.resetSprites()
+		
+		if (selectedTab == 0)
+			entryList = Extras.extrasEntryList
+		else if (selectedTab == 1)
+			entryList = Extras.secretsEntryList
+		else if (selectedTab == 2)
+			entryList = Extras.achievementsEntryList
+		else entryList = 4
+		++frameCounter
+		
+		ActSelect.HandleFadeIn(fadeInMethod, frameCounter)
+		Extras.DrawBackground()
+		
+		Extras.DrawMenu(selectedTab, selectedEntry)
+		
+		if (selectedEntry == 0)
+		{
+			if ((control.pad1.pressed & CONTROL_LEFT || Input.buttonPressed(BUTTON_L)) && selectedTab > 0)
+			{
+				--selectedTab
+				playSound(0xb7)
+			}
+			else if ((control.pad1.pressed & CONTROL_RIGHT || Input.buttonPressed(BUTTON_R)) && selectedTab < 2)
+			{
+				++selectedTab
+				playSound(0xb7)
+			}
+		}
+		else if (Input.buttonPressed(BUTTON_L) || Input.buttonPressed(BUTTON_R))
+		{
+			selectedEntry = 0
+		}
+		
+		if (control.pad1.pressed & CONTROL_UP)
+		{
+			if (selectedEntry > 0)
+				--selectedEntry
+			else selectedEntry = u16(entryList+1)
+			playSound(SFX_CLICK)
+		}
+		else if (control.pad1.pressed & CONTROL_DOWN)
+		{
+			if (selectedEntry < u16(1 + entryList))
+				++selectedEntry
+			else selectedEntry = 0
+			playSound(SFX_CLICK)
+		}
+			
+		if (s16(camera.foreground.x.u16) < 0)
+			camera.foreground.x.u16 = 0
+		
+		if (s16(camera.foreground.y.u16) < 0)
+			camera.foreground.y.u16 = 0
+		
+		if (camera.foreground.x.u16 < u16(selectedTab) * 220)
+			camera.foreground.x.u16 += 20
+		else if (camera.foreground.x.u16 > u16(selectedTab) * 220)
+			camera.foreground.x.u16 -= 20
+		else camera.foreground.x.u16 = selectedTab * 220
+		
+		s16 pixelsPerEntry = selectedTab == 0 ? 56 : selectedTab == 1 ? 64 : selectedTab == 2 ? 57 : 0
+		
+		if (s16(camera.foreground.y.u16) < s16(selectedEntry - 2) * pixelsPerEntry && s16(camera.foreground.y.u16) < s16(entryList * pixelsPerEntry) - Math.roundToInt(pixelsPerEntry * 1.5f))
+			camera.foreground.y.u16 += s16(camera.foreground.y.u16) < s16(selectedEntry - 4) * pixelsPerEntry ? 16 : 8
+		
+		if (s16(selectedEntry - 1) * pixelsPerEntry < s16(camera.foreground.y.u16) && s16(camera.foreground.y.u16) > 0)
+			camera.foreground.y.u16 -= selectedEntry * pixelsPerEntry < s16(camera.foreground.y.u16) - (pixelsPerEntry * 2) ? 16 : 8
+		
+		waitForNextFrame()
+		
+		if (Input.buttonPressed(BUTTON_B) || Input.buttonPressed(BUTTON_BACK) || (selectedEntry == entryList + 1 && (Input.buttonPressed(BUTTON_A) || (Input.buttonPressed(BUTTON_START) || Input.buttonPressed(BUTTON_X)))))
+		{
+			result = RESULT_GO_BACK
+		}
+		else if ((Input.buttonPressed(BUTTON_A) || Input.buttonPressed(BUTTON_X) || Input.buttonPressed(BUTTON_START)) && selectedEntry > 0 && selectedEntry < u16(1 + entryList) && (selectedTab == 0 || selectedTab == 3))
+		{
+			result = RESULT_START_GAME
+		}
+	}
+
+	if (result == RESULT_START_GAME)
+	{
+		playSound(0xAF)
+		globalComponentAddedColorR = 1
+		System.callFunctionByName(stringformat("%s", u64[0x870020 + ((selectedEntry - 1) * 48)]))
+	}
+	else if (result == RESULT_GO_BACK)
+	{
+		playSound(0xad)
+		
+		u32 backupA0 = A0
+		FadeOutScreenBlocking()
+		A0 = backupA0
+
+		// Do not fade out music in this case, Data Select music is meant to keep playing
+		Game.returnToMainMenu()
+		yieldExecution()
+	}
+}
+
+function void Extras.addExtrasEntry(string name, string key, string init_function)
+{
+	u8 entry = Extras.extrasEntryList
+	u64[0x870000 + (entry * 48)] = name
+	u64[0x870010 + (entry * 48)] = key
+	u64[0x870020 + (entry * 48)] = init_function
+	++Extras.extrasEntryList
+}
+
+function void Extras.addSecretsEntry(string name, string description, string key, u32 id, bool hidden_until_unlocked, u8 required_achievements)
+{
+	if (hidden_until_unlocked == true && Game.isSecretUnlocked(id) == false)
+		return
+	
+	u8 entry = Extras.secretsEntryList
+	u64[0x890000 + (entry * 96)] = name
+	u64[0x890010 + (entry * 96)] = description
+	u64[0x890020 + (entry * 96)] = key
+	u64[0x890030 + (entry * 96)] = id
+	u64[0x890040 + (entry * 96)] = hidden_until_unlocked
+	u64[0x890050 + (entry * 96)] = required_achievements
+	++Extras.secretsEntryList
+}
+
+function void Extras.addAchievementsEntry(string name, string description, string key, u32 id)
+{
+	if (Game.getSetting(SETTING_DEBUG_MODE) && System.isDevModeActive() == false)
+		return
+	
+	u8 entry = Extras.achievementsEntryList
+	if ((!Game.isAchievementComplete(id) && Extras.addedOpenAchievementsToEntryList == false) || (Game.isAchievementComplete(id) && Extras.addedOpenAchievementsToEntryList == true))
+	{
+		u64[0x8b0000 + (entry * 64)] = name
+		u64[0x8b0010 + (entry * 64)] = description
+		u64[0x8b0020 + (entry * 64)] = key
+		u32[0x8b0030 + (entry * 64)] = id
+		++Extras.achievementsEntryList
+	}
+}
+
+#endif

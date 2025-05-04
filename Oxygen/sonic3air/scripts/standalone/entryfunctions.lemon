@@ -56,6 +56,11 @@ function void EntryFunctions.actSelect()
 	System.setupCallFrame("LevelSelect.startGame")
 }
 
+function void EntryFunctions.extrasMenu()
+{
+	Extras.Menu(1)	// 1 for normal fade-in
+}
+
 
 function void EntryFunctions.competitionMode()
 {
