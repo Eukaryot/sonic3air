@@ -289,7 +289,7 @@ function void fn05b514()
 
 #if STANDALONE
 	// Number of text lines in credits
-	u32 lines = 0x287
+	u32 lines = 0x28C
 
 	// Sync point in credits music (in frames from music start)
 	//  -> This is different for emulated original S&K medley and the longer remastered one featuring also S3 music tracks

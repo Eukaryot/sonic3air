@@ -198,28 +198,34 @@ function u32 CreditsDataGenerator.build(u8 creditsIndex)
 		CreditsDataGenerator.addLine(line+5, 0, "LINNCAKI")
 		CreditsDataGenerator.addLine(line+6, 0, "FLAMEWING")
 		CreditsDataGenerator.addLine(line+7, 0, "HYLLIAN")
-		CreditsDataGenerator.addLine(line+8, 0, "VINEGAR")
-		CreditsDataGenerator.addLine(line+9, 0, "LEGOBOUWER")
-		CreditsDataGenerator.addLine(line+10, 0, "GFX")
-		CreditsDataGenerator.addLine(line+11, 0, "DYNAMIC LEMONS")
-		CreditsDataGenerator.addLine(line+12, 0, "HAZELSPOODER")
-		CreditsDataGenerator.addLine(line+13, 0, "ICLOUDIUS")
-		CreditsDataGenerator.addLine(line+14, 0, "DA GARDEN")
-		CreditsDataGenerator.addLine(line+15, 0, "ALIENEER")
-		CreditsDataGenerator.addLine(line+16, 0, "THREEPILLS")
-		CreditsDataGenerator.addLine(line+17, 0, "ELSIE THE PICT")
-		CreditsDataGenerator.addLine(line+18, 0, "THEMUSHRUNT")
-		CreditsDataGenerator.addLine(line+19, 0, "MRGRASSMANFOURTEEN")
-		line += 0x27
+		CreditsDataGenerator.addLine(line+8, 0, "MAXIM STEPIN")
+		CreditsDataGenerator.addLine(line+9, 0, "CAMERON ZEMEK")
+		CreditsDataGenerator.addLine(line+10, 0, "JULES BLOK")
+		CreditsDataGenerator.addLine(line+11, 0, "SEWERFIFTYSIX")
+		CreditsDataGenerator.addLine(line+12, 0, "VINEGAR")
+		CreditsDataGenerator.addLine(line+13, 0, "THORN")
+		CreditsDataGenerator.addLine(line+14, 0, "LEGOBOUWER")
+		CreditsDataGenerator.addLine(line+15, 0, "GFXTHIRTYTWO")
+		CreditsDataGenerator.addLine(line+16, 0, "DYNAMIC LEMONS")
+		CreditsDataGenerator.addLine(line+17, 0, "HAZELSPOODER")
+		CreditsDataGenerator.addLine(line+18, 0, "ICLOUDIUS")
+		CreditsDataGenerator.addLine(line+19, 0, "DA GARDEN")
+		CreditsDataGenerator.addLine(line+20, 0, "ALIENEER")
+		CreditsDataGenerator.addLine(line+21, 0, "THREEPILLS")
+		CreditsDataGenerator.addLine(line+22, 0, "ELSIE THE PICT")
+		CreditsDataGenerator.addLine(line+23, 0, "THEMUSHRUNT")
+		CreditsDataGenerator.addLine(line+24, 0, "MRGRASSMANFOURTEEN")
+		line += 0x2C
 
 		CreditsDataGenerator.addLine(line,   1, "SPECIAL THANKS TO")
 		CreditsDataGenerator.addLine(line+2, 0, "FRED BRONZE")
 		CreditsDataGenerator.addLine(line+3, 0, "MAINMEMORY")
 		CreditsDataGenerator.addLine(line+4, 0, "VALLEYBELL")
 		CreditsDataGenerator.addLine(line+5, 0, "SAXMAN")
-		CreditsDataGenerator.addLine(line+6, 0, "THE SONIC RETRO")
-		CreditsDataGenerator.addLine(line+7, 0, "COMMUNITY")
-		line += 0x15
+		CreditsDataGenerator.addLine(line+6, 0, "JERMAPHOBE")
+		CreditsDataGenerator.addLine(line+7, 0, "THE SONIC RETRO")
+		CreditsDataGenerator.addLine(line+8, 0, "COMMUNITY")
+		line += 0x16
 
 		CreditsDataGenerator.addLine(line,   0, "A BIG THANK YOU")
 		CreditsDataGenerator.addLine(line+1, 0, "TO ALL SUPPORTERS")
@@ -230,7 +236,7 @@ function u32 CreditsDataGenerator.build(u8 creditsIndex)
 		// Note: If changing the number of lines in the credits, make sure to also adjust "u32 lines" in "fn05b514()"
 
 		// Some spaces, then signal end
-		line = 0x8A		// This is chosen to match timing
+		line = 0x90		// This is chosen to match timing
 		CreditsDataGenerator.addLine(line, 0x10, 0, "   ")
 		CreditsDataGenerator.addSignal(0xfff4)
 	}
@@ -239,6 +245,7 @@ function u32 CreditsDataGenerator.build(u8 creditsIndex)
 	A1 = backupA1
 	return startAddress
 }
+
 
 
 
