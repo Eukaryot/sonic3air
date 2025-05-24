@@ -4,9 +4,6 @@
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
-*
-*	FTX_System
-*		FTX system manager class.
 */
 
 #pragma once
@@ -16,11 +13,11 @@ namespace rmx
 {
 
 	// FTX::System
-	class API_EXPORT FTX_SystemManager
+	class API_EXPORT SystemManager
 	{
 	public:
-		FTX_SystemManager();
-		~FTX_SystemManager();
+		SystemManager();
+		~SystemManager();
 
 		// System
 		bool initialize();
@@ -47,12 +44,13 @@ namespace rmx
 		// Input
 		bool  getKeyState(int key) const		{ return mInputContext.getKeyState(key); }
 		bool  getKeyChange(int key) const		{ return mInputContext.getKeyChange(key); }
-		const Vec2i& getMousePos() const		{ return mInputContext.mMousePos;  }
-		const Vec2i& getMouseRel() const		{ return mInputContext.mMouseRel;  }
-		int   getMouseWheel() const				{ return mInputContext.mMouseWheel; }
+		bool  getKeyRepeat(int key) const		{ return mInputContext.getKeyRepeat(key); }
+		const Vec2i& getMousePos() const		{ return mInputContext.getMousePos();  }
+		const Vec2i& getMouseRel() const		{ return mInputContext.getMouseRel();  }
+		int   getMouseWheel() const				{ return mInputContext.getMouseWheel(); }
 		bool  getMouseState(int button) const	{ return mInputContext.getMouseState(button); }
 		bool  getMouseChange(int button) const	{ return mInputContext.getMouseChange(button); }
-		bool  mouseIn(const Recti& rect) const	{ return rect.contains(mInputContext.mMousePos); }
+		bool  mouseIn(const Recti& rect) const	{ return rect.contains(mInputContext.getMousePos()); }
 		void  warpMouse(int x, int y);
 
 		// Consumption of the current event (like a keyboard, mouse, update, render call)
@@ -85,56 +83,6 @@ namespace rmx
 
 		InputContext mInputContext;
 		bool mCurrentEventConsumed = false;
-	};
-
-
-	// FTX::Video
-	class API_EXPORT FTX_VideoManager
-	{
-	friend class FTX_SystemManager;
-
-	public:
-		FTX_VideoManager();
-		~FTX_VideoManager();
-
-		bool isActive() const  { return mInitialized; }
-
-		// System
-		bool initialize(const VideoConfig& videoconfig);
-		void setInitialized(const VideoConfig& videoconfig, SDL_Window* window);
-
-		void reshape(int width, int height);
-
-		void beginRendering();
-		void endRendering();
-
-		// Video
-		const VideoConfig& getVideoConfig() const { return mVideoConfig; }
-		void setAutoClearScreen(bool enable)	{ mVideoConfig.mAutoClearScreen = enable; }
-		void setAutoSwapBuffers(bool enable)	{ mVideoConfig.mAutoSwapBuffers = enable; }
-
-		int getScreenWidth() const				{ return mVideoConfig.mWindowRect.width; }
-		int getScreenHeight() const				{ return mVideoConfig.mWindowRect.height; }
-		Vec2i getScreenSize() const				{ return mVideoConfig.mWindowRect.getSize(); }
-		const Recti& getScreenRect() const		{ return mVideoConfig.mWindowRect; }
-
-		bool reshaped() const					{ return mReshaped; }
-
-		void setPixelView();
-		void setPerspective2D(double fov, double dnear, double dfar);
-		void getScreenBitmap(Bitmap& bitmap);
-
-		uint64 getNativeWindowHandle() const;
-		SDL_Window* getMainWindow() const { return mMainWindow; }
-
-	private:
-		bool setVideoMode(const VideoConfig& videoconfig);
-
-	private:
-		bool mInitialized = false;
-		VideoConfig mVideoConfig;
-		bool mReshaped = false;
-		SDL_Window* mMainWindow = nullptr;
 	};
 
 }

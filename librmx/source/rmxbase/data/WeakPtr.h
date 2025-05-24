@@ -37,13 +37,17 @@ namespace rmx
 
 	protected:
 		WeakPtrBase()  {}	// Protected constructor so this base class can't be instanced
-		WeakPtrBase(WeakPtrTarget* target)  { setTarget(target); }
-		WeakPtrBase(WeakPtrTarget& target)  { setTarget(target); }
+		WeakPtrBase(WeakPtrTarget* target)		{ setTarget(target); }
+		WeakPtrBase(WeakPtrTarget& target)		{ setTarget(target); }
+		WeakPtrBase(const WeakPtrBase&& ptr)	{ setTarget(ptr.mTarget); }
+		WeakPtrBase(WeakPtrBase&& ptr)			{ setTarget(ptr.mTarget); ptr.clearTarget(); }
 		virtual ~WeakPtrBase()  { clearTarget(); }
 
 		void clearTarget();
 		void setTarget(WeakPtrTarget& target);
 		void setTarget(WeakPtrTarget* target);
+
+		inline void operator=(const WeakPtrBase& ptr)  { setTarget(ptr.mTarget); }
 
 	protected:
 		WeakPtrTarget* mTarget = nullptr;
@@ -60,8 +64,10 @@ class WeakPtr : public rmx::WeakPtrBase
 {
 public:
 	WeakPtr()  {}
-	WeakPtr(T* target)  { setTarget(target); }
-	WeakPtr(T& target)  { setTarget(target); }
+	WeakPtr(T* target)				{ setTarget(target); }
+	WeakPtr(T& target)				{ setTarget(target); }
+	WeakPtr(const WeakPtr<T>& ptr)	{ setTarget(ptr.mTarget); }
+	WeakPtr(WeakPtr<T>&& ptr)		{ setTarget(ptr.mTarget); ptr.clearTarget(); }
 
 	inline T* get() const  { return static_cast<T*>(mTarget); }
 
@@ -72,6 +78,8 @@ public:
 
 	inline T& operator*() const   { RMX_ASSERT(nullptr != mTarget, "Dereferencing invalid weak pointer"); return static_cast<T&>(*mTarget); }
 	inline T* operator->() const  { return static_cast<T*>(mTarget); }
+
+	inline void operator=(const WeakPtr<T>& ptr)   { setTarget(ptr.mTarget); }
 
 	inline bool operator==(const WeakPtr<T>& ptr) const  { return mTarget == ptr.mTarget; }
 	inline bool operator!=(const WeakPtr<T>& ptr) const  { return mTarget != ptr.mTarget; }

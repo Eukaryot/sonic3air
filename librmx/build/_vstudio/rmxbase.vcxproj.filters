@@ -334,4 +334,7 @@
       <Filter>_jsoncpp</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="librmx.natvis" />
+  </ItemGroup>
 </Project>

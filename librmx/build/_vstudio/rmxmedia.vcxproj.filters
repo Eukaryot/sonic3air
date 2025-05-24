@@ -85,9 +85,6 @@
     <ClCompile Include="..\..\source\rmxmedia\framework\AppFramework.cpp">
       <Filter>framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\rmxmedia\framework\FTX_System.cpp">
-      <Filter>framework</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\rmxmedia\framework\GuiBase.cpp">
       <Filter>framework</Filter>
     </ClCompile>
@@ -99,6 +96,15 @@
     </ClCompile>
     <ClCompile Include="..\..\source\rmxmedia\font\FontSource.cpp">
       <Filter>font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\framework\InputContext.cpp">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\framework\SystemManager.cpp">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\framework\VideoManager.cpp">
+      <Filter>framework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -173,9 +179,6 @@
     <ClInclude Include="..\..\source\rmxmedia\framework\AppFramework.h">
       <Filter>framework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\rmxmedia\framework\FTX_System.h">
-      <Filter>framework</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\rmxmedia\framework\GuiBase.h">
       <Filter>framework</Filter>
     </ClInclude>
@@ -187,6 +190,15 @@
     </ClInclude>
     <ClInclude Include="..\..\source\rmxmedia\font\FontSource.h">
       <Filter>font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\framework\InputContext.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\framework\SystemManager.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\framework\VideoManager.h">
+      <Filter>framework</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

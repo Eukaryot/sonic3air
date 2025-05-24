@@ -13,12 +13,12 @@
 // Singletons
 namespace FTX
 {
-	SingletonPtr<rmx::JobManager>		 JobManager;
-	SingletonPtr<rmx::FTX_SystemManager> System;
-	SingletonPtr<rmx::FTX_VideoManager>	 Video;
-	SingletonPtr<rmx::AudioManager>		 Audio;
+	SingletonPtr<rmx::JobManager>	 JobManager;
+	SingletonPtr<rmx::SystemManager> System;
+	SingletonPtr<rmx::VideoManager>	 Video;
+	SingletonPtr<rmx::AudioManager>	 Audio;
 #ifdef RMX_WITH_OPENGL_SUPPORT
-	SingletonPtr<rmx::Painter>			 Painter;
+	SingletonPtr<rmx::Painter>		 Painter;
 #endif
 };
 

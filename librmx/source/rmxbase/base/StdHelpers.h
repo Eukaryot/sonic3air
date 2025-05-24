@@ -38,6 +38,16 @@ T& vectorAdd(std::vector<T>& vec)
 
 // Remove element from an std::vector by swapping with the last one
 template<typename T>
+bool vectorRemoveAt(std::vector<T>& vec, size_t index)
+{
+	if (index >= vec.size())
+		return false;
+	vec.erase(vec.begin() + index);
+	return true;
+}
+
+// Remove element from an std::vector by swapping with the last one
+template<typename T>
 bool vectorRemoveSwap(std::vector<T>& vec, size_t index)
 {
 	if (index + 1 < vec.size())
@@ -46,6 +56,20 @@ bool vectorRemoveSwap(std::vector<T>& vec, size_t index)
 		return false;
 	vec.pop_back();
 	return true;
+}
+
+// Remove all instances of an element from an std::vector
+template<typename T, typename S>
+void vectorRemoveAll(std::vector<T>& vec, S value)
+{
+	vec.erase(std::remove(vec.begin(), vec.end(), value), vec.end());
+}
+
+// Remove all elements matching the predicate from an std::vector
+template<typename T, class PRED>
+void vectorRemoveByPredicate(std::vector<T>& vec, PRED predicate)
+{
+	vec.erase(std::remove_if(vec.begin(), vec.end(), predicate), vec.end());
 }
 
 // Check if an std::vector contains a certain element (actually only an alias for "containsElement")
@@ -80,20 +104,6 @@ const T* vectorFindByPredicate(const std::vector<T>& vec, PRED predicate)
 {
 	const auto it = std::find_if(vec.begin(), vec.end(), predicate);
 	return (it == vec.end()) ? nullptr : &*it;
-}
-
-// Remove all instances of an element from an std::vector
-template<typename T, typename S>
-void vectorRemoveAll(std::vector<T>& container, S value)
-{
-	container.erase(std::remove(container.begin(), container.end(), value), container.end());
-}
-
-// Remove all elements matching the predicate from an std::vector
-template<typename T, class PRED>
-void vectorRemoveByPredicate(std::vector<T>& container, PRED predicate)
-{
-	container.erase(std::remove_if(container.begin(), container.end(), predicate), container.end());
 }
 
 

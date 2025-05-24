@@ -14,36 +14,6 @@
 
 namespace rmx
 {
-	struct KeyboardEvent
-	{
-		int key = 0;
-		uint32 scancode = 0;
-		uint16 modifiers = 0;
-		bool state = false;
-		bool repeat = false;
-	};
-
-	struct TextInputEvent
-	{
-		WString text;
-	};
-
-	enum class MouseButton
-	{
-		Left = 0,
-		Right,
-		Middle,
-		Button4,
-		Button5
-	};
-
-	struct MouseEvent
-	{
-		MouseButton button = MouseButton::Left;
-		bool state = false;
-		Vec2i position;
-	};
-
 
 	struct VideoConfig
 	{
@@ -76,35 +46,6 @@ namespace rmx
 		VideoConfig(bool fullscreen, int width, int height, const String& caption = "");
 	};
 
-
-
-	class InputContext
-	{
-	public:
-		InputContext();
-		~InputContext();
-
-		void copy(const InputContext& source);
-
-		void applyEvent(const KeyboardEvent& ev);
-		void applyEvent(const MouseEvent& ev);
-
-		inline size_t getBitIndex(int key) const { return (key & 0x01ff) + ((key & SDLK_SCANCODE_MASK) >> 21); }
-		inline bool getKeyState(int key) const	 { return mKeyState.isBitSet(getBitIndex(key)); }
-		inline bool getKeyChange(int key) const	 { return mKeyChange.isBitSet(getBitIndex(key)); }
-
-		bool getMouseState(int button) const;
-		bool getMouseChange(int button) const;
-
-	public:
-		BitArray<0x400> mKeyState;
-		BitArray<0x400> mKeyChange;
-		Vec2i mMousePos;
-		Vec2i mMouseRel;
-		int   mMouseWheel;
-		bool  mMouseState[5];
-		bool  mMouseChange[5];
-	};
 }
 
 
@@ -126,6 +67,10 @@ namespace FTX
 	// Keyboard
 	bool keyState(int key);
 	bool keyChange(int key);
+	bool keyRepeat(int key);
+	bool keyPressed(int key);
+	bool keyPressedOrRepeat(int key);
+	bool keyReleased(int key);
 
 	// Mouse
 	const Vec2i& mousePos();
@@ -133,5 +78,7 @@ namespace FTX
 	int  mouseWheel();
 	bool mouseState(rmx::MouseButton button);
 	bool mouseChange(rmx::MouseButton button);
+	bool mousePressed(rmx::MouseButton button);
+	bool mouseReleased(rmx::MouseButton button);
 	bool mouseIn(const Recti& rect);
 }

@@ -33,59 +33,6 @@ namespace rmx
 			mCaption = caption;
 	}
 
-
-
-	InputContext::InputContext()
-	{
-		memset(this, 0, sizeof(InputContext));
-	}
-
-	InputContext::~InputContext()
-	{
-	}
-
-	void InputContext::copy(const InputContext& source)
-	{
-		*this = source;
-	}
-
-	void InputContext::applyEvent(const KeyboardEvent& ev)
-	{
-		static_assert(SDL_NUM_SCANCODES == 0x0200);		// That's actually only partially relevant, as we're using keycodes, not scancodes
-		const size_t bitIndex = getBitIndex(ev.key);
-
-		const bool oldState = mKeyState.isBitSet(bitIndex);
-		const bool change = (oldState != ev.state);
-		if (change)
-		{
-			mKeyState.setBit(bitIndex, ev.state);
-			mKeyChange.setBit(bitIndex);
-		}
-		else
-		{
-			mKeyChange.clearBit(bitIndex);
-		}
-	}
-
-	void InputContext::applyEvent(const MouseEvent& ev)
-	{
-		mMouseChange[(int)ev.button] = (ev.state != mMouseState[(int)ev.button]);
-		mMouseState[(int)ev.button] = ev.state;
-	}
-
-	bool InputContext::getMouseState(int button) const
-	{
-		if (button < 0 || button > 4)
-			return false;
-		return mMouseState[button];
-	}
-
-	bool InputContext::getMouseChange(int button) const
-	{
-		if (button < 0 || button > 4)
-			return false;
-		return mMouseChange[button];
-	}
 }
 
 
@@ -102,13 +49,19 @@ namespace FTX
 	float getFramerate()		{ return FTX::System->getFramerate(); }
 	int   getFrameCounter()		{ return FTX::System->getFrameCounter(); }
 
-	bool keyState(int key)		{ return FTX::System->getKeyState(key); }
-	bool keyChange(int key)		{ return FTX::System->getKeyChange(key); }
+	bool keyState(int key)				{ return FTX::System->getKeyState(key); }
+	bool keyChange(int key)				{ return FTX::System->getKeyChange(key); }
+	bool keyRepeat(int key)				{ return FTX::System->getKeyRepeat(key); }
+	bool keyPressed(int key)			{ return keyState(key) && keyChange(key); }
+	bool keyPressedOrRepeat(int key)	{ return keyPressed(key) || keyRepeat(key); }
+	bool keyReleased(int key)			{ return !keyState(key) && keyChange(key); }
 
 	const Vec2i& mousePos()						{ return FTX::System->getMousePos(); }
 	const Vec2i& mouseRel()						{ return FTX::System->getMouseRel(); }
 	int mouseWheel()							{ return FTX::System->getMouseWheel(); }
 	bool mouseState(rmx::MouseButton button)	{ return FTX::System->getMouseState((int)button); }
 	bool mouseChange(rmx::MouseButton button)	{ return FTX::System->getMouseChange((int)button); }
+	bool mousePressed(rmx::MouseButton button)	{ return mouseState(button) && mouseChange(button); }
+	bool mouseReleased(rmx::MouseButton button)	{ return !mouseState(button) && mouseChange(button); }
 	bool mouseIn(const Recti& rect)				{ return rect.contains(FTX::System->getMousePos()); }
 }

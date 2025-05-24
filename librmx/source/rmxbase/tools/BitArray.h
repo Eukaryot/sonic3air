@@ -1,6 +1,6 @@
 /*
-*	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	rmx Library
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -155,6 +155,30 @@ public:
 
 		// No cleared bit found any more
 		return -1;
+	}
+
+	void makeAND(const BitArray<NUM_BITS>& inputA, const BitArray<NUM_BITS>& inputB)
+	{
+		for (int chunkIndex = 0; chunkIndex < NUM_CHUNKS; ++chunkIndex)
+		{
+			mChunks[chunkIndex] = inputA.mChunks[chunkIndex] & inputB.mChunks[chunkIndex];
+		}
+	}
+
+	void makeOR(const BitArray<NUM_BITS>& inputA, const BitArray<NUM_BITS>& inputB)
+	{
+		for (int chunkIndex = 0; chunkIndex < NUM_CHUNKS; ++chunkIndex)
+		{
+			mChunks[chunkIndex] = inputA.mChunks[chunkIndex] | inputB.mChunks[chunkIndex];
+		}
+	}
+
+	void makeXOR(const BitArray<NUM_BITS>& inputA, const BitArray<NUM_BITS>& inputB)
+	{
+		for (int chunkIndex = 0; chunkIndex < NUM_CHUNKS; ++chunkIndex)
+		{
+			mChunks[chunkIndex] = inputA.mChunks[chunkIndex] ^ inputB.mChunks[chunkIndex];
+		}
 	}
 
 private:
