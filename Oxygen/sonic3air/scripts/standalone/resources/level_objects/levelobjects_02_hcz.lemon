@@ -178,6 +178,13 @@ function void LevelObjectTableBuilder.buildObjects_HCZ1()
 	LevelObjectTableBuilder.addObject(0x19b0, 0x07f0, OBJECTTABLE1_3b, 0x01, 0)
 	LevelObjectTableBuilder.addObject(0x19d8, 0x030b, OBJECTTABLE1_3e, 0x05, 0)
 	LevelObjectTableBuilder.addObject(0x19d8, 0x0335, OBJECTTABLE1_3e, 0x15, LVLOBJ_FLIP_X)
+
+	if (Game.getSetting(SETTING_FIX_GLITCHES))
+	{
+		// Push character back behind forground tile elements
+		LevelObjectTableBuilder.addObject(0x1a10, 0x06c0, OBJECTTABLE1_02, 0x41, 0)
+	}
+
 	LevelObjectTableBuilder.addObject(0x1a90, 0x07c6, OBJECTTABLE1_07, 0x24, LVLOBJ_FLIP_Y)
 	LevelObjectTableBuilder.addObject(0x1ac0, 0x036c, OBJECTTABLE1_34, 0x02, 0)
 
