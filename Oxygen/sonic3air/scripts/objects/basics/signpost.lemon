@@ -578,3 +578,4 @@ function void StartCharacterWinPose()
 	objA0.flags2a &= ~object.flag.P1_PUSHING
 	objA0.flags2a &= ~object.flag.P2_PUSHING
 }
+
