@@ -24,7 +24,7 @@ public:
 	inline const std::unordered_map<uint64, Mod*>& getActiveModsByNameHash() const	{ return mActiveModsByNameHash; }
 	inline const std::unordered_map<uint64, Mod*>& getModsByIDHash() const			{ return mModsByIDHash; }
 
-	Mod* findModByIDHash(uint64 idHash) const  { Mod*const* ptr = mapFind(mModsByIDHash, idHash); return (nullptr != ptr) ? *ptr : nullptr; }
+	Mod* findModByIDHash(uint64 idHash) const  { return mapFindOrDefault(mModsByIDHash, idHash, nullptr); }
 
 	void startup();
 	void clear();

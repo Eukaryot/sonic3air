@@ -39,11 +39,8 @@ const PaletteBase* PaletteCollection::getPalette(uint64 key, uint8 line) const
 	if (nullptr != palette)
 		return palette;
 
-	PaletteBase*const* palettePtr = mapFind(mRedirections, key + line);
-	if (nullptr != palettePtr)
-		return *palettePtr;
-
-	return nullptr;
+	palette = mapFindOrDefault(mRedirections, key + line, nullptr);
+	return palette;
 }
 
 void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool isModded)

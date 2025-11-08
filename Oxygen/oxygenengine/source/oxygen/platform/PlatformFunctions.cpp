@@ -425,7 +425,7 @@ void PlatformFunctions::showMessageBox(const std::string& caption, const std::st
 {
 #ifdef PLATFORM_WINDOWS
 
-	MessageBoxA(nullptr, text.c_str(), caption.c_str(), MB_OK | MB_ICONEXCLAMATION);
+	MessageBoxA((HWND)FTX::Video->getNativeWindowHandle(), text.c_str(), caption.c_str(), MB_OK | MB_ICONEXCLAMATION);
 
 #else
 
