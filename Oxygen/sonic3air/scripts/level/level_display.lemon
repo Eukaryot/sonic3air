@@ -303,17 +303,12 @@ function void WriteDataToVRAM()
 function void ReadDataFromVRAM()
 {
 	// Read from VDP
-#if STANDALONE
-	VDP.setupVRAMWrite(D0.u16)
-#else
-	u32[0xc00004] = VDPHelper.getDirectWriteCode(D0.u16, 0)
-#endif
+	VDP.setupVRAMRead(D0.u16)
 
-	while (D1.s16 >= 0)
+	for (; D1.s16 >= 0; --D1.s16)
 	{
 		u32[A0] = VDP.readData32()
 		A0 += 4
-		--D1.s16
 	}
 }
 
