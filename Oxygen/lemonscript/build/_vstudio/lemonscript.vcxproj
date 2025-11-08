@@ -66,12 +66,12 @@
     <ClCompile Include="..\..\source\lemon\utility\StringFormatterLegacy.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\lemon\basics\GenericManager.h" />
     <ClInclude Include="..\..\source\lemon\compiler\backend\FunctionCompiler.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Errors.h" />
     <ClInclude Include="..\..\source\lemon\compiler\frontend\CompilerFrontend.h" />
     <ClInclude Include="..\..\source\lemon\compiler\frontend\TokenProcessing.h" />
-    <ClInclude Include="..\..\source\lemon\compiler\GenericManager.h" />
     <ClInclude Include="..\..\source\lemon\compiler\LineNumberTranslation.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Node.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Definitions.h" />

@@ -522,7 +522,7 @@ namespace lemon
 	{
 		switch (token.getType())
 		{
-			case Token::Type::UNARY_OPERATION:
+			case UnaryOperationToken::TYPE:
 			{
 				CHECK_ERROR(!isLValue, "Cannot assign value to a unary operation", mLineNumber);
 				const UnaryOperationToken& uot = token.as<UnaryOperationToken>();
@@ -563,7 +563,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::BINARY_OPERATION:
+			case BinaryOperationToken::TYPE:
 			{
 				CHECK_ERROR(!isLValue, "Cannot assign value to a binary operation", mLineNumber);
 				const BinaryOperationToken& bot = token.as<BinaryOperationToken>();
@@ -703,7 +703,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::PARENTHESIS:
+			case ParenthesisToken::TYPE:
 			{
 				CHECK_ERROR(!isLValue, "Cannot assign value to an expression in parentheses", mLineNumber);
 				const ParenthesisToken& pt = token.as<ParenthesisToken>();
@@ -717,7 +717,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::CONSTANT:
+			case ConstantToken::TYPE:
 			{
 				CHECK_ERROR(!isLValue, "Cannot assign value to a constant", mLineNumber);
 				const ConstantToken& ct = token.as<ConstantToken>();
@@ -725,7 +725,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::VARIABLE:
+			case VariableToken::TYPE:
 			{
 				const VariableToken& vt = token.as<VariableToken>();
 				const Opcode::Type opcodeType = isLValue ? Opcode::Type::SET_VARIABLE_VALUE : Opcode::Type::GET_VARIABLE_VALUE;
@@ -733,7 +733,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::FUNCTION:
+			case FunctionToken::TYPE:
 			{
 				CHECK_ERROR(!isLValue, "Cannot assign value to a function call", mLineNumber);
 				const FunctionToken& ft = token.as<FunctionToken>();
@@ -750,7 +750,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::MEMORY_ACCESS:
+			case MemoryAccessToken::TYPE:
 			{
 				const MemoryAccessToken& mat = token.as<MemoryAccessToken>();
 				compileTokenTreeToOpcodes(*mat.mAddress);
@@ -760,7 +760,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::BRACKET_ACCESS:
+			case BracketAccessToken::TYPE:
 			{
 				const BracketAccessToken& bat = token.as<BracketAccessToken>();
 				const DataTypeDefinition::BracketOperator& bracket = bat.mVariable->getDataType()->getBracketOperator();
@@ -790,7 +790,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::VALUE_CAST:
+			case ValueCastToken::TYPE:
 			{
 				CHECK_ERROR(!isLValue, "Cannot assign value to a type cast", mLineNumber);
 				const ValueCastToken& vct = token.as<ValueCastToken>();

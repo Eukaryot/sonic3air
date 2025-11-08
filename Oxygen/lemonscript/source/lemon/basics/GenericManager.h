@@ -15,7 +15,11 @@ namespace genericmanager
 {
 
 	template<class ELEMENT> class Manager;
-	template<class ELEMENT> struct GetElementFactoryLookupType;
+	namespace detail
+	{
+		template<class ELEMENT> class ElementClassBase;
+		template<class ELEMENT> class ElementClassCollection;
+	}
 
 
 	// Managed element base class
@@ -28,8 +32,13 @@ namespace genericmanager
 	public:
 		inline Type getType() const  { return mType; }
 
-		template<typename T> T& as()  { return static_cast<T&>(*this); }
-		template<typename T> const T& as() const  { return static_cast<const T&>(*this); }
+		template<typename T> bool isA() const		{ return (getType() == T::TYPE); }
+
+		template<typename T> T& as()				{ return *static_cast<T*>(this); }
+		template<typename T> const T& as() const	{ return *static_cast<const T*>(this); }
+
+		template<typename T> T* cast()				{ return isA<T>() ? static_cast<T*>(this) : nullptr; }
+		template<typename T> const T* cast() const	{ return isA<T>() ? static_cast<const T*>(this) : nullptr; }
 
 		inline uint32 getReferenceCounter() const  { return mReferenceCounter; }
 
@@ -69,17 +78,21 @@ namespace genericmanager
 		template<class ELEMENT>
 		class ElementFactoryBase
 		{
+		friend class Manager<ELEMENT>;
+
 		public:
 			virtual ELEMENT& create() = 0;
-			virtual void destroy(ELEMENT& element) = 0;
 			virtual void shrinkPool() {}
+
+		protected:
+			virtual void destroy(ELEMENT& element) = 0;
 		};
 
 
 		template<class ELEMENT, typename T>
-		class ElementFactory : public ElementFactoryBase<ELEMENT>
+		class ElementFactoryImpl : public ElementFactoryBase<ELEMENT>
 		{
-		public:
+		protected:
 			inline ELEMENT& create() override  { return mElementPool.createObject(); }
 			inline void destroy(ELEMENT& element) override  { mElementPool.destroyObject(static_cast<T&>(element)); }
 			inline void shrinkPool() override  { mElementPool.shrink(); }
@@ -90,87 +103,77 @@ namespace genericmanager
 
 
 		template<class ELEMENT>
-		class ElementFactoryMap
+		class ElementClassBase
+		{
+		public:
+			inline uint32 getType() const  { return mType; }
+			inline ElementFactoryBase<ELEMENT>& getFactory() const  { return mFactory; }
+
+		public:
+			inline bool operator==(const ElementClassBase<ELEMENT>& other) const  { return this == &other; }
+
+		private:
+			const uint32 mType;
+			ElementFactoryBase<ELEMENT>& mFactory;
+
+		protected:
+			inline ElementClassBase(uint32 type, ElementFactoryBase<ELEMENT>& factory) : mType(type), mFactory(factory)
+			{
+				ElementClassCollection<ELEMENT>::getInstance().registerClass(*this);
+			}
+		};
+
+
+		template<class ELEMENT, class T, uint32 TYPE>
+		class ElementClassImpl : public ElementClassBase<ELEMENT>
+		{
+		public:
+			ElementFactoryImpl<ELEMENT, T> mFactoryImplementation;
+
+			inline ElementClassImpl() : ElementClassBase<ELEMENT>(TYPE, mFactoryImplementation) {}
+		};
+
+
+		template<class ELEMENT>
+		class ElementClassCollection
 		{
 		public:
 			typedef uint32 Type;
-			typedef ElementFactoryBase<ELEMENT> FactoryBase;
 
 		public:
-			template<typename T>
-			FactoryBase& getOrCreateElementFactory()
+			static inline ElementClassCollection<ELEMENT>& getInstance()
 			{
-				const constexpr uint32 type = (uint32)T::TYPE;
-				if constexpr (type < 0x80)
+				if (nullptr == mInstance)
+					mInstance = new ElementClassCollection<ELEMENT>();
+				return *mInstance;
+			}
+
+		public:
+			void registerClass(ElementClassBase<ELEMENT>& newClass)
+			{
+				mClassList.push_back(&newClass);
+				mClassMap[newClass.getType()] = &newClass;
+			}
+
+			void shrinkAllPools() const
+			{
+				for (ElementClassBase<ELEMENT>* elementClass : mClassList)
 				{
-					// Use std::vector
-					if (nullptr != mClassFactoriesList[type])
-					{
-						return *mClassFactoriesList[type];
-					}
-					else
-					{
-						FactoryBase* factory = new ElementFactory<ELEMENT, T>();
-						mClassFactoriesList[type] = factory;
-						return *factory;
-					}
-				}
-				else
-				{
-					// Use std::map
-					const auto it = mClassFactoriesMap.find(type);
-					if (it != mClassFactoriesMap.end())
-					{
-						return *it->second;
-					}
-					else
-					{
-						FactoryBase* factory = new ElementFactory<ELEMENT, T>();
-						mClassFactoriesMap[type] = factory;
-						return *factory;
-					}
+					elementClass->getFactory().shrinkPool();
 				}
 			}
 
-			FactoryBase& getElementFactory(Type type_)
+			ElementFactoryBase<ELEMENT>* getFactory(Type type) const
 			{
-				const uint32 type = (uint32)type_;
-				if (type < 0x80)
-				{
-					if (nullptr != mClassFactoriesList[type])
-					{
-						return *mClassFactoriesList[type];
-					}
-				}
-				else
-				{
-					const auto it = mClassFactoriesMap.find(type);
-					if (it != mClassFactoriesMap.end())
-					{
-						return *it->second;
-					}
-				}
-				RMX_ERROR("Element class factory does not exist for type " << type, RMX_REACT_THROW);
-				static FactoryBase* dummy = nullptr;
-				return *dummy;
-			}
-
-			void shrinkAllPools()
-			{
-				for (size_t index = 0; index < 0x80; ++index)
-				{
-					if (nullptr != mClassFactoriesList[index])
-						mClassFactoriesList[index]->shrinkPool();
-				}
-				for (const auto& pair : mClassFactoriesMap)
-				{
-					pair.second->shrinkPool();
-				}
+				const auto it = mClassMap.find(type);
+				return (it != mClassMap.end()) ? &(it->second)->getFactory() : nullptr;
 			}
 
 		private:
-			FactoryBase* mClassFactoriesList[0x80] = { nullptr };	// Used for types that are less than 0x80 as unsigned integer
-			std::map<uint32, FactoryBase*> mClassFactoriesMap;		// Used for types that are 0x80 or higher as unsigned integer
+			static inline ElementClassCollection<ELEMENT>* mInstance = nullptr;
+
+			std::vector<ElementClassBase<ELEMENT>*> mClassList;
+			std::unordered_map<Type, ElementClassBase<ELEMENT>*> mClassMap;
 		};
 	}
 
@@ -181,6 +184,7 @@ namespace genericmanager
 	class Manager
 	{
 	friend class Element<ELEMENT>;
+	friend class detail::ElementClassBase<ELEMENT>;
 
 	public:
 		typedef uint32 Type;
@@ -189,25 +193,33 @@ namespace genericmanager
 		template<typename TYPE>
 		static TYPE& create()
 		{
-			detail::ElementFactoryBase<ELEMENT>& factory = mFactoryMap.template getOrCreateElementFactory<TYPE>();
-			return static_cast<TYPE&>(factory.create());
+			return static_cast<TYPE&>(TYPE::CLASS.getFactory().create());
+		}
+
+		static ELEMENT& create(Type type)
+		{
+			detail::ElementClassCollection<ELEMENT>& collection = detail::ElementClassCollection<ELEMENT>::getInstance();
+			detail::ElementFactoryBase<ELEMENT>* factory = collection.getFactory(type);
+			RMX_ASSERT(nullptr != factory, "Invalid type " << type);
+			return factory->create();
 		}
 
 		static void shrinkAllPools()
 		{
-			mFactoryMap.shrinkAllPools();
+			detail::ElementClassCollection<ELEMENT>& collection = detail::ElementClassCollection<ELEMENT>::getInstance();
+			collection.shrinkAllPools();
 		}
 
 	private:
+		// Destroy is private as it should only be called by the reference counting mechanism
 		static void destroy(Element<ELEMENT>& element)
 		{
 			RMX_ASSERT(element.getReferenceCounter() == 0, "Element still has references");
-			detail::ElementFactoryBase<ELEMENT>& factory = mFactoryMap.getElementFactory(element.getType());
-			factory.destroy(static_cast<ELEMENT&>(element));
+			detail::ElementClassCollection<ELEMENT>& collection = detail::ElementClassCollection<ELEMENT>::getInstance();
+			detail::ElementFactoryBase<ELEMENT>* factory = collection.getFactory(element.getType());
+			RMX_ASSERT(nullptr != factory, "Invalid factory");
+			factory->destroy(static_cast<ELEMENT&>(element));
 		}
-
-	private:
-		static inline detail::ElementFactoryMap<ELEMENT> mFactoryMap;
 	};
 
 
@@ -216,6 +228,9 @@ namespace genericmanager
 	template<class ELEMENT, typename BASE = ELEMENT>
 	class ElementPtr
 	{
+	public:
+		typedef uint32 Type;
+
 	public:
 		inline ElementPtr() : mElement(nullptr)  {}
 		inline explicit ElementPtr(ELEMENT& element) : mElement(nullptr)  { set(&element); }
@@ -229,6 +244,7 @@ namespace genericmanager
 		template<typename T> T* as() const  { return static_cast<T*>(mElement); }
 
 		template<typename T> T& create()  { T& element = Manager<BASE>::template create<T>(); set(element); return element; }
+		ELEMENT& create(Type type)		  { ELEMENT& element = Manager<BASE>::template create(type); set(element); return element; }
 
 		inline void clear()  { set(nullptr); }
 		inline void set(ELEMENT& element)		{ set(&element); }
@@ -243,9 +259,22 @@ namespace genericmanager
 				mElement->addReference();
 		}
 
+		void swapWith(ElementPtr& ptr)
+		{
+			std::swap(mElement, ptr.mElement);
+		}
+
 		inline void operator=(ELEMENT& element)		 { set(element); }
 		inline void operator=(ELEMENT* element)		 { set(element); }
 		inline void operator=(const ElementPtr& ptr) { set(ptr); }
+
+		inline void operator=(ElementPtr&& ptr)
+		{
+			if (nullptr != mElement)
+				mElement->removeReference();
+			mElement = ptr.mElement;
+			ptr.mElement = nullptr;
+		}
 
 		inline ELEMENT& operator*()				  { return *mElement; }
 		inline const ELEMENT& operator*() const	  { return *mElement; }
@@ -268,7 +297,7 @@ namespace genericmanager
 			mElements(mBuffer)
 		{}
 
-		explicit ElementList(const ElementList& other)
+		inline explicit ElementList(const ElementList& other)
 		{
 			const size_t size = other.mSize;
 			reserve(size);
@@ -279,6 +308,12 @@ namespace genericmanager
 				//RMX_CHECK(nullptr != mElements[i], "Invalid entry in element list", RMX_REACT_THROW);
 				mElements[i]->addReference();
 			}
+		}
+
+		inline ElementList(ElementList&& other) :
+			ElementList()
+		{
+			swapWith(other);
 		}
 
 		inline virtual ~ElementList()
@@ -460,6 +495,32 @@ namespace genericmanager
 			mSize -= actuallyRemoved;
 		}
 
+		void copyFrom(const ElementList& other)
+		{
+			copyFrom(other, 0, other.size());
+		}
+
+		void copyFrom(const ElementList& other, size_t startIndex, size_t count)
+		{
+			if (startIndex + count > other.mSize)
+			{
+				if (startIndex >= other.mSize)
+					return;
+				count = other.mSize - startIndex;
+			}
+			reserve(mSize + count);
+			for (size_t i = 0; i < count; ++i)
+			{
+				mElements[mSize + i] = other.mElements[startIndex + i];
+				mElements[mSize + i]->addReference();
+			}
+			for (size_t i = startIndex; i < other.mSize - count; ++i)
+			{
+				other.mElements[i] = other.mElements[i + count];
+			}
+			mSize += count;
+		}
+
 		void moveFrom(ElementList& other, size_t startIndex, size_t count)
 		{
 			if (startIndex + count > other.mSize)
@@ -520,6 +581,18 @@ namespace genericmanager
 		ELEMENT& back() const  { return *mElements[mSize-1]; }
 		ELEMENT& operator[](size_t index) const { return *mElements[index]; }
 
+		void operator=(const ElementList& other)
+		{
+			clear();
+			copyFrom(other, 0, other.size());
+		}
+
+		void operator=(ElementList&& other)
+		{
+			clear();
+			moveFrom(other, 0, other.size());
+		}
+
 	private:
 		size_t mSize = 0;
 		size_t mReserved = FIXEDSIZE;
@@ -528,3 +601,12 @@ namespace genericmanager
 	};
 
 }
+
+
+#define DEFINE_GENERIC_MANAGER_ELEMENT_TYPE(_element_, _base_, _class_, _type_) \
+public: \
+	static inline const uint32 TYPE = _type_; \
+	static inline genericmanager::detail::ElementClassImpl<_element_, _class_, _type_> CLASS; \
+	inline _class_() : _base_(TYPE) {} \
+protected: \
+	inline explicit _class_(uint32 TYPE) : _base_(TYPE) {}	// For sub-classes that want to inherit from this

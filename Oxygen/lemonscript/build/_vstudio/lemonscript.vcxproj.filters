@@ -31,6 +31,9 @@
     <Filter Include="lemon\compiler\parser">
       <UniqueIdentifier>{bb405800-486c-4cfb-9b24-da9a021501c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lemon\basics">
+      <UniqueIdentifier>{e8cf751e-41fd-49fb-a6cf-a392a9be71cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\lemon\compiler\Compiler.cpp">
@@ -200,9 +203,6 @@
     <ClInclude Include="..\..\source\lemon\runtime\Runtime.h">
       <Filter>lemon\runtime</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\lemon\compiler\GenericManager.h">
-      <Filter>lemon\compiler</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\lemon\runtime\StandardLibrary.h">
       <Filter>lemon\runtime</Filter>
     </ClInclude>
@@ -346,6 +346,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\utility\StringFormatterLegacy.h">
       <Filter>lemon\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\basics\GenericManager.h">
+      <Filter>lemon\basics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

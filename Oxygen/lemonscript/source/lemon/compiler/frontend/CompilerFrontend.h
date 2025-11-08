@@ -90,7 +90,7 @@ namespace lemon
 
 		// Misc
 		bool processGlobalPragma(const std::string& content);
-		AnyBaseValue readConstantExpression(const TokenList& tokens, size_t& pos, size_t endPos, const DataTypeDefinition* dataType, uint32 lineNumber);
+		AnyBaseValue readConstantExpression(TokenList& tokens, size_t& pos, size_t endPos, const DataTypeDefinition* dataType, uint32 lineNumber);
 
 	private:
 		Module& mModule;

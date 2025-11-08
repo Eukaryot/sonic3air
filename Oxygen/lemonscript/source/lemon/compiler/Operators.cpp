@@ -206,4 +206,42 @@ namespace lemon
 		}
 	}
 
+	Operator OperatorHelper::getBinaryForAssign(Operator op)
+	{
+		switch (op)
+		{
+			case lemon::Operator::ASSIGN_PLUS:			return lemon::Operator::BINARY_PLUS;
+			case lemon::Operator::ASSIGN_MINUS:			return lemon::Operator::BINARY_MINUS;
+			case lemon::Operator::ASSIGN_MULTIPLY:		return lemon::Operator::BINARY_MULTIPLY;
+			case lemon::Operator::ASSIGN_DIVIDE:		return lemon::Operator::BINARY_DIVIDE;
+			case lemon::Operator::ASSIGN_MODULO:		return lemon::Operator::BINARY_MODULO;
+			case lemon::Operator::ASSIGN_SHIFT_LEFT:	return lemon::Operator::BINARY_SHIFT_LEFT;
+			case lemon::Operator::ASSIGN_SHIFT_RIGHT:	return lemon::Operator::BINARY_SHIFT_RIGHT;
+			case lemon::Operator::ASSIGN_AND:			return lemon::Operator::BINARY_AND;
+			case lemon::Operator::ASSIGN_OR:			return lemon::Operator::BINARY_OR;
+			case lemon::Operator::ASSIGN_XOR:			return lemon::Operator::BINARY_XOR;
+			default:
+				return lemon::Operator::_INVALID;
+		}
+	}
+
+	Operator OperatorHelper::getAssignForBinary(Operator op)
+	{
+		switch (op)
+		{
+			case lemon::Operator::BINARY_PLUS:			return lemon::Operator::ASSIGN_PLUS;
+			case lemon::Operator::BINARY_MINUS:			return lemon::Operator::ASSIGN_MINUS;
+			case lemon::Operator::BINARY_MULTIPLY:		return lemon::Operator::ASSIGN_MULTIPLY;
+			case lemon::Operator::BINARY_DIVIDE:		return lemon::Operator::ASSIGN_DIVIDE;
+			case lemon::Operator::BINARY_MODULO:		return lemon::Operator::ASSIGN_MODULO;
+			case lemon::Operator::BINARY_SHIFT_LEFT:	return lemon::Operator::ASSIGN_SHIFT_LEFT;
+			case lemon::Operator::BINARY_SHIFT_RIGHT:	return lemon::Operator::ASSIGN_SHIFT_RIGHT;
+			case lemon::Operator::BINARY_AND:			return lemon::Operator::ASSIGN_AND;
+			case lemon::Operator::BINARY_OR:			return lemon::Operator::ASSIGN_OR;
+			case lemon::Operator::BINARY_XOR:			return lemon::Operator::ASSIGN_XOR;
+			default:
+				return lemon::Operator::_INVALID;
+		}
+	}
+
 }

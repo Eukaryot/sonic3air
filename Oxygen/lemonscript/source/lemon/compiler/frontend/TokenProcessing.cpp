@@ -185,23 +185,72 @@ namespace lemon
 		bool anyResolved = false;
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			if (tokens[i].isA<IdentifierToken>())
+			if (tryResolveIdentifier(tokens, i))
 			{
-				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
-				if (nullptr == identifierToken.mResolved)
-				{
-					const uint64 nameHash = identifierToken.mName.getHash();
-					identifierToken.mResolved = mGlobalsLookup.resolveIdentifierByHash(nameHash);
-					if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::DATA_TYPE)
-					{
-						VarTypeToken& varTypeToken = tokens.createReplaceAt<VarTypeToken>(i);
-						varTypeToken.mDataType = &identifierToken.mResolved->as<const DataTypeDefinition>();
-					}
-					anyResolved = true;
-				}
+				anyResolved = true;
 			}
 		}
 		return anyResolved;
+	}
+
+	bool TokenProcessing::tryResolveIdentifier(TokenList& tokens, size_t pos)
+	{
+		IdentifierToken* identifierToken = tokens[pos].cast<IdentifierToken>();
+		if (nullptr == identifierToken)
+			return false;
+		if (nullptr != identifierToken->mResolved)
+			return false;		// Return false to signal that there was no change
+
+		const uint64 nameHash = identifierToken->mName.getHash();
+		identifierToken->mResolved = mGlobalsLookup.resolveIdentifierByHash(nameHash);
+		if (nullptr != identifierToken->mResolved && identifierToken->mResolved->getType() == GlobalsLookup::Identifier::Type::DATA_TYPE)
+		{
+			VarTypeToken& varTypeToken = tokens.createReplaceAt<VarTypeToken>(pos);
+			varTypeToken.mDataType = &identifierToken->mResolved->as<const DataTypeDefinition>();
+		}
+		return true;
+	}
+
+	bool TokenProcessing::processConstant(TokenList& tokens, size_t pos)
+	{
+		IdentifierToken* identifierToken = tokens[pos].cast<IdentifierToken>();
+		if (nullptr == identifierToken)
+			return false;
+
+		if (nullptr == identifierToken->mResolved)
+		{
+			if (!tryResolveIdentifier(tokens, pos))
+				return false;
+
+			// Token type might have changed, so better check for that
+			identifierToken = tokens[pos].cast<IdentifierToken>();
+			if (nullptr == identifierToken)
+				return false;
+		}
+
+		const Constant* constant = nullptr;
+		if (nullptr != identifierToken->mResolved && identifierToken->mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT)
+		{
+			constant = &identifierToken->mResolved->as<Constant>();
+		}
+		else
+		{
+			for (const Constant& localConstant : *mContext.mLocalConstants)
+			{
+				if (localConstant.getName() == identifierToken->mName)
+				{
+					constant = &localConstant;
+					break;
+				}
+			}
+			if (nullptr == constant)
+				return false;
+		}
+
+		ConstantToken& newToken = tokens.createReplaceAt<ConstantToken>(pos);
+		newToken.mDataType = constant->getDataType();
+		newToken.mValue.set(constant->getValue());
+		return true;
 	}
 
 	void TokenProcessing::insertCastTokenIfNecessary(TokenPtr<StatementToken>& token, const DataTypeDefinition* targetDataType)
@@ -258,32 +307,7 @@ namespace lemon
 	{
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			if (tokens[i].isA<IdentifierToken>())
-			{
-				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
-				const Constant* constant = nullptr;
-				if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT)
-				{
-					constant = &identifierToken.mResolved->as<Constant>();
-				}
-				else
-				{
-					for (const Constant& localConstant : *mContext.mLocalConstants)
-					{
-						if (localConstant.getName() == identifierToken.mName)
-						{
-							constant = &localConstant;
-							break;
-						}
-					}
-					if (nullptr == constant)
-						continue;
-				}
-
-				ConstantToken& newToken = tokens.createReplaceAt<ConstantToken>(i);
-				newToken.mDataType = constant->getDataType();
-				newToken.mValue.set(constant->getValue());
-			}
+			processConstant(tokens, i);
 		}
 	}
 
@@ -401,14 +425,14 @@ namespace lemon
 		{
 			switch (tokens[i].getType())
 			{
-				case Token::Type::PARENTHESIS:
+				case ParenthesisToken::TYPE:
 				{
 					// Call recursively for this parenthesis' contents
 					processTokenListRecursive(tokens[i].as<ParenthesisToken>().mContent);
 					break;
 				}
 
-				case Token::Type::COMMA_SEPARATED:
+				case CommaSeparatedListToken::TYPE:
 				{
 					// Call recursively for each comma-separated part
 					for (TokenList& content : tokens[i].as<CommaSeparatedListToken>().mContent)
@@ -463,7 +487,7 @@ namespace lemon
 			Token& token = tokens[i];
 			switch (token.getType())
 			{
-				case Token::Type::KEYWORD:
+				case KeywordToken::TYPE:
 				{
 					const Keyword keyword = token.as<KeywordToken>().mKeyword;
 					if (keyword == Keyword::FUNCTION)
@@ -477,7 +501,7 @@ namespace lemon
 					break;
 				}
 
-				case Token::Type::VARTYPE:
+				case VarTypeToken::TYPE:
 				{
 					const DataTypeDefinition* varType = token.as<VarTypeToken>().mDataType;
 
@@ -1046,7 +1070,7 @@ namespace lemon
 	{
 		switch (inputToken.getType())
 		{
-			case Token::Type::PARENTHESIS:
+			case ParenthesisToken::TYPE:
 			{
 				ParenthesisToken& pt = inputToken.as<ParenthesisToken>();
 				if (pt.mParenthesisType == ParenthesisType::PARENTHESIS && pt.mContent.size() == 1 && pt.mContent[0].isStatement())
@@ -1061,7 +1085,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::UNARY_OPERATION:
+			case UnaryOperationToken::TYPE:
 			{
 				UnaryOperationToken& uot = inputToken.as<UnaryOperationToken>();
 				evaluateCompileTimeConstantsRecursive(*uot.mArgument, uot.mArgument);
@@ -1081,7 +1105,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::BINARY_OPERATION:
+			case BinaryOperationToken::TYPE:
 			{
 				BinaryOperationToken& bot = inputToken.as<BinaryOperationToken>();
 				evaluateCompileTimeConstantsRecursive(*bot.mLeft, bot.mLeft);
@@ -1102,7 +1126,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::FUNCTION:
+			case FunctionToken::TYPE:
 			{
 				FunctionToken& ft = inputToken.as<FunctionToken>();
 				bool allConstant = true;
@@ -1320,7 +1344,7 @@ namespace lemon
 	{
 		switch (token.getType())
 		{
-			case Token::Type::CONSTANT:
+			case ConstantToken::TYPE:
 			{
 				if (token.mDataType->getClass() == DataTypeDefinition::Class::INTEGER)
 				{
@@ -1337,25 +1361,25 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::VARIABLE:
+			case VariableToken::TYPE:
 			{
 				// Nothing to do, data type was already set when creating the token
 				break;
 			}
 
-			case Token::Type::FUNCTION:
+			case FunctionToken::TYPE:
 			{
 				// Nothing to do, "processFunctionCalls" cared about everything already
 				break;
 			}
 
-			case Token::Type::MEMORY_ACCESS:
+			case MemoryAccessToken::TYPE:
 			{
 				// Nothing to do, "processMemoryAccesses" cared about everything already
 				break;
 			}
 
-			case Token::Type::PARENTHESIS:
+			case ParenthesisToken::TYPE:
 			{
 				ParenthesisToken& pt = token.as<ParenthesisToken>();
 
@@ -1367,14 +1391,14 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::UNARY_OPERATION:
+			case UnaryOperationToken::TYPE:
 			{
 				UnaryOperationToken& uot = token.as<UnaryOperationToken>();
 				token.mDataType = assignStatementDataType(*uot.mArgument, resultType);
 				break;
 			}
 
-			case Token::Type::BINARY_OPERATION:
+			case BinaryOperationToken::TYPE:
 			{
 				BinaryOperationToken& bot = token.as<BinaryOperationToken>();
 				const OperatorHelper::OperatorType opType = OperatorHelper::getOperatorType(bot.mOperator);
@@ -1422,7 +1446,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::VALUE_CAST:
+			case ValueCastToken::TYPE:
 			{
 				ValueCastToken& vct = token.as<ValueCastToken>();
 

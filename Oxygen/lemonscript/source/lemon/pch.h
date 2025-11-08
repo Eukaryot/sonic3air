@@ -7,3 +7,4 @@
 */
 
 #include <rmxbase.h>
+#include "lemon/basics/GenericManager.h"

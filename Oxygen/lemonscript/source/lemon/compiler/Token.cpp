@@ -14,36 +14,79 @@
 namespace lemon
 {
 
+	struct TokenSerializationIDTranslator
+	{
+		static const uint8 LAST_ENTRY = 0x4b;
+
+		// Initialization was meant to be done in a constructor, but that can lead to the constructor of our static instance getting called too early, namely before all token calsses could register
+		void initialize()
+		{
+			#define ADD_ENTRIES(_serializationID_, _type_) \
+				static_assert(_serializationID_ <= LAST_ENTRY); \
+				mFactoryBySerializationID[_serializationID_] = &_type_::CLASS.getFactory(); \
+				mSerializationIDByTokenType[_type_::TYPE] = _serializationID_;
+
+			// Serialization IDs used here are those originally used as enum values for token types (though that enum does not exist any more)
+			ADD_ENTRIES(0x00, KeywordToken);
+			ADD_ENTRIES(0x01, VarTypeToken);
+			ADD_ENTRIES(0x02, OperatorToken);
+			ADD_ENTRIES(0x03, LabelToken);
+			ADD_ENTRIES(0x41, ConstantToken);
+			ADD_ENTRIES(0x42, IdentifierToken);
+			ADD_ENTRIES(0x43, ParenthesisToken);
+			ADD_ENTRIES(0x44, CommaSeparatedListToken);
+			ADD_ENTRIES(0x45, UnaryOperationToken);
+			ADD_ENTRIES(0x46, BinaryOperationToken);
+			ADD_ENTRIES(0x47, VariableToken);
+			ADD_ENTRIES(0x48, FunctionToken);
+			ADD_ENTRIES(0x49, BracketAccessToken);
+			ADD_ENTRIES(0x4a, MemoryAccessToken);
+			ADD_ENTRIES(0x4b, ValueCastToken);
+
+			#undef ADD_ENTRIES
+
+			mInitialized = true;
+		}
+
+		Token* createToken(uint8 serializationID)
+		{
+			if (!mInitialized)
+				initialize();
+
+			RMX_CHECK(serializationID <= LAST_ENTRY, "Unknown or unsupported token type to create (" << serializationID << ")", RMX_REACT_THROW);
+			genericmanager::detail::ElementFactoryBase<Token>* factory = mFactoryBySerializationID[serializationID];
+			RMX_CHECK(nullptr != factory, "Unknown or unsupported token type to create (" << serializationID << ")", RMX_REACT_THROW);
+			return &factory->create();
+		}
+
+		uint8 getSerializationID(Token& token)
+		{
+			if (!mInitialized)
+				initialize();
+
+			const uint8* serializationID = mapFind(mSerializationIDByTokenType, token.getType());
+			RMX_CHECK(nullptr != serializationID, "Unknown or unsupported token type to save", RMX_REACT_THROW);
+			return *serializationID;
+		}
+
+	private:
+		bool mInitialized = false;
+		genericmanager::detail::ElementFactoryBase<Token>* mFactoryBySerializationID[LAST_ENTRY + 1] = { nullptr };
+		std::unordered_map<uint32, uint8> mSerializationIDByTokenType;
+	};
+
+	static TokenSerializationIDTranslator mTranslator;
+
+
 	void TokenSerializer::serializeToken(VectorBinarySerializer& serializer, TokenPtr<Token>& token, const GlobalsLookup& globalsLookup)
 	{
 		if (serializer.isReading())
 		{
-			const Token::Type tokenType = (Token::Type)serializer.read<uint8>();
-			switch (tokenType)
-			{
-				case Token::Type::KEYWORD:			token = &genericmanager::Manager<Token>::template create<KeywordToken>();			 break;
-				case Token::Type::VARTYPE:			token = &genericmanager::Manager<Token>::template create<VarTypeToken>();			 break;
-				case Token::Type::OPERATOR:			token = &genericmanager::Manager<Token>::template create<OperatorToken>();			 break;
-				case Token::Type::LABEL:			token = &genericmanager::Manager<Token>::template create<LabelToken>();				 break;
-				case Token::Type::CONSTANT:			token = &genericmanager::Manager<Token>::template create<ConstantToken>();			 break;
-				case Token::Type::IDENTIFIER:		token = &genericmanager::Manager<Token>::template create<IdentifierToken>();		 break;
-				case Token::Type::PARENTHESIS:		token = &genericmanager::Manager<Token>::template create<ParenthesisToken>();		 break;
-				case Token::Type::COMMA_SEPARATED:	token = &genericmanager::Manager<Token>::template create<CommaSeparatedListToken>(); break;
-				case Token::Type::UNARY_OPERATION:	token = &genericmanager::Manager<Token>::template create<UnaryOperationToken>();	 break;
-				case Token::Type::BINARY_OPERATION:	token = &genericmanager::Manager<Token>::template create<BinaryOperationToken>();	 break;
-				case Token::Type::VARIABLE:			token = &genericmanager::Manager<Token>::template create<VariableToken>();			 break;
-				case Token::Type::FUNCTION:			token = &genericmanager::Manager<Token>::template create<FunctionToken>();			 break;
-				case Token::Type::BRACKET_ACCESS:	token = &genericmanager::Manager<Token>::template create<BracketAccessToken>();		 break;
-				case Token::Type::MEMORY_ACCESS:	token = &genericmanager::Manager<Token>::template create<MemoryAccessToken>();		 break;
-				case Token::Type::VALUE_CAST:		token = &genericmanager::Manager<Token>::template create<ValueCastToken>();			 break;
-
-				default:
-					RMX_ERROR("Unknown or unsupported token type to create", );
-			}
+			token = mTranslator.createToken(serializer.read<uint8>());
 		}
 		else
 		{
-			serializer.writeAs<uint8>(token->getType());
+			serializer.write<uint8>(mTranslator.getSerializationID(*token));
 		}
 
 		serializeTokenData(serializer, *token, globalsLookup);
@@ -71,7 +114,8 @@ namespace lemon
 			serializer.writeAs<uint8>(tokenList.size());
 			for (size_t k = 0; k < tokenList.size(); ++k)
 			{
-				serializer.writeAs<uint8>(tokenList[k].getType());
+				const uint8 serializationID = mTranslator.getSerializationID(tokenList[k]);
+				serializer.write<uint8>(serializationID);
 				serializeTokenData(serializer, tokenList[k], globalsLookup);
 			}
 		}
@@ -81,35 +125,35 @@ namespace lemon
 	{
 		switch (token_.getType())
 		{
-			case Token::Type::KEYWORD:
+			case KeywordToken::TYPE:
 			{
 				KeywordToken& token = token_.as<KeywordToken>();
 				serializer.serializeAs<uint8>(token.mKeyword);
 				break;
 			}
 
-			case Token::Type::VARTYPE:
+			case VarTypeToken::TYPE:
 			{
 				VarTypeToken& token = token_.as<VarTypeToken>();
 				globalsLookup.serializeDataType(serializer, token.mDataType);
 				break;
 			}
 
-			case Token::Type::OPERATOR:
+			case OperatorToken::TYPE:
 			{
 				OperatorToken& token = token_.as<OperatorToken>();
 				serializer.serializeAs<uint8>(token.mOperator);
 				break;
 			}
 
-			case Token::Type::LABEL:
+			case LabelToken::TYPE:
 			{
 				LabelToken& token = token_.as<LabelToken>();
 				token.mName.serialize(serializer);
 				break;
 			}
 
-			case Token::Type::CONSTANT:
+			case ConstantToken::TYPE:
 			{
 				ConstantToken& token = token_.as<ConstantToken>();
 				globalsLookup.serializeDataType(serializer, token.mDataType);
@@ -120,7 +164,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::IDENTIFIER:
+			case IdentifierToken::TYPE:
 			{
 				IdentifierToken& token = token_.as<IdentifierToken>();
 				globalsLookup.serializeDataType(serializer, token.mDataType);
@@ -128,7 +172,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::PARENTHESIS:
+			case ParenthesisToken::TYPE:
 			{
 				ParenthesisToken& token = token_.as<ParenthesisToken>();
 				globalsLookup.serializeDataType(serializer, token.mDataType);
@@ -137,7 +181,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::COMMA_SEPARATED:
+			case CommaSeparatedListToken::TYPE:
 			{
 				CommaSeparatedListToken& token = token_.as<CommaSeparatedListToken>();
 				globalsLookup.serializeDataType(serializer, token.mDataType);
@@ -152,7 +196,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::UNARY_OPERATION:
+			case UnaryOperationToken::TYPE:
 			{
 				UnaryOperationToken& token = token_.as<UnaryOperationToken>();
 				globalsLookup.serializeDataType(serializer, token.mDataType);
@@ -161,7 +205,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::BINARY_OPERATION:
+			case BinaryOperationToken::TYPE:
 			{
 				BinaryOperationToken& token = token_.as<BinaryOperationToken>();
 				globalsLookup.serializeDataType(serializer, token.mDataType);
@@ -171,7 +215,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::VARIABLE:
+			case VariableToken::TYPE:
 			{
 				RMX_ERROR("Not supported", );
 			/*
@@ -182,7 +226,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::FUNCTION:
+			case FunctionToken::TYPE:
 			{
 				RMX_ERROR("Not supported", );
 			/*
@@ -193,7 +237,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::BRACKET_ACCESS:
+			case BracketAccessToken::TYPE:
 			{
 				BracketAccessToken& token = token_.as<BracketAccessToken>();
 				globalsLookup.serializeDataType(serializer, token.mDataType);
@@ -201,7 +245,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::MEMORY_ACCESS:
+			case MemoryAccessToken::TYPE:
 			{
 				MemoryAccessToken& token = token_.as<MemoryAccessToken>();
 				globalsLookup.serializeDataType(serializer, token.mDataType);
@@ -209,7 +253,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::VALUE_CAST:
+			case ValueCastToken::TYPE:
 			{
 				ValueCastToken& token = token_.as<ValueCastToken>();
 				globalsLookup.serializeDataType(serializer, token.mDataType);

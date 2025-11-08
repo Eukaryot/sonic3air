@@ -57,6 +57,7 @@ namespace lemon
 		inline const CArray<ControlFlow::State>& getCallStack() const  { return mCallStack; }
 
 		void getCallStack(std::vector<ControlFlow::Location>& outLocations) const;
+		void getRecentExecutionLocation(Location& outLocation) const;
 		void getCurrentExecutionLocation(Location& outLocation) const;
 		const ScriptFunction* getCurrentFunction() const;
 
