@@ -14,28 +14,26 @@
 class SoftwareRasterizer
 {
 public:
-	struct Vertex_P2_T2
+	struct Vertex
 	{
 		Vec2f mPosition;
+		Color mColor = Color::WHITE;
 		Vec2f mUV;
-	};
-	struct Vertex_P2_C4
-	{
-		Vec2f mPosition;
-		Color mColor;
 	};
 
 public:
-	SoftwareRasterizer(BitmapViewMutable<uint32>& output, const Blitter::Options& options) : mOutput(output), mOptions(options) {}
+	SoftwareRasterizer(const BitmapViewMutable<uint32>& output, const Blitter::Options& options) : mOutput(output), mOptions(options) {}
 
-	void drawTriangle(const Vertex_P2_T2* vertices, const Bitmap& texture);
-	void drawTriangle(const Vertex_P2_C4* vertices);
+	void setOutput(const BitmapViewMutable<uint32>& output);
 
-private:
-	void drawTrapezoid(const Vertex_P2_T2& vertex00, const Vertex_P2_T2& vertex10, const Vertex_P2_T2& vertex01, const Vertex_P2_T2& vertex11, const Bitmap& texture);
-	void drawTrapezoid(const Vertex_P2_C4& vertex00, const Vertex_P2_C4& vertex10, const Vertex_P2_C4& vertex01, const Vertex_P2_C4& vertex11);
+	void drawTriangle(const Vertex* vertices, const BitmapView<uint32>& texture, bool useVertexColors);
+	void drawTriangle(const Vertex* vertices);
 
 private:
-	BitmapViewMutable<uint32>& mOutput;
+	void drawTrapezoid(const Vertex& vertex00, const Vertex& vertex10, const Vertex& vertex01, const Vertex& vertex11, const BitmapView<uint32>& texture, bool useVertexColors);
+	void drawTrapezoid(const Vertex& vertex00, const Vertex& vertex10, const Vertex& vertex01, const Vertex& vertex11);
+
+private:
+	BitmapViewMutable<uint32> mOutput;
 	Blitter::Options mOptions;
 };

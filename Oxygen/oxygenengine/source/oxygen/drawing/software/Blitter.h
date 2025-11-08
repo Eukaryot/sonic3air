@@ -17,15 +17,22 @@ class Blitter
 public:
 	struct Options
 	{
-		const float* mTransform = nullptr;		// Optional 2x2 transformation matrix
-		const float* mInvTransform = nullptr;	// Must be set if mTransform is set, and be the inverse 2x2 matrix
+		// Transformation
+		const float* mTransform = nullptr;			// Optional 2x2 transformation matrix
+		const float* mInvTransform = nullptr;		// Must be set if mTransform is set, and be the inverse 2x2 matrix
+
+		// Sampling & blending
 		SamplingMode mSamplingMode = SamplingMode::POINT;
 		BlendMode mBlendMode = BlendMode::OPAQUE;
+
+		// Color handling
 		const Vec4f* mTintColor = nullptr;
 		const Vec4f* mAddedColor = nullptr;
 		bool mSwapRedBlueChannels = false;
+
+		// Depth test
 		const BitmapViewMutable<uint8>* mDepthBuffer = nullptr;
-		uint8 mDepthTestValue = 0;				// Blitter will never do a depth write, only depth test if mDepthBuffer is set
+		uint8 mDepthTestValue = 0;					// Blitter will never do a depth write, only depth test if mDepthBuffer is set
 	};
 
 	struct OutputWrapper

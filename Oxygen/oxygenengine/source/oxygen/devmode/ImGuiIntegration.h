@@ -41,4 +41,5 @@ private:
 private:
 	static inline bool mEnabled = false;
 	static inline bool mRunning = false;
+	static inline bool mUsingOpenGL = false;
 };

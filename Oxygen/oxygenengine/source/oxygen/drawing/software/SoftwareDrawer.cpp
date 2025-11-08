@@ -598,7 +598,7 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 					// Note that this does not support red-blue channel swap
 
 					SoftwareRasterizer rasterizer(outputView, options);
-					SoftwareRasterizer::Vertex_P2_T2 triangle[3];
+					SoftwareRasterizer::Vertex triangle[3];
 
 					const int numTriangles = (int)dc.mTriangles.size() / 3;
 					for (int i = 0; i < numTriangles; ++i)
@@ -609,7 +609,7 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 							triangle[k].mPosition = input[k].mPosition;
 							triangle[k].mUV = input[k].mTexcoords;
 						}
-						rasterizer.drawTriangle(triangle, inputBitmap);
+						rasterizer.drawTriangle(triangle, inputBitmap, false);
 					}
 				}
 				break;
@@ -624,7 +624,7 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 				options.mBlendMode = mInternal.useAlphaBlending() ? BlendMode::ALPHA : BlendMode::OPAQUE;
 
 				SoftwareRasterizer rasterizer(outputView, options);
-				SoftwareRasterizer::Vertex_P2_C4 triangle[3];
+				SoftwareRasterizer::Vertex triangle[3];
 				const bool swapRedBlue = mInternal.needSwapRedBlueChannels();
 
 				const int numTriangles = (int)dc.mTriangles.size() / 3;
@@ -717,4 +717,14 @@ void SoftwareDrawer::presentScreen()
 
 	mInternal.unlockScreenSurface();
 	SDL_UpdateWindowSurface(mInternal.mOutputWindow);
+}
+
+const BitmapViewMutable<uint32>& SoftwareDrawer::getRenderTarget() const
+{
+	return mInternal.getOutputWrapper();
+}
+
+bool SoftwareDrawer::needSwapRedBlueChannels() const
+{
+	return mInternal.needSwapRedBlueChannels();
 }

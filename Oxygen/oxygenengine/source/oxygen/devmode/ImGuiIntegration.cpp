@@ -12,6 +12,7 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/devmode/DevModeMainWindow.h"
+#include "oxygen/devmode/ImGuiSoftwareRenderer.h"
 
 #include "imgui.h"
 #include "backends/imgui_impl_opengl3.h"
@@ -56,10 +57,9 @@ void ImGuiIntegration::startup()
 	if (!mEnabled)
 		return;
 
-	// Only OpenGL renderer is supported
+	// We can choose between the OpenGL renderer and a custom software renderer as fallback
 	//  -> I also quickly tried out the SDLRenderer, but that didn't work correctly
-	if (FTX::Video->getVideoConfig().mRenderer != rmx::VideoConfig::Renderer::OPENGL)
-		return;
+	mUsingOpenGL = (FTX::Video->getVideoConfig().mRenderer == rmx::VideoConfig::Renderer::OPENGL);
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -67,8 +67,15 @@ void ImGuiIntegration::startup()
 
 	// Setup platform / renderer backends
 	SDL_Window* window = FTX::Video->getMainWindow();
-	ImGui_ImplSDL2_InitForOpenGL(window, SDL_GL_GetCurrentContext());
-	ImGui_ImplOpenGL3_Init();
+	if (mUsingOpenGL)
+	{
+		ImGui_ImplSDL2_InitForOpenGL(window, SDL_GL_GetCurrentContext());
+		ImGui_ImplOpenGL3_Init();
+	}
+	else
+	{
+		ImGui_ImplSDL2_InitForOther(window);
+	}
 
 	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
@@ -119,7 +126,10 @@ void ImGuiIntegration::shutdown()
 
 	SAFE_DELETE(mDevModeMainWindow);
 
-	ImGui_ImplOpenGL3_Shutdown();
+	if (mUsingOpenGL)
+	{
+		ImGui_ImplOpenGL3_Shutdown();
+	}
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 
@@ -141,7 +151,14 @@ void ImGuiIntegration::startFrame()
 		return;
 
 	// Start the Dear ImGui frame
-	ImGui_ImplOpenGL3_NewFrame();
+	if (mUsingOpenGL)
+	{
+		ImGui_ImplOpenGL3_NewFrame();
+	}
+	else
+	{
+		ImGuiSoftwareRenderer::newFrame();
+	}
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 }
@@ -168,7 +185,15 @@ void ImGuiIntegration::endFrame()
 
 	// ImGui rendering
 	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	if (mUsingOpenGL)
+	{
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
+	else
+	{
+		ImGuiSoftwareRenderer::renderDrawData();
+	}
 
 	// Save ini if there was a change
 	if (ImGui::GetIO().WantSaveIniSettings)
@@ -183,14 +208,11 @@ void ImGuiIntegration::onWindowRecreated(bool useOpenGL)
 	if (!mEnabled)
 		return;
 
-	if (mRunning && !useOpenGL)
+	if (mUsingOpenGL != useOpenGL)
 	{
-		// OpenGL got deactivated, we need to shut down without it
+		// Shutdown and restart
 		shutdown();
-	}
-	else if (!mRunning && useOpenGL)
-	{
-		// Start again now that OpenGL is available
+		mUsingOpenGL = useOpenGL;
 		startup();
 	}
 }

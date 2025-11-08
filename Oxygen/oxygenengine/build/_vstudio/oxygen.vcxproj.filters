@@ -562,6 +562,9 @@
     <ClCompile Include="..\..\source\oxygen\devmode\windows\PersistentDataWindow.cpp">
       <Filter>devmode\windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\ImGuiSoftwareRenderer.cpp">
+      <Filter>devmode</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -1062,6 +1065,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\devmode\windows\PersistentDataWindow.h">
       <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\ImGuiSoftwareRenderer.h">
+      <Filter>devmode</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
