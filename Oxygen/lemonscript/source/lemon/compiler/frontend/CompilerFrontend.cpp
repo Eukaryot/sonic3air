@@ -376,45 +376,110 @@ namespace lemon
 
 						case Keyword::DEFINE:
 						{
-							size_t offset = 1;
-							const DataTypeDefinition* dataType = nullptr;	// Not specified
-
-							// Typename is optional
-							if (offset < tokens.size() && tokens[offset].isA<VarTypeToken>())
+							// Check for copy(...) to(...) variant
+							CHECK_ERROR(tokens.size() >= 2, "Expected anything after define", lineNumber);
+							constexpr uint64 COPY_HASH = rmx::constMurmur2_64("copy");
+							constexpr uint64 TO_HASH = rmx::constMurmur2_64("to");
+							if (isIdentifier(tokens[1], COPY_HASH))
 							{
-								dataType = tokens[offset].as<VarTypeToken>().mDataType;
-								++offset;
+								CHECK_ERROR(tokens.size() == 13, "Syntax error after define copy", lineNumber);
+								CHECK_ERROR(isOperator(tokens[2], Operator::PARENTHESIS_LEFT), "Expected parenthesis after 'copy' in define copy() to()", lineNumber);
+								CHECK_ERROR(tokens[3].isA<IdentifierToken>(), "Expected identifier as first argument of 'copy' part of in define copy() to()", lineNumber);
+								CHECK_ERROR(isOperator(tokens[4], Operator::COMMA_SEPARATOR), "Expected comma between arguments in 'copy' part of define copy() to()", lineNumber);
+								CHECK_ERROR(tokens[5].isA<IdentifierToken>(), "Expected identifier as second argument of 'copy' part of in define copy() to()", lineNumber);
+								CHECK_ERROR(isOperator(tokens[6], Operator::PARENTHESIS_RIGHT), "Expected parenthesis after 'copy' in define copy() to()", lineNumber);
+
+								CHECK_ERROR(isIdentifier(tokens[7], TO_HASH), "Expected 'to' in define copy() to()", lineNumber);
+								CHECK_ERROR(isOperator(tokens[8], Operator::PARENTHESIS_LEFT), "Expected parenthesis after 'to' in define copy() to()", lineNumber);
+								CHECK_ERROR(tokens[9].isA<IdentifierToken>(), "Expected identifier as first argument of 'to' part of in define copy() to()", lineNumber);
+								CHECK_ERROR(isOperator(tokens[10], Operator::COMMA_SEPARATOR), "Expected comma between arguments in 'to' part of define copy() to()", lineNumber);
+								CHECK_ERROR(tokens[11].isA<IdentifierToken>(), "Expected identifier as second argument of 'to' part of in define copy() to()", lineNumber);
+								CHECK_ERROR(isOperator(tokens[12], Operator::PARENTHESIS_RIGHT), "Expected parenthesis after 'to' in define copy() to()", lineNumber);
+
+								const FlyweightString prefixBefore = tokens[3].as<IdentifierToken>().mName;
+								const FlyweightString identifierBefore = tokens[5].as<IdentifierToken>().mName;
+								const FlyweightString prefixAfter = tokens[9].as<IdentifierToken>().mName;
+								const FlyweightString identifierAfter = tokens[11].as<IdentifierToken>().mName;
+
+								std::vector<const Define*> definesToCopy;
+								for (const Define* existingDefine : mModule.getDefines())
+								{
+									if (rmx::startsWith(existingDefine->getName().getString(), prefixBefore.getString()))
+									{
+										definesToCopy.push_back(existingDefine);
+									}
+								}
+
+								for (const Define* existingDefine : definesToCopy)
+								{
+									// Copy that define into a new one
+									std::string newDefineName(prefixAfter.getString());
+									newDefineName += existingDefine->getName().getString().substr(prefixBefore.getString().length());
+
+									Define& newDefine = mModule.addDefine(newDefineName, existingDefine->getDataType());
+									newDefine.mContent.copyFrom(existingDefine->mContent);		// Note that this is only a shallow copy, still pointing to the same token instances
+
+									// Deep copy and replace
+									for (size_t k = 0; k < newDefine.mContent.size(); ++k)
+									{
+										const IdentifierToken* identifierToken = newDefine.mContent[k].cast<IdentifierToken>();
+										if (nullptr != identifierToken && identifierToken->mName == identifierBefore)
+										{
+											// Replace token with a new one
+											//  -> Don't just change the existing one because it's still shared with the define that it was copied from
+											IdentifierToken& newToken = newDefine.mContent.createReplaceAt<IdentifierToken>(k);
+											newToken.mName = identifierAfter;
+											newToken.mDataType = identifierToken->mDataType;
+
+											RMX_LOG_INFO("Copied define: " << existingDefine->getName().getString() << " -> " << newDefineName);
+										}
+									}
+
+									mGlobalsLookup.registerDefine(newDefine);
+								}
 							}
-
-							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier for define", lineNumber);
-							const FlyweightString identifier = tokens[offset].as<IdentifierToken>().mName;
-							++offset;
-
-							CHECK_ERROR(offset < tokens.size() && isOperator(tokens[offset], Operator::ASSIGN), "Expected '=' in define", lineNumber);
-							++offset;
-
-							// Rest is define content
-							CHECK_ERROR(offset < tokens.size(), "Missing define content", lineNumber);
-
-							// Find out the data type if not specified yet
-							if (nullptr == dataType)
+							else
 							{
-								if (tokens[offset].isA<VarTypeToken>())
+								size_t offset = 1;
+								const DataTypeDefinition* dataType = nullptr;	// Not specified
+
+								// Typename is optional
+								if (offset < tokens.size() && tokens[offset].isA<VarTypeToken>())
 								{
 									dataType = tokens[offset].as<VarTypeToken>().mDataType;
+									++offset;
 								}
-								else
-								{
-									CHECK_ERROR(false, "Data type of define could not be determined", lineNumber);
-								}
-							}
 
-							// Create define
-							Define& define = mModule.addDefine(identifier, dataType);
-							mGlobalsLookup.registerDefine(define);
-							for (size_t i = offset; i < tokens.size(); ++i)
-							{
-								define.mContent.add(tokens[i]);
+								CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier for define", lineNumber);
+								const FlyweightString identifier = tokens[offset].as<IdentifierToken>().mName;
+								++offset;
+
+								CHECK_ERROR(offset < tokens.size() && isOperator(tokens[offset], Operator::ASSIGN), "Expected '=' in define", lineNumber);
+								++offset;
+
+								// Rest is define content
+								CHECK_ERROR(offset < tokens.size(), "Missing define content", lineNumber);
+
+								// Find out the data type if not specified yet
+								if (nullptr == dataType)
+								{
+									if (tokens[offset].isA<VarTypeToken>())
+									{
+										dataType = tokens[offset].as<VarTypeToken>().mDataType;
+									}
+									else
+									{
+										CHECK_ERROR(false, "Data type of define could not be determined", lineNumber);
+									}
+								}
+
+								// Create define
+								Define& define = mModule.addDefine(identifier, dataType);
+								for (size_t i = offset; i < tokens.size(); ++i)
+								{
+									define.mContent.add(tokens[i]);
+								}
+								mGlobalsLookup.registerDefine(define);
 							}
 							break;
 						}
@@ -897,7 +962,7 @@ namespace lemon
 			values.reserve(0x20);
 
 			bool expectingComma = false;
-			const auto parseContentTokens = [this, arrayDataType, &expectingComma](const TokenList& tokens, size_t firstIndex, size_t endIndex, uint32 lineNumber, std::vector<AnyBaseValue>& values)
+			const auto parseContentTokens = [this, arrayDataType, &expectingComma](TokenList& tokens, size_t firstIndex, size_t endIndex, uint32 lineNumber, std::vector<AnyBaseValue>& values)
 			{
 				for (size_t i = firstIndex; i < endIndex; ++i)
 				{
@@ -1123,7 +1188,7 @@ namespace lemon
 		return false;
 	}
 
-	AnyBaseValue CompilerFrontend::readConstantExpression(const TokenList& tokens, size_t& pos, size_t endPos, const DataTypeDefinition* dataType, uint32 lineNumber)
+	AnyBaseValue CompilerFrontend::readConstantExpression(TokenList& tokens, size_t& pos, size_t endPos, const DataTypeDefinition* dataType, uint32 lineNumber)
 	{
 		// TODO: Support all statements that result in a compile-time constant
 		CHECK_ERROR(pos < endPos, "Expected constant value", lineNumber);
@@ -1136,20 +1201,46 @@ namespace lemon
 			CHECK_ERROR(pos < endPos, "Expected constant value after minus sign", lineNumber);
 		}
 
-		CHECK_ERROR(tokens[pos].isA<ConstantToken>(), "Expected constant value", lineNumber);
-		const ConstantToken& ct = tokens[pos].as<ConstantToken>();
+		AnyBaseValue constantValue;
+		const DataTypeDefinition* constantDataType = nullptr;
+
+		if (tokens[pos].isA<IdentifierToken>())
+		{
+			if (!mTokenProcessing.processConstant(tokens, pos))
+			{
+				IdentifierToken* identifierToken = tokens[pos].cast<IdentifierToken>();
+				CHECK_ERROR(nullptr != identifierToken, "Expected constant value, but got an invalid identifier", lineNumber);
+				CHECK_ERROR(nullptr != identifierToken->mResolved, "Expected constant value, but got unknown identifier " << identifierToken->mName, lineNumber);
+				CHECK_ERROR(false, "Expected constant value, but got non-constant identifier " << identifierToken->mName, lineNumber);
+			}
+		}
+
+		switch (tokens[pos].getType())
+		{
+			case ConstantToken::TYPE:
+			{
+				const ConstantToken& constantToken = tokens[pos].as<ConstantToken>();
+				constantValue = constantToken.mValue;
+				constantDataType = constantToken.mDataType;
+				break;
+			}
+
+			default:
+				CHECK_ERROR(tokens[pos].isA<ConstantToken>(), "Expected constant value", lineNumber);
+				break;
+		}
+
 		++pos;
 
 		// Negate value if needed
-		AnyBaseValue constantValue = ct.mValue;
 		if (negative)
 		{
-			if (!negateBaseTypeValue(constantValue, ct.mDataType))
+			if (!negateBaseTypeValue(constantValue, constantDataType))
 				CHECK_ERROR(false, "Can't apply negative sign to constant value of type " << dataType->getName(), lineNumber);
 		}
 
 		// For integers, check if data gets lost by the cast
-		if (ct.mDataType->getClass() == DataTypeDefinition::Class::INTEGER && dataType->getClass() == DataTypeDefinition::Class::INTEGER)
+		if (constantDataType->getClass() == DataTypeDefinition::Class::INTEGER && dataType->getClass() == DataTypeDefinition::Class::INTEGER)
 		{
 			if (!isInsideIntegerRange(constantValue.get<int64>(), dataType->as<IntegerDataType>()))
 				CHECK_ERROR(false, "Constant " << constantValue.get<int64>() << " (" << rmx::hexString(constantValue.get<int64>()) << ") can't fit into data type " << dataType->getName().getString() << ", data would get lost", lineNumber);
@@ -1157,9 +1248,9 @@ namespace lemon
 
 		// Cast the value as needed, because the constant might have a different type than the constant array
 		AnyBaseValue finalValue;
-		const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(constantValue, ct.mDataType, finalValue, dataType);
+		const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(constantValue, constantDataType, finalValue, dataType);
 		const bool castSuccessful = (castHandling.mResult == TypeCasting::CastHandling::Result::NO_CAST || castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST);
-		CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << ct.mDataType->getName().getString() << " to type " << dataType->getName().getString(), lineNumber);
+		CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << constantDataType->getName().getString() << " to type " << dataType->getName().getString(), lineNumber);
 
 		return finalValue;
 	}
