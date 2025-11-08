@@ -40,6 +40,7 @@ namespace math
 	FUNCTION_EXPORT bool intersectRayWithPlane(const Ray& ray, const Plane& plane, Vec3f* outIntersectionPoint = nullptr, float* outIntersectionT = nullptr, bool onlyFromFront = false);
 	FUNCTION_EXPORT bool intersectLineWithPlane(const Line& line, const Plane& plane, Vec3f* outIntersectionPoint = nullptr, float* outIntersectionT = nullptr, bool onlyFromFront = false);
 	FUNCTION_EXPORT bool intersectRayWithBox(const Ray& ray, const Box3f& box, float* outIntersectionT0 = nullptr, float* outIntersectionT1 = nullptr);
+	FUNCTION_EXPORT bool intersectLineWithSphere(const Line& line, const Vec3f& center, float radius, float* outIntersectionT0 = nullptr, float* outIntersectionT1 = nullptr);
 
 	FUNCTION_EXPORT bool nearestPointBetweenLines(const Line& line1, const Line& line2, Vec3f* outPoint = nullptr, float* outT = nullptr);
 	FUNCTION_EXPORT Vec3f nearestPointOnLine(const Vec3f& point, const Line& line);

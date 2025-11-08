@@ -134,7 +134,8 @@ namespace
 		}
 
 		// Show the message box
-		return MessageBoxA(nullptr, stringBuilder.str().c_str(), caption.c_str(), type | icon);
+		const uint64 handle = (rmx::ErrorHandling::mNativeWindowHandleProvider) ? rmx::ErrorHandling::mNativeWindowHandleProvider() : 0;
+		return MessageBoxA((HWND)handle, stringBuilder.str().c_str(), caption.c_str(), type | icon);
 	}
 
 	int showWindowsMessageBox(rmx::ErrorHandling::MessageBoxInterface::DialogType dialogType, rmx::ErrorSeverity errorSeverity, const std::string& message)

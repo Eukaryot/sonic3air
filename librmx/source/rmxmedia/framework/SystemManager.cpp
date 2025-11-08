@@ -175,7 +175,7 @@ namespace rmx
 		mTimeDifference = (float)(mTicks - oldTicks) * 0.001f;
 		mTotalTime += mTimeDifference;
 
-		const float dt = clamp(mTimeDifference, 0.001f, 1.0f);
+		const float dt = clamp(mTimeDifference, 0.0001f, 1.0f);
 		const float adaption = expf(-dt * 10.0f);
 		mFrameRate = (1.0f / dt) * (1.0f - adaption) + mFrameRate * adaption;
 

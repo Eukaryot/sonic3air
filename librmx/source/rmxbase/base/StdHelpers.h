@@ -122,6 +122,13 @@ const V* mapFind(const std::map<K, V>& map, K key)
 	return (it == map.end()) ? nullptr : &it->second;
 }
 
+template<typename K, typename V, typename D>
+V mapFindOrDefault(const std::map<K, V>& map, K key, D defaultValue)
+{
+	const auto it = map.find(key);
+	return (it == map.end()) ? defaultValue : it->second;
+}
+
 template<typename K, typename V>
 V* mapFind(std::unordered_map<K, V>& map, K key)
 {
@@ -134,4 +141,11 @@ const V* mapFind(const std::unordered_map<K, V>& map, K key)
 {
 	const auto it = map.find(key);
 	return (it == map.end()) ? nullptr : &it->second;
+}
+
+template<typename K, typename V, typename D>
+V mapFindOrDefault(const std::unordered_map<K, V>& map, K key, D defaultValue)
+{
+	const auto it = map.find(key);
+	return (it == map.end()) ? defaultValue : it->second;
 }

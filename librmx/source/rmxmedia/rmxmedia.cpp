@@ -27,6 +27,8 @@ void rmxmedia::initialize()
 {
 	rmxbase::initialize();
 
+	rmx::ErrorHandling::mNativeWindowHandleProvider = []() { return FTX::Video->getNativeWindowHandle(); };
+
 	// Initialize audio load callbacks
 	AudioBuffer::LoadCallbackList callbacks;
 	callbacks.push_back(rmx::WavLoader::load);
