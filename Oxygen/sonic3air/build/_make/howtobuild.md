@@ -1,6 +1,6 @@
 # Building using Make
 
-**Warning: The Switch build is currently not maintained and will need a manual update of the makefile!**
+**Warning: The Switch build is currently not maintained and may need a manual update of the makefile!**
 
 ## Nintendo Switch
 1. [Follow the instructions from devkitPro to get your build environment set up.](https://devkitpro.org/wiki/Getting_Started#Setup)
