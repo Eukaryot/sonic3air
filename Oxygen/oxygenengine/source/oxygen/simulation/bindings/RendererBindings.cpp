@@ -103,6 +103,11 @@ namespace
 		mWriteAddress = cramAddress;
 	}
 
+	// Oxygen engine doesn't differentiate read or write mode
+	void VDP_setupVRAMRead(uint16 vramAddress)   { VDP_setupVRAMWrite(vramAddress); }
+	void VDP_setupVSRAMRead(uint16 vsramAddress) { VDP_setupVSRAMWrite(vsramAddress); }
+	void VDP_setupCRAMRead(uint16 cramAddress)	 { VDP_setupCRAMWrite(cramAddress); }
+
 	void VDP_setWriteIncrement(uint16 increment)
 	{
 		mWriteIncrement = increment;
@@ -413,6 +418,11 @@ namespace
 	{
 		RMX_CHECK(lifetimeContext <= 2, "Lifetime context must be between 0 and 2", return);
 		RenderParts::instance().getSpriteManager().setCurrentLifetimeContext((RenderItem::LifetimeContext)lifetimeContext);
+	}
+
+	void Renderer_setCollectLegacyVdpSprites(bool enable)
+	{
+		RenderParts::instance().getSpriteManager().setLegacyVdpSpriteMode(enable);
 	}
 
 	void Renderer_drawVdpSprite(int16 px, int16 py, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue)
@@ -978,6 +988,15 @@ void RendererBindings::registerBindings(lemon::Module& module)
 
 
 		// VDP emulation
+		builder.addNativeFunction("VDP.setupVRAMRead", lemon::wrap(&VDP_setupVRAMRead), defaultFlags)
+			.setParameters("vramAddress");
+
+		builder.addNativeFunction("VDP.setupVSRAMRead", lemon::wrap(&VDP_setupVSRAMRead), defaultFlags)
+			.setParameters("vramAddress");
+
+		builder.addNativeFunction("VDP.setupCRAMRead", lemon::wrap(&VDP_setupCRAMRead), defaultFlags)
+			.setParameters("vramAddress");
+
 		builder.addNativeFunction("VDP.setupVRAMWrite", lemon::wrap(&VDP_setupVRAMWrite), defaultFlags)
 			.setParameters("vramAddress");
 
@@ -1105,6 +1124,9 @@ void RendererBindings::registerBindings(lemon::Module& module)
 
 		builder.addNativeFunction("Renderer.setLifetimeContext", lemon::wrap(&Renderer_setLifetimeContext), defaultFlags)
 			.setParameters("lifetimeContext");
+
+		builder.addNativeFunction("Renderer.setCollectLegacyVdpSprites", lemon::wrap(&Renderer_setCollectLegacyVdpSprites), defaultFlags)
+			.setParameters("enable");
 
 		builder.addNativeFunction("Renderer.drawVdpSprite", lemon::wrap(&Renderer_drawVdpSprite), defaultFlags)
 			.setParameters("px", "py", "encodedSize", "patternIndex", "renderQueue");

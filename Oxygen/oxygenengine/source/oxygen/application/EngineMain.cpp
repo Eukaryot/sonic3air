@@ -433,7 +433,15 @@ bool EngineMain::initConfigAndSettings()
 	{
 	#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX) || defined(PLATFORM_MAC)
 		// Load config.json once again on top, so that config.json is preferred over settings.json
-		loadConfigJson();
+		if (!hasCustomGameProfile && !mArguments.mProjectPath.empty() && FTX::FileSystem->exists(mArguments.mProjectPath + L"oxygenproject.json"))
+		{
+			// Load project path's config.json, if there is one
+			config.loadConfiguration(mArguments.mProjectPath + L"config.json");
+		}
+		else
+		{
+			loadConfigJson();
+		}
 	#endif
 	}
 	else
@@ -466,7 +474,7 @@ bool EngineMain::initConfigAndSettings()
 #if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_VITA)
 	// Use fullscreen, with no borders please
 	//  -> Note that this doesn't work for the web version, if running in mobile browsers - we rely on a window with fixed size (see config.json) there
-	config.mWindowMode = Configuration::WindowMode::EXCLUSIVE_FULLSCREEN;
+	config.mWindowMode = Configuration::WindowMode::FULLSCREEN_EXCLUSIVE;
 #endif
 
 	RMX_LOG_INFO(((config.mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Using pure software renderer" :
