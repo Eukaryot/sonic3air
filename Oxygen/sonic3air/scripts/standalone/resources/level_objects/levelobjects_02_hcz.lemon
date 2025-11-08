@@ -181,7 +181,7 @@ function void LevelObjectTableBuilder.buildObjects_HCZ1()
 
 	if (Game.getSetting(SETTING_FIX_GLITCHES))
 	{
-		// Push character back behind forground tile elements
+		// Push character back behind forground tile elements, #contributed by PaperTriangle
 		LevelObjectTableBuilder.addObject(0x1a10, 0x06c0, OBJECTTABLE1_02, 0x41, 0)
 	}
 

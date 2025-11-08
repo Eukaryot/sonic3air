@@ -87,6 +87,8 @@ Game scripts & other contributions by:
 * Elsie The Pict
 * TheMushrunt
 * mrgrassman14
+* Vague Rant
+* PaperTriangle
 
 Additional thanks:
 * All contributors of the Sonic 3 / Sonic & Knuckles Disassembly (https://github.com/sonicretro/skdisasm), which has proven itself a valuable source of information on S3&K code
