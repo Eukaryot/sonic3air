@@ -27,6 +27,7 @@ struct FontProcessingData
 class FontProcessor
 {
 public:
+	virtual ~FontProcessor() {}
 	virtual void process(FontProcessingData& data) = 0;
 };
 

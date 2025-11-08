@@ -56,6 +56,21 @@ namespace lemon
 		}
 	}
 
+	void ControlFlow::getRecentExecutionLocation(Location& outLocation) const
+	{
+		if (!mCallStack.empty())
+		{
+			const State& state = mCallStack.back();
+			outLocation.mFunction = state.mRuntimeFunction->mFunction;
+			outLocation.mProgramCounter = state.mRuntimeFunction->translateFromRuntimeProgramCounter(state.mProgramCounter);
+		}
+		else
+		{
+			outLocation.mFunction = nullptr;
+			outLocation.mProgramCounter = 0;
+		}
+	}
+
 	void ControlFlow::getCurrentExecutionLocation(Location& outLocation) const
 	{
 		if (!mCallStack.empty() && &mRuntime == Runtime::getActiveRuntime())

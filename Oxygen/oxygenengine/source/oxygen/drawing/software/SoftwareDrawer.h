@@ -32,6 +32,9 @@ public:
 	void performRendering(const DrawCollection& drawCollection) override;
 	void presentScreen() override;
 
+	const BitmapViewMutable<uint32>& getRenderTarget() const;
+	bool needSwapRedBlueChannels() const;
+
 private:
 	softwaredrawer::Internal& mInternal;
 };

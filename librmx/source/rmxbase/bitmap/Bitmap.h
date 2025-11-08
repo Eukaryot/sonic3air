@@ -156,6 +156,7 @@ namespace rmx
 	class API_EXPORT IBitmapCodec
 	{
 	public:
+		virtual ~IBitmapCodec() {}
 		virtual bool canDecode(const String& format) const  { return false; }
 		virtual bool canEncode(const String& format) const  { return false; }
 		virtual bool decode(Bitmap& bitmap, InputStream& stream, Bitmap::LoadResult& outResult)  { return false; }

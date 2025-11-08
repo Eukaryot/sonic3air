@@ -198,7 +198,6 @@ public:
 
 	void setTransformation(const Vec3<TYPE>& dir0, const Vec3<TYPE>& dir1, const Vec3<TYPE>& dir2)
 	{
-		setIdentity();
 		for (int i = 0; i < 3; ++i)
 		{
 			data[i*3+0] = dir0.data[i];
@@ -209,7 +208,6 @@ public:
 
 	void setTransformationInv(const Vec3<TYPE>& dir0, const Vec3<TYPE>& dir1, const Vec3<TYPE>& dir2)
 	{
-		setIdentity();
 		for (int i = 0; i < 3; ++i)
 		{
 			data[i]     = dir0.data[i];

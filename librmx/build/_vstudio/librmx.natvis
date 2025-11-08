@@ -33,4 +33,11 @@
 		</Expand>
 	</Type>
 
+	<Type Name="WeakPtr&lt;*&gt;">
+		<DisplayString>{mTarget}</DisplayString>
+		<Expand>
+			<Item Name="Target" ExcludeView="simple">mTarget</Item>
+		</Expand>
+	</Type>
+
 </AutoVisualizer>

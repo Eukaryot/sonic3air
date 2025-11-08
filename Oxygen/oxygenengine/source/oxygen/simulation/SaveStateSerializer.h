@@ -26,6 +26,9 @@ public:
 	};
 
 public:
+	static inline uint32 mLastReadPC = 0;		// Only relevant after reading a Gensx emulator save state
+
+public:
 	SaveStateSerializer(Simulation& simulation, RenderParts& renderParts);
 
 	bool loadState(const std::vector<uint8>& input, StateType* outStateType = nullptr);

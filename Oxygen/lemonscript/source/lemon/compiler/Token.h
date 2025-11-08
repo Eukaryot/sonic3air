@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "lemon/compiler/GenericManager.h"
+#include "lemon/basics/GenericManager.h"
 #include "lemon/program/DataType.h"
 
 
@@ -21,41 +21,15 @@ namespace lemon
 	class API_EXPORT Token : public genericmanager::Element<Token>
 	{
 	public:
-		enum class Type : uint8		// Keep values under 0x80 for optimizations in "genericmanager::ElementFactoryMap" to work
-		{
-			KEYWORD,
-			VARTYPE,
-			OPERATOR,
-			LABEL,
-
-			// Statements
-			STATEMENT = 0x40,
-			CONSTANT,
-			IDENTIFIER,
-			PARENTHESIS,
-			COMMA_SEPARATED,
-			UNARY_OPERATION,
-			BINARY_OPERATION,
-			VARIABLE,
-			FUNCTION,
-			BRACKET_ACCESS,
-			MEMORY_ACCESS,
-			VALUE_CAST
-		};
-
-	public:
 		virtual ~Token() {}
 
-		inline Type getType() const  { return (Type)genericmanager::Element<Token>::getType(); }
-		inline bool isStatement() const  { return (genericmanager::Element<Token>::getType() & (uint32)Type::STATEMENT) != 0; }
-
-		template<typename T> bool isA() const { return getType() == T::TYPE; }
-
-		template<typename T> const T& as() const  { return *static_cast<const T*>(this); }
-		template<typename T> T& as()  { return *static_cast<T*>(this); }
+		inline bool isStatement() const  { return (getType() & 0x10000000) != 0; }
 
 	protected:
-		inline Token(Type type) : genericmanager::Element<Token>((uint32)type) {}
+		inline Token(Type type) : genericmanager::Element<Token>(type) {}
+
+	protected:
+		static constexpr Type assignType(const char* data, bool isStatement)  { return (rmx::constMurmur2_64(data) & 0x0fffffff) + isStatement * 0x10000000; }
 	};
 
 

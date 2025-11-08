@@ -17,6 +17,25 @@
 namespace ImGuiHelpers
 {
 
+	bool InputString::isEmpty() const
+	{
+		return (mInternal[0] == 0);
+	}
+
+	void InputString::set(std::string_view str)
+	{
+		const size_t len = std::min(str.length(), sizeof(mInternal) - 1);
+		if (!str.empty())
+			memcpy(mInternal, str.data(), len);
+		mInternal[len] = 0;
+	}
+
+
+	bool WideInputString::isEmpty() const
+	{
+		return mWideString.empty();
+	}
+
 	void WideInputString::set(std::wstring_view str)
 	{
 		if (str == mWideString)

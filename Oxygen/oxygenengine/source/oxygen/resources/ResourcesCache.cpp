@@ -44,7 +44,8 @@ bool ResourcesCache::loadRom()
 
 #if !defined(PLATFORM_ANDROID)
 	// Try at last known ROM location, if there is one
-	if (!loaded && !config.mLastRomPath.empty())
+	//  -> Do this only for the S3AIR executable, it won't work when switching between projects in OxygenApp
+	if (!loaded && !config.mLastRomPath.empty() && gameProfile.mShortName == "Sonic 3 A.I.R.")
 	{
 		romPath = config.mLastRomPath;
 		loaded = loadRomFile(romPath);

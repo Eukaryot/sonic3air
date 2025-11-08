@@ -103,6 +103,11 @@
 				"AsmStack":   [ "0x0004c4", "0x00668c" ],
 				"LemonStack": [ "GameModeControlLoop @EntryPoint", "GameMode.MainGame @EntryPointCompetition" ]
 			}
-		]
+		],
+
+		"Lemonizer":
+		{
+			"ReplacePrefixedDefines": [ "objA0" ]
+		}
 	}
 }

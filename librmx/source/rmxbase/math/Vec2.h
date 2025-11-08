@@ -118,6 +118,14 @@ public:
 		return sqrDist(*this, other);
 	}
 
+	static float getDirectionAndDistance(Vec2& outDirection, const Vec2& start, const Vec2& end)
+	{
+		const Vec2 difference = end - start;
+		const float length = difference.length();
+		outDirection = difference / length;
+		return length;
+	}
+
 	static TYPE dot(const Vec2& source1, const Vec2& source2)
 	{
 		// Dot product

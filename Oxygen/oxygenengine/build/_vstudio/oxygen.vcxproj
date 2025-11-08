@@ -56,6 +56,7 @@
     <ClCompile Include="..\..\source\oxygen\devmode\DevModeWindowBase.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\ImGuiHelpers.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\ImGuiIntegration.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\ImGuiSoftwareRenderer.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\AudioBrowserWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\CallFramesWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\CustomSidePanelWindow.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiDefinitions.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiHelpers.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiIntegration.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\ImGuiSoftwareRenderer.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\AudioBrowserWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\CallFramesWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\CustomSidePanelWindow.h" />

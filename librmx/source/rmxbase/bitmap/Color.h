@@ -37,6 +37,10 @@ public:
 	inline static Color fromARGB32(uint32 colorARGB)  { return Color(colorARGB, Encoding::ARGB_32); }
 	inline static Color fromABGR32(uint32 colorABGR)  { return Color(colorABGR, Encoding::ABGR_32); }
 
+	inline static Color fromHSL(const Vec3f& hsl)	  { Color color;  color.setFromHSL(hsl);  color.a = 1.0f;  return color; }
+	inline static Color fromHSV(const Vec3f& hsv)	  { Color color;  color.setFromHSV(hsv);  color.a = 1.0f;  return color; }
+	inline static Color fromYUV(const Vec3f& yuv)	  { Color color;  color.setFromYUV(yuv);  color.a = 1.0f;  return color; }
+
 	static Color interpolateColor(const Color& c0, const Color& c1, float factor);
 
 public:

@@ -221,6 +221,50 @@ namespace
 		return result;
 	}
 
+	void pre_call1()
+	{
+		push(0);
+	}
+
+	void pre_call2(uint32 returnAddress)
+	{
+		push(returnAddress);
+	}
+
+	void asm_return()
+	{
+		pop();
+	}
+
+
+	uint32 createStackFrame(uint32 value, int16 offset)
+	{
+		uint32& A7 = getEmulatorInterface().getRegister(15);
+		push(value);						// Store original register value
+		const uint32 stackPointer = A7;		// Current stack pointer will be preserved by assigning the returned value
+		A7 += offset;						// Make some space on the stack
+		return stackPointer;
+	}
+
+	uint32 resolveStackFrame(uint32 value)
+	{
+		uint32& A7 = getEmulatorInterface().getRegister(15);
+		A7 = value;
+		return pop();
+	}
+
+	void createStackFrame_A6(int16 offset)
+	{
+		uint32& A6 = getEmulatorInterface().getRegister(14);
+		A6 = createStackFrame(A6, offset);
+	}
+
+	void resolveStackFrame_A6()
+	{
+		uint32& A6 = getEmulatorInterface().getRegister(14);
+		A6 = resolveStackFrame(A6);
+	}
+
 
 	uint32 System_loadPersistentData_withOffset(uint32 targetAddress, uint32 offset, uint32 bytes, lemon::StringRef file, lemon::StringRef key, bool localFile)
 	{
@@ -887,9 +931,7 @@ namespace
 	{
 		if (modName.isValid())
 		{
-			Mod*const* modPtr = mapFind(ModManager::instance().getActiveModsByNameHash(), modName.getHash());
-			if (nullptr != modPtr)
-				return *modPtr;
+			return mapFindOrDefault(ModManager::instance().getActiveModsByNameHash(), modName.getHash(), nullptr);
 		}
 		return nullptr;
 	}
@@ -1103,8 +1145,10 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 {
 	lemon::ModuleBindingsBuilder builder(module);
 
-	// Basic functions
 	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
+	const BitFlagSet<lemon::Function::Flag> excludedFlags(lemon::Function::Flag::EXCLUDE_FROM_DEFINITIONS);
+
+	// Basic functions
 	builder.addNativeFunction("assert", lemon::wrap(&scriptAssert1), defaultFlags);
 	builder.addNativeFunction("assert", lemon::wrap(&scriptAssert2), defaultFlags);
 
@@ -1123,9 +1167,11 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			module.addExternalVariable(registerNamesDAR[i] + ".s32", &lemon::PredefinedDataTypes::INT_32,  std::bind(accessRegister, i));
 		}
 
+
 		// Query flags
 		builder.addNativeFunction("_equal", lemon::wrap(&checkFlags_equal), defaultFlags);
 		builder.addNativeFunction("_negative", lemon::wrap(&checkFlags_negative), defaultFlags);
+
 
 		// Explictly set flags
 		builder.addNativeFunction("_setZeroFlagByValue", lemon::wrap(&setZeroFlagByValue), defaultFlags)
@@ -1158,9 +1204,28 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameters("startAddress", "bytes", "value");
 
 
-		// Push and pop
+		// Stack handling
 		builder.addNativeFunction("push", lemon::wrap(&push), defaultFlags);
+
 		builder.addNativeFunction("pop", lemon::wrap(&pop), defaultFlags);
+
+		builder.addNativeFunction("pre_call", lemon::wrap(&pre_call1), excludedFlags);							// Excluded by default because it's only relevant for certain projects
+
+		builder.addNativeFunction("pre_call", lemon::wrap(&pre_call2), excludedFlags)							// Excluded by default because it's only relevant for certain projects
+			.setParameters("returnAddress");
+
+		builder.addNativeFunction("asm_return", lemon::wrap(&asm_return), excludedFlags);						// Excluded by default because it's only relevant for certain projects
+
+		builder.addNativeFunction("createStackFrame", lemon::wrap(&createStackFrame), excludedFlags)			// Excluded by default because it's only relevant for certain projects
+			.setParameters("value", "offset");
+
+		builder.addNativeFunction("createStackFrame_A6", lemon::wrap(&createStackFrame_A6), excludedFlags)		// Excluded by default because it's only relevant for certain projects
+			.setParameters("offset");
+
+		builder.addNativeFunction("resolveStackFrame", lemon::wrap(&resolveStackFrame), excludedFlags)			// Excluded by default because it's only relevant for certain projects
+			.setParameters("value");
+
+		builder.addNativeFunction("resolveStackFrame_A6", lemon::wrap(&resolveStackFrame_A6), excludedFlags);	// Excluded by default because it's only relevant for certain projects
 
 
 		// Persistent data

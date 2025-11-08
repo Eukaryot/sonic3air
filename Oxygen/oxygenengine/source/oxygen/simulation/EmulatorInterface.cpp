@@ -82,8 +82,8 @@ namespace emulatorinterface
 			}
 			else if (address >= 0xa00000 && address < 0xd00000)
 			{
-				//if ((address & 0xfffff0) == 0xc00000)
-				//	_asm nop;
+				if (MODE == MEMORY_MODE_WRITE_DEV && (address & 0xfffff0) == 0xc00000)
+					RMX_ERROR("Unhandled VDP memory " << (MODE == MEMORY_MODE_READ ? "read" : "write") << " to address " << rmx::hexString(address, 6), );
 				static uint64 dummy;
 				dummy = 0;
 				return (uint8*)&dummy;

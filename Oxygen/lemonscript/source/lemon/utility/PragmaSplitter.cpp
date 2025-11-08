@@ -17,14 +17,14 @@ namespace lemon
 		size_t pos = 0;
 		while (pos < input.length())
 		{
-			// Skip all spaces
-			while (pos < input.length() && input[pos] == 32)
+			// Skip all whitespace
+			while (pos < input.length() && (input[pos] == ' ' || input[pos] == '\t'))
 				++pos;
 
 			if (pos < input.length())
 			{
 				const size_t startPos = pos;
-				while (pos < input.length() && input[pos] != 32)
+				while (pos < input.length() && (input[pos] != ' ' && input[pos] != '\t'))
 					++pos;
 
 				mEntries.emplace_back();

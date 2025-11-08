@@ -12,6 +12,40 @@
 #include "oxygen/helper/JsonHelper.h"
 
 
+namespace
+{
+	bool parseAddressRange(GameProfile::AddressRange& outRange, const String& input)
+	{
+		const int pos = input.findChar('-', 0, 1);
+		if (pos >= 0 && pos < input.length())
+		{
+			String part1 = input.getSubString(0, pos);
+			String part2 = input.getSubString(pos + 1, -1);
+			part1.trimWhitespace();
+			part2.trimWhitespace();
+			const uint32 value1 = (uint32)rmx::parseInteger(part1);
+			const uint32 value2 = (uint32)rmx::parseInteger(part2);
+			if (value1 <= value2)
+			{
+				outRange.first = value1;
+				outRange.second = value2;
+				return true;
+			}
+		}
+		else
+		{
+			String part = input;
+			part.trimWhitespace();
+			const uint32 value = (uint32)rmx::parseInteger(part);
+			outRange.first = value;
+			outRange.second = value;
+			return true;
+		}
+		return false;
+	}
+}
+
+
 bool GameProfile::loadOxygenProjectFromFile(const std::wstring& filename)
 {
 	// Open file
@@ -116,13 +150,14 @@ bool GameProfile::loadOxygenProjectFromJson(const Json::Value& jsonRoot)
 				std::string blankRegionsString;
 				if (jsonHelper.tryReadString("BlankRegions", blankRegionsString))
 				{
-					String value = blankRegionsString;
-					const int pos = value.findChar('-', 0, 1);
-					if (pos >= 0 && pos < value.length())
+					AddressRange range;
+					if (parseAddressRange(range, blankRegionsString))
 					{
-						const String address1 = value.getSubString(0, pos);
-						const String address2 = value.getSubString(pos + 1, -1);
-						romInfo.mBlankRegions.emplace_back((uint32)rmx::parseInteger(address1), (uint32)rmx::parseInteger(address2));
+						romInfo.mBlankRegions.emplace_back(range);
+					}
+					else
+					{
+						RMX_ERROR("Invalid range in BlankRegions", );
 					}
 				}
 
@@ -169,20 +204,21 @@ bool GameProfile::loadOxygenProjectFromJson(const Json::Value& jsonRoot)
 		const Json::Value emulationJson = jsonRoot["Emulation"];
 		if (!emulationJson.isNull())
 		{
+			rmx::JsonHelper emulationJsonHelper(emulationJson);
+			emulationJsonHelper.tryReadBool("PushPopAddressOnCall", mPushPopAddressOnCall);
+
 			const Json::Value asmStackRangeJson = emulationJson["AsmStackRange"];
 			if (asmStackRangeJson.isString())
 			{
-				String str(asmStackRangeJson.asString());
-				const int pos = str.findChar('-', 0, +1);
-				if (pos > 0 && pos < str.length() - 1)
+				AddressRange range;
+				if (parseAddressRange(range, asmStackRangeJson.asCString()))
 				{
-					String part1 = str.getSubString(0, pos);
-					String part2 = str.getSubString(pos + 1, -1);
-					part1.trimWhitespace();
-					part2.trimWhitespace();
-					mAsmStackRange.first  = 0xffff0000 | part1.parseInt();
-					mAsmStackRange.second = 0xffff0000 | part2.parseInt();
-					RMX_CHECK(mAsmStackRange.first < mAsmStackRange.second, "Invalid range in AsmStackRange", );
+					mAsmStackRange.first = range.first | 0xffff0000;
+					mAsmStackRange.second = range.second | 0xffff0000;
+				}
+				else
+				{
+					RMX_ERROR("Invalid range in AsmStackRange: " << asmStackRangeJson.asCString(), );
 				}
 			}
 
@@ -198,9 +234,17 @@ bool GameProfile::loadOxygenProjectFromJson(const Json::Value& jsonRoot)
 					{
 						for (Json::Value it2 : asmStackJson)
 						{
-							const uint32 address = (uint32)rmx::parseInteger(String(it2.asCString()));
-							stackLookup.mAsmStack.push_back(address);
+							AddressRange range;
+							if (parseAddressRange(range, it2.asCString()))
+							{
+								stackLookup.mAsmStack.emplace_back(range);
+							}
+							else
+							{
+								RMX_ERROR("Invalid range in AsmStack: " << it2.asCString(), );
+							}
 						}
+
 						for (Json::Value it2 : lemonStackJson)
 						{
 							LemonStackEntry& entry = vectorAdd(stackLookup.mLemonStack);

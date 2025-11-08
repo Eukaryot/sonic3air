@@ -21,6 +21,7 @@ namespace lemon
 	class ConstantToken;
 	class Function;
 	class GlobalsLookup;
+	class IdentifierToken;
 	class LocalVariable;
 	class Module;
 	class ScriptFunction;
@@ -52,6 +53,9 @@ namespace lemon
 		void processForPreprocessor(TokenList& tokensRoot, uint32 lineNumber);
 
 		bool resolveIdentifiers(TokenList& tokens);
+		bool tryResolveIdentifier(TokenList& tokens, size_t pos);
+
+		bool processConstant(TokenList& tokens, size_t pos);
 
 	private:
 		struct BinaryOperationResult

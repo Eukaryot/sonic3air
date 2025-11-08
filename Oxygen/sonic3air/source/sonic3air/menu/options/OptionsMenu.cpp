@@ -198,7 +198,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::MHZ_ELEVATOR,				SharedDatabase::Setting::SETTING_MHZ_ELEVATOR);
 		setupOptionEntry(option::FBZ_ENTERCYLINDER,			SharedDatabase::Setting::SETTING_FBZ_ENTERCYLINDER);
 		setupOptionEntry(option::FBZ_SCREWDOORS,			SharedDatabase::Setting::SETTING_FBZ_SCREWDOORS);
-		setupOptionEntry(option::SOZ_PYRAMID,				SharedDatabase::Setting::SETTING_SOZ_PYRAMID);	
+		setupOptionEntry(option::SOZ_PYRAMID,				SharedDatabase::Setting::SETTING_SOZ_PYRAMID);
 
 		setupOptionEntryBitmask(option::LEVELMUSIC_CNZ1,	SharedDatabase::Setting::SETTING_CNZ_PROTOTYPE_MUSIC);
 		setupOptionEntryBitmask(option::LEVELMUSIC_CNZ2,	SharedDatabase::Setting::SETTING_CNZ_PROTOTYPE_MUSIC);

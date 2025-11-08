@@ -18,6 +18,7 @@
 #include "oxygen/application/GameProfile.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/GameRecorder.h"
+#include "oxygen/simulation/SaveStateSerializer.h"
 
 #include <lemon/program/Function.h>
 #include <lemon/runtime/Runtime.h>
@@ -25,7 +26,7 @@
 
 namespace
 {
-	const std::vector<GameProfile::LemonStackEntry>* getLemonStackByAsmStack(const std::vector<uint32>& asmStack)
+	const std::vector<GameProfile::LemonStackEntry>* getLemonStackByAsmStack(const std::vector<uint32>& asmStack, bool includesPC)
 	{
 		// Try to find the right stack
 		for (const GameProfile::StackLookupEntry& lookup : GameProfile::instance().mStackLookups)
@@ -35,7 +36,7 @@ namespace
 				bool equal = true;
 				for (size_t i = 0; i < asmStack.size(); ++i)
 				{
-					if (lookup.mAsmStack[i] != asmStack[i])
+					if (asmStack[i] < lookup.mAsmStack[i].first || asmStack[i] > lookup.mAsmStack[i].second)
 					{
 						equal = false;
 						break;
@@ -49,33 +50,13 @@ namespace
 			}
 		}
 
-		return nullptr;
-	}
-
-	const std::vector<GameProfile::LemonStackEntry>* findCurrentLemonStack(const std::vector<uint32>& asmStack)
-	{
-		// Try to find the right stack
-		for (const GameProfile::StackLookupEntry& lookup : GameProfile::instance().mStackLookups)
+		if (includesPC && !asmStack.empty())
 		{
-			if (lookup.mAsmStack.size() == asmStack.size())
-			{
-				bool equal = true;
-				for (size_t i = 0; i < asmStack.size(); ++i)
-				{
-					if (lookup.mAsmStack[i] != asmStack[i])
-					{
-						equal = false;
-						break;
-					}
-				}
-
-				if (equal)
-				{
-					return &lookup.mLemonStack;
-				}
-			}
+			// Try again without the PC at the end of the stack
+			std::vector<uint32> reducedStack = asmStack;
+			reducedStack.pop_back();
+			return getLemonStackByAsmStack(reducedStack, false);
 		}
-
 		return nullptr;
 	}
 
@@ -94,10 +75,10 @@ namespace
 
 struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
 {
-	CodeExec& mCodeExec;
-
+public:
 	inline explicit RuntimeExecuteConnector(CodeExec& codeExec) : mCodeExec(codeExec) {}
 
+protected:
 	bool handleCall(const lemon::Function* func, uint64 callTarget) override
 	{
 		if (nullptr == func)
@@ -120,7 +101,12 @@ struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
 	bool handleExternalCall(uint64 address) override
 	{
 		// Check for address hook at the target address
-		return mCodeExec.tryCallAddressHook((uint32)address);
+		if (!mCodeExec.tryCallAddressHook((uint32)address))
+		{
+			popAddressOnFailedCall();
+			return false;
+		}
+		return true;
 	}
 
 	bool handleExternalJump(uint64 address) override
@@ -128,13 +114,29 @@ struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
 		handleReturn();
 		return handleExternalCall(address);
 	}
+
+protected:
+	void popAddressOnFailedCall()
+	{
+		// When a call fails, pop the return address if the project requires it
+		if (GameProfile::instance().mPushPopAddressOnCall)
+		{
+			uint32& A7 = mCodeExec.getEmulatorInterface().getRegister(15);
+			A7 += 4;
+		}
+	}
+
+protected:
+	CodeExec& mCodeExec;
 };
 
 
 struct RuntimeExecuteConnectorDev : public RuntimeExecuteConnector
 {
+public:
 	inline explicit RuntimeExecuteConnectorDev(CodeExec& codeExec) : RuntimeExecuteConnector(codeExec) {}
 
+protected:
 	bool handleCall(const lemon::Function* func, uint64 callTarget) override
 	{
 		if (nullptr == func)
@@ -160,7 +162,12 @@ struct RuntimeExecuteConnectorDev : public RuntimeExecuteConnector
 	bool handleExternalCall(uint64 address) override
 	{
 		// Check for address hook at the target address
-		return mCodeExec.tryCallAddressHookDev((uint32)address);
+		if (!mCodeExec.tryCallAddressHookDev((uint32)address))
+		{
+			popAddressOnFailedCall();
+			return false;
+		}
+		return true;
 	}
 
 	bool handleExternalJump(uint64 address) override
@@ -411,16 +418,14 @@ void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enfo
 			RMX_CHECK((stackPointer & 0x00ff0000) == 0x00ff0000, "Stack pointer in register A7 is not pointing to a RAM address", );
 			stackPointer |= 0xffff0000;
 			RMX_CHECK(stackPointer >= GameProfile::instance().mAsmStackRange.first && stackPointer <= GameProfile::instance().mAsmStackRange.second, "Stack pointer in register A7 is not inside the ASM stack range", );
-			while (stackPointer < GameProfile::instance().mAsmStackRange.second)
+			for (uint32 stackPos = GameProfile::instance().mAsmStackRange.second - 4; stackPos >= stackPointer; stackPos -= 4)
 			{
-				callstack.push_back(mEmulatorInterface.readMemory32(stackPointer));
-				stackPointer += 4;
+				callstack.push_back(mEmulatorInterface.readMemory32(stackPos));
 			}
-
-			std::reverse(callstack.begin(), callstack.end());
+			callstack.push_back(SaveStateSerializer::mLastReadPC);
 
 			// Build up initial script call stack
-			const std::vector<GameProfile::LemonStackEntry>* lemonStack = getLemonStackByAsmStack(callstack);
+			const std::vector<GameProfile::LemonStackEntry>* lemonStack = getLemonStackByAsmStack(callstack, true);
 			if (nullptr != lemonStack)
 			{
 				for (const GameProfile::LemonStackEntry& entry : *lemonStack)
@@ -674,6 +679,8 @@ void CodeExec::runScript(bool executeSingleFunction, CallFrameTracking* callFram
 		catch (const std::exception& e)
 		{
 			RMX_ERROR("Caught exception during script execution: " << e.what(), );
+			mExecutionState = ExecutionState::INTERRUPTED;
+			break;
 		}
 
 		// Regularly check if we should better interrupt execution

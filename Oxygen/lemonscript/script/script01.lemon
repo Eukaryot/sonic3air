@@ -1,4 +1,11 @@
 
+global u32 A0 = 0
+global u32 A1 = 0
+
+define objA0.something = s16[A0 + 0x08]
+define copy(objA0, A0) to(objA1, A1)
+
+
 constant u8 ONE = 1
 constant float MINUS_ONE = -1
 global float GLOBAL_NEGATIVE_VALUE = -1.2345f
@@ -13,6 +20,12 @@ constant array<u8> fibonacci =
 
 function void script01()
 {
+	A0 = 0x0873
+	bool flag1 = (A0 & 0x0800)		// Should be true, but isn't
+	bool flag2 = (A0 & 0x0800) != 0
+	debugLog(flag1)
+	debugLog(flag2)
+
 #if 0
 	// Test for floats
 	debugLog(3.)

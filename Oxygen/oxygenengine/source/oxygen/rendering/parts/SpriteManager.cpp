@@ -58,15 +58,10 @@ void SpriteManager::postFrameUpdate()
 		clearLifetimeContext(RenderItem::LifetimeContext::OUTSIDE_FRAME);
 		mCurrentLifetimeContext = RenderItem::LifetimeContext::OUTSIDE_FRAME;
 
-		if (EngineMain::getDelegate().useDeveloperFeatures() && (mResetRenderItemsBitmask & 0x01))
+		// In legacy mode, we collect current sprites from VRAM, instead of (or in addition to) the usual methods via script calls like "Renderer.drawVdpSprite"
+		if (mLegacyVdpSpriteMode && (mResetRenderItemsBitmask & 0x01))
 		{
-			mLegacyVdpSpriteMode = FTX::keyState('u') && (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT));
-
-			// In legacy mode, we collect current sprites from VRAM, instead of the usual methods via script calls like "Renderer.drawVdpSprite"
-			if (mLegacyVdpSpriteMode)
-			{
-				collectLegacySprites();
-			}
+			collectLegacySprites();
 		}
 
 		// When maintaining sprites, make sure to reset sprite interpolation
@@ -547,8 +542,8 @@ void SpriteManager::collectLegacySprites()
 		const uint16* data = (uint16*)&EmulatorInterface::instance().getVRam()[mSpriteAttributeTableBase + link * 2];
 
 		renderitems::VdpSpriteInfo& sprite = mPoolOfRenderItems.mVdpSprites.createObject();
-		sprite.mRenderQueue = 0x2100 - numSpritesAdded;
 		sprite.mPriorityFlag = (data[2] & 0x8000) != 0;
+		sprite.mRenderQueue = (sprite.mPriorityFlag ? 0x4fff : 0x2fff) - numSpritesAdded;
 		sprite.mUseGlobalComponentTint = false;
 
 		// Note that for accurate emulation, this would be 0x1ff instead of 0x3ff

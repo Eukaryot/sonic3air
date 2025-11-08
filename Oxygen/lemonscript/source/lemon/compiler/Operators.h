@@ -77,6 +77,9 @@ namespace lemon
 		static uint8 getOperatorPriority(Operator op);
 		static bool isOperatorAssociative(Operator op);
 		static OperatorType getOperatorType(Operator op);
+
+		static Operator getBinaryForAssign(Operator op);
+		static Operator getAssignForBinary(Operator op);
 	};
 
 }

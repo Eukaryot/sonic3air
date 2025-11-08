@@ -151,6 +151,8 @@ SOURCES	+=	\
 			Oxygen/lemonscript/source/lemon/translator/Translator \
 			Oxygen/lemonscript/source/lemon/utility/FlyweightString \
 			Oxygen/lemonscript/source/lemon/utility/PragmaSplitter \
+			Oxygen/lemonscript/source/lemon/utility/StringFormatter \
+			Oxygen/lemonscript/source/lemon/utility/StringFormatterLegacy \
 			Oxygen/oxygenengine/source/oxygen/pch \
 			Oxygen/oxygenengine/source/oxygen/application/Application \
 			Oxygen/oxygenengine/source/oxygen/application/Configuration \
@@ -164,12 +166,12 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/application/audio/AudioSourceManager \
 			Oxygen/oxygenengine/source/oxygen/application/audio/EmulationAudioSource \
 			Oxygen/oxygenengine/source/oxygen/application/audio/OggAudioSource \
+			Oxygen/oxygenengine/source/oxygen/application/gameview/GameView \
 			Oxygen/oxygenengine/source/oxygen/application/input/ControlsIn \
 			Oxygen/oxygenengine/source/oxygen/application/input/InputConfig \
 			Oxygen/oxygenengine/source/oxygen/application/input/InputManager \
 			Oxygen/oxygenengine/source/oxygen/application/input/InputRecorder \
 			Oxygen/oxygenengine/source/oxygen/application/input/RumbleEffectQueue \
-			Oxygen/oxygenengine/source/oxygen/application/mainview/GameView \
 			Oxygen/oxygenengine/source/oxygen/application/menu/GameSetupScreen \
 			Oxygen/oxygenengine/source/oxygen/application/menu/MenuItems \
 			Oxygen/oxygenengine/source/oxygen/application/menu/OxygenMenu \
@@ -185,6 +187,8 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/application/overlays/SaveStateMenu \
 			Oxygen/oxygenengine/source/oxygen/application/overlays/TouchControlsOverlay \
 			Oxygen/oxygenengine/source/oxygen/application/video/VideoOut \
+			Oxygen/oxygenengine/source/oxygen/devmode/ImGuiHelpers \
+			Oxygen/oxygenengine/source/oxygen/devmode/ImGuiIntegration \
 			Oxygen/oxygenengine/source/oxygen/download/Downloader \
 			Oxygen/oxygenengine/source/oxygen/download/DownloadManager \
 			Oxygen/oxygenengine/source/oxygen/drawing/DrawCollection \
@@ -209,11 +213,18 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/helper/FileHelper \
 			Oxygen/oxygenengine/source/oxygen/helper/HighResolutionTimer \
 			Oxygen/oxygenengine/source/oxygen/helper/JsonHelper \
+			Oxygen/oxygenengine/source/oxygen/helper/JsonSerializer \
 			Oxygen/oxygenengine/source/oxygen/helper/Logging \
 			Oxygen/oxygenengine/source/oxygen/helper/Profiling \
+			Oxygen/oxygenengine/source/oxygen/helper/RandomNumberGenerator \
 			Oxygen/oxygenengine/source/oxygen/helper/TextInputHandler \
 			Oxygen/oxygenengine/source/oxygen/helper/Transform2D \
 			Oxygen/oxygenengine/source/oxygen/helper/Utils \
+			Oxygen/oxygenengine/source/oxygen/network/EngineServerClient \
+			Oxygen/oxygenengine/source/oxygen/network/netplay/ExternalAddressQuery \
+			Oxygen/oxygenengine/source/oxygen/network/netplay/NetplayClient \
+			Oxygen/oxygenengine/source/oxygen/network/netplay/NetplayHost \
+			Oxygen/oxygenengine/source/oxygen/network/netplay/NetplayManager \
 			Oxygen/oxygenengine/source/oxygen/platform/AndroidJavaInterface \
 			Oxygen/oxygenengine/source/oxygen/platform/CrashHandler \
 			Oxygen/oxygenengine/source/oxygen/platform/PlatformFunctions \
@@ -223,10 +234,18 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/rendering/opengl/OpenGLRenderResources \
 			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/DebugDrawPlaneShader \
 			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/OpenGLShader \
+			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/PostFXBlurShader \
 			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/RenderComponentSpriteShader \
 			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/RenderPaletteSpriteShader \
 			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/RenderPlaneShader \
 			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/RenderVdpSpriteShader \
+			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/SimpleCopyScreenShader \
+			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/SimpleRectColoredShader \
+			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/SimpleRectIndexedShader \
+			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/SimpleRectOverdrawShader \
+			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/SimpleRectTexturedShader \
+			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/SimpleRectTexturedUVShader \
+			Oxygen/oxygenengine/source/oxygen/rendering/opengl/shaders/SimpleRectVertexColorShader \
 			Oxygen/oxygenengine/source/oxygen/rendering/parts/palette/PaletteManager \
 			Oxygen/oxygenengine/source/oxygen/rendering/parts/palette/Palette \
 			Oxygen/oxygenengine/source/oxygen/rendering/parts/PatternManager \
@@ -235,18 +254,20 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/rendering/parts/RenderParts \
 			Oxygen/oxygenengine/source/oxygen/rendering/parts/ScrollOffsetsManager \
 			Oxygen/oxygenengine/source/oxygen/rendering/parts/SpriteManager \
+			Oxygen/oxygenengine/source/oxygen/rendering/Renderer \
 			Oxygen/oxygenengine/source/oxygen/rendering/software/SoftwareRenderer \
 			Oxygen/oxygenengine/source/oxygen/rendering/sprite/ComponentSprite \
 			Oxygen/oxygenengine/source/oxygen/rendering/sprite/PaletteSprite \
 			Oxygen/oxygenengine/source/oxygen/rendering/sprite/SpriteDump \
 			Oxygen/oxygenengine/source/oxygen/rendering/utils/BufferTexture \
 			Oxygen/oxygenengine/source/oxygen/rendering/utils/Kosinski \
-			Oxygen/oxygenengine/source/oxygen/rendering/utils/PaletteBitmap \
 			Oxygen/oxygenengine/source/oxygen/rendering/utils/RenderUtils \
 			Oxygen/oxygenengine/source/oxygen/resources/FontCollection \
+			Oxygen/oxygenengine/source/oxygen/resources/PaletteCollection \
 			Oxygen/oxygenengine/source/oxygen/resources/PrintedTextCache \
+			Oxygen/oxygenengine/source/oxygen/resources/RawDataCollection \
 			Oxygen/oxygenengine/source/oxygen/resources/ResourcesCache \
-			Oxygen/oxygenengine/source/oxygen/resources/SpriteCache \
+			Oxygen/oxygenengine/source/oxygen/resources/SpriteCollection \
 			Oxygen/oxygenengine/source/oxygen/simulation/CodeExec \
 			Oxygen/oxygenengine/source/oxygen/simulation/EmulatorInterface \
 			Oxygen/oxygenengine/source/oxygen/simulation/GameRecorder \
@@ -256,6 +277,7 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/simulation/PersistentData \
 			Oxygen/oxygenengine/source/oxygen/simulation/SaveStateSerializer \
 			Oxygen/oxygenengine/source/oxygen/simulation/Simulation \
+			Oxygen/oxygenengine/source/oxygen/simulation/SimulationState \
 			Oxygen/oxygenengine/source/oxygen/simulation/analyse/ROMDataAnalyser \
 			Oxygen/oxygenengine/source/oxygen/simulation/bindings/LemonScriptBindings \
 			Oxygen/oxygenengine/source/oxygen/simulation/bindings/RendererBindings \
@@ -269,7 +291,6 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen_netcore/network/ConnectionManager \
 			Oxygen/oxygenengine/source/oxygen_netcore/network/NetConnection \
 			Oxygen/oxygenengine/source/oxygen_netcore/network/RequestBase \
-			Oxygen/oxygenengine/source/oxygen_netcore/network/ServerClientBase \
 			Oxygen/oxygenengine/source/oxygen_netcore/network/Sockets \
 			Oxygen/oxygenengine/source/oxygen_netcore/network/internal/CryptoFunctions \
 			Oxygen/oxygenengine/source/oxygen_netcore/network/internal/ReceivedPacketCache \
@@ -281,6 +302,7 @@ SOURCES	+=	\
 			Oxygen/sonic3air/source/sonic3air/Game \
 			Oxygen/sonic3air/source/sonic3air/main \
 			Oxygen/sonic3air/source/sonic3air/pch \
+			Oxygen/sonic3air/source/sonic3air/platform/PlatformSpecifics \
 			Oxygen/sonic3air/source/sonic3air/_nativized/NativizedCode \
 			Oxygen/sonic3air/source/sonic3air/audio/AudioOut \
 			Oxygen/sonic3air/source/sonic3air/audio/CustomAudioMixer \
@@ -300,7 +322,6 @@ SOURCES	+=	\
 			Oxygen/sonic3air/source/sonic3air/helper/DrawingUtils \
 			Oxygen/sonic3air/source/sonic3air/helper/GameUtils \
 			Oxygen/sonic3air/source/sonic3air/helper/PackageBuilder \
-			Oxygen/sonic3air/source/sonic3air/menu/ActSelectMenu \
 			Oxygen/sonic3air/source/sonic3air/menu/ExtrasMenu \
 			Oxygen/sonic3air/source/sonic3air/menu/GameApp \
 			Oxygen/sonic3air/source/sonic3air/menu/GameMenuBase \
@@ -317,6 +338,7 @@ SOURCES	+=	\
 			Oxygen/sonic3air/source/sonic3air/menu/helper/GameMenuScrolling \
 			Oxygen/sonic3air/source/sonic3air/menu/mods/ModsMenu \
 			Oxygen/sonic3air/source/sonic3air/menu/mods/ModsMenuEntries \
+			Oxygen/sonic3air/source/sonic3air/menu/mods/ModsStartPage \
 			Oxygen/sonic3air/source/sonic3air/menu/options/ControllerSetupMenu \
 			Oxygen/sonic3air/source/sonic3air/menu/options/OptionsEntry \
 			Oxygen/sonic3air/source/sonic3air/menu/options/OptionsMenu \
@@ -338,6 +360,8 @@ SOURCES	+=	\
 			librmx/source/rmxbase/bitmap/BitmapCodecJPG \
 			librmx/source/rmxbase/bitmap/BitmapCodecPNG \
 			librmx/source/rmxbase/bitmap/Color \
+			librmx/source/rmxbase/bitmap/PaletteBitmap \
+			librmx/source/rmxbase/data/WeakPtr \
 			librmx/source/rmxbase/file/FileCrawler \
 			librmx/source/rmxbase/file/FileHandle \
 			librmx/source/rmxbase/file/FileIO \
@@ -373,8 +397,10 @@ SOURCES	+=	\
 			librmx/source/rmxmedia/font/FontProcessor \
 			librmx/source/rmxmedia/font/FontSource \
 			librmx/source/rmxmedia/framework/AppFramework \
-			librmx/source/rmxmedia/framework/FTX_System \
 			librmx/source/rmxmedia/framework/GuiBase \
+			librmx/source/rmxmedia/framework/InputContext \
+			librmx/source/rmxmedia/framework/SystemManager \
+			librmx/source/rmxmedia/framework/VideoManager \
 			librmx/source/rmxmedia/opengl/Framebuffer \
 			librmx/source/rmxmedia/opengl/GLTools \
 			librmx/source/rmxmedia/opengl/OpenGLFontOutput \

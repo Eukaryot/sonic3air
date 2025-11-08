@@ -131,6 +131,7 @@ bool Channels::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 			}
 
 			// Done
+			//RMX_LOG_INFO("LeaveChannelRequest done");
 			return evaluation.respond(request);
 		}
 
@@ -214,6 +215,7 @@ void Channels::cleanupEmptyChannels()
 	{
 		if (channel->mPlayers.empty())
 		{
+			//RMX_LOG_INFO("Destroying channel '" << channel->mName << "' because it's empty");
 			destroyChannel(*channel);
 		}
 	}

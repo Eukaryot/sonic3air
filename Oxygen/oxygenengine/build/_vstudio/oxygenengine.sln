@@ -1,12 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oxygen", "oxygen.vcxproj", "{1E137789-9E2E-45DD-AEF2-96BD3A6F4E02}"
 	ProjectSection(ProjectDependencies) = postProject
-		{7F7D8740-C72D-44E2-A8A9-50265C4E8BD4} = {7F7D8740-C72D-44E2-A8A9-50265C4E8BD4}
+		{013D2171-2009-4CC5-ACE5-A8303B02BA64} = {013D2171-2009-4CC5-ACE5-A8303B02BA64}
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8} = {13AFDEC3-A272-4577-8DF5-B6AF731760A8}
 		{488CD7A3-2B09-43AC-82B2-8D72DEBFBB78} = {488CD7A3-2B09-43AC-82B2-8D72DEBFBB78}
+		{7F7D8740-C72D-44E2-A8A9-50265C4E8BD4} = {7F7D8740-C72D-44E2-A8A9-50265C4E8BD4}
+		{88C313E3-D9E6-4A5F-9B62-AD399E2725DA} = {88C313E3-D9E6-4A5F-9B62-AD399E2725DA}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "engineapp", "engineapp.vcxproj", "{F6771A16-17FA-4082-BE87-25D5DF87EA54}"
@@ -15,8 +18,22 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "engineapp", "engineapp.vcxp
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lemonscript", "..\..\..\lemonscript\build\_vstudio\lemonscript.vcxproj", "{7F7D8740-C72D-44E2-A8A9-50265C4E8BD4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8} = {13AFDEC3-A272-4577-8DF5-B6AF731760A8}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oxygen_netcore", "oxygen_netcore.vcxproj", "{488CD7A3-2B09-43AC-82B2-8D72DEBFBB78}"
+	ProjectSection(ProjectDependencies) = postProject
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8} = {13AFDEC3-A272-4577-8DF5-B6AF731760A8}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "librmx", "librmx", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rmxbase", "..\..\..\..\librmx\build\_vstudio\rmxbase.vcxproj", "{13AFDEC3-A272-4577-8DF5-B6AF731760A8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rmxmedia", "..\..\..\..\librmx\build\_vstudio\rmxmedia.vcxproj", "{013D2171-2009-4CC5-ACE5-A8303B02BA64}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rmxext_oggvorbis", "..\..\..\..\librmx\build\_vstudio\rmxext_oggvorbis.vcxproj", "{88C313E3-D9E6-4A5F-9B62-AD399E2725DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,9 +75,38 @@ Global
 		{488CD7A3-2B09-43AC-82B2-8D72DEBFBB78}.Release|Win32.Build.0 = Release|Win32
 		{488CD7A3-2B09-43AC-82B2-8D72DEBFBB78}.Release|x64.ActiveCfg = Release|x64
 		{488CD7A3-2B09-43AC-82B2-8D72DEBFBB78}.Release|x64.Build.0 = Release|x64
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Debug|Win32.Build.0 = Debug|Win32
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Debug|x64.ActiveCfg = Debug|x64
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Debug|x64.Build.0 = Debug|x64
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Release|Win32.ActiveCfg = Release|Win32
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Release|Win32.Build.0 = Release|Win32
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Release|x64.ActiveCfg = Release|x64
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8}.Release|x64.Build.0 = Release|x64
+		{013D2171-2009-4CC5-ACE5-A8303B02BA64}.Debug|Win32.ActiveCfg = Debug|Win32
+		{013D2171-2009-4CC5-ACE5-A8303B02BA64}.Debug|Win32.Build.0 = Debug|Win32
+		{013D2171-2009-4CC5-ACE5-A8303B02BA64}.Debug|x64.ActiveCfg = Debug|x64
+		{013D2171-2009-4CC5-ACE5-A8303B02BA64}.Debug|x64.Build.0 = Debug|x64
+		{013D2171-2009-4CC5-ACE5-A8303B02BA64}.Release|Win32.ActiveCfg = Release|Win32
+		{013D2171-2009-4CC5-ACE5-A8303B02BA64}.Release|Win32.Build.0 = Release|Win32
+		{013D2171-2009-4CC5-ACE5-A8303B02BA64}.Release|x64.ActiveCfg = Release|x64
+		{013D2171-2009-4CC5-ACE5-A8303B02BA64}.Release|x64.Build.0 = Release|x64
+		{88C313E3-D9E6-4A5F-9B62-AD399E2725DA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{88C313E3-D9E6-4A5F-9B62-AD399E2725DA}.Debug|Win32.Build.0 = Debug|Win32
+		{88C313E3-D9E6-4A5F-9B62-AD399E2725DA}.Debug|x64.ActiveCfg = Debug|x64
+		{88C313E3-D9E6-4A5F-9B62-AD399E2725DA}.Debug|x64.Build.0 = Debug|x64
+		{88C313E3-D9E6-4A5F-9B62-AD399E2725DA}.Release|Win32.ActiveCfg = Release|Win32
+		{88C313E3-D9E6-4A5F-9B62-AD399E2725DA}.Release|Win32.Build.0 = Release|Win32
+		{88C313E3-D9E6-4A5F-9B62-AD399E2725DA}.Release|x64.ActiveCfg = Release|x64
+		{88C313E3-D9E6-4A5F-9B62-AD399E2725DA}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{13AFDEC3-A272-4577-8DF5-B6AF731760A8} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{013D2171-2009-4CC5-ACE5-A8303B02BA64} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{88C313E3-D9E6-4A5F-9B62-AD399E2725DA} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DE4488CF-0169-420E-A237-A8C2B588B644}

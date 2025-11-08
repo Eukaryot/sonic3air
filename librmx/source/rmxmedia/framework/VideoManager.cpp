@@ -30,253 +30,17 @@
 namespace rmx
 {
 
-	FTX_SystemManager::FTX_SystemManager()
+	VideoManager::VideoManager()
 	{
 	}
 
-	FTX_SystemManager::~FTX_SystemManager()
-	{
-	}
-
-	bool FTX_SystemManager::initialize()
-	{
-		if (mInitialized)
-			return true;
-
-		// Initialize SDL video
-		if (SDL_Init(SDL_INIT_VIDEO) < 0)
-		{
-			std::cout << "SDL_Init(SDL_INIT_VIDEO) failed with error: " << SDL_GetError() << "\n";
-			return false;
-		}
-
-		mInitialized = true;
-		return true;
-	}
-
-	void FTX_SystemManager::exit()
-	{
-		// Quit SDL
-		SDL_Quit();
-	}
-
-	void FTX_SystemManager::startTick()
-	{
-		// TODO...
-	}
-
-	void FTX_SystemManager::checkSDLEvents()
-	{
-		// Handle events
-		InputContext& ctx = mInputContext;
-		const Vec2i oldMousePos = ctx.mMousePos;
-		bool oldMouseState[5];
-		memcpy(oldMouseState, ctx.mMouseState, sizeof(ctx.mMouseState));
-		ctx.mMouseWheel = 0;
-
-		// Process SDL event queue
-		SDL_Event evnt;
-		while (SDL_PollEvent(&evnt))
-		{
-			switch (evnt.type)
-			{
-				case SDL_QUIT:
-					quit();
-					break;
-
-				case SDL_WINDOWEVENT:
-					if (evnt.window.event == SDL_WINDOWEVENT_RESIZED || evnt.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-						reshape(evnt.window.data1, evnt.window.data2);
-					break;
-
-				case SDL_KEYDOWN:
-				case SDL_KEYUP:
-					keyboard(evnt.key);
-					break;
-
-				case SDL_TEXTINPUT:
-					textinput(evnt.text);
-					break;
-
-				case SDL_MOUSEBUTTONDOWN:
-				case SDL_MOUSEBUTTONUP:
-					mouse(evnt.button);
-					break;
-
-				case SDL_MOUSEWHEEL:
-					mousewheel(evnt.wheel);
-					break;
-
-				case SDL_MOUSEMOTION:
-					ctx.mMousePos.set(evnt.motion.x, evnt.motion.y);
-					break;
-			}
-
-			mRoot.sdlEvent(evnt);
-		}
-
-		// Track changes since previous update
-		ctx.mMouseRel = ctx.mMousePos - oldMousePos;
-		for (int i = 0; i < 5; ++i)
-			ctx.mMouseChange[i] = (ctx.mMouseState[i] != oldMouseState[i]);
-	}
-
-	void FTX_SystemManager::reshape(int width, int height)
-	{
-		if (FTX::Video.valid())
-			FTX::Video->reshape(width, height);
-	}
-
-	void FTX_SystemManager::keyboard(const SDL_KeyboardEvent& evnt)
-	{
-		KeyboardEvent ev;
-		ev.key = evnt.keysym.sym;
-		ev.scancode = evnt.keysym.scancode;
-		ev.modifiers = evnt.keysym.mod;
-		ev.state = (evnt.type == SDL_KEYDOWN);
-		ev.repeat = (evnt.repeat != 0);
-		mInputContext.applyEvent(ev);
-
-		mCurrentEventConsumed = false;
-		mRoot.keyboard(ev);
-	}
-
-	void FTX_SystemManager::textinput(const SDL_TextInputEvent& evnt)
-	{
-		TextInputEvent ev;
-		ev.text.readUnicode((const uint8*)evnt.text, (uint32)strlen(evnt.text), UnicodeEncoding::UTF8);
-
-		mCurrentEventConsumed = false;
-		mRoot.textinput(ev);
-	}
-
-	void FTX_SystemManager::mouse(const SDL_MouseButtonEvent& evnt)
-	{
-		// Mouse click
-		if (evnt.button < 1 || evnt.button > 7)
-			return;
-
-		static const MouseButton buttonMap[3] = { MouseButton::Left, MouseButton::Middle, MouseButton::Right };
-		MouseEvent ev;
-		ev.button = (evnt.button <= 3) ? buttonMap[evnt.button-1] : (MouseButton)(evnt.button-3);
-		ev.state = (evnt.type == SDL_MOUSEBUTTONDOWN);
-		ev.position.set(evnt.x, evnt.y);
-		mInputContext.applyEvent(ev);
-
-		mCurrentEventConsumed = false;
-		mRoot.mouse(ev);
-	}
-
-	void FTX_SystemManager::mousewheel(const SDL_MouseWheelEvent& evnt)
-	{
-		// Mouse wheel
-		mInputContext.mMouseWheel += evnt.y;
-	}
-
-	void FTX_SystemManager::update()
-	{
-		// Update timing
-		unsigned int oldTicks = mTicks;
-		mTicks = SDL_GetTicks();
-		mTimeDifference = (float)(mTicks - oldTicks) * 0.001f;
-		mTotalTime += mTimeDifference;
-
-		const float dt = clamp(mTimeDifference, 0.001f, 1.0f);
-		const float adaption = expf(-dt * 10.0f);
-		mFrameRate = (1.0f / dt) * (1.0f - adaption) + mFrameRate * adaption;
-
-		// Update root GuiBase instance
-		mCurrentEventConsumed = false;
-		mRoot.update(dt);
-		++mFrameCounter;
-	}
-
-	void FTX_SystemManager::render()
-	{
-		// Perform rendering
-		if (!FTX::Video.valid())
-			return;
-		if (!FTX::Video->isActive())
-			return;
-
-		mCurrentEventConsumed = false;
-		FTX::Video->beginRendering();
-		mRoot.render();
-		FTX::Video->endRendering();
-	}
-
-	void FTX_SystemManager::run(GuiBase& app)
-	{
-		mRoot.addChild(app);
-		run();
-		mRoot.removeChild(app);
-	}
-
-	void FTX_SystemManager::mainLoop()
-	{
-		startTick();
-		checkSDLEvents();
-		update();
-		render();
-
-#ifdef PLATFORM_WEB
-		if (!mRunning)
-		{
-			emscripten_cancel_main_loop();
-			EM_ASM(
-				if(Module["onExit"])Module["onExit"]();
-			);
-		}
-#endif
-	}
-
-	void loop_func(void* arg)
-	{
-		FTX_SystemManager* host = (FTX_SystemManager*)arg;
-		host->mainLoop();
-	}
-
-	void FTX_SystemManager::run()
-	{
-		// Start
-		mTicks = SDL_GetTicks();
-		mRunning = true;
-
-#ifdef PLATFORM_WEB
-		emscripten_set_main_loop_arg(loop_func, (void*)this, 0, 1);
-#else
-		// Main loop
-		while (mRunning)
-		{
-			mainLoop();
-		}
-#endif
-	}
-
-	void FTX_SystemManager::quit()
-	{
-		mRunning = false;
-	}
-
-	void FTX_SystemManager::warpMouse(int x, int y)
-	{
-		SDL_WarpMouseInWindow(FTX::Video->mMainWindow, x, y);
-		mInputContext.mMousePos.set(x, y);
-	}
-
-
-
-	FTX_VideoManager::FTX_VideoManager()
-	{
-	}
-
-	FTX_VideoManager::~FTX_VideoManager()
+	VideoManager::~VideoManager()
 	{
 		// TODO: Do this right here?
 		SDL_DestroyWindow(mMainWindow);
 	}
 
-	bool FTX_VideoManager::setVideoMode(const VideoConfig& videoconfig)
+	bool VideoManager::setVideoMode(const VideoConfig& videoconfig)
 	{
 		// Change video mode
 		uint32 flags = 0;
@@ -341,7 +105,7 @@ namespace rmx
 		return true;
 	}
 
-	bool FTX_VideoManager::initialize(const VideoConfig& videoconfig)
+	bool VideoManager::initialize(const VideoConfig& videoconfig)
 	{
 		// Initialize video mode
 		if (!FTX::System->initialize())
@@ -421,14 +185,14 @@ namespace rmx
 		return true;
 	}
 
-	void FTX_VideoManager::setInitialized(const VideoConfig& videoconfig, SDL_Window* window)
+	void VideoManager::setInitialized(const VideoConfig& videoconfig, SDL_Window* window)
 	{
 		mVideoConfig = videoconfig;
 		mMainWindow = window;
 		mInitialized = true;
 	}
 
-	void FTX_VideoManager::reshape(int width, int height)
+	void VideoManager::reshape(int width, int height)
 	{
 		// Called e.g. when window size changed
 		if (mVideoConfig.mWindowRect.width == width && mVideoConfig.mWindowRect.height == height)
@@ -443,7 +207,7 @@ namespace rmx
 	*/
 	}
 
-	void FTX_VideoManager::beginRendering()
+	void VideoManager::beginRendering()
 	{
 		if (mVideoConfig.mAutoClearScreen)
 		{
@@ -456,7 +220,7 @@ namespace rmx
 		}
 	}
 
-	void FTX_VideoManager::endRendering()
+	void VideoManager::endRendering()
 	{
 		if (mVideoConfig.mAutoSwapBuffers)
 		{
@@ -470,7 +234,7 @@ namespace rmx
 		mReshaped = false;
 	}
 
-	void FTX_VideoManager::setPixelView()
+	void VideoManager::setPixelView()
 	{
 	#ifdef RMX_WITH_OPENGL_SUPPORT
 		if (mVideoConfig.mRenderer == VideoConfig::Renderer::OPENGL)
@@ -490,7 +254,7 @@ namespace rmx
 	#endif
 	}
 
-	void FTX_VideoManager::setPerspective2D(double fov, double dnear, double dfar)
+	void VideoManager::setPerspective2D(double fov, double dnear, double dfar)
 	{
 	#ifdef RMX_WITH_OPENGL_SUPPORT
 		if (mVideoConfig.mRenderer == VideoConfig::Renderer::OPENGL)
@@ -512,7 +276,7 @@ namespace rmx
 	#endif
 	}
 
-	void FTX_VideoManager::getScreenBitmap(Bitmap& bitmap)
+	void VideoManager::getScreenBitmap(Bitmap& bitmap)
 	{
 	#ifdef RMX_WITH_OPENGL_SUPPORT
 		if (mVideoConfig.mRenderer == VideoConfig::Renderer::OPENGL)
@@ -525,7 +289,7 @@ namespace rmx
 	#endif
 	}
 
-	uint64 FTX_VideoManager::getNativeWindowHandle() const
+	uint64 VideoManager::getNativeWindowHandle() const
 	{
 	#ifdef PLATFORM_WINDOWS
 		SDL_SysWMinfo info;

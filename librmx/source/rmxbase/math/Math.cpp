@@ -163,6 +163,29 @@ namespace math
 		return true;
 	}
 
+	bool intersectLineWithSphere(const Line& line, const Vec3f& center, float radius, float* outIntersectionT0, float* outIntersectionT1)
+	{
+		// Resolve this equation:  (line.origin + line.dir * t - center) ^ 2 = radius ^ 2
+
+		const float a = 1.0f;
+		const float b = 2.0f * Vec3f::dot(line.getOrigin() - center, line.getDirection());
+		const float c = (line.getOrigin() - center).sqrLen() - radius * radius;
+
+		const float D = b * b - 4.0f * a * c;
+		if (D < 0.0f)
+			return false;
+
+		if (nullptr != outIntersectionT0 || nullptr != outIntersectionT1)
+		{
+			const float root = std::sqrt(D);
+			if (nullptr != outIntersectionT0)
+				*outIntersectionT0 = (-b - root) / (2.0f * a);
+			if (nullptr != outIntersectionT1)
+				*outIntersectionT1 = (-b + root) / (2.0f * a);
+		}
+		return true;
+	}
+
 	bool nearestPointBetweenLines(const Line& line1, const Line& line2, Vec3f* outPoint, float* outT)
 	{
 		// Vector orthogonal to each line, this is also a direction vector along the connection of the closest points

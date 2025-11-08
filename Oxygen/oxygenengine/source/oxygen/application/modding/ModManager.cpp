@@ -46,15 +46,14 @@ void ModManager::startup()
 			const uint64 hash = rmx::getMurmur2_64(localPath);
 
 			// Search for this mod in the previously found mods
-			Mod** found = mapFind(mModsByLocalDirectoryHash, hash);
-			if (nullptr == found)
+			Mod* mod = mapFindOrDefault(mModsByLocalDirectoryHash, hash, nullptr);
+			if (nullptr == mod)
 			{
 				// Not found... we could make this an error / failed mod
 			}
 			else
 			{
 				// Make this mod active
-				Mod* mod = *found;
 				mod->mState = Mod::State::ACTIVE;
 				mActiveMods.emplace_back(mod);
 			}
