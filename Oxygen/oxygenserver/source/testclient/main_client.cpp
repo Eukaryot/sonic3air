@@ -248,5 +248,6 @@ int main(int argc, char** argv)
 	Sockets::shutdownSockets();
 	const char* message = (success ? "Server check successful" : "Server check failed!");
 	RMX_LOG_INFO(message);
+	RMX_CHECK(success, "Server check failed!", );
 	return success ? 0 : 1;
 }
