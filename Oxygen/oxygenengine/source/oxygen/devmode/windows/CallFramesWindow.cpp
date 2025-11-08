@@ -116,7 +116,7 @@ void CallFramesWindow::buildContent()
 
 		if (!mSortedUnknownAddressed.empty())
 		{
-			if (ImGui::CollapsingHeader("Unknown called addresses"))
+			if (ImGui::CollapsingHeader("Unknown called addresses", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGuiHelpers::ScopedIndent si;
 				for (uint32 address : mSortedUnknownAddressed)
@@ -204,7 +204,14 @@ void CallFramesWindow::buildContent()
 				ignoreDepth = -1;
 			}
 
-			ImGuiHelpers::ScopedIndent si(4.0f + callFrame.mDepth * 16.0f);
+			// Indentation is linear at first, but switched to inverse exponential for deeper call farmes
+			constexpr float DEFAULT_INDENT = 16.0f;
+			constexpr int EXP_MIN_DEPTH = 10;
+			constexpr float EXP_FALLOFF = 0.05f;
+			float indent = (float)clamp(callFrame.mDepth, 0, EXP_MIN_DEPTH);
+			if (callFrame.mDepth > EXP_MIN_DEPTH)
+				indent += (1.0f - std::expf((float)(EXP_MIN_DEPTH - callFrame.mDepth) * EXP_FALLOFF)) / EXP_FALLOFF;
+			ImGuiHelpers::ScopedIndent si(4.0f + std::floor(indent * DEFAULT_INDENT));
 
 			uint64 key = (nullptr == callFrame.mFunction) ? 0xffffffffffffffffULL : callFrame.mFunction->getID();
 			const int keyCount = ++keyCounters[key];
@@ -247,7 +254,7 @@ void CallFramesWindow::buildContent()
 
 			if (callFrame.mType == CodeExec::CallFrame::Type::FAILED_HOOK)
 			{
-				ImGui::TextColored(ImGuiHelpers::COLOR_RED, "%06x", callFrame.mAddress);
+				ImGui::TextColored(ImGuiHelpers::COLOR_RED, "0x%06x", callFrame.mAddress);
 			}
 			else
 			{

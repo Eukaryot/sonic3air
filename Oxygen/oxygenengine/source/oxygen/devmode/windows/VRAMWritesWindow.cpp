@@ -56,12 +56,32 @@ void VRAMWritesWindow::buildContent()
 	ImGui::Checkbox("Plane B", &mShowPlaneB);
 	ImGui::Checkbox("Scroll Offsets", &mShowScroll);
 	ImGui::Checkbox("Patterns and others", &mShowOthers);
+
+	static int32 filterAddress = -1;
+	static ImGuiHelpers::InputString filterAddressString;
+	ImGui::AlignTextToFramePadding();
+	ImGui::Text("Filter by address:");
+	ImGui::SameLine();
+	if (ImGui::InputText("##FilterByAddress", filterAddressString.mInternal, sizeof(filterAddressString.mInternal)))
+	{
+		if (filterAddressString.isEmpty())
+			filterAddress = -1;
+		else
+			filterAddress = (int32)rmx::parseInteger(filterAddressString.mInternal);
+	}
+
 	ImGui::Spacing();
 
 	if (ImGui::BeginTable("VRAM Writes Table", 1, ImGuiTableFlags_Borders, ImVec2(0.0f, 0.0f)))
 	{
 		for (const DebugTracking::VRAMWrite* write : writes)
 		{
+			if (filterAddress >= 0)
+			{
+				if (filterAddress < write->mAddress || filterAddress >= write->mAddress + write->mSize)
+					continue;
+			}
+
 			const uint64 key = ((uint64)write->mAddress << 32) + write->mSize;
 			String line(0, "0x%04x (0x%02x bytes) at %s", write->mAddress, write->mSize, write->mLocation.toString(codeExec).c_str());
 			ImVec4 color(1.0f, 1.0f, 1.0f, 1.0f);

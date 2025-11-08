@@ -25,11 +25,19 @@ void DevModeWindowBase::setIsWindowOpen(bool open)
 		return;
 
 	mIsWindowOpen = open;
+	mLastWindowOpen = open;
 	onChangedIsWindowOpen(open);
 }
 
 bool DevModeWindowBase::buildWindow()
 {
+	// Check if window was closed by ImGui itself (when clicking the close button)
+	if (mIsWindowOpen != mLastWindowOpen)
+	{
+		mLastWindowOpen = mIsWindowOpen;
+		onChangedIsWindowOpen(mIsWindowOpen);
+	}
+
 	if (!mIsWindowOpen)
 		return false;
 

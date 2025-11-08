@@ -61,12 +61,24 @@ namespace ImGuiHelpers
 	};
 
 
+	struct InputString
+	{
+		char mInternal[256] = { 0 };
+
+		InputString() = default;
+		InputString(std::string_view str) { set(str); };
+		bool isEmpty() const;
+		void set(std::string_view str);
+	};
+
+
 	struct WideInputString
 	{
 		WString mWideString;
 		char mInternalUTF8[256] = { 0 };
 
 		const WString& get() const  { return mWideString; }
+		bool isEmpty() const;
 		void set(std::wstring_view str);
 		void refreshFromInternal();
 	};

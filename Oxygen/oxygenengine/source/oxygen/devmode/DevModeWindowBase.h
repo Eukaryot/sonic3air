@@ -46,6 +46,7 @@ protected:
 	const Category mCategory = Category::MISC;
 
 	bool mIsWindowOpen = false;
+	bool mLastWindowOpen = false;
 	ImGuiWindowFlags mImGuiWindowFlags = 0;
 
 	DevModeMainWindow* mDevModeMainWindow = nullptr;

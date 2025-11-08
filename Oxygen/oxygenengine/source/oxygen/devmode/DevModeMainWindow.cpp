@@ -188,7 +188,11 @@ void DevModeMainWindow::buildContent()
 							DevModeWindowBase* window = windows[k];
 							if (nullptr != window)
 							{
-								ImGui::Checkbox(window->mTitle.c_str(), &window->mIsWindowOpen);
+								bool isOpen = window->mIsWindowOpen;
+								if (ImGui::Checkbox(window->mTitle.c_str(), &isOpen))
+								{
+									window->setIsWindowOpen(isOpen);
+								}
 							}
 						#ifdef DEBUG
 							else
