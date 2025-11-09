@@ -10,6 +10,8 @@ Alternative: Manual build
 	- libogg
 		- Visual Studio Solution in "ogg-vorbis\libogg\win32\VS2015"
 		- If downloaded libogg separately or updating it:
+			- Update the Visual Studio project to VS 2022 and latest Windows SDK for all configurations
+				- Both can be found in the Project Properties under General
 			- Changes in the Project Properties required for static build, for all configurations:
 				- C/C++ -> Code Generation -> "Runtime Library" = "Multi-threaded (/MT)"
 				- C/C++ -> Code Generation -> "Enable Function-Level Linking" = "Yes"
