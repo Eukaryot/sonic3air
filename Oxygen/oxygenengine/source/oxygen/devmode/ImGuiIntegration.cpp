@@ -22,8 +22,7 @@
 namespace
 {
 	DevModeMainWindow* mDevModeMainWindow = nullptr;
-	ImFont* mDefaultFontx1 = nullptr;
-	ImFont* mDefaultFontx2 = nullptr;
+	ImFont* mDefaultFont = nullptr;
 	std::wstring mIniFilePath;
 
 	bool loadFont(const char* filename, float size, ImFont*& outFont)
@@ -106,8 +105,7 @@ void ImGuiIntegration::startup()
 	mRunning = true;
 
 	// Configure default styles
-	loadFont("data/font/ttf/DroidSans.ttf", 15.0f, mDefaultFontx1);
-	loadFont("data/font/ttf/DroidSans.ttf", 30.0f, mDefaultFontx2);
+	loadFont("data/font/ttf/DroidSans.ttf", 15.0f, mDefaultFont);
 	refreshImGuiStyle();
 
 	mDevModeMainWindow = new DevModeMainWindow();
@@ -173,8 +171,7 @@ void ImGuiIntegration::showDebugWindow()
 	IM_ASSERT(ImGui::GetCurrentContext() != nullptr && "Missing Dear ImGui context. Refer to examples app!");
 	IMGUI_CHECKVERSION();
 
-	ImFont* font = (Configuration::instance().mDevMode.mUIScale <= 1.0f) ? mDefaultFontx1 : mDefaultFontx2;
-	ImGui::PushFont(font, 0.0f);	// TODO: Make use of second parameter instead of having two fonts that only differ in font size
+	ImGui::PushFont(mDefaultFont, 0.0f);	// TODO: Make use of second parameter instead of having two fonts that only differ in font size
 	mDevModeMainWindow->buildWindow();
 	ImGui::PopFont();
 }
@@ -281,9 +278,7 @@ void ImGuiIntegration::refreshImGuiStyle()
 
 void ImGuiIntegration::updateFontScale()
 {
-	const float uiScale = Configuration::instance().mDevMode.mUIScale;
-	const float fontSize = (uiScale <= 1.0f) ? 1.0f : 2.0f;
-	ImGui::GetStyle().FontScaleMain = uiScale / fontSize;
+	ImGui::GetStyle().FontScaleMain = Configuration::instance().mDevMode.mUIScale;
 }
 
 void ImGuiIntegration::toggleMainWindow()
