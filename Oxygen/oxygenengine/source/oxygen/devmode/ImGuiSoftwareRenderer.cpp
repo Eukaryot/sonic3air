@@ -16,12 +16,14 @@
 #include "imgui.h"
 
 
+void ImGuiSoftwareRenderer::initBackend()
+{
+	// Signify to ImGui that this backend supports the new texture mechanism introduced in ImGui 1.92
+	ImGui::GetIO().BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
+}
+
 void ImGuiSoftwareRenderer::newFrame()
 {
-	// This is needed not only to cache the fonts texture data, but also to let ImGui know we actually processed the font texture data
-	uint8* data = nullptr;
-	ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&data, &mFontsTextureSize.x, &mFontsTextureSize.y);
-	mFontsTextureData = reinterpret_cast<uint32*>(data);
 }
 
 void ImGuiSoftwareRenderer::renderDrawData()
@@ -48,8 +50,8 @@ void ImGuiSoftwareRenderer::renderDrawData()
 
 	SoftwareRasterizer::Vertex vertices[3];
 
-	const ImDrawData* data = ImGui::GetDrawData();
-	for (const ImDrawList* drawList : data->CmdLists)
+	const ImDrawData* drawData = ImGui::GetDrawData();
+	for (const ImDrawList* drawList : drawData->CmdLists)
 	{
 		for (const ImDrawCmd& drawCmd : drawList->CmdBuffer)
 		{
@@ -60,21 +62,26 @@ void ImGuiSoftwareRenderer::renderDrawData()
 			BitmapViewMutable<uint32> outputView(output, clipRect);
 			rasterizer.setOutput(outputView);
 
-			const uint32* textureData = nullptr;
+			const uint32* texImageData = nullptr;
 			Vec2i textureSize;
-			if (drawCmd.TextureId == ImGui::GetIO().Fonts->TexID)
+			if (nullptr != drawData->Textures)
 			{
-				textureData = mFontsTextureData;
-				textureSize = mFontsTextureSize;
-			}
-			else
-			{
-				// TODO: Support other textures than the default one (depending on "drawCmd.TextureId")
+				const ImVector<ImTextureData*>& textures = *drawData->Textures;
+				if (drawCmd.TexRef._TexID < textures.Size)
+				{
+					ImTextureData* textureData = textures[(int)drawCmd.TexRef._TexID];
+					if (nullptr != textureData && textureData->Format == ImTextureFormat_RGBA32)	// TODO: We should better support other texture formats as well; but for now this works
+					{
+						texImageData = reinterpret_cast<const uint32*>(textureData->GetPixels());
+						textureSize.x = textureData->Width;
+						textureSize.y = textureData->Height;
+					}
+				}
 			}
 
-			if (nullptr != textureData)
+			if (nullptr != texImageData)
 			{
-				BitmapView<uint32> inputView(textureData, textureSize);
+				BitmapView<uint32> inputView(texImageData, textureSize);
 
 				for (uint32 k = 0; k + 3 <= drawCmd.ElemCount; k += 3)
 				{
@@ -138,7 +145,7 @@ void ImGuiSoftwareRenderer::renderDrawData()
 							vertices[j].mColor = Color::fromABGR32(vert.col);
 							vertices[j].mUV.set(vert.uv.x, vert.uv.y);
 
-							// TODO: This doesn't swap red and blue channels for the sampled texture - that would need to be implemented separately in teh rasterizer itself
+							// TODO: This doesn't swap red and blue channels for the sampled texture - that would need to be implemented separately in the rasterizer itself
 							if (blitterOptions.mSwapRedBlueChannels)
 								vertices[j].mColor.swapRedBlue();
 						}
@@ -150,7 +157,7 @@ void ImGuiSoftwareRenderer::renderDrawData()
 					}
 					else
 					{
-						rasterizer.drawTriangle(vertices, BitmapView<uint32>(textureData, textureSize), !isUntinted);
+						rasterizer.drawTriangle(vertices, BitmapView<uint32>(texImageData, textureSize), !isUntinted);
 					}
 				}
 			}

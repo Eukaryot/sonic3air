@@ -75,6 +75,7 @@ void ImGuiIntegration::startup()
 	else
 	{
 		ImGui_ImplSDL2_InitForOther(window);
+		ImGuiSoftwareRenderer::initBackend();
 	}
 
 	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
@@ -173,7 +174,7 @@ void ImGuiIntegration::showDebugWindow()
 	IMGUI_CHECKVERSION();
 
 	ImFont* font = (Configuration::instance().mDevMode.mUIScale <= 1.0f) ? mDefaultFontx1 : mDefaultFontx2;
-	ImGui::PushFont(font);
+	ImGui::PushFont(font, 0.0f);	// TODO: Make use of second parameter instead of having two fonts that only differ in font size
 	mDevModeMainWindow->buildWindow();
 	ImGui::PopFont();
 }
@@ -282,7 +283,7 @@ void ImGuiIntegration::updateFontScale()
 {
 	const float uiScale = Configuration::instance().mDevMode.mUIScale;
 	const float fontSize = (uiScale <= 1.0f) ? 1.0f : 2.0f;
-	ImGui::GetIO().FontGlobalScale = uiScale / fontSize;
+	ImGui::GetStyle().FontScaleMain = uiScale / fontSize;
 }
 
 void ImGuiIntegration::toggleMainWindow()
