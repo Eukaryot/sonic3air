@@ -30,7 +30,6 @@ void ImGuiSoftwareRenderer::newFrame()
 void ImGuiSoftwareRenderer::renderDrawData()
 {
 	// TODO:
-	//  - Extend software rasterizer to respect the "mSwapRedBlueChannels" setting when sampling a texture
 	//  - Performance optimization: Support rendering textured rectangles as well
 	//  - Fix the minor glitches; though they might in part be related to missing anti-aliasing
 
@@ -158,10 +157,6 @@ void ImGuiSoftwareRenderer::renderDrawData()
 							vertices[j].mPosition.set(vert.pos.x - drawCmd.ClipRect.x, vert.pos.y - drawCmd.ClipRect.y);
 							vertices[j].mColor = Color::fromABGR32(vert.col);
 							vertices[j].mUV.set(vert.uv.x, vert.uv.y);
-
-							// TODO: This doesn't swap red and blue channels for the sampled texture - that would need to be implemented separately in the rasterizer itself
-							if (blitterOptions.mSwapRedBlueChannels)
-								vertices[j].mColor.swapRedBlue();
 						}
 					}
 

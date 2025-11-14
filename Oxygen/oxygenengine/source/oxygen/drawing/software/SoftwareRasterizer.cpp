@@ -46,9 +46,13 @@ namespace
 		}
 	}
 
-	template<int USE_COLORS, bool BILINEAR_SAMPLING, bool ALPHA_BLENDING>
-	FORCE_INLINE void processTexturedLine(uint8* output, int numPixels, Color currentColor, Color diffColor, Vec2f currentUV, Vec2f diffUV, Vec2f scaleUV, const BitmapView<uint32>& texture)
+	template<int USE_COLORS, bool BILINEAR_SAMPLING, bool ALPHA_BLENDING, bool SWAP_RED_BLUE>
+	FORCE_INLINE void processTexturedLineInternal(uint8* output, int numPixels, Color currentColor, Color diffColor, Vec2f currentUV, Vec2f diffUV, Vec2f scaleUV, const BitmapView<uint32>& texture)
 	{
+		constexpr int SAMPLE_INDEX_R = SWAP_RED_BLUE ? 2 : 0;
+		constexpr int SAMPLE_INDEX_G = 1;
+		constexpr int SAMPLE_INDEX_B = SWAP_RED_BLUE ? 0 : 2;
+
 		if constexpr (BILINEAR_SAMPLING)
 		{
 			currentUV.x -= 0.5f / scaleUV.x;
@@ -76,9 +80,9 @@ namespace
 				const uint8* sample01 = (const uint8*)texture.getPixelPointer(sampleX0, sampleY1);
 				const uint8* sample10 = (const uint8*)texture.getPixelPointer(sampleX1, sampleY0);
 				const uint8* sample11 = (const uint8*)texture.getPixelPointer(sampleX1, sampleY1);
-				float r = ((float)sample00[0] * (1.0f - factorX) + (float)sample10[0] * factorX) * (1.0f - factorY) + ((float)sample01[0] * (1.0f - factorX) + (float)sample11[0] * factorX) * factorY;
-				float g = ((float)sample00[1] * (1.0f - factorX) + (float)sample10[1] * factorX) * (1.0f - factorY) + ((float)sample01[1] * (1.0f - factorX) + (float)sample11[1] * factorX) * factorY;
-				float b = ((float)sample00[2] * (1.0f - factorX) + (float)sample10[2] * factorX) * (1.0f - factorY) + ((float)sample01[2] * (1.0f - factorX) + (float)sample11[2] * factorX) * factorY;
+				float r = ((float)sample00[SAMPLE_INDEX_R] * (1.0f - factorX) + (float)sample10[SAMPLE_INDEX_R] * factorX) * (1.0f - factorY) + ((float)sample01[SAMPLE_INDEX_R] * (1.0f - factorX) + (float)sample11[SAMPLE_INDEX_R] * factorX) * factorY;
+				float g = ((float)sample00[SAMPLE_INDEX_G] * (1.0f - factorX) + (float)sample10[SAMPLE_INDEX_G] * factorX) * (1.0f - factorY) + ((float)sample01[SAMPLE_INDEX_G] * (1.0f - factorX) + (float)sample11[SAMPLE_INDEX_G] * factorX) * factorY;
+				float b = ((float)sample00[SAMPLE_INDEX_B] * (1.0f - factorX) + (float)sample10[SAMPLE_INDEX_B] * factorX) * (1.0f - factorY) + ((float)sample01[SAMPLE_INDEX_B] * (1.0f - factorX) + (float)sample11[SAMPLE_INDEX_B] * factorX) * factorY;
 
 				if constexpr (USE_COLORS)
 				{
@@ -127,9 +131,9 @@ namespace
 						const float multiplierA = (float)sample[3] / 255.0f * currentColor.a;
 						const float multiplierB = 1.0f - multiplierA;
 
-						output[0] = (uint8)((float)sample[0] * currentColor.r * multiplierA + (float)output[0] * multiplierB);
-						output[1] = (uint8)((float)sample[1] * currentColor.g * multiplierA + (float)output[1] * multiplierB);
-						output[2] = (uint8)((float)sample[2] * currentColor.b * multiplierA + (float)output[2] * multiplierB);
+						output[0] = (uint8)((float)sample[SAMPLE_INDEX_R] * currentColor.r * multiplierA + (float)output[0] * multiplierB);
+						output[1] = (uint8)((float)sample[SAMPLE_INDEX_G] * currentColor.g * multiplierA + (float)output[1] * multiplierB);
+						output[2] = (uint8)((float)sample[SAMPLE_INDEX_B] * currentColor.b * multiplierA + (float)output[2] * multiplierB);
 						output[3] = 0xff;
 					}
 					else
@@ -137,9 +141,9 @@ namespace
 						const uint16 multiplierA = ((uint32)sample[3] << 8) / 255;
 						const uint16 multiplierB = (256 - multiplierA);
 
-						output[0] = (sample[0] * multiplierA + output[0] * multiplierB) >> 8;
-						output[1] = (sample[1] * multiplierA + output[1] * multiplierB) >> 8;
-						output[2] = (sample[2] * multiplierA + output[2] * multiplierB) >> 8;
+						output[0] = (sample[SAMPLE_INDEX_R] * multiplierA + output[0] * multiplierB) >> 8;
+						output[1] = (sample[SAMPLE_INDEX_G] * multiplierA + output[1] * multiplierB) >> 8;
+						output[2] = (sample[SAMPLE_INDEX_B] * multiplierA + output[2] * multiplierB) >> 8;
 						output[3] = 0xff;
 					}
 				}
@@ -152,14 +156,21 @@ namespace
 					{
 						const uint8* sample = (const uint8*)texture.getPixelPointer(sampleX, sampleY);
 
-						output[0] = (uint8)((float)sample[0] * currentColor.r);
-						output[1] = (uint8)((float)sample[1] * currentColor.g);
-						output[2] = (uint8)((float)sample[2] * currentColor.b);
+						output[0] = (uint8)((float)sample[SAMPLE_INDEX_R] * currentColor.r);
+						output[1] = (uint8)((float)sample[SAMPLE_INDEX_G] * currentColor.g);
+						output[2] = (uint8)((float)sample[SAMPLE_INDEX_B] * currentColor.b);
 						output[3] = 0xff;
 					}
 					else
 					{
-						*reinterpret_cast<uint32*>(output) = texColor | 0xff000000;
+						if constexpr (SWAP_RED_BLUE)
+						{
+							*reinterpret_cast<uint32*>(output) = (texColor & 0x00ff00) | ((texColor & 0xff0000) >> 16) | ((texColor & 0x0000ff) << 16) | 0xff000000;
+						}
+						else
+						{
+							*reinterpret_cast<uint32*>(output) = texColor | 0xff000000;
+						}
 					}
 				}
 			}
@@ -173,6 +184,45 @@ namespace
 				{
 					currentColor[k] += diffColor[k];
 				}
+			}
+		}
+	}
+
+	template<int USE_COLORS>
+	FORCE_INLINE void processTexturedLine(uint8* output, int numPixels, Color currentColor, Color diffColor, Vec2f currentUV, Vec2f diffUV, Vec2f scaleUV, const BitmapView<uint32>& texture, const Blitter::Options& options)
+	{
+		if (options.mSamplingMode == SamplingMode::POINT)
+		{
+			if (options.mBlendMode == BlendMode::ALPHA)
+			{
+				if (options.mSwapRedBlueChannels)
+					processTexturedLineInternal<USE_COLORS, false, true, true>(output, numPixels, currentColor, diffColor, currentUV, diffUV, scaleUV, texture);
+				else
+					processTexturedLineInternal<USE_COLORS, false, true, false>(output, numPixels, currentColor, diffColor, currentUV, diffUV, scaleUV, texture);
+			}
+			else
+			{
+				if (options.mSwapRedBlueChannels)
+					processTexturedLineInternal<USE_COLORS, false, false, true>(output, numPixels, currentColor, diffColor, currentUV, diffUV, scaleUV, texture);
+				else
+					processTexturedLineInternal<USE_COLORS, false, false, false>(output, numPixels, currentColor, diffColor, currentUV, diffUV, scaleUV, texture);
+			}
+		}
+		else
+		{
+			if (options.mBlendMode == BlendMode::ALPHA)
+			{
+				if (options.mSwapRedBlueChannels)
+					processTexturedLineInternal<USE_COLORS, true, true, true>(output, numPixels, currentColor, diffColor, currentUV, diffUV, scaleUV, texture);
+				else
+					processTexturedLineInternal<USE_COLORS, true, true, false>(output, numPixels, currentColor, diffColor, currentUV, diffUV, scaleUV, texture);
+			}
+			else
+			{
+				if (options.mSwapRedBlueChannels)
+					processTexturedLineInternal<USE_COLORS, true, false, true>(output, numPixels, currentColor, diffColor, currentUV, diffUV, scaleUV, texture);
+				else
+					processTexturedLineInternal<USE_COLORS, true, false, false>(output, numPixels, currentColor, diffColor, currentUV, diffUV, scaleUV, texture);
 			}
 		}
 	}
@@ -332,7 +382,7 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex& vertex00, const Vertex& ver
 		for (int k = 0; k < 4; ++k)
 		{
 			advanceLeft.mColor[k]  = (vertex01.mColor[k] - vertex00.mColor[k]) / rangeY;
-			advanceRight.mColor[k]  = (vertex11.mColor[k] - vertex10.mColor[k]) / rangeY;
+			advanceRight.mColor[k] = (vertex11.mColor[k] - vertex10.mColor[k]) / rangeY;
 		}
 	}
 
@@ -347,9 +397,17 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex& vertex00, const Vertex& ver
 	{
 		for (int k = 0; k < 4; ++k)
 		{
-			vertexLeft.mColor[k] += advanceLeft.mColor[k] * firstStepY;
+			vertexLeft.mColor[k]  += advanceLeft.mColor[k] * firstStepY;
 			vertexRight.mColor[k] += advanceRight.mColor[k] * firstStepY;
 		}
+	}
+
+	if (mOptions.mSwapRedBlueChannels)
+	{
+		vertexLeft.mColor.swapRedBlue();
+		vertexRight.mColor.swapRedBlue();
+		advanceLeft.mColor.swapRedBlue();
+		advanceRight.mColor.swapRedBlue();
 	}
 
 	int minY = (int)(firstIntegerY);
@@ -386,78 +444,15 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex& vertex00, const Vertex& ver
 					currentColor[k] = vertexLeft.mColor[k] + diffColor[k] * factor2;
 				}
 
-				if (mOptions.mBlendMode == BlendMode::ALPHA)
-				{
-					if (mOptions.mSamplingMode == SamplingMode::POINT)
-					{
-						processTexturedLine<2, false, true>(outputBytes, numPixels, currentColor, diffColor, currentUV, diffUV, scaleUV, texture);
-					}
-					else
-					{
-						processTexturedLine<2, true, true>(outputBytes, numPixels, currentColor, diffColor, currentUV, diffUV, scaleUV, texture);
-					}
-				}
-				else
-				{
-					if (mOptions.mSamplingMode == SamplingMode::POINT)
-					{
-						processTexturedLine<2, false, false>(outputBytes, numPixels, currentColor, diffColor, currentUV, diffUV, scaleUV, texture);
-					}
-					else
-					{
-						processTexturedLine<2, true, false>(outputBytes, numPixels, currentColor, diffColor, currentUV, diffUV, scaleUV, texture);
-					}
-				}
+				processTexturedLine<2>(outputBytes, numPixels, currentColor, diffColor, currentUV, diffUV, scaleUV, texture, mOptions);
 			}
 			else if (useVertexColors)
 			{
-				if (mOptions.mBlendMode == BlendMode::ALPHA)
-				{
-					if (mOptions.mSamplingMode == SamplingMode::POINT)
-					{
-						processTexturedLine<1, false, true>(outputBytes, numPixels, vertex00.mColor, Color::TRANSPARENT, currentUV, diffUV, scaleUV, texture);
-					}
-					else
-					{
-						processTexturedLine<1, true, true>(outputBytes, numPixels, vertex00.mColor, Color::TRANSPARENT, currentUV, diffUV, scaleUV, texture);
-					}
-				}
-				else
-				{
-					if (mOptions.mSamplingMode == SamplingMode::POINT)
-					{
-						processTexturedLine<1, false, false>(outputBytes, numPixels, vertex00.mColor, Color::TRANSPARENT, currentUV, diffUV, scaleUV, texture);
-					}
-					else
-					{
-						processTexturedLine<1, true, false>(outputBytes, numPixels, vertex00.mColor, Color::TRANSPARENT, currentUV, diffUV, scaleUV, texture);
-					}
-				}
+				processTexturedLine<1>(outputBytes, numPixels, vertexLeft.mColor, Color::TRANSPARENT, currentUV, diffUV, scaleUV, texture, mOptions);
 			}
 			else
 			{
-				if (mOptions.mBlendMode == BlendMode::ALPHA)
-				{
-					if (mOptions.mSamplingMode == SamplingMode::POINT)
-					{
-						processTexturedLine<0, false, true>(outputBytes, numPixels, vertex00.mColor, Color::TRANSPARENT, currentUV, diffUV, scaleUV, texture);
-					}
-					else
-					{
-						processTexturedLine<0, true, true>(outputBytes, numPixels, vertex00.mColor, Color::TRANSPARENT, currentUV, diffUV, scaleUV, texture);
-					}
-				}
-				else
-				{
-					if (mOptions.mSamplingMode == SamplingMode::POINT)
-					{
-						processTexturedLine<0, false, false>(outputBytes, numPixels, vertex00.mColor, Color::TRANSPARENT, currentUV, diffUV, scaleUV, texture);
-					}
-					else
-					{
-						processTexturedLine<0, true, false>(outputBytes, numPixels, vertex00.mColor, Color::TRANSPARENT, currentUV, diffUV, scaleUV, texture);
-					}
-				}
+				processTexturedLine<0>(outputBytes, numPixels, vertexLeft.mColor, Color::TRANSPARENT, currentUV, diffUV, scaleUV, texture, mOptions);
 			}
 		}
 
@@ -510,6 +505,14 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex& vertex00, const Vertex& ver
 		}
 	}
 
+	if (mOptions.mSwapRedBlueChannels)
+	{
+		vertexLeft.mColor.swapRedBlue();
+		vertexRight.mColor.swapRedBlue();
+		advanceLeft.mColor.swapRedBlue();
+		advanceRight.mColor.swapRedBlue();
+	}
+
 	int minY = (int)(firstIntegerY);
 	int maxY = (int)(std::floor(endY));
 	minY = clamp(minY, 0, mOutput.getSize().y);
@@ -553,7 +556,7 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex& vertex00, const Vertex& ver
 			else
 			{
 				// No blending, fixed color
-				const uint32 fixedColorABGR = vertex00.mColor.getABGR32();
+				const uint32 fixedColorABGR = vertexLeft.mColor.getABGR32();
 				for (int x = minX; x <= maxX; ++x)
 				{
 					*outputData = fixedColorABGR;
