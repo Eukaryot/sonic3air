@@ -62,7 +62,8 @@ public:
 
 	struct DevModeSettings
 	{
-		bool mEnabled = false;
+		bool mEnabled = false;			// Set if dev mode is currently enabled
+		bool mEnableAtStartup = false;	// Set if dev mode is meant to be enabled at startup
 		float mGameViewScale = 1.0f;
 		Vec2f mGameViewAlignment;
 		float mUIScale = 1.0f;
