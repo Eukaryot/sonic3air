@@ -53,10 +53,6 @@ EngineServerClient::~EngineServerClient()
 
 bool EngineServerClient::setupClient(bool useIPv6)
 {
-	const Configuration::GameServerBase& config = Configuration::instance().mGameServerBase;
-	if (config.mServerHostName.empty())
-		return false;
-
 	mUseIPv6 = useIPv6;
 	Sockets::startupSockets();
 

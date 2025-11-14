@@ -290,6 +290,11 @@ bool EngineMain::startupEngine()
 	mAudioOut = &EngineMain::getDelegate().createAudioOut();
 	mAudioOut->startup();
 
+	// Networking
+	RMX_LOG_INFO("Networking initialization...");
+	const bool useIPv6 = false;
+	mInternal.mEngineServerClient.setupClient(useIPv6);
+
 	// ImGui integration
 	ImGuiIntegration::setEnabled(config.mDevMode.mEnabled);
 	ImGuiIntegration::startup();

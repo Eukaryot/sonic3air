@@ -18,11 +18,8 @@ GameClient::GameClient() :
 
 void GameClient::setupClient()
 {
-	const bool useIPv6 = false;
 	EngineServerClient& engineServerClient = EngineServerClient::instance();
-
 	engineServerClient.setListener(this);
-	engineServerClient.setupClient(useIPv6);
 }
 
 void GameClient::updateClient(float timeElapsed)

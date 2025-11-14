@@ -112,7 +112,8 @@ bool Sockets::resolveToIP(const std::string& hostName, std::string& outIP, bool 
 	// Resolve host name to an IP
 	addrinfo* addrInfo = nullptr;
 	addrinfo hintsAddrInfo = {};
-	if (::getaddrinfo(hostName.c_str(), nullptr, &hintsAddrInfo, &addrInfo) == 0)
+	const int result = ::getaddrinfo(hostName.c_str(), nullptr, &hintsAddrInfo, &addrInfo);
+	if (result == 0)
 	{
 		addrinfo* firstAddrInfo = addrInfo;
 
