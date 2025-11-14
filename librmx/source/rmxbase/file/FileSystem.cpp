@@ -247,6 +247,13 @@ namespace rmx
 				}
 			}
 		}
+
+		// Sort and also remove duplicates (because the special case mentioned above can easily add the same directory multiple times)
+		if (outEntries.size() >= 2)
+		{
+			std::sort(outEntries.begin(), outEntries.end(), [](const std::wstring& a, const std::wstring& b) { return a < b; } );
+			outEntries.erase(std::unique(outEntries.begin(), outEntries.end()), outEntries.end());
+		}
 	}
 
 	bool FileSystem::renameFile(std::wstring_view oldFilename, std::wstring_view newFilename)

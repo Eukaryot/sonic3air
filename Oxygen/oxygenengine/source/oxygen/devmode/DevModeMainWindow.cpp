@@ -16,6 +16,7 @@
 #include "oxygen/devmode/windows/CallFramesWindow.h"
 #include "oxygen/devmode/windows/CustomSidePanelWindow.h"
 #include "oxygen/devmode/windows/DebugLogWindow.h"
+#include "oxygen/devmode/windows/FileBrowserWindow.h"
 #include "oxygen/devmode/windows/GameSimWindow.h"
 #include "oxygen/devmode/windows/GameVisualizationsWindow.h"
 #include "oxygen/devmode/windows/MemoryHexViewWindow.h"
@@ -65,6 +66,7 @@ DevModeMainWindow::DevModeMainWindow() :
 		createWindow(mSettingsWindow);
 	#ifdef DEBUG
 		createWindow(mNetworkingWindow);
+		createWindow(mFileBrowserWindow);
 	#endif
 	}
 
