@@ -166,7 +166,6 @@ void ModsMenu::initialize()
 				Bitmap* sourceLarge = !icon64px.empty() ? &icon64px : !icon16px.empty() ? &icon16px : nullptr;
 				if (nullptr != sourceLarge)
 				{
-					EngineMain::instance().getDrawer().createTexture(res.mLargeIcon);
 					res.mLargeIcon.accessBitmap().rescale(*sourceLarge, 64, 64);
 					res.mLargeIcon.bitmapUpdated();
 				}
@@ -174,11 +173,9 @@ void ModsMenu::initialize()
 				Bitmap* sourceSmall = !icon16px.empty() ? &icon16px : !icon64px.empty() ? &icon64px : nullptr;
 				if (nullptr != sourceSmall)
 				{
-					EngineMain::instance().getDrawer().createTexture(res.mSmallIcon);
 					res.mSmallIcon.accessBitmap().rescale(*sourceSmall, 16, 16);
 					res.mSmallIcon.bitmapUpdated();
 
-					EngineMain::instance().getDrawer().createTexture(res.mSmallIconGray);
 					{
 						Bitmap& bitmap = res.mSmallIconGray.accessBitmap();
 						bitmap = res.mSmallIcon.accessBitmap();

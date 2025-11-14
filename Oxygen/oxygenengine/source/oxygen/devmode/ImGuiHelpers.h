@@ -33,6 +33,9 @@ namespace ImGuiHelpers
 	static const ImVec4 COLOR_MAGENTA	  (1.0f, 0.0f, 1.0f, 1.0f);
 
 
+	extern ImTextureRef getTextureRef(DrawerTexture& drawerTexture);
+
+
 	struct ScopedIndent
 	{
 	public:

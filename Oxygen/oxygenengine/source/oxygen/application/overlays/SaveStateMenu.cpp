@@ -296,10 +296,6 @@ void SaveStateMenu::setHighlightedIndex(uint32 highlightedIndex)
 			Bitmap bmp;
 			if (bmp.load(mSaveStateDirectory[(size_t)entry.mType] + L"/" + entry.mName + L".state.bmp"))
 			{
-				if (!mPreview.isValid())
-				{
-					EngineMain::instance().getDrawer().createTexture(mPreview);
-				}
 				mPreview.accessBitmap() = bmp;
 				mPreview.bitmapUpdated();
 				mHasPreview = true;

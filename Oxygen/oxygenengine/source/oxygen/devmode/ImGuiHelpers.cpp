@@ -12,10 +12,22 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/platform/PlatformFunctions.h"
+#include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
+#include "oxygen/drawing/software/SoftwareDrawerTexture.h"
 
 
 namespace ImGuiHelpers
 {
+
+	ImTextureRef getTextureRef(DrawerTexture& drawerTexture)
+	{
+		Drawer& drawer = EngineMain::instance().getDrawer();
+		if (drawer.getType() == Drawer::Type::OPENGL)
+			return ImTextureRef(drawerTexture.getImplementation<OpenGLDrawerTexture>()->getTextureHandle());
+		else
+			return ImTextureRef(drawerTexture.getUniqueID());
+	}
+
 
 	void InputString::set(std::string_view str)
 	{

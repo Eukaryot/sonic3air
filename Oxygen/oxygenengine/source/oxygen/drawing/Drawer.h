@@ -51,6 +51,7 @@ public:
 	inline DrawerInterface* getActiveDrawer() const  { return mActiveDrawer; }
 
 	void createTexture(DrawerTexture& outTexture);
+	const DrawerTexture* getTextureByID(uint32 uniqueID) const;
 
 	Recti getSpriteRect(uint64 spriteKey) const;	// Return sprite size and pivot offset (usually negative)
 
@@ -99,4 +100,6 @@ private:
 	DrawerInterface* mActiveDrawer = nullptr;
 	DrawCollection mDrawCollection;
 	std::vector<DrawerTexture*> mDrawerTextures;
+	std::unordered_map<uint32, DrawerTexture*> mTexturesByID;
+	uint32 mNextUniqueID = 1;
 };

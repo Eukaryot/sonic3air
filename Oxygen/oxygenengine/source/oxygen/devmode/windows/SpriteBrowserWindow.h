@@ -13,6 +13,7 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/devmode/DevModeWindowBase.h"
+#include "oxygen/drawing/DrawerTexture.h"
 #include "oxygen/resources/SpriteCollection.h"
 
 
@@ -29,8 +30,8 @@ private:
 
 	const SpriteCollection::Item* mPreviewItem = nullptr;
 	int mPreviewScale = 0;
-	Texture mPreviewTexture;
-	Bitmap mTempBitmap;
+	DrawerTexture mPreviewTexture;
+	bool mHasValidPreviewTexture = false;
 	bool mShowPalette = false;
 };
 

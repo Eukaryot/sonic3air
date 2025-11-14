@@ -44,7 +44,6 @@ void VideoOut::startup()
 	mGameResolution = Configuration::instance().mGameScreen;
 
 	RMX_LOG_INFO("VideoOut: Setup of game screen");
-	EngineMain::instance().getDrawer().createTexture(mGameScreenTexture);
 	mGameScreenTexture.setupAsRenderTarget(mGameResolution.x, mGameResolution.y);
 
 	if (nullptr == mRenderParts)

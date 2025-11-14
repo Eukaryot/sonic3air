@@ -12,6 +12,7 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/drawing/software/SoftwareDrawer.h"
+#include "oxygen/drawing/software/SoftwareDrawerTexture.h"
 #include "oxygen/drawing/software/SoftwareRasterizer.h"
 #include "imgui.h"
 
@@ -30,20 +31,19 @@ void ImGuiSoftwareRenderer::renderDrawData()
 {
 	// TODO:
 	//  - Extend software rasterizer to respect the "mSwapRedBlueChannels" setting when sampling a texture
-	//  - Support different textures; this requires actual usage of drawer textures (e.g. in SpriteBrowserWindow) and some system extensions to have unique texture IDs
 	//  - Performance optimization: Support rendering textured rectangles as well
 	//  - Fix the minor glitches; though they might in part be related to missing anti-aliasing
 
-	DrawerInterface* drawer = EngineMain::instance().getDrawer().getActiveDrawer();
-	if (nullptr == drawer || drawer->getType() != Drawer::Type::SOFTWARE)
+	Drawer& drawer = EngineMain::instance().getDrawer();
+	DrawerInterface* drawerInterface = EngineMain::instance().getDrawer().getActiveDrawer();
+	if (nullptr == drawerInterface || drawerInterface->getType() != Drawer::Type::SOFTWARE)
 		return;
 
-	SoftwareDrawer& softwareDrawer = *static_cast<SoftwareDrawer*>(drawer);
+	SoftwareDrawer& softwareDrawer = *static_cast<SoftwareDrawer*>(drawerInterface);
 	const BitmapViewMutable<uint32>& output = softwareDrawer.getRenderTarget();
 
 	Blitter::Options blitterOptions;
 	blitterOptions.mBlendMode = BlendMode::ALPHA;
-	blitterOptions.mSamplingMode = SamplingMode::BILINEAR;	// Looks a bit better, but is expensive
 	blitterOptions.mSwapRedBlueChannels = softwareDrawer.needSwapRedBlueChannels();
 	SoftwareRasterizer rasterizer = SoftwareRasterizer(output, blitterOptions);
 	Blitter blitter;
@@ -75,6 +75,20 @@ void ImGuiSoftwareRenderer::renderDrawData()
 						texImageData = reinterpret_cast<const uint32*>(textureData->GetPixels());
 						textureSize.x = textureData->Width;
 						textureSize.y = textureData->Height;
+
+						rasterizer.accessOptions().mSamplingMode = SamplingMode::BILINEAR;	// Looks a bit better, but is expensive
+					}
+				}
+				else
+				{
+					const DrawerTexture* drawerTexture = drawer.getTextureByID((uint32)drawCmd.TexRef._TexID);
+					if (nullptr != drawerTexture)
+					{
+						const Bitmap& bitmap = drawerTexture->getBitmap();
+						texImageData = bitmap.getData();
+						textureSize = bitmap.getSize();
+
+						rasterizer.accessOptions().mSamplingMode = SamplingMode::POINT;
 					}
 				}
 			}
