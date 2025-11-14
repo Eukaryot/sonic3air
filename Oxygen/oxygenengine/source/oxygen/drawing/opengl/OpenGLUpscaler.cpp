@@ -10,24 +10,52 @@
 
 #ifdef RMX_WITH_OPENGL_SUPPORT
 
-#include "oxygen/drawing/opengl/Upscaler.h"
+#include "oxygen/drawing/opengl/OpenGLUpscaler.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/rendering/opengl/shaders/SimpleRectTexturedShader.h"
 
 
-void Upscaler::startup()
+void OpenGLUpscaler::startup()
 {
-	FileHelper::loadShader(mUpscalerSoftShader,             L"data/shader/upscaler_soft.shader", "Standard");
-	FileHelper::loadShader(mUpscalerSoftShaderScanlines,    L"data/shader/upscaler_soft.shader", "Scanlines");
-#if !defined(PLATFORM_VITA)
-	FileHelper::loadShader(mUpscalerXBRZMultipassShader[0], L"data/shader/upscaler_xbrz-freescale-pass0.shader", "Standard");
-	FileHelper::loadShader(mUpscalerXBRZMultipassShader[1], L"data/shader/upscaler_xbrz-freescale-pass1.shader", "Standard");
-	FileHelper::loadShader(mUpscalerHQ2xShader,             L"data/shader/upscaler_hqx.shader", "Standard_2x");
-	FileHelper::loadShader(mUpscalerHQ3xShader,             L"data/shader/upscaler_hqx.shader", "Standard_3x");
-	FileHelper::loadShader(mUpscalerHQ4xShader,             L"data/shader/upscaler_hqx.shader", "Standard_4x");
-#endif
+	mFilterLinear = false;
+
+	switch (mType)
+	{
+		default:
+		case Type::DEFAULT:
+			break;
+
+		case Type::SOFT:
+		{
+			mFilterLinear = true;
+
+			mShaders.resize(2);
+			FileHelper::loadShader(mShaders[0], L"data/shader/upscaler_soft.shader", "Standard");
+			FileHelper::loadShader(mShaders[1], L"data/shader/upscaler_soft.shader", "Scanlines");
+			break;
+		}
+
+	#if !defined(PLATFORM_VITA)
+		case Type::XBRZ:
+		{
+			mShaders.resize(2);
+			FileHelper::loadShader(mShaders[0], L"data/shader/upscaler_xbrz-freescale-pass0.shader", "Standard");
+			FileHelper::loadShader(mShaders[1], L"data/shader/upscaler_xbrz-freescale-pass1.shader", "Standard");
+			break;
+		}
+
+		case Type::HQX:
+		{
+			mShaders.resize(3);
+			FileHelper::loadShader(mShaders[0], L"data/shader/upscaler_hqx.shader", "Standard_2x");
+			FileHelper::loadShader(mShaders[1], L"data/shader/upscaler_hqx.shader", "Standard_3x");
+			FileHelper::loadShader(mShaders[2], L"data/shader/upscaler_hqx.shader", "Standard_4x");
+			break;
+		}
+	#endif
+	}
 
 	mPass0Texture.setup(Configuration::instance().mGameScreen, rmx::OpenGLHelper::FORMAT_RGBA);
 
@@ -37,72 +65,63 @@ void Upscaler::startup()
 	mPass0Buffer.unbind();
 }
 
-void Upscaler::shutdown()
+void OpenGLUpscaler::shutdown()
 {
 }
 
-void Upscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i textureResolution)
+void OpenGLUpscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i textureResolution)
 {
 	const int filtering = Configuration::instance().mFiltering;
 	const int scanlines = Configuration::instance().mScanlines;
 
 	// Select upscaler
-	SimpleRectTexturedShader& simpleRectTexturedShader = mResources.getSimpleRectTexturedShader(false, false);
-	Shader* upscaleShader = &simpleRectTexturedShader.getShader();		// Fallback: Simple rendering
+	Shader* upscaleShader = nullptr;
 	Shader* pass0Shader = nullptr;
-	bool filterLinear = false;
 	int lookupTextureIndex = -1;
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureHandle);
-	if (scanlines > 0 && filtering < 3)
+	switch (mType)
 	{
-		filterLinear = true;
-		upscaleShader = &mUpscalerSoftShaderScanlines;
-	}
-	else
-	{
-		switch (filtering)
+		default:
+		case Type::DEFAULT:
+			break;
+
+		case Type::SOFT:
 		{
-			case 0:
-				upscaleShader = &simpleRectTexturedShader.getShader();
-				break;
+			upscaleShader = &mShaders[(scanlines > 0) ? 1 : 0];
+			break;
+		}
 
-			case 1:
-			case 2:
-				filterLinear = true;
-				upscaleShader = &mUpscalerSoftShader;
-				break;
+		case Type::XBRZ:
+		{
+			pass0Shader = &mShaders[0];
+			upscaleShader = &mShaders[1];
+			break;
+		}
 
-		#if !defined(PLATFORM_VITA)
-			case 3:
-				pass0Shader = &mUpscalerXBRZMultipassShader[0];
-				upscaleShader = &mUpscalerXBRZMultipassShader[1];
-				break;
-
-			case 4:
-				upscaleShader = &mUpscalerHQ2xShader;
-				lookupTextureIndex = 0;
-				break;
-			case 5:
-				upscaleShader = &mUpscalerHQ3xShader;
-				lookupTextureIndex = 1;
-				break;
-			case 6:
-				upscaleShader = &mUpscalerHQ4xShader;
-				lookupTextureIndex = 2;
-				break;
-		#else
-			case 3: break;
-			case 4: break;
-			case 5: break;
-			case 6: break;
-		#endif
+		case Type::HQX:
+		{
+			switch (filtering)
+			{
+				default:
+				case 4:
+					lookupTextureIndex = 0;
+					break;
+				case 5:
+					lookupTextureIndex = 1;
+					break;
+				case 6:
+					lookupTextureIndex = 2;
+					break;
+			}
+			upscaleShader = &mShaders[lookupTextureIndex];
+			break;
 		}
 	}
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterLinear ? GL_LINEAR : GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterLinear ? GL_LINEAR : GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mFilterLinear ? GL_LINEAR : GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mFilterLinear ? GL_LINEAR : GL_NEAREST);
 
 	// Multipass rendering?
 	const bool isMultiPass = (nullptr != pass0Shader);
@@ -123,8 +142,9 @@ void Upscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i textur
 		}
 	}
 
-	if (firstShader == &simpleRectTexturedShader.getShader())
+	if (mType == Type::DEFAULT)
 	{
+		SimpleRectTexturedShader& simpleRectTexturedShader = mResources.getSimpleRectTexturedShader(false, false);
 		simpleRectTexturedShader.setup(textureHandle, Vec4f(-1.0f, 1.0f, 2.0f, -2.0f));
 	}
 	else
@@ -134,14 +154,14 @@ void Upscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i textur
 		firstShader->setParam("GameResolution", Vec2f(textureResolution));
 
 		// Configuration for soft shader
-		if (firstShader == &mUpscalerSoftShader || firstShader == &mUpscalerSoftShaderScanlines)
+		if (mType == Type::SOFT)
 		{
 			// PixelFactor is at least 1.0f, which is basically bilinear sampling, infinity would be point sampling
 			float pixelFactor = rect.height / (float)textureResolution.y;
 			pixelFactor *= (filtering == 1) ? 2.0f : 1.0f;
 			firstShader->setParam("PixelFactor", clamp(pixelFactor, 1.0f, 1000.0f));
 
-			if (firstShader == &mUpscalerSoftShaderScanlines)
+			if (firstShader == &mShaders[1])
 			{
 				firstShader->setParam("ScanlinesIntensity", (float)scanlines * 0.25f);
 			}

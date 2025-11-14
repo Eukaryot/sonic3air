@@ -15,10 +15,19 @@
 class OpenGLDrawerResources;
 
 
-class Upscaler
+class OpenGLUpscaler
 {
 public:
-	explicit Upscaler(OpenGLDrawerResources& resources) : mResources(resources) {}
+	enum class Type
+	{
+		DEFAULT,
+		SOFT,
+		XBRZ,
+		HQX
+	};
+
+public:
+	OpenGLUpscaler(Type type, OpenGLDrawerResources& resources) : mType(type), mResources(resources) {}
 
 	void startup();
 	void shutdown();
@@ -26,18 +35,15 @@ public:
 	void renderImage(const Recti& rect, GLuint textureHandle, Vec2i textureResolution);
 
 private:
+	const Type mType = Type::DEFAULT;
 	OpenGLDrawerResources& mResources;
 
-	Shader mUpscalerSoftShader;
-	Shader mUpscalerSoftShaderScanlines;
-	Shader mUpscalerXBRZMultipassShader[2];
-	Shader mUpscalerHQ2xShader;
-	Shader mUpscalerHQ3xShader;
-	Shader mUpscalerHQ4xShader;
-
+	std::vector<Shader> mShaders;
 	Framebuffer mPass0Buffer;
 	OpenGLTexture mPass0Texture;
 	OpenGLTexture mLookupTexture[3];
+
+	bool mFilterLinear = false;
 };
 
 #endif

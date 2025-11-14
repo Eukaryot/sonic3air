@@ -13,6 +13,7 @@
 #include "oxygen/rendering/parts/palette/Palette.h"
 #include "oxygen/drawing/opengl/OpenGLTexture.h"
 
+class OpenGLUpscaler;
 class SimpleRectColoredShader;
 class SimpleRectVertexColorShader;
 class SimpleRectTexturedShader;
@@ -48,6 +49,8 @@ public:
 	const OpenGLTexture& getCustomPaletteTexture(const PaletteBase& primaryPalette, const PaletteBase& secondaryPalette);
 	const Vec2i& getPaletteTextureSize() const;
 
+	OpenGLUpscaler& getUpscaler();
+
 private:
 	struct State
 	{
@@ -73,7 +76,7 @@ private:
 	struct Internal;
 	Internal& mInternal;
 
-	// Paletteb cache
+	// Palette cache
 	std::unordered_map<uint64, PaletteData> mCustomPalettes;	// Using a key built from a combination of primary and secondary palette keys
 	float mSecondsSinceLastPaletteCleanup = 0.0f;
 };
