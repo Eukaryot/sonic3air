@@ -515,7 +515,6 @@ void SoftwareRenderer::renderPlane(const PlaneGeometry& geometry)
 		BufferedPlaneData& bufferedPlaneData = mBufferedPlaneData[foundFittingBufferedPlaneDataIndex];
 
 		const uint32* palettes[2] = { paletteManager.getMainPalette(0).getRawColors(), paletteManager.getMainPalette(1).getRawColors() };
-		const bool isBackground = (geometry.mPlaneIndex == PlaneManager::PLANE_B && !geometry.mPriorityFlag);
 
 		const std::vector<BufferedPlaneData::PixelBlock>& blocks = geometry.mPriorityFlag ? bufferedPlaneData.mPrioBlocks : bufferedPlaneData.mNonPrioBlocks;
 		for (const BufferedPlaneData::PixelBlock& block : blocks)
@@ -524,14 +523,7 @@ void SoftwareRenderer::renderPlane(const PlaneGeometry& geometry)
 			uint32* RESTRICT dstRGBA = &gameScreenBitmap.getData()[block.mLinearPosition];
 			const uint32* RESTRICT paletteWithAtex = &palettes[block.mPaletteIndex][block.mAtex];
 
-			if (isBackground)
-			{
-				for (int i = 0; i < block.mNumPixels; ++i)
-				{
-					dstRGBA[i] = paletteWithAtex[src[i]];
-				}
-			}
-			else if (geometry.mPriorityFlag)
+			if (geometry.mPriorityFlag)
 			{
 				uint8* RESTRICT dstDepth = &mDepthBuffer[block.mStartCoords.x + block.mStartCoords.y * 0x200];
 				for (int i = 0; i < block.mNumPixels; ++i)

@@ -18,12 +18,9 @@
 class ImGuiSoftwareRenderer
 {
 public:
+	static void initBackend();
 	static void newFrame();
 	static void renderDrawData();
-
-private:
-	static inline const uint32* mFontsTextureData = nullptr;
-	static inline Vec2i mFontsTextureSize;
 };
 
 #endif

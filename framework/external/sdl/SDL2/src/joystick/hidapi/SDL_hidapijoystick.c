@@ -197,7 +197,13 @@ SDL_bool HIDAPI_SupportsPlaystationDetection(Uint16 vendor, Uint16 product)
     case USB_VENDOR_SHANWAN_ALT:
         return SDL_TRUE;
     case USB_VENDOR_THRUSTMASTER:
-        return SDL_TRUE;
+        /* Most of these are wheels, don't have the full set of effects, and
+         * at least in the case of the T248 and T300 RS, the hid-tmff2 driver
+         * puts them in a non-standard report mode and they can't be read.
+         *
+         * If these should use the HIDAPI driver, add them to controller_list.h
+         */
+        return SDL_FALSE;
     case USB_VENDOR_ZEROPLUS:
         return SDL_TRUE;
     case 0x7545 /* SZ-MYPOWER */:
@@ -816,11 +822,12 @@ SDL_bool HIDAPI_JoystickConnected(SDL_HIDAPI_Device *device, SDL_JoystickID *pJo
 
     ++SDL_HIDAPI_numjoysticks;
 
-    SDL_PrivateJoystickAdded(joystickID);
-
     if (pJoystickID) {
         *pJoystickID = joystickID;
     }
+
+    SDL_PrivateJoystickAdded(joystickID);
+
     return SDL_TRUE;
 }
 
@@ -884,10 +891,8 @@ static SDL_HIDAPI_Device *HIDAPI_AddDevice(const struct SDL_hid_device_info *inf
         return NULL;
     }
     device->magic = &SDL_HIDAPI_device_magic;
-    device->path = SDL_strdup(info->path);
-    if (!device->path) {
-        SDL_free(device);
-        return NULL;
+    if (info->path) {
+        device->path = SDL_strdup(info->path);
     }
     device->seen = SDL_TRUE;
     device->vendor_id = info->vendor_id;

@@ -58,6 +58,8 @@
 #include "viewporter-client-protocol.h"
 #include "primary-selection-unstable-v1-client-protocol.h"
 #include "fractional-scale-v1-client-protocol.h"
+#include "cursor-shape-v1-client-protocol.h"
+#include "xdg-toplevel-icon-v1-client-protocol.h"
 
 #ifdef HAVE_LIBDECOR_H
 #include <libdecor.h>
@@ -160,9 +162,6 @@ static void Wayland_DeleteDevice(SDL_VideoDevice *device)
         WAYLAND_wl_display_flush(data->display);
         WAYLAND_wl_display_disconnect(data->display);
     }
-    if (device->wakeup_lock) {
-        SDL_DestroyMutex(device->wakeup_lock);
-    }
     SDL_free(data);
     SDL_free(device);
     SDL_WAYLAND_UnloadSymbols();
@@ -231,7 +230,6 @@ static SDL_VideoDevice *Wayland_CreateDevice(void)
     }
 
     device->driverdata = data;
-    device->wakeup_lock = SDL_CreateMutex();
 
     /* Set the function pointers */
     device->VideoInit = Wayland_VideoInit;
@@ -275,6 +273,7 @@ static SDL_VideoDevice *Wayland_CreateDevice(void)
     device->SetWindowMaximumSize = Wayland_SetWindowMaximumSize;
     device->SetWindowModalFor = Wayland_SetWindowModalFor;
     device->SetWindowTitle = Wayland_SetWindowTitle;
+    device->SetWindowIcon = Wayland_SetWindowIcon;
     device->GetWindowSizeInPixels = Wayland_GetWindowSizeInPixels;
     device->DestroyWindow = Wayland_DestroyWindow;
     device->SetWindowHitTest = Wayland_SetWindowHitTest;
@@ -737,6 +736,7 @@ static void Wayland_free_display(SDL_VideoData *d, uint32_t id)
     int num_displays = SDL_GetNumVideoDisplays();
     SDL_VideoDisplay *display;
     SDL_WaylandOutputData *data;
+    SDL_Window *window;
     int i;
 
     for (i = 0; i < num_displays; i += 1) {
@@ -756,6 +756,14 @@ static void Wayland_free_display(SDL_VideoData *d, uint32_t id)
                     }
                 }
             }
+
+            /* Surface leave events may be implicit when an output is destroyed, so make sure that
+             * no windows retain a reference to a destroyed output.
+             */
+            for (window = SDL_GetVideoDevice()->windows; window; window = window->next) {
+                Wayland_RemoveOutputFromWindow(window->driverdata, data->output);
+            }
+
             if (data->xdg_output) {
                 zxdg_output_v1_destroy(data->xdg_output);
             }
@@ -870,6 +878,13 @@ static void display_handle_global(void *data, struct wl_registry *registry, uint
         d->viewporter = wl_registry_bind(d->registry, id, &wp_viewporter_interface, 1);
     } else if (SDL_strcmp(interface, "wp_fractional_scale_manager_v1") == 0) {
         d->fractional_scale_manager = wl_registry_bind(d->registry, id, &wp_fractional_scale_manager_v1_interface, 1);
+    } else if (SDL_strcmp(interface, "wp_cursor_shape_manager_v1") == 0) {
+        d->cursor_shape_manager = wl_registry_bind(d->registry, id, &wp_cursor_shape_manager_v1_interface, 1);
+        if (d->input) {
+            Wayland_CreateCursorShapeDevice(d->input);
+        }
+    } else if (SDL_strcmp(interface, "xdg_toplevel_icon_manager_v1") == 0) {
+            d->xdg_toplevel_icon_manager_v1 = wl_registry_bind(d->registry, id, &xdg_toplevel_icon_manager_v1_interface, 1);
 #ifdef SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
     } else if (SDL_strcmp(interface, "qt_touch_extension") == 0) {
         Wayland_touch_create(d, id);
@@ -1111,6 +1126,16 @@ static void Wayland_VideoCleanup(_THIS)
     if (data->fractional_scale_manager) {
         wp_fractional_scale_manager_v1_destroy(data->fractional_scale_manager);
         data->fractional_scale_manager = NULL;
+    }
+
+    if (data->cursor_shape_manager) {
+        wp_cursor_shape_manager_v1_destroy(data->cursor_shape_manager);
+        data->cursor_shape_manager = NULL;
+    }
+
+    if (data->xdg_toplevel_icon_manager_v1) {
+        xdg_toplevel_icon_manager_v1_destroy(data->xdg_toplevel_icon_manager_v1);
+        data->xdg_toplevel_icon_manager_v1 = NULL;
     }
 
     if (data->compositor) {

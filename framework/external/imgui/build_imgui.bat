@@ -7,7 +7,7 @@ call ../get_msbuild_path.bat
 
 @echo.
 @echo.
-@echo === Building SDL2 ===
+@echo === Building ImGui ===
 
 pushd _vstudio
 %msbuildPath% imgui.sln /target:imgui /property:Configuration=Debug   /property:Platform=x86 -verbosity:minimal

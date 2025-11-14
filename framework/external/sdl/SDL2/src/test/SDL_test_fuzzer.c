@@ -153,21 +153,22 @@ Sint32 SDLTest_RandomIntegerInRange(Sint32 pMin, Sint32 pMax)
 {
     Sint64 min = pMin;
     Sint64 max = pMax;
-    Sint64 temp;
-    Sint64 number;
+    Uint64 range;
 
     if (pMin > pMax) {
-        temp = min;
-        min = max;
-        max = temp;
+        min = pMax;
+        max = pMin;
     } else if (pMin == pMax) {
         return (Sint32)min;
     }
 
-    number = SDLTest_RandomUint32();
-    /* invocation count increment in preceeding call */
-
-    return (Sint32)((number % ((max + 1) - min)) + min);
+    range = (Sint64)max - (Sint64)min;
+    if (range < SDL_MAX_SINT32) {
+        return (Sint32) (min + (Sint32) (SDLTest_RandomUint32() % (range + 1)));
+    } else {
+        const Uint64 add = SDLTest_RandomUint32() | SDLTest_RandomUint32();
+        return (Sint32) (min + (Sint64) (add % (range + 1)));
+    }
 }
 
 /* !

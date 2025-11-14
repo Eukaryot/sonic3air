@@ -41,7 +41,7 @@ bool DevModeWindowBase::buildWindow()
 	if (!mIsWindowOpen)
 		return false;
 
-	if (!ImGui::Begin(mTitle.c_str(), &mIsWindowOpen, mImGuiWindowFlags))
+	if (!ImGui::Begin(mTitle.c_str(), mCanBeClosed ? &mIsWindowOpen : nullptr, mImGuiWindowFlags))
 	{
 		ImGui::End();
 		return false;

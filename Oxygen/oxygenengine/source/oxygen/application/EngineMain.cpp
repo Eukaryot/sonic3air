@@ -456,6 +456,9 @@ bool EngineMain::initConfigAndSettings()
 		config.mDisplayIndex = mArguments.mDisplayIndex;
 	}
 
+	// Enable dev mode if requested
+	config.mDevMode.mEnabled = config.mDevMode.mEnableAtStartup;
+
 	// Evaluate fail-safe mode
 	if (config.mFailSafeMode)
 	{

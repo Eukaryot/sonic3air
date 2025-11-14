@@ -334,7 +334,7 @@ void InputManager::updateInput(float timeElapsed)
 
 	// Update touches
 	mActiveTouches.clear();
-	if (mTouchInputEnabled)
+	if (mTouchInputEnabled && !FTX::System->wasEventConsumed())
 	{
 		const int touchDevices = SDL_GetNumTouchDevices();
 		for (int k = 0; k < touchDevices; ++k)

@@ -253,9 +253,6 @@
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerTexture.cpp">
       <Filter>drawing\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\drawing\opengl\Upscaler.cpp">
-      <Filter>drawing\opengl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareDrawer.cpp">
       <Filter>drawing\software</Filter>
     </ClCompile>
@@ -565,6 +562,12 @@
     <ClCompile Include="..\..\source\oxygen\devmode\ImGuiSoftwareRenderer.cpp">
       <Filter>devmode</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLUpscaler.cpp">
+      <Filter>drawing\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\FileBrowserWindow.cpp">
+      <Filter>devmode\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -729,9 +732,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\drawing\DrawerInterface.h">
       <Filter>drawing</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\drawing\opengl\Upscaler.h">
-      <Filter>drawing\opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareDrawer.h">
       <Filter>drawing\software</Filter>
@@ -1068,6 +1068,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiSoftwareRenderer.h">
       <Filter>devmode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLUpscaler.h">
+      <Filter>drawing\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\FileBrowserWindow.h">
+      <Filter>devmode\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

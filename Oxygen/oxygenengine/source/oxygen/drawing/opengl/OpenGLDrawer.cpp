@@ -14,7 +14,7 @@
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
 #include "oxygen/drawing/opengl/OpenGLSpriteTextureManager.h"
-#include "oxygen/drawing/opengl/Upscaler.h"
+#include "oxygen/drawing/opengl/OpenGLUpscaler.h"
 #include "oxygen/drawing/DrawCollection.h"
 #include "oxygen/drawing/DrawCommand.h"
 #include "oxygen/application/EngineMain.h"
@@ -111,8 +111,7 @@ namespace opengldrawer
 	struct Internal
 	{
 	public:
-		Internal() :
-			mUpscaler(mResources)
+		Internal()
 		{
 		#if defined(RMX_USE_GLEW)
 			// GLEW initialization
@@ -152,10 +151,6 @@ namespace opengldrawer
 			RMX_LOG_INFO("Setting OpenGL defaults...");
 			mResources.setBlendMode(BlendMode::OPAQUE);
 
-			// Startup upscaler
-			RMX_LOG_INFO("Upscaler startup");
-			mUpscaler.startup();
-
 			mSetupSuccessful = true;
 		}
 
@@ -163,7 +158,6 @@ namespace opengldrawer
 		{
 			if (mSetupSuccessful)
 			{
-				mUpscaler.shutdown();
 				mResources.shutdown();
 			}
 		}
@@ -377,7 +371,6 @@ namespace opengldrawer
 		SDL_Window* mOutputWindow = nullptr;
 
 		OpenGLDrawerResources mResources;
-		Upscaler mUpscaler;
 		OpenGLSpriteTextureManager mSpriteTextureManager;
 
 		Recti mCurrentViewport;
@@ -505,7 +498,7 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 					break;
 
 				UpscaledRectDrawCommand& dc = drawCommand->as<UpscaledRectDrawCommand>();
-				mInternal.mUpscaler.renderImage(dc.mRect, dc.mTexture->getImplementation<OpenGLDrawerTexture>()->getTextureHandle(), dc.mTexture->getSize());
+				mInternal.mResources.getUpscaler().renderImage(dc.mRect, dc.mTexture->getImplementation<OpenGLDrawerTexture>()->getTextureHandle(), dc.mTexture->getSize());
 				break;
 			}
 
