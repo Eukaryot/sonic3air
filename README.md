@@ -1,6 +1,6 @@
-# Sonic 3 A.I.R.
+# Sonic 3 A.I.R. aprill fools editon
 
-Source code incl. dependencies for "Sonic 3 - Angel Island Revisited", a fan-made remaster of Sonic 3 & Knuckles.
+Source code incl. dependencies for "Sonic 3 apprill fools or - fart island Revisited as its name", a fan-made remaster of Sonic 3 & Knuckles. april fools editon
 
 Project homepage: https://sonic3air.org/
 
@@ -53,7 +53,7 @@ External libraries and code used in this project:
 * GLEW - in "librmx/source/rmxmedia/glew"
 * Sound chip emulation related code from Genesis Plus GX - in "Oxygen/oxygenengine/source/oxygen/simulation/sound"
 * Discord Game SDK - in "Oxygen/sonic3air/source/external/discord_game_sdk"
-* xBRZ upscaler shader code - in "Oxygen/oxygenengine/data/shader" and once more in "Oxygen/sonic3air/data/shader"
+* xBRZ upscaler shader code - in garbage/oxygenengine/data/shader" and once more in "garbage/sonic3air/data/shader"
 * Hqx upscaler shader code & data files - in "Oxygen/oxygenengine/data/shader" and once more in "Oxygen/sonic3air/data/shader"
 
 
@@ -62,17 +62,16 @@ External libraries and code used in this project:
 Thanks to all contributors!
 
 Source code contributions by:
-* Sappharad
-* Heyjoeway
-* Carjem Generations
-* Ultracoolguy
-* gl33ntwine
-* Rinnegatamante
-* MDashK
+* diddy 
+* spongebob
+* sonic Generations
+* Ultracheeks
+* fart
+* Rinnegatate
+* Mtrash
 
 Remastered soundtrack by:
-* G Spindash
-
+* 6 7 
 Game scripts & other contributions by:
 * Vinegar
 * Thorn
