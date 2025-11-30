@@ -316,17 +316,22 @@ namespace lemon
 			return false;
 
 		const ScriptFunction& func = static_cast<const ScriptFunction&>(function);
-		size_t offset = 0xffffffff;
-		if (!func.getLabel(labelName, offset))
+		const ScriptFunction::Label* label = func.findLabelByName(labelName);
+		if (nullptr == label)
 			return false;
 
-		RuntimeFunction* runtimeFunction = getRuntimeFunction(func);
+		return callFunctionAtLabel(func, *label);
+	}
+
+	bool Runtime::callFunctionAtLabel(const ScriptFunction& function, const ScriptFunction::Label& label)
+	{
+		RuntimeFunction* runtimeFunction = getRuntimeFunction(function);
 		RMX_ASSERT(nullptr != runtimeFunction, "Got invalid runtime function");
 		callRuntimeFunction(*runtimeFunction);
 
 		// Build up scope accordingly (all local variables will have a value of zero, though)
-		int numLocalVars = (int)func.mLocalVariablesByID.size();
-		//for (size_t i = 0; i < offset; ++i)
+		int numLocalVars = (int)function.mLocalVariablesByID.size();
+		//for (size_t i = 0; i < label.mOffset; ++i)
 		//{
 		//	if (func.mOpcodes[i].mType == Opcode::Type::MOVE_VAR_STACK)
 		//	{
@@ -336,7 +341,7 @@ namespace lemon
 		memset(&mSelectedControlFlow->mLocalVariablesBuffer[mSelectedControlFlow->mLocalVariablesSize], 0, numLocalVars * sizeof(int64));
 		mSelectedControlFlow->mLocalVariablesSize += numLocalVars;
 		RMX_CHECK(mSelectedControlFlow->mLocalVariablesSize <= ControlFlow::VAR_STACK_LIMIT, "Reached var stack limit, probably due to recursive function calls", RMX_REACT_THROW);
-		mSelectedControlFlow->mCallStack.back().mProgramCounter = runtimeFunction->translateToRuntimeProgramCounter(offset);
+		mSelectedControlFlow->mCallStack.back().mProgramCounter = runtimeFunction->translateToRuntimeProgramCounter(label.mOffset);
 		return true;
 	}
 

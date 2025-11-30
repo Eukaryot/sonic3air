@@ -131,10 +131,13 @@ namespace lemon
 			for (size_t jumpLocation : collectedLabel.mJumpLocations)
 			{
 				RMX_ASSERT(mOpcodes[jumpLocation].mType == Opcode::Type::JUMP, "Expected JUMP opcode");
-				size_t offset = 0;
-				if (!mFunction.getLabel(collectedLabel.mLabelName, offset))
+				const ScriptFunction::Label* label = mFunction.findLabelByName(collectedLabel.mLabelName);
+				if (nullptr == label)
+				{
 					RMX_ASSERT(false, "Jump target label not found: " << collectedLabel.mLabelName.getString());
-				mOpcodes[jumpLocation].mParameter = (uint64)offset;
+					continue;
+				}
+				mOpcodes[jumpLocation].mParameter = (uint64)label->mOffset;
 			}
 		}
 
@@ -287,7 +290,8 @@ namespace lemon
 
 			case Node::Type::LABEL:
 			{
-				mFunction.addLabel(node.as<LabelNode>().mLabel, mOpcodes.size());
+				const LabelNode& labelNode = node.as<LabelNode>();
+				mFunction.addLabel(labelNode.mLabel, mOpcodes.size(), labelNode.mAddressHooks);
 				break;
 			}
 

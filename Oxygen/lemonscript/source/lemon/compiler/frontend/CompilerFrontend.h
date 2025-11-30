@@ -23,6 +23,7 @@ namespace lemon
 	class BlockNode;
 	class UndefinedNode;
 	class FunctionNode;
+	class PragmaNode;
 	class TokenList;
 	struct LineNumberTranslation;
 
@@ -99,6 +100,7 @@ namespace lemon
 		CompileOptions& mCompileOptions;
 		TokenProcessing& mTokenProcessing;
 		std::vector<FunctionNode*>& mFunctionNodes;
+		std::vector<const PragmaNode*> mCurrentPragmas;
 	};
 
 }

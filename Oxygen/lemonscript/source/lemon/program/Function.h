@@ -19,6 +19,7 @@ namespace lemon
 	class Module;
 	class ControlFlow;
 
+
 	class API_EXPORT Function
 	{
 	friend class Module;
@@ -108,10 +109,17 @@ namespace lemon
 	class ScriptFunction : public Function
 	{
 	public:
+		struct AddressHook
+		{
+			uint32 mAddress = 0;
+			bool mDisabled = false;
+		};
+
 		struct Label
 		{
 			FlyweightString mName;
 			uint32 mOffset = 0;
+			std::vector<AddressHook> mLabelAddressHooks;
 		};
 
 	public:
@@ -125,11 +133,12 @@ namespace lemon
 		LocalVariable& getLocalVariableByID(uint32 id) const;
 		LocalVariable& addLocalVariable(FlyweightString name, const DataTypeDefinition* dataType, uint32 lineNumber);
 
-		bool getLabel(FlyweightString labelName, size_t& outOffset) const;
-		void addLabel(FlyweightString labelName, size_t offset);
+		const std::vector<Label>& getLabels() const  { return mLabels; }
+		const Label* findLabelByName(FlyweightString labelName) const;
 		const Label* findLabelByOffset(size_t offset) const;
+		void addLabel(FlyweightString labelName, size_t offset, const std::vector<AddressHook>& addressHooks);
 
-		const std::vector<uint32>& getAddressHooks() const  { return mAddressHooks; }
+		const std::vector<AddressHook>& getAddressHooks() const  { return mAddressHooks; }
 
 		void addOrProcessPragma(std::string_view pragmaString, bool consumeIfProcessed);
 		inline const std::vector<std::string>& getPragmas() const  { return mPragmas; }
@@ -148,7 +157,7 @@ namespace lemon
 		std::vector<Label> mLabels;
 
 		// Address hooks
-		std::vector<uint32> mAddressHooks;
+		std::vector<AddressHook> mAddressHooks;
 
 		// Pragmas
 		std::vector<std::string> mPragmas;

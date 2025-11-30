@@ -120,24 +120,16 @@ namespace lemon
 		return variable;
 	}
 
-	bool ScriptFunction::getLabel(FlyweightString labelName, size_t& outOffset) const
+	const ScriptFunction::Label* ScriptFunction::findLabelByName(FlyweightString labelName) const
 	{
 		for (const Label& label : mLabels)
 		{
 			if (label.mName == labelName)
 			{
-				outOffset = (size_t)label.mOffset;
-				return true;
+				return &label;
 			}
 		}
-		return false;
-	}
-
-	void ScriptFunction::addLabel(FlyweightString labelName, size_t offset)
-	{
-		Label& label = vectorAdd(mLabels);
-		label.mName = labelName;
-		label.mOffset = (uint32)offset;
+		return nullptr;
 	}
 
 	const ScriptFunction::Label* ScriptFunction::findLabelByOffset(size_t offset) const
@@ -153,11 +145,20 @@ namespace lemon
 		return nullptr;
 	}
 
+	void ScriptFunction::addLabel(FlyweightString labelName, size_t offset, const std::vector<AddressHook>& addressHooks)
+	{
+		Label& label = vectorAdd(mLabels);
+		label.mName = labelName;
+		label.mOffset = (uint32)offset;
+		label.mLabelAddressHooks = addressHooks;
+	}
+
 	void ScriptFunction::addOrProcessPragma(std::string_view pragmaString, bool consumeIfProcessed)
 	{
 		PragmaSplitter pragmaSplitter(pragmaString);
 		if (!pragmaSplitter.mEntries.empty())
 		{
+			ScriptFunction::AddressHook* lastAddressHook = nullptr;
 			bool hadAddressHook = false;
 			bool hadAlias = false;
 			for (const lemon::PragmaSplitter::Entry& entry : pragmaSplitter.mEntries)
@@ -172,14 +173,23 @@ namespace lemon
 				{
 					// Create address hook
 					RMX_CHECK(!entry.mValue.empty(), "Address hook must have a value", continue);
-					const uint32 address = (uint32)rmx::parseInteger(entry.mValue);
-					mAddressHooks.push_back(address);
+					ScriptFunction::AddressHook& addressHook = vectorAdd(mAddressHooks);
+					addressHook.mAddress = (uint32)rmx::parseInteger(entry.mValue);
+					lastAddressHook = &addressHook;
 					hadAddressHook = true;
 				}
 				else if (entry.mArgument == "translated")
 				{
 					// You can use "translated" to denote that some code was already put into script, but should not be an actual address hook
 					hadAddressHook = true;
+				}
+				else if (entry.mArgument == "off")
+				{
+					// Mark address hook as disabled
+					if (nullptr != lastAddressHook)
+					{
+						lastAddressHook->mDisabled = true;
+					}
 				}
 				else if (entry.mArgument == "deprecated")
 				{

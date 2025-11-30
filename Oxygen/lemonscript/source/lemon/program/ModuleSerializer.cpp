@@ -57,6 +57,27 @@ namespace lemon
 			BaseType::VOID,			// EXTERNAL_CALL
 			BaseType::VOID,			// EXTERNAL_JUMP
 		};
+
+		void readAddressHooks(VectorBinarySerializer& serializer, std::vector<ScriptFunction::AddressHook>& addressHook)
+		{
+			const size_t hooksCount = (size_t)serializer.read<uint8>();
+			addressHook.resize(hooksCount);
+			for (size_t j = 0; j < hooksCount; ++j)
+			{
+				serializer.serialize(addressHook[j].mAddress);
+				serializer.serialize(addressHook[j].mDisabled);
+			}
+		}
+
+		void writeAddressHooks(VectorBinarySerializer& serializer, const std::vector<ScriptFunction::AddressHook>& addressHook)
+		{
+			serializer.writeAs<uint8>(addressHook.size());
+			for (const ScriptFunction::AddressHook& addressHook : addressHook)
+			{
+				serializer.write(addressHook.mAddress);
+				serializer.write(addressHook.mDisabled);
+			}
+		}
 	}
 
 
@@ -83,11 +104,12 @@ namespace lemon
 		//  - 0x11 = Serialization of callable function addresses
 		//  - 0x12 = Support for deprecation flags in function alias names
 		//  - 0x13 = Source file info with local paths
+		//  - 0x14 = Label address hooks and disabled address hooks
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";	// "Lemonscript Module"
-		const uint16 MINIMUM_VERSION = 0x13;
-		uint16 version = 0x13;
+		const uint16 MINIMUM_VERSION = 0x14;
+		uint16 version = 0x14;
 
 		if (outerSerializer.isReading())
 		{
@@ -512,24 +534,25 @@ namespace lemon
 					// Labels
 					if (flags & FLAG_HAS_LABELS)
 					{
+						std::vector<ScriptFunction::AddressHook> labelAddressHooks;
 						count = (size_t)serializer.read<uint32>();
 						for (size_t k = 0; k < count; ++k)
 						{
 							FlyweightString name;
 							name.serialize(serializer);
 							const uint32 offset = serializer.read<uint32>();
-							scriptFunc.addLabel(name, (size_t)offset);
+							if (offset & 0x80000000)
+							{
+								readAddressHooks(serializer, labelAddressHooks);
+							}
+							scriptFunc.addLabel(name, (size_t)(offset & 0x7fffffff), labelAddressHooks);
 						}
 					}
 
 					// Address hooks
 					if (flags & FLAG_HAS_ADDRESS_HOOKS)
 					{
-						count = (size_t)serializer.read<uint32>();
-						for (size_t k = 0; k < count; ++k)
-						{
-							scriptFunc.mAddressHooks.emplace_back(serializer.read<uint32>());
-						}
+						readAddressHooks(serializer, scriptFunc.mAddressHooks);
 					}
 
 					// Pragmas
@@ -650,18 +673,22 @@ namespace lemon
 						for (const ScriptFunction::Label& label : scriptFunc.mLabels)
 						{
 							label.mName.write(serializer);
-							serializer.write(label.mOffset);
+							uint32 offset = (uint32)label.mOffset;
+							if (!label.mLabelAddressHooks.empty())
+								offset |= 0x80000000;
+							serializer.write(offset);
+							if (!label.mLabelAddressHooks.empty())
+							{
+								writeAddressHooks(serializer, label.mLabelAddressHooks);
+							}
+
 						}
 					}
 
 					// Address hooks
 					if (flags & FLAG_HAS_ADDRESS_HOOKS)
 					{
-						serializer.writeAs<uint32>(scriptFunc.mAddressHooks.size());
-						for (uint32 addressHook : scriptFunc.mAddressHooks)
-						{
-							serializer.write(addressHook);
-						}
+						writeAddressHooks(serializer, scriptFunc.mAddressHooks);
 					}
 
 					// Pragmas
