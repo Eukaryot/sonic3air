@@ -316,9 +316,9 @@ namespace
 		RenderParts::instance().getPlaneManager().setPlayfieldSizeInPixels(Vec2i(width, height));
 	}
 
-	void VDP_Config_setupWindowPlane(uint8 useWindowPlane, uint16 splitY)
+	void VDP_Config_setupWindowPlane(uint8 isPlaneWBelowSplit, uint16 splitY)
 	{
-		RenderParts::instance().getPlaneManager().setupPlaneW(useWindowPlane != 0, splitY);
+		RenderParts::instance().getPlaneManager().setupPlaneW(isPlaneWBelowSplit != 0, splitY);
 		RenderParts::instance().getScrollOffsetsManager().setPlaneWScrollOffset(Vec2i(0, 0));	// Reset scroll offset to default
 	}
 
@@ -1067,7 +1067,7 @@ void RendererBindings::registerBindings(lemon::Module& module)
 			.setParameters("width", "height");
 
 		builder.addNativeFunction("VDP.Config.setupWindowPlane", lemon::wrap(&VDP_Config_setupWindowPlane), defaultFlags)
-			.setParameters("useWindowPlane", "splitY");
+			.setParameters("isPlaneWBelowSplit", "splitY");
 
 		builder.addNativeFunction("VDP.Config.setPlaneWScrollOffset", lemon::wrap(&VDP_Config_setPlaneWScrollOffset), defaultFlags)
 			.setParameters("x", "y");

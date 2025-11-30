@@ -193,7 +193,6 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 		glClearColor(color.r, color.g, color.b, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDepthMask(GL_FALSE);
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glDisable(GL_SCISSOR_TEST);
 	}
 
@@ -211,10 +210,16 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 				// For blur effect, we need to render everything in background into the processing buffer
 				mIsRenderingToProcessingBuffer = true;
 				glBindFramebuffer(GL_FRAMEBUFFER, mProcessingBuffer.getHandle());
+
+				// Also clear the processing buffer with the backdrop color
+				glClear(GL_COLOR_BUFFER_BIT);
 				break;
 			}
 		}
 	}
+
+	// Reset clear color to black for the full screen
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Check if sprite masking needed
 	const bool usingSpriteMask = isUsingSpriteMask(geometries);

@@ -63,8 +63,10 @@ void RenderedGeometryWindow::buildContent()
 			{
 				case Geometry::Type::PLANE:
 				{
+					static const char* PLANE_NAMES[4] = { "Plane B", "Plane A", "Plane W", "Unknown" };
 					const PlaneGeometry& pg = *static_cast<const PlaneGeometry*>(geometry);
-					typeString.formatString("Plane %d%s", pg.mPlaneIndex, pg.mPriorityFlag ? " (Prio)" : "");
+					const char* planeName = PLANE_NAMES[std::min<size_t>((size_t)pg.mPlaneIndex, 3)];
+					typeString.formatString("%s (%d) %s", planeName, pg.mPlaneIndex, pg.mPriorityFlag ? " (Prio)" : "");
 					position = pg.mActiveRect.getPos();
 					size = pg.mActiveRect.getSize();
 					highlightRect = pg.mActiveRect;
