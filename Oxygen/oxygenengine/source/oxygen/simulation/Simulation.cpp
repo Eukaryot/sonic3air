@@ -611,7 +611,7 @@ uint32 Simulation::saveGameRecording(WString* outFilename)
 	{
 		filename = L"gamerecording_" + String(timeString).toStdWString() + L".bin";
 	}
-	filename = Configuration::instance().mAppDataPath + L"gamerecordings/" + filename;
+	filename = Configuration::instance().mGameAppDataPath + L"gamerecordings/" + filename;
 
 	if (!mGameRecorder.saveRecording(filename, 180))
 		return 0;

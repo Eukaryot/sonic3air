@@ -3,8 +3,8 @@
 	// Path to game project to load
 	//"LoadProject": "../oxygen_sonic1",
 	//"LoadProject": "../oxygen_sonic2",
-	"LoadProject": "../sonic3air",
-	//"LoadProject": "../oxygen_tje2",
+	"LoadProject": "../oxygen_tje2",
+	//"LoadProject": "../sonic3air",
 
 	// Dev mode
 	"DevMode":

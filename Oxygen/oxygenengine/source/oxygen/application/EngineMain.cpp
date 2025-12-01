@@ -402,8 +402,8 @@ void EngineMain::initDirectories()
 		}
 	}
 
-	config.mSaveStatesDirLocal = config.mAppDataPath + L"savestates/";
-	config.mPersistentDataBasePath = config.mAppDataPath + L"storage/";
+	// Fill some paths with fallback values, even though we haven't loaded a game profile yet
+	updateGameProfilePaths();
 }
 
 bool EngineMain::initConfigAndSettings()
@@ -429,7 +429,10 @@ bool EngineMain::initConfigAndSettings()
 		const bool loadedProject = mInternal.mGameProfile.loadOxygenProjectFromFile(config.mProjectPath + L"oxygenproject.json");
 		RMX_CHECK(loadedProject, "Failed to load game profile from '" << *WString(config.mProjectPath).toString() << "oxygenproject.json'", );
 	}
+	
+	updateGameProfilePaths();
 
+	// Load settings
 	RMX_LOG_INFO("Loading settings");
 	const bool loadedSettings = config.loadSettings(config.mAppDataPath + L"settings.json", Configuration::SettingsType::STANDARD);
 	config.loadSettings(config.mAppDataPath + L"settings_input.json", Configuration::SettingsType::INPUT);
@@ -507,11 +510,30 @@ void EngineMain::loadConfigJson()
 	}
 }
 
+void EngineMain::updateGameProfilePaths()
+{
+	Configuration& config = Configuration::instance();
+
+	// Use an project-specific app data sub-folder path, unless the application defined its own app data folder (like the S3AIR executable does)
+	if ((mDelegate.getAppMetaData().mAppDataFolder != L"OxygenEngine") || mInternal.mGameProfile.mIdentifier.empty())
+	{
+		config.mGameAppDataPath = config.mAppDataPath;
+	}
+	else
+	{
+		config.mGameAppDataPath = config.mAppDataPath + L"_" + String(mInternal.mGameProfile.mIdentifier).toStdWString() + L"/";
+	}
+
+	// Update dependent paths
+	config.mSaveStatesDirLocal = config.mGameAppDataPath + L"savestates/";
+	config.mPersistentDataBasePath = config.mGameAppDataPath + L"storage/";
+}
+
 bool EngineMain::initFileSystem()
 {
 	// Create mod data folder (the default mod directory)
 	Configuration& config = Configuration::instance();
-	FTX::FileSystem->createDirectory(config.mAppDataPath + L"mods");
+	FTX::FileSystem->createDirectory(config.mGameAppDataPath + L"mods");
 
 	// Add real file system provider for the game data path, if it isn't located in local "data" directory
 	//  -> This is relevant for Oxygen Engine using an external game data path

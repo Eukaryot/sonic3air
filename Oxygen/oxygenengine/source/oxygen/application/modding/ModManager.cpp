@@ -24,7 +24,7 @@ ModManager::~ModManager()
 void ModManager::startup()
 {
 	// Update base path (actually only needs to be done once, it shouldn't change afterwards anyways)
-	mBasePath = Configuration::instance().mAppDataPath + L"mods/";
+	mBasePath = Configuration::instance().mGameAppDataPath + L"mods/";
 
 	// First go through all mod directories recursively to gather all installed mods
 	scanMods();

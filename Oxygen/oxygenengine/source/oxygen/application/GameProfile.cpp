@@ -85,6 +85,7 @@ bool GameProfile::loadOxygenProjectFromJson(const Json::Value& jsonRoot)
 
 	// Load metadata
 	{
+		rootHelper.tryReadString("Identifier", mIdentifier);
 		rootHelper.tryReadString("ShortName", mShortName);
 		rootHelper.tryReadString("FullName", mFullName);
 	}
