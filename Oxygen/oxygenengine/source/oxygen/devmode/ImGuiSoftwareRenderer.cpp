@@ -21,6 +21,7 @@ void ImGuiSoftwareRenderer::initBackend()
 {
 	// Signify to ImGui that this backend supports the new texture mechanism introduced in ImGui 1.92
 	ImGui::GetIO().BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
+	ImGui::GetStyle().AntiAliasedFill = false;
 }
 
 void ImGuiSoftwareRenderer::newFrame()
@@ -31,7 +32,6 @@ void ImGuiSoftwareRenderer::renderDrawData()
 {
 	// TODO:
 	//  - Performance optimization: Support rendering textured rectangles as well
-	//  - Fix the minor glitches; though they might in part be related to missing anti-aliasing
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
 	DrawerInterface* drawerInterface = EngineMain::instance().getDrawer().getActiveDrawer();
