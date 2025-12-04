@@ -58,6 +58,8 @@ private:
 	std::vector<Entry> mEntries;
 	std::wstring mSaveStateDirectory[2];
 
+	float mScrollOffset = 0.0f;
+
 	uint32 mHighlightedIndex = 0;
 	std::wstring mHighlightedName;
 

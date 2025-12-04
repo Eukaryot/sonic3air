@@ -8,13 +8,13 @@
 
 #pragma once
 
+#include "lemon/program/Function.h"
 #include "lemon/program/StringRef.h"
 #include "lemon/runtime/ControlFlow.h"
 
 
 namespace lemon
 {
-	class Function;
 	class Program;
 	class NativeFunction;
 	class Variable;
@@ -165,6 +165,7 @@ namespace lemon
 		void callRuntimeFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex = 0);
 		void callFunction(const Function& function, size_t baseCallIndex = 0);
 		bool callFunctionAtLabel(const Function& function, FlyweightString labelName);
+		bool callFunctionAtLabel(const ScriptFunction& function, const ScriptFunction::Label& label);
 		bool callFunctionByName(FlyweightString functionName, FlyweightString labelName = FlyweightString());
 		bool callFunctionWithParameters(FlyweightString functionName, const FunctionCallParameters& params);
 		bool returnFromFunction();

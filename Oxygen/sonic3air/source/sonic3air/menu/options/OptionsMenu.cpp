@@ -111,6 +111,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntryInt(option::GHOST_SYNC_RENDERING,		&config.mGameServerImpl.mGhostSync.mGhostRendering);
 		setupOptionEntryBool(option::SHOW_CONTROLS_DISPLAY,		&config.mShowControlsDisplay);
 		setupOptionEntryInt(option::SCRIPT_OPTIMIZATION,		&config.mScriptOptimizationLevel);
+		setupOptionEntryBool(option::DEV_MODE,					&config.mDevMode.mEnableAtStartup);
 		setupOptionEntryInt(option::GAME_RECORDING_MODE,		&config.mGameRecorder.mRecordingMode);
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
 		setupOptionEntryInt(option::BACKDROP,					&config.mBackdrop);
@@ -1145,6 +1146,16 @@ void OptionsMenu::createOptionMenuEntry(GameMenuEntries& entries, const OptionsC
 			GameMenuEntry& entry = entries.addEntry<AdvancedOptionMenuEntry>()
 				.setDefaultValue(-1)
 				.initEntry(setting.mName, option::GAME_RECORDING_MODE)
+				.addOptions(setting);
+			break;
+		}
+
+		case option::DEV_MODE:
+		{
+			entries.addEntry<LabelMenuEntry>().initEntry("Dev Mode is providing debugging and mod development tools.\nIf you just want to play the game or use mods, leave it disabled.", Color(1.0f, 0.8f, 0.6f));
+
+			GameMenuEntry& entry = entries.addEntry<DevModeMenuEntry>()
+				.initEntry(setting.mName, option::DEV_MODE)
 				.addOptions(setting);
 			break;
 		}

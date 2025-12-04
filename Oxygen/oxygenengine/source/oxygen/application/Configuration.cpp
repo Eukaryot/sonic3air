@@ -615,7 +615,7 @@ void Configuration::serializeDevMode(JsonSerializer& serializer)
 {
 	if (serializer.beginObject("DevMode"))
 	{
-		serializer.serialize("Enabled", mDevMode.mEnabled);
+		serializer.serialize("Enabled", mDevMode.mEnableAtStartup);
 
 		serializer.serialize("LoadSaveState", mLoadSaveState);
 		serializer.serialize("LoadLevel", mLoadLevel);

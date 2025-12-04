@@ -44,7 +44,6 @@ void VideoOut::startup()
 	mGameResolution = Configuration::instance().mGameScreen;
 
 	RMX_LOG_INFO("VideoOut: Setup of game screen");
-	EngineMain::instance().getDrawer().createTexture(mGameScreenTexture);
 	mGameScreenTexture.setupAsRenderTarget(mGameResolution.x, mGameResolution.y);
 
 	if (nullptr == mRenderParts)
@@ -272,20 +271,9 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 	{
 		const PlaneManager& pm = mRenderParts->getPlaneManager();
 		const Recti fullscreenRect(0, 0, mGameResolution.x, mGameResolution.y);
-		Recti rectForPlaneB = fullscreenRect;
-		Recti rectForPlaneA = fullscreenRect;
-		Recti rectForPlaneW = fullscreenRect;
-		if (pm.isPlaneUsed(PlaneManager::PLANE_W))
-		{
-			const int splitY = pm.getPlaneAWSplit();
-			rectForPlaneA.height = splitY;
-			rectForPlaneW.y = splitY;
-			rectForPlaneW.height -= splitY;
-		}
-		else
-		{
-			rectForPlaneW.height = 0;
-		}
+		Recti rectForPlaneB = pm.getPlaneRect(PlaneManager::PLANE_B, fullscreenRect);
+		Recti rectForPlaneA = pm.getPlaneRect(PlaneManager::PLANE_A, fullscreenRect);
+		Recti rectForPlaneW = pm.getPlaneRect(PlaneManager::PLANE_W, fullscreenRect);
 
 		// Plane B non-prio
 		if (mRenderParts->mLayerRendering[0] && pm.isDefaultPlaneEnabled(0))

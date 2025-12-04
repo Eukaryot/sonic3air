@@ -26,6 +26,8 @@ public:
 
 	void setOutput(const BitmapViewMutable<uint32>& output);
 
+	Blitter::Options& accessOptions()  { return mOptions; }
+
 	void drawTriangle(const Vertex* vertices, const BitmapView<uint32>& texture, bool useVertexColors);
 	void drawTriangle(const Vertex* vertices);
 

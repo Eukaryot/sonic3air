@@ -85,8 +85,8 @@ void PlaneManager::reset()
 	mNameTableBaseW = 0x8000;
 
 	mPlayfieldSize.set(64, 32);
-	mUsingPlaneW = false;
-	mPlaneAWSplit = 0;
+	mIsPlaneWBelowSplitY = false;
+	mPlaneAWSplitY = 0;
 
 	resetCustomPlanes();
 }
@@ -139,6 +139,7 @@ void PlaneManager::resetCustomPlanes()
 
 bool PlaneManager::isPlaneUsed(int index) const
 {
+	// Is index valid at all?
 	if (EngineMain::getDelegate().useDeveloperFeatures())
 	{
 		if (index > PLANE_DEBUG)
@@ -150,8 +151,20 @@ bool PlaneManager::isPlaneUsed(int index) const
 			return false;
 	}
 
-	if (index == PLANE_W)
-		return mUsingPlaneW;
+	// Plane A or W may be unused
+	if (mPlaneAWSplitY == 0)
+	{
+		if (mIsPlaneWBelowSplitY)
+		{
+			if (index == PLANE_A)
+				return false;
+		}
+		else
+		{
+			if (index == PLANE_W)
+				return false;
+		}
+	}
 
 	return true;
 }
@@ -236,10 +249,33 @@ const uint16* PlaneManager::getPlaneContent(int planeIndex, uint16 patternIndex)
 	return (uint16*)(EmulatorInterface::instance().getVRam() + getPatternVRAMAddress(planeIndex, patternIndex));
 }
 
-void PlaneManager::setupPlaneW(bool use, uint16 splitY)
+void PlaneManager::setupPlaneW(bool isPlaneWBelowSplit, uint16 splitY)
 {
-	mUsingPlaneW = use;
-	mPlaneAWSplit = splitY;
+	mIsPlaneWBelowSplitY = isPlaneWBelowSplit;
+	mPlaneAWSplitY = splitY;
+}
+
+Recti PlaneManager::getPlaneRect(int planeIndex, const Recti& fullscreenRect) const
+{
+	Recti output = fullscreenRect;
+	switch (planeIndex)
+	{
+		case PLANE_A:
+		case PLANE_W:
+		{
+			if (mIsPlaneWBelowSplitY == (planeIndex == PLANE_W))
+			{
+				output.y = mPlaneAWSplitY;
+				output.height -= mPlaneAWSplitY;
+			}
+			else
+			{
+				output.height = mPlaneAWSplitY;
+			}
+			break;
+		}
+	}
+	return output;
 }
 
 void PlaneManager::dumpAsPaletteBitmap(PaletteBitmap& output, int planeIndex, bool highlightPrioPatterns) const
@@ -322,8 +358,8 @@ void PlaneManager::serializeSaveState(VectorBinarySerializer& serializer, uint8 
 	if (formatVersion >= 4)
 	{
 		serializer.serialize(mNameTableBaseW);
-		serializer.serializeAs<uint8>(mUsingPlaneW);
-		serializer.serialize(mPlaneAWSplit);
+		serializer.serializeAs<uint8>(mIsPlaneWBelowSplitY);
+		serializer.serialize(mPlaneAWSplitY);
 
 		for (int k = 0; k < 4; ++k)
 		{

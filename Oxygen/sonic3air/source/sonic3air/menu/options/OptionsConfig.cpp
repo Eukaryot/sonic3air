@@ -114,6 +114,13 @@ void OptionsConfig::buildSystem()
 			.addOption("Disabled", 0)
 			.addOption("Enabled", 1);
 	}
+
+	CATEGORY("Dev Mode")
+	{
+		configBuilder.addSetting("Dev Mode", option::DEV_MODE)
+			.addOption("Off", 0)
+			.addOption("On", 1);
+	}
 }
 
 void OptionsConfig::buildDisplay()

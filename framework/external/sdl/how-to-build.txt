@@ -16,12 +16,12 @@ Alternative: Manual build
 
 Fixes to apply after updating
 	- Optional: Build SDL for static linking
-		- Switch to static library build for project SDL2 (all configurations):
+		- Switch to static library build for project SDL2 (all configurations and platforms):
 			General -> Configuration Type = "Static library (.lib)"
 		- Link statically against the VC++ runtime, for projects SDL2 and SDL2main:
 			C/C++ -> Code Generation -> Runtime Library = "Multi-threaded (/MT)" (yes, also for Debug)
 		- Add the HAVE_LIBC definition into "SDL2\include\SDL_config_windows"
-	- That's all... as of SDL 2.30.14, no further fixes are known tor be applied
+	- That's all... as of SDL 2.32.10, no further fixes are known to be applied
 
 
 Notes on SDL2 static builds

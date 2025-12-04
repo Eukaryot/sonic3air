@@ -20,7 +20,7 @@ public:
 	{
 		PLANE_B		= 0,	// Plane B, background
 		PLANE_A		= 1,	// Plane A, foreground
-		PLANE_W		= 2,	// Plane W, window (rarely used)
+		PLANE_W		= 2,	// Plane W, window (optionally split out of plane A)
 		PLANE_DEBUG	= 3		// Additional plane containing all patterns for debug output
 	};
 
@@ -64,8 +64,10 @@ public:
 	uint16 getPatternAtIndex(int planeIndex, uint16 patternIndex) const;
 	void setPatternAtIndex(int planeIndex, uint16 patternIndex, uint16 value);
 
-	inline uint16 getPlaneAWSplit() const  { return mPlaneAWSplit; }
-	void setupPlaneW(bool use, uint16 splitY);
+	inline bool isPlaneWBelowSplitY() const  { return mIsPlaneWBelowSplitY; }
+	inline uint16 getPlaneAWSplitY() const	 { return mPlaneAWSplitY; }
+	void setupPlaneW(bool isPlaneWBelowSplit, uint16 splitY);
+	Recti getPlaneRect(int planeIndex, const Recti& fullscreenRect) const;
 
 	void dumpAsPaletteBitmap(PaletteBitmap& output, int planeIndex, bool highlightPrioPatterns = false) const;
 
@@ -90,8 +92,8 @@ private:
 	Vec2i mPlayfieldSize;		// In patterns (8x8 pixels)
 	uint16 mPlanePatternsBuffer[4][0x1000] = { 0 };		// Enough space to support 128 x 32 patterns (though usually only 0x800 is needed, for 64 x 32 patterns)
 
-	bool mUsingPlaneW = false;
-	uint16 mPlaneAWSplit = 0;
+	bool mIsPlaneWBelowSplitY = false;	// If true, plane W is below plane A, otherwise it's above plane A
+	uint16 mPlaneAWSplitY = 0;
 
 	bool mDisabledDefaultPlane[4];
 	std::vector<CustomPlane> mCustomPlanes;

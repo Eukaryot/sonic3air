@@ -17,6 +17,7 @@
 #include "lemon/compiler/parser/ParserTokens.h"
 #include "lemon/program/GlobalsLookup.h"
 #include "lemon/program/Module.h"
+#include "lemon/utility/PragmaSplitter.h"
 
 
 namespace lemon
@@ -430,8 +431,6 @@ namespace lemon
 											IdentifierToken& newToken = newDefine.mContent.createReplaceAt<IdentifierToken>(k);
 											newToken.mName = identifierAfter;
 											newToken.mDataType = identifierToken->mDataType;
-
-											RMX_LOG_INFO("Copied define: " << existingDefine->getName().getString() << " -> " << newDefineName);
 										}
 									}
 
@@ -610,11 +609,18 @@ namespace lemon
 		{
 			Node& node = *nodesIterator;
 			const size_t nodeIndex = nodesIterator.mCurrentIndex;
+
 			switch (node.getType())
 			{
 				case Node::Type::BLOCK:
 				{
 					processUndefinedNodesInBlock(node.as<BlockNode>(), function, scopeContext);
+					break;
+				}
+
+				case Node::Type::PRAGMA:
+				{
+					mCurrentPragmas.push_back(&node.as<PragmaNode>());
 					break;
 				}
 
@@ -629,6 +635,7 @@ namespace lemon
 						// Replace undefined node
 						blockNode.mNodes.replace(*newNode, nodeIndex);
 					}
+					mCurrentPragmas.clear();
 					break;
 				}
 
@@ -639,6 +646,7 @@ namespace lemon
 
 		// Block end: Close scope
 		scopeContext.endScope();
+		mCurrentPragmas.clear();
 	}
 
 	Node* CompilerFrontend::processUndefinedNode(UndefinedNode& undefinedNode, ScriptFunction& function, ScopeContext& scopeContext, NodesIterator& nodesIterator)
@@ -868,6 +876,32 @@ namespace lemon
 			LabelNode& node = NodeFactory::create<LabelNode>();
 			node.mLabel = tokens[0].as<LabelToken>().mName;		// Note that the label includes the '@' character
 			node.setLineNumber(lineNumber);
+
+			// Evaluate pragmas for address hooks
+			for (const PragmaNode* pragmaNode : mCurrentPragmas)
+			{
+				PragmaSplitter pragmaSplitter(pragmaNode->mContent);
+				ScriptFunction::AddressHook* lastAddressHook = nullptr;
+				for (const lemon::PragmaSplitter::Entry& entry : pragmaSplitter.mEntries)
+				{
+					if (entry.mArgument == "address-hook")
+					{
+						// Create address hook
+						RMX_CHECK(!entry.mValue.empty(), "Address hook must have a value", continue);
+						ScriptFunction::AddressHook& addressHook = vectorAdd(node.mAddressHooks);
+						addressHook.mAddress = (uint32)rmx::parseInteger(entry.mValue);
+						lastAddressHook = &addressHook;
+					}
+					else if (entry.mArgument == "off")
+					{
+						// Mark address hook as disabled
+						if (nullptr != lastAddressHook)
+						{
+							lastAddressHook->mDisabled = true;
+						}
+					}
+				}
+			}
 			return &node;
 		}
 		else

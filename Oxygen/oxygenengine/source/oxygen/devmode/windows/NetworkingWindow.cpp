@@ -60,6 +60,19 @@ void NetworkingWindow::buildContent()
 			{
 				engineServerClient.connectToServer();
 			}
+
+			Configuration::GameServerBase& config = Configuration::instance().mGameServerBase;
+			static ImGuiHelpers::InputString serverNameInput(config.mServerHostName);
+			ImGui::SameLine();
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("   Server:");
+			ImGui::SameLine();
+			ImGui::PushItemWidth(200);
+			if (ImGui::InputText("##ServerName", serverNameInput.mInternal, sizeof(serverNameInput.mInternal)))
+			{
+				config.mServerHostName = serverNameInput.get();
+			}
+			ImGui::PopItemWidth();
 		}
 	}
 

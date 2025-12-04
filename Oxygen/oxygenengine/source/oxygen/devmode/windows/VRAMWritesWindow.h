@@ -26,6 +26,7 @@ private:
 	bool mShowPlaneA = true;
 	bool mShowPlaneB = true;
 	bool mShowScroll = true;
+	bool mShowSAT = true;
 	bool mShowOthers = true;
 };
 

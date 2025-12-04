@@ -125,3 +125,12 @@ public:
 	void triggerButton() override;
 	bool shouldBeShown() override;
 };
+
+
+class DevModeMenuEntry : public OptionsMenuEntry
+{
+public:
+	DevModeMenuEntry();
+
+	void renderEntry(RenderContext& renderContext) override;
+};

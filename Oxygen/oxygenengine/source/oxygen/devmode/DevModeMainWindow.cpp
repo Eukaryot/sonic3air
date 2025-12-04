@@ -16,6 +16,7 @@
 #include "oxygen/devmode/windows/CallFramesWindow.h"
 #include "oxygen/devmode/windows/CustomSidePanelWindow.h"
 #include "oxygen/devmode/windows/DebugLogWindow.h"
+#include "oxygen/devmode/windows/FileBrowserWindow.h"
 #include "oxygen/devmode/windows/GameSimWindow.h"
 #include "oxygen/devmode/windows/GameVisualizationsWindow.h"
 #include "oxygen/devmode/windows/MemoryHexViewWindow.h"
@@ -42,6 +43,11 @@ DevModeMainWindow::DevModeMainWindow() :
 	const Configuration::DevModeSettings& config = Configuration::instance().mDevMode;
 	mIsWindowOpen = config.mMainWindowOpen;
 
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
+	// No close button on mobile platforms, as there's usually no F1 key to bring the window back
+	mCanBeClosed = false;
+#endif
+
 	// Create windows
 	//  -> Note that the order of creation defines the listing order inside each category
 	{
@@ -65,6 +71,7 @@ DevModeMainWindow::DevModeMainWindow() :
 		createWindow(mSettingsWindow);
 	#ifdef DEBUG
 		createWindow(mNetworkingWindow);
+		createWindow(mFileBrowserWindow);
 	#endif
 	}
 
@@ -118,9 +125,12 @@ bool DevModeMainWindow::buildWindow()
 
 void DevModeMainWindow::buildContent()
 {
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
+	ImGui::SetWindowPos(ImVec2(20.0f, 20.0f), ImGuiCond_FirstUseEver);
+#else
 	ImGui::SetWindowPos(ImVec2(5.0f, 5.0f), ImGuiCond_FirstUseEver);
+#endif
 	ImGui::SetWindowSize(ImVec2(150.0f, 200.0f), ImGuiCond_FirstUseEver);
-	ImGui::SetWindowCollapsed(true, ImGuiCond_FirstUseEver);
 
 	const float uiScale = getUIScale();
 

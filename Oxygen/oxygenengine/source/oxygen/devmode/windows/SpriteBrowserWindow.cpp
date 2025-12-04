@@ -27,6 +27,7 @@ void SpriteBrowserWindow::buildContent()
 	ImGui::SetWindowSize(ImVec2(500.0f, 250.0f), ImGuiCond_FirstUseEver);
 
 	const float uiScale = getUIScale();
+	Drawer& drawer = EngineMain::instance().getDrawer();
 
 	// Refresh list if needed
 	const SpriteCollection& spriteCollection = SpriteCollection::instance();
@@ -50,7 +51,7 @@ void SpriteBrowserWindow::buildContent()
 			[](const SpriteCollection::Item* a, const SpriteCollection::Item* b) { return a->mSourceInfo.mSourceIdentifier < b->mSourceInfo.mSourceIdentifier; });
 
 		mPreviewItem = nullptr;
-		mPreviewTexture = Texture();
+		mHasValidPreviewTexture = false;
 	}
 
 	// TODO: Cache filter results
@@ -124,8 +125,9 @@ void SpriteBrowserWindow::buildContent()
 		if (clickedItem->mUsesComponentSprite)
 		{
 			const Bitmap& bitmap = static_cast<ComponentSprite*>(clickedItem->mSprite)->getBitmap();
-			mPreviewTexture.load(bitmap);
-			mPreviewTexture.setFilterNearest();
+			mPreviewTexture.accessBitmap().copy(bitmap);
+			mPreviewTexture.bitmapUpdated();
+			mHasValidPreviewTexture = true;
 		}
 		else
 		{
@@ -133,14 +135,15 @@ void SpriteBrowserWindow::buildContent()
 			const PaletteBase* palette = PaletteCollection::instance().getPalette(paletteKey, 0);
 			if (nullptr != palette)
 			{
+				Bitmap& bmp = mPreviewTexture.accessBitmap();
 				const PaletteBitmap& paletteBitmap = static_cast<PaletteSprite*>(clickedItem->mSprite)->getBitmap();
-				paletteBitmap.convertToRGBA(mTempBitmap, palette->getRawColors(), palette->getSize());
-				mPreviewTexture.load(mTempBitmap);
-				mPreviewTexture.setFilterNearest();
+				paletteBitmap.convertToRGBA(bmp, palette->getRawColors(), palette->getSize());
+				mPreviewTexture.bitmapUpdated();
+				mHasValidPreviewTexture = true;
 			}
 			else
 			{
-				mPreviewTexture = Texture();
+				mHasValidPreviewTexture = false;
 			}
 		}
 	}
@@ -163,7 +166,7 @@ void SpriteBrowserWindow::buildContent()
 			ImGui::Text("%s", mPreviewItem->mUsesComponentSprite ? "Component sprite" : "Palette sprite");
 		}
 
-		if (mPreviewTexture.getHandle() != 0)
+		if (mHasValidPreviewTexture && mPreviewTexture.isValid())
 		{
 			ImGui::Text("Preview");
 			ImGui::SameLine();
@@ -188,9 +191,10 @@ void SpriteBrowserWindow::buildContent()
 			int scale = mPreviewScale;
 			if (scale == 0)
 				scale = clamp(std::min(500 / mPreviewTexture.getWidth(), 350 / mPreviewTexture.getHeight()), 1, 8);
+			const Vec2f size = Vec2f(mPreviewTexture.getSize() * scale);
 
 			ImGui::BeginChild("Preview Image", ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
-			ImGui::Image(mPreviewTexture.getHandle(), ImVec2((float)(mPreviewTexture.getWidth() * scale), (float)(mPreviewTexture.getHeight() * scale)));
+			ImGui::Image(ImGuiHelpers::getTextureRef(mPreviewTexture), ImVec2(size.x, size.y));
 			ImGui::EndChild();
 
 			if (!mPreviewItem->mUsesComponentSprite)

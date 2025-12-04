@@ -135,6 +135,7 @@ namespace lemon
 
 	public:
 		FlyweightString mLabel;
+		std::vector<ScriptFunction::AddressHook> mAddressHooks;
 	};
 
 

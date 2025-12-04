@@ -3,6 +3,8 @@
 cmake_minimum_required(VERSION 3.12)
 project(sdl_test LANGUAGES C)
 
+include(CheckLanguage)
+include(FeatureSummary)
 include(GenerateExportHeader)
 
 if(ANDROID)
@@ -19,8 +21,6 @@ cmake_policy(SET CMP0074 NEW)
 # Override CMAKE_FIND_ROOT_PATH_MODE to allow search for SDL2 outside of sysroot
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE NEVER)
 
-include(FeatureSummary)
-
 option(TEST_SHARED "Test linking to shared SDL2 library" ON)
 add_feature_info("TEST_SHARED" TEST_SHARED "Test linking with shared library")
 
@@ -32,6 +32,19 @@ add_feature_info("TEST_TEST" TEST_STATIC "Test linking to SDL test library")
 
 option(TEST_FULL "Run complete SDL test suite" OFF)
 add_feature_info("TEST_FULL" TEST_FULL "Build full SDL testsuite")
+
+# FIXME: how to target ios/tvos with Swift?
+# https://gitlab.kitware.com/cmake/cmake/-/issues/20104
+if(APPLE AND CMAKE_SYSTEM_NAME MATCHES ".*(Darwin|MacOS).*")
+    # multiple values for CMAKE_OSX_ARCHITECTURES not supported with Swift
+    list(LENGTH CMAKE_OSX_ARCHITECTURES count_osx_archs)
+    if(count_osx_archs LESS_EQUAL 1)
+        check_language(Swift)
+        if(CMAKE_Swift_COMPILER)
+            enable_language(Swift)
+        endif()
+    endif()
+endif()
 
 if(TEST_SHARED)
     find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2)
@@ -86,6 +99,12 @@ if(TEST_SHARED)
         add_executable(sdltest-shared sdltest.c)
         target_link_libraries(sdltest-shared PRIVATE SDL2::SDL2main SDL2::SDL2test SDL2::SDL2)
     endif()
+
+    if(CMAKE_Swift_COMPILER)
+        add_executable(swift-shared main.swift)
+        target_include_directories(swift-shared PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/swift")
+        target_link_libraries(swift-shared PRIVATE SDL2::SDL2)
+    endif()
 endif()
 
 if(TEST_STATIC)
@@ -121,6 +140,11 @@ if(TEST_STATIC)
         add_executable(cli-static-vars main_cli.c)
         target_link_libraries(cli-static-vars PRIVATE ${SDL2_STATIC_LIBRARIES})
         target_include_directories(cli-static-vars PRIVATE ${SDL2_INCLUDE_DIRS})
+    endif()
+
+    if(TEST_TEST)
+        add_executable(sdltest-static sdltest.c)
+        target_link_libraries(sdltest-static PRIVATE SDL2::SDL2main SDL2::SDL2test SDL2::SDL2-static)
     endif()
 
     if(CMAKE_Swift_COMPILER)

@@ -111,6 +111,7 @@ private:
 	void initDirectories();
 	bool initConfigAndSettings();
 	void loadConfigJson();
+	void updateGameProfilePaths();
 
 	bool initFileSystem();
 	bool loadFilePackages(bool forceReload);

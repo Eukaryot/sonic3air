@@ -19,10 +19,16 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+/* WIKI CATEGORY: CPUInfo */
+
 /**
- *  \file SDL_cpuinfo.h
+ * # CategoryCPUInfo
  *
- *  CPU feature detection for SDL.
+ * CPU feature detection for SDL.
+ *
+ * These functions are largely concerned with reporting if the system has
+ * access to various SIMD instruction sets, but also has other important info
+ * to share, such as number of logical CPU cores.
  */
 
 #ifndef SDL_cpuinfo_h_
@@ -109,7 +115,8 @@ _m_prefetch(void *__P)
 #include <lasxintrin.h>
 #define __LASX__
 #endif
-#if defined(HAVE_IMMINTRIN_H) && !defined(SDL_DISABLE_IMMINTRIN_H)
+#if defined(HAVE_IMMINTRIN_H) && !defined(SDL_DISABLE_IMMINTRIN_H) && \
+   (defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86))
 #include <immintrin.h>
 #else
 #if defined(__MMX__) && !defined(SDL_DISABLE_MMINTRIN_H)

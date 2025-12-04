@@ -57,6 +57,7 @@ public:
 
 public:
 	// Meta data
+	std::string mIdentifier;
 	std::string mShortName;
 	std::string mFullName;
 

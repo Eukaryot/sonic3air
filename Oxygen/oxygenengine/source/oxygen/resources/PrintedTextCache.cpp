@@ -40,7 +40,6 @@ PrintedTextCache::CacheItem& PrintedTextCache::addCacheItem(const Key& key, Font
 	cacheItem.mKey = key;
 	cacheItem.mRecentlyUsed = true;
 
-	EngineMain::instance().getDrawer().createTexture(cacheItem.mTexture);
 	Bitmap& bitmap = cacheItem.mTexture.accessBitmap();
 	font.printBitmap(bitmap, cacheItem.mInnerRect, textString, key.mSpacing);
 	cacheItem.mTexture.bitmapUpdated();

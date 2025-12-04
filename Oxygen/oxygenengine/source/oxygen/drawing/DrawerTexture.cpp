@@ -28,6 +28,14 @@ void DrawerTexture::invalidate()
 	mImplementation = nullptr;
 }
 
+void DrawerTexture::ensureValidity()
+{
+	if (nullptr == mImplementation)
+	{
+		EngineMain::instance().getDrawer().createTexture(*this);
+	}
+}
+
 void DrawerTexture::setImplementation(DrawerTextureImplementation* implementation)
 {
 	delete mImplementation;
@@ -45,6 +53,11 @@ void DrawerTexture::clearBitmap()
 	invalidate();
 }
 
+const Bitmap& DrawerTexture::getBitmap() const
+{
+	return mBitmap;
+}
+
 Bitmap& DrawerTexture::accessBitmap()
 {
 	return mBitmap;
@@ -54,6 +67,7 @@ void DrawerTexture::bitmapUpdated()
 {
 	mSize.set(mBitmap.getWidth(), mBitmap.getHeight());
 
+	ensureValidity();
 	if (nullptr != mImplementation)
 	{
 		mImplementation->updateFromBitmap(mBitmap);
@@ -69,6 +83,7 @@ void DrawerTexture::setupAsRenderTarget(uint32 width, uint32 height)
 	mSize.set(width, height);
 	mSetupAsRenderTarget = true;
 
+	ensureValidity();
 	if (nullptr != mImplementation)
 	{
 		mImplementation->setupAsRenderTarget(mSize);
@@ -77,6 +92,7 @@ void DrawerTexture::setupAsRenderTarget(uint32 width, uint32 height)
 
 void DrawerTexture::writeContentToBitmap(Bitmap& outBitmap)
 {
+	ensureValidity();
 	if (nullptr != mImplementation)
 	{
 		mImplementation->writeContentToBitmap(outBitmap);

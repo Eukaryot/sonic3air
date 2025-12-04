@@ -183,18 +183,25 @@ bool LemonScriptRuntime::callAddressHook(uint32 address)
 				if (nullptr == hook)
 					return false;
 
-				// Try to get the respective runtime function
-				RMX_ASSERT(nullptr != hook->mFunction, "Invalid address hook function");
-				const lemon::RuntimeFunction* runtimeFunction = mInternal.mRuntime.getRuntimeFunction(*hook->mFunction);
-				if (nullptr != runtimeFunction)
+				if (nullptr != hook->mLabel)
 				{
-					mInternal.mAddressHookLookup.add(address, runtimeFunction);
-					mInternal.mRuntime.callRuntimeFunction(*runtimeFunction);
+					mInternal.mRuntime.callFunctionAtLabel(*hook->mFunction, *hook->mLabel);
 				}
 				else
 				{
-					RMX_ASSERT(false, "Unable to get runtime function for address hook at " << rmx::hexString(hook->mAddress, 8));
-					mInternal.mRuntime.callFunction(*hook->mFunction);
+					// Try to get the respective runtime function
+					RMX_ASSERT(nullptr != hook->mFunction, "Invalid address hook function");
+					const lemon::RuntimeFunction* runtimeFunction = mInternal.mRuntime.getRuntimeFunction(*hook->mFunction);
+					if (nullptr != runtimeFunction)
+					{
+						mInternal.mAddressHookLookup.add(address, runtimeFunction);
+						mInternal.mRuntime.callRuntimeFunction(*runtimeFunction);
+					}
+					else
+					{
+						RMX_ASSERT(false, "Unable to get runtime function for address hook at " << rmx::hexString(hook->mAddress, 8));
+						mInternal.mRuntime.callFunction(*hook->mFunction);
+					}
 				}
 			}
 			return true;

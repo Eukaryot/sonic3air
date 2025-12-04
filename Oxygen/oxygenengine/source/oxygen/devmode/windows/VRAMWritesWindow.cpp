@@ -40,13 +40,17 @@ void VRAMWritesWindow::buildContent()
 	DebugTracking& debugTracking = codeExec.getDebugTracking();
 
 	const PlaneManager& planeManager = VideoOut::instance().getRenderParts().getPlaneManager();
+	const ScrollOffsetsManager& scrollOffsetsManager = VideoOut::instance().getRenderParts().getScrollOffsetsManager();
+	const SpriteManager& spriteManager = VideoOut::instance().getRenderParts().getSpriteManager();
+
 	const uint16 startAddressPlaneA = planeManager.getPlaneBaseVRAMAddress(PlaneManager::PLANE_A);
 	const uint16 startAddressPlaneB = planeManager.getPlaneBaseVRAMAddress(PlaneManager::PLANE_B);
 	const uint16 endAddressPlaneA = startAddressPlaneA + (uint16)planeManager.getPlaneSizeInVRAM(PlaneManager::PLANE_A);
 	const uint16 endAddressPlaneB = startAddressPlaneB + (uint16)planeManager.getPlaneSizeInVRAM(PlaneManager::PLANE_B);
-	const ScrollOffsetsManager& scrollOffsetsManager = VideoOut::instance().getRenderParts().getScrollOffsetsManager();
 	const uint16 startAddressScrollOffsets = scrollOffsetsManager.getHorizontalScrollTableBase();
-	const uint16 endAddressScrollOffsets = startAddressScrollOffsets + 0x200;
+	const uint16 endAddressScrollOffsets = startAddressScrollOffsets + 0x400;
+	const uint16 startAddressSAT = spriteManager.getSpriteAttributeTableBase();
+	const uint16 endAddressSAT = startAddressSAT + 0x200;
 
 	// Create a sorted list
 	std::vector<DebugTracking::VRAMWrite*> writes = debugTracking.getVRAMWrites();
@@ -55,6 +59,7 @@ void VRAMWritesWindow::buildContent()
 	ImGui::Checkbox("Plane A", &mShowPlaneA);
 	ImGui::Checkbox("Plane B", &mShowPlaneB);
 	ImGui::Checkbox("Scroll Offsets", &mShowScroll);
+	ImGui::Checkbox("Sprite Attribute Table", &mShowSAT);
 	ImGui::Checkbox("Patterns and others", &mShowOthers);
 
 	static int32 filterAddress = -1;
@@ -74,6 +79,8 @@ void VRAMWritesWindow::buildContent()
 
 	if (ImGui::BeginTable("VRAM Writes Table", 1, ImGuiTableFlags_Borders, ImVec2(0.0f, 0.0f)))
 	{
+		std::unordered_map<int, int> uniqueIDCounter;
+
 		for (const DebugTracking::VRAMWrite* write : writes)
 		{
 			if (filterAddress >= 0)
@@ -106,6 +113,13 @@ void VRAMWritesWindow::buildContent()
 				line = String("[Scroll Offsets] ") + line;
 				color = ImVec4(0.75f, 1.0f, 1.0f, 1.0f);
 			}
+			else if (write->mAddress >= startAddressSAT && write->mAddress < endAddressSAT)
+			{
+				if (!mShowSAT)
+					continue;
+				line = String("[Sprites] ") + line;
+				color = ImVec4(0.75f, 0.75f, 1.0f, 1.0f);
+			}
 			else
 			{
 				if (!mShowOthers)
@@ -115,7 +129,11 @@ void VRAMWritesWindow::buildContent()
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
 
-			ImGui::PushID(write);
+			int ID = (write->mAddress << 24) + (write->mSize << 16);
+			int& counter = uniqueIDCounter[ID];
+			ID += counter;
+			++counter;
+			ImGui::PushID(ID);
 
 			const bool openTree = ImGui::TreeNodeEx("##", 0);
 			ImGui::SameLine();

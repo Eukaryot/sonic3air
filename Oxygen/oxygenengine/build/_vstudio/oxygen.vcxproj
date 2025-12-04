@@ -61,6 +61,7 @@
     <ClCompile Include="..\..\source\oxygen\devmode\windows\CallFramesWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\CustomSidePanelWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\DebugLogWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\FileBrowserWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\GameSimWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\GameVisualizationsWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.cpp" />
@@ -85,7 +86,7 @@
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerTexture.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLTexture.cpp" />
-    <ClCompile Include="..\..\source\oxygen\drawing\opengl\Upscaler.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLUpscaler.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\software\Blitter.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareDrawer.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareDrawerTexture.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="..\..\source\oxygen\devmode\windows\CallFramesWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\CustomSidePanelWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\DebugLogWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\FileBrowserWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\GameSimWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\GameVisualizationsWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.h" />
@@ -246,7 +248,7 @@
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerTexture.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLTexture.h" />
-    <ClInclude Include="..\..\source\oxygen\drawing\opengl\Upscaler.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLUpscaler.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\software\BlitterHelper.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\software\Blitter.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.h" />

@@ -12,44 +12,45 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/drawing/software/SoftwareDrawer.h"
+#include "oxygen/drawing/software/SoftwareDrawerTexture.h"
 #include "oxygen/drawing/software/SoftwareRasterizer.h"
 #include "imgui.h"
 
 
+void ImGuiSoftwareRenderer::initBackend()
+{
+	// Signify to ImGui that this backend supports the new texture mechanism introduced in ImGui 1.92
+	ImGui::GetIO().BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
+	ImGui::GetStyle().AntiAliasedFill = false;
+}
+
 void ImGuiSoftwareRenderer::newFrame()
 {
-	// This is needed not only to cache the fonts texture data, but also to let ImGui know we actually processed the font texture data
-	uint8* data = nullptr;
-	ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&data, &mFontsTextureSize.x, &mFontsTextureSize.y);
-	mFontsTextureData = reinterpret_cast<uint32*>(data);
 }
 
 void ImGuiSoftwareRenderer::renderDrawData()
 {
 	// TODO:
-	//  - Extend software rasterizer to respect the "mSwapRedBlueChannels" setting when sampling a texture
-	//  - Support different textures; this requires actual usage of drawer textures (e.g. in SpriteBrowserWindow) and some system extensions to have unique texture IDs
 	//  - Performance optimization: Support rendering textured rectangles as well
-	//  - Fix the minor glitches; though they might in part be related to missing anti-aliasing
 
-	DrawerInterface* drawer = EngineMain::instance().getDrawer().getActiveDrawer();
-	if (nullptr == drawer || drawer->getType() != Drawer::Type::SOFTWARE)
+	Drawer& drawer = EngineMain::instance().getDrawer();
+	DrawerInterface* drawerInterface = EngineMain::instance().getDrawer().getActiveDrawer();
+	if (nullptr == drawerInterface || drawerInterface->getType() != Drawer::Type::SOFTWARE)
 		return;
 
-	SoftwareDrawer& softwareDrawer = *static_cast<SoftwareDrawer*>(drawer);
+	SoftwareDrawer& softwareDrawer = *static_cast<SoftwareDrawer*>(drawerInterface);
 	const BitmapViewMutable<uint32>& output = softwareDrawer.getRenderTarget();
 
 	Blitter::Options blitterOptions;
 	blitterOptions.mBlendMode = BlendMode::ALPHA;
-	blitterOptions.mSamplingMode = SamplingMode::BILINEAR;	// Looks a bit better, but is expensive
 	blitterOptions.mSwapRedBlueChannels = softwareDrawer.needSwapRedBlueChannels();
 	SoftwareRasterizer rasterizer = SoftwareRasterizer(output, blitterOptions);
 	Blitter blitter;
 
 	SoftwareRasterizer::Vertex vertices[3];
 
-	const ImDrawData* data = ImGui::GetDrawData();
-	for (const ImDrawList* drawList : data->CmdLists)
+	const ImDrawData* drawData = ImGui::GetDrawData();
+	for (const ImDrawList* drawList : drawData->CmdLists)
 	{
 		for (const ImDrawCmd& drawCmd : drawList->CmdBuffer)
 		{
@@ -60,21 +61,40 @@ void ImGuiSoftwareRenderer::renderDrawData()
 			BitmapViewMutable<uint32> outputView(output, clipRect);
 			rasterizer.setOutput(outputView);
 
-			const uint32* textureData = nullptr;
+			const uint32* texImageData = nullptr;
 			Vec2i textureSize;
-			if (drawCmd.TextureId == ImGui::GetIO().Fonts->TexID)
+			if (nullptr != drawData->Textures)
 			{
-				textureData = mFontsTextureData;
-				textureSize = mFontsTextureSize;
-			}
-			else
-			{
-				// TODO: Support other textures than the default one (depending on "drawCmd.TextureId")
+				const ImVector<ImTextureData*>& textures = *drawData->Textures;
+				if (drawCmd.TexRef._TexID < textures.Size)
+				{
+					ImTextureData* textureData = textures[(int)drawCmd.TexRef._TexID];
+					if (nullptr != textureData && textureData->Format == ImTextureFormat_RGBA32)	// TODO: We should better support other texture formats as well; but for now this works
+					{
+						texImageData = reinterpret_cast<const uint32*>(textureData->GetPixels());
+						textureSize.x = textureData->Width;
+						textureSize.y = textureData->Height;
+
+						rasterizer.accessOptions().mSamplingMode = SamplingMode::BILINEAR;	// Looks a bit better, but is expensive
+					}
+				}
+				else
+				{
+					const DrawerTexture* drawerTexture = drawer.getTextureByID((uint32)drawCmd.TexRef._TexID);
+					if (nullptr != drawerTexture)
+					{
+						const Bitmap& bitmap = drawerTexture->getBitmap();
+						texImageData = bitmap.getData();
+						textureSize = bitmap.getSize();
+
+						rasterizer.accessOptions().mSamplingMode = SamplingMode::POINT;
+					}
+				}
 			}
 
-			if (nullptr != textureData)
+			if (nullptr != texImageData)
 			{
-				BitmapView<uint32> inputView(textureData, textureSize);
+				BitmapView<uint32> inputView(texImageData, textureSize);
 
 				for (uint32 k = 0; k + 3 <= drawCmd.ElemCount; k += 3)
 				{
@@ -137,10 +157,6 @@ void ImGuiSoftwareRenderer::renderDrawData()
 							vertices[j].mPosition.set(vert.pos.x - drawCmd.ClipRect.x, vert.pos.y - drawCmd.ClipRect.y);
 							vertices[j].mColor = Color::fromABGR32(vert.col);
 							vertices[j].mUV.set(vert.uv.x, vert.uv.y);
-
-							// TODO: This doesn't swap red and blue channels for the sampled texture - that would need to be implemented separately in teh rasterizer itself
-							if (blitterOptions.mSwapRedBlueChannels)
-								vertices[j].mColor.swapRedBlue();
 						}
 					}
 
@@ -150,7 +166,7 @@ void ImGuiSoftwareRenderer::renderDrawData()
 					}
 					else
 					{
-						rasterizer.drawTriangle(vertices, BitmapView<uint32>(textureData, textureSize), !isUntinted);
+						rasterizer.drawTriangle(vertices, BitmapView<uint32>(texImageData, textureSize), !isUntinted);
 					}
 				}
 			}

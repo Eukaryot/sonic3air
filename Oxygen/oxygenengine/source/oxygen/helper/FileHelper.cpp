@@ -141,11 +141,6 @@ bool FileHelper::loadBitmap(Bitmap& bitmap, const std::wstring& filename, bool s
 
 	bool FileHelper::loadTexture(DrawerTexture& texture, const std::wstring& filename, bool showError)
 	{
-		if (!texture.isValid())
-		{
-			EngineMain::instance().getDrawer().createTexture(texture);
-		}
-
 		Bitmap& bitmap = texture.accessBitmap();
 		if (!loadBitmap(bitmap, filename, showError))
 			return false;

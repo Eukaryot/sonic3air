@@ -32,6 +32,7 @@ namespace
 
 void ConfigurationImpl::fillDefaultGameProfile(GameProfile& gameProfile)
 {
+	gameProfile.mIdentifier = "S3AIR";
 	gameProfile.mShortName = "Sonic 3 A.I.R.";
 	gameProfile.mFullName = "Sonic 3 - Angel Island Revisited";
 

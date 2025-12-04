@@ -1226,10 +1226,10 @@ namespace lemon
 					{
 						if (function.mFunction->getType() == Function::Type::SCRIPT)
 						{
-							const std::vector<uint32>& addressHooks = static_cast<const ScriptFunction*>(function.mFunction)->getAddressHooks();
+							const std::vector<ScriptFunction::AddressHook>& addressHooks = static_cast<const ScriptFunction*>(function.mFunction)->getAddressHooks();
 							if (!addressHooks.empty())
 							{
-								address = addressHooks[0];
+								address = addressHooks[0].mAddress;
 								break;
 							}
 						}

@@ -18,6 +18,7 @@ class AudioBrowserWindow;
 class CallFramesWindow;
 class CustomSidePanelWindow;
 class DebugLogWindow;
+class FileBrowserWindow;
 class GameSimWindow;
 class GameVisualizationsWindow;
 class MemoryHexViewWindow;
@@ -63,6 +64,7 @@ private:
 	CallFramesWindow* mCallFramesWindow = nullptr;
 	CustomSidePanelWindow* mCustomSidePanelWindow = nullptr;
 	DebugLogWindow* mDebugLogWindow = nullptr;
+	FileBrowserWindow* mFileBrowserWindow = nullptr;
 	GameSimWindow* mGameSimWindow = nullptr;
 	GameVisualizationsWindow* mGameVisualizationsWindow = nullptr;
 	MemoryHexViewWindow* mMemoryHexViewWindow = nullptr;

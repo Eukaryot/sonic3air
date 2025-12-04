@@ -44,6 +44,7 @@ public:
 protected:
 	const std::string mTitle;
 	const Category mCategory = Category::MISC;
+	bool mCanBeClosed = true;
 
 	bool mIsWindowOpen = false;
 	bool mLastWindowOpen = false;

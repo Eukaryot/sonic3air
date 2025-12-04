@@ -156,7 +156,9 @@ endif()
 
 # imgui
 if (USE_IMGUI)
-	file(GLOB_RECURSE IMGUI_SOURCES ${WORKSPACE_DIR}/framework/external/imgui/imgui/*.cpp)
+	file(GLOB IMGUI_SOURCES ${WORKSPACE_DIR}/framework/external/imgui/imgui/*.cpp
+							${WORKSPACE_DIR}/framework/external/imgui/imgui/backends/imgui_impl_opengl3.cpp
+							${WORKSPACE_DIR}/framework/external/imgui/imgui/backends/imgui_impl_sdl2.cpp)
 
 	add_library(imgui ${IMGUI_SOURCES})
 

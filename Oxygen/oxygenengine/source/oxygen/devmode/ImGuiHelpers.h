@@ -33,6 +33,9 @@ namespace ImGuiHelpers
 	static const ImVec4 COLOR_MAGENTA	  (1.0f, 0.0f, 1.0f, 1.0f);
 
 
+	extern ImTextureRef getTextureRef(DrawerTexture& drawerTexture);
+
+
 	struct ScopedIndent
 	{
 	public:
@@ -67,7 +70,9 @@ namespace ImGuiHelpers
 
 		InputString() = default;
 		InputString(std::string_view str) { set(str); };
-		bool isEmpty() const;
+
+		inline bool isEmpty() const  { return (mInternal[0] == 0); }
+		inline std::string_view get() const  { return std::string_view(mInternal); }
 		void set(std::string_view str);
 	};
 
@@ -77,8 +82,8 @@ namespace ImGuiHelpers
 		WString mWideString;
 		char mInternalUTF8[256] = { 0 };
 
-		const WString& get() const  { return mWideString; }
-		bool isEmpty() const;
+		inline bool isEmpty() const  { return mWideString.empty(); }
+		inline const WString& get() const  { return mWideString; }
 		void set(std::wstring_view str);
 		void refreshFromInternal();
 	};

@@ -210,7 +210,6 @@ void GameView::initialize()
 	const Vec2i& resolution = Configuration::instance().mGameScreen;
 
 	RMX_LOG_INFO("Creating game screen texture");
-	EngineMain::instance().getDrawer().createTexture(mFinalGameTexture);
 	mFinalGameTexture.setupAsRenderTarget(resolution.x, resolution.y);
 }
 
@@ -694,10 +693,6 @@ void GameView::render()
 	// Debug visualizations
 	if (mDebugVisualizations.mEnabled)
 	{
-		if (!mDebugVisualizationsOverlay.isValid())
-		{
-			drawer.createTexture(mDebugVisualizationsOverlay);
-		}
 		Bitmap& bitmap = mDebugVisualizationsOverlay.accessBitmap();
 		bitmap.resize(gameScreenRect.width, gameScreenRect.height);
 		bitmap.clear(0);

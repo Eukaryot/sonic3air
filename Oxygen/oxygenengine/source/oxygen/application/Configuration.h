@@ -62,7 +62,8 @@ public:
 
 	struct DevModeSettings
 	{
-		bool mEnabled = false;
+		bool mEnabled = false;			// Set if dev mode is currently enabled
+		bool mEnableAtStartup = false;	// Set if dev mode is meant to be enabled at startup
 		float mGameViewScale = 1.0f;
 		Vec2f mGameViewAlignment;
 		float mUIScale = 1.0f;
@@ -149,19 +150,20 @@ private:
 
 public:
 	// Paths
-	std::wstring mProjectPath;	// Only used in Engine App
+	std::wstring mProjectPath;				// Only used in Engine App
 	std::wstring mExePath;
-	std::wstring mAppDataPath;
+	std::wstring mAppDataPath;				// App data path for the engine
+	std::wstring mGameAppDataPath;			// App data path for the game; can be the same as the app data path for the engine, or a sub-folder of it
 	std::wstring mSettingsFilenames[3];		// Uses SettingsType as key
 	std::wstring mEngineDataPath;
 	std::wstring mGameDataPath;
-	std::wstring mRomPath;		// From configuration
-	std::wstring mLastRomPath;	// From settings
+	std::wstring mRomPath;					// From configuration
+	std::wstring mLastRomPath;				// From settings
 	std::wstring mScriptsDir;
 	std::wstring mMainScriptName;
 	lemon::PreprocessorDefinitionMap mPreprocessorDefinitions;
-	std::wstring mSaveStatesDir;
-	std::wstring mSaveStatesDirLocal;
+	std::wstring mSaveStatesDir;			// Save states dir in the installation
+	std::wstring mSaveStatesDirLocal;		// Save states dir in app data, specific for the game profile
 	std::wstring mAnalysisDir;
 	std::wstring mPersistentDataBasePath;
 

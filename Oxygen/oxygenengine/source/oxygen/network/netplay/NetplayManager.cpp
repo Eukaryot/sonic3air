@@ -16,7 +16,7 @@
 #include "oxygen_netcore/serverclient/ProtocolVersion.h"
 
 
-#define USE_IPv6 true
+#define USE_IPv6 false
 
 
 NetplayManager::NetplayManager() :
