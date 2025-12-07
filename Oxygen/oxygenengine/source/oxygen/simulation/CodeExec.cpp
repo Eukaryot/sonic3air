@@ -598,7 +598,7 @@ bool CodeExec::canExecute() const
 		case ExecutionState::READY:
 		case ExecutionState::YIELDED:
 		case ExecutionState::INTERRUPTED:
-			return true;
+			return mLemonScriptRuntime.getInternalLemonRuntime().canExecuteSteps();
 
 		case ExecutionState::INACTIVE:
 		case ExecutionState::HALTED:

@@ -170,6 +170,7 @@ namespace lemon
 		bool callFunctionWithParameters(FlyweightString functionName, const FunctionCallParameters& params);
 		bool returnFromFunction();
 
+		bool canExecuteSteps() const;
 		void executeSteps(ExecuteConnector& result, size_t stepsLimit, size_t minimumCallStackSize);
 		const Function* handleResultCall(const RuntimeOpcode& runtimeOpcode);
 
@@ -205,6 +206,7 @@ namespace lemon
 		std::vector<ControlFlow*> mControlFlows;		// Contains at least one control flow at all times = the main control flow at index 0
 		ControlFlow* mSelectedControlFlow = nullptr;	// The currently selected control flow used by methods like "executeSteps" and "callFunction"; this must always be a valid pointer
 
+		bool mEncounteredBuildError = false;			// Set if there was a fatal error in runtime function building
 		bool mReceivedStopSignal = false;
 		const RuntimeOpcode*const* mCurrentOpcodePtr = nullptr;
 	};

@@ -87,11 +87,11 @@ namespace lemon
 	}
 
 
-	void RuntimeFunction::build(Runtime& runtime)
+	bool RuntimeFunction::build(Runtime& runtime)
 	{
 		// First check if it is built already
 		if (!mRuntimeOpcodeBuffer.empty() || mFunction->mOpcodes.empty())
-			return;
+			return true;
 
 		// Create the runtime opcodes
 		{
@@ -110,19 +110,27 @@ namespace lemon
 
 			mProgramCounterByOpcodeIndex.resize(numOpcodes, 0xffffffff);
 
-			// Let the opcode providers create runtime opcodes
-			//  -> They may choose to merge more than one opcode into a runtime opcode, where that's feasible
-			for (size_t i = 0; i < numOpcodes; )
+			try
 			{
-				const size_t start = tempBuffer.size();
-
-				int numOpcodesConsumed = 1;
-				createRuntimeOpcode(tempBuffer, &opcodes[i], opcodeData[i].mRemainingSequenceLength, (int)i, numOpcodesConsumed, runtime);
-				for (int k = 0; k < numOpcodesConsumed; ++k)
+				// Let the opcode providers create runtime opcodes
+				//  -> They may choose to merge more than one opcode into a runtime opcode, where that's feasible
+				for (size_t i = 0; i < numOpcodes; )
 				{
-					mProgramCounterByOpcodeIndex[k + i] = start;
+					const size_t start = tempBuffer.size();
+					int numOpcodesConsumed = 1;
+					createRuntimeOpcode(tempBuffer, &opcodes[i], opcodeData[i].mRemainingSequenceLength, (int)i, numOpcodesConsumed, runtime);
+
+					for (int k = 0; k < numOpcodesConsumed; ++k)
+					{
+						mProgramCounterByOpcodeIndex[k + i] = start;
+					}
+					i += numOpcodesConsumed;
 				}
-				i += numOpcodesConsumed;
+			}
+			catch (const std::exception& e)
+			{
+				RMX_ERROR("Build of lemonscript runtime function \"" << mFunction->getName() << "\" failed due to error: " << e.what(), );
+				return false;
 			}
 
 			// Copy the runtime opcodes over into the actual opcode buffer for this function
@@ -193,6 +201,8 @@ namespace lemon
 				}
 			}
 		}
+
+		return true;
 	}
 
 	size_t RuntimeFunction::translateFromRuntimeProgramCounter(const uint8* runtimeProgramCounter) const

@@ -66,7 +66,9 @@ namespace lemon
 		enum class OperatorType
 		{
 			ASSIGNMENT,
+			ASSIGNMENT_INT,
 			SYMMETRIC,
+			SYMMETRIC_INT,
 			COMPARISON,
 			TRINARY,
 			UNKNOWN
