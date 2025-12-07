@@ -47,7 +47,7 @@ function void SpecialStage()
 	VDP.Config.setNameTableBasePlaneA(0xc000)
 	VDP.Config.setNameTableBasePlaneB(0xe000)
 	VDP.Config.setPlayfieldSizeInPixels(512, 256)
-	VDP.Config.setupWindowPlane(false, 0)	// Disable window plane
+	VDP.Config.setWindowPlaneSplitY(false, 0)	// Disable window plane
 	VDP.Config.setVerticalScrolling(false, 0)
 	VDP.Config.setBackdropColor(0x20)
 	VDP.Config.setRenderingModeConfiguration(false)

@@ -249,9 +249,15 @@ const uint16* PlaneManager::getPlaneContent(int planeIndex, uint16 patternIndex)
 	return (uint16*)(EmulatorInterface::instance().getVRam() + getPatternVRAMAddress(planeIndex, patternIndex));
 }
 
-void PlaneManager::setupPlaneW(bool isPlaneWBelowSplit, uint16 splitY)
+void PlaneManager::setWindowPlaneSplitX(bool rightSideWindow, uint16 splitX)
 {
-	mIsPlaneWBelowSplitY = isPlaneWBelowSplit;
+	mIsPlaneWRightOfSplitX = rightSideWindow;
+	mPlaneAWSplitX = splitX;
+}
+
+void PlaneManager::setWindowPlaneSplitY(bool bottomWindow, uint16 splitY)
+{
+	mIsPlaneWBelowSplitY = bottomWindow;
 	mPlaneAWSplitY = splitY;
 }
 
@@ -263,6 +269,8 @@ Recti PlaneManager::getPlaneRect(int planeIndex, const Recti& fullscreenRect) co
 		case PLANE_A:
 		case PLANE_W:
 		{
+			// TODO: Support mPlaneAWSplitX and mIsPlaneWRightOfSplitX
+
 			if (mIsPlaneWBelowSplitY == (planeIndex == PLANE_W))
 			{
 				output.y = mPlaneAWSplitY;

@@ -429,7 +429,7 @@ function void initializeMainGame()
 	VDP.Config.setSpriteAttributeTableBase(0xf800)
 	VDP.Config.setPlayfieldSizeInPixels(512, 256)
 	VDP.Config.enableHInt(false)
-	VDP.Config.setupWindowPlane(false, 0)	// Disable window plane
+	VDP.Config.setWindowPlaneSplitY(false, 0)	// Disable window plane
 	VDP.Config.setBackdropColor(0x20)
 	VDP.Config.setRenderingModeConfiguration(false)
 

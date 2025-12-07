@@ -268,9 +268,14 @@ bool SaveStateSerializer::readGensxState(VectorBinarySerializer& serializer)
 			const uint16 playfieldHeights[4] = { 256, 512, 768, 1024 };
 			mRenderParts.getPlaneManager().setPlayfieldSizeInPixels(Vec2i(playfieldWidths[vdp_reg[0x10] & 3], playfieldHeights[(vdp_reg[0x10] >> 4) & 3]));
 
-			const bool isPlaneWBelowSplit = (vdp_reg[0x12] & 0x80) != 0;
+			const bool isPlaneWRightOfSplitX = (vdp_reg[0x11] & 0x80) != 0;
+			const uint16 splitX = (vdp_reg[0x11] & 0x7f) * 16;
+			mRenderParts.getPlaneManager().setWindowPlaneSplitX(isPlaneWRightOfSplitX, splitX);
+
+			const bool isPlaneWBelowSplitY = (vdp_reg[0x12] & 0x80) != 0;
 			const uint16 splitY = (vdp_reg[0x12] & 0x7f) * 8;
-			mRenderParts.getPlaneManager().setupPlaneW(isPlaneWBelowSplit, splitY);
+			mRenderParts.getPlaneManager().setWindowPlaneSplitY(isPlaneWBelowSplitY, splitY);
+
 			mRenderParts.getScrollOffsetsManager().setPlaneWScrollOffset(Vec2i(0, 0));	// Reset scroll offset to default
 		}
 

@@ -161,7 +161,7 @@ function void TitleScreen()
 	VDP.Config.setNameTableBasePlaneA(0xc000)
 	VDP.Config.setNameTableBasePlaneB(0xe000)
 	VDP.Config.setPlayfieldSizeInPixels(512, 256)
-	VDP.Config.setupWindowPlane(false, 0)			// Disable window plane
+	VDP.Config.setWindowPlaneSplitY(false, 0)			// Disable window plane
 	VDP.Config.setVerticalScrolling(false, 0xff)	// Good old horizontal scrolling mode
 	VDP.Config.setBackdropColor(0)
 	VDP.Config.setRenderingModeConfiguration(false)

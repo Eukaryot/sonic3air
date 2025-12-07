@@ -412,7 +412,7 @@ function void fn04e8a4()
 	VDP.zeroVRAM(0x300)
 
 	VDP.Config.setNameTableBasePlaneW(0x8000)
-	VDP.Config.setupWindowPlane(true, 40)
+	VDP.Config.setWindowPlaneSplitY(true, 40)
 	gfx.plane_update_routine = 0
 
 #if STANDALONE
@@ -458,7 +458,7 @@ function void fn04e8e8()
 		}
 	}
 
-	VDP.Config.setupWindowPlane(false, 0)	// Disable window plane
+	VDP.Config.setWindowPlaneSplitY(false, 0)	// Disable window plane
 	gfx.plane_update_routine = 0
 }
 

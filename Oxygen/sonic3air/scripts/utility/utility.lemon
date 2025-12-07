@@ -635,7 +635,13 @@ function void VDP.Config.setPlayfieldSizeInPixels(u16 width, u16 height)
 	u16[0xc00004] = 0x9000 + data
 }
 
-function void VDP.Config.setupWindowPlane(bool useWindowPlane, u16 splitY)
+function void VDP.Config.setWindowPlaneSplitX(bool rightSideWindow, u16 splitX)
+{
+	u8 data = (rightSideWindow * 0x80) + (splitX / 16)
+	u16[0xc00004] = 0x9100 + data
+}
+
+function void VDP.Config.setWindowPlaneSplitY(bool useWindowPlane, u16 splitY)
 {
 	u8 data = (useWindowPlane * 0x80) + (splitY / 8)
 	u16[0xc00004] = 0x9200 + data
