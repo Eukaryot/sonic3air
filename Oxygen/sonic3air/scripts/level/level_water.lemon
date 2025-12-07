@@ -680,26 +680,26 @@ function void UpdateWaterSurfaceLevel.LBZ2()
 			// Special handling for Knuckles on Sonic's route (only before the cutscene starts)
 			if (checkpoint.number == 5 && camera.position.x.u16 < 0x3c00)
 			{
-				water.height.current = 0x0660
-				water.height.next = 0x0660
+				// Adjust water height to match Sonic's, as it normally rises a bit too low #contributed by mrgrassman14
+				water.height.current = 0x065e
+				water.height.next = 0x065e
 				return
 			}
 		#endif
-
 			A1 = 0x006f12
 			fn006f2c()
 		}
 		else
 		{
 		#if STANDALONE
-			if (water.height.next > 0x0660)
+			if (water.height.next > 0x065e)
 			{
 				// Revised handling of rising water:
-				//  -> Do not set the water level to the target level (at 0x0660) too early, as this makes things a bit unfair for slower players
+				//  -> Do not set the water level to the target level (at 0x065e) too early, as this makes things a bit unfair for slower players
 				//  -> But when you're fast, make sure the water can keep up -- this is needed to prevent the water from rising too slow and leaving abroken background at the exit for really fast players
 				if (camera.position.y.u16 >= water.height.next && camera.position.y.u16 < 0x08e0)
 				{
-					water.height.next = 0x0660
+					water.height.next = 0x065e
 				}
 				else if (camera.position.y.u16 + getScreenHeight() < water.height.next)
 				{

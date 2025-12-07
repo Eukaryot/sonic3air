@@ -175,6 +175,12 @@ function void fn067cba()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if ((u8[A1 + 0x2a] & 0x80) == 0)
 	{
+	#if STANDALONE
+		// Use correct animation speed for Egg Robo, #contributed by mrgrassman14
+		if (isMainCharacter(CHARACTER_KNUCKLES))
+			Object.animationProgress(0x0681d0)
+		else
+	#endif
 		Object.animationProgress(0x0681cc)
 	}
 

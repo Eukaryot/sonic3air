@@ -617,6 +617,9 @@ function void fn0747d6()
 		return
 	}
 
+#if STANDALONE
+	objA0.flags38 &= ~0x10	// Restore missing exhaust flame, #contributed by mrgrassman14
+#endif
 	objA0.update_address = 0x07481c
 	objA0.velocity.x = 0x200
 	fn0685e2()

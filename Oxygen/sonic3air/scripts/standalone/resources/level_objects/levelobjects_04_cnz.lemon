@@ -515,7 +515,11 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x24a4, 0x0570, OBJECTTABLE1_01, 0x03, 0)
 	LevelObjectTableBuilder.addObject(0x24b0, 0x06a0, OBJECTTABLE1_46, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x24c0, 0x0088, OBJECTTABLE1_a5, 0x00, 0)
+#if STANDALONE
+	LevelObjectTableBuilder.addObject(0x24c0, 0x0108, OBJECTTABLE1_3c, 0x80, LVLOBJ_FLIP_Y) // Move this trapdoor object up 1 pixel so it's completely hidden under the level art like the others, #contributed by mrgrassman14
+#else
 	LevelObjectTableBuilder.addObject(0x24c0, 0x0109, OBJECTTABLE1_3c, 0x80, LVLOBJ_FLIP_Y)
+#endif
 	LevelObjectTableBuilder.addObject(0x24c0, 0x02a0, OBJECTTABLE1_48, 0x10, 0)
 	LevelObjectTableBuilder.addObject(0x24c0, 0x02c8, OBJECTTABLE1_3c, 0x80, LVLOBJ_FLIP_Y)
 	LevelObjectTableBuilder.addObject(0x24c0, 0x03a0, OBJECTTABLE1_48, 0x10, 0)

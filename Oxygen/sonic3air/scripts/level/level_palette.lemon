@@ -222,7 +222,6 @@ function void LevelPaletteUpdate.CNZ()
 	}
 	copyMemory(0xfffffc52, A0 + D0.u16, 6)
 
-
 	A0 = 0x002ee2
 	copyMemory(0xfffff0d2, A0 + D0.u16, 6)
 
@@ -231,14 +230,19 @@ function void LevelPaletteUpdate.CNZ()
 	{
 		level.palettefx.timer_2 = 2
 
-		A0 = 0x002e42
 		D0.u16 = level.palettefx.frame_3
 		level.palettefx.frame_3 += 4
 		if (level.palettefx.frame_3 >= 0x40)
 			level.palettefx.frame_3 = 0
 
-		u32[0xfffffc4e] = u32[A0 + D0.u16]
 		A0 = 0x002e42
+		u32[0xfffffc4e] = u32[A0 + D0.u16]
+
+	#if STANDALONE
+		A0 = 0x002f96	// Use proper underwater version of this palette cycle, #contributed by mrgrassman14
+	#else
+		A0 = 0x002e42
+	#endif
 		u32[0xfffff0ce] = u32[A0 + D0.u16]
 	}
 }

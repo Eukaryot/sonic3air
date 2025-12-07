@@ -252,7 +252,7 @@ function void fn063308()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	bool leverDown = (u8[A1 + 0x22] == 2)
 	objA0.animation.sprite = leverDown ? 1 : 0
-	Child.DrawSprite()
+	DrawOrUnloadObject()	// Fix for lever despawning when Knuckles leaves and returns to the area, #contributed by mrgrassman14
 }
 
 
