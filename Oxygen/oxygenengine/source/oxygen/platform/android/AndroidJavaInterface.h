@@ -52,7 +52,7 @@
 
 		void openFolderAccessDialog();
 
-		uint64 startFileDownload(const char* url, const char* filenameUTF8);
+		uint64 startFileDownload(const std::string& urlUTF8, const std::string& filenameUTF8);
 		bool stopFileDownload(uint64 downloadId);
 		void getDownloadStatus(uint64 downloadId, int& outStatus, uint64& outCurrentBytes, uint64& outTotalBytes);
 

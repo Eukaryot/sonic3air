@@ -22,7 +22,7 @@ namespace rmx
 
 	struct TextInputEvent
 	{
-		WString text;
+		std::wstring text;
 	};
 
 	enum class MouseButton

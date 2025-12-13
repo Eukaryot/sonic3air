@@ -327,6 +327,20 @@ namespace rmx
 		return (it != fullString.end());
 	}
 
+	std::wstring convertFromUTF8(std::string_view str)
+	{
+		std::wstring output;
+		UTF8Conversion::convertFromUTF8(str, output);
+		return output;
+	}
+
+	std::string convertToUTF8(std::wstring_view str)
+	{
+		std::string output;
+		UTF8Conversion::convertToUTF8(str, output);
+		return output;
+	}
+
 	std::string getTimestampStringForFilename()
 	{
 		time_t now = time(0);

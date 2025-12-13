@@ -63,7 +63,7 @@ public:
 	static bool hasClipboardSupport();
 	static bool copyToClipboard(const std::string& string);
 	static bool copyToClipboard(std::wstring_view string);
-	static bool pasteFromClipboard(WString& outString);
+	static bool pasteFromClipboard(std::wstring& outString);
 
 	static bool isDebuggerPresent();
 };

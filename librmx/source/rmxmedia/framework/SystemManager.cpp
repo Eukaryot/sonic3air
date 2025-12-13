@@ -138,7 +138,7 @@ namespace rmx
 	void SystemManager::textinput(const SDL_TextInputEvent& evnt)
 	{
 		TextInputEvent ev;
-		ev.text.readUnicode((const uint8*)evnt.text, (uint32)strlen(evnt.text), UnicodeEncoding::UTF8);
+		ev.text = rmx::convertFromUTF8(evnt.text);
 
 		mCurrentEventConsumed = false;
 		mRoot.textinput(ev);

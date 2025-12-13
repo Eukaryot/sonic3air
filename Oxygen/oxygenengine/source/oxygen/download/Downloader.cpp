@@ -139,7 +139,7 @@ void Downloader::performDownload()
 #elif defined(PLATFORM_ANDROID)
 
 	AndroidJavaInterface& javaInterface = AndroidJavaInterface::instance();
-	const uint64 downloadId = javaInterface.startFileDownload(mURL.c_str(), *WString(mOutputFilename).toUTF8());
+	const uint64 downloadId = javaInterface.startFileDownload(mURL.c_str(), rmx::convertToUTF8(mOutputFilename).c_str());
 
 	// The download runs in its own thread, so we just have to wait here...
 	mThreadRunning = true;

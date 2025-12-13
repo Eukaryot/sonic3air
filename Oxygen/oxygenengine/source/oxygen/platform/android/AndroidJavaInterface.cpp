@@ -131,8 +131,7 @@
 
 	void AndroidJavaInterface::openFileExportDialog(const std::wstring& filename, const std::vector<uint8>& contents)
     {
-        //mFileSelection.mDialogResult = BinaryDialogResult::PENDING;
-        AndroidJNIHelper().callVoidMethod("openFileExportDialog", WString(filename).toUTF8().getData(), contents);
+        AndroidJNIHelper().callVoidMethod("openFileExportDialog", rmx::convertToUTF8(filename).c_str(), contents);
     }
 
 
@@ -142,9 +141,9 @@
 	}
 
 
-	uint64 AndroidJavaInterface::startFileDownload(const char* url, const char* filenameUTF8)
+	uint64 AndroidJavaInterface::startFileDownload(const std::string& urlUTF8, const std::string& filenameUTF8)
 	{
-		return AndroidJNIHelper().callLongMethod("startFileDownload", url, filenameUTF8);
+		return AndroidJNIHelper().callLongMethod("startFileDownload", urlUTF8.c_str(), filenameUTF8.c_str());
 	}
 
 	bool AndroidJavaInterface::stopFileDownload(uint64 downloadId)

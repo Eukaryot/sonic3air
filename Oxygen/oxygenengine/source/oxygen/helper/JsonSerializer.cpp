@@ -71,7 +71,7 @@ bool JsonSerializer::serialize(const char* key, std::wstring& value)
 	}
 	else
 	{
-		(*mCurrentJson)[key] = WString(value).toUTF8().toStdString();
+		(*mCurrentJson)[key] = rmx::convertToUTF8(value);
 		return true;
 	}
 }

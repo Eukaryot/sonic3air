@@ -167,7 +167,7 @@ void SaveStateMenu::textinput(const rmx::TextInputEvent& ev)
 	if (mEditing && mHighlightedIndex < mEntries.size())
 	{
 		Entry& entry = mEntries[mHighlightedIndex];
-		entry.mName += *ev.text;
+		entry.mName += ev.text;
 	}
 }
 

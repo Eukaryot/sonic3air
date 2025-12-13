@@ -183,7 +183,7 @@ void FileBrowserWindow::drawFileBrowser()
 #endif
 
 	// Address line
-	ImGui::Text("[AppData] %s", *WString(mLocalPath).toUTF8());
+	ImGui::Text("[AppData] %s", rmx::convertToUTF8(mLocalPath).c_str());
 
 	// Refresh directories & file entries if needed
 	if (mRefreshFileEntries)
@@ -217,7 +217,7 @@ void FileBrowserWindow::drawFileBrowser()
 				clickedDirectory = &directory;
 			}
 			ImGui::SameLine();
-			ImGui::TextColored(FOLDER_COLOR, "%s", *WString(directory).toUTF8());
+			ImGui::TextColored(FOLDER_COLOR, "%s", rmx::convertToUTF8(directory).c_str());
 
 			ImGui::TableNextColumn();
 
@@ -240,7 +240,7 @@ void FileBrowserWindow::drawFileBrowser()
 			ImGui::TableNextColumn();
 			ImGui::Selectable("##", false, 0);
 			ImGui::SameLine();
-			ImGui::Text("%s", *WString(entry.mFilename).toUTF8());
+			ImGui::Text("%s", rmx::convertToUTF8(entry.mFilename).c_str());
 
 			ImGui::TableNextColumn();
 			drawFileSize((uint64)entry.mSize);
@@ -310,7 +310,7 @@ void FileBrowserWindow::drawActionsMenu(bool openMenuNow)
 		}
 		else
 		{
-			ImGui::TextColored(FOLDER_COLOR, "%s", *WString(*mOpenActionsForDirectory).toUTF8());
+			ImGui::TextColored(FOLDER_COLOR, "%s", rmx::convertToUTF8(*mOpenActionsForDirectory).c_str());
 
 			ImGui::Separator();
 
@@ -348,7 +348,7 @@ void FileBrowserWindow::drawActionsMenu(bool openMenuNow)
 		}
 		else
 		{
-			ImGui::Text("%s", *WString(mOpenActionsForFile->mFilename).toUTF8());
+			ImGui::Text("%s", rmx::convertToUTF8(mOpenActionsForFile->mFilename).c_str());
 
 			if (rmx::endsWith(mOpenActionsForFile->mFilename, L".zip") || rmx::endsWith(mOpenActionsForFile->mFilename, L".ZIP"))
 			{
@@ -414,11 +414,11 @@ void FileBrowserWindow::drawConfirmDeletionPopup(bool openPopupNow)
 			ImGui::SameLineNoSpace();
 			if (nullptr != mOpenActionsForFile)
 			{
-				ImGui::TextColored(FILE_COLOR, "%s", *WString(mOpenActionsForFile->mFilename).toUTF8());
+				ImGui::TextColored(FILE_COLOR, "%s", rmx::convertToUTF8(mOpenActionsForFile->mFilename).c_str());
 			}
 			else
 			{
-				ImGui::TextColored(FOLDER_COLOR, "%s", *WString(*mOpenActionsForDirectory).toUTF8());
+				ImGui::TextColored(FOLDER_COLOR, "%s", rmx::convertToUTF8(*mOpenActionsForDirectory).c_str());
 			}
 			ImGui::SameLineNoSpace();
 			ImGui::Text("?");
@@ -494,11 +494,11 @@ void FileBrowserWindow::drawRenamingPopup(bool openPopupNow)
 			ImGui::SameLineNoSpace();
 			if (nullptr != mOpenActionsForFile)
 			{
-				ImGui::TextColored(FILE_COLOR, "%s", *WString(mOpenActionsForFile->mFilename).toUTF8());
+				ImGui::TextColored(FILE_COLOR, "%s", rmx::convertToUTF8(mOpenActionsForFile->mFilename).c_str());
 			}
 			else
 			{
-				ImGui::TextColored(FOLDER_COLOR, "%s", *WString(*mOpenActionsForDirectory).toUTF8());
+				ImGui::TextColored(FOLDER_COLOR, "%s", rmx::convertToUTF8(*mOpenActionsForDirectory).c_str());
 			}
 			ImGui::SameLineNoSpace();
 			ImGui::Text("to:");

@@ -38,11 +38,11 @@ AudioSourceBase* AudioSourceManager::getAudioSourceForPlayback(SourceRegistratio
 	uint64 hash = 0;
 	if (sourceRegistration.mType == SourceRegistration::Type::FILE)
 	{
-		hash = rmx::getMurmur2_64((String("OggFile:") + WString(sourceRegistration.mSourceFile).toUTF8()));
+		hash = rmx::getMurmur2_64("OggFile:" + rmx::convertToUTF8(sourceRegistration.mSourceFile));
 	}
 	else if (!sourceRegistration.mSourceFile.empty())
 	{
-		hash = rmx::getMurmur2_64((String("SMPSFile:") + WString(sourceRegistration.mSourceFile).toUTF8()));
+		hash = rmx::getMurmur2_64("SMPSFile:" + rmx::convertToUTF8(sourceRegistration.mSourceFile));
 	}
 	else if (sourceRegistration.mSourceAddress != 0)
 	{
