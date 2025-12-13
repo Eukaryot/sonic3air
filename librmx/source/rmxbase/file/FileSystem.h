@@ -41,7 +41,10 @@ namespace rmx
 		void listDirectories(std::wstring_view path, std::vector<std::wstring>& outDirectories);
 
 		bool renameFile(std::wstring_view oldFilename, std::wstring_view newFilename);
+		bool renameDirectory(std::wstring_view oldPath, std::wstring_view newPath);
+
 		bool removeFile(std::wstring_view path);
+		bool removeDirectory(std::wstring_view path);
 
 		// Wrapper functions
 		bool exists(std::string_view path);

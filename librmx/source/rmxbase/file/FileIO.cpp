@@ -297,12 +297,12 @@ namespace rmx
 	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
 		const std_filesystem::path fspath(filename.data());
 		std::error_code errorCode;
-		const std::filesystem::file_time_type time = std_filesystem::last_write_time(fspath, errorCode);
+		const std_filesystem::file_time_type time = std_filesystem::last_write_time(fspath, errorCode);
 		if (errorCode)
 			return false;
 
 		// This is the C++17 solution for converting the time -- see https://stackoverflow.com/questions/61030383/how-to-convert-stdfilesystemfile-time-type-to-time-t
-		const std::chrono::system_clock::time_point timePoint = std::chrono::time_point_cast<std::chrono::system_clock::duration>(time - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
+		const std::chrono::system_clock::time_point timePoint = std::chrono::time_point_cast<std::chrono::system_clock::duration>(time - std_filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
 		outTime = std::chrono::system_clock::to_time_t(timePoint);
 		return true;
 	#else
@@ -384,6 +384,20 @@ namespace rmx
 	#endif
 	}
 
+	bool FileIO::renameDirectory(const std::wstring& oldFilename, const std::wstring& newFilename)
+	{
+	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+		const std_filesystem::path fspathOld(oldFilename.data());
+		const std_filesystem::path fspathNew(newFilename.data());
+		std::error_code errorCode;
+		std_filesystem::rename(fspathOld, fspathNew, errorCode);
+		return !errorCode;
+	#else
+		RMX_ASSERT(false, "Not implemented: FileIO::renameDirectory");
+		return false;
+	#endif
+	}
+
 	bool FileIO::removeFile(std::wstring_view path)
 	{
 	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
@@ -393,6 +407,19 @@ namespace rmx
 		return !errorCode;
 	#else
 		RMX_ASSERT(false, "Not implemented: FileIO::removeFile");
+		return false;
+	#endif
+	}
+
+	bool FileIO::removeDirectory(std::wstring_view path)
+	{
+	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+		const std_filesystem::path fspath(path);
+		std::error_code errorCode;
+		std_filesystem::remove_all(fspath, errorCode);
+		return !errorCode;
+	#else
+		RMX_ASSERT(false, "Not implemented: FileIO::removeDirectory");
 		return false;
 	#endif
 	}
