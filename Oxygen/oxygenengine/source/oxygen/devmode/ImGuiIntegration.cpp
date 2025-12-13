@@ -100,8 +100,6 @@ void ImGuiIntegration::startup()
 		}
 	}
 
-	updateFontScale();
-
 	mRunning = true;
 
 	// Configure default styles
@@ -232,8 +230,25 @@ void ImGuiIntegration::refreshImGuiStyle()
 
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.FrameBorderSize = 1.0f;
-	style.FrameRounding = 3.0f;
-	style.ItemSpacing.y = 5.0f;
+
+	const float uiScale = Configuration::instance().mDevMode.mUIScale;
+	style.FontScaleMain = uiScale;
+	style.WindowPadding.x = uiScale * 8.0f;
+	style.WindowPadding.y = uiScale * 8.0f;
+	style.FramePadding.x = uiScale * 4.0f;
+	style.FramePadding.y = uiScale * 3.0f;
+	style.FrameRounding = uiScale * 3.0f;
+	style.ItemSpacing.x = uiScale * 8.0f;
+	style.ItemSpacing.y = uiScale * 5.0f;
+	style.ItemInnerSpacing.x = uiScale * 4.0f;
+	style.ItemInnerSpacing.y = uiScale * 4.0f;
+	style.GrabMinSize = uiScale * 15.0f;
+	style.TouchExtraPadding.x = uiScale * 5.0f;
+	style.TouchExtraPadding.y = uiScale * 5.0f;
+	style.ScrollbarSize = uiScale * 16.0f;
+	style.ScrollbarRounding = uiScale * 10.0f;
+	style.TabBarBorderSize = std::max(uiScale, 1.0f);
+	style.TabRounding = uiScale * 5.0f;
 
 	Color accentColor = Configuration::instance().mDevMode.mUIAccentColor;
 	const auto GetAccentColorMix = [&](float accent, float saturation = 1.0f, float grayValue = 0.3f)
@@ -274,11 +289,6 @@ void ImGuiIntegration::refreshImGuiStyle()
 	style.Colors[ImGuiCol_TabHovered]			= GetAccentColorMix(0.8f, 0.9f, 0.4f);
 	style.Colors[ImGuiCol_TabSelected]			= GetAccentColorMix(1.0f, 0.9f, 0.5f);
 	style.Colors[ImGuiCol_TabSelectedOverline]	= GetAccentColorMix(1.0f, 0.9f, 0.5f);
-}
-
-void ImGuiIntegration::updateFontScale()
-{
-	ImGui::GetStyle().FontScaleMain = Configuration::instance().mDevMode.mUIScale;
 }
 
 void ImGuiIntegration::toggleMainWindow()
