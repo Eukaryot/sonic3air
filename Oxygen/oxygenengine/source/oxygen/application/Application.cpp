@@ -439,6 +439,9 @@ void Application::update(float timeElapsed)
 		RMX_LOG_INFO("Start of first application update call");
 	}
 
+	// ImGui frame start must be done here (instead of at the start of "render"), to ensure that the mouse capturing flag is set correctly
+	//  -> This is particularly relevant for touch input, where we would miss the first touch into an ImGui window and falsely pass it to the touch overlay
+	ImGuiIntegration::startFrame();
 	if (ImGuiIntegration::isCapturingMouse() || ImGuiIntegration::isCapturingKeyboard())
 	{
 		FTX::System->consumeCurrentEvent();
@@ -527,7 +530,7 @@ void Application::update(float timeElapsed)
 		mRemoveChild = nullptr;
 	}
 
-	if (FTX::mouseRel() != Vec2i())
+	if (FTX::mouseRel() != Vec2i() || FTX::mouseState(rmx::MouseButton::Left) || FTX::mouseState(rmx::MouseButton::Right) || ImGuiIntegration::isCapturingMouse())
 	{
 		mMouseHideTimer = 0.0f;
 		SDL_ShowCursor(1);
@@ -561,8 +564,6 @@ void Application::render()
 	{
 		FTX::System->consumeCurrentEvent();
 	}
-
-	ImGuiIntegration::startFrame();
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
 	drawer.setupRenderWindow(&EngineMain::instance().getSDLWindow());
