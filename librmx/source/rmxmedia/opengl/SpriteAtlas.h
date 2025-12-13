@@ -61,6 +61,8 @@ protected:
 
 		inline Node() {}
 		inline Node(const Recti& rct) : mRect(rct) {}
+		inline Node(const Node& other) = delete;
+		inline Node(Node&& other) noexcept : mChildNode{other.mChildNode[0], other.mChildNode[1]}, mRect(other.mRect), mUsed(other.mUsed) { other.mChildNode[0] = nullptr; other.mChildNode[1] = nullptr; }
 		inline ~Node()  { clear(); }
 
 		void clear();
