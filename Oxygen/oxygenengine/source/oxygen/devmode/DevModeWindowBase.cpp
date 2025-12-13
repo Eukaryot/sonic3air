@@ -11,6 +11,33 @@
 
 #if defined(SUPPORT_IMGUI)
 
+#include "imgui_internal.h"
+
+namespace
+{
+	void scrollWhenDraggingOnVoid(const ImVec2& delta, ImGuiMouseButton mouse_button)
+	{
+		// Based on https://github.com/ocornut/imgui/issues/3379
+		using namespace ImGui;
+
+		ImGuiContext& g = *GetCurrentContext();
+		ImGuiWindow* window = g.CurrentWindow;
+		ImGuiID id = window->GetID("##scrolldraggingoverlay");
+		KeepAliveID(id);
+
+		// Passing 0 to ItemHoverable means it doesn't set HoveredId, which is what we want.
+		if (g.ActiveId == 0 && ItemHoverable(window->Rect(), 0, g.CurrentItemFlags) && IsMouseClicked(mouse_button, ImGuiInputFlags_None, id))
+			SetActiveID(id, window);
+		if (g.ActiveId == id && !g.IO.MouseDown[mouse_button])
+			ClearActiveID();
+
+		if (g.ActiveId == id && delta.x != 0.0f)
+			SetScrollX(window, window->Scroll.x - delta.x);
+		if (g.ActiveId == id && delta.y != 0.0f)
+			SetScrollY(window, window->Scroll.y - delta.y);
+	}
+}
+
 
 DevModeWindowBase::DevModeWindowBase(std::string_view title, Category category, ImGuiWindowFlags windowFlags) :
 	mTitle(title),
@@ -62,6 +89,11 @@ bool DevModeWindowBase::buildWindow()
 	}
 
 	buildContent();
+
+	if (Configuration::instance().mDevMode.mScrollByDragging)
+	{
+		scrollWhenDraggingOnVoid(ImGui::GetIO().MouseDelta, ImGuiMouseButton_Left);
+	}
 
 	ImGui::End();
 	return true;

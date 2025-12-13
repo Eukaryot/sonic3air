@@ -631,6 +631,7 @@ void Configuration::serializeDevMode(JsonSerializer& serializer)
 		{
 			serializer.serialize("Scale", mDevMode.mUIScale);
 			serializer.serializeHexColorRGB("AccentColor", mDevMode.mUIAccentColor);
+			serializer.serialize("ScrollByDragging", mDevMode.mScrollByDragging);
 			serializer.serializeArray("OpenWindows", mDevMode.mOpenUIWindows);
 			serializer.serialize("MainWindowOpen", mDevMode.mMainWindowOpen);
 			serializer.serialize("UseTabsInMainWindow", mDevMode.mUseTabsInMainWindow);

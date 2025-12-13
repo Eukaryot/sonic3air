@@ -93,7 +93,7 @@ void SettingsWindow::buildContent()
 	Configuration& config = Configuration::instance();
 	const float uiScale = getUIScale();
 
-	if (ImGui::CollapsingHeader("UI Style", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader("UI Style & Behavior", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGuiHelpers::ScopedIndent si;
 
@@ -103,11 +103,21 @@ void SettingsWindow::buildContent()
 			ImGuiIntegration::refreshImGuiStyle();
 		}
 
+		ImGui::Text("Dragging inside an empty spot of a window should...");
+		{
+			ImGuiHelpers::ScopedIndent si2;
+			if (ImGui::RadioButton("Move the window", !config.mDevMode.mScrollByDragging))
+				config.mDevMode.mScrollByDragging = false;
+			ImGui::SameLine();
+			if (ImGui::RadioButton("Scroll the content", config.mDevMode.mScrollByDragging))
+				config.mDevMode.mScrollByDragging = true;
+		}
+
 		ImGui::Checkbox("Use Tabs in Main Window", &config.mDevMode.mUseTabsInMainWindow);
 
 		if (ImGui::DragFloat("UI Scale", &config.mDevMode.mUIScale, 0.003f, 0.5f, 4.0f, "%.1f"))
 		{
-			ImGuiIntegration::updateFontScale();
+			ImGuiIntegration::refreshImGuiStyle();
 		}
 	}
 

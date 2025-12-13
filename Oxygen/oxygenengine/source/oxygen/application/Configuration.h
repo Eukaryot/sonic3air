@@ -68,6 +68,7 @@ public:
 		Vec2f mGameViewAlignment;
 		float mUIScale = 1.0f;
 		Color mUIAccentColor = Color(0.2f, 0.5f, 0.8f);
+		bool mScrollByDragging = true;
 		std::vector<std::string> mOpenUIWindows;
 		bool mMainWindowOpen = true;
 		bool mUseTabsInMainWindow = true;
