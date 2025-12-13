@@ -41,6 +41,8 @@ bool DevModeWindowBase::buildWindow()
 	if (!mIsWindowOpen)
 		return false;
 
+	mUIScale = Configuration::instance().mDevMode.mUIScale;
+
 	if (!ImGui::Begin(mTitle.c_str(), mCanBeClosed ? &mIsWindowOpen : nullptr, mImGuiWindowFlags))
 	{
 		ImGui::End();
@@ -63,11 +65,6 @@ bool DevModeWindowBase::buildWindow()
 
 	ImGui::End();
 	return true;
-}
-
-float DevModeWindowBase::getUIScale() const
-{
-	return Configuration::instance().mDevMode.mUIScale;
 }
 
 #endif

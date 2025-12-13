@@ -35,7 +35,7 @@
 #include "oxygen/simulation/PersistentData.h"
 #include "oxygen/simulation/Simulation.h"
 #if defined(PLATFORM_ANDROID)
-	#include "oxygen/platform/AndroidJavaInterface.h"
+	#include "oxygen/platform/android/AndroidJavaInterface.h"
 #endif
 
 

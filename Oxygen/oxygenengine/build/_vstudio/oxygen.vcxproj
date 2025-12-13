@@ -114,7 +114,8 @@
     <ClCompile Include="..\..\source\oxygen\helper\JsonHelper.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Logging.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Utils.cpp" />
-    <ClCompile Include="..\..\source\oxygen\platform\AndroidJavaInterface.cpp" />
+    <ClCompile Include="..\..\source\oxygen\platform\android\AndroidJavaInterface.cpp" />
+    <ClCompile Include="..\..\source\oxygen\platform\android\AndroidJNIHelper.cpp" />
     <ClCompile Include="..\..\source\oxygen\platform\CrashHandler.cpp" />
     <ClCompile Include="..\..\source\oxygen\platform\PlatformFunctions.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\Geometry.cpp" />
@@ -277,7 +278,8 @@
     <ClInclude Include="..\..\source\oxygen\helper\JsonHelper.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Logging.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Utils.h" />
-    <ClInclude Include="..\..\source\oxygen\platform\AndroidJavaInterface.h" />
+    <ClInclude Include="..\..\source\oxygen\platform\android\AndroidJavaInterface.h" />
+    <ClInclude Include="..\..\source\oxygen\platform\android\AndroidJNIHelper.h" />
     <ClInclude Include="..\..\source\oxygen\platform\CrashHandler.h" />
     <ClInclude Include="..\..\source\oxygen\platform\PlatformFunctions.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\Geometry.h" />

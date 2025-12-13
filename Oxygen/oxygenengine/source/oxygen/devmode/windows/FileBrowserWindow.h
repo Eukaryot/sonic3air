@@ -23,10 +23,20 @@ public:
 	virtual void buildContent() override;
 
 private:
+	void refreshFileEntries();
+
+	void drawFileBrowser();
+	void drawActionsMenu(bool openMenuNow);
+	void drawConfirmDeletionPopup(bool openPopupNow);
+	void drawRenamingPopup(bool openPopupNow);
+
+private:
 	std::wstring mBasePath;
 	std::wstring mLocalPath;
 	bool mRefreshFileEntries = false;
+
 	std::vector<std::wstring> mDirectories;
+	std::vector<std::wstring> mZipDirectories;
 	std::vector<rmx::FileIO::FileEntry> mFileEntries;
 
 	const std::wstring* mOpenActionsForDirectory = nullptr;

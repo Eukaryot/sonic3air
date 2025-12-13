@@ -103,6 +103,9 @@
     <Filter Include="network\netplay">
       <UniqueIdentifier>{4a237758-a433-4d69-ad33-1a130e7d4ea6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="platform\android">
+      <UniqueIdentifier>{b0926db4-e620-4721-bfec-f42ec7cc7efe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -315,9 +318,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\GameLoader.cpp">
       <Filter>application</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\platform\AndroidJavaInterface.cpp">
-      <Filter>platform</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\input\InputManager.cpp">
       <Filter>application\input</Filter>
@@ -568,6 +568,12 @@
     <ClCompile Include="..\..\source\oxygen\devmode\windows\FileBrowserWindow.cpp">
       <Filter>devmode\windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\platform\android\AndroidJavaInterface.cpp">
+      <Filter>platform\android</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\platform\android\AndroidJNIHelper.cpp">
+      <Filter>platform\android</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -792,9 +798,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\GameLoader.h">
       <Filter>application</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\platform\AndroidJavaInterface.h">
-      <Filter>platform</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\input\InputManager.h">
       <Filter>application\input</Filter>
@@ -1074,6 +1077,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\devmode\windows\FileBrowserWindow.h">
       <Filter>devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\platform\android\AndroidJavaInterface.h">
+      <Filter>platform\android</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\platform\android\AndroidJNIHelper.h">
+      <Filter>platform\android</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

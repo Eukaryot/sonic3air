@@ -30,7 +30,7 @@
 
 #elif defined(PLATFORM_ANDROID)
 	#define PLATFORM_SUPPORTS_DOWNLOADER
-	#include "oxygen/platform/AndroidJavaInterface.h"
+	#include "oxygen/platform/android/AndroidJavaInterface.h"
 #endif
 
 

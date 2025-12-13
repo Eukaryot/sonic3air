@@ -17,6 +17,7 @@
 	public:
 		enum class BinaryDialogResult
 		{
+			INACTIVE,	// Dialog not active
 			PENDING,	// No result yet
 			FAILED,		// Dialog failed
 			SUCCESS		// Dialog successful
@@ -24,26 +25,40 @@
 
 		struct RomFileInjection
 		{
-			BinaryDialogResult mDialogResult = BinaryDialogResult::PENDING;
+			BinaryDialogResult mDialogResult = BinaryDialogResult::INACTIVE;
 			std::vector<uint8> mRomContent;
 		};
 
-	public:
-		bool hasRomFileAlready();
-		void openRomFileSelectionDialog();
-		inline const RomFileInjection& getRomFileInjection() const  { return mRomFileInjection; }
+		struct FileSelection
+		{
+			BinaryDialogResult mDialogResult = BinaryDialogResult::INACTIVE;
+			std::wstring mPath;
+			std::vector<uint8> mFileContent;
+		};
 
+	public:
+		inline const RomFileInjection& getRomFileInjection() const  { return mRomFileInjection; }
+		bool hasRomFileAlready();
+		void openRomFileSelectionDialog(const std::string& gameName);
 		void onReceivedRomContent(const uint8* content, size_t bytes);
 		void onRomContentSelectionFailed();
+
+		inline FileSelection& getFileSelection()  { return mFileSelection; }
+		void openFileSelectionDialog();
+		void onFileImportSuccess(const uint8* content, size_t bytes, std::string_view path);
+		void onFileImportFailed();
+
+		void openFileExportDialog(const std::wstring& filename, const std::vector<uint8>& contents);
+
+		void openFolderAccessDialog();
 
 		uint64 startFileDownload(const char* url, const char* filenameUTF8);
 		bool stopFileDownload(uint64 downloadId);
 		void getDownloadStatus(uint64 downloadId, int& outStatus, uint64& outCurrentBytes, uint64& outTotalBytes);
 
-		void openFolderAccessDialog();
-
 	private:
 		RomFileInjection mRomFileInjection;
+		FileSelection mFileSelection;
 	};
 
 #endif

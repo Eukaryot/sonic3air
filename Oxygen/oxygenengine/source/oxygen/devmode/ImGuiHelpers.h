@@ -107,4 +107,15 @@ namespace ImGuiHelpers
 
 }
 
+
+// Extend ImGui namespace itself by some helpful functions
+namespace ImGui
+{
+	// Use instead of "SameLine" if you want to write two texts after another without any additional space (e.g. when just changing text colors)
+	extern void SameLineNoSpace();
+
+	// A red button that really does not seem to want to be pressed
+	extern bool RedButton(const char* label, const ImVec2& size = ImVec2(0, 0));
+}
+
 #endif

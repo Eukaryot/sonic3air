@@ -33,7 +33,7 @@
 
 #if defined(PLATFORM_ANDROID)
 	// Just for testing
-	#include "oxygen/platform/AndroidJavaInterface.h"
+	#include "oxygen/platform/android/AndroidJavaInterface.h"
 #endif
 
 
@@ -68,10 +68,10 @@ DevModeMainWindow::DevModeMainWindow() :
 		createWindow(mAudioBrowserWindow);
 		createWindow(mCustomSidePanelWindow);
 		createWindow(mPersistentDataWindow);
+		createWindow(mFileBrowserWindow);
 		createWindow(mSettingsWindow);
 	#ifdef DEBUG
 		createWindow(mNetworkingWindow);
-		createWindow(mFileBrowserWindow);
 	#endif
 	}
 

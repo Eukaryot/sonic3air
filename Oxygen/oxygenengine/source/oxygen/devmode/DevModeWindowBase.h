@@ -39,7 +39,7 @@ public:
 	virtual bool buildWindow();
 	virtual void buildContent() = 0;
 
-	float getUIScale() const;
+	inline float getUIScale() const  { return mUIScale; }
 
 protected:
 	const std::string mTitle;
@@ -51,6 +51,8 @@ protected:
 	ImGuiWindowFlags mImGuiWindowFlags = 0;
 
 	DevModeMainWindow* mDevModeMainWindow = nullptr;
+
+	float mUIScale = 1.0f;
 };
 
 #endif
