@@ -54,6 +54,7 @@
     <ClCompile Include="..\..\source\oxygen\application\video\VideoOut.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\DevModeMainWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\DevModeWindowBase.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\ImGuiExtensions.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\ImGuiHelpers.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\ImGuiIntegration.cpp" />
     <ClCompile Include="..\..\source\oxygen\devmode\ImGuiSoftwareRenderer.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="..\..\source\oxygen\devmode\DevModeMainWindow.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\DevModeWindowBase.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiDefinitions.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\ImGuiExtensions.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiHelpers.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiIntegration.h" />
     <ClInclude Include="..\..\source\oxygen\devmode\ImGuiSoftwareRenderer.h" />

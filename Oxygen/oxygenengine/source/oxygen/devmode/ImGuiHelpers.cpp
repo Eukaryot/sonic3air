@@ -141,24 +141,4 @@ namespace ImGuiHelpers
 
 }
 
-
-namespace ImGui
-{
-	void SameLineNoSpace()
-	{
-		ImGui::SameLine();
-		ImGui::SetCursorPosX(ImGui::GetCursorPosX() - 6);
-	}
-
-	bool RedButton(const char* label, const ImVec2& size)
-	{
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.1f, 0.1f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
-		const bool result = ImGui::Button(label, size);
-		ImGui::PopStyleColor(3);
-		return result;
-	}
-}
-
 #endif

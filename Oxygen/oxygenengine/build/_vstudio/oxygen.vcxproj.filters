@@ -574,6 +574,9 @@
     <ClCompile Include="..\..\source\oxygen\platform\android\AndroidJNIHelper.cpp">
       <Filter>platform\android</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\devmode\ImGuiExtensions.cpp">
+      <Filter>devmode</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -1083,6 +1086,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\platform\android\AndroidJNIHelper.h">
       <Filter>platform\android</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\devmode\ImGuiExtensions.h">
+      <Filter>devmode</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

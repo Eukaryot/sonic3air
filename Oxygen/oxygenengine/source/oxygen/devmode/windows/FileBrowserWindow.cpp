@@ -69,7 +69,7 @@ void FileBrowserWindow::buildContent()
 		mBasePath = Configuration::instance().mAppDataPath;
 		FTX::FileSystem->normalizePath(mBasePath, true);
 		mLocalPath.clear();
-		mRefreshFileEntries = true;
+		updateFullPath();
 	}
 
 	drawFileBrowser();
@@ -83,7 +83,7 @@ void FileBrowserWindow::buildContent()
 			case AndroidJavaInterface::BinaryDialogResult::SUCCESS:
 			{
 				std::wstring_view filename = std::wstring_view(fileSelection.mPath).substr(fileSelection.mPath.find_last_of(L'/') + 1);
-				FTX::FileSystem->saveFile(mBasePath + mLocalPath + WString(filename).toStdWString(), fileSelection.mFileContent);
+				FTX::FileSystem->saveFile(mFullPath + WString(filename).toStdWString(), fileSelection.mFileContent);
 
 				fileSelection = AndroidJavaInterface::FileSelection();	// Reset
 				mRefreshFileEntries = true;
@@ -100,12 +100,22 @@ void FileBrowserWindow::buildContent()
 #endif
 }
 
+void FileBrowserWindow::updateFullPath()
+{
+	mFullPath = mBasePath;
+	for (const std::wstring& dir : mLocalPath)
+	{
+		mFullPath += dir + L"/";
+	}
+	mRefreshFileEntries = true;
+}
+
 void FileBrowserWindow::refreshFileEntries()
 {
 	mDirectories.clear();
 	mFileEntries.clear();
-	FTX::FileSystem->listDirectories(mBasePath + mLocalPath, mDirectories);
-	FTX::FileSystem->listFiles(mBasePath + mLocalPath, false, mFileEntries);
+	FTX::FileSystem->listDirectories(mFullPath, mDirectories);
+	FTX::FileSystem->listFiles(mFullPath, false, mFileEntries);
 
 	// Filter out all ZIP directories
 	for (size_t k = 0; k < mDirectories.size(); ++k)
@@ -140,28 +150,7 @@ void FileBrowserWindow::refreshFileEntries()
 
 void FileBrowserWindow::drawFileBrowser()
 {
-	// "Up" button
-	ImGui::BeginDisabled(mLocalPath.empty());
-	if (ImGui::Button("Up"))
-	{
-		if (!mLocalPath.empty())
-		{
-			size_t pos = mLocalPath.find_last_of(L'/', mLocalPath.size() - 2);
-			if (pos != std::wstring::npos)
-			{
-				mLocalPath.erase(pos + 1);
-			}
-			else
-			{
-				mLocalPath.clear();
-			}
-			mRefreshFileEntries = true;
-		}
-	}
-	ImGui::EndDisabled();
-
 	// "Refresh" button
-	ImGui::SameLine();
 	if (ImGui::Button("Refresh"))
 	{
 		mRefreshFileEntries = true;
@@ -183,7 +172,7 @@ void FileBrowserWindow::drawFileBrowser()
 #endif
 
 	// Address line
-	ImGui::Text("[AppData] %s", rmx::convertToUTF8(mLocalPath).c_str());
+	drawAddressLine();
 
 	// Refresh directories & file entries if needed
 	if (mRefreshFileEntries)
@@ -275,11 +264,79 @@ void FileBrowserWindow::drawFileBrowser()
 	}
 	else if (nullptr != clickedDirectory)
 	{
-		mLocalPath = mLocalPath + *clickedDirectory + L"/";
-		mRefreshFileEntries = true;
+		mLocalPath.push_back(*clickedDirectory);
+		updateFullPath();
 	}
 
 	drawActionsMenu(openActionsMenu);
+}
+
+void FileBrowserWindow::drawAddressLine()
+{
+	// Draw background frame
+	const float rectWidth = ImGui::GetWindowWidth() - 32 * mUIScale;
+	const ImVec2 rectStart = ImGui::GetCursorScreenPos();
+	const ImVec2 rectEnd = rectStart + ImVec2(rectWidth, 29 * mUIScale);
+	ImGui::GetWindowDrawList()->AddRectFilled(rectStart, rectEnd, 0xff402020, 5 * mUIScale);
+	ImGui::GetWindowDrawList()->AddRect(rectStart, rectEnd, 0xffc08080, 5 * mUIScale);
+
+	ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(4, 4) * mUIScale);
+
+	// "Up" button
+	ImGui::BeginDisabled(mLocalPath.empty());
+	if (ImGui::Button("Up"))
+	{
+		if (!mLocalPath.empty())
+		{
+			mLocalPath.pop_back();
+			updateFullPath();
+		}
+	}
+	ImGui::EndDisabled();
+
+	ImGui::SameLine();
+	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10 * mUIScale);
+
+	ImGui::PushClipRect(ImVec2(ImGui::GetCursorScreenPos().x - 1, rectStart.y), rectEnd, true);
+
+	// Estimate total width of the entries
+	float width = ImGui::CalcTextSize("AppData").x + 11 * mUIScale;
+	for (size_t index = 0; index < mLocalPath.size(); ++index)
+	{
+		width += ImGui::CalcTextSize(rmx::convertToUTF8(mLocalPath[index]).c_str()).x;
+		width += 26 * mUIScale;
+	}
+	// Just for debugging
+	//ImGui::GetWindowDrawList()->AddRect(rectStart, rectStart + ImVec2(width, 29 * mUIScale), 0xff00ff00, 5 * mUIScale);
+
+	const float px1 = ImGui::GetCursorPosX();
+	const float px2 = (rectEnd.x - ImGui::GetWindowPos().x) - width;
+	ImGui::SetCursorPosX(std::min(px1, px2));
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.25f, 0.5f, 0.5f));
+	for (size_t index = 0; index <= mLocalPath.size(); ++index)
+	{
+		if (index == 0)
+		{
+		}
+		else
+		{
+			ImGui::SameLineRelSpace(0.5f);
+			ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), ">");
+			ImGui::SameLineRelSpace(0.5f);
+		}
+
+		if (ImGui::Button((index == 0) ? "AppData" : (rmx::convertToUTF8(mLocalPath[index - 1]) + "##" + std::to_string(index)).c_str()))
+		{
+			mLocalPath.resize(index);
+			updateFullPath();
+			break;
+		}
+	}
+	ImGui::PopStyleColor(1);
+
+	ImGui::PopClipRect();
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 }
 
 void FileBrowserWindow::drawActionsMenu(bool openMenuNow)
@@ -330,7 +387,7 @@ void FileBrowserWindow::drawActionsMenu(bool openMenuNow)
 			ImGui::Separator();
 			if (ImGui::Button(OPEN_EXTERNAL_TEXT, BUTTON_SIZE))
 			{
-				PlatformFunctions::openDirectoryExternal(mBasePath + mLocalPath + *mOpenActionsForDirectory);
+				PlatformFunctions::openDirectoryExternal(mFullPath + *mOpenActionsForDirectory);
 				ImGui::CloseCurrentPopup();
 			}
 		#endif
@@ -354,8 +411,8 @@ void FileBrowserWindow::drawActionsMenu(bool openMenuNow)
 			{
 				if (ImGui::Button("Open zip file", BUTTON_SIZE))
 				{
-					mLocalPath = mLocalPath + mOpenActionsForFile->mFilename + L"/";
-					mRefreshFileEntries = true;
+					mLocalPath.push_back(mOpenActionsForFile->mFilename);
+					updateFullPath();
 					ImGui::CloseCurrentPopup();
 				}
 			}
@@ -453,7 +510,7 @@ void FileBrowserWindow::drawConfirmDeletionPopup(bool openPopupNow)
 
 	if (performDeletion)
 	{
-		const std::wstring currentPath = mBasePath + mLocalPath;
+		const std::wstring currentPath = mFullPath;
 		if (nullptr != mOpenActionsForFile)
 		{
 			FTX::FileSystem->removeFile(currentPath + mOpenActionsForFile->mFilename);
@@ -540,7 +597,7 @@ void FileBrowserWindow::drawRenamingPopup(bool openPopupNow)
 
 	if (performRenaming)
 	{
-		const std::wstring currentPath = mBasePath + mLocalPath;
+		const std::wstring currentPath = mFullPath;
 		if (nullptr != mOpenActionsForFile)
 		{
 			const std::wstring oldName = mOpenActionsForFile->mFilename;
