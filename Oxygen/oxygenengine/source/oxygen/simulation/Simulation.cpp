@@ -85,7 +85,7 @@ bool Simulation::startup()
 	{
 		success = loadState(config.mSaveStatesDirLocal + config.mLoadSaveState + L".state", false);
 		if (!success)
-			loadState(config.mSaveStatesDir + config.mLoadSaveState + L".state");
+			loadState(config.mSaveStatesDir + config.mLoadSaveState + L".state", false);
 	}
 	RMX_LOG_INFO("Runtime environment ready");
 
