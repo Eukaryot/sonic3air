@@ -23,6 +23,7 @@ public:
 	AudioOutBase& createAudioOut() override;
 
 	bool onEnginePreStartup() override;
+	bool isDedicatedApplication() override;
 	bool setupCustomGameProfile() override;
 
 	void startupGame(EmulatorInterface& emulatorInterface) override;

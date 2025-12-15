@@ -243,12 +243,21 @@ void ImGuiIntegration::refreshImGuiStyle()
 	style.ItemInnerSpacing.x = uiScale * 4.0f;
 	style.ItemInnerSpacing.y = uiScale * 4.0f;
 	style.GrabMinSize = uiScale * 15.0f;
-	style.TouchExtraPadding.x = uiScale * 5.0f;
-	style.TouchExtraPadding.y = uiScale * 5.0f;
 	style.ScrollbarSize = uiScale * 16.0f;
 	style.ScrollbarRounding = uiScale * 10.0f;
 	style.TabBarBorderSize = std::max(uiScale, 1.0f);
 	style.TabRounding = uiScale * 5.0f;
+	style.CellPadding.x = uiScale * 4.0f;
+	style.CellPadding.y = uiScale * 2.0f;
+
+	// On mobile, increase touch-sensitive areas for buttons and other interactable objects
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
+	style.TouchExtraPadding.x = uiScale * 4.0f;
+	style.TouchExtraPadding.y = uiScale * 4.0f;
+#else
+	style.TouchExtraPadding.x = 0.0f;
+	style.TouchExtraPadding.y = 0.0f;
+#endif
 
 	Color accentColor = Configuration::instance().mDevMode.mUIAccentColor;
 	const auto GetAccentColorMix = [&](float accent, float saturation = 1.0f, float grayValue = 0.3f)

@@ -16,15 +16,6 @@
 namespace utils
 {
 
-	bool startsWith(const std::wstring& fullString, const std::wstring& prefix)
-	{
-		if (fullString.length() < prefix.length())
-			return false;
-		if (memcmp((void*)&fullString[0], (void*)&prefix[0], prefix.length() * sizeof(wchar_t)) != 0)
-			return false;
-		return true;
-	}
-
 	void splitTextIntoLines(std::vector<std::string>& outLines, const std::string& text, Font& font, int maxLineWidth)
 	{
 		outLines.clear();

@@ -97,7 +97,7 @@ EngineMain::~EngineMain()
 
 void EngineMain::execute()
 {
-	// Startup the Oxygen engine part that is independent from the application / project
+	// Startup the Oxygen Engine part that is independent from the application / project
 	if (startupEngine())
 	{
 		// Enter the application run loop
@@ -531,18 +531,34 @@ void EngineMain::updateGameProfilePaths()
 
 bool EngineMain::initFileSystem()
 {
-	// Create mod data folder (the default mod directory)
 	Configuration& config = Configuration::instance();
-	FTX::FileSystem->createDirectory(config.mGameAppDataPath + L"mods");
 
-	// Add real file system provider for the game data path, if it isn't located in local "data" directory
-	//  -> This is relevant for Oxygen Engine using an external game data path
-	if (config.mGameDataPath != L"data" && config.mGameDataPath != L"./data")
+	if (mDelegate.isDedicatedApplication())
 	{
-		rmx::RealFileProvider* provider = new rmx::RealFileProvider();
-		FTX::FileSystem->addManagedFileProvider(*provider);
-		FTX::FileSystem->addMountPoint(*provider, L"data/", config.mGameDataPath + L'/', 0x10);
+		// Add Oxygen Engine data path if it exists in the expected place
+		//  -> This is relevant when starting an external project app (like S3AIR) during development
+		const std::wstring engineBasePath = L"../oxygenengine/";
+		if (FTX::FileSystem->exists(engineBasePath))
+		{
+			rmx::RealFileProvider* provider = new rmx::RealFileProvider();
+			FTX::FileSystem->addManagedFileProvider(*provider);
+			FTX::FileSystem->addMountPoint(*provider, L"data/", engineBasePath + L"data/", 0x10);
+		}
 	}
+	else
+	{
+		// Add real file system provider for the game data path, if it isn't located in local "data" directory
+		//  -> This is relevant for Oxygen Engine using an external game data path
+		if (config.mGameDataPath != L"data" && config.mGameDataPath != L"./data")
+		{
+			rmx::RealFileProvider* provider = new rmx::RealFileProvider();
+			FTX::FileSystem->addManagedFileProvider(*provider);
+			FTX::FileSystem->addMountPoint(*provider, L"data/", config.mGameDataPath + L'/', 0x10);
+		}
+	}
+
+	// Create mod data folder (the default mod directory)
+	FTX::FileSystem->createDirectory(config.mGameAppDataPath + L"mods");
 
 	// Add package providers
 	return loadFilePackages(false);

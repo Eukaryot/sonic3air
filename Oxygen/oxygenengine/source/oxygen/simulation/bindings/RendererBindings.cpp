@@ -103,7 +103,7 @@ namespace
 		mWriteAddress = cramAddress;
 	}
 
-	// Oxygen engine doesn't differentiate read or write mode
+	// Oxygen Engine doesn't differentiate read or write mode
 	void VDP_setupVRAMRead(uint16 vramAddress)   { VDP_setupVRAMWrite(vramAddress); }
 	void VDP_setupVSRAMRead(uint16 vsramAddress) { VDP_setupVSRAMWrite(vsramAddress); }
 	void VDP_setupCRAMRead(uint16 cramAddress)	 { VDP_setupCRAMWrite(cramAddress); }

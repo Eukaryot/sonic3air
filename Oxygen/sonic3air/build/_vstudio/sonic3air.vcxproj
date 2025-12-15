@@ -233,8 +233,8 @@
       </IgnoreSpecificDefaultLibraries>
     </Link>
     <PreBuildEvent>
-      <Command>robocopy $(ProjectDir)..\..\..\oxygenengine\data\shader $(ProjectDir)..\..\data\shader /mir &gt; nul
-exit /b 0</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
@@ -262,8 +262,8 @@ exit /b 0</Command>
       </IgnoreSpecificDefaultLibraries>
     </Link>
     <PreBuildEvent>
-      <Command>robocopy $(ProjectDir)..\..\..\oxygenengine\data\shader $(ProjectDir)..\..\data\shader /mir &gt; nul
-exit /b 0</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86_64 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
@@ -291,8 +291,8 @@ exit /b 0</Command>
       </IgnoreSpecificDefaultLibraries>
     </Link>
     <PreBuildEvent>
-      <Command>robocopy $(ProjectDir)..\..\..\oxygenengine\data\shader $(ProjectDir)..\..\data\shader /mir &gt; nul
-exit /b 0</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
@@ -320,8 +320,8 @@ exit /b 0</Command>
       </IgnoreSpecificDefaultLibraries>
     </Link>
     <PreBuildEvent>
-      <Command>robocopy $(ProjectDir)..\..\..\oxygenengine\data\shader $(ProjectDir)..\..\data\shader /mir &gt; nul
-exit /b 0</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86_64 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
