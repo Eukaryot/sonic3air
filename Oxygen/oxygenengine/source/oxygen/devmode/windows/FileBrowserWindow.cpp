@@ -12,6 +12,7 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/devmode/ImGuiHelpers.h"
+#include "oxygen/helper/FileHelper.h"
 #include "oxygen/platform/PlatformFunctions.h"
 
 #if defined(PLATFORM_ANDROID)
@@ -57,6 +58,9 @@ namespace
 FileBrowserWindow::FileBrowserWindow() :
 	DevModeWindowBase("File Browser", Category::MISC, 0)
 {
+	FileHelper::loadTexture(mFolderIconTexture, L"data/images/menu/filebrowser/icon_folder_32.png");
+	FileHelper::loadTexture(mFileIconTexture, L"data/images/menu/filebrowser/icon_file_32.png");
+	FileHelper::loadTexture(mZipIconTexture, L"data/images/menu/filebrowser/icon_zip_32.png");
 }
 
 void FileBrowserWindow::buildContent()
@@ -150,6 +154,9 @@ void FileBrowserWindow::refreshFileEntries()
 
 void FileBrowserWindow::drawFileBrowser()
 {
+	ImGui::Text("  ");
+	ImGui::SameLine();
+
 	// "Refresh" button
 	if (ImGui::Button("Refresh"))
 	{
@@ -174,6 +181,8 @@ void FileBrowserWindow::drawFileBrowser()
 	// Address line
 	drawAddressLine();
 
+	ImGui::Spacing();
+
 	// Refresh directories & file entries if needed
 	if (mRefreshFileEntries)
 	{
@@ -184,8 +193,12 @@ void FileBrowserWindow::drawFileBrowser()
 	const std::wstring* openActionsForDirectory = nullptr;
 	const rmx::FileIO::FileEntry* openActionsForFile = nullptr;
 
+	ImGui::PushStyleVarY(ImGuiStyleVar_CellPadding, 5.0f * mUIScale);
+	ImGui::PushStyleColor(ImGuiCol_TableRowBg, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_TableRowBgAlt, ImVec4(0.05f, 0.05f, 0.05f, 1.0f));
+
 	int index = 0;
-	if (ImGui::BeginTable("FileList", 3, ImGuiTableFlags_BordersH | ImGuiTableFlags_SizingStretchProp))
+	if (ImGui::BeginTable("FileList", 3, ImGuiTableFlags_BordersH | ImGuiTableFlags_BordersOuterV | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg))
 	{
 		ImGuiHelpers::ScopedIndent si(10.0f);
 
@@ -194,6 +207,7 @@ void FileBrowserWindow::drawFileBrowser()
 		ImGui::TableSetupColumn("Actions", 0, 50);
 		ImGui::TableHeadersRow();
 
+		// Directories
 		for (const std::wstring& directory : mDirectories)
 		{
 			ImGui::PushID(index);
@@ -205,6 +219,8 @@ void FileBrowserWindow::drawFileBrowser()
 			{
 				clickedDirectory = &directory;
 			}
+			ImGui::SameLine();
+			ImGui::Image(ImGuiHelpers::getTextureRef(mFolderIconTexture), ImVec2(16, 16) * mUIScale);
 			ImGui::SameLine();
 			ImGui::TextColored(FOLDER_COLOR, "%s", rmx::convertToUTF8(directory).c_str());
 
@@ -221,6 +237,7 @@ void FileBrowserWindow::drawFileBrowser()
 			++index;
 		}
 
+		// Files
 		for (const rmx::FileIO::FileEntry& entry : mFileEntries)
 		{
 			ImGui::PushID(index);
@@ -228,6 +245,8 @@ void FileBrowserWindow::drawFileBrowser()
 
 			ImGui::TableNextColumn();
 			ImGui::Selectable("##", false, 0);
+			ImGui::SameLine();
+			ImGui::Image(ImGuiHelpers::getTextureRef(getFileIcon(entry.mFilename)), ImVec2(16, 16) * mUIScale);
 			ImGui::SameLine();
 			ImGui::Text("%s", rmx::convertToUTF8(entry.mFilename).c_str());
 
@@ -247,6 +266,8 @@ void FileBrowserWindow::drawFileBrowser()
 
 		ImGui::EndTable();
 	}
+	ImGui::PopStyleColor(2);
+	ImGui::PopStyleVar();
 
 	bool openActionsMenu = false;
 
@@ -367,6 +388,8 @@ void FileBrowserWindow::drawActionsMenu(bool openMenuNow)
 		}
 		else
 		{
+			ImGui::Image(ImGuiHelpers::getTextureRef(mFolderIconTexture), ImVec2(16, 16) * mUIScale);
+			ImGui::SameLine();
 			ImGui::TextColored(FOLDER_COLOR, "%s", rmx::convertToUTF8(*mOpenActionsForDirectory).c_str());
 
 			ImGui::Separator();
@@ -405,6 +428,8 @@ void FileBrowserWindow::drawActionsMenu(bool openMenuNow)
 		}
 		else
 		{
+			ImGui::Image(ImGuiHelpers::getTextureRef(getFileIcon(mOpenActionsForFile->mFilename)), ImVec2(16, 16) * mUIScale);
+			ImGui::SameLine();
 			ImGui::Text("%s", rmx::convertToUTF8(mOpenActionsForFile->mFilename).c_str());
 
 			if (rmx::endsWith(mOpenActionsForFile->mFilename, L".zip") || rmx::endsWith(mOpenActionsForFile->mFilename, L".ZIP"))
@@ -558,7 +583,7 @@ void FileBrowserWindow::drawRenamingPopup(bool openPopupNow)
 				ImGui::TextColored(FOLDER_COLOR, "%s", rmx::convertToUTF8(*mOpenActionsForDirectory).c_str());
 			}
 			ImGui::SameLineNoSpace();
-			ImGui::Text("to:");
+			ImGui::Text(" to:");
 
 			if (openPopupNow)
 			{
@@ -619,6 +644,15 @@ void FileBrowserWindow::drawRenamingPopup(bool openPopupNow)
 
 		mRefreshFileEntries = true;
 	}
+}
+
+DrawerTexture& FileBrowserWindow::getFileIcon(const std::wstring& filename)
+{
+	if (rmx::endsWith(filename, L".zip"))
+	{
+		return mZipIconTexture;
+	}
+	return mFileIconTexture;
 }
 
 #endif

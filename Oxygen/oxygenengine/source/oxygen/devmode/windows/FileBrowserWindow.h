@@ -13,6 +13,7 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/devmode/DevModeWindowBase.h"
+#include "oxygen/drawing/DrawerTexture.h"
 
 
 class FileBrowserWindow : public DevModeWindowBase
@@ -33,6 +34,8 @@ private:
 	void drawConfirmDeletionPopup(bool openPopupNow);
 	void drawRenamingPopup(bool openPopupNow);
 
+	DrawerTexture& getFileIcon(const std::wstring& filename);
+
 private:
 	std::wstring mBasePath;
 	std::wstring mFullPath;
@@ -46,6 +49,10 @@ private:
 	const std::wstring* mOpenActionsForDirectory = nullptr;
 	const rmx::FileIO::FileEntry* mOpenActionsForFile = nullptr;
 	ImVec2 mActionsMenuPosition;
+
+	DrawerTexture mFolderIconTexture;
+	DrawerTexture mFileIconTexture;
+	DrawerTexture mZipIconTexture;
 };
 
 #endif
