@@ -18,7 +18,8 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/download/DownloadManager.h"
-#include "oxygen/devmode/ImGuiIntegration.h"
+#include "oxygen/menu/imgui/ImGuiIntegration.h"
+#include "oxygen/menu/devmode/DevModeMainWindow.h"
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/software/SoftwareDrawer.h"
 #include "oxygen/file/PackedFileProvider.h"
@@ -183,7 +184,8 @@ void EngineMain::switchToRenderMethod(Configuration::RenderMethod newRenderMetho
 		// Check OpenGL in the config again, it could have changed - namely if OpenGL initialization failed
 		nowUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
 
-		ImGuiIntegration::onWindowRecreated(nowUsingOpenGL);
+		if (ImGuiIntegration::hasInstance())
+			ImGuiIntegration::instance().onWindowRecreated(nowUsingOpenGL);
 	}
 
 	if (nowUsingOpenGL)
@@ -295,10 +297,6 @@ bool EngineMain::startupEngine()
 	const bool useIPv6 = false;
 	mInternal.mEngineServerClient.setupClient(useIPv6);
 
-	// ImGui integration
-	ImGuiIntegration::setEnabled(config.mDevMode.mEnabled);
-	ImGuiIntegration::startup();
-
 	// Done
 	RMX_LOG_INFO("Engine startup successful");
 	return true;
@@ -317,8 +315,6 @@ void EngineMain::run()
 
 void EngineMain::shutdown()
 {
-	ImGuiIntegration::shutdown();
-
 	destroyWindow();
 
 	// Shutdown subsystems

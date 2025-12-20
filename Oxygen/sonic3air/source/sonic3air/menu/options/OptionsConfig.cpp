@@ -95,6 +95,11 @@ void OptionsConfig::buildSystem()
 	}
 #endif
 
+	CATEGORY("Data Management")
+	{
+		configBuilder.addSetting("Open File Browser", option::_OPEN_FILE_BROWSER);
+	}
+
 	CATEGORY("More Info")
 	{
 		configBuilder.addSetting("Open Game Homepage", option::_OPEN_HOMEPAGE);

@@ -11,13 +11,14 @@
 #include "sonic3air/menu/overlays/SecretUnlockedWindow.h"
 #include "oxygen/drawing/DrawerTexture.h"
 
+class ApplicationContextMenu;
 class GameView;
 class GameMenuManager;
+class ImGuiFileBrowser;
 class MenuBackground;
 class PauseMenu;
-class TimeAttackResultsMenu;
 class SkippableCutsceneWindow;
-class ApplicationContextMenu;
+class TimeAttackResultsMenu;
 
 
 class GameApp : public GuiBase, public SingleInstance<GameApp>
@@ -51,6 +52,9 @@ public:
 	inline GameView& getGameView() const { return *mGameView; }
 	inline GameMenuManager& getGameMenuManager() const  { return *mGameMenuManager; }
 	inline MenuBackground& getMenuBackground() const	{ return *mMenuBackground; }
+
+	bool supportsFileBrowser();
+	bool openFileBrowser();
 
 private:
 	void gotoPhase(int phaseNumber);

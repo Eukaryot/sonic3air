@@ -27,7 +27,7 @@
 #include "oxygen/application/overlays/SaveStateMenu.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/video/VideoOut.h"
-#include "oxygen/devmode/ImGuiIntegration.h"
+#include "oxygen/menu/imgui/ImGuiIntegration.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/network/EngineServerClient.h"
@@ -36,6 +36,9 @@
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/PersistentData.h"
 #include "oxygen/simulation/Simulation.h"
+#if defined(SUPPORT_IMGUI)
+	#include "oxygen/menu/devmode/DevModeMainWindow.h"
+#endif
 
 
 static const float MOUSE_HIDE_TIME = 1.0f;	// Seconds until mouse cursor gets hidden after last movement
@@ -65,6 +68,11 @@ Application::Application() :
 
 Application::~Application()
 {
+#if defined(SUPPORT_IMGUI)
+	// This will also shutdown ImGui itself
+	ImGuiManager::instance().clearProviders();
+#endif
+
 	EngineServerClient::instance().shutdownClient();
 
 	delete mGameLoader;
@@ -94,6 +102,10 @@ void Application::initialize()
 		mDebugSidePanel = &createChild<DebugSidePanel>();
 		createChild<MemoryHexView>();
 		createChild<DebugLogView>();
+
+	#if defined(SUPPORT_IMGUI)
+		ImGuiManager::instance().getOrAddImGuiContentProvider<DevModeMainWindow>();
+	#endif
 	}
 
 	//mOxygenMenu = &mGameView->createChild<OxygenMenu>();
@@ -141,7 +153,7 @@ void Application::sdlEvent(const SDL_Event& ev)
 
 	//RMX_LOG_INFO("SDL event: type = " << ev.type);
 
-	ImGuiIntegration::processSdlEvent(ev);
+	mImGuiIntegration.processSdlEvent(ev);
 
 	// Inform input manager as well
 	if (ev.type == SDL_KEYDOWN || ev.type == SDL_KEYUP)		// TODO: Also add joystick events?
@@ -210,7 +222,7 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 		return;
 	}
 
-	if (ImGuiIntegration::isCapturingKeyboard())
+	if (mImGuiIntegration.isCapturingKeyboard())
 	{
 		FTX::System->consumeCurrentEvent();
 	}
@@ -293,7 +305,11 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 					#ifdef SUPPORT_IMGUI
 						else if (EngineMain::getDelegate().useDeveloperFeatures())
 						{
-							ImGuiIntegration::toggleMainWindow();
+							DevModeMainWindow* devModeMainWindow = ImGuiManager::instance().getImGuiContentProvider<DevModeMainWindow>();
+							if (nullptr != devModeMainWindow)
+							{
+								devModeMainWindow->setIsWindowOpen(!devModeMainWindow->getIsWindowOpen());
+							}
 						}
 					#endif
 						else
@@ -424,7 +440,7 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 
 void Application::mouse(const rmx::MouseEvent& ev)
 {
-	if (ImGuiIntegration::isCapturingMouse())
+	if (mImGuiIntegration.isCapturingMouse())
 	{
 		FTX::System->consumeCurrentEvent();
 	}
@@ -441,8 +457,8 @@ void Application::update(float timeElapsed)
 
 	// ImGui frame start must be done here (instead of at the start of "render"), to ensure that the mouse capturing flag is set correctly
 	//  -> This is particularly relevant for touch input, where we would miss the first touch into an ImGui window and falsely pass it to the touch overlay
-	ImGuiIntegration::startFrame();
-	if (ImGuiIntegration::isCapturingMouse() || ImGuiIntegration::isCapturingKeyboard())
+	mImGuiIntegration.startFrame();
+	if (mImGuiIntegration.isCapturingMouse() || mImGuiIntegration.isCapturingKeyboard())
 	{
 		FTX::System->consumeCurrentEvent();
 	}
@@ -530,7 +546,7 @@ void Application::update(float timeElapsed)
 		mRemoveChild = nullptr;
 	}
 
-	if (FTX::mouseRel() != Vec2i() || FTX::mouseState(rmx::MouseButton::Left) || FTX::mouseState(rmx::MouseButton::Right) || ImGuiIntegration::isCapturingMouse())
+	if (FTX::mouseRel() != Vec2i() || FTX::mouseState(rmx::MouseButton::Left) || FTX::mouseState(rmx::MouseButton::Right) || mImGuiIntegration.isCapturingMouse())
 	{
 		mMouseHideTimer = 0.0f;
 		SDL_ShowCursor(1);
@@ -560,7 +576,7 @@ void Application::render()
 		RMX_LOG_INFO("Start of first application render call");
 	}
 
-	if (ImGuiIntegration::isCapturingMouse())
+	if (mImGuiIntegration.isCapturingMouse())
 	{
 		FTX::System->consumeCurrentEvent();
 	}
@@ -604,7 +620,6 @@ void Application::render()
 	{
 		drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 0.8f));
 
-		// TODO: The sprites are from S3AIR, but used in OxygenApp as well
 	#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(PLATFORM_IOS)
 		constexpr uint64 key = rmx::constMurmur2_64("auto_pause_text_tap");
 	#else
@@ -616,8 +631,8 @@ void Application::render()
 
 	drawer.performRendering();
 
-	ImGuiIntegration::showDebugWindow();
-	ImGuiIntegration::endFrame();
+	mImGuiIntegration.buildContents();
+	mImGuiIntegration.endFrame();
 
 	// Needed only for precise profiling
 	//glFinish();

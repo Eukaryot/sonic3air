@@ -10,6 +10,7 @@
 
 #include "oxygen/application/Configuration.h"
 #include "oxygen/helper/HighResolutionTimer.h"
+#include "oxygen/menu/imgui/ImGuiIntegration.h"
 
 class AudioPlayer;
 class BackdropView;
@@ -93,6 +94,8 @@ private:
 	SaveStateMenu* mSaveStateMenu = nullptr;
 	DebugSidePanel* mDebugSidePanel = nullptr;
 	ProfilingView* mProfilingView = nullptr;
+
+	ImGuiIntegration mImGuiIntegration;
 
 	// Input
 	float mMouseHideTimer = 0.0f;

@@ -708,6 +708,12 @@ void OptionsMenu::update(float timeElapsed)
 							break;
 						}
 
+						case option::_OPEN_FILE_BROWSER:
+						{
+							GameApp::instance().openFileBrowser();
+							break;
+						}
+
 						case option::_OPEN_HOMEPAGE:
 						{
 							PlatformFunctions::openURLExternal("https://sonic3air.org/");
