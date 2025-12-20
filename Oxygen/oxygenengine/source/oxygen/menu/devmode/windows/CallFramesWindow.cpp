@@ -210,7 +210,7 @@ void CallFramesWindow::buildContent()
 			constexpr float EXP_FALLOFF = 0.05f;
 			float indent = (float)clamp(callFrame.mDepth, 0, EXP_MIN_DEPTH);
 			if (callFrame.mDepth > EXP_MIN_DEPTH)
-				indent += (1.0f - std::expf((float)(EXP_MIN_DEPTH - callFrame.mDepth) * EXP_FALLOFF)) / EXP_FALLOFF;
+				indent += (1.0f - std::exp((float)(EXP_MIN_DEPTH - callFrame.mDepth) * EXP_FALLOFF)) / EXP_FALLOFF;
 			ImGuiHelpers::ScopedIndent si(4.0f + std::floor(indent * DEFAULT_INDENT));
 
 			uint64 key = (nullptr == callFrame.mFunction) ? 0xffffffffffffffffULL : callFrame.mFunction->getID();

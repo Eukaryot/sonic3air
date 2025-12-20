@@ -57,6 +57,9 @@ namespace lemon
 					}
 					break;
 				}
+
+				default:
+					return false;
 			}
 			return false;
 		}

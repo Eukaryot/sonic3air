@@ -80,6 +80,9 @@ bool ModsStartPage::update(float timeElapsed)
 
 		case ButtonEffect::BACK:
 			return false;
+
+		case ButtonEffect::NONE:
+			break;
 	}
 
 	const GameMenuEntries::UpdateResult result = mMenuEntries.update();

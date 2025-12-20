@@ -31,6 +31,9 @@ namespace lemon
 					else
 						value = roundToInt(arg.mValue.get<double>());
 					break;
+
+				default:
+					return;
 			}
 
 			if (formatCharacter == 'd')
@@ -61,6 +64,9 @@ namespace lemon
 					else
 						output.addDouble(arg.mValue.get<double>());
 					break;
+
+				default:
+					return;
 			}
 		}
 	}

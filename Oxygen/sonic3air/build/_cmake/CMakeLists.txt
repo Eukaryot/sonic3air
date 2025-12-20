@@ -48,6 +48,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(WORKSPACE_DIR ../../../..)
 
 #add_definitions(-DDEBUG)
+if (USE_IMGUI)
+	add_definitions(-DUSE_IMGUI)
+endif()
 
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

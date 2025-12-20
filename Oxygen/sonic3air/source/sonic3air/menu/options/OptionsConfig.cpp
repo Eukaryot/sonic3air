@@ -95,10 +95,12 @@ void OptionsConfig::buildSystem()
 	}
 #endif
 
+#if defined(SUPPORT_IMGUI)
 	CATEGORY("Data Management")
 	{
 		configBuilder.addSetting("Open File Browser", option::_OPEN_FILE_BROWSER);
 	}
+#endif
 
 	CATEGORY("More Info")
 	{
