@@ -9,6 +9,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
+import android.provider.OpenableColumns;
 import android.util.Log;
 
 import org.libsdl.app.SDLActivity;
@@ -119,9 +120,44 @@ public class GameActivity extends SDLActivity
 				{
 					// File selection returned a result
 					Uri uri = intent.getData();
+
+					// Get the file name (required for Release builds, as "uri.getPath()" gives a wrong file name there)
+					String displayName = null;
+					{
+						String uriString = uri.toString();
+						File myFile = new File(uriString);
+						String path = myFile.getAbsolutePath();
+
+						if (uriString.startsWith("content://"))
+						{
+							Cursor cursor = null;
+							try
+							{
+								cursor = getContentResolver().query(uri, null, null, null, null);
+								if (cursor != null && cursor.moveToFirst())
+								{
+									displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+								}
+							}
+							finally
+							{
+								cursor.close();
+							}
+						}
+						else if (uriString.startsWith("file://"))
+						{
+							displayName = myFile.getName();
+						}
+						else
+						{
+							displayName = uri.getPath();
+						}
+					}
+
 					Log.i("oxygen", "File path from intent = " + uri.getPath());
+					Log.i("oxygen", "Display name from intent = " + displayName);
 					byte[] fileContent = readFileContentsFromUri(uri, getContentResolver(), 0x40000000);    // 1 GB file size limit
-					receivedFileContent(null != fileContent, fileContent, uri.getPath());
+					receivedFileContent(null != fileContent, fileContent, displayName);
 				}
 				else
 				{
