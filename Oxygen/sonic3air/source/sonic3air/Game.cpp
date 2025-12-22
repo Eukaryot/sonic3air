@@ -34,6 +34,7 @@
 
 #include <lemon/program/FunctionWrapper.h>
 #include <lemon/program/Module.h>
+#include <lemon/program/ModuleBindingsBuilder.h>
 
 
 namespace
@@ -147,6 +148,8 @@ void Game::update(float timeElapsed)
 
 void Game::registerScriptBindings(lemon::Module& module)
 {
+	lemon::ModuleBindingsBuilder builder(module);
+
 	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
 	const BitFlagSet<lemon::Function::Flag> noInlineExecution;
 
@@ -238,6 +241,12 @@ void Game::registerScriptBindings(lemon::Module& module)
 
 		module.addNativeFunction("Game.setDiscordSmallImage", lemon::wrap(&setDiscordSmallImage), defaultFlags)
 			.setParameterInfo(0, "imageName");
+	}
+
+	// CrowdControl
+	{
+		builder.addNativeFunction("CrowdControl.sendResponse", lemon::wrap(mCrowdControlClient, &CrowdControlClient::sendResponse), defaultFlags)
+			.setParameters("id", "status", "message");
 	}
 
 	// Audio

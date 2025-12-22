@@ -10,6 +10,8 @@
 
 #include "oxygen_netcore/network/Sockets.h"
 
+#include <lemon/program/StringRef.h>
+
 
 // Crowd Control documentation: https://developer.crowdcontrol.live/sdk/simpletcp/structure.html
 
@@ -19,6 +21,8 @@ public:
 	bool startConnection();
 	void stopConnection();
 	void updateConnection(float timeElapsed);
+
+	void sendResponse(uint32 id, uint8 status, lemon::StringRef message);
 
 private:
 	enum class StatusCode : uint8
@@ -37,9 +41,31 @@ private:
 		NOT_SELECTABLE	= 0x83		// The effect should be unselectable in the menu
 	};
 
+	enum class RequestType
+	{
+		TEST		= 0x00,		// Respond as with a normal request but don’t actually activate the effect
+		START		= 0x01,		// A standard effect request. A response (see above) is always required
+		STOP		= 0x02,		// A request to stop all instances of the requested effect code
+		PLAYER_INFO	= 0xe0,		// RESERVED This field will appear in a future release. Request information about the player
+		LOGIN		= 0xf0,		// Indicates that this is a login request or response
+		KEEP_ALIVE	= 0xff
+	};
+
+	struct Request
+	{
+		int mId = 0;
+		RequestType mType = RequestType::KEEP_ALIVE;
+		std::string mCode;
+		std::string mMessage;
+		int mCost = 0;
+		int mDuration = 0;
+		int mQuantity = 0;
+			// There's also the "parameter" object that might be interesting...
+	};
+
 private:
-	void evaluateMessage(const Json::Value& message);
-	StatusCode triggerEffect(const std::string& effectCode);
+	void evaluateRequestJson(const Json::Value& requestJson);
+	void triggerEffect(const Request& request);
 
 private:
 	bool mSetupDone = false;

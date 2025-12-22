@@ -205,3 +205,27 @@ function void restartTimeAttack()
 
 	yieldInWhiteScreen()
 }
+
+
+
+//-------------------------------------------------------//
+// CrowdControl integration                              //
+//-------------------------------------------------------//
+
+constant u8 CCStatusCode.SUCCESS		= 0x00		// The effect executed successfully
+constant u8 CCStatusCode.FAILURE		= 0x01		// The effect failed to trigger, but is still available for use; viewer(s) will be refunded
+constant u8 CCStatusCode.UNAVAILABLE	= 0x02		// Same as FAILURE but the effect is no longer available for use for the remainder of the game
+constant u8 CCStatusCode.RETRY			= 0x03		// The effect cannot be triggered right now, try again in a few seconds - note: this is the "normal" failure response
+constant u8 CCStatusCode.PAUSED			= 0x06		// The timed effect has been paused and is now waiting
+constant u8 CCStatusCode.RESUME			= 0x07		// The timed effect has been resumed and is counting down again
+constant u8 CCStatusCode.FINISHED		= 0x08		// The timed effect has finished
+
+
+function void CrowdControl.triggerEffect(u32 id, string code, s32 quantity, s32 duration)
+{
+	// This is just here so script implementing this have a base function to call:
+	//  base.CrowdControl.triggerEffect(id, code, quantity, duration)
+
+	// For a successfully handled effect, please end with this call to notify CrowdControl:
+	//  CrowdControl.sendResponse(id, CCStatusCode.SUCCESS, "")
+}
