@@ -566,7 +566,7 @@ bool CodeExec::executeScriptFunction(const std::string& functionName, bool showE
 			}
 
 			// Evaluate the return value
-			if (nullptr != execData && nullptr != execData->mParams.mReturnType)
+			if (nullptr != execData && nullptr != execData->mParams.mReturnType && execData->mParams.mReturnType->getBytes() > 0)
 			{
 				execData->mReturnValueStorage = mLemonScriptRuntime.getInternalLemonRuntime().getSelectedControlFlowMutable().popValueStack<uint64>();
 			}

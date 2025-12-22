@@ -851,5 +851,5 @@ void GameView::setLogDisplay(const String& string, float time)
 void GameView::setGameSpeed(float speed)
 {
 	mSimulation.setSpeed(speed);
-	setLogDisplay(String(0, "Emulator speed: %.02f", speed));
+	setLogDisplay(String(0, "Simulation speed: %.02f", speed));
 }
