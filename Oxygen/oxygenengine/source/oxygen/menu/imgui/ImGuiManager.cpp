@@ -29,13 +29,17 @@ void ImGuiManager::clearProviders()
 	ImGuiIntegration::instance().setEnabled(false);
 }
 
-void ImGuiManager::addImGuiContentProvider(uint64 key, ImGuiContentProvider& provider)
+void ImGuiManager::addImGuiContentProvider(uint64 key, int priority, ImGuiContentProvider& provider)
 {
 	RMX_ASSERT(nullptr == getImGuiContentProvider(key), "ImGui content provider key " << rmx::hexString(key, 16) << " is already in use");
 
 	ProviderRegistration& reg = vectorAdd(mProviders);
 	reg.mKey = key;
+	reg.mPriority = priority;
 	reg.mProvider = &provider;
+
+	// Sort to ensure that higher priorities go first
+	std::sort(mProviders.begin(), mProviders.end(), [](const ProviderRegistration& a, const ProviderRegistration& b) { return a.mPriority > b.mPriority; } );
 
 	// Make sure that ImGui will get started, if it's not already running
 	ImGuiIntegration::instance().setEnabled(true);
@@ -60,6 +64,8 @@ void ImGuiManager::buildAllImGuiContent()
 		// Build content
 		reg.mProvider->buildImGuiContent();
 
+		const bool breakAfterwards = reg.mProvider->shouldBlockOtherProviders();
+
 		// Handle the case that the provider wants to be removed
 		if (reg.mProvider->shouldRemoveContentProvider())
 		{
@@ -72,6 +78,9 @@ void ImGuiManager::buildAllImGuiContent()
 				ImGuiIntegration::instance().setEnabled(false);
 			}
 		}
+
+		if (breakAfterwards)
+			break;
 	}
 }
 

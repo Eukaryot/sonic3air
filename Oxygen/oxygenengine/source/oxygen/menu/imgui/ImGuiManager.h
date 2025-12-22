@@ -18,17 +18,17 @@ public:
 	~ImGuiManager();
 
 	void clearProviders();
-	void addImGuiContentProvider(uint64 key, ImGuiContentProvider& provider);
+	void addImGuiContentProvider(uint64 key, int priority, ImGuiContentProvider& provider);
 	ImGuiContentProvider* getImGuiContentProvider(uint64 key) const;
 
 	template<typename T>
-	T& getOrAddImGuiContentProvider()
+	T& getOrAddImGuiContentProvider(int priority)
 	{
 		T* provider = static_cast<T*>(getImGuiContentProvider(T::PROVIDER_KEY));
 		if (nullptr == provider)
 		{
 			provider = new T();
-			addImGuiContentProvider(T::PROVIDER_KEY, *provider);
+			addImGuiContentProvider(T::PROVIDER_KEY, priority, *provider);
 		}
 		return *provider;
 	}
@@ -45,6 +45,7 @@ private:
 	struct ProviderRegistration
 	{
 		uint64 mKey = 0;
+		int mPriority = 0;
 		ImGuiContentProvider* mProvider = nullptr;	// Note that ImGuiManager is considered the owner of the provider and will eventually destroy the provider instance
 	};
 

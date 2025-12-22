@@ -355,7 +355,7 @@ bool GameApp::supportsFileBrowser()
 bool GameApp::openFileBrowser()
 {
 #if defined(SUPPORT_IMGUI)
-	ImGuiManager::instance().getOrAddImGuiContentProvider<ImGuiFileBrowser>();
+	ImGuiManager::instance().getOrAddImGuiContentProvider<ImGuiFileBrowser>(100);
 	return true;
 #else
 	return false;

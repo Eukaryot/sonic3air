@@ -104,7 +104,7 @@ void Application::initialize()
 		createChild<DebugLogView>();
 
 	#if defined(SUPPORT_IMGUI)
-		ImGuiManager::instance().getOrAddImGuiContentProvider<DevModeMainWindow>();
+		ImGuiManager::instance().getOrAddImGuiContentProvider<DevModeMainWindow>(0);
 	#endif
 	}
 

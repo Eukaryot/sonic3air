@@ -11,9 +11,10 @@
 
 #if defined(SUPPORT_IMGUI)
 
+#include "oxygen/helper/FileHelper.h"
+#include "oxygen/menu/imgui/ImGuiIntegration.h"
 #include "oxygen/menu/imgui/ImGuiHelpers.h"
 #include "oxygen/menu/devmode/DevModeMainWindow.h"	// Only used for "DevModeWindowBase::allowDragScrolling"
-#include "oxygen/helper/FileHelper.h"
 #include "oxygen/platform/PlatformFunctions.h"
 
 #if defined(PLATFORM_ANDROID)
@@ -54,14 +55,14 @@ namespace
 		}
 	}
 
-	void moveWindowToFitOnScreen(ImVec2& position)
+	void moveWindowToFitOnScreen(ImVec2& position, float uiScale)
 	{
 		const float diffX = (ImGui::GetWindowPos().x + ImGui::GetWindowSize().x) - FTX::screenWidth();
 		const float diffY = (ImGui::GetWindowPos().y + ImGui::GetWindowSize().y) - FTX::screenHeight();
 		if (diffX > 0.0f)
-			position.x -= std::min(diffX, 1000.0f * FTX::getTimeDifference());
+			position.x -= std::min(diffX, 1000.0f * FTX::getTimeDifference() * uiScale);
 		if (diffY > 0.0f)
-			position.y -= std::min(diffY, 1000.0f * FTX::getTimeDifference());
+			position.y -= std::min(diffY, 1000.0f * FTX::getTimeDifference() * uiScale);
 	}
 }
 
@@ -75,17 +76,28 @@ ImGuiFileBrowser::ImGuiFileBrowser()
 
 void ImGuiFileBrowser::buildImGuiContent()
 {
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.05f, 0.05f, 0.05f, 0.99f));
+	// Draw a dark fullscreen background
+	ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(0, 0), ImVec2((float)FTX::screenWidth(), (float)FTX::screenHeight()), 0xfa101010);
 
-	if (ImGui::Begin("Fullscreen File Browser", nullptr, ImGuiWindowFlags_NoDecoration))
+	// The actual window
+	if (ImGui::Begin("Fullscreen File Browser", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
 	{
-		ImGui::SetWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
-		ImGui::SetWindowSize(ImVec2((float)FTX::screenWidth(), (float)FTX::screenHeight()), ImGuiCond_Always);
+		ImGui::SetWindowPos(ImVec2((float)FTX::screenWidth() * 0.05f, (float)FTX::screenHeight() * 0.01f), ImGuiCond_Always);
+		ImGui::SetWindowSize(ImVec2((float)FTX::screenWidth() * 0.9f, (float)FTX::screenHeight() * 0.98f), ImGuiCond_Always);
 
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("File Browser");
-		ImGui::SameLineRelSpace(5.0f);
-		if (ImGui::RedButton("Close"))
+
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 220 * mUIScale);
+		const ImVec2 settingsPopupPos = ImGui::GetCursorScreenPos() + ImVec2(-120, 23) * mUIScale;
+		if (ImGui::Button("Settings"))
+		{
+			ImGui::OpenPopup("FileBrowser_Settings");
+		}
+
+		ImGui::SameLineRelSpace(3.0f);
+		if (ImGui::RedButton("Return to Options"))
 		{
 			mRemoveContentProvider = true;
 		}
@@ -97,15 +109,26 @@ void ImGuiFileBrowser::buildImGuiContent()
 	#else
 		ImGui::Text("Please use a mouse or touch input to interact with this window.");
 	#endif
+
+		ImGui::Spacing();
 		ImGui::Separator();
+
+		ImGui::SetNextWindowPos(settingsPopupPos);
+		if (ImGui::BeginPopup("FileBrowser_Settings"))
+		{
+			if (ImGui::DragFloat("UI Scale", &Configuration::instance().mDevMode.mUIScale, 0.003f, 0.5f, 4.0f, "%.1f"))
+			{
+				ImGuiIntegration::instance().refreshImGuiStyle();
+			}
+
+			ImGui::EndPopup();
+		}
 
 		buildWindowContent();
 
 		DevModeWindowBase::allowDragScrolling();
 	}
 	ImGui::End();
-
-	ImGui::PopStyleColor();
 }
 
 void ImGuiFileBrowser::buildWindowContent()
@@ -228,6 +251,9 @@ void ImGuiFileBrowser::drawFileBrowser()
 	}
 #endif
 
+	ImGui::Separator();
+	ImGui::Spacing();
+
 	// Address line
 	drawAddressLine();
 
@@ -244,8 +270,8 @@ void ImGuiFileBrowser::drawFileBrowser()
 	const rmx::FileIO::FileEntry* openActionsForFile = nullptr;
 
 	ImGui::PushStyleVarY(ImGuiStyleVar_CellPadding, 5.0f * mUIScale);
-	ImGui::PushStyleColor(ImGuiCol_TableRowBg, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
-	ImGui::PushStyleColor(ImGuiCol_TableRowBgAlt, ImVec4(0.05f, 0.05f, 0.05f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_TableRowBg, ImGuiHelpers::getAccentColorMix(1.0f, 0.1f, 0.05f));
+	ImGui::PushStyleColor(ImGuiCol_TableRowBgAlt, ImGuiHelpers::getAccentColorMix(1.0f, 0.05f, 0.05f));
 
 	int index = 0;
 	if (ImGui::BeginTable("FileList", 3, ImGuiTableFlags_BordersH | ImGuiTableFlags_BordersOuterV | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg))
@@ -312,6 +338,13 @@ void ImGuiFileBrowser::drawFileBrowser()
 
 			ImGui::PopID();
 			++index;
+		}
+
+		if (mDirectories.empty() && mFileEntries.empty())
+		{
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			ImGui::TextColored(ImGuiHelpers::COLOR_GRAY60, " - Empty folder -");
 		}
 
 		ImGui::EndTable();
@@ -468,7 +501,7 @@ void ImGuiFileBrowser::drawActionsMenu(bool openMenuNow)
 		#endif
 		}
 
-		moveWindowToFitOnScreen(mActionsMenuPosition);
+		moveWindowToFitOnScreen(mActionsMenuPosition, mUIScale);
 		ImGui::EndPopup();
 	}
 
@@ -525,7 +558,7 @@ void ImGuiFileBrowser::drawActionsMenu(bool openMenuNow)
 		#endif
 		}
 
-		moveWindowToFitOnScreen(mActionsMenuPosition);
+		moveWindowToFitOnScreen(mActionsMenuPosition, mUIScale);
 		ImGui::EndPopup();
 	}
 
@@ -671,7 +704,7 @@ void ImGuiFileBrowser::drawRenamingPopup(bool openPopupNow)
 			ImGui::CloseCurrentPopup();
 		}
 
-		moveWindowToFitOnScreen(mActionsMenuPosition);
+		moveWindowToFitOnScreen(mActionsMenuPosition, mUIScale);
 		ImGui::EndPopup();
 	}
 

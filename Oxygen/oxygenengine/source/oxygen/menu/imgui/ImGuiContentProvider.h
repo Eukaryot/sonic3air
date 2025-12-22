@@ -18,7 +18,9 @@ public:
 	virtual ~ImGuiContentProvider() {}
 	virtual void buildImGuiContent() = 0;
 
-	bool shouldRemoveContentProvider() const  { return mRemoveContentProvider; }
+	inline bool shouldRemoveContentProvider() const  { return mRemoveContentProvider; }
+
+	virtual bool shouldBlockOtherProviders() const  { return false; }
 
 protected:
 	bool mRemoveContentProvider = false;	// Set to true as a signal that this instance should be removed
