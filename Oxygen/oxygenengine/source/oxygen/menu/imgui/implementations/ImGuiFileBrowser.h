@@ -29,7 +29,7 @@ public:
 
 	virtual void buildImGuiContent() override;	// Builds a fullscreen window variant of the file browser
 	
-	virtual bool shouldBlockOtherProviders() const  { return true; }
+	virtual bool shouldBlockOtherProviders() const override  { return true; }
 
 	void buildWindowContent();
 

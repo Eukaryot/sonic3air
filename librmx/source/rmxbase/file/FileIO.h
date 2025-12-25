@@ -25,6 +25,8 @@ namespace rmx
 			size_t mSize = 0;
 		};
 
+		static inline std::error_code mLastErrorCode;
+
 	public:
 		static bool exists(std::wstring_view path);
 		static bool isFile(std::wstring_view path);

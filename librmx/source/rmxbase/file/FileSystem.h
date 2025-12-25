@@ -24,6 +24,8 @@ namespace rmx
 		FileSystem();
 		~FileSystem();
 
+		inline const std::error_code& getLastErrorCode() const  { return mLastErrorCode; }
+
 		bool exists(std::wstring_view filename);
 		bool isFile(std::wstring_view path);
 		bool isDirectory(std::wstring_view path);
@@ -96,6 +98,8 @@ namespace rmx
 
 		mutable std::wstring mTempPath;		// Only for temporary internal use
 		mutable std::wstring mTempPath2;	// Only for temporary internal use
+
+		std::error_code mLastErrorCode;
 	};
 
 }

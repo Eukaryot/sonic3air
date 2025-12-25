@@ -11,6 +11,7 @@
 
 #if defined(SUPPORT_IMGUI)
 
+#include "oxygen/application/modding/ModManager.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/menu/imgui/ImGuiIntegration.h"
 #include "oxygen/menu/imgui/ImGuiHelpers.h"
@@ -63,6 +64,20 @@ namespace
 			position.x -= std::min(diffX, 1000.0f * FTX::getTimeDifference() * uiScale);
 		if (diffY > 0.0f)
 			position.y -= std::min(diffY, 1000.0f * FTX::getTimeDifference() * uiScale);
+	}
+
+	bool isZipFileName(std::wstring_view filename)
+	{
+		return rmx::endsWithCaseInsensitive(filename, L".zip");
+	}
+
+	void unmountModZipFile(std::wstring_view filepath)
+	{
+		if (isZipFileName(filepath) && rmx::startsWith(filepath, ModManager::instance().getModsBasePath()))
+		{
+			const std::wstring modsLocalFilePath = std::wstring(filepath.substr(ModManager::instance().getModsBasePath().length()));
+			ModManager::instance().tryRemoveZipFileProvider(modsLocalFilePath);
+		}
 	}
 }
 
@@ -198,7 +213,7 @@ void ImGuiFileBrowser::refreshFileEntries()
 	for (size_t k = 0; k < mDirectories.size(); ++k)
 	{
 		const std::wstring& dirName = mDirectories[k];
-		if (rmx::endsWith(dirName, L".zip") || rmx::endsWith(dirName, L".ZIP"))
+		if (isZipFileName(dirName))
 		{
 			const auto isFile = [&]()
 			{
@@ -518,7 +533,7 @@ void ImGuiFileBrowser::drawActionsMenu(bool openMenuNow)
 			ImGui::SameLine();
 			ImGui::Text("%s", rmx::convertToUTF8(mOpenActionsForFile->mFilename).c_str());
 
-			if (rmx::endsWith(mOpenActionsForFile->mFilename, L".zip") || rmx::endsWith(mOpenActionsForFile->mFilename, L".ZIP"))
+			if (isZipFileName(mOpenActionsForFile->mFilename))
 			{
 				if (ImGui::Button("Open zip file", BUTTON_SIZE))
 				{
@@ -623,15 +638,19 @@ void ImGuiFileBrowser::drawConfirmDeletionPopup(bool openPopupNow)
 	if (performDeletion)
 	{
 		const std::wstring currentPath = mFullPath;
+		bool success = true;
 		if (nullptr != mOpenActionsForFile)
 		{
-			FTX::FileSystem->removeFile(currentPath + mOpenActionsForFile->mFilename);
+			const std::wstring fullFilePath = currentPath + mOpenActionsForFile->mFilename;
+			unmountModZipFile(fullFilePath);	// Just in case it's a mounted mod zip, we need to unmount it first
+			success = FTX::FileSystem->removeFile(fullFilePath);
 		}
 		else if (nullptr != mOpenActionsForDirectory)
 		{
-			FTX::FileSystem->removeDirectory(currentPath + *mOpenActionsForDirectory);
+			success = FTX::FileSystem->removeDirectory(currentPath + *mOpenActionsForDirectory);
 		}
 
+		RMX_CHECK(success, "Deletion failed with error: " << FTX::FileSystem->getLastErrorCode().message(), );
 		mRefreshFileEntries = true;
 	}
 }
@@ -711,13 +730,17 @@ void ImGuiFileBrowser::drawRenamingPopup(bool openPopupNow)
 	if (performRenaming)
 	{
 		const std::wstring currentPath = mFullPath;
+		bool success = true;
 		if (nullptr != mOpenActionsForFile)
 		{
 			const std::wstring oldName = mOpenActionsForFile->mFilename;
 			const std::wstring newName = newNameInput.get().toStdWString();
 			if (oldName != newName)
 			{
-				FTX::FileSystem->renameFile(currentPath + oldName, currentPath + newName);
+				const std::wstring oldFullFilePath = currentPath + oldName;
+				const std::wstring newFullFilePath = currentPath + newName;
+				unmountModZipFile(oldFullFilePath);		// Just in case it's a mounted mod zip, we need to unmount it first
+				success = FTX::FileSystem->renameFile(oldFullFilePath, newFullFilePath);
 			}
 		}
 		else if (nullptr != mOpenActionsForDirectory)
@@ -726,17 +749,18 @@ void ImGuiFileBrowser::drawRenamingPopup(bool openPopupNow)
 			const std::wstring newName = newNameInput.get().toStdWString();
 			if (oldName != newName)
 			{
-				FTX::FileSystem->renameDirectory(currentPath + oldName, currentPath + newName);
+				success = FTX::FileSystem->renameDirectory(currentPath + oldName, currentPath + newName);
 			}
 		}
 
+		RMX_CHECK(success, "Renaming failed", );
 		mRefreshFileEntries = true;
 	}
 }
 
 DrawerTexture& ImGuiFileBrowser::getFileIcon(const std::wstring& filename)
 {
-	if (rmx::endsWith(filename, L".zip"))
+	if (isZipFileName(filename))
 	{
 		return mZipIconTexture;
 	}

@@ -275,11 +275,12 @@ namespace rmx
 
 	bool FileIO::getFileSize(std::wstring_view filename, uint64& outSize)
 	{
+		mLastErrorCode.clear();
+
 	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
 		const std_filesystem::path fspath(filename.data());
-		std::error_code errorCode;
-		const std::uintmax_t size = std_filesystem::file_size(fspath, errorCode);
-		if (errorCode)
+		const std::uintmax_t size = std_filesystem::file_size(fspath, mLastErrorCode);
+		if (mLastErrorCode)
 			return false;
 		outSize = (uint64)size;
 		return true;
@@ -294,11 +295,12 @@ namespace rmx
 
 	bool FileIO::getFileTime(std::wstring_view filename, time_t& outTime)
 	{
+		mLastErrorCode.clear();
+
 	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
 		const std_filesystem::path fspath(filename.data());
-		std::error_code errorCode;
-		const std_filesystem::file_time_type time = std_filesystem::last_write_time(fspath, errorCode);
-		if (errorCode)
+		const std_filesystem::file_time_type time = std_filesystem::last_write_time(fspath, mLastErrorCode);
+		if (mLastErrorCode)
 			return false;
 
 		// This is the C++17 solution for converting the time -- see https://stackoverflow.com/questions/61030383/how-to-convert-stdfilesystemfile-time-type-to-time-t
@@ -372,12 +374,13 @@ namespace rmx
 
 	bool FileIO::renameFile(const std::wstring& oldFilename, const std::wstring& newFilename)
 	{
+		mLastErrorCode.clear();
+
 	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
 		const std_filesystem::path fspathOld(oldFilename.data());
 		const std_filesystem::path fspathNew(newFilename.data());
-		std::error_code errorCode;
-		std_filesystem::rename(fspathOld, fspathNew, errorCode);
-		return !errorCode;
+		std_filesystem::rename(fspathOld, fspathNew, mLastErrorCode);
+		return !mLastErrorCode;
 	#else
 		RMX_ASSERT(false, "Not implemented: FileIO::renameFile");
 		return false;
@@ -386,12 +389,13 @@ namespace rmx
 
 	bool FileIO::renameDirectory(const std::wstring& oldFilename, const std::wstring& newFilename)
 	{
+		mLastErrorCode.clear();
+
 	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
 		const std_filesystem::path fspathOld(oldFilename.data());
 		const std_filesystem::path fspathNew(newFilename.data());
-		std::error_code errorCode;
-		std_filesystem::rename(fspathOld, fspathNew, errorCode);
-		return !errorCode;
+		std_filesystem::rename(fspathOld, fspathNew, mLastErrorCode);
+		return !mLastErrorCode;
 	#else
 		RMX_ASSERT(false, "Not implemented: FileIO::renameDirectory");
 		return false;
@@ -400,11 +404,12 @@ namespace rmx
 
 	bool FileIO::removeFile(std::wstring_view path)
 	{
+		mLastErrorCode.clear();
+
 	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
 		const std_filesystem::path fspath(path);
-		std::error_code errorCode;
-		std_filesystem::remove(fspath, errorCode);
-		return !errorCode;
+		std_filesystem::remove(fspath, mLastErrorCode);
+		return !mLastErrorCode;
 	#else
 		RMX_ASSERT(false, "Not implemented: FileIO::removeFile");
 		return false;
@@ -413,11 +418,12 @@ namespace rmx
 
 	bool FileIO::removeDirectory(std::wstring_view path)
 	{
+		mLastErrorCode.clear();
+
 	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
 		const std_filesystem::path fspath(path);
-		std::error_code errorCode;
-		std_filesystem::remove_all(fspath, errorCode);
-		return !errorCode;
+		std_filesystem::remove_all(fspath, mLastErrorCode);
+		return !mLastErrorCode;
 	#else
 		RMX_ASSERT(false, "Not implemented: FileIO::removeDirectory");
 		return false;

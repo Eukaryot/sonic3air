@@ -303,13 +303,17 @@ namespace rmx
 	bool FileSystem::removeFile(std::wstring_view path)
 	{
 		// TODO: Use file providers here as well
-		return FileIO::removeFile(path);
+		const bool result = FileIO::removeFile(path);
+		mLastErrorCode = FileIO::mLastErrorCode;
+		return result;
 	}
 
 	bool FileSystem::removeDirectory(std::wstring_view path)
 	{
 		// TODO: Use file providers here as well
-		return FileIO::removeDirectory(path);
+		const bool result = FileIO::removeDirectory(path);
+		mLastErrorCode = FileIO::mLastErrorCode;
+		return result;
 	}
 
 	bool FileSystem::exists(std::string_view path)

@@ -19,6 +19,8 @@ class ModManager : public SingleInstance<ModManager>
 public:
 	~ModManager();
 
+	inline const std::wstring& getModsBasePath() const  { return mBasePath; }
+
 	inline const std::vector<Mod*>& getAllMods() const	   { return mAllMods; }
 	inline const std::vector<Mod*>& getActiveMods() const  { return mActiveMods; }	// Sorted in inverse priority, i.e. highest prio mods are at the end of the list
 	inline const std::unordered_map<uint64, Mod*>& getActiveModsByNameHash() const	{ return mActiveModsByNameHash; }
@@ -37,6 +39,8 @@ public:
 
 	void copyModSettingsFromConfig();
 	void copyModSettingsToConfig();
+
+	bool tryRemoveZipFileProvider(const std::wstring&);
 
 private:
 	struct FoundMod

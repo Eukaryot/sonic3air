@@ -205,6 +205,18 @@ void ModManager::copyModSettingsToConfig()
 	}
 }
 
+bool ModManager::tryRemoveZipFileProvider(const std::wstring& zipLocalPath)
+{
+	const auto it = mZipFileProviders.find(zipLocalPath);
+	if (it == mZipFileProviders.end())
+		return false;
+
+	// Note that destroying the file provider will automatically remove its mount points
+	delete it->second;
+	mZipFileProviders.erase(it);
+	return true;
+}
+
 bool ModManager::scanMods()
 {
 	// Mark all existing mods as dirty first
