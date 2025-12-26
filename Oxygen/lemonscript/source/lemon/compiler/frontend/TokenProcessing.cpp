@@ -700,6 +700,7 @@ namespace lemon
 								}
 								case DataTypeDefinition::Class::INTEGER:
 								case DataTypeDefinition::Class::STRING:
+								case DataTypeDefinition::Class::FLOAT:
 								{
 									ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
 									constantToken.mValue.reset();
@@ -752,6 +753,7 @@ namespace lemon
 					functionToken.mFunction = function;
 					functionToken.mDataType = function->getReturnType();
 				}
+				RMX_ASSERT(function, "");
 			}
 		}
 	}
@@ -845,6 +847,7 @@ namespace lemon
 				#endif
 
 					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
+					RMX_ASSERT(matchingFunction, "");
 					token.mFunction = matchingFunction;
 					token.mParameters.resize(2);
 					ConstantToken& idToken = token.mParameters[0].create<ConstantToken>();
