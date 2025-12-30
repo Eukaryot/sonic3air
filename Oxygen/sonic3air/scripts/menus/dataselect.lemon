@@ -1015,7 +1015,7 @@ function bool fn00d458()
 			{
 				playSound(SFX_CLICK)
 				--D1.u16
-				if (D1.s16 < 0)
+				if (D1.s16 < 0 || D1.s16 > D6.u16)
 				{
 					D1.u16 = D6.u16
 				}
