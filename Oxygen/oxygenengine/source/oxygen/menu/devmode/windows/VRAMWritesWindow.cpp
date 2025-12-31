@@ -67,7 +67,7 @@ void VRAMWritesWindow::buildContent()
 	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Filter by address:");
 	ImGui::SameLine();
-	if (ImGui::InputText("##FilterByAddress", filterAddressString.mInternal, sizeof(filterAddressString.mInternal)))
+	if (ImGuiHelpers::InputText("##FilterByAddress", filterAddressString))
 	{
 		if (filterAddressString.isEmpty())
 			filterAddress = -1;

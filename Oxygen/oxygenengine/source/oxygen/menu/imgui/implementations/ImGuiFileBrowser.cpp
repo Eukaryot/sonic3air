@@ -79,6 +79,18 @@ namespace
 			ModManager::instance().tryRemoveZipFileProvider(modsLocalFilePath);
 		}
 	}
+
+	int filterFileNameInput(ImGuiInputTextCallbackData* data)
+	{
+		static const char FORBIDDEN_CHARACTERS[] = "/\\*?:|<>\"";
+
+		for (char character : FORBIDDEN_CHARACTERS)
+		{
+			if (data->EventChar == character)
+				return 1;
+		}
+		return 0;
+	}
 }
 
 
@@ -695,11 +707,7 @@ void ImGuiFileBrowser::drawRenamingPopup(bool openPopupNow)
 			{
 				ImGui::SetKeyboardFocusHere();
 			}
-			if (ImGui::InputText("##NewName", newNameInput.mInternalUTF8, sizeof(newNameInput.mInternalUTF8), ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll))
-			{
-				// TODO: Check for invalid characters for the file name (including slashes and hacks like "..")
-				newNameInput.refreshFromInternal();
-			}
+			ImGuiHelpers::InputText("##NewName", newNameInput, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_CallbackCharFilter, &filterFileNameInput);
 
 			ImGui::Separator();
 

@@ -14,30 +14,32 @@
 
 #include "oxygen/menu/imgui/ImGuiExtensions.h"
 
-namespace ImGuiHelpers
+struct ImGuiHelpers
 {
 
-	static const ImVec4 COLOR_WHITE		  (1.0f, 1.0f, 1.0f, 1.0f);
-	static const ImVec4 COLOR_GRAY80	  (0.8f, 0.8f, 0.8f, 1.0f);
-	static const ImVec4 COLOR_GRAY60	  (0.6f, 0.6f, 0.6f, 1.0f);
-	static const ImVec4 COLOR_GRAY40	  (0.4f, 0.4f, 0.4f, 1.0f);
-	static const ImVec4 COLOR_GRAY30	  (0.3f, 0.3f, 0.3f, 1.0f);
-	static const ImVec4 COLOR_BLACK		  (0.0f, 0.0f, 0.0f, 1.0f);
-	static const ImVec4 COLOR_TRANSPARENT (0.0f, 0.0f, 0.0f, 0.0f);
+	static inline const ImVec4 COLOR_WHITE			= ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+	static inline const ImVec4 COLOR_GRAY80			= ImVec4(0.8f, 0.8f, 0.8f, 1.0f);
+	static inline const ImVec4 COLOR_GRAY60			= ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
+	static inline const ImVec4 COLOR_GRAY40			= ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
+	static inline const ImVec4 COLOR_GRAY30			= ImVec4(0.3f, 0.3f, 0.3f, 1.0f);
+	static inline const ImVec4 COLOR_BLACK			= ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+	static inline const ImVec4 COLOR_TRANSPARENT	= ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	static const ImVec4 COLOR_RED		  (1.0f, 0.0f, 0.0f, 1.0f);
-	static const ImVec4 COLOR_YELLOW	  (1.0f, 1.0f, 0.0f, 1.0f);
-	static const ImVec4 COLOR_LIGHT_YELLOW(1.0f, 1.0f, 0.5f, 1.0f);
-	static const ImVec4 COLOR_GREEN		  (0.0f, 1.0f, 0.0f, 1.0f);
-	static const ImVec4 COLOR_CYAN		  (0.0f, 1.0f, 1.0f, 1.0f);
-	static const ImVec4 COLOR_LIGHT_CYAN  (0.5f, 1.0f, 0.0f, 1.0f);
-	static const ImVec4 COLOR_BLUE		  (0.0f, 0.0f, 1.0f, 1.0f);
-	static const ImVec4 COLOR_MAGENTA	  (1.0f, 0.0f, 1.0f, 1.0f);
+	static inline const ImVec4 COLOR_RED			= ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+	static inline const ImVec4 COLOR_YELLOW	 		= ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
+	static inline const ImVec4 COLOR_LIGHT_YELLOW	= ImVec4(1.0f, 1.0f, 0.5f, 1.0f);
+	static inline const ImVec4 COLOR_GREEN			= ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+	static inline const ImVec4 COLOR_CYAN			= ImVec4(0.0f, 1.0f, 1.0f, 1.0f);
+	static inline const ImVec4 COLOR_LIGHT_CYAN		= ImVec4(0.5f, 1.0f, 0.0f, 1.0f);
+	static inline const ImVec4 COLOR_BLUE			= ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
+	static inline const ImVec4 COLOR_MAGENTA		= ImVec4(1.0f, 0.0f, 1.0f, 1.0f);
 
 
-	extern ImTextureRef getTextureRef(DrawerTexture& drawerTexture);
+	static void resetForNextFrame();
 
-	extern ImVec4 getAccentColorMix(float accent, float saturation = 1.0f, float grayValue = 0.3f);
+	static ImTextureRef getTextureRef(DrawerTexture& drawerTexture);
+
+	static ImVec4 getAccentColorMix(float accent, float saturation = 1.0f, float grayValue = 0.3f);
 
 
 	struct ScopedIndent
@@ -93,6 +95,13 @@ namespace ImGuiHelpers
 	};
 
 
+	static inline Recti mActiveInputRect = Recti();
+
+	static bool InputText(const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void* user_data = nullptr);
+	static bool InputText(const char* label, ImGuiHelpers::InputString& inputString, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void* user_data = nullptr);
+	static bool InputText(const char* label, ImGuiHelpers::WideInputString& inputString, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void* user_data = nullptr);
+
+
 	struct FilterString
 	{
 		char mString[256] = { 0 };
@@ -108,7 +117,6 @@ namespace ImGuiHelpers
 		static bool drawButton(const std::wstring& path, int lineNumber);
 		static bool open(const std::wstring& path, int lineNumber);
 	};
-
-}
+};
 
 #endif

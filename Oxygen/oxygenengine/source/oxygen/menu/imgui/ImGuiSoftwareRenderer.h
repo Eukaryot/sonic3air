@@ -18,9 +18,9 @@
 class ImGuiSoftwareRenderer
 {
 public:
-	static void initBackend();
-	static void newFrame();
-	static void renderDrawData();
+	void initBackend();
+	void newFrame();
+	void renderDrawData(Vec2i globalScreenOffset);
 };
 
 #endif

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "oxygen/menu/imgui/ImGuiManager.h"
+#include "oxygen/menu/imgui/ImGuiSoftwareRenderer.h"
 #include <rmxmedia.h>
 
 
@@ -31,6 +32,8 @@ public:
 
 	void refreshImGuiStyle();
 
+	inline Vec2i getGlobalScreenOffset() const  { return mGlobalScreenOffset; }
+
 private:
 	void saveIniSettings();
 
@@ -39,9 +42,11 @@ private:
 	bool mRunning = false;
 	bool mInsideFrame = false;
 	bool mUsingOpenGL = false;
+	Vec2i mGlobalScreenOffset;
 
 #if defined(SUPPORT_IMGUI)
 	ImGuiManager mImGuiManager;
+	ImGuiSoftwareRenderer mImGuiSoftwareRenderer;
 
 	ImFont* mDefaultFont = nullptr;
 	std::wstring mIniFilePath;

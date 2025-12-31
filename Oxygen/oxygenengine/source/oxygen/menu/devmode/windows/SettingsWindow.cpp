@@ -183,9 +183,8 @@ void SettingsWindow::buildContent()
 			if (active)
 				editor.mInputText.set(*editor.mConfigPathVariable);
 
-			if (ImGui::InputText(*String(0, "%s File Location", editor.mExecutableName.c_str()), editor.mInputText.mInternalUTF8, sizeof(editor.mInputText.mInternalUTF8)))
+			if (ImGuiHelpers::InputText(*String(0, "%s File Location", editor.mExecutableName.c_str()), editor.mInputText))
 			{
-				editor.mInputText.refreshFromInternal();
 				*editor.mConfigPathVariable = editor.mInputText.get();
 				editor.mCheckResult.reset();
 			}
@@ -223,9 +222,8 @@ void SettingsWindow::buildContent()
 				static ImGuiHelpers::WideInputString argsText;
 				argsText.set(editorConfig.mCustomEditorArgs);
 
-				if (ImGui::InputText("Arguments Format", argsText.mInternalUTF8, sizeof(argsText.mInternalUTF8)))
+				if (ImGuiHelpers::InputText("Arguments Format", argsText))
 				{
-					argsText.refreshFromInternal();
 					editorConfig.mCustomEditorArgs = argsText.get();
 				}
 			}

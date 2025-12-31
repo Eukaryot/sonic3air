@@ -13,6 +13,7 @@
 
 #include "imgui_internal.h"
 
+
 namespace
 {
 	void scrollWhenDraggingOnVoid(const ImVec2& delta, ImGuiMouseButton mouse_button)
@@ -80,22 +81,25 @@ bool DevModeWindowBase::buildWindow()
 
 	mUIScale = Configuration::instance().mDevMode.mUIScale;
 
+	// Check if window is outside the visible screen
+	//  -> Note that this check is done before the "ImGui::Begin" call so we can set the corrected window position in advance,
+	//     avoiding glitches where the window frame still uses the non-corrected position, and only the content uses the corrected one
+	ImGuiWindow* window = ImGui::FindWindowByName(mTitle.c_str());
+	if (nullptr != window)
+	{
+		const Vec2f maxPos = Vec2f(FTX::screenSize()) - Vec2f(40.0f, 20.0f);
+		const ImVec2 originalScreenPos = window->Pos;
+		const ImVec2 screenPos(std::min(originalScreenPos.x, maxPos.x), clamp(originalScreenPos.y, 0.0f, maxPos.y));
+		if (screenPos.x != originalScreenPos.x || screenPos.y != originalScreenPos.y)
+		{
+			ImGui::SetNextWindowPos(screenPos);
+		}
+	}
+
 	if (!ImGui::Begin(mTitle.c_str(), mCanBeClosed ? &mIsWindowOpen : nullptr, mImGuiWindowFlags))
 	{
 		ImGui::End();
 		return false;
-	}
-
-	// Check if window is outside the visible screen
-	// -> We only check the right / bottom side, as ImGui already handles the others
-	{
-		const Vec2f maxPos = Vec2f(FTX::screenSize()) - Vec2f(10.0f);
-		const ImVec2 originalScreenPos = ImGui::GetWindowPos();
-		const ImVec2 screenPos(std::min(originalScreenPos.x, maxPos.x), std::min(originalScreenPos.y, maxPos.y));
-		if (screenPos.x != originalScreenPos.x || screenPos.y != originalScreenPos.y)
-		{
-			ImGui::SetWindowPos(screenPos);
-		}
 	}
 
 	buildContent();

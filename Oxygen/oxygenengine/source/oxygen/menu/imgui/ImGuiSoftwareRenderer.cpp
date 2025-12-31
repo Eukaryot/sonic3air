@@ -28,10 +28,11 @@ void ImGuiSoftwareRenderer::newFrame()
 {
 }
 
-void ImGuiSoftwareRenderer::renderDrawData()
+void ImGuiSoftwareRenderer::renderDrawData(Vec2i globalScreenOffset)
 {
 	// TODO:
 	//  - Performance optimization: Support rendering textured rectangles as well
+	//  - Rendering of textured triangles/quads that are cut off at the upper screen border looks broken
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
 	DrawerInterface* drawerInterface = EngineMain::instance().getDrawer().getActiveDrawer();
@@ -48,6 +49,7 @@ void ImGuiSoftwareRenderer::renderDrawData()
 	Blitter blitter;
 
 	SoftwareRasterizer::Vertex vertices[3];
+	const Vec2f globalOffsetf = Vec2f(globalScreenOffset);
 
 	const ImDrawData* drawData = ImGui::GetDrawData();
 	for (const ImDrawList* drawList : drawData->CmdLists)
@@ -57,7 +59,8 @@ void ImGuiSoftwareRenderer::renderDrawData()
 			const ImDrawIdx* indexPtr = &drawList->IdxBuffer[drawCmd.IdxOffset];
 			const uint32 indexOffset = drawCmd.VtxOffset;
 
-			const Recti clipRect((int)drawCmd.ClipRect.x, (int)drawCmd.ClipRect.y, (int)(drawCmd.ClipRect.z - drawCmd.ClipRect.x), (int)(drawCmd.ClipRect.w - drawCmd.ClipRect.y));
+			const Recti clipRect((int)drawCmd.ClipRect.x + globalScreenOffset.x, (int)drawCmd.ClipRect.y + globalScreenOffset.y, (int)(drawCmd.ClipRect.z - drawCmd.ClipRect.x), (int)(drawCmd.ClipRect.w - drawCmd.ClipRect.y));
+			const Vec2i clipIndent(std::max(-clipRect.x, 0), std::max(-clipRect.y, 0));
 			BitmapViewMutable<uint32> outputView(output, clipRect);
 			rasterizer.setOutput(outputView);
 
@@ -98,6 +101,7 @@ void ImGuiSoftwareRenderer::renderDrawData()
 
 				for (uint32 k = 0; k + 3 <= drawCmd.ElemCount; k += 3)
 				{
+				#if 1
 					// Check if the next two triangles form a rectangle
 					if (k + 6 <= drawCmd.ElemCount)
 					{
@@ -107,23 +111,24 @@ void ImGuiSoftwareRenderer::renderDrawData()
 							const ImDrawVert& v1 = drawList->VtxBuffer[indexOffset + indexPtr[k + 1]];
 							const ImDrawVert& v2 = drawList->VtxBuffer[indexOffset + indexPtr[k + 2]];
 							const ImDrawVert& v3 = drawList->VtxBuffer[indexOffset + indexPtr[k + 5]];
-
+					
 							if (v0.pos.x == v3.pos.x && v1.pos.x == v2.pos.x && v0.pos.y == v1.pos.y && v2.pos.y == v3.pos.y &&
 								v0.uv.x == v3.uv.x && v1.uv.x == v2.uv.x && v0.uv.y == v1.uv.y && v2.uv.y == v3.uv.y &&
 								v0.col == v1.col && v1.col == v2.col && v2.col == v3.col)
 							{
-								Recti destRect((int)v0.pos.x, (int)v0.pos.y, (int)(v2.pos.x - v0.pos.x), (int)(v2.pos.y - v0.pos.y));
+								Recti destRect((int)v0.pos.x + globalScreenOffset.x, (int)v0.pos.y + globalScreenOffset.y, (int)(v2.pos.x - v0.pos.x), (int)(v2.pos.y - v0.pos.y));
 								destRect.intersect(clipRect);
+					
 								Color color = Color::fromABGR32(v0.col);
 								const bool isUntextured = (v0.uv.x == v2.uv.x && v0.uv.y == v2.uv.y);
-
+					
 								if (isUntextured)
 								{
 									if (blitterOptions.mSwapRedBlueChannels)
 										color.swapRedBlue();
-
+					
 									blitter.blitColor(Blitter::OutputWrapper(output, destRect), color, BlendMode::ALPHA);
-
+					
 									// Skip the next triangle, as we already handled it
 									k += 3;
 									continue;
@@ -131,11 +136,12 @@ void ImGuiSoftwareRenderer::renderDrawData()
 								else
 								{
 									// TODO: Support textured rects as well
-
+					
 								}
 							}
 						}
 					}
+				#endif
 
 					// Build vertices
 					bool isUntextured = false;
@@ -154,7 +160,7 @@ void ImGuiSoftwareRenderer::renderDrawData()
 						for (int j = 0; j < 3; ++j)
 						{
 							const ImDrawVert& vert = *tri[j];
-							vertices[j].mPosition.set(vert.pos.x - drawCmd.ClipRect.x, vert.pos.y - drawCmd.ClipRect.y);
+							vertices[j].mPosition.set(vert.pos.x - drawCmd.ClipRect.x - clipIndent.x, vert.pos.y - drawCmd.ClipRect.y - clipIndent.y);
 							vertices[j].mColor = Color::fromABGR32(vert.col);
 							vertices[j].mUV.set(vert.uv.x, vert.uv.y);
 						}

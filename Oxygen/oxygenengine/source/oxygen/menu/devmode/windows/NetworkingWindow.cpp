@@ -68,7 +68,7 @@ void NetworkingWindow::buildContent()
 			ImGui::Text("   Server:");
 			ImGui::SameLine();
 			ImGui::PushItemWidth(200);
-			if (ImGui::InputText("##ServerName", serverNameInput.mInternal, sizeof(serverNameInput.mInternal)))
+			if (ImGuiHelpers::InputText("##ServerName", serverNameInput))
 			{
 				config.mServerHostName = serverNameInput.get();
 			}
@@ -167,7 +167,7 @@ void NetworkingWindow::buildContent()
 			ImGui::Text(" IP:");
 			ImGui::SameLine();
 			ImGui::PushItemWidth(90);
-			ImGui::InputText("##IP", ipBuffer, 32);
+			ImGuiHelpers::InputText("##IP", ipBuffer, 32);
 			ImGui::PopItemWidth();
 
 			ImGui::SameLine();

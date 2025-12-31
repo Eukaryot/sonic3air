@@ -12,7 +12,6 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/menu/imgui/ImGuiHelpers.h"
-#include "oxygen/menu/imgui/ImGuiSoftwareRenderer.h"
 
 #include "imgui.h"
 #include "backends/imgui_impl_opengl3.h"
@@ -65,7 +64,7 @@ void ImGuiIntegration::startup()
 	//  -> I also quickly tried out the SDLRenderer, but that didn't work correctly
 	mUsingOpenGL = (FTX::Video->getVideoConfig().mRenderer == rmx::VideoConfig::Renderer::OPENGL);
 
-	// Setup Dear ImGui context
+	// Setup ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
@@ -79,7 +78,7 @@ void ImGuiIntegration::startup()
 	else
 	{
 		ImGui_ImplSDL2_InitForOther(window);
-		ImGuiSoftwareRenderer::initBackend();
+		mImGuiSoftwareRenderer.initBackend();
 	}
 
 	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
@@ -124,6 +123,8 @@ void ImGuiIntegration::shutdown()
 
 	saveIniSettings();
 
+	SDL_StopTextInput();
+
 	if (mUsingOpenGL)
 	{
 		ImGui_ImplOpenGL3_Shutdown();
@@ -138,6 +139,32 @@ void ImGuiIntegration::processSdlEvent(const SDL_Event& ev)
 {
 	if (!mRunning)
 		return;
+
+	// Apply global screen offset to mouse events
+	if (mGlobalScreenOffset != Vec2i())
+	{
+		switch (ev.type)
+		{
+			case SDL_MOUSEMOTION:
+			{
+				SDL_Event newEvent = ev;
+				newEvent.motion.x -= mGlobalScreenOffset.x;
+				newEvent.motion.y -= mGlobalScreenOffset.y;
+				ImGui_ImplSDL2_ProcessEvent(&newEvent);
+				return;
+			}
+
+			case SDL_MOUSEBUTTONUP:
+			case SDL_MOUSEBUTTONDOWN:
+			{
+				SDL_Event newEvent = ev;
+				newEvent.button.x -= mGlobalScreenOffset.x;
+				newEvent.button.y -= mGlobalScreenOffset.y;
+				ImGui_ImplSDL2_ProcessEvent(&newEvent);
+				return;
+			}
+		}
+	}
 
 	// Forward to ImGui backend
 	ImGui_ImplSDL2_ProcessEvent(&ev);
@@ -157,17 +184,19 @@ void ImGuiIntegration::startFrame()
 		startup();
 	}
 
-	// Start the Dear ImGui frame
+	// Start the ImGui frame
 	if (mUsingOpenGL)
 	{
 		ImGui_ImplOpenGL3_NewFrame();
 	}
 	else
 	{
-		ImGuiSoftwareRenderer::newFrame();
+		mImGuiSoftwareRenderer.newFrame();
 	}
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
+
+	ImGuiHelpers::resetForNextFrame();
 }
 
 void ImGuiIntegration::endFrame()
@@ -178,16 +207,41 @@ void ImGuiIntegration::endFrame()
 	if (!mRunning)
 		return;
 
+	mGlobalScreenOffset.set(0, 0);
+
+#if defined(PLATFORM_ANDROID)
+	// Move all windows up for active text input, if needed
+	if (ImGui::GetIO().WantTextInput && ImGuiHelpers::mActiveInputRect != Recti())
+	{
+		const int maxY = FTX::screenHeight() * 2/5;
+		const int diffY = ImGuiHelpers::mActiveInputRect.getEndPos().y - maxY;
+		if (diffY > 0)
+			mGlobalScreenOffset.y -= diffY;
+	}
+#endif
+
 	// ImGui rendering
 	ImGui::Render();
 
 	if (mUsingOpenGL)
 	{
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		ImDrawData* drawData = ImGui::GetDrawData();
+		drawData->DisplayPos.x -= mGlobalScreenOffset.x;
+		drawData->DisplayPos.y -= mGlobalScreenOffset.y;
+		ImGui_ImplOpenGL3_RenderDrawData(drawData);
 	}
 	else
 	{
-		ImGuiSoftwareRenderer::renderDrawData();
+		mImGuiSoftwareRenderer.renderDrawData(mGlobalScreenOffset);
+	}
+
+	// Show or hide virtual keyboard on platforms that support it (especially Android)
+	if (ImGui::GetIO().WantTextInput != (bool)SDL_IsTextInputActive())
+	{
+		if (ImGui::GetIO().WantTextInput)
+			SDL_StartTextInput();
+		else
+			SDL_StopTextInput();
 	}
 
 	// Save ini if there was a change
@@ -224,7 +278,7 @@ void ImGuiIntegration::buildContents()
 		return;
 
 	// Some checks
-	IM_ASSERT(ImGui::GetCurrentContext() != nullptr && "Missing Dear ImGui context. Refer to examples app!");
+	IM_ASSERT(ImGui::GetCurrentContext() != nullptr && "Missing ImGui context. Refer to examples app!");
 	IMGUI_CHECKVERSION();
 
 	ImGui::PushFont(mDefaultFont, 0.0f);
