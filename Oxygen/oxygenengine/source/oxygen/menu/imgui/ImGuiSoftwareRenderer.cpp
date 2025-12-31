@@ -111,24 +111,24 @@ void ImGuiSoftwareRenderer::renderDrawData(Vec2i globalScreenOffset)
 							const ImDrawVert& v1 = drawList->VtxBuffer[indexOffset + indexPtr[k + 1]];
 							const ImDrawVert& v2 = drawList->VtxBuffer[indexOffset + indexPtr[k + 2]];
 							const ImDrawVert& v3 = drawList->VtxBuffer[indexOffset + indexPtr[k + 5]];
-					
+
 							if (v0.pos.x == v3.pos.x && v1.pos.x == v2.pos.x && v0.pos.y == v1.pos.y && v2.pos.y == v3.pos.y &&
 								v0.uv.x == v3.uv.x && v1.uv.x == v2.uv.x && v0.uv.y == v1.uv.y && v2.uv.y == v3.uv.y &&
 								v0.col == v1.col && v1.col == v2.col && v2.col == v3.col)
 							{
 								Recti destRect((int)v0.pos.x + globalScreenOffset.x, (int)v0.pos.y + globalScreenOffset.y, (int)(v2.pos.x - v0.pos.x), (int)(v2.pos.y - v0.pos.y));
 								destRect.intersect(clipRect);
-					
+
 								Color color = Color::fromABGR32(v0.col);
 								const bool isUntextured = (v0.uv.x == v2.uv.x && v0.uv.y == v2.uv.y);
-					
+
 								if (isUntextured)
 								{
 									if (blitterOptions.mSwapRedBlueChannels)
 										color.swapRedBlue();
-					
+
 									blitter.blitColor(Blitter::OutputWrapper(output, destRect), color, BlendMode::ALPHA);
-					
+
 									// Skip the next triangle, as we already handled it
 									k += 3;
 									continue;
@@ -136,7 +136,7 @@ void ImGuiSoftwareRenderer::renderDrawData(Vec2i globalScreenOffset)
 								else
 								{
 									// TODO: Support textured rects as well
-					
+
 								}
 							}
 						}

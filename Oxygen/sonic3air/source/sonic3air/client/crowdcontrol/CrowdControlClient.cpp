@@ -92,7 +92,7 @@ void CrowdControlClient::evaluateRequestJson(const Json::Value& requestJson)
 {
 	// Read request properties from the JSON
 	Request request;
-	
+
 	JsonHelper jsonHelper(requestJson);
 	if (!jsonHelper.tryReadInt("id", request.mId))
 		return;

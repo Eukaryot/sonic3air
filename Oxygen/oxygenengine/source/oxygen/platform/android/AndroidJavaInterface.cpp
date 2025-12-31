@@ -130,9 +130,9 @@
 
 
 	void AndroidJavaInterface::openFileExportDialog(const std::wstring& filename, const std::vector<uint8>& contents)
-    {
-        AndroidJNIHelper().callVoidMethod("openFileExportDialog", rmx::convertToUTF8(filename).c_str(), contents);
-    }
+	{
+		AndroidJNIHelper().callVoidMethod("openFileExportDialog", rmx::convertToUTF8(filename).c_str(), contents);
+	}
 
 
 	void AndroidJavaInterface::openFolderAccessDialog()
