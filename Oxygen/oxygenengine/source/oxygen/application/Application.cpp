@@ -584,49 +584,56 @@ void Application::render()
 	Drawer& drawer = EngineMain::instance().getDrawer();
 	drawer.setupRenderWindow(&EngineMain::instance().getSDLWindow());
 
-	GuiBase::render();
-
-	// TODO: This gets called too late
-	mBackdropView->setGameViewRect(mGameView->getGameViewport());
-
-	// Show log display output
+	if (mImGuiIntegration.hasBlockingImGuiWindow())
 	{
-		LogDisplay& logDisplay = LogDisplay::instance();
+		mPausedByFocusLoss = false;
+	}
+	else
+	{
+		GuiBase::render();
 
-		if (!logDisplay.mModeDisplayString.empty())
-		{
-			const Recti rect(0, 0, FTX::screenWidth(), 26);
-			drawer.drawRect(rect, Color(0.4f, 0.4f, 0.4f, 0.4f));
-			drawer.printText(mLogDisplayFont, Vec2i(5, 5), logDisplay.mModeDisplayString);
-		}
+		// TODO: This gets called too late
+		mBackdropView->setGameViewRect(mGameView->getGameViewport());
 
-		if (logDisplay.mLogDisplayTimeout > 0.0f)
+		// Show log display output
 		{
-			drawer.printText(mLogDisplayFont, Vec2i(5, FTX::screenHeight() - 25), logDisplay.mLogDisplayString, 1, Color(1.0f, 1.0f, 1.0f, saturate(logDisplay.mLogDisplayTimeout / 0.25f)));
-		}
+			LogDisplay& logDisplay = LogDisplay::instance();
 
-		if (!logDisplay.mLogErrorStrings.empty())
-		{
-			Vec2i pos(5, FTX::screenHeight() - 30 - (int)logDisplay.mLogErrorStrings.size() * 20);
-			for (const String& error : logDisplay.mLogErrorStrings)
+			if (!logDisplay.mModeDisplayString.empty())
 			{
-				drawer.printText(mLogDisplayFont, pos, error, 1, Color(1.0f, 0.2f, 0.2f));
-				pos.y += 20;
+				const Recti rect(0, 0, FTX::screenWidth(), 26);
+				drawer.drawRect(rect, Color(0.4f, 0.4f, 0.4f, 0.4f));
+				drawer.printText(mLogDisplayFont, Vec2i(5, 5), logDisplay.mModeDisplayString);
+			}
+
+			if (logDisplay.mLogDisplayTimeout > 0.0f)
+			{
+				drawer.printText(mLogDisplayFont, Vec2i(5, FTX::screenHeight() - 25), logDisplay.mLogDisplayString, 1, Color(1.0f, 1.0f, 1.0f, saturate(logDisplay.mLogDisplayTimeout / 0.25f)));
+			}
+
+			if (!logDisplay.mLogErrorStrings.empty())
+			{
+				Vec2i pos(5, FTX::screenHeight() - 30 - (int)logDisplay.mLogErrorStrings.size() * 20);
+				for (const String& error : logDisplay.mLogErrorStrings)
+				{
+					drawer.printText(mLogDisplayFont, pos, error, 1, Color(1.0f, 0.2f, 0.2f));
+					pos.y += 20;
+				}
 			}
 		}
-	}
 
-	if (mPausedByFocusLoss)
-	{
-		drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 0.8f));
+		if (mPausedByFocusLoss)
+		{
+			drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 0.8f));
 
-	#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(PLATFORM_IOS)
-		constexpr uint64 key = rmx::constMurmur2_64("auto_pause_text_tap");
-	#else
-		constexpr uint64 key = rmx::constMurmur2_64("auto_pause_text_key");
-	#endif
-		const float scale = (float)(FTX::screenHeight() / 160);		// A bit larger than the usual upscaled pixel size
-		drawer.drawSprite(FTX::screenSize() / 2, key, Color(0.3f, 1.0f, 1.0f), Vec2f(scale));
+		#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(PLATFORM_IOS)
+			constexpr uint64 key = rmx::constMurmur2_64("auto_pause_text_tap");
+		#else
+			constexpr uint64 key = rmx::constMurmur2_64("auto_pause_text_key");
+		#endif
+			const float scale = (float)(FTX::screenHeight() / 160);		// A bit larger than the usual upscaled pixel size
+			drawer.drawSprite(FTX::screenSize() / 2, key, Color(0.3f, 1.0f, 1.0f), Vec2f(scale));
+		}
 	}
 
 	drawer.performRendering();

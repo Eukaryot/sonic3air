@@ -24,6 +24,7 @@ void ImGuiManager::clearProviders()
 		delete reg.mProvider;
 	}
 	mProviders.clear();
+	mHasBlockingProvider = false;
 
 	// ImGui is not needed any more now
 	ImGuiIntegration::instance().setEnabled(false);
@@ -57,6 +58,8 @@ ImGuiContentProvider* ImGuiManager::getImGuiContentProvider(uint64 key) const
 
 void ImGuiManager::buildAllImGuiContent()
 {
+	mHasBlockingProvider = false;
+
 	for (size_t index = 0; index < mProviders.size(); ++index)
 	{
 		ProviderRegistration& reg = mProviders[index];
@@ -64,7 +67,7 @@ void ImGuiManager::buildAllImGuiContent()
 		// Build content
 		reg.mProvider->buildImGuiContent();
 
-		const bool breakAfterwards = reg.mProvider->shouldBlockOtherProviders();
+		mHasBlockingProvider = reg.mProvider->shouldBlockOtherProviders();
 
 		// Handle the case that the provider wants to be removed
 		if (reg.mProvider->shouldRemoveContentProvider())
@@ -79,7 +82,7 @@ void ImGuiManager::buildAllImGuiContent()
 			}
 		}
 
-		if (breakAfterwards)
+		if (mHasBlockingProvider)
 			break;
 	}
 }

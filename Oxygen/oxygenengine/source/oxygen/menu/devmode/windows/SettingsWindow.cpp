@@ -115,7 +115,7 @@ void SettingsWindow::buildContent()
 
 		ImGui::Checkbox("Use Tabs in Main Window", &config.mDevMode.mUseTabsInMainWindow);
 
-		if (ImGui::DragFloat("UI Scale", &config.mDevMode.mUIScale, 0.003f, 0.5f, 4.0f, "%.1f"))
+		if (ImGui::DragFloat("UI Scale", &config.mDevMode.mUIScale, 0.003f, 0.5f, 4.0f, "<   %.1f   >"))
 		{
 			ImGuiIntegration::instance().refreshImGuiStyle();
 		}

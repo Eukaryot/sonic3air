@@ -41,6 +41,8 @@ public:
 
 	void buildAllImGuiContent();
 
+	inline bool hasBlockingProvider() const  { return mHasBlockingProvider; }
+
 private:
 	struct ProviderRegistration
 	{
@@ -51,6 +53,7 @@ private:
 
 private:
 	std::vector<ProviderRegistration> mProviders;
+	bool mHasBlockingProvider = false;
 };
 
 #endif

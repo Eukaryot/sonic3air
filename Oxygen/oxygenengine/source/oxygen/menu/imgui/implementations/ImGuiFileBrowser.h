@@ -52,6 +52,7 @@ private:
 	std::wstring mBasePath;
 	std::wstring mFullPath;
 	std::vector<std::wstring> mLocalPath;
+	bool mIsReadOnlyLocation = false;
 	bool mRefreshFileEntries = false;
 
 	std::vector<std::wstring> mDirectories;

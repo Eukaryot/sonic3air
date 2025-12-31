@@ -40,7 +40,8 @@ public:
 	void copyModSettingsFromConfig();
 	void copyModSettingsToConfig();
 
-	bool tryRemoveZipFileProvider(const std::wstring&);
+	bool addZipFileProvider(const std::wstring& zipLocalPath);
+	bool tryRemoveZipFileProvider(const std::wstring& zipLocalPath);
 
 private:
 	struct FoundMod
@@ -54,7 +55,6 @@ private:
 	bool scanMods();
 	void scanDirectoryRecursive(std::vector<FoundMod>& outFoundMods, const std::wstring& localPath);
 	void findZipsRecursively(std::vector<std::wstring>& outZipPaths, const std::wstring& localPath, int maxDepth);
-	bool processModZipFile(const std::wstring& zipLocalPath);
 	void onActiveModsChanged(bool duringStartup = false);
 
 private:

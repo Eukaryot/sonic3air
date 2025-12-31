@@ -296,6 +296,11 @@ bool ImGuiIntegration::isCapturingKeyboard()
 	return mRunning && ImGui::GetIO().WantCaptureKeyboard;
 }
 
+bool ImGuiIntegration::hasBlockingImGuiWindow() const
+{
+	return mRunning && mImGuiManager.hasBlockingProvider();
+}
+
 void ImGuiIntegration::refreshImGuiStyle()
 {
 	if (!mRunning)
@@ -386,6 +391,7 @@ void ImGuiIntegration::onWindowRecreated(bool useOpenGL)  {}
 void ImGuiIntegration::buildContents()  {}
 bool ImGuiIntegration::isCapturingMouse()  { return false; }
 bool ImGuiIntegration::isCapturingKeyboard()  { return false; }
+bool ImGuiIntegration::hasBlockingImGuiWindow()  { return false; }
 void ImGuiIntegration::refreshImGuiStyle()  {}
 void ImGuiIntegration::saveIniSettings()  {}
 

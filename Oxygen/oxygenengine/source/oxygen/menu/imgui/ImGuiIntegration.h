@@ -29,6 +29,7 @@ public:
 
 	bool isCapturingMouse();
 	bool isCapturingKeyboard();
+	bool hasBlockingImGuiWindow() const;
 
 	void refreshImGuiStyle();
 

@@ -361,6 +361,7 @@ std::wstring PlatformFunctions::getAppDataPath()
 	{
 		std::wstring result(path);
 		CoTaskMemFree(path);
+		FTX::FileSystem->normalizePath(result, false);	// Do not add a slash at the end
 		return result;
 	}
 #elif defined(PLATFORM_LINUX)
