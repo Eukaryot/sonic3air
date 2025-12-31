@@ -15,3 +15,4 @@
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/drawing/Drawer.h"
 #include "oxygen/helper/Logging.h"
+#include "oxygen/platform/PlatformFlags.h"

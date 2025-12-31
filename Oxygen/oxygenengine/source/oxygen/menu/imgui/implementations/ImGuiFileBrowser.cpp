@@ -16,6 +16,7 @@
 #include "oxygen/menu/imgui/ImGuiIntegration.h"
 #include "oxygen/menu/imgui/ImGuiHelpers.h"
 #include "oxygen/menu/devmode/DevModeMainWindow.h"	// Only used for "DevModeWindowBase::allowDragScrolling"
+#include "oxygen/platform/PlatformFlags.h"
 #include "oxygen/platform/PlatformFunctions.h"
 
 #if defined(PLATFORM_ANDROID)
@@ -129,9 +130,9 @@ void ImGuiFileBrowser::buildImGuiContent()
 			mRemoveContentProvider = true;
 		}
 
-	#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MACOS) || defined(PLATFORM_LINUX)
+	#if defined(PLATFORM_HAS_MOUSE)
 		ImGui::Text("Please use your mouse to interact with this window.");
-	#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
+	#elif defined(PLATFORM_HAS_TOUCH_INPUT)
 		ImGui::Text("Please use touch input to interact with this window.");
 	#else
 		ImGui::Text("Please use a mouse or touch input to interact with this window.");
@@ -371,7 +372,7 @@ void ImGuiFileBrowser::drawFileBrowser()
 		{
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			ImGui::TextColored(ImGuiHelpers::COLOR_GRAY60, " - Empty folder -");
+			ImGui::TextColored(ImGuiHelpers::COLOR_GRAY60, " - Empty " PLATFORM_DIRECTORY_STRING " -");
 		}
 
 		ImGui::EndTable();
@@ -606,7 +607,7 @@ void ImGuiFileBrowser::drawConfirmDeletionPopup(bool openPopupNow)
 	{
 		if (nullptr != mOpenActionsForFile || nullptr != mOpenActionsForDirectory)
 		{
-			ImGui::Text(nullptr != mOpenActionsForFile ? "Really delete file " : "Really delete folder ");
+			ImGui::Text(nullptr != mOpenActionsForFile ? "Really delete file " : "Really delete " PLATFORM_DIRECTORY_STRING " ");
 			ImGui::SameLineNoSpace();
 			if (nullptr != mOpenActionsForFile)
 			{
@@ -690,7 +691,7 @@ void ImGuiFileBrowser::drawRenamingPopup(bool openPopupNow)
 	{
 		if (nullptr != mOpenActionsForFile || nullptr != mOpenActionsForDirectory)
 		{
-			ImGui::Text(nullptr != mOpenActionsForFile ? "Rename file " : "Rename folder ");
+			ImGui::Text(nullptr != mOpenActionsForFile ? "Rename file " : "Rename " PLATFORM_DIRECTORY_STRING " ");
 			ImGui::SameLineNoSpace();
 			if (nullptr != mOpenActionsForFile)
 			{

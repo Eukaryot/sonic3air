@@ -159,9 +159,9 @@ uint32 EngineMain::getPlatformFlags() const
 	else
 	{
 		uint32 flags = 0;
-	#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MAC) || defined(PLATFORM_LINUX)
+	#if defined(PLATFORM_IS_DESKTOP)
 		flags |= 0x0001;
-	#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(PLATFORM_IOS)
+	#elif defined(PLATFORM_IS_MOBILE)
 		flags |= 0x0002;
 	#endif
 		return flags;
@@ -425,7 +425,7 @@ bool EngineMain::initConfigAndSettings()
 		const bool loadedProject = mInternal.mGameProfile.loadOxygenProjectFromFile(config.mProjectPath + L"oxygenproject.json");
 		RMX_CHECK(loadedProject, "Failed to load game profile from '" << *WString(config.mProjectPath).toString() << "oxygenproject.json'", );
 	}
-	
+
 	updateGameProfilePaths();
 
 	// Load settings
@@ -435,7 +435,7 @@ bool EngineMain::initConfigAndSettings()
 	config.loadSettings(config.mAppDataPath + L"settings_global.json", Configuration::SettingsType::GLOBAL);
 	if (loadedSettings)
 	{
-	#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX) || defined(PLATFORM_MAC)
+	#if defined(PLATFORM_IS_DESKTOP)
 		// Load config.json once again on top, so that config.json is preferred over settings.json
 		if (!hasCustomGameProfile && !mArguments.mProjectPath.empty() && FTX::FileSystem->exists(mArguments.mProjectPath + L"oxygenproject.json"))
 		{

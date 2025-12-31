@@ -1114,6 +1114,9 @@
     <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\WatchesWindow.h">
       <Filter>menu\devmode\windows</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\platform\PlatformFlags.h">
+      <Filter>platform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Oxygen.natvis" />

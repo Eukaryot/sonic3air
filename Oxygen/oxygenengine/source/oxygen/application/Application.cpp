@@ -821,7 +821,7 @@ void Application::triggerGameRecordingSave()
 
 bool Application::hasKeyboard() const
 {
-#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MAC) || defined(PLATFORM_LINUX)
+#if defined(PLATFORM_HAS_HARDWARE_KEYBOARD)
 	// It should be safe to assume that desktop platforms always have a keyboard
 	return true;
 #else

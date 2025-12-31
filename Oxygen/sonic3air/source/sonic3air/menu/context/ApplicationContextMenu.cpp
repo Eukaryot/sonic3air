@@ -29,14 +29,8 @@ void ApplicationContextMenu::initialize()
 
 	if (mItems.empty())
 	{
-		#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MAC)
-			#define DIRECTORY_STRING "folder"
-		#else
-			#define DIRECTORY_STRING "directory"
-		#endif
-
-		mItems.emplace_back(Item { "Open saved data " DIRECTORY_STRING, Item::Function::OPEN_SAVED_DATA_DIRECTORY });
-		mItems.emplace_back(Item { "Open mods " DIRECTORY_STRING,		Item::Function::OPEN_MODS_DIRECTORY });
+		mItems.emplace_back(Item { "Open saved data " PLATFORM_DIRECTORY_STRING, Item::Function::OPEN_SAVED_DATA_DIRECTORY });
+		mItems.emplace_back(Item { "Open mods " PLATFORM_DIRECTORY_STRING,		Item::Function::OPEN_MODS_DIRECTORY });
 	#if 0
 		// TODO: This does not work well on Windows
 		mItems.emplace_back(Item { "Open log file",						Item::Function::OPEN_LOGFILE });

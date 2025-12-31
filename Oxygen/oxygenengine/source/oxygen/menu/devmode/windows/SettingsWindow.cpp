@@ -140,7 +140,7 @@ void SettingsWindow::buildContent()
 
 	// External file editor settings
 	//  -> Only really makes sense on desktop platforms
-#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS)
+#if defined(PLATFORM_IS_DESKTOP)
 	if (ImGui::CollapsingHeader("External Code Editor"))
 	{
 		ImGuiHelpers::ScopedIndent si;
