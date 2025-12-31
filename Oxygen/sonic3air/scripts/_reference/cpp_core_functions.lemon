@@ -403,6 +403,9 @@ declare function void Game.setDiscordDetails(string text)
 declare function void Game.setDiscordState(string text)
 declare function void Game.setDiscordLargeImage(string imageName)
 declare function void Game.setDiscordSmallImage(string imageName)
+
+declare function void CrowdControl.sendResponse(u32 id, u8 status, string message)
+
 declare function void Game.setUnderwaterAudioEffect(u8 value)
 
 declare function void Kosinski.Decompress()
