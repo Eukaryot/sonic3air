@@ -26,6 +26,8 @@ namespace lemon
 	class PragmaNode;
 	class TokenList;
 	struct LineNumberTranslation;
+	struct NodesIterator;
+
 
 	class CompilerFrontend
 	{
@@ -71,8 +73,6 @@ namespace lemon
 				mScopeStack.pop_back();
 			}
 		};
-
-		struct NodesIterator;
 
 	private:
 		// Node building

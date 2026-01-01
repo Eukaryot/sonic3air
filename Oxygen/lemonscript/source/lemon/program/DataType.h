@@ -146,6 +146,7 @@ namespace lemon
 
 	struct PredefinedDataTypes
 	{
+	public:
 		inline static const VoidDataType VOID		  = VoidDataType();
 		inline static const AnyDataType ANY			  = AnyDataType();
 
@@ -165,16 +166,9 @@ namespace lemon
 
 		inline static const StringDataType STRING	  = StringDataType(13);
 
-		static void collectPredefinedDataTypes(std::vector<const DataTypeDefinition*>& outDataTypes);
-	};
-
-
-	struct DataTypeHelper
-	{
-		static size_t getSizeOfBaseType(BaseType baseType);
+	public:
 		static const DataTypeDefinition* getDataTypeDefinitionForBaseType(BaseType baseType);
-
-		static bool isPureIntegerBaseCast(BaseCastType baseCastType);
+		static void collectPredefinedDataTypes(std::vector<const DataTypeDefinition*>& outDataTypes);
 	};
 
 }

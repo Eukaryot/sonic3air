@@ -1013,7 +1013,7 @@ namespace lemon
 					{
 						// TODO: Support conversions between integer, float, double constants
 						//  -> Unless this is done in the compiler frontend already, which actually makes more sense...
-						if (DataTypeHelper::isPureIntegerBaseCast((BaseCastType)opcode2.mParameter))
+						if (BaseTypeHelper::isPureIntegerBaseCast((BaseCastType)opcode2.mParameter))
 						{
 							switch (opcode2.mParameter & 0x13)
 							{

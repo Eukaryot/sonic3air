@@ -449,7 +449,7 @@ namespace lemon
 						int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
 						runtimeOpcode.setParameter(value);
 
-						switch (DataTypeHelper::getSizeOfBaseType(opcode.mDataType))
+						switch (BaseTypeHelper::getSizeOfBaseType(opcode.mDataType))
 						{
 							case 1:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_GET_VARIABLE_VALUE_EXTERNAL<uint8>;   break;
 							case 2:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_GET_VARIABLE_VALUE_EXTERNAL<uint16>;  break;
@@ -491,7 +491,7 @@ namespace lemon
 						int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
 						runtimeOpcode.setParameter(value);
 
-						switch (DataTypeHelper::getSizeOfBaseType(opcode.mDataType))
+						switch (BaseTypeHelper::getSizeOfBaseType(opcode.mDataType))
 						{
 							case 1:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_SET_VARIABLE_VALUE_EXTERNAL<uint8>;   break;
 							case 2:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_SET_VARIABLE_VALUE_EXTERNAL<uint16>;  break;
