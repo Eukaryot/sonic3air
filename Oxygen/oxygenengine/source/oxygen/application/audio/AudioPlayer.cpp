@@ -577,7 +577,7 @@ AudioPlayer::PlayingSound* AudioPlayer::playAudioInternal(SourceRegistration* so
 
 	// Check for channel overrides
 	const bool isOverridden = isChannelOverridden(channelId, contextId);
-	const float volume = isOverridden ? 0.0f : 1.0f;
+	const float volume = isOverridden ? 0.0f : sourceReg->mVolume;
 
 	// Start playing that sound
 	PlayingSound* playingSound = nullptr;
