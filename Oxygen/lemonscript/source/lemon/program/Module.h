@@ -44,6 +44,9 @@ namespace lemon
 		inline const std::string& getModuleName() const  { return mModuleName; }
 		inline uint64 getModuleId() const  { return mModuleId; }
 
+		inline uint32 getScriptFeatureLevel() const  { return mScriptFeatureLevel; }
+		inline void setScriptFeatureLevel(uint32 scriptFeatureLevel)  { mScriptFeatureLevel = scriptFeatureLevel; }
+
 		inline AppendedInfo* getAppendedInfo() const  { return mAppendedInfo; }
 
 		void clear();
@@ -113,6 +116,7 @@ namespace lemon
 	private:
 		std::string mModuleName;
 		uint64 mModuleId = 0;
+		uint32 mScriptFeatureLevel = 2;
 
 		AppendedInfo* mAppendedInfo = nullptr;
 

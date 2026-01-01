@@ -1219,6 +1219,7 @@ namespace lemon
 					REPORT_ERROR_CODE(CompilerError::Code::SCRIPT_FEATURE_LEVEL_TOO_HIGH, value, CompileOptions::MAX_SCRIPT_FEATURE_LEVEL, "Script uses feature level " << value << ", but the highest supported level is " << CompileOptions::MAX_SCRIPT_FEATURE_LEVEL);
 				}
 				mCompileOptions.mScriptFeatureLevel = (uint32)value;
+				mModule.setScriptFeatureLevel((uint32)value);
 			}
 			return true;
 		}

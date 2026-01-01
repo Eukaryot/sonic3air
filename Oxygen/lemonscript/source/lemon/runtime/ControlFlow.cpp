@@ -99,4 +99,10 @@ namespace lemon
 		return (nullptr != runtimeFunction) ? runtimeFunction->mFunction : nullptr;
 	}
 
+	const Module* ControlFlow::getCurrentModule() const
+	{
+		const ScriptFunction* function = getCurrentFunction();
+		return (nullptr != function) ? &function->getModule() : nullptr;
+	}
+
 }

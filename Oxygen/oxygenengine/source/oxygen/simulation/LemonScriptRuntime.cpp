@@ -324,7 +324,7 @@ lemon::AnyBaseValue LemonScriptRuntime::getGlobalVariableValue(lemon::FlyweightS
 	{
 		const lemon::AnyBaseValue inValue = mInternal.mRuntime.getGlobalVariableValue(*variable);
 		lemon::CompileOptions compileOptions;
-		compileOptions.mScriptFeatureLevel = 2;
+		compileOptions.mScriptFeatureLevel = getCurrentExecutionScriptFeatureLevel();
 		const lemon::TypeCasting::CastHandling castHandling = lemon::TypeCasting(compileOptions).castBaseValue(inValue, variable->getDataType(), outValue, dataType, true);
 		if (castHandling.mResult == lemon::TypeCasting::CastHandling::Result::INVALID)
 			outValue.reset();
@@ -339,7 +339,7 @@ void LemonScriptRuntime::setGlobalVariableValue(lemon::FlyweightString variableN
 	{
 		lemon::AnyBaseValue valueToSet;
 		lemon::CompileOptions compileOptions;
-		compileOptions.mScriptFeatureLevel = 2;
+		compileOptions.mScriptFeatureLevel = getCurrentExecutionScriptFeatureLevel();
 		const lemon::TypeCasting::CastHandling castHandling = lemon::TypeCasting(compileOptions).castBaseValue(value, dataType, valueToSet, variable->getDataType(), true);
 		if (castHandling.mResult == lemon::TypeCasting::CastHandling::Result::INVALID)
 			valueToSet.reset();
@@ -358,6 +358,12 @@ void LemonScriptRuntime::getCurrentExecutionLocation(const lemon::ScriptFunction
 std::string LemonScriptRuntime::getOwnCurrentScriptLocationString() const
 {
 	return buildScriptLocationString(mInternal.mRuntime.getSelectedControlFlow());
+}
+
+uint32 LemonScriptRuntime::getCurrentExecutionScriptFeatureLevel() const
+{
+	const lemon::Module* module = mInternal.mRuntime.getSelectedControlFlow().getCurrentModule();
+	return (nullptr != module) ? module->getScriptFeatureLevel() : 2;
 }
 
 std::string LemonScriptRuntime::buildScriptLocationString(const lemon::ControlFlow& controlFlow)

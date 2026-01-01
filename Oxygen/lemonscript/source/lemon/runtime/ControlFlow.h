@@ -16,6 +16,7 @@
 namespace lemon
 {
 	class MemoryAccessHandler;
+	class Module;
 	class Program;
 	class Runtime;
 	class RuntimeFunction;
@@ -60,6 +61,7 @@ namespace lemon
 		void getRecentExecutionLocation(Location& outLocation) const;
 		void getCurrentExecutionLocation(Location& outLocation) const;
 		const ScriptFunction* getCurrentFunction() const;
+		const Module* getCurrentModule() const;
 
 		inline size_t getValueStackSize() const  { return mValueStackPtr - mValueStackStart; }
 
