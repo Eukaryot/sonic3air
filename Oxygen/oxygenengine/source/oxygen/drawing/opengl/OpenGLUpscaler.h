@@ -35,13 +35,21 @@ public:
 	void renderImage(const Recti& rect, GLuint textureHandle, Vec2i textureResolution);
 
 private:
+	struct LookupTexture
+	{
+		bool mInitialized = false;
+		std::wstring mImagePath;
+		OpenGLTexture mTexture;
+	};
+
+private:
 	const Type mType = Type::DEFAULT;
 	OpenGLDrawerResources& mResources;
 
 	std::vector<Shader> mShaders;
 	Framebuffer mPass0Buffer;
 	OpenGLTexture mPass0Texture;
-	OpenGLTexture mLookupTexture[3];
+	std::vector<LookupTexture> mLookupTextures;
 
 	bool mFilterLinear = false;
 };

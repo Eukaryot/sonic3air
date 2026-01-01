@@ -52,6 +52,11 @@ void OpenGLUpscaler::startup()
 			FileHelper::loadShader(mShaders[0], L"data/shader/upscaler_hqx.shader", "Standard_2x");
 			FileHelper::loadShader(mShaders[1], L"data/shader/upscaler_hqx.shader", "Standard_3x");
 			FileHelper::loadShader(mShaders[2], L"data/shader/upscaler_hqx.shader", "Standard_4x");
+
+			mLookupTextures.resize(3);
+			mLookupTextures[0].mImagePath = L"data/shader/hq2x.png";
+			mLookupTextures[1].mImagePath = L"data/shader/hq3x.png";
+			mLookupTextures[2].mImagePath = L"data/shader/hq4x.png";
 			break;
 		}
 	#endif
@@ -129,16 +134,22 @@ void OpenGLUpscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i 
 	Shader* secondShader = upscaleShader;
 
 	// Need a lookup texture?
-	if (lookupTextureIndex != -1)
+	LookupTexture* lut = nullptr;
+	if (lookupTextureIndex >= 0 && lookupTextureIndex < (int)mLookupTextures.size())
 	{
-		if (mLookupTexture[lookupTextureIndex].getHandle() == 0)
+		lut = &mLookupTextures[lookupTextureIndex];
+		if (!lut->mInitialized)
 		{
-			const wchar_t* textureFilename = (lookupTextureIndex == 0) ? L"hq2x.png" : (lookupTextureIndex == 1) ? L"hq3x.png" : L"hq4x.png";
 			Bitmap bitmap;
-			if (FileHelper::loadBitmap(bitmap, std::wstring(L"data/shader/") + textureFilename))
+			if (FileHelper::loadBitmap(bitmap, lut->mImagePath))
 			{
-				mLookupTexture[lookupTextureIndex].loadBitmap(bitmap);
+				lut->mTexture.loadBitmap(bitmap);
 			}
+			else
+			{
+				RMX_ERROR("Failed to load upscaler texture " << WString(lut->mImagePath).toStdString(), );
+			}
+			lut->mInitialized = true;
 		}
 	}
 
@@ -168,9 +179,9 @@ void OpenGLUpscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i 
 		}
 
 		// Configuration for shaders that need lookup textures
-		if (lookupTextureIndex != -1)
+		if (nullptr != lut)
 		{
-			firstShader->setTexture("LUT", mLookupTexture[lookupTextureIndex].getHandle(), GL_TEXTURE_2D);
+			firstShader->setTexture("LUT", lut->mTexture.getHandle(), GL_TEXTURE_2D);
 		}
 	}
 
