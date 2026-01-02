@@ -68,27 +68,6 @@ void AudioOut::resetGame()
 	mAudioPlayer.resetAudioModifiers();
 }
 
-void AudioOut::realtimeUpdate(float secondsPassed)
-{
-	// Sync volumes
-	ConfigurationImpl& config = ConfigurationImpl::instance();
-	if (mMusicVolume != config.mMusicVolume)
-	{
-		mMusicVolume = config.mMusicVolume;
-		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::INGAME_MUSIC, mMusicVolume);
-		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::MENU_MUSIC, mMusicVolume);
-	}
-	if (mSoundVolume != config.mSoundVolume)
-	{
-		mSoundVolume = config.mSoundVolume;
-		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::INGAME_SOUND, mSoundVolume);
-		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::MENU_SOUND, mSoundVolume);
-	}
-
-	// Call base implementation
-	AudioOutBase::realtimeUpdate(secondsPassed);
-}
-
 void AudioOut::playAudioDirect(uint64 sfxId, SoundRegType type, int contextBase, AudioReference* outAudioReference)
 {
 	SfxHandling handling;

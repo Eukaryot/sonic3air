@@ -40,7 +40,7 @@ void AudioOutBase::startup()
 
 	// Startup
 	mAudioPlayer.startup();
-	setGlobalVolume(Configuration::instance().mAudioVolume);
+	setGlobalVolume(Configuration::instance().mAudio.mMasterVolume);
 }
 
 void AudioOutBase::shutdown()
@@ -51,10 +51,24 @@ void AudioOutBase::shutdown()
 void AudioOutBase::realtimeUpdate(float secondsPassed)
 {
 	// Sync volumes
-	if (mGlobalVolume != Configuration::instance().mAudioVolume)
+	Configuration& config = Configuration::instance();
+	if (mGlobalVolume != config.mAudio.mMasterVolume)
 	{
-		setGlobalVolume(Configuration::instance().mAudioVolume);
+		setGlobalVolume(config.mAudio.mMasterVolume);
 	}
+	if (mMusicVolume != config.mAudio.mMusicVolume)
+	{
+		mMusicVolume = config.mAudio.mMusicVolume;
+		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::INGAME_MUSIC, mMusicVolume);
+		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::MENU_MUSIC, mMusicVolume);
+	}
+	if (mSoundVolume != config.mAudio.mSoundVolume)
+	{
+		mSoundVolume = config.mAudio.mSoundVolume;
+		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::INGAME_SOUND, mSoundVolume);
+		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::MENU_SOUND, mSoundVolume);
+	}
+
 
 	// Update playback and streaming
 	mAudioPlayer.updatePlayback(secondsPassed);

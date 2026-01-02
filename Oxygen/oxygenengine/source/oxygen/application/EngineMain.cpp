@@ -286,7 +286,7 @@ bool EngineMain::startupEngine()
 
 	// Audio
 	RMX_LOG_INFO("Audio initialization...");
-	FTX::Audio->initialize(config.mAudioSampleRate, 2, 1024);
+	FTX::Audio->initialize(config.mAudio.mSampleRate, 2, 1024);
 
 	RMX_LOG_INFO("Startup of AudioOut");
 	mAudioOut = &EngineMain::getDelegate().createAudioOut();

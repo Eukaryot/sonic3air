@@ -110,9 +110,16 @@ void ConfigurationImpl::serializeSettingsInternal(JsonSerializer& serializer)
 	}
 
 	// Audio
-	serializer.serialize("Audio_MusicVolume", mMusicVolume);
-	serializer.serialize("Audio_SoundVolume", mSoundVolume);
-	serializer.serialize("ActiveSoundtrack", mActiveSoundtrack);
+	if (serializer.beginObject("Audio"))
+	{
+		serializer.serialize("ActiveSoundtrack", mActiveSoundtrack);
+		serializer.endObject();
+	}
+	else if (serializer.isReading())
+	{
+		// Legacy support for old, more flat way of storing settings (before Jan 2026)
+		serializer.serialize("ActiveSoundtrack", mActiveSoundtrack);
+	}
 
 	// Input
 	serializer.serialize("GamepadVisualStyle", mGamepadVisualStyle);

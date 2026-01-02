@@ -508,9 +508,6 @@ void Configuration::loadConfigurationProperties(JsonSerializer& serializer)
 	serializer.serialize("PerformanceDisplay", mPerformanceDisplay);
 	tryReadRenderMethod(serializer, mFailSafeMode, mRenderMethod, mAutoDetectRenderMethod);
 
-	// Audio
-	serializer.serialize("AudioSampleRate", mAudioSampleRate);
-
 	// Input recorder
 	if (mDevMode.mEnabled)
 	{
@@ -537,7 +534,7 @@ void Configuration::serializeStandardSettings(JsonSerializer& serializer)
 	serializer.serialize("FailSafeMode", mFailSafeMode);
 
 	if (serializer.isReading() && mFailSafeMode)
-		mUseAudioThreading = false;
+		mAudio.mUseAudioThreading = false;
 
 	// Graphics
 	if (serializer.isReading())
@@ -566,18 +563,49 @@ void Configuration::serializeStandardSettings(JsonSerializer& serializer)
 	serializer.serialize("PerformanceDisplay", mPerformanceDisplay);
 
 	// Audio
-	serializer.serialize("Volume", mAudioVolume);
+	if (serializer.beginObject("Audio"))
+	{
+		serializer.serialize("MasterVolume", mAudio.mMasterVolume);
+		serializer.serialize("MusicVolume", mAudio.mMusicVolume);
+		serializer.serialize("SoundVolume", mAudio.mSoundVolume);
+		serializer.serialize("SampleRate", mAudio.mSampleRate);
+		serializer.endObject();
+	}
+	else if (serializer.isReading())
+	{
+		// Legacy support for old, more flat way of storing settings (before Jan 2026)
+		serializer.serialize("Volume", mAudio.mMasterVolume);
+		serializer.serialize("Audio_MusicVolume", mAudio.mMusicVolume);
+		serializer.serialize("Audio_SoundVolume", mAudio.mSoundVolume);
+	}
 
 	// Input
-	serializer.serialize("PreferredGamepadPlayer1", mPreferredGamepad[0]);
-	serializer.serialize("PreferredGamepadPlayer2", mPreferredGamepad[1]);
-	serializer.serialize("PreferredGamepadPlayer3", mPreferredGamepad[2]);
-	serializer.serialize("PreferredGamepadPlayer4", mPreferredGamepad[3]);
-	serializer.serialize("ControllerRumblePlayer1", mControllerRumbleIntensity[0]);
-	serializer.serialize("ControllerRumblePlayer2", mControllerRumbleIntensity[1]);
-	serializer.serialize("ControllerRumblePlayer3", mControllerRumbleIntensity[2]);
-	serializer.serialize("ControllerRumblePlayer4", mControllerRumbleIntensity[3]);
-	serializer.serialize("AutoAssignGamepadPlayerIndex", mAutoAssignGamepadPlayerIndex);
+	if (serializer.beginObject("Input"))
+	{
+		serializer.serialize("PreferredGamepadPlayer1", mPreferredGamepad[0]);
+		serializer.serialize("PreferredGamepadPlayer2", mPreferredGamepad[1]);
+		serializer.serialize("PreferredGamepadPlayer3", mPreferredGamepad[2]);
+		serializer.serialize("PreferredGamepadPlayer4", mPreferredGamepad[3]);
+		serializer.serialize("ControllerRumblePlayer1", mControllerRumbleIntensity[0]);
+		serializer.serialize("ControllerRumblePlayer2", mControllerRumbleIntensity[1]);
+		serializer.serialize("ControllerRumblePlayer3", mControllerRumbleIntensity[2]);
+		serializer.serialize("ControllerRumblePlayer4", mControllerRumbleIntensity[3]);
+		serializer.serialize("AutoAssignGamepadPlayerIndex", mAutoAssignGamepadPlayerIndex);
+		serializer.endObject();
+	}
+	else if (serializer.isReading())
+	{
+		// Legacy support for old, more flat way of storing settings (before Jan 2026)
+		serializer.serialize("PreferredGamepadPlayer1", mPreferredGamepad[0]);
+		serializer.serialize("PreferredGamepadPlayer2", mPreferredGamepad[1]);
+		serializer.serialize("PreferredGamepadPlayer3", mPreferredGamepad[2]);
+		serializer.serialize("PreferredGamepadPlayer4", mPreferredGamepad[3]);
+		serializer.serialize("ControllerRumblePlayer1", mControllerRumbleIntensity[0]);
+		serializer.serialize("ControllerRumblePlayer2", mControllerRumbleIntensity[1]);
+		serializer.serialize("ControllerRumblePlayer3", mControllerRumbleIntensity[2]);
+		serializer.serialize("ControllerRumblePlayer4", mControllerRumbleIntensity[3]);
+		serializer.serialize("AutoAssignGamepadPlayerIndex", mAutoAssignGamepadPlayerIndex);
+	}
 
 	// Virtual gamepad
 	if (serializer.beginObject("VirtualGamepad"))

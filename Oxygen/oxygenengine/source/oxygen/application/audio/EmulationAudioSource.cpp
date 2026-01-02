@@ -164,10 +164,10 @@ AudioSourceBase::State EmulationAudioSource::startupInternal()
 
 	SDL_LockMutex(mMutex);
 	mAudioBuffer.lock();
-	mAudioBuffer.clear(Configuration::instance().mAudioSampleRate, 2);
+	mAudioBuffer.clear(Configuration::instance().mAudio.mSampleRate, 2);
 	mAudioBuffer.unlock();
 
-	mSoundEmulation.init(Configuration::instance().mAudioSampleRate, 60.0);
+	mSoundEmulation.init(Configuration::instance().mAudio.mSampleRate, 60.0);
 	mSoundDriver.reset();
 	mSoundDriver.playSound(mSoundId);
 	SDL_UnlockMutex(mMutex);
@@ -182,7 +182,7 @@ void EmulationAudioSource::progressInternal(float precacheTime)
 	// Update job priority
 	setJobPriority(mPrecacheTime - mAudioBuffer.getLengthInSec());
 
-	if (Configuration::instance().mUseAudioThreading)
+	if (Configuration::instance().mAudio.mUseAudioThreading)
 	{
 		// Add to job manager if not done yet
 		if (!isJobRegistered())

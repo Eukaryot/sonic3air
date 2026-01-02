@@ -45,8 +45,6 @@ private:
 
 public:
 	// Audio
-	float mMusicVolume = 0.8f;
-	float mSoundVolume = 0.8f;
 	int mActiveSoundtrack = 1;		// 0 = emulated, 1 = remastered
 
 	// Input

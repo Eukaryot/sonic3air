@@ -407,9 +407,9 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 				case SDLK_KP_PLUS:
 				case SDLK_KP_MINUS:
 				{
-					int volume = roundToInt(Configuration::instance().mAudioVolume * 100.0f);
+					int volume = roundToInt(Configuration::instance().mAudio.mMasterVolume * 100.0f);
 					volume = clamp((ev.key == SDLK_KP_PLUS) ? volume + 5 : volume - 5, 0, 100);
-					Configuration::instance().mAudioVolume = (float)volume / 100.0f;
+					Configuration::instance().mAudio.mMasterVolume = (float)volume / 100.0f;
 					LogDisplay::instance().setLogDisplay(String(0, "Audio volume: %d%%", volume));
 					break;
 				}

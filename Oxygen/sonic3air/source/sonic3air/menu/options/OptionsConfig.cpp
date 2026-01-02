@@ -240,7 +240,7 @@ void OptionsConfig::buildAudio()
 		const char* volumeName[] = { "Overall Volume:", "Music Volume:", "Sound Volume:" };
 		for (int k = 0; k < 3; ++k)
 		{
-			configBuilder.addSetting(volumeName[k], (option::Option)(option::AUDIO_VOLUME + k))
+			configBuilder.addSetting(volumeName[k], (option::Option)(option::MASTER_VOLUME + k))
 				.addOption("Off", 0)
 				.addNumberOptions(5, 100, 5, "%");
 		}

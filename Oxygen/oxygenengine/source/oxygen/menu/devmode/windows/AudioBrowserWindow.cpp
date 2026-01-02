@@ -31,7 +31,7 @@ void AudioBrowserWindow::buildContent()
 	AudioOutBase& audioOut = EngineMain::instance().getAudioOut();
 	AudioCollection& audioCollection = AudioCollection::instance();
 
-	ImGui::SliderFloat("Master Volume", &Configuration::instance().mAudioVolume, 0.0f, 1.0f, "%.2f");
+	ImGui::SliderFloat("Master Volume", &Configuration::instance().mAudio.mMasterVolume, 0.0f, 1.0f, "%.2f");
 
 	if (ImGui::Button("Reload Modded Audio"))
 	{
