@@ -237,7 +237,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
+      <Command>robocopy "$(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86" "$(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode)" discord_game_sdk.dll /mir &gt; nul
 exit /b 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -266,7 +266,7 @@ exit /b 0</Command>
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86_64 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
+      <Command>robocopy "$(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86_64" "$(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode)" discord_game_sdk.dll /mir &gt; nul
 exit /b 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -295,7 +295,7 @@ exit /b 0</Command>
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
+      <Command>robocopy "$(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86" "$(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode)" discord_game_sdk.dll /mir &gt; nul
 exit /b 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -324,7 +324,7 @@ exit /b 0</Command>
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86_64 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
+      <Command>robocopy "$(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86_64" "$(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode)" discord_game_sdk.dll /mir &gt; nul
 exit /b 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
