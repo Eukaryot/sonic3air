@@ -8,8 +8,8 @@ else {
 }
 
 android {
-    compileSdkVersion 34
-    ndkVersion "26.0.10792818"
+    compileSdkVersion 36
+    ndkVersion "29.0.14206865"
     defaultConfig {
         if (buildAsApplication) {
             namespace "org.eukaryot.sonic3air"
