@@ -60,11 +60,6 @@ namespace rmx
 		SDL_Quit();
 	}
 
-	void SystemManager::startTick()
-	{
-		// TODO...
-	}
-
 	void SystemManager::checkSDLEvents()
 	{
 		// Handle events
@@ -208,10 +203,13 @@ namespace rmx
 
 	void SystemManager::mainLoop()
 	{
-		startTick();
+		mRoot.beginFrame();
+
 		checkSDLEvents();
 		update();
 		render();
+
+		mRoot.endFrame();
 
 #ifdef PLATFORM_WEB
 		if (!mRunning)

@@ -59,7 +59,6 @@ namespace rmx
 
 	private:
 		void run();
-		void startTick();
 		void checkSDLEvents();
 		void reshape(int width, int height);
 		void keyboard(const SDL_KeyboardEvent& ev);

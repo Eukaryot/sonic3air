@@ -11,6 +11,7 @@
 
 #if defined(SUPPORT_IMGUI)
 
+#include "oxygen/application/Application.h"
 #include "oxygen/menu/imgui/ImGuiHelpers.h"
 
 #include "imgui.h"
@@ -236,12 +237,9 @@ void ImGuiIntegration::endFrame()
 	}
 
 	// Show or hide virtual keyboard on platforms that support it (especially Android)
-	if (ImGui::GetIO().WantTextInput != (bool)SDL_IsTextInputActive())
+	if (ImGui::GetIO().WantTextInput)
 	{
-		if (ImGui::GetIO().WantTextInput)
-			SDL_StartTextInput();
-		else
-			SDL_StopTextInput();
+		Application::instance().requestActiveTextInput();
 	}
 
 	// Save ini if there was a change
