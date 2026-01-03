@@ -432,7 +432,6 @@ bool EngineMain::initConfigAndSettings()
 	RMX_LOG_INFO("Loading settings");
 	const bool loadedSettings = config.loadSettings(config.mAppDataPath + L"settings.json", Configuration::SettingsType::STANDARD);
 	config.loadSettings(config.mAppDataPath + L"settings_input.json", Configuration::SettingsType::INPUT);
-	config.loadSettings(config.mAppDataPath + L"settings_global.json", Configuration::SettingsType::GLOBAL);
 	if (loadedSettings)
 	{
 	#if defined(PLATFORM_IS_DESKTOP)
@@ -447,6 +446,9 @@ bool EngineMain::initConfigAndSettings()
 			loadConfigJson();
 		}
 	#endif
+
+		// Remove old "settings_global.json", which was only used for legacy compatibility
+		FTX::FileSystem->removeFile(config.mAppDataPath + L"settings_global.json");
 	}
 	else
 	{

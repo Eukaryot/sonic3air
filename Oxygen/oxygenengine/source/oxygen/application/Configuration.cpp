@@ -296,7 +296,7 @@ bool Configuration::loadConfiguration(const std::wstring& filename)
 		mProjectPath += L"/";
 	}
 
-	// Load everything shared with settings_global
+	// Load everything shared with settings
 	loadConfigurationProperties(serializer);
 
 	// Call subclass implementation
@@ -314,11 +314,6 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 	if (root.isNull())
 		return false;
 	JsonSerializer serializer(true, root);
-
-	if (settingsType == SettingsType::GLOBAL)
-	{
-		loadConfigurationProperties(serializer);
-	}
 
 	if (settingsType == SettingsType::INPUT)
 	{
@@ -358,12 +353,6 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 			case SettingsType::INPUT:
 			{
 				retainOldEntries = false;
-				break;
-			}
-
-			case SettingsType::GLOBAL:
-			{
-				retainOldEntries = true;
 				break;
 			}
 		}
@@ -410,30 +399,6 @@ void Configuration::saveSettings()
 
 		// Save file
 		JsonHelper::saveFile(mSettingsFilenames[settingsIndex], root);
-	}
-
-	// Save global settings
-	settingsIndex = (int)SettingsType::GLOBAL;
-	if (!mSettingsFilenames[settingsIndex].empty())
-	{
-		Json::Value root = mSettingsJsons[settingsIndex];
-		if (!root.isNull())		// Only overwrite if it existed before already
-		{
-			JsonSerializer serializer(false, root);
-
-			// Overwrite only certain properties, namely those that can be defined by the mod manager AND changed by the game
-			std::string renderMethod = mAutoDetectRenderMethod ? "auto" :
-										(mRenderMethod == RenderMethod::OPENGL_FULL) ? "opengl-full" :
-										(mRenderMethod == RenderMethod::OPENGL_SOFT) ? "opengl-soft" : "software";
-			serializer.serialize("RenderMethod", renderMethod);
-			serializer.serializeAs<int>("Fullscreen", mWindowMode);
-
-			// Call subclass implementation
-			saveSettingsInternal(serializer, SettingsType::GLOBAL);
-
-			// Save file
-			JsonHelper::saveFile(mSettingsFilenames[settingsIndex], root);
-		}
 	}
 
 	// Save input settings

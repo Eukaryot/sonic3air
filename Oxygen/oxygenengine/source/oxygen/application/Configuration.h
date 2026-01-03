@@ -123,7 +123,6 @@ public:
 	{
 		STANDARD = 0,	// "settings.json"
 		INPUT = 1,		// "settings_input.json"
-		GLOBAL = 2		// "settings_global.json"
 	};
 
 	static const int NUM_PLAYERS = 4;
@@ -164,7 +163,7 @@ public:
 	std::wstring mExePath;
 	std::wstring mAppDataPath;				// App data path for the engine
 	std::wstring mGameAppDataPath;			// App data path for the game; can be the same as the app data path for the engine, or a sub-folder of it
-	std::wstring mSettingsFilenames[3];		// Uses SettingsType as key
+	std::wstring mSettingsFilenames[2];		// Uses SettingsType as key
 	std::wstring mEngineDataPath;
 	std::wstring mGameDataPath;
 	std::wstring mRomPath;					// From configuration
