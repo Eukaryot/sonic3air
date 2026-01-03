@@ -158,6 +158,7 @@ void Mod::loadFromJson(const Json::Value& json)
 				otherModInfo.mDisplayName = otherModInfo.mModID;
 			jsonHelper.tryReadString("MinimumVersion", otherModInfo.mMinimumVersion);
 			jsonHelper.tryReadBool("IsRequired", otherModInfo.mIsRequired);
+			jsonHelper.tryReadBool("IsConflict", otherModInfo.mIsConflict);
 
 			const Json::Value& priorityValue = modJson["Priority"];
 			if (priorityValue.isString())
@@ -168,6 +169,12 @@ void Mod::loadFromJson(const Json::Value& json)
 					otherModInfo.mRelativePriority = +1;
 				else if (str == "lower")
 					otherModInfo.mRelativePriority = -1;
+			}
+
+			if (otherModInfo.mIsRequired && otherModInfo.mIsConflict)
+			{
+				RMX_ERROR("Error while parsing mod.json of \"" << mDisplayName << "\": You can't set IsRequired and IsConflict for the other mod \"" << otherModInfo.mDisplayName << "\"", );
+				otherModInfo.mIsRequired = false;
 			}
 		}
 	}
