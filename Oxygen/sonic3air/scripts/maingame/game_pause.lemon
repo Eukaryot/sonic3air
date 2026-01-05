@@ -524,4 +524,3 @@ function void UpdateGamePause()
 }
 
 #endif
-
