@@ -103,7 +103,7 @@ namespace
 		mWriteAddress = cramAddress;
 	}
 
-	// Oxygen engine doesn't differentiate read or write mode
+	// Oxygen Engine doesn't differentiate read or write mode
 	void VDP_setupVRAMRead(uint16 vramAddress)   { VDP_setupVRAMWrite(vramAddress); }
 	void VDP_setupVSRAMRead(uint16 vsramAddress) { VDP_setupVSRAMWrite(vsramAddress); }
 	void VDP_setupCRAMRead(uint16 cramAddress)	 { VDP_setupCRAMWrite(cramAddress); }
@@ -316,9 +316,15 @@ namespace
 		RenderParts::instance().getPlaneManager().setPlayfieldSizeInPixels(Vec2i(width, height));
 	}
 
-	void VDP_Config_setupWindowPlane(uint8 isPlaneWBelowSplit, uint16 splitY)
+	void VDP_Config_setWindowPlaneSplitX(uint8 rightSideWindow, uint16 splitX)
 	{
-		RenderParts::instance().getPlaneManager().setupPlaneW(isPlaneWBelowSplit != 0, splitY);
+		RenderParts::instance().getPlaneManager().setWindowPlaneSplitX(rightSideWindow != 0, splitX);
+		RenderParts::instance().getScrollOffsetsManager().setPlaneWScrollOffset(Vec2i(0, 0));	// Reset scroll offset to default
+	}
+
+	void VDP_Config_setWindowPlaneSplitY(uint8 bottomWindow, uint16 splitY)
+	{
+		RenderParts::instance().getPlaneManager().setWindowPlaneSplitY(bottomWindow != 0, splitY);
 		RenderParts::instance().getScrollOffsetsManager().setPlaneWScrollOffset(Vec2i(0, 0));	// Reset scroll offset to default
 	}
 
@@ -1066,8 +1072,11 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		builder.addNativeFunction("VDP.Config.setPlayfieldSizeInPixels", lemon::wrap(&VDP_Config_setPlayfieldSizeInPixels), defaultFlags)
 			.setParameters("width", "height");
 
-		builder.addNativeFunction("VDP.Config.setupWindowPlane", lemon::wrap(&VDP_Config_setupWindowPlane), defaultFlags)
-			.setParameters("isPlaneWBelowSplit", "splitY");
+		builder.addNativeFunction("VDP.Config.setWindowPlaneSplitX", lemon::wrap(&VDP_Config_setWindowPlaneSplitX), defaultFlags)
+			.setParameters("rightSideWindow", "splitX");
+
+		builder.addNativeFunction("VDP.Config.setWindowPlaneSplitY", lemon::wrap(&VDP_Config_setWindowPlaneSplitY), defaultFlags)
+			.setParameters("bottomWindow", "splitY");
 
 		builder.addNativeFunction("VDP.Config.setPlaneWScrollOffset", lemon::wrap(&VDP_Config_setPlaneWScrollOffset), defaultFlags)
 			.setParameters("x", "y");

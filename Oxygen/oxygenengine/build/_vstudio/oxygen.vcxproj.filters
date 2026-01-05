@@ -91,17 +91,29 @@
     <Filter Include="rendering\parts\palette">
       <UniqueIdentifier>{024aa6e6-0643-4877-a939-04441686575c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="devmode">
-      <UniqueIdentifier>{fad00101-ca62-4d18-9200-2355a6823252}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="devmode\windows">
-      <UniqueIdentifier>{fa83976a-22f3-48e0-9249-ec0580c42843}</UniqueIdentifier>
-    </Filter>
     <Filter Include="network">
       <UniqueIdentifier>{bda58169-9ff3-4e0f-b925-86b7e05a5bba}</UniqueIdentifier>
     </Filter>
     <Filter Include="network\netplay">
       <UniqueIdentifier>{4a237758-a433-4d69-ad33-1a130e7d4ea6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="platform\android">
+      <UniqueIdentifier>{b0926db4-e620-4721-bfec-f42ec7cc7efe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="menu">
+      <UniqueIdentifier>{b8bfee64-2d0c-4b99-9e3f-42eef55a2e6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="menu\imgui">
+      <UniqueIdentifier>{c6dd6a86-6a65-4c3c-924e-fa9467aa4666}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="menu\imgui\implementations">
+      <UniqueIdentifier>{f7944f69-d739-44de-84a5-c29581e198bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="menu\devmode">
+      <UniqueIdentifier>{6b3a75e4-c7b3-408f-832b-3b0bf9ca6313}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="menu\devmode\windows">
+      <UniqueIdentifier>{89c3dd34-ae44-4bd5-9227-c171ac17b9c1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -316,9 +328,6 @@
     <ClCompile Include="..\..\source\oxygen\application\GameLoader.cpp">
       <Filter>application</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\platform\AndroidJavaInterface.cpp">
-      <Filter>platform</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\input\InputManager.cpp">
       <Filter>application\input</Filter>
     </ClCompile>
@@ -472,50 +481,8 @@
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleCopyScreenShader.cpp">
       <Filter>rendering\opengl\shaders</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\ImGuiIntegration.cpp">
-      <Filter>devmode</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\GameSimWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\WatchesWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\SpriteBrowserWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\PaletteViewWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\SettingsWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\ScriptBuildWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\ImGuiHelpers.cpp">
-      <Filter>devmode</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\AudioBrowserWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\GameVisualizationsWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\RenderedGeometryWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\PaletteBrowserWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\helper\JsonSerializer.cpp">
       <Filter>helper</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\NetworkingWindow.cpp">
-      <Filter>devmode\windows</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayClient.cpp">
       <Filter>network\netplay</Filter>
@@ -529,44 +496,101 @@
     <ClCompile Include="..\..\source\oxygen\network\EngineServerClient.cpp">
       <Filter>network</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\DevModeMainWindow.cpp">
-      <Filter>devmode</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\DevModeWindowBase.cpp">
-      <Filter>devmode</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\VRAMWritesWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\CallFramesWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\network\netplay\ExternalAddressQuery.cpp">
       <Filter>network\netplay</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\DebugLogWindow.cpp">
-      <Filter>devmode\windows</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\Renderer.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\CustomSidePanelWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\gameview\GameView.cpp">
       <Filter>application\gameview</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\PersistentDataWindow.cpp">
-      <Filter>devmode\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\ImGuiSoftwareRenderer.cpp">
-      <Filter>devmode</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLUpscaler.cpp">
       <Filter>drawing\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\devmode\windows\FileBrowserWindow.cpp">
-      <Filter>devmode\windows</Filter>
+    <ClCompile Include="..\..\source\oxygen\platform\android\AndroidJavaInterface.cpp">
+      <Filter>platform\android</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\platform\android\AndroidJNIHelper.cpp">
+      <Filter>platform\android</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\imgui\implementations\ImGuiFileBrowser.cpp">
+      <Filter>menu\imgui\implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\imgui\ImGuiHelpers.cpp">
+      <Filter>menu\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\imgui\ImGuiIntegration.cpp">
+      <Filter>menu\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\imgui\ImGuiSoftwareRenderer.cpp">
+      <Filter>menu\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\imgui\ImGuiExtensions.cpp">
+      <Filter>menu\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\imgui\ImGuiManager.cpp">
+      <Filter>menu\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\DevModeMainWindow.cpp">
+      <Filter>menu\devmode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\DevModeWindowBase.cpp">
+      <Filter>menu\devmode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\AudioBrowserWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\CallFramesWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\CustomSidePanelWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\DebugLogWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\FileBrowserWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\GameSimWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\GameVisualizationsWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\MemoryHexViewWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\NetworkingWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\PaletteBrowserWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\PaletteViewWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\PersistentDataWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\RenderedGeometryWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\ScriptBuildWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\SettingsWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\SpriteBrowserWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\VRAMWritesWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\WatchesWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -793,9 +817,6 @@
     <ClInclude Include="..\..\source\oxygen\application\GameLoader.h">
       <Filter>application</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\platform\AndroidJavaInterface.h">
-      <Filter>platform</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\input\InputManager.h">
       <Filter>application\input</Filter>
     </ClInclude>
@@ -973,53 +994,8 @@
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleCopyScreenShader.h">
       <Filter>rendering\opengl\shaders</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\ImGuiIntegration.h">
-      <Filter>devmode</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\ImGuiHelpers.h">
-      <Filter>devmode</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\ImGuiDefinitions.h">
-      <Filter>devmode</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\GameSimWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\WatchesWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\SpriteBrowserWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\PaletteViewWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\SettingsWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\ScriptBuildWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\AudioBrowserWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\GameVisualizationsWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\RenderedGeometryWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\PaletteBrowserWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\helper\JsonSerializer.h">
       <Filter>helper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\NetworkingWindow.h">
-      <Filter>devmode\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\network\netplay\ExternalAddressQuery.h">
       <Filter>network\netplay</Filter>
@@ -1042,38 +1018,104 @@
     <ClInclude Include="..\..\source\oxygen\application\ArgumentsReader.h">
       <Filter>application</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\DevModeMainWindow.h">
-      <Filter>devmode</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\DevModeWindowBase.h">
-      <Filter>devmode</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\VRAMWritesWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\CallFramesWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\DebugLogWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\CustomSidePanelWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\gameview\GameView.h">
       <Filter>application\gameview</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\PersistentDataWindow.h">
-      <Filter>devmode\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\ImGuiSoftwareRenderer.h">
-      <Filter>devmode</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLUpscaler.h">
       <Filter>drawing\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\devmode\windows\FileBrowserWindow.h">
-      <Filter>devmode\windows</Filter>
+    <ClInclude Include="..\..\source\oxygen\platform\android\AndroidJavaInterface.h">
+      <Filter>platform\android</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\platform\android\AndroidJNIHelper.h">
+      <Filter>platform\android</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\imgui\implementations\ImGuiFileBrowser.h">
+      <Filter>menu\imgui\implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\imgui\ImGuiExtensions.h">
+      <Filter>menu\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\imgui\ImGuiHelpers.h">
+      <Filter>menu\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\imgui\ImGuiIntegration.h">
+      <Filter>menu\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\imgui\ImGuiSoftwareRenderer.h">
+      <Filter>menu\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\imgui\ImGuiDefinitions.h">
+      <Filter>menu\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\imgui\ImGuiManager.h">
+      <Filter>menu\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\imgui\ImGuiContentProvider.h">
+      <Filter>menu\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\DevModeMainWindow.h">
+      <Filter>menu\devmode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\DevModeWindowBase.h">
+      <Filter>menu\devmode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\AudioBrowserWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\CallFramesWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\CustomSidePanelWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\DebugLogWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\FileBrowserWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\GameSimWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\GameVisualizationsWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\MemoryHexViewWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\NetworkingWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\PaletteBrowserWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\PaletteViewWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\PersistentDataWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\RenderedGeometryWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\ScriptBuildWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\SettingsWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\SpriteBrowserWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\VRAMWritesWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\WatchesWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\platform\PlatformFlags.h">
+      <Filter>platform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

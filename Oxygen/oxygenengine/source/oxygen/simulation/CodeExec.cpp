@@ -22,6 +22,7 @@
 
 #include <lemon/program/Function.h>
 #include <lemon/runtime/Runtime.h>
+#include <lemon/runtime/RuntimeFunction.h>
 
 
 namespace
@@ -480,18 +481,21 @@ bool CodeExec::performFrameUpdate()
 			// Reset call frame tracking
 			mMainCallFrameTracking.clear();
 
-			static std::vector<const lemon::Function*> callstack;	// This is static to avoid reallocations
-			mLemonScriptRuntime.getCallStack(callstack);
-			for (const lemon::Function* func : callstack)
+			// Push content of current call stack as call frames
+			const CArray<lemon::ControlFlow::State>& callStack = mLemonScriptRuntime.getInternalLemonRuntime().getMainControlFlow().getCallStack();
+			for (size_t k = 0; k < callStack.count; ++k)
 			{
+				const lemon::ControlFlow::State& state = callStack[k];
 				CallFrame& callFrame = mMainCallFrameTracking.pushCallFrame(CallFrame::Type::SCRIPT_STACK);
-				callFrame.mFunction = func;
+				callFrame.mFunction = state.mRuntimeFunction->mFunction;
+				if (k >= 1)
+					callFrame.mCallingPC = callStack[k - 1].mProgramCounter;
 			}
 		}
 
 		// Perform pre-update hook, if there is one
 		//  -> This acts like a call from wherever the last script execution stopped / yielded
-		tryCallUpdateHook(false);
+		tryCallUpdateHook(false, &mMainCallFrameTracking);
 	}
 
 	// Run script
@@ -502,7 +506,7 @@ bool CodeExec::performFrameUpdate()
 	{
 		// Perform post-update hook, if there is one
 		//  -> Note that the hook must yield execution, otherwise parts of the next frame get executed
-		if (canExecute() && tryCallUpdateHook(true))
+		if (canExecute() && tryCallUpdateHook(true, &mMainCallFrameTracking))
 		{
 			runScript(true, &mMainCallFrameTracking);
 		}
@@ -562,7 +566,7 @@ bool CodeExec::executeScriptFunction(const std::string& functionName, bool showE
 			}
 
 			// Evaluate the return value
-			if (nullptr != execData && nullptr != execData->mParams.mReturnType)
+			if (nullptr != execData && nullptr != execData->mParams.mReturnType && execData->mParams.mReturnType->getBytes() > 0)
 			{
 				execData->mReturnValueStorage = mLemonScriptRuntime.getInternalLemonRuntime().getSelectedControlFlowMutable().popValueStack<uint64>();
 			}
@@ -594,7 +598,7 @@ bool CodeExec::canExecute() const
 		case ExecutionState::READY:
 		case ExecutionState::YIELDED:
 		case ExecutionState::INTERRUPTED:
-			return true;
+			return mLemonScriptRuntime.getInternalLemonRuntime().canExecuteSteps();
 
 		case ExecutionState::INACTIVE:
 		case ExecutionState::HALTED:
@@ -786,13 +790,13 @@ bool CodeExec::tryCallAddressHookDev(uint32 address)
 	}
 }
 
-bool CodeExec::tryCallUpdateHook(bool postUpdate)
+bool CodeExec::tryCallUpdateHook(bool postUpdate, CallFrameTracking* callFrameTracking)
 {
 	if (mLemonScriptRuntime.callUpdateHook(postUpdate))
 	{
-		if (nullptr != mActiveCallFrameTracking)
+		if (nullptr != callFrameTracking)
 		{
-			CallFrame& callFrame = mActiveCallFrameTracking->pushCallFrame(CallFrame::Type::SCRIPT_DIRECT);
+			CallFrame& callFrame = callFrameTracking->pushCallFrame(CallFrame::Type::SCRIPT_DIRECT);
 			callFrame.mFunction = mLemonScriptRuntime.getCurrentFunction();
 		}
 		return true;

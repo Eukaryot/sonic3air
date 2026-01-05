@@ -46,7 +46,7 @@ public:
 	void serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion);
 
 public:
-	int mSplitPositionY = 0xffff;	// Use some large value as default that is definitely larger than any responsible screen height
+	int mSplitPositionY = 0x1fff;	// Use some large value as default that is definitely larger than any responsible screen height; not not too high, as that can cause graphics issues on some mobile devices
 
 private:
 	Palette mMainPalette[2];		// [0] = Standard palette, [1] = Underwater palette (in S3AIR)

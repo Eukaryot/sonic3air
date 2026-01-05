@@ -1215,6 +1215,9 @@ function void fn07ce42()
 function void fn07ce6c()
 {
 	setupObjectAttributesFull(0x07d45c)
+#if STANDALONE
+	MoveAndFlipWithParent()		// Fix for Egg Mobile debris facing left despite Egg Robo facing right #contributed by mrgrassman14
+#endif
 	objA0.update_address = 0x085102
 	objA0.animation.sprite = objA0.subtype2c >> 1
 

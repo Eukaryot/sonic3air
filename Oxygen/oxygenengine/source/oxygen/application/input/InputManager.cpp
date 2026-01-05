@@ -11,7 +11,7 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/Configuration.h"
-#include "oxygen/devmode/ImGuiIntegration.h"
+#include "oxygen/menu/imgui/ImGuiIntegration.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/utils/RenderUtils.h"
 #include "oxygen/simulation/LogDisplay.h"
@@ -1007,7 +1007,7 @@ bool InputManager::isPressed(const ControlInput& input)
 				// Ignore key presses while Alt is down
 				if (!FTX::keyState(SDLK_LALT) && !FTX::keyState(SDLK_RALT))
 				{
-					if (!ImGuiIntegration::isCapturingKeyboard())
+					if (!ImGuiIntegration::instance().isCapturingKeyboard())
 						return true;
 				}
 			}

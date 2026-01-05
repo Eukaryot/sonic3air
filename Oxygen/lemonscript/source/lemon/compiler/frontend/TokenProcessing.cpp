@@ -700,6 +700,7 @@ namespace lemon
 								}
 								case DataTypeDefinition::Class::INTEGER:
 								case DataTypeDefinition::Class::STRING:
+								case DataTypeDefinition::Class::FLOAT:
 								{
 									ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
 									constantToken.mValue.reset();
@@ -752,6 +753,7 @@ namespace lemon
 					functionToken.mFunction = function;
 					functionToken.mDataType = function->getReturnType();
 				}
+				RMX_ASSERT(function, "");
 			}
 		}
 	}
@@ -845,6 +847,7 @@ namespace lemon
 				#endif
 
 					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
+					RMX_ASSERT(matchingFunction, "");
 					token.mFunction = matchingFunction;
 					token.mParameters.resize(2);
 					ConstantToken& idToken = token.mParameters[0].create<ConstantToken>();
@@ -1402,10 +1405,18 @@ namespace lemon
 			{
 				BinaryOperationToken& bot = token.as<BinaryOperationToken>();
 				const OperatorHelper::OperatorType opType = OperatorHelper::getOperatorType(bot.mOperator);
-				const DataTypeDefinition* expectedType = (opType == OperatorHelper::OperatorType::SYMMETRIC) ? resultType : nullptr;
+				const bool isSymmetric = (opType == OperatorHelper::OperatorType::SYMMETRIC || opType == OperatorHelper::OperatorType::SYMMETRIC_INT);
+				const bool isAssignment = (opType == OperatorHelper::OperatorType::ASSIGNMENT || opType == OperatorHelper::OperatorType::ASSIGNMENT_INT);
+				const DataTypeDefinition* expectedType = isSymmetric ? resultType : nullptr;
 
 				const DataTypeDefinition* leftDataType = assignStatementDataType(*bot.mLeft, expectedType);
-				const DataTypeDefinition* rightDataType = assignStatementDataType(*bot.mRight, (opType == OperatorHelper::OperatorType::ASSIGNMENT) ? leftDataType : expectedType);
+				const DataTypeDefinition* rightDataType = assignStatementDataType(*bot.mRight, isAssignment ? leftDataType : expectedType);
+
+				// For assignemnts, enforce that the right side uses the target type
+				if (isAssignment)
+				{
+					rightDataType = leftDataType;
+				}
 
 				const BinaryOperationResult result = getBestOperatorSignature(bot.mOperator, leftDataType, rightDataType);
 				if (nullptr == result.mEnforcedFunction)

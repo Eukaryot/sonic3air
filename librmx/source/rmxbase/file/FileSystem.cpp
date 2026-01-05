@@ -278,10 +278,42 @@ namespace rmx
 		return false;
 	}
 
+	bool FileSystem::renameDirectory(std::wstring_view oldPath, std::wstring_view newPath)
+	{
+		mTempPath2 = normalizePath(oldPath, mTempPath2, true);
+		std::wstring newTempPath(newPath);
+		normalizePath(newTempPath, true);
+		for (MountPoint& mountPoint : mMountPoints)
+		{
+			const std::wstring* oldLocalPath = applyMountPoint(mountPoint, mTempPath2, mTempPath);
+			if (nullptr != oldLocalPath)
+			{
+				std::wstring tempPathForMounting;
+				const std::wstring* newLocalPath = applyMountPoint(mountPoint, newTempPath, tempPathForMounting);
+				if (nullptr != newLocalPath)
+				{
+					if (mountPoint.mFileProvider->renameDirectory(*oldLocalPath, *newLocalPath))
+						return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	bool FileSystem::removeFile(std::wstring_view path)
 	{
 		// TODO: Use file providers here as well
-		return FileIO::removeFile(path);
+		const bool result = FileIO::removeFile(path);
+		mLastErrorCode = FileIO::mLastErrorCode;
+		return result;
+	}
+
+	bool FileSystem::removeDirectory(std::wstring_view path)
+	{
+		// TODO: Use file providers here as well
+		const bool result = FileIO::removeDirectory(path);
+		mLastErrorCode = FileIO::mLastErrorCode;
+		return result;
 	}
 
 	bool FileSystem::exists(std::string_view path)

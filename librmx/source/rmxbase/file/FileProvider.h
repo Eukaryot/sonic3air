@@ -30,6 +30,8 @@ namespace rmx
 		virtual bool readFile(const std::wstring& filename, std::vector<uint8>& outData)  { return false; }
 
 		virtual bool renameFile(const std::wstring& oldFilename, const std::wstring& newFilename)  { return false; }
+		virtual bool renameDirectory(const std::wstring& oldPath, const std::wstring& newPath)  { return false; }
+
 		virtual bool listFiles(const std::wstring& path, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries)  { return false; }
 		virtual bool listFilesByMask(const std::wstring& filemask, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries)  { return false; }
 		virtual bool listDirectories(const std::wstring& path, std::vector<std::wstring>& outDirectories)  { return false; }

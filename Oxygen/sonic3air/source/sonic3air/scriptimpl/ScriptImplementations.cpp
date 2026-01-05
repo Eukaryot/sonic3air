@@ -16,6 +16,7 @@
 
 #include <lemon/program/FunctionWrapper.h>
 #include <lemon/program/Module.h>
+#include <lemon/program/ModuleBindingsBuilder.h>
 
 
 namespace s3air
@@ -118,19 +119,17 @@ namespace s3air
 
 void ScriptImplementations::registerScriptBindings(lemon::Module& module)
 {
+	lemon::ModuleBindingsBuilder builder(module);
+
 	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
 
-	module.addNativeFunction("Kosinski.Decompress", lemon::wrap(&s3air::kosinskiDecompress), defaultFlags);
-	module.addNativeFunction("WriteScrollOffsets", lemon::wrap(&s3air::writeScrollOffsets), defaultFlags);
-	module.addNativeFunction("WriteScrollOffsetsFlipped", lemon::wrap(&s3air::writeScrollOffsetsFlipped), defaultFlags);
+	builder.addNativeFunction("Kosinski.Decompress", lemon::wrap(&s3air::kosinskiDecompress), defaultFlags);
+	builder.addNativeFunction("WriteScrollOffsets", lemon::wrap(&s3air::writeScrollOffsets), defaultFlags);
+	builder.addNativeFunction("WriteScrollOffsetsFlipped", lemon::wrap(&s3air::writeScrollOffsetsFlipped), defaultFlags);
 
-	module.addNativeFunction("putNybbles", lemon::wrap(&s3air::putNybbles), defaultFlags)
-		.setParameterInfo(0, "input")
-		.setParameterInfo(1, "count")
-		.setParameterInfo(2, "value");
+	builder.addNativeFunction("putNybbles", lemon::wrap(&s3air::putNybbles), defaultFlags)
+		.setParameters("input", "count", "value");
 
-	// TEST!
-	module.addNativeFunction("uncompressKosinskiData", lemon::wrap(&s3air::decompressKosinskiData), defaultFlags)
-		.setParameterInfo(0, "sourceAddress")
-		.setParameterInfo(1, "targetInVRAM");
+	builder.addNativeFunction("uncompressKosinskiData", lemon::wrap(&s3air::decompressKosinskiData), defaultFlags)
+		.setParameters("sourceAddress", "targetInVRAM");
 }

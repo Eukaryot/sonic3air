@@ -20,6 +20,7 @@ function void ApplyROMManipulations()
 	ROMManipulation.AIZ2.StartPosition()
 	ROMManipulation.AIZ2.BlimpSequenceBombs()
 	ROMManipulation.HCZ.SetBottomHeight()
+	ROMManipulation.MGZ1.BossExplosionFix()
 	ROMManipulation.CNZ2.KnucklesPreBossCutscene()
 	ROMManipulation.HPZ.SecondMuralChunks()
 	ROMManipulation.SSZ.LevelLayoutWidescreen()
@@ -244,6 +245,13 @@ function void ROMManipulation.HCZ.SetBottomHeight()
 		u16[0x01bce4] = 0x0c00 - getScreenHeight()
 	else
 		u16[0x01bce4] = 0x1000
+}
+
+function void ROMManipulation.MGZ1.BossExplosionFix()
+{
+	// Fix for incorrect explosion graphics #contributed by mrgrassman14
+	u16[0x088b94] = 0xa5c0	// Change target VRAM address for pointy rock graphics
+	u16[0x088b12] = 0x452e	// Make pointy rock object use new VRAM address
 }
 
 function void ROMManipulation.CNZ2.KnucklesPreBossCutscene()

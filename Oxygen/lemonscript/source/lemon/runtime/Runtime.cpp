@@ -122,6 +122,8 @@ namespace lemon
 
 	void Runtime::reset()
 	{
+		mEncounteredBuildError = false;
+
 		clearAllControlFlows();
 
 		mRuntimeFunctions.clear();
@@ -211,7 +213,12 @@ namespace lemon
 			return nullptr;
 
 		RuntimeFunction* runtimeFunction = it->second;
-		runtimeFunction->build(*this);
+		if (!runtimeFunction->build(*this))
+		{
+			mEncounteredBuildError = true;
+			return nullptr;
+		}
+
 		return runtimeFunction;
 	}
 
@@ -407,8 +414,19 @@ namespace lemon
 		return true;
 	}
 
+	bool Runtime::canExecuteSteps() const
+	{
+		return !mEncounteredBuildError;
+	}
+
 	void Runtime::executeSteps(ExecuteConnector& result, size_t stepsLimit, size_t minimumCallStackSize)
 	{
+		if (mEncounteredBuildError)
+		{
+			result.mResult = ExecuteResult::Result::HALT;
+			return;
+		}
+
 		result.mStepsExecuted = 0;
 		result.mResult = ExecuteResult::Result::OKAY;
 

@@ -176,7 +176,17 @@ function void fn0777f0()
 
 	objA0.base_state = u8[A0 + 0x42]
 	u8[A0 + 0x28] = 0
+
+#if STANDALONE
+	// Fixes Robotnik/Egg Robo being stuck on hurt frame if damaged right before the armor flies back on, #contribued by mrgrassman14
+	u8[A0 + 0x20] = 0
+	u8[A0 + 0x2a] &= ~0x40
+
+	// Fix for boss palette damage flash, #contributed by mrgrassman14
+	Boss.updateHitFlashing(5, 0x07826c, 0x078276, 0x078280, 0x01)
+#else
 	Boss.updateHitFlashing(3, 0x07826c, 0x078276, 0x078276, 0x01)
+#endif
 }
 
 

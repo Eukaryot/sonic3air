@@ -15,8 +15,6 @@ class Font;
 
 namespace utils
 {
-	bool startsWith(const std::wstring& fullString, const std::wstring& prefix);
-
 	void splitTextIntoLines(std::vector<std::string>& outLines, const std::string& text, Font& font, int maxLineWidth);
 	void splitTextIntoLines(std::vector<std::string_view>& outLines, std::string_view text, Font& font, int maxLineWidth);
 	void shortenTextToFit(std::string& text, Font& font, int maxLineWidth);

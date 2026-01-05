@@ -10,9 +10,6 @@
 	// Default window size
 	"WindowSize": "1200 x 672",
 
-	// Audio output sample rate, valid values: 11025, 22050, 44100, 48000
-	"AudioSampleRate": "48000",
-
 	// Platform override ("1": desktop, "2": mobile, "-1": auto-selection)
 	"PlatformFlags": "-1",
 

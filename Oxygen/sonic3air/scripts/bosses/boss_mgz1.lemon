@@ -382,6 +382,9 @@ function void fn0888a6()
 function void fn08894c()
 {
 	setupObjectAttributesBasic(0x088b1a)
+#if STANDALONE
+	MoveAndFlipWithParent()		// Fix for boss debris facing up even if the boss is facing down, #contributed by mrgrassman14
+#endif
 	objA0.update_address = 0x085102
 	objA0.animation.sprite = u8[0x088970 + (objA0.subtype2c >> 1)]
 

@@ -244,7 +244,7 @@ namespace genericmanager
 		template<typename T> T* as() const  { return static_cast<T*>(mElement); }
 
 		template<typename T> T& create()  { T& element = Manager<BASE>::template create<T>(); set(element); return element; }
-		ELEMENT& create(Type type)		  { ELEMENT& element = Manager<BASE>::template create(type); set(element); return element; }
+		ELEMENT& create(Type type)		  { ELEMENT& element = Manager<BASE>::create(type); set(element); return element; }
 
 		inline void clear()  { set(nullptr); }
 		inline void set(ELEMENT& element)		{ set(&element); }

@@ -277,7 +277,7 @@ function void fn073058()
 	{
 		objA0.position.y.u16 = D0.u16
 		DrawObject()
-		u16[A0 + 0x48] = 0
+		objA0.flags2a &= ~0x80	// Fix for Robotnik head animation, #contributed by mrgrassman14
 	}
 	else
 	{

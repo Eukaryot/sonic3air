@@ -1615,7 +1615,11 @@ function void fn07ce90()
 	A2 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A2 + 0x04] & 0x01)
 	{
-		D2.s16 = -D2.s16
+	#if STANDALONE
+		D1.s16 = -D1.s16	// Fix for incorrectly positioned debris if Mecha Sonic is facing right, #contributed by mrgrassman14
+	#else
+		D2.s16 = -D2.s16 
+	#endif
 		objA0.render_flags |= render_flag.FLIP_X
 	}
 

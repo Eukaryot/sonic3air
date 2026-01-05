@@ -229,7 +229,7 @@ void OggAudioSource::progressInternal(float precacheTime)
 	// Update job priority
 	setJobPriority(mPrecacheTime - mAudioBuffer.getLengthInSec());
 
-	if (Configuration::instance().mUseAudioThreading)
+	if (Configuration::instance().mAudio.mUseAudioThreading)
 	{
 		// Add to job manager if not done yet
 		if (!isJobRegistered())

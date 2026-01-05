@@ -10,7 +10,9 @@
 #include "sonic3air/client/crowdcontrol/CrowdControlClient.h"
 
 #include "oxygen/application/Application.h"
+#include "oxygen/helper/JsonHelper.h"
 #include "oxygen/simulation/CodeExec.h"
+#include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/Simulation.h"
 
 
@@ -29,6 +31,8 @@ bool CrowdControlClient::startConnection()
 	// Assume a locally running instance of the Crowd Control app
 	if (!mSocket.connectTo("127.0.0.1", 58430))
 		return false;
+
+	LogDisplay::instance().setLogDisplay("Now connected to Crowd Control!", 10.0f);
 
 	// Done
 	mSetupDone = true;
@@ -60,49 +64,72 @@ void CrowdControlClient::updateConnection(float timeElapsed)
 		return;
 
 	TCPSocket::ReceiveResult result;
-	if (mSocket.receiveNonBlocking(result))
+	if (mSocket.receiveNonBlocking(result) && !result.mBuffer.empty())
 	{
 		std::string errors;
 		Json::Value jsonRoot = rmx::JsonHelper::loadFromMemory(result.mBuffer, &errors);
 		if (jsonRoot.isObject())
 		{
-			evaluateMessage(jsonRoot);
+			evaluateRequestJson(jsonRoot);
 		}
 	}
 }
 
-void CrowdControlClient::evaluateMessage(const Json::Value& message)
+void CrowdControlClient::sendResponse(uint32 id, uint8 status, lemon::StringRef message)
 {
-	// Read properties from the JSON message
-	const std::string code = message["code"].asString();
-	const std::string viewer = message["viewer"].asString();
-	// TODO: https://github.com/BttrDrgn/ccpp/blob/master/ccpp.cpp removes double quotes " here for code and viewer, is this needed for us as well?
-	const int id = message["id"].asInt();
+	// Send back a response JSON to Crowd Control
+	std::string response = "{";
+	response += "\"id\":" + std::to_string(id);
+	response += ",\"status\":" + std::to_string(status);
+	if (!message.isEmpty())
+		response += ",\"message\":\"" + std::string(message.getString()) + "\"";
+	response += "}";
 
-	// Trigger the effect
-	const StatusCode statusCode = triggerEffect(code);
-
-	// Send back a response
-	const std::string response = "{\"id\":" + std::to_string(id) + ",\"status\":" + std::to_string((int)statusCode) + "}";
 	mSocket.sendData((const uint8*)response.c_str(), response.length() + 1);
 }
 
-CrowdControlClient::StatusCode CrowdControlClient::triggerEffect(const std::string& effectCode)
+void CrowdControlClient::evaluateRequestJson(const Json::Value& requestJson)
+{
+	// Read request properties from the JSON
+	Request request;
+
+	JsonHelper jsonHelper(requestJson);
+	if (!jsonHelper.tryReadInt("id", request.mId))
+		return;
+	if (!jsonHelper.tryReadAsInt("type", request.mType))
+		return;
+
+	const bool hasCode     = jsonHelper.tryReadString("code", request.mCode);
+	const bool hasMessage  = jsonHelper.tryReadString("message", request.mMessage);
+	const bool hasCost     = jsonHelper.tryReadInt("cost", request.mCost);
+	const bool hasDuration = jsonHelper.tryReadInt("duration", request.mDuration);
+	const bool hasQuantity = jsonHelper.tryReadInt("quantity", request.mQuantity);
+
+	switch (request.mType)
+	{
+		case RequestType::START:
+		{
+			// Trigger the effect
+			triggerEffect(request);
+
+			// Note that we're not sending a response right away, but scripts will have to handle that by calling "CrowdControl.sendResponse"
+			break;
+		}
+	}
+}
+
+void CrowdControlClient::triggerEffect(const Request& request)
 {
 	// Prepare and execute script call
 	CodeExec& codeExec = Application::instance().getSimulation().getCodeExec();
 	LemonScriptRuntime& runtime = codeExec.getLemonScriptRuntime();
 
-	const uint64 effectCodeHash = runtime.getInternalLemonRuntime().addString(effectCode);
-
+	// Call signature: "void CrowdControl.triggerEffect(u32 id, string code, s32 quantity, s32 duration)"
 	CodeExec::FunctionExecData execData;
-	execData.mParams.mReturnType = &lemon::PredefinedDataTypes::UINT_8;
-	lemon::Runtime::FunctionCallParameters::Parameter& param1 = vectorAdd(execData.mParams.mParams);
-	param1.mDataType = &lemon::PredefinedDataTypes::STRING;
-	param1.mStorage = effectCodeHash;
-
-	codeExec.executeScriptFunction("Game.triggerCrowdControlEffect", false, &execData);
-
-	const StatusCode result = (StatusCode)execData.mReturnValueStorage;
-	return result;
+	execData.mParams.mReturnType = &lemon::PredefinedDataTypes::VOID;
+	execData.mParams.mParams.emplace_back(lemon::PredefinedDataTypes::UINT_32, request.mId);
+	execData.mParams.mParams.emplace_back(lemon::PredefinedDataTypes::STRING, runtime.getInternalLemonRuntime().addString(request.mCode));
+	execData.mParams.mParams.emplace_back(lemon::PredefinedDataTypes::INT_32, request.mQuantity);
+	execData.mParams.mParams.emplace_back(lemon::PredefinedDataTypes::INT_32, request.mDuration);
+	codeExec.executeScriptFunction("CrowdControl.triggerEffect", false, &execData);
 }

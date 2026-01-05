@@ -8,8 +8,9 @@
 
 #include "lemon/pch.h"
 #include "lemon/compiler/frontend/CompilerFrontend.h"
+#include "lemon/compiler/frontend/BlockNodeStack.h"
+#include "lemon/compiler/frontend/NodesIterator.h"
 #include "lemon/compiler/LineNumberTranslation.h"
-#include "lemon/compiler/Node.h"
 #include "lemon/compiler/TokenHelper.h"
 #include "lemon/compiler/TokenTypes.h"
 #include "lemon/compiler/Utility.h"
@@ -17,105 +18,12 @@
 #include "lemon/compiler/parser/ParserTokens.h"
 #include "lemon/program/GlobalsLookup.h"
 #include "lemon/program/Module.h"
+#include "lemon/utility/DataTypeHelper.h"
 #include "lemon/utility/PragmaSplitter.h"
 
 
 namespace lemon
 {
-	namespace
-	{
-		template<typename T>
-		T& addNode(std::vector<BlockNode*>& blockStack, uint32 lineNumber)
-		{
-			T& node = blockStack.back()->mNodes.createBack<T>();
-			node.setLineNumber(lineNumber);
-			return node;
-		}
-
-		bool negateBaseTypeValue(AnyBaseValue& value, const DataTypeDefinition* dataType)
-		{
-			switch (dataType->getClass())
-			{
-				case DataTypeDefinition::Class::INTEGER:
-				{
-					switch (dataType->getBytes())
-					{
-						case 1:  value.set<int8>(-value.get<int8>());    return true;
-						case 2:  value.set<int16>(-value.get<int16>());  return true;
-						case 4:  value.set<int32>(-value.get<int32>());  return true;
-						case 8:  value.set<int64>(-value.get<int64>());  return true;
-					}
-					break;
-				}
-
-				case DataTypeDefinition::Class::FLOAT:
-				{
-					switch (dataType->getBytes())
-					{
-						case 4:  value.set<float>(-value.get<float>());    return true;
-						case 8:  value.set<double>(-value.get<double>());  return true;
-					}
-					break;
-				}
-			}
-			return false;
-		}
-
-		bool isInsideIntegerRange(int64 value, const IntegerDataType& dataType)
-		{
-			const size_t bits = dataType.getBytes() * 8;
-			if (bits >= 64)
-				return true;
-
-			if (dataType.mIsSigned)
-			{
-				if (value >= 0)
-					return (value >> bits) == 0;			// Note this does allow for something like "constant s16 a = 0xf000"
-				else
-					return (value >> (bits - 1)) == ~0ull;
-			}
-			else
-			{
-				return (value >> bits) == 0;
-			}
-		}
-	}
-
-
-	struct CompilerFrontend::NodesIterator
-	{
-		BlockNode& mBlockNode;
-		size_t mCurrentIndex = 0;
-		std::vector<size_t> mIndicesToErase;
-
-		inline NodesIterator(BlockNode& blockNode) :
-			mBlockNode(blockNode)
-		{}
-
-		inline ~NodesIterator()
-		{
-			mBlockNode.mNodes.erase(mIndicesToErase);
-		}
-
-		inline void operator++()		{ ++mCurrentIndex; }
-		inline Node& operator*() const	{ return mBlockNode.mNodes[mCurrentIndex]; }
-		inline Node* operator->() const	{ return &mBlockNode.mNodes[mCurrentIndex]; }
-		inline bool valid() const		{ return (mCurrentIndex < mBlockNode.mNodes.size()); }
-		inline Node* get() const		{ return (mCurrentIndex < mBlockNode.mNodes.size()) ? &mBlockNode.mNodes[mCurrentIndex] : nullptr; }
-		inline Node* peek() const		{ return (mCurrentIndex + 1 < mBlockNode.mNodes.size()) ? &mBlockNode.mNodes[mCurrentIndex + 1] : nullptr; }
-
-		template<typename T> inline T* getSpecific() const   { Node* node = get();  return (nullptr != node && node->isA<T>()) ? static_cast<T*>(node) : nullptr; }
-		template<typename T> inline T* peekSpecific() const  { Node* node = peek(); return (nullptr != node && node->isA<T>()) ? static_cast<T*>(node) : nullptr; }
-
-		inline void eraseCurrent()
-		{
-			// For performance reasons, don't erase it here already, but all of these in one go later on
-			if (mIndicesToErase.empty())
-				mIndicesToErase.reserve(mBlockNode.mNodes.size() / 2);
-			mIndicesToErase.push_back(mCurrentIndex);
-		}
-	};
-
 
 	CompilerFrontend::CompilerFrontend(Module& module, GlobalsLookup& globalsLookup, CompileOptions& compileOptions, const LineNumberTranslation& lineNumberTranslation, TokenProcessing& tokenProcessing, std::vector<FunctionNode*>& functionNodes) :
 		mModule(module),
@@ -148,7 +56,7 @@ namespace lemon
 		Parser parser;
 		ParserTokenList parserTokens;
 
-		std::vector<BlockNode*> blockStack = { &rootNode };
+		BlockNodeStack blockNodeStack(rootNode);
 		uint32 lineNumber = 0;
 
 		for (const std::string_view line : lines)
@@ -173,8 +81,7 @@ namespace lemon
 						CHECK_ERROR(parserTokens.size() == 1, "Curly brace must use its own line", lineNumber);
 
 						// Start new block
-						BlockNode& node = addNode<BlockNode>(blockStack, lineNumber);
-						blockStack.push_back(&node);
+						blockNodeStack.pushBlockNode(lineNumber);
 
 						isUndefined = false;
 						break;
@@ -185,9 +92,7 @@ namespace lemon
 						CHECK_ERROR(parserTokens.size() == 1, "Curly brace must use its own line", lineNumber);
 
 						// Close block
-						blockStack.pop_back();
-
-						CHECK_ERROR(!blockStack.empty(), "Closed too many blocks", lineNumber);
+						blockNodeStack.popBlockNode(lineNumber);
 
 						isUndefined = false;
 						break;
@@ -204,7 +109,7 @@ namespace lemon
 				std::string& content = parserTokens[0].as<PragmaParserToken>().mContent;
 				if (!processGlobalPragma(content))
 				{
-					PragmaNode& node = addNode<PragmaNode>(blockStack, lineNumber);
+					PragmaNode& node = blockNodeStack.appendNode<PragmaNode>(lineNumber);
 					node.mContent.swap(content);
 				}
 				isUndefined = false;
@@ -213,7 +118,7 @@ namespace lemon
 			if (isUndefined)
 			{
 				// Add undefined node containing the token list, translated from parser token to (compiler) tokens
-				UndefinedNode& node = addNode<UndefinedNode>(blockStack, lineNumber);
+				UndefinedNode& node = blockNodeStack.appendNode<UndefinedNode>(lineNumber);
 				node.mTokenList.reserve(parserTokens.size());
 				for (size_t i = 0; i < parserTokens.size(); ++i)
 				{
@@ -286,7 +191,7 @@ namespace lemon
 			}
 		}
 
-		CHECK_ERROR(blockStack.size() == 1, "More blocks opened than closed", lineNumber);
+		CHECK_ERROR(blockNodeStack.mStack.size() == 1, "More blocks opened than closed", lineNumber);
 	}
 
 	void CompilerFrontend::processGlobalDefinitions(BlockNode& rootNode)
@@ -1216,6 +1121,7 @@ namespace lemon
 					REPORT_ERROR_CODE(CompilerError::Code::SCRIPT_FEATURE_LEVEL_TOO_HIGH, value, CompileOptions::MAX_SCRIPT_FEATURE_LEVEL, "Script uses feature level " << value << ", but the highest supported level is " << CompileOptions::MAX_SCRIPT_FEATURE_LEVEL);
 				}
 				mCompileOptions.mScriptFeatureLevel = (uint32)value;
+				mModule.setScriptFeatureLevel((uint32)value);
 			}
 			return true;
 		}
@@ -1269,14 +1175,14 @@ namespace lemon
 		// Negate value if needed
 		if (negative)
 		{
-			if (!negateBaseTypeValue(constantValue, constantDataType))
+			if (!DataTypeHelper::negateBaseTypeValue(constantValue, *constantDataType))
 				CHECK_ERROR(false, "Can't apply negative sign to constant value of type " << dataType->getName(), lineNumber);
 		}
 
 		// For integers, check if data gets lost by the cast
 		if (constantDataType->getClass() == DataTypeDefinition::Class::INTEGER && dataType->getClass() == DataTypeDefinition::Class::INTEGER)
 		{
-			if (!isInsideIntegerRange(constantValue.get<int64>(), dataType->as<IntegerDataType>()))
+			if (!DataTypeHelper::isInsideIntegerRange(constantValue.get<int64>(), dataType->as<IntegerDataType>()))
 				CHECK_ERROR(false, "Constant " << constantValue.get<int64>() << " (" << rmx::hexString(constantValue.get<int64>()) << ") can't fit into data type " << dataType->getName().getString() << ", data would get lost", lineNumber);
 		}
 

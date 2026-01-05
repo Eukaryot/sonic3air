@@ -105,11 +105,12 @@ namespace lemon
 		//  - 0x12 = Support for deprecation flags in function alias names
 		//  - 0x13 = Source file info with local paths
 		//  - 0x14 = Label address hooks and disabled address hooks
+		//  - 0x15 = Script feature level of module
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";	// "Lemonscript Module"
 		const uint16 MINIMUM_VERSION = 0x14;
-		uint16 version = 0x14;
+		uint16 version = 0x15;
 
 		if (outerSerializer.isReading())
 		{
@@ -151,6 +152,8 @@ namespace lemon
 		// Serialize module
 		serializer & module.mFirstFunctionID;
 		serializer & module.mFirstVariableID;
+		if (version >= 0x15)
+			serializer & module.mScriptFeatureLevel;
 
 		// Serialize source file info
 		{

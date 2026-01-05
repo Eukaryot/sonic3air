@@ -137,7 +137,7 @@ private:
 
 	bool tryCallAddressHook(uint32 address);
 	bool tryCallAddressHookDev(uint32 address);
-	bool tryCallUpdateHook(bool postUpdate);
+	bool tryCallUpdateHook(bool postUpdate, CallFrameTracking* callFrameTracking);
 
 	void applyCallFramesToAdd();
 

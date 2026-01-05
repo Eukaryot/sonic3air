@@ -95,6 +95,13 @@ void OptionsConfig::buildSystem()
 	}
 #endif
 
+#if defined(SUPPORT_IMGUI) && !defined(PLATFORM_WEB)	// Hide the file browser option in the Web version, as it already has its own file manager with more functionality
+	CATEGORY("Data Management")
+	{
+		configBuilder.addSetting("Open File Browser", option::_OPEN_FILE_BROWSER);
+	}
+#endif
+
 	CATEGORY("More Info")
 	{
 		configBuilder.addSetting("Open Game Homepage", option::_OPEN_HOMEPAGE);
@@ -233,7 +240,7 @@ void OptionsConfig::buildAudio()
 		const char* volumeName[] = { "Overall Volume:", "Music Volume:", "Sound Volume:" };
 		for (int k = 0; k < 3; ++k)
 		{
-			configBuilder.addSetting(volumeName[k], (option::Option)(option::AUDIO_VOLUME + k))
+			configBuilder.addSetting(volumeName[k], (option::Option)(option::MASTER_VOLUME + k))
 				.addOption("Off", 0)
 				.addNumberOptions(5, 100, 5, "%");
 		}

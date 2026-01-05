@@ -165,6 +165,12 @@
     <ClCompile Include="..\..\source\lemon\utility\StringFormatterLegacy.cpp">
       <Filter>lemon\utility</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\lemon\utility\DataTypeHelper.cpp">
+      <Filter>lemon\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\BaseType.cpp">
+      <Filter>lemon\program</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h">
@@ -349,6 +355,15 @@
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\basics\GenericManager.h">
       <Filter>lemon\basics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\frontend\NodesIterator.h">
+      <Filter>lemon\compiler\frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\frontend\BlockNodeStack.h">
+      <Filter>lemon\compiler\frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\utility\DataTypeHelper.h">
+      <Filter>lemon\utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

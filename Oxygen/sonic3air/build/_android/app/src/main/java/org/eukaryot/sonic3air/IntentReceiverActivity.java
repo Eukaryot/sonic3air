@@ -47,23 +47,23 @@ public class IntentReceiverActivity extends Activity
 			dlgAlert.setTitle("Sonic 3 A.I.R. file handler");
 			dlgAlert.setMessage("Passed file to Sonic 3 A.I.R.\nPress OK to switch back to the game.");
 			dlgAlert.setPositiveButton("Ok",
-					new DialogInterface.OnClickListener()
+				new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int which)
 					{
-						public void onClick(DialogInterface dialog, int which)
+						String activityToStart = "org.eukaryot.sonic3air.GameActivity";
+						try
 						{
-							String activityToStart = "org.eukaryot.sonic3air.GameActivity";
-							try
-							{
-								Class<?> c = Class.forName(activityToStart);
-								Intent intent = new Intent(IntentReceiverActivity.this, c);
-								startActivity(intent);
-							}
-							catch (ClassNotFoundException ignored)
-							{
-							}
-							finish();
+							Class<?> c = Class.forName(activityToStart);
+							Intent intent = new Intent(IntentReceiverActivity.this, c);
+							startActivity(intent);
 						}
-					});
+						catch (ClassNotFoundException ignored)
+						{
+						}
+						finish();
+					}
+				});
 			dlgAlert.setCancelable(true);
 			dlgAlert.create().show();
 		}

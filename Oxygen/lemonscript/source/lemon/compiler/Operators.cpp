@@ -158,13 +158,17 @@ namespace lemon
 			case Operator::ASSIGN_MULTIPLY:
 			case Operator::ASSIGN_DIVIDE:
 			case Operator::ASSIGN_MODULO:
+			{
+				return OperatorType::ASSIGNMENT;
+			}
+
 			case Operator::ASSIGN_SHIFT_LEFT:	// TODO: Special handling required
 			case Operator::ASSIGN_SHIFT_RIGHT:	// TODO: Special handling required
 			case Operator::ASSIGN_AND:
 			case Operator::ASSIGN_OR:
 			case Operator::ASSIGN_XOR:
 			{
-				return OperatorType::ASSIGNMENT;
+				return OperatorType::ASSIGNMENT_INT;
 			}
 
 			case Operator::BINARY_PLUS:
@@ -172,16 +176,20 @@ namespace lemon
 			case Operator::BINARY_MULTIPLY:
 			case Operator::BINARY_DIVIDE:
 			case Operator::BINARY_MODULO:
-			case Operator::BINARY_SHIFT_LEFT:	// TODO: Special handling required
-			case Operator::BINARY_SHIFT_RIGHT:	// TODO: Special handling required
-			case Operator::BINARY_AND:
-			case Operator::BINARY_OR:
-			case Operator::BINARY_XOR:
 			case Operator::LOGICAL_AND:
 			case Operator::LOGICAL_OR:
 			case Operator::COLON:
 			{
 				return OperatorType::SYMMETRIC;
+			}
+
+			case Operator::BINARY_SHIFT_LEFT:	// TODO: Special handling required
+			case Operator::BINARY_SHIFT_RIGHT:	// TODO: Special handling required
+			case Operator::BINARY_AND:
+			case Operator::BINARY_OR:
+			case Operator::BINARY_XOR:
+			{
+				return OperatorType::SYMMETRIC_INT;
 			}
 
 			case Operator::COMPARE_EQUAL:

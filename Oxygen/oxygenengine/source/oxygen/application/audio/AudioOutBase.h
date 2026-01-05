@@ -84,5 +84,8 @@ protected:
 	AudioCollection mAudioCollection;
 	AudioPlayer mAudioPlayer;
 	bool mLoadedRemasteredSoundtrack = false;
+
 	float mGlobalVolume = 1.0f;
+	float mMusicVolume = 1.0f;
+	float mSoundVolume = 1.0f;
 };

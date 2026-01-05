@@ -46,7 +46,7 @@ PaletteManager::PaletteManager()
 
 void PaletteManager::preFrameUpdate()
 {
-	mSplitPositionY = 0xffff;
+	mSplitPositionY = 0x1fff;
 	mUsesGlobalComponentTint = false;
 	mGlobalComponentTintColor = Color::WHITE;
 	mGlobalComponentAddedColor = Color::TRANSPARENT;

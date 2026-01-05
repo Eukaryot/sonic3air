@@ -21,6 +21,8 @@ public:
 	Texture();
 	Texture(const Bitmap& bitmap);
 	Texture(const String& filename);
+	Texture(const Texture& other) = delete;
+	Texture(Texture&& other);
 	~Texture();
 
 	void generate();	// Just calls "glGenTextures", nothing else

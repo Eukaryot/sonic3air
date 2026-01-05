@@ -115,13 +115,16 @@ void PlaneManager::refresh()
 
 			default:
 			{
-				const uint16* src = getPlaneContent(index);
-				memcpy(buffer, src, numPatterns * sizeof(uint16));
-				if (isDeveloperMode)
+				if (isPlaneUsed(index))
 				{
-					for (int k = 0; k < numPatterns; ++k)
+					const uint16* src = getPlaneContent(index);
+					memcpy(buffer, src, numPatterns * sizeof(uint16));
+					if (isDeveloperMode)
 					{
-						mPatternManager.setLastUsedAtex(src[k], (src[k] >> 9) & 0x70);
+						for (int k = 0; k < numPatterns; ++k)
+						{
+							mPatternManager.setLastUsedAtex(src[k], (src[k] >> 9) & 0x70);
+						}
 					}
 				}
 				break;
@@ -249,9 +252,15 @@ const uint16* PlaneManager::getPlaneContent(int planeIndex, uint16 patternIndex)
 	return (uint16*)(EmulatorInterface::instance().getVRam() + getPatternVRAMAddress(planeIndex, patternIndex));
 }
 
-void PlaneManager::setupPlaneW(bool isPlaneWBelowSplit, uint16 splitY)
+void PlaneManager::setWindowPlaneSplitX(bool rightSideWindow, uint16 splitX)
 {
-	mIsPlaneWBelowSplitY = isPlaneWBelowSplit;
+	mIsPlaneWRightOfSplitX = rightSideWindow;
+	mPlaneAWSplitX = splitX;
+}
+
+void PlaneManager::setWindowPlaneSplitY(bool bottomWindow, uint16 splitY)
+{
+	mIsPlaneWBelowSplitY = bottomWindow;
 	mPlaneAWSplitY = splitY;
 }
 
@@ -263,6 +272,8 @@ Recti PlaneManager::getPlaneRect(int planeIndex, const Recti& fullscreenRect) co
 		case PLANE_A:
 		case PLANE_W:
 		{
+			// TODO: Support mPlaneAWSplitX and mIsPlaneWRightOfSplitX
+
 			if (mIsPlaneWBelowSplitY == (planeIndex == PLANE_W))
 			{
 				output.y = mPlaneAWSplitY;
@@ -302,7 +313,7 @@ void PlaneManager::dumpAsPaletteBitmap(PaletteBitmap& output, int planeIndex, bo
 			const uint16 patternIndex = getPatternAtIndex(planeIndex, (x / 8) + (y / 8) * numPatternsPerLine);
 			const PatternManager::CacheItem::Pattern& pattern = patternCache[patternIndex & 0x07ff].mFlipVariation[(patternIndex >> 11) & 3];
 			const uint8* srcPatternPixels = &pattern.mPixels[(x & 0x07) + (y & 0x07) * 8];
-			const uint8 atex = (patternIndex >> 9) & 0x30;
+			const uint8 atex = ((planeIndex != PLANE_DEBUG) ? (patternIndex >> 9) : mPatternManager.getLastUsedAtex(patternIndex)) & 0x30;
 
 			for (int k = 0; k < 8; ++k)
 			{

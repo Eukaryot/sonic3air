@@ -81,11 +81,11 @@ bool Simulation::startup()
 
 	// Optionally load save state
 	mStateLoaded.clear();
-	if (success && EngineMain::getDelegate().useDeveloperFeatures() && !config.mLoadSaveState.empty())
+	if (success && EngineMain::getDelegate().useDeveloperFeatures() && !config.mLoadSaveState.empty() && config.mStartPhase == 3)
 	{
 		success = loadState(config.mSaveStatesDirLocal + config.mLoadSaveState + L".state", false);
 		if (!success)
-			loadState(config.mSaveStatesDir + config.mLoadSaveState + L".state");
+			loadState(config.mSaveStatesDir + config.mLoadSaveState + L".state", false);
 	}
 	RMX_LOG_INFO("Runtime environment ready");
 

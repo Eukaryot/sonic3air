@@ -95,6 +95,8 @@ namespace lemon
 
 	void Module::startCompiling(const GlobalsLookup& globalsLookup)
 	{
+		mScriptFeatureLevel = 1;	// Default for compiled scripts is feature level 1 unless the script explicitly defines feature level 2
+
 		if (mFunctions.empty())
 		{
 			// It's the same here as for variables, see below

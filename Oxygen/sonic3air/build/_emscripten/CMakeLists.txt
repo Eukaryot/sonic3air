@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 3.10)
 
 project(Sonic3AIR)
 
+
+# Build options
+option(USE_IMGUI "Use ImGui, required for dev mode and system windows" ON)
+
+message(STATUS "USE_IMGUI = ${USE_IMGUI}")
+
+
+
 set(CMAKE_CXX_STANDARD 17)
 
 set(WORKSPACE_DIR ../../../..)
@@ -10,6 +18,10 @@ set(WORKSPACE_DIR ../../../..)
 add_definitions(-D__EMSCRIPTEN__)
 add_definitions(-DRMX_USE_GLES2)
 add_compile_definitions(PLATFORM_ENDUSER)
+if (USE_IMGUI)
+	add_definitions(-DUSE_IMGUI)
+endif()
+
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
@@ -36,12 +48,25 @@ set (CMAKE_CXX_FLAGS "-s USE_VORBIS=1 -s USE_SDL=2 -s USE_ZLIB=1")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lidbfs.js -lwebsocket.js")
 
 include_directories(${WORKSPACE_DIR}/framework/external/sdl/SDL2/include)
+include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizip)
+if (USE_IMGUI)
+	include_directories(${WORKSPACE_DIR}/framework/external/imgui/imgui)
+endif()
 include_directories(${WORKSPACE_DIR}/librmx/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/lemonscript/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/oxygenengine/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/sonic3air/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/sonic3air/source/external)
-include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizip)
+
+
+# imgui
+if (USE_IMGUI)
+	file(GLOB IMGUI_SOURCES ${WORKSPACE_DIR}/framework/external/imgui/imgui/*.cpp
+							${WORKSPACE_DIR}/framework/external/imgui/imgui/backends/imgui_impl_opengl3.cpp
+							${WORKSPACE_DIR}/framework/external/imgui/imgui/backends/imgui_impl_sdl2.cpp)
+
+	add_library(imgui ${IMGUI_SOURCES})
+endif()
 
 
 # rmxbase
@@ -114,6 +139,9 @@ target_compile_definitions(oxygen_enduser PUBLIC ENDUSER)
 target_link_libraries(oxygen_enduser rmxmedia)
 target_link_libraries(oxygen_enduser rmxext_oggvorbis)
 target_link_libraries(oxygen_enduser lemonscript)
+if (USE_IMGUI)
+	target_link_libraries(oxygen_enduser imgui)
+endif()
 target_link_libraries(oxygen_enduser oxygen_netcore)
 
 

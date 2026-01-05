@@ -162,8 +162,8 @@
 	// Sound effects                                //
 	//----------------------------------------------//
 
-	"33": { "Source": "Emulation", "Type": "Sound", "Volume": "0.8" },	// Alternating ring sound (emulation plays left)
-	"34": { "Source": "Emulation", "Type": "Sound", "Volume": "0.8" },	// Ring sound always playing right
+	"33": { "Source": "Emulation", "Type": "Sound" },		// Alternating ring sound (emulation plays left)
+	"34": { "Source": "Emulation", "Type": "Sound" },		// Ring sound always playing right
 	"35": { "Source": "Emulation", "Type": "Sound" },
 	"36": { "Source": "Emulation", "Type": "Sound" },		// Brake
 	"37": { "Source": "Emulation", "Type": "Sound" },
@@ -171,7 +171,7 @@
 	"39": { "Source": "Emulation", "Type": "Sound" },
 	"3A": { "Source": "Emulation", "Type": "Sound" },
 	"3B": { "Source": "Emulation", "Type": "Sound" },
-	"3C": { "Source": "Emulation", "Type": "Sound", "Volume": "0.7" },		// Roll
+	"3C": { "Source": "Emulation", "Type": "Sound" },		// Roll
 	"3D": { "Source": "Emulation", "Type": "Sound" },
 	"3E": { "Source": "Emulation", "Type": "Sound" },
 	"3F": { "Source": "Emulation", "Type": "Sound" },
@@ -202,9 +202,9 @@
 	"56": { "Source": "Emulation", "Type": "Sound" },
 	"57": { "Source": "Emulation", "Type": "Sound" },
 	"58": { "Source": "Emulation", "Type": "Sound" },
-	"59": { "Source": "Emulation", "Type": "Sound", "Volume": "0.7" },		// Collapse sound (which is a bit loud imho)
+	"59": { "Source": "Emulation", "Type": "Sound" },		// Collapse sound
 	"5A": { "Source": "Emulation", "Type": "Sound" },
-	"5B": { "File": "sfx5B.ogg", "Type": "Sound" },			// Still using the recorded version, as the emulated version somehow feels off (though I can't really say why)
+	"5B": { "File":   "sfx5B.ogg", "Type": "Sound" },		// Still using the recorded version, as the emulated version somehow feels off (though I can't really say why)
 	"5C": { "Source": "Emulation", "Type": "Sound" },
 	"5D": { "Source": "Emulation", "Type": "Sound" },
 	"5E": { "Source": "Emulation", "Type": "Sound" },
@@ -289,7 +289,7 @@
 	"A8": { "Source": "Emulation", "Type": "Sound" },
 	"A9": { "Source": "Emulation", "Type": "Sound" },
 	"AA": { "Source": "Emulation", "Type": "Sound" },
-	"AB": { "Source": "EmulationContinuous", "Type": "Sound", "Volume": "0.8" },		// Spindash charge; needs to be emulated dynamically (i.e. "continuous") because of reverb effect
+	"AB": { "Source": "EmulationContinuous", "Type": "Sound" },		// Spindash charge; needs to be emulated dynamically (i.e. "continuous") because of reverb effect
 	"AC": { "Source": "Emulation", "Type": "Sound" },
 	"AD": { "Source": "Emulation", "Type": "Sound" },
 	"AE": { "Source": "Emulation", "Type": "Sound" },
@@ -310,7 +310,7 @@
 	
 	// Continuous sounds have to be emulated
 	"BC": { "Source": "EmulationContinuous", "Type": "Sound" },
-	"BD": { "Source": "EmulationContinuous", "Type": "Sound", "Volume": "0.5" },
+	"BD": { "Source": "EmulationContinuous", "Type": "Sound" },
 	"BE": { "Source": "EmulationContinuous", "Type": "Sound" },
 	"BF": { "Source": "EmulationContinuous", "Type": "Sound" },
 

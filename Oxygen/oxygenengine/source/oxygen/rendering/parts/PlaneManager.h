@@ -66,7 +66,8 @@ public:
 
 	inline bool isPlaneWBelowSplitY() const  { return mIsPlaneWBelowSplitY; }
 	inline uint16 getPlaneAWSplitY() const	 { return mPlaneAWSplitY; }
-	void setupPlaneW(bool isPlaneWBelowSplit, uint16 splitY);
+	void setWindowPlaneSplitX(bool rightSideWindow, uint16 splitX);
+	void setWindowPlaneSplitY(bool bottomWindow, uint16 splitY);
 	Recti getPlaneRect(int planeIndex, const Recti& fullscreenRect) const;
 
 	void dumpAsPaletteBitmap(PaletteBitmap& output, int planeIndex, bool highlightPrioPatterns = false) const;
@@ -92,7 +93,9 @@ private:
 	Vec2i mPlayfieldSize;		// In patterns (8x8 pixels)
 	uint16 mPlanePatternsBuffer[4][0x1000] = { 0 };		// Enough space to support 128 x 32 patterns (though usually only 0x800 is needed, for 64 x 32 patterns)
 
-	bool mIsPlaneWBelowSplitY = false;	// If true, plane W is below plane A, otherwise it's above plane A
+	bool mIsPlaneWRightOfSplitX = false;	// If true, plane W is right of plane A, otherwise it's left of plane A
+	bool mIsPlaneWBelowSplitY = false;		// If true, plane W is below plane A, otherwise it's above plane A
+	uint16 mPlaneAWSplitX = 0;
 	uint16 mPlaneAWSplitY = 0;
 
 	bool mDisabledDefaultPlane[4];

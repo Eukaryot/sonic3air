@@ -26,6 +26,8 @@ namespace rmx
 		bool readFile(const std::wstring& filename, std::vector<uint8>& outData) override;
 
 		bool renameFile(const std::wstring& oldFilename, const std::wstring& newFilename) override;
+		bool renameDirectory(const std::wstring& oldPath, const std::wstring& newPath) override;
+
 		bool listFiles(const std::wstring& path, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries) override;
 		bool listFilesByMask(const std::wstring& filemask, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries) override;
 		bool listDirectories(const std::wstring& path, std::vector<std::wstring>& outDirectories) override;

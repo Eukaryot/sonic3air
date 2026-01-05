@@ -630,6 +630,9 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 		{
 			// Shared code for palette & component sprite rendering
 			const renderitems::CustomSpriteInfoBase& spriteBase = static_cast<const renderitems::CustomSpriteInfoBase&>(geometry.mSpriteInfo);
+			if (nullptr == spriteBase.mCacheItem)
+				break;
+
 			const bool isPaletteSprite = (geometry.mSpriteInfo.getType() == RenderItem::Type::PALETTE_SPRITE);
 
 			const PaletteManager& paletteManager = mRenderParts.getPaletteManager();

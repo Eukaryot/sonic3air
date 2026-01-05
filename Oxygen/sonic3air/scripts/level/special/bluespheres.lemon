@@ -47,7 +47,7 @@ function void SpecialStage()
 	VDP.Config.setNameTableBasePlaneA(0xc000)
 	VDP.Config.setNameTableBasePlaneB(0xe000)
 	VDP.Config.setPlayfieldSizeInPixels(512, 256)
-	VDP.Config.setupWindowPlane(false, 0)	// Disable window plane
+	VDP.Config.setWindowPlaneSplitY(false, 0)	// Disable window plane
 	VDP.Config.setVerticalScrolling(false, 0)
 	VDP.Config.setBackdropColor(0x20)
 	VDP.Config.setRenderingModeConfiguration(false)
@@ -1638,7 +1638,6 @@ function void BlueSpheres.RenderSingleSphereA()
 }
 
 
-// TODO: This function does not verify!
 //# address-hook(0x009b18) end(0x009b60)
 function void BlueSpheres.RenderSingleSphereB()
 {
@@ -1653,10 +1652,9 @@ function void BlueSpheres.RenderSingleSphereB()
 		u16[A6+4] = u16[A3+2] + D6.u16
 
 		u16 backupD1 = D1.u16
-		D0.u16 = baseX + 0x120 - u16[A3+4]
+		D0.u16 = baseX - 0x120 + u16[A3+4]
 		D1.u16 = bluespheres.lifted_height + 0x100
-		D0.s32 = (s32(D0.s16) * D1.s16) >> 8
-		D0.u16 += 0x120
+		D0.s32 = 0x120 + ((s32(D0.s16) * D1.s16) >> 8)
 		if (D0.u16 >= 0x1d0)
 			D0.u16 = 1
 		u16[A6+6] = D0.u16 + getScreenExtend()

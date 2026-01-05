@@ -126,9 +126,9 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntryInt(option::TIMEATTACK_INSTANTRESTART,	&config.mInstantTimeAttackRestart);
 		setupOptionEntryInt(option::GAME_SPEED,					&config.mSimulationFrequency);
 
-		setupOptionEntryPercent(option::AUDIO_VOLUME,			&config.mAudioVolume);
-		setupOptionEntryPercent(option::MUSIC_VOLUME,			&config.mMusicVolume);
-		setupOptionEntryPercent(option::SOUND_VOLUME,			&config.mSoundVolume);
+		setupOptionEntryPercent(option::MASTER_VOLUME,			&config.mAudio.mMasterVolume);
+		setupOptionEntryPercent(option::MUSIC_VOLUME,			&config.mAudio.mMusicVolume);
+		setupOptionEntryPercent(option::SOUND_VOLUME,			&config.mAudio.mSoundVolume);
 		setupOptionEntryPercent(option::VGAMEPAD_OPACITY,		&config.mVirtualGamepad.mOpacity);
 		setupOptionEntryPercent(option::CONTROLLER_RUMBLE_P1,	&config.mControllerRumbleIntensity[0]);
 		setupOptionEntryPercent(option::CONTROLLER_RUMBLE_P2,	&config.mControllerRumbleIntensity[1]);
@@ -433,7 +433,7 @@ void OptionsMenu::update(float timeElapsed)
 		mOptionEntries[option::FRAME_SYNC].loadValue();
 		mOptionEntries[option::FILTERING].loadValue();
 		mOptionEntries[option::BG_BLUR].loadValue();
-		mOptionEntries[option::AUDIO_VOLUME].loadValue();
+		mOptionEntries[option::MASTER_VOLUME].loadValue();
 		mOptionEntries[option::RENDERER].mGameMenuEntry->setSelectedIndexByValue((int)config.mRenderMethod);
 
 		if (mActiveMenu == &mTabMenuEntries && (keys.Down.justPressedOrRepeat() || keys.Up.justPressedOrRepeat()))
@@ -705,6 +705,12 @@ void OptionsMenu::update(float timeElapsed)
 									playSoundtest(*mPlayingSoundTest);
 								}
 							}
+							break;
+						}
+
+						case option::_OPEN_FILE_BROWSER:
+						{
+							GameApp::instance().openFileBrowser();
 							break;
 						}
 

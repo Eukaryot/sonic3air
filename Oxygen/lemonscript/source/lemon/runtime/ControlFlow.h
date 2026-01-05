@@ -16,6 +16,7 @@
 namespace lemon
 {
 	class MemoryAccessHandler;
+	class Module;
 	class Program;
 	class Runtime;
 	class RuntimeFunction;
@@ -60,6 +61,7 @@ namespace lemon
 		void getRecentExecutionLocation(Location& outLocation) const;
 		void getCurrentExecutionLocation(Location& outLocation) const;
 		const ScriptFunction* getCurrentFunction() const;
+		const Module* getCurrentModule() const;
 
 		inline size_t getValueStackSize() const  { return mValueStackPtr - mValueStackStart; }
 
@@ -96,10 +98,10 @@ namespace lemon
 		}
 
 	private:
-		inline static const size_t VALUE_STACK_MAX_SIZE    = 128;
+		inline static const size_t VALUE_STACK_MAX_SIZE    = 0x100;
 		inline static const size_t VALUE_STACK_FIRST_INDEX = 4;			// Leave 4 elements so that removing too many elements from the stack doesn't break everything immediately
 		inline static const size_t VALUE_STACK_LAST_INDEX  = VALUE_STACK_MAX_SIZE - 8;
-		inline static const size_t VAR_STACK_LIMIT         = 1024;
+		inline static const size_t VAR_STACK_LIMIT         = 0x1000;
 
 		Runtime& mRuntime;
 		const Program* mProgram = nullptr;

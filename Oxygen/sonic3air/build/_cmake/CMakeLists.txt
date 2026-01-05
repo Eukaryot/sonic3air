@@ -15,7 +15,7 @@ option(BUILD_OXYGEN_SERVER "Build the Oxygen server executable" OFF)
 option(BUILD_SDL_STATIC "Build SDL as a static library instead of a shared / dynamic one" ON)
 option(USE_GLES "Use OpenGLESv2" OFF)
 option(USE_DISCORD "Use Discord API" ON)
-option(USE_IMGUI "Use ImGui for scripts development" ON)
+option(USE_IMGUI "Use ImGui, required for dev mode and system windows" ON)
 
 
 if (USE_GLES)
@@ -48,6 +48,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(WORKSPACE_DIR ../../../..)
 
 #add_definitions(-DDEBUG)
+if (USE_IMGUI)
+	add_definitions(-DUSE_IMGUI)
+endif()
 
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

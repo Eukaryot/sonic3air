@@ -54,7 +54,7 @@ namespace lemon
 	class API_EXPORT RuntimeFunction
 	{
 	public:
-		void build(Runtime& runtime);
+		bool build(Runtime& runtime);
 
 		const uint8* getFirstRuntimeOpcode() const	{ return mRuntimeOpcodeBuffer.getStart(); }
 

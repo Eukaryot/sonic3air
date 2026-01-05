@@ -108,7 +108,11 @@ function void fn027424()
 		{
 			// Let the water rise (in Knuckles' area)
 			global.level_flag02 = 1
+		#if STANDALONE
+			water.height.target = 0x065e	// Adjust water height to match Sonic's, #contributed by mrgrassman14
+		#else
 			water.height.target = 0x0660
+		#endif
 			if (super.active)
 			{
 				water.height.changerate = 2

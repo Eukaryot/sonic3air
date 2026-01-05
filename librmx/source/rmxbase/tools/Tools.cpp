@@ -258,65 +258,85 @@ namespace rmx
 	}
 
 
-	template<typename STRING>
+	template<bool CASE_SENSITIVE, typename STRING>
+	bool stringEquals(const STRING& strA, const STRING& strB)
+	{
+		if (strA.length() != strB.length())
+			return false;
+
+		if constexpr (CASE_SENSITIVE)
+		{
+			if (strA.empty())
+				return true;
+			if (memcmp((void*)&strA[0], (void*)&strB[0], strA.length() * sizeof(strA[0])) != 0)
+				return false;
+		}
+		else
+		{
+			for (size_t k = 0; k < strA.length(); ++k)
+			{
+				if (std::tolower(strA[k]) != std::tolower(strB[k]))
+					return false;
+			}
+		}
+		return true;
+	}
+
+	template<bool CASE_SENSITIVE, typename STRING>
 	bool stringStartsWith(const STRING& fullString, const STRING& prefix)
 	{
 		if (fullString.length() < prefix.length())
 			return false;
-		if (memcmp((void*)&fullString[0], (void*)&prefix[0], prefix.length() * sizeof(fullString[0])) != 0)
-			return false;
-		return true;
+		return stringEquals<CASE_SENSITIVE, STRING>(fullString.substr(0, prefix.length()), prefix);
 	}
 
-	template<typename STRING>
+	template<bool CASE_SENSITIVE, typename STRING>
 	bool stringEndsWith(const STRING& fullString, const STRING& suffix)
 	{
 		if (fullString.length() < suffix.length())
 			return false;
 		const size_t offset = fullString.length() - suffix.length();
-		if (memcmp((void*)&fullString[offset], (void*)&suffix[0], suffix.length() * sizeof(fullString[0])) != 0)
-			return false;
-		return true;
-	}
-
-	bool startsWith(const std::string& fullString, const std::string& prefix)
-	{
-		return stringStartsWith<std::string>(fullString, prefix);
-	}
-
-	bool startsWith(const std::wstring& fullString, const std::wstring& prefix)
-	{
-		return stringStartsWith<std::wstring>(fullString, prefix);
+		return stringEquals<CASE_SENSITIVE, STRING>(fullString.substr(offset, suffix.length()), suffix);
 	}
 
 	bool startsWith(std::string_view fullString, std::string_view prefix)
 	{
-		return stringStartsWith<std::string_view>(fullString, prefix);
+		return stringStartsWith<true, std::string_view>(fullString, prefix);
 	}
 
 	bool startsWith(std::wstring_view fullString, std::wstring_view prefix)
 	{
-		return stringStartsWith<std::wstring_view>(fullString, prefix);
+		return stringStartsWith<true, std::wstring_view>(fullString, prefix);
 	}
 
-	bool endsWith(const std::string& fullString, const std::string& prefix)
+	bool startsWithCaseInsensitive(std::string_view fullString, std::string_view prefix)
 	{
-		return stringEndsWith<std::string>(fullString, prefix);
+		return stringStartsWith<false, std::string_view>(fullString, prefix);
 	}
 
-	bool endsWith(const std::wstring& fullString, const std::wstring& prefix)
+	bool startsWithCaseInsensitive(std::wstring_view fullString, std::wstring_view prefix)
 	{
-		return stringEndsWith<std::wstring>(fullString, prefix);
+		return stringStartsWith<false, std::wstring_view>(fullString, prefix);
 	}
 
-	bool endsWith(std::string_view fullString, std::string_view prefix)
+	bool endsWith(std::string_view fullString, std::string_view suffix)
 	{
-		return stringEndsWith<std::string_view>(fullString, prefix);
+		return stringEndsWith<true, std::string_view>(fullString, suffix);
 	}
 
-	bool endsWith(std::wstring_view fullString, std::wstring_view prefix)
+	bool endsWith(std::wstring_view fullString, std::wstring_view suffix)
 	{
-		return stringEndsWith<std::wstring_view>(fullString, prefix);
+		return stringEndsWith<true, std::wstring_view>(fullString, suffix);
+	}
+
+	bool endsWithCaseInsensitive(std::string_view fullString, std::string_view suffix)
+	{
+		return stringEndsWith<false, std::string_view>(fullString, suffix);
+	}
+
+	bool endsWithCaseInsensitive(std::wstring_view fullString, std::wstring_view suffix)
+	{
+		return stringEndsWith<false, std::wstring_view>(fullString, suffix);
 	}
 
 	bool containsCaseInsensitive(std::string_view fullString, std::string_view substring)
@@ -325,6 +345,20 @@ namespace rmx
 			[](char a, char b) { return std::toupper(a) == std::toupper(b); }
 		);
 		return (it != fullString.end());
+	}
+
+	std::wstring convertFromUTF8(std::string_view str)
+	{
+		std::wstring output;
+		UTF8Conversion::convertFromUTF8(str, output);
+		return output;
+	}
+
+	std::string convertToUTF8(std::wstring_view str)
+	{
+		std::string output;
+		UTF8Conversion::convertToUTF8(str, output);
+		return output;
 	}
 
 	std::string getTimestampStringForFilename()

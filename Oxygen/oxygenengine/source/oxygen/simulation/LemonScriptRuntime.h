@@ -82,6 +82,8 @@ public:
 	std::string getOwnCurrentScriptLocationString() const;
 
 private:
+	uint32 getCurrentExecutionScriptFeatureLevel() const;
+
 	static std::string buildScriptLocationString(const lemon::ControlFlow& controlFlow);
 	static uint32 getLineNumberInFile(const lemon::ScriptFunction& function, size_t programCounter);
 

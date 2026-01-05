@@ -10,6 +10,7 @@
 
 #include "oxygen/application/Configuration.h"
 #include "oxygen/helper/HighResolutionTimer.h"
+#include "oxygen/menu/imgui/ImGuiIntegration.h"
 
 class AudioPlayer;
 class BackdropView;
@@ -37,6 +38,10 @@ public:
 
 	virtual void initialize() override;
 	virtual void deinitialize() override;
+
+	virtual void beginFrame() override;
+	virtual void endFrame() override;
+
 	virtual void sdlEvent(const SDL_Event& ev) override;
 	virtual void keyboard(const rmx::KeyboardEvent& ev) override;
 	virtual void mouse(const rmx::MouseEvent& ev) override;
@@ -59,6 +64,8 @@ public:
 
 	bool hasKeyboard() const;
 	bool hasVirtualGamepad() const;
+
+	void requestActiveTextInput();
 
 private:
 	int updateWindowDisplayIndex();
@@ -94,6 +101,9 @@ private:
 	DebugSidePanel* mDebugSidePanel = nullptr;
 	ProfilingView* mProfilingView = nullptr;
 
+	ImGuiIntegration mImGuiIntegration;
+
 	// Input
 	float mMouseHideTimer = 0.0f;
+	bool mRequestActiveTextInput = false;
 };

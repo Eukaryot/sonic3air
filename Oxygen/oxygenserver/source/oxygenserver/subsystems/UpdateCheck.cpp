@@ -52,12 +52,13 @@ UpdateCheck::UpdateCheck()
 	}
 #endif
 
-	// Test build (Windows)
+	// Test build (Windows, Android)
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x25021500;
+		definition.mVersionNumber = 0x25123100;
 		definition.mReleaseChannel = ReleaseChannel::TEST;
 		definition.addPlatform(Platform::WINDOWS);
+		definition.addPlatform(Platform::ANDROID);
 		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";
 	}
 

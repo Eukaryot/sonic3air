@@ -47,6 +47,11 @@ namespace rmx
 		return FileIO::renameFile(oldFilename, newFilename);
 	}
 
+	bool RealFileProvider::renameDirectory(const std::wstring& oldPath, const std::wstring& newPath)
+	{
+		return FileIO::renameDirectory(oldPath, newPath);
+	}
+
 	bool RealFileProvider::listFiles(const std::wstring& path, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries)
 	{
 		FileIO::listFiles(path, recursive, outFileEntries);

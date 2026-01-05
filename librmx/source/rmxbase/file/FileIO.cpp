@@ -275,11 +275,12 @@ namespace rmx
 
 	bool FileIO::getFileSize(std::wstring_view filename, uint64& outSize)
 	{
+		mLastErrorCode.clear();
+
 	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
 		const std_filesystem::path fspath(filename.data());
-		std::error_code errorCode;
-		const std::uintmax_t size = std_filesystem::file_size(fspath, errorCode);
-		if (errorCode)
+		const std::uintmax_t size = std_filesystem::file_size(fspath, mLastErrorCode);
+		if (mLastErrorCode)
 			return false;
 		outSize = (uint64)size;
 		return true;
@@ -294,15 +295,16 @@ namespace rmx
 
 	bool FileIO::getFileTime(std::wstring_view filename, time_t& outTime)
 	{
+		mLastErrorCode.clear();
+
 	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
 		const std_filesystem::path fspath(filename.data());
-		std::error_code errorCode;
-		const std::filesystem::file_time_type time = std_filesystem::last_write_time(fspath, errorCode);
-		if (errorCode)
+		const std_filesystem::file_time_type time = std_filesystem::last_write_time(fspath, mLastErrorCode);
+		if (mLastErrorCode)
 			return false;
 
 		// This is the C++17 solution for converting the time -- see https://stackoverflow.com/questions/61030383/how-to-convert-stdfilesystemfile-time-type-to-time-t
-		const std::chrono::system_clock::time_point timePoint = std::chrono::time_point_cast<std::chrono::system_clock::duration>(time - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
+		const std::chrono::system_clock::time_point timePoint = std::chrono::time_point_cast<std::chrono::system_clock::duration>(time - std_filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
 		outTime = std::chrono::system_clock::to_time_t(timePoint);
 		return true;
 	#else
@@ -315,7 +317,7 @@ namespace rmx
 	{
 		// Read from file system
 	#ifdef USE_UTF8_PATHS
-		std::ifstream stream(*WString(filename).toUTF8(), std::ios::binary);
+		std::ifstream stream(rmx::convertToUTF8(filename).c_str(), std::ios::binary);
 	#else
 		std::ifstream stream(filename.data(), std::ios::binary);
 	#endif
@@ -344,7 +346,7 @@ namespace rmx
 		}
 
 	#ifdef USE_UTF8_PATHS
-		std::ofstream stream(*WString(filename).toUTF8(), std::ios::binary);
+		std::ofstream stream(rmx::convertToUTF8(filename).c_str(), std::ios::binary);
 	#else
 		std::ofstream stream(filename.data(), std::ios::binary);
 	#endif
@@ -372,27 +374,58 @@ namespace rmx
 
 	bool FileIO::renameFile(const std::wstring& oldFilename, const std::wstring& newFilename)
 	{
+		mLastErrorCode.clear();
+
 	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
 		const std_filesystem::path fspathOld(oldFilename.data());
 		const std_filesystem::path fspathNew(newFilename.data());
-		std::error_code errorCode;
-		std_filesystem::rename(fspathOld, fspathNew, errorCode);
-		return !errorCode;
+		std_filesystem::rename(fspathOld, fspathNew, mLastErrorCode);
+		return !mLastErrorCode;
 	#else
 		RMX_ASSERT(false, "Not implemented: FileIO::renameFile");
 		return false;
 	#endif
 	}
 
+	bool FileIO::renameDirectory(const std::wstring& oldFilename, const std::wstring& newFilename)
+	{
+		mLastErrorCode.clear();
+
+	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+		const std_filesystem::path fspathOld(oldFilename.data());
+		const std_filesystem::path fspathNew(newFilename.data());
+		std_filesystem::rename(fspathOld, fspathNew, mLastErrorCode);
+		return !mLastErrorCode;
+	#else
+		RMX_ASSERT(false, "Not implemented: FileIO::renameDirectory");
+		return false;
+	#endif
+	}
+
 	bool FileIO::removeFile(std::wstring_view path)
 	{
+		mLastErrorCode.clear();
+
 	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
 		const std_filesystem::path fspath(path);
-		std::error_code errorCode;
-		std_filesystem::remove(fspath, errorCode);
-		return !errorCode;
+		std_filesystem::remove(fspath, mLastErrorCode);
+		return !mLastErrorCode;
 	#else
 		RMX_ASSERT(false, "Not implemented: FileIO::removeFile");
+		return false;
+	#endif
+	}
+
+	bool FileIO::removeDirectory(std::wstring_view path)
+	{
+		mLastErrorCode.clear();
+
+	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+		const std_filesystem::path fspath(path);
+		std_filesystem::remove_all(fspath, mLastErrorCode);
+		return !mLastErrorCode;
+	#else
+		RMX_ASSERT(false, "Not implemented: FileIO::removeDirectory");
 		return false;
 	#endif
 	}

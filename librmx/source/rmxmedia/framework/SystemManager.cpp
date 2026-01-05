@@ -60,11 +60,6 @@ namespace rmx
 		SDL_Quit();
 	}
 
-	void SystemManager::startTick()
-	{
-		// TODO...
-	}
-
 	void SystemManager::checkSDLEvents()
 	{
 		// Handle events
@@ -138,7 +133,7 @@ namespace rmx
 	void SystemManager::textinput(const SDL_TextInputEvent& evnt)
 	{
 		TextInputEvent ev;
-		ev.text.readUnicode((const uint8*)evnt.text, (uint32)strlen(evnt.text), UnicodeEncoding::UTF8);
+		ev.text = rmx::convertFromUTF8(evnt.text);
 
 		mCurrentEventConsumed = false;
 		mRoot.textinput(ev);
@@ -208,10 +203,13 @@ namespace rmx
 
 	void SystemManager::mainLoop()
 	{
-		startTick();
+		mRoot.beginFrame();
+
 		checkSDLEvents();
 		update();
 		render();
+
+		mRoot.endFrame();
 
 #ifdef PLATFORM_WEB
 		if (!mRunning)

@@ -253,7 +253,7 @@ namespace lemon
 			case Node::Type::MEMORY_FIXED:
 			{
 				const bool swapBytes = (node.mValue & 0x01) != 0;
-				const size_t bytes = DataTypeHelper::getSizeOfBaseType(node.mDataType);
+				const size_t bytes = BaseTypeHelper::getSizeOfBaseType(node.mDataType);
 				if (swapBytes && bytes >= 2)
 				{
 					line += *String(0, "swapBytes%d(", bytes * 8);

@@ -117,7 +117,7 @@ void SaveStateMenu::keyboard(const rmx::KeyboardEvent& ev)
 			{
 				onAccept(true, true);
 				InputManager::instance().updateInput(0.0f);		// This clears the changed state of "Enter"
-				ControlsIn::instance().setAllIgnores();	// Just to make sure any current key pressed (especially "Enter") won't have an effect in the simulation
+				ControlsIn::instance().setAllIgnores();			// Just to make sure any current key pressed (especially "Enter") won't have an effect in the simulation
 				break;
 			}
 
@@ -167,7 +167,7 @@ void SaveStateMenu::textinput(const rmx::TextInputEvent& ev)
 	if (mEditing && mHighlightedIndex < mEntries.size())
 	{
 		Entry& entry = mEntries[mHighlightedIndex];
-		entry.mName += *ev.text;
+		entry.mName += ev.text;
 	}
 }
 
@@ -190,7 +190,11 @@ void SaveStateMenu::update(float timeElapsed)
 		changeHighlightedIndex(+1);
 	}
 
-	if (!mEditing)
+	if (mEditing)
+	{
+		Application::instance().requestActiveTextInput();
+	}
+	else
 	{
 		if (controller.A.justPressed())
 		{

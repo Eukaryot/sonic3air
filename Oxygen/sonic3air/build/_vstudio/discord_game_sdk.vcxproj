@@ -135,9 +135,6 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <PostBuildEvent>
-      <Command>copy $(SolutionDir)lib\Release_$(BuildCode)\discord_game_sdk.lib $(SolutionDir)lib\Release-Enduser_$(BuildCode) /y</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -155,9 +152,6 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <PostBuildEvent>
-      <Command>copy $(SolutionDir)lib\Release_$(BuildCode)\discord_game_sdk.lib $(SolutionDir)lib\Release-Enduser_$(BuildCode) /y</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\achievement_manager.cpp" />
