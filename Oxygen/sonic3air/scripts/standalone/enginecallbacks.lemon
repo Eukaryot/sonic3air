@@ -97,6 +97,7 @@ function void PreFrameUpdate()
 //# post-update-hook
 function void PostFrameUpdate()
 {
+	Renderer.setLifetimeContext(1) // fixes offscreen P2 and Ghost Sync players in the pause menu not being cleared, often creating a mess on the screen
 	if (Game.getSetting(SETTING_PLAYER2_OFFSCREEN) && global.game_mode == 0x0c && !competition_mode.active)
 	{
 		// Draw off-screen Tails (only when controlled by a player)
@@ -229,3 +230,4 @@ function void CrowdControl.triggerEffect(u32 id, string code, s32 quantity, s32 
 	// For a successfully handled effect, please end with this call to notify CrowdControl:
 	//  CrowdControl.sendResponse(id, CCStatusCode.SUCCESS, "")
 }
+
