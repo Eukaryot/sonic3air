@@ -543,16 +543,16 @@ bool EngineMain::initFileSystem()
 			FTX::FileSystem->addMountPoint(*provider, L"data/", engineBasePath + L"data/", 0x10);
 		}
 	}
-	else
+
+	// In case the game data path isn't located in local "data" directory, add a real file system provider for it
+	//  -> This is relevant for Oxygen Engine using an external game data path
+	//  -> Also, the Mac build of S3AIR requires this logic, as game data is in a different subdirectory inside the app container than the binary
+	//  -> In other cases (such as S3AIR on other platforms), no additional real file provider is needed, so this part is skipped
+	if (config.mGameDataPath != L"data" && config.mGameDataPath != L"./data")
 	{
-		// Add real file system provider for the game data path, if it isn't located in local "data" directory
-		//  -> This is relevant for Oxygen Engine using an external game data path
-		if (config.mGameDataPath != L"data" && config.mGameDataPath != L"./data")
-		{
-			rmx::RealFileProvider* provider = new rmx::RealFileProvider();
-			FTX::FileSystem->addManagedFileProvider(*provider);
-			FTX::FileSystem->addMountPoint(*provider, L"data/", config.mGameDataPath + L'/', 0x10);
-		}
+		rmx::RealFileProvider* provider = new rmx::RealFileProvider();
+		FTX::FileSystem->addManagedFileProvider(*provider);
+		FTX::FileSystem->addMountPoint(*provider, L"data/", config.mGameDataPath + L'/', 0x10);
 	}
 
 	// Create mod data folder (the default mod directory)
