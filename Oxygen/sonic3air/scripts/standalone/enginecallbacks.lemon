@@ -223,9 +223,23 @@ constant u8 CCStatusCode.FINISHED		= 0x08		// The timed effect has finished
 
 function void CrowdControl.triggerEffect(u32 id, string code, s32 quantity, s32 duration)
 {
-	// This is just here so script implementing this have a base function to call:
-	//  base.CrowdControl.triggerEffect(id, code, quantity, duration)
+	/*
+	 * When implementing a CrowdControl effect, please implement your own override of "CrowdControl.triggerEffect" as follows:
+	 *
+	 *	- Check the code parameter for whether it's an effect code that your mod can handle
+	 *
+	 *	- If you can handle the effect code:
+	 *		- Send back a response using "CrowdControl.sendResponse" like this:
+	 *			CrowdControl.sendResponse(id, CCStatusCode.SUCCESS, "")
+	 *		- Then return *without* calling "base.CrowdControl.triggerEffect"
+	 *
+	 *	- If you don't handle the effect code:
+	 *		- Call "base.CrowdControl.triggerEffect" after your own code evaluations, like this:
+	 *			base.CrowdControl.triggerEffect(id, code, quantity, duration)
+	 *		- Do not call "CrowdControl.sendResponse" in this case
+	 */
 
-	// For a successfully handled effect, please end with this call to notify CrowdControl:
-	//  CrowdControl.sendResponse(id, CCStatusCode.SUCCESS, "")
+	// Default implementation in case the code could not be handled by any mod:
+	//  Tell CrowdControl that the code is not supported / available
+	CrowdControl.sendResponse(id, CCStatusCode.UNAVAILABLE, "")
 }
