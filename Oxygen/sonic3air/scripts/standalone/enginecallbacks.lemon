@@ -243,3 +243,11 @@ function void CrowdControl.triggerEffect(u32 id, string code, s32 quantity, s32 
 	//  Tell CrowdControl that the code is not supported / available
 	CrowdControl.sendResponse(id, CCStatusCode.UNAVAILABLE, "")
 }
+
+
+#if !GAMEAPP
+	// When running in Oxygen Engine, CrowdControl is not available (yet?), so this dummy implementation is required
+	function void CrowdControl.sendResponse(u32 id, u8 status, string message)
+	{
+	}
+#endif
