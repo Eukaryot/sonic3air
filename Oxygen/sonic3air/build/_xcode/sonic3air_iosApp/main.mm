@@ -11,6 +11,7 @@
 #include "sonic3air/data/SharedDatabase.h"
 #include "sonic3air/pch.h"
 #include "sonic3air/EngineDelegate.h"
+#include "sonic3air/GameArgumentsReader.h"
 #include "sonic3air/version.inc"
 #include "oxygen/platform/CrashHandler.h"
 #include "oxygen/platform/PlatformFunctions.h"
@@ -21,8 +22,11 @@ EngineMain* _myMain;
 int main(int argc, char * argv[]) {
 	INIT_RMX;
 	INIT_RMXEXT_OGGVORBIS;
-	_myMain = new EngineMain(_myDelegate);
-	
+	GameArgumentsReader arguments;
+	arguments.read(argc, argv);
+	_myMain = new EngineMain(_myDelegate, arguments);
+
+	randomize();
 	Configuration& config = Configuration::instance();
 	//Files for this app will go into ~/Documents/
 	NSURL* myDocuments = [NSFileManager.defaultManager URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
@@ -41,7 +45,6 @@ int main(int argc, char * argv[]) {
 	SharedDatabase::initialize();
 	bool loadedSettings = config.loadSettings(config.mAppDataPath + L"settings.json", Configuration::SettingsType::STANDARD);
 	config.loadSettings(config.mAppDataPath + L"settings_input.json", Configuration::SettingsType::INPUT);
-	config.loadSettings(config.mAppDataPath + L"settings_global.json", Configuration::SettingsType::GLOBAL);
 	if (loadedSettings)
 	{
 		NSString* romPath = [NSString stringWithCString:((char*)config.mLastRomPath.c_str()) encoding:NSUTF8StringEncoding];
@@ -74,11 +77,7 @@ int main(int argc, char * argv[]) {
 			config.mRenderMethod = Configuration::RenderMethod::SOFTWARE;
 			config.saveSettings();
 			
-			NSString* appPath = NSBundle.mainBundle.bundlePath;
-			int argc = 1;
-			char** argv = new char*[argc];
-			argv[0] =(char*)[appPath UTF8String];
-			_myMain->execute(argc, (char**)argv);
+			_myMain->execute();
 		}
 		catch (const std::exception& e)
 		{

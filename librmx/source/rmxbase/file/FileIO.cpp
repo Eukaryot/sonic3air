@@ -17,24 +17,9 @@
 	#include <direct.h>
 	#include <io.h>
 
-#elif defined(PLATFORM_LINUX) || defined(PLATFORM_WEB)
+#elif defined(PLATFORM_LINUX) || defined(PLATFORM_MAC) || defined(PLATFORM_WEB)
 	#include <filesystem>
 	namespace std_filesystem = std::filesystem;
-	#define USE_STD_FILESYSTEM
-
-	#include <dirent.h>
-	#include <sys/stat.h>
-
-#elif defined(PLATFORM_MAC)
-#if TARGET_CPU_X86_64
-	//Older Intel macOS < 10.15 lacks std::filesystem, so we substitute with boost::filesystem
-	#include <boost/filesystem.hpp>
-	namespace std_filesystem = boost::filesystem;
-#else
-	//Newer Macs, specifically arm64, are running macOS 11 or newer which has std::filesystem
-	#include <filesystem>
-	namespace std_filesystem = std::filesystem;
-#endif
 	#define USE_STD_FILESYSTEM
 
 	#include <dirent.h>
@@ -297,7 +282,7 @@ namespace rmx
 	{
 		mLastErrorCode.clear();
 
-	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+	#if defined(USE_STD_FILESYSTEM)
 		const std_filesystem::path fspath(filename.data());
 		const std_filesystem::file_time_type time = std_filesystem::last_write_time(fspath, mLastErrorCode);
 		if (mLastErrorCode)
@@ -376,7 +361,7 @@ namespace rmx
 	{
 		mLastErrorCode.clear();
 
-	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+	#if defined(USE_STD_FILESYSTEM)
 		const std_filesystem::path fspathOld(oldFilename.data());
 		const std_filesystem::path fspathNew(newFilename.data());
 		std_filesystem::rename(fspathOld, fspathNew, mLastErrorCode);
@@ -391,7 +376,7 @@ namespace rmx
 	{
 		mLastErrorCode.clear();
 
-	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+	#if defined(USE_STD_FILESYSTEM)
 		const std_filesystem::path fspathOld(oldFilename.data());
 		const std_filesystem::path fspathNew(newFilename.data());
 		std_filesystem::rename(fspathOld, fspathNew, mLastErrorCode);
@@ -406,7 +391,7 @@ namespace rmx
 	{
 		mLastErrorCode.clear();
 
-	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+	#if defined(USE_STD_FILESYSTEM)
 		const std_filesystem::path fspath(path);
 		std_filesystem::remove(fspath, mLastErrorCode);
 		return !mLastErrorCode;
@@ -420,7 +405,7 @@ namespace rmx
 	{
 		mLastErrorCode.clear();
 
-	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+	#if defined(USE_STD_FILESYSTEM)
 		const std_filesystem::path fspath(path);
 		std_filesystem::remove_all(fspath, mLastErrorCode);
 		return !mLastErrorCode;
