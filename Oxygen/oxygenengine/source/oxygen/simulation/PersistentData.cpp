@@ -231,7 +231,7 @@ void PersistentData::setDataInternal(std::string_view filePath, uint64 filePathH
 		// Sanity checks
 		{
 			const WString path = String(filePath).toWString();
-			RMX_CHECK(rmx::FileIO::isValidFileName(path), "Persistent data file path '" << filePath << "' contains illegal characters for file names (like \" < > : | ? * )", return);
+			RMX_CHECK(rmx::FileIO::isValidPathName(path), "Persistent data file path '" << filePath << "' contains illegal characters for file names (like \" < > : | ? * )", return);
 			RMX_CHECK(path.findString(L"..") == -1, "Persistent data file path '" << filePath << "' must not contain \"..\"", return);
 		}
 

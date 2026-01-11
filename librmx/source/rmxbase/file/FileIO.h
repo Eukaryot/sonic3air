@@ -45,7 +45,7 @@ namespace rmx
 		static bool removeFile(std::wstring_view path);
 		static bool removeDirectory(std::wstring_view path);
 
-		static void createDirectory(std::wstring_view path);
+		static bool createDirectory(std::wstring_view path);
 
 		static void listFiles(std::wstring_view path, bool recursive, std::vector<FileEntry>& outFileEntries);
 		static void listFilesByMask(std::wstring_view filemask, bool recursive, std::vector<FileEntry>& outFileEntries);
@@ -56,7 +56,9 @@ namespace rmx
 		static std::wstring_view normalizePath(std::wstring_view path, std::wstring& tempBuffer, bool isDirectory);
 
 		static bool isValidFileName(std::wstring_view filename);
+		static bool isValidPathName(std::wstring_view pathname);
 		static void sanitizeFileName(std::wstring& filename);
+		static void sanitizePathName(std::wstring& pathname);
 
 		static std::wstring getCurrentDirectory();
 		static void setCurrentDirectory(std::wstring_view path);

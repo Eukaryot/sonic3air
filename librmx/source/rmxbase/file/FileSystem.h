@@ -37,7 +37,7 @@ namespace rmx
 		bool saveFile(std::wstring_view filename, const void* data, size_t size);
 		InputStream* createInputStream(std::wstring_view filename);
 
-		void createDirectory(std::wstring_view path);
+		bool createDirectory(std::wstring_view path);
 		void listFiles(std::wstring_view path, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries);
 		void listFilesByMask(std::wstring_view filemask, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries);
 		void listDirectories(std::wstring_view path, std::vector<std::wstring>& outDirectories);

@@ -169,11 +169,11 @@ namespace rmx
 		return nullptr;
 	}
 
-	void FileSystem::createDirectory(std::wstring_view path)
+	bool FileSystem::createDirectory(std::wstring_view path)
 	{
 		// TODO: Use file providers here as well
 		mTempPath2 = normalizePath(path, mTempPath2, true);
-		FileIO::createDirectory(mTempPath2);
+		return FileIO::createDirectory(mTempPath2);
 	}
 
 	void FileSystem::listFiles(std::wstring_view path, bool recursive, std::vector<rmx::FileIO::FileEntry>& outEntries)

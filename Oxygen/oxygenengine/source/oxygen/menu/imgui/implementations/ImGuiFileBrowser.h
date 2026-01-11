@@ -43,6 +43,7 @@ private:
 	void drawActionsMenu(bool openMenuNow);
 	void drawConfirmDeletionPopup(bool openPopupNow);
 	void drawRenamingPopup(bool openPopupNow);
+	void drawCreateDirectoryPopup(bool openPopupNow);
 
 	DrawerTexture& getFileIcon(const std::wstring& filename);
 

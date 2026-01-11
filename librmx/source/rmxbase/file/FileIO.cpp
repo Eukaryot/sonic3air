@@ -206,21 +206,34 @@ namespace rmx
 
 		struct FileNameCharacterValidityLookup
 		{
-			FileNameCharacterValidityLookup()
+			explicit FileNameCharacterValidityLookup(bool allowSlash)
 			{
 				for (int k = 32; k < 128; ++k)		// Exclude non-printable ASCII characters
 					mIsCharacterValid.setBit(k);
-				const std::wstring invalidCharacters = L"\"<>:|?*";		// Technically not all of these characters are problematic on all platforms, but we treat them all as illegal to avoid cross-platform issues
+				const std::wstring invalidCharacters = L"/\"<>:|?*";		// Technically not all of these characters are problematic on all platforms, but we treat them all as illegal to avoid cross-platform issues
 				for (wchar_t ch : invalidCharacters)
 					mIsCharacterValid.clearBit(ch);
+				if (!allowSlash)
+					mIsCharacterValid.clearBit(L'/');
 			}
 
 			bool isValid(wchar_t ch) const  { return ch >= 128 || mIsCharacterValid.isBitSet(ch); }
 
+			bool allValid(std::wstring_view str) const
+			{
+				for (wchar_t ch : str)
+				{
+					if (!isValid(ch))
+						return false;
+				}
+				return true;
+			}
+
 			BitArray<128> mIsCharacterValid;
 		};
 
-		static FileNameCharacterValidityLookup mFileNameCharacterValidityLookup;
+		static FileNameCharacterValidityLookup mFileNameCharacterValidityLookup(false);
+		static FileNameCharacterValidityLookup mFilePathCharacterValidityLookup(true);
 
 	}
 
@@ -415,9 +428,9 @@ namespace rmx
 	#endif
 	}
 
-	void FileIO::createDirectory(std::wstring_view path)
+	bool FileIO::createDirectory(std::wstring_view path)
 	{
-		createDir(path, true);
+		return createDir(path, true);
 	}
 
 	void FileIO::listFiles(std::wstring_view path, bool recursive, std::vector<FileEntry>& outFileEntries)
@@ -593,19 +606,40 @@ namespace rmx
 
 	bool FileIO::isValidFileName(std::wstring_view filename)
 	{
-		for (wchar_t ch : filename)
-		{
-			if (!mFileNameCharacterValidityLookup.isValid(ch))
-				return false;
-		}
+		if (filename.empty())
+			return false;
+		if (!mFileNameCharacterValidityLookup.allValid(filename))
+			return false;
+		if (filename == L"." || rmx::startsWith(filename, L".."))
+			return false;
+		return true;
+	}
+
+	bool FileIO::isValidPathName(std::wstring_view pathname)
+	{
+		if (pathname.empty())
+			return false;
+		if (!mFilePathCharacterValidityLookup.allValid(pathname))
+			return false;
 		return true;
 	}
 
 	void FileIO::sanitizeFileName(std::wstring& filename)
 	{
 		// Replace all characters that are not valid in a file name
-		//  -> Note that this does not replace slashes (though it converts backslashes to forward slashes)
+		//  -> Note that this does replace slashes with underscores
 		for (wchar_t& ch : filename)
+		{
+			if (!mFileNameCharacterValidityLookup.isValid(ch))
+				ch = L'_';
+		}
+	}
+
+	void FileIO::sanitizePathName(std::wstring& pathname)
+	{
+		// Replace all characters that are not valid in a path name
+		//  -> Note that this does not replace slashes (though it converts backslashes to forward slashes)
+		for (wchar_t& ch : pathname)
 		{
 			if (!mFileNameCharacterValidityLookup.isValid(ch))
 				ch = L'_';

@@ -92,9 +92,10 @@ namespace
 
 	int filterFileNameInput(ImGuiInputTextCallbackData* data)
 	{
-		static const char FORBIDDEN_CHARACTERS[] = "/\\*?:|<>\"";
+		static const char FORBIDDEN_FILENAME_CHARACTERS[] = "/\\*?:|<>\"";
 
-		for (char character : FORBIDDEN_CHARACTERS)
+		// Check for forbidden characters
+		for (char character : FORBIDDEN_FILENAME_CHARACTERS)
 		{
 			if (data->EventChar == character)
 				return 1;
@@ -273,6 +274,11 @@ void ImGuiFileBrowser::refreshFileEntries()
 
 void ImGuiFileBrowser::drawFileBrowser()
 {
+	const std::wstring* clickedDirectory = nullptr;
+	const std::wstring* openActionsForDirectory = nullptr;
+	const rmx::FileIO::FileEntry* openActionsForFile = nullptr;
+	bool openCreateDirectoryDialog = false;
+
 	ImGui::Text("  ");
 	ImGui::SameLine();
 
@@ -282,13 +288,23 @@ void ImGuiFileBrowser::drawFileBrowser()
 		mRefreshFileEntries = true;
 	}
 
-#if defined(PLATFORM_ANDROID) || defined(DEBUG)
-	// "Import file" button
 	ImGui::SameLine();
 	ImGui::Text("  |  ");
 	ImGui::SameLine();
 
 	ImGui::BeginDisabled(mIsReadOnlyLocation);
+
+	ImVec2 cursorScreenPos = ImGui::GetCursorScreenPos();
+	if (ImGui::Button("New " PLATFORM_DIRECTORY_STRING))
+	{
+		openCreateDirectoryDialog = true;
+		mActionsMenuPosition = cursorScreenPos;
+		mActionsMenuPosition.y += mUIScale * 23.0f;
+	}
+
+#if defined(PLATFORM_ANDROID) || defined(DEBUG)
+	// "Import file" button
+	ImGui::SameLine();
 	if (ImGui::Button("Import file..."))
 	{
 	#if defined(PLATFORM_ANDROID)
@@ -296,8 +312,9 @@ void ImGuiFileBrowser::drawFileBrowser()
 		javaInterface.openFileSelectionDialog();
 	#endif
 	}
-	ImGui::EndDisabled();
 #endif
+
+	ImGui::EndDisabled();
 
 	ImGui::Separator();
 	ImGui::Spacing();
@@ -312,10 +329,6 @@ void ImGuiFileBrowser::drawFileBrowser()
 	{
 		refreshFileEntries();
 	}
-
-	const std::wstring* clickedDirectory = nullptr;
-	const std::wstring* openActionsForDirectory = nullptr;
-	const rmx::FileIO::FileEntry* openActionsForFile = nullptr;
 
 	ImGui::PushStyleVarY(ImGuiStyleVar_CellPadding, 5.0f * mUIScale);
 	ImGui::PushStyleColor(ImGuiCol_TableRowBg, ImGuiHelpers::getAccentColorMix(1.0f, 0.1f, 0.05f));
@@ -421,6 +434,7 @@ void ImGuiFileBrowser::drawFileBrowser()
 	}
 
 	drawActionsMenu(openActionsMenu);
+	drawCreateDirectoryPopup(openCreateDirectoryDialog);
 }
 
 void ImGuiFileBrowser::drawAddressLine()
@@ -748,11 +762,13 @@ void ImGuiFileBrowser::drawRenamingPopup(bool openPopupNow)
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max<float>(ImGui::GetContentRegionAvail().x - 208 * mUIScale, 0) / 2);
 
 			// Buttons
+			ImGui::BeginDisabled(!rmx::FileIO::isValidFileName(newNameInput.mWideString));
 			if (ImGui::Button("Rename", ImVec2(100 * mUIScale, 0)))
 			{
 				performRenaming = true;
 				ImGui::CloseCurrentPopup();
 			}
+			ImGui::EndDisabled();
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(100 * mUIScale, 0)))
 			{
@@ -795,6 +811,60 @@ void ImGuiFileBrowser::drawRenamingPopup(bool openPopupNow)
 		}
 
 		RMX_CHECK(success, "Renaming failed", );
+		mRefreshFileEntries = true;
+	}
+}
+
+void ImGuiFileBrowser::drawCreateDirectoryPopup(bool openPopupNow)
+{
+	bool performCreation = false;
+	static ImGuiHelpers::WideInputString directoryNameInput;
+
+	if (openPopupNow)
+	{
+		ImGui::OpenPopup("FileBrowser_CreateDirectory");
+	}
+
+	ImGui::SetNextWindowPos(mActionsMenuPosition);
+	if (ImGui::BeginPopup("FileBrowser_CreateDirectory"))
+	{
+		ImGui::Text("Name of new " PLATFORM_DIRECTORY_STRING ":");
+
+		if (openPopupNow)
+		{
+			ImGui::SetKeyboardFocusHere();
+		}
+		ImGuiHelpers::InputText("##NewName", directoryNameInput, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_CallbackCharFilter, &filterFileNameInput);
+
+		ImGui::Separator();
+
+		// Center the buttons
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max<float>(ImGui::GetContentRegionAvail().x - 208 * mUIScale, 0) / 2);
+
+		// Buttons
+		ImGui::BeginDisabled(!rmx::FileIO::isValidFileName(directoryNameInput.mWideString));
+		if (ImGui::Button("Create", ImVec2(100 * mUIScale, 0)))
+		{
+			performCreation = true;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndDisabled();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(100 * mUIScale, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		moveWindowToFitOnScreen(mActionsMenuPosition, mUIScale);
+		ImGui::EndPopup();
+	}
+
+	if (performCreation)
+	{
+		const std::wstring fullPath = mFullPath + directoryNameInput.get().toStdWString();
+		bool success = FTX::FileSystem->createDirectory(fullPath);
+
+		RMX_CHECK(success, "Failed to create new " << PLATFORM_DIRECTORY_STRING, );
 		mRefreshFileEntries = true;
 	}
 }
