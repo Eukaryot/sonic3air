@@ -199,7 +199,7 @@ void ConfigurationImpl::serializeSettingsInternal(JsonSerializer& serializer)
 					continue;
 
 				int value = mLocalGameSettings.getValue(pair.first);
-				if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::HIDDEN && value == setting.mDefaultValue)
+				if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::HIDDEN && value == setting.mDefaultValue && !serializer.getCurrentJson().isMember(setting.mIdentifier))
 					continue;
 
 				serializer.serialize(setting.mIdentifier.c_str(), value);
