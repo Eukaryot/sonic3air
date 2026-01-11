@@ -125,19 +125,10 @@ void ConfigurationImpl::serializeSettingsInternal(JsonSerializer& serializer)
 	serializer.serialize("GamepadVisualStyle", mGamepadVisualStyle);
 
 	// Game simulation
+	serializer.serialize("SimulationFrequency", mSimulationFrequency);
 	if (serializer.isReading())
 	{
-		if (serializer.serialize("SimulationFrequency", mSimulationFrequency))
-		{
-			mSimulationFrequency = clamp(mSimulationFrequency, 30, 240);
-		}
-	}
-	else
-	{
-		if (mSimulationFrequency != 60)
-		{
-			serializer.serialize("SimulationFrequency", mSimulationFrequency);
-		}
+		mSimulationFrequency = clamp(mSimulationFrequency, 30, 240);
 	}
 
 	// Time Attack
