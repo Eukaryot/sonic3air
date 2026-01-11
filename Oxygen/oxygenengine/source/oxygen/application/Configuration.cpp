@@ -243,7 +243,7 @@ Configuration::Configuration()
 
 #if defined(PLATFORM_WEB)
 	// Threading in general is not (afaik) supported by emscripten
-	mUseAudioThreading = false;
+	mAudio.mUseAudioThreading = false;
 #endif
 
 #if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
