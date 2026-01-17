@@ -76,7 +76,7 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 					}
 
 				#elif defined(PLATFORM_ANDROID)
-					javaInterface.openRomFileSelectionDialog(gameProfile.mFullName);
+					javaInterface.openRomFileSelectionDialog(gameProfile.mRomInfos[0].mSteamGameName);
 					mState = State::WAITING_FOR_ROM;
 					return UpdateResult::CONTINUE;
 
