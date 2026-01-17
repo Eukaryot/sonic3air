@@ -17,6 +17,7 @@ function void main()
 
 include script01
 include unittests
+include testcode/?
 
 function void main()
 {

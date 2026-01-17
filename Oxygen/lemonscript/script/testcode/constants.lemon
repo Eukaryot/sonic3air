@@ -1,0 +1,17 @@
+
+global u32 A0 = 0
+global u32 A1 = 0
+
+define objA0.something = s16[A0 + 0x08]
+define copy(objA0, A0) to(objA1, A1)
+
+
+constant u8 ONE = 1
+constant float MINUS_ONE = -1
+global float GLOBAL_NEGATIVE_VALUE = -1.2345f
+
+
+function void testConstants()
+{
+	debugLog(GLOBAL_NEGATIVE_VALUE)
+}

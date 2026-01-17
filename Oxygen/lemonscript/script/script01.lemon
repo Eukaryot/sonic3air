@@ -1,103 +1,11 @@
 
-global u32 A0 = 0
-global u32 A1 = 0
-
-define objA0.something = s16[A0 + 0x08]
-define copy(objA0, A0) to(objA1, A1)
-
-
-constant u8 ONE = 1
-constant float MINUS_ONE = -1
-global float GLOBAL_NEGATIVE_VALUE = -1.2345f
-
-constant array<u8> fibonacci =
-{
-	1, 1, 2, 3,
-	5, 8, 13, 21,	// Some numbers, in multiple lines
-	34, 55,
-}
-
 
 function void script01()
 {
-	A0 = 0x0873
-	bool flag1 = (A0 & 0x0800)		// Should be true, but isn't
-	bool flag2 = (A0 & 0x0800) != 0
-	debugLog(flag1)
-	debugLog(flag2)
-
-#if 0
-	// Test for floats
-	debugLog(3.)
-	debugLog(.3)
-	debugLog(12345.67890f)
-	debugLog(125e-4f)
-	debugLog(2.56e-1)
-	debugLog(6.5536e5)
-
-	float two = 2.0
-	debugLog(two)
-	debugLog(two + (two / 5))	// Result: 2.4
-#endif
-
-	debugLog(GLOBAL_NEGATIVE_VALUE)
-
-	debugLog(Math.degreesToRadians(90.0f))
-	debugLog(Math.degreesToRadians(90.0))
-	debugLog(Math.degreesToRadians(90))
-	debugLog(Math.degreesToRadians(s16(90)))
-	debugLog(Math.degreesToRadians(89 + 1.0f))
-
-	ObjectHandle obj
-	obj = makeObjectHandle(99)
-	obj = increaseObjectHandle(obj)
-	obj = obj.increase()
-	debugLog(obj)
-
-#if 0
-	// Test for constant arrays & strings
-	{
-		for (u8 i = 0; i < 11; ++i)
-		{
-			debugLog(stringformat("[%d] = %d", i, fibonacci[i]))
-		}
-
-		constant array<string> strings = { "ABC", "DEF", "GHIJKL", "MNOP", "QRSTUV" }
-
-		for (u8 i = 0; i < strings.length(); ++i)
-		{
-			debugLog(stringformat("[%d] = \"%s\"", i, strings[i]))
-		}
-
-		string hello = "Hello " + "World"
-		hello += "!"
-		debugLog(hello)
-		Log = hello.length()
-	}
-#endif
-
-#if 0
-	u8 a = 0
-	if (a == ONE)
-	{
-		Log = 1
-	}
-	else if (a == 2)
-		Log = 2
-	else if (a != 0)
-		if (a == 3)
-			Log = 3
-		else
-		{
-		}
-
-	if (a != 0)
-		if (a == 3)
-			Log = 3
-		else
-		{
-		}
-	else
-		Log = 0
-#endif
+	testBools()
+	testConstants()
+	testFloats()
+	testIfElse()
+	testObjectHandle()
+	testStrings()
 }

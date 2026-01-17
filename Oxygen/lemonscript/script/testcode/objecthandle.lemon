@@ -1,0 +1,10 @@
+
+
+function void testObjectHandle()
+{
+	ObjectHandle obj
+	obj = makeObjectHandle(99)
+	obj = increaseObjectHandle(obj)
+	obj = obj.increase()
+	debugLog(obj)
+}

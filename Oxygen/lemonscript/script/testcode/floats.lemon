@@ -1,0 +1,22 @@
+
+
+function void testFloats()
+{
+	// Test for floats
+	debugLog(3.)
+	debugLog(.3)
+	debugLog(12345.67890f)
+	debugLog(125e-4f)
+	debugLog(2.56e-1)
+	debugLog(6.5536e5)
+
+	float two = 2.0
+	debugLog(two)
+	debugLog(two + (two / 5))	// Result: 2.4
+
+	debugLog(Math.degreesToRadians(90.0f))
+	debugLog(Math.degreesToRadians(90.0))
+	debugLog(Math.degreesToRadians(90))
+	debugLog(Math.degreesToRadians(s16(90)))
+	debugLog(Math.degreesToRadians(89 + 1.0f))
+}
