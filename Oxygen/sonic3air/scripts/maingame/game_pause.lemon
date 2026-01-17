@@ -131,6 +131,11 @@ function void GamePause.Menu()
 		// Inner loop will be exited once the player selected an entry in the menu
 		while (true)
 		{
+			// During pause, use lifetime context 1 for everything rendered by the pause menu and afterwards (in "PostFrameUpdate" and by ghost sync)
+			//  -> This allows for selectively clearing these sprites, texts, etc. in each frame without touching the game's rendered content
+			Renderer.resetLifetimeContext(1)
+			Renderer.setLifetimeContext(1)
+
 			float deltaSeconds = 1.0f / 60.0f
 			totalTime += deltaSeconds
 
@@ -150,10 +155,6 @@ function void GamePause.Menu()
 			if (!screenshotModeActive)
 			{
 				GamePause.DrawMenu(totalTime)
-			}
-			else
-			{
-				Renderer.resetLifetimeContext(1)
 			}
 
 			enableCustomPlaneReset = false	// Maintain custom planes that were set before the pause
@@ -376,12 +377,7 @@ function void GamePause.DrawMenu(float time)
 	u16 rightAnchor = getScreenWidth() + Math.roundToInt((1.0f - GamePause.visibility) * 160)
 	u16 py = getScreenHeight() - numEntries * LINE_HEIGHT
 
-	// Use lifetime context 1 for everything rendered by the pause menu
-	//  -> This allows for selectively clearing these sprites, texts, etc. in each frame without touching the game's rendered content
-	Renderer.resetLifetimeContext(1)
-	Renderer.setLifetimeContext(1)
-
-	// Ensure that the game pause menu always renders onto the full screen, #contributed by nabbup / Raine
+	// Ensure that the game pause menu always renders onto the full screen, #contributed by nabbup / Ramona
 	Renderer.resetViewport(0xfeff)
 
 	Renderer.drawSprite("pause_screen_upper", rightAnchor - 210, 0, 0, SPRITE_FLAG_PRIO | SPRITE_FLAG_NO_GLOBAL_TINT, 0xff00)
