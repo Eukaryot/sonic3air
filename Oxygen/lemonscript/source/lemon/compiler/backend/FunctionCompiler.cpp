@@ -769,17 +769,21 @@ namespace lemon
 				const BracketAccessToken& bat = token.as<BracketAccessToken>();
 				const DataTypeDefinition::BracketOperator& bracket = bat.mVariable->getDataType()->getBracketOperator();
 
-				// First parameter is the parameter inside the brackets
-				compileTokenTreeToOpcodes(*bat.mParameter);
-				addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
-
-				// Second parameter is the variable ID
-				addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
-
 				// Choose the right function depending on isLValue
 				if (isLValue)
 				{
-					addOpcode(Opcode::Type::CALL, 0, bracket.mSetterNameAndSignatureHash);
+					// First parameter is the variable value
+					addOpcode(Opcode::Type::GET_VARIABLE_VALUE, bat.mVariable->getDataType(), bat.mVariable->getID());
+					// TODO: Should the first parameter be the variable ID instead, as kind of a reference?
+					//  -> This might be needed for strings, and possibly other types as well
+					//  -> Maybe the same should also be done for the getter, for the sake of consistency
+					//addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
+
+					// Second parameter is the parameter inside the brackets
+					compileTokenTreeToOpcodes(*bat.mParameter);
+					addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+					addOpcode(Opcode::Type::CALL, bracket.mSetterNameAndSignatureHash);
 
 					// TODO: We actually need the value to assign to as third parameter here already
 					//  -> It's not sufficient to just add it afterwards as for memory access
@@ -789,7 +793,14 @@ namespace lemon
 				}
 				else
 				{
-					addOpcode(Opcode::Type::CALL, 0, bracket.mGetterNameAndSignatureHash);
+					// First parameter is the variable value
+					addOpcode(Opcode::Type::GET_VARIABLE_VALUE, bat.mVariable->getDataType(), bat.mVariable->getID());
+
+					// Second parameter is the parameter inside the brackets
+					compileTokenTreeToOpcodes(*bat.mParameter);
+					addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+					addOpcode(Opcode::Type::CALL, bracket.mGetterNameAndSignatureHash);
 				}
 				break;
 			}

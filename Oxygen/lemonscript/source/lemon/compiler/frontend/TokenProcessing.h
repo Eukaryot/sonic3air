@@ -129,6 +129,7 @@ namespace lemon
 		CachedBuiltinFunction mBuiltinStringOperatorLessOrEqual;
 		CachedBuiltinFunction mBuiltinStringOperatorGreater;
 		CachedBuiltinFunction mBuiltinStringOperatorGreaterOrEqual;
+		CachedBuiltinFunction mBuiltinStringBracketGetter;
 
 		std::vector<BinaryOperationLookup> mBinaryOperationLookup[(size_t)Operator::_NUM_OPERATORS];
 	};

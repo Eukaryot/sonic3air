@@ -131,6 +131,7 @@ namespace lemon
 		fillCachedBuiltInFunction(mBuiltinStringOperatorLessOrEqual,	false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS_OR_EQUAL);
 		fillCachedBuiltInFunction(mBuiltinStringOperatorGreater,		false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER);
 		fillCachedBuiltInFunction(mBuiltinStringOperatorGreaterOrEqual,	false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER_OR_EQUAL);
+		fillCachedBuiltInFunction(mBuiltinStringBracketGetter,			false, globalsLookup, BuiltInFunctions::STRING_BRACKET_GETTER);
 
 		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlus,           &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING);
 		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusInt64,      &PredefinedDataTypes::STRING, &PredefinedDataTypes::INT_64, &PredefinedDataTypes::STRING);
@@ -141,6 +142,12 @@ namespace lemon
 		mBinaryOperationLookup[(size_t)Operator::COMPARE_LESS_OR_EQUAL]   .emplace_back(&mBuiltinStringOperatorLessOrEqual,    &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::BOOL);
 		mBinaryOperationLookup[(size_t)Operator::COMPARE_GREATER]         .emplace_back(&mBuiltinStringOperatorGreater,        &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::BOOL);
 		mBinaryOperationLookup[(size_t)Operator::COMPARE_GREATER_OR_EQUAL].emplace_back(&mBuiltinStringOperatorGreaterOrEqual, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::BOOL);
+
+		// TODO: This is a very hacky way of doing things...
+		{
+			DataTypeDefinition::BracketOperator& bracketOperator = const_cast<DataTypeDefinition::BracketOperator&>(PredefinedDataTypes::STRING.getBracketOperator());
+			bracketOperator.mGetterNameAndSignatureHash = mBuiltinStringBracketGetter.mFunctions[0]->getNameAndSignatureHash();
+		}
 	}
 
 	void TokenProcessing::processTokens(TokenList& tokensRoot, uint32 lineNumber, const DataTypeDefinition* resultType)

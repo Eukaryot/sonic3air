@@ -97,6 +97,18 @@ namespace lemon
 			mValueStackPtr += change;
 		}
 
+		template<typename T>
+		FORCE_INLINE T readLocalVariable(size_t index) const
+		{
+			return BaseTypeConversion::convert<int64, T>(mCurrentLocalVariables[index]);
+		}
+
+		template<typename T>
+		FORCE_INLINE void writeLocalVariable(size_t index, T value) const
+		{
+			mCurrentLocalVariables[index] = BaseTypeConversion::convert<T, int64>(value);
+		}
+
 	private:
 		inline static const size_t VALUE_STACK_MAX_SIZE    = 0x100;
 		inline static const size_t VALUE_STACK_FIRST_INDEX = 4;			// Leave 4 elements so that removing too many elements from the stack doesn't break everything immediately

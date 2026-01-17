@@ -52,13 +52,13 @@ namespace lemon
 		template<typename T>
 		FORCE_INLINE T readLocalVariable(size_t index) const
 		{
-			return BaseTypeConversion::convert<int64, T>(mControlFlow->mCurrentLocalVariables[index]);
+			return mControlFlow->readLocalVariable<T>(index);
 		}
 
 		template<typename T>
 		FORCE_INLINE void writeLocalVariable(size_t index, T value) const
 		{
-			mControlFlow->mCurrentLocalVariables[index] = BaseTypeConversion::convert<T, int64>(value);
+			return mControlFlow->writeLocalVariable(index, value);
 		}
 	};
 }

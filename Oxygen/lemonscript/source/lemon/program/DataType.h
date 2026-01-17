@@ -128,9 +128,7 @@ namespace lemon
 	struct StringDataType : public DataTypeDefinition
 	{
 	public:
-		inline explicit StringDataType(uint16 id) :
-			DataTypeDefinition("string", id, Class::STRING, 8, BaseType::UINT_64)
-		{}
+		explicit StringDataType(uint16 id);
 
 		// Rather unfortunately, the data type hash for string needs to be the same as for u64, for feature level 1 compatibility regarding function overloading
 		uint16 getDataTypeHash() const override;

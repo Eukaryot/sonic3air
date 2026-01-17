@@ -21,6 +21,15 @@ namespace lemon
 	}
 
 
+	StringDataType::StringDataType(uint16 id) :
+		DataTypeDefinition("string", id, Class::STRING, 8, BaseType::UINT_64)
+	{
+		mBracketOperator.mGetterNameAndSignatureHash = 0;	// This gets filled in later
+		mBracketOperator.mSetterNameAndSignatureHash = 0;
+		mBracketOperator.mParameterType = &PredefinedDataTypes::INT_32;
+		mBracketOperator.mValueType = &PredefinedDataTypes::INT_32;
+	}
+
 	uint16 StringDataType::getDataTypeHash() const
 	{
 		return PredefinedDataTypes::UINT_64.getID();
