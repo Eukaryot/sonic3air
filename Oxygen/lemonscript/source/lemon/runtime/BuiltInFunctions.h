@@ -38,6 +38,7 @@ namespace lemon
 		static FunctionName STRING_OPERATOR_GREATER;
 		static FunctionName STRING_OPERATOR_GREATER_OR_EQUAL;
 		static FunctionName STRING_BRACKET_GETTER;
+		static FunctionName STRING_BRACKET_SETTER;
 
 	public:
 		static void registerBuiltInFunctions(Module& module);

@@ -171,6 +171,9 @@
     <ClCompile Include="..\..\source\lemon\program\BaseType.cpp">
       <Filter>lemon\program</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\backend\OpcodeOptimization.cpp">
+      <Filter>lemon\compiler\backend</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h">
@@ -364,6 +367,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\utility\DataTypeHelper.h">
       <Filter>lemon\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\backend\OpcodeOptimization.h">
+      <Filter>lemon\compiler\backend</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

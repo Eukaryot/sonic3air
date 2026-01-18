@@ -10,6 +10,7 @@
 #include "lemon/runtime/ControlFlow.h"
 #include "lemon/runtime/Runtime.h"
 #include "lemon/runtime/RuntimeFunction.h"
+#include "lemon/program/Program.h"
 
 
 namespace lemon
@@ -103,6 +104,78 @@ namespace lemon
 	{
 		const ScriptFunction* function = getCurrentFunction();
 		return (nullptr != function) ? &function->getModule() : nullptr;
+	}
+
+	int64 ControlFlow::readVariableGeneric(uint32 variableId)
+	{
+		const Variable::Type type = (Variable::Type)(variableId >> 28);
+		switch (type)
+		{
+			default:
+			case Variable::Type::LOCAL:
+			{
+				return readLocalVariable<int64>(variableId);
+			}
+
+			case Variable::Type::USER:
+			{
+				const UserDefinedVariable& variable = static_cast<UserDefinedVariable&>(mProgram->getGlobalVariableByID(variableId));
+				variable.mGetter(*this);		// This is supposed to write a value to the value stack
+				return popValueStack<int64>();
+			}
+
+			case Variable::Type::GLOBAL:
+			{
+				const int64* valuePtr = getRuntime().accessGlobalVariableValue(mProgram->getGlobalVariableByID(variableId));
+				return (nullptr != valuePtr) ? *valuePtr : 0;
+			}
+
+			case Variable::Type::EXTERNAL:
+			{
+				const ExternalVariable& variable = static_cast<ExternalVariable&>(mProgram->getGlobalVariableByID(variableId));
+				const int64* valuePtr = variable.mAccessor();
+				return (nullptr != valuePtr) ? *valuePtr : 0;
+			}
+		}
+	}
+
+	void ControlFlow::writeVariableGeneric(uint32 variableId, int64 value)
+	{
+		const Variable::Type type = (Variable::Type)(variableId >> 28);
+		switch (type)
+		{
+			default:
+			case Variable::Type::LOCAL:
+			{
+				writeLocalVariable(variableId, value);
+				break;
+			}
+
+			case Variable::Type::USER:
+			{
+				const UserDefinedVariable& variable = static_cast<UserDefinedVariable&>(mProgram->getGlobalVariableByID(variableId));
+				pushValueStack(value);
+				variable.mSetter(*this);		// This is supposed to read a value from the value stack
+				break;
+			}
+
+			case Variable::Type::GLOBAL:
+			{
+				int64* valuePtr = getRuntime().accessGlobalVariableValue(mProgram->getGlobalVariableByID(variableId));
+				if (nullptr != valuePtr)
+					*valuePtr = value;
+				break;
+			}
+
+			case Variable::Type::EXTERNAL:
+			{
+				const ExternalVariable& variable = static_cast<ExternalVariable&>(mProgram->getGlobalVariableByID(variableId));
+				int64* valuePtr = variable.mAccessor();
+				if (nullptr != valuePtr)
+					*valuePtr = value;
+				break;
+			}
+		}
 	}
 
 }

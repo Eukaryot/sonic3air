@@ -18,6 +18,24 @@ namespace lemon
 {
 	namespace builtins
 	{
+		// Local helper functions
+		namespace
+		{
+			StringRef readStringVariable(const NativeFunction::Context& context, uint32 variableId)
+			{
+				const uint64 stringHash = context.mControlFlow.readVariableGeneric(variableId);
+				const FlyweightString* str = context.mControlFlow.getRuntime().resolveStringByKey(stringHash);
+				return (nullptr != str) ? StringRef(*str) : StringRef();
+			}
+
+			void writeStringVariable(const NativeFunction::Context& context, uint32 variableId, std::string_view value)
+			{
+				const uint64 hash = context.mControlFlow.getRuntime().addString(value);
+				context.mControlFlow.writeVariableGeneric(variableId, hash);
+			}
+		}
+
+
 		template<typename T>
 		T constant_array_access(uint32 id, uint32 index)
 		{
@@ -106,11 +124,40 @@ namespace lemon
 			return (str1.getString() >= str2.getString());
 		}
 
+	/*
+		// Old implementation without variable access
 		uint32 builtin_string_bracket_getter(StringRef str, uint32 index)
 		{
 			if ((size_t)index >= str.getString().length())
 				return 0;
 			return (uint32)str.getString()[index];
+		}
+	*/
+		uint32 builtin_string_bracket_getter(const NativeFunction::Context* context, uint32 variableId, uint32 index)
+		{
+			const StringRef stringRef = readStringVariable(*context, variableId);
+			if ((size_t)index >= stringRef.getString().length())
+				return 0;
+			return (uint32)stringRef.getString()[index];
+		}
+
+		void builtin_string_bracket_setter(const NativeFunction::Context* context, uint32 value, uint32 variableId, uint32 index)
+		{
+			const StringRef stringRef = readStringVariable(*context, variableId);
+			if ((size_t)index > stringRef.getString().length())
+				return;
+
+			const char character = (char)value;
+			std::string newString(stringRef.getString());
+			if ((size_t)index < stringRef.getString().length())
+			{
+				newString[index] = character;
+			}
+			else
+			{
+				newString.push_back(character);
+			}
+			writeStringVariable(*context, variableId, newString);
 		}
 	}
 
@@ -125,6 +172,7 @@ namespace lemon
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_GREATER("#builtin_string_operator_greater");
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_GREATER_OR_EQUAL("#builtin_string_operator_greater_equal");
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_BRACKET_GETTER("#builtin_string_bracket_getter");
+	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_BRACKET_SETTER("#builtin_string_bracket_setter");
 
 
 	void BuiltInFunctions::registerBuiltInFunctions(lemon::Module& module)
@@ -152,5 +200,6 @@ namespace lemon
 		module.addNativeFunction(STRING_OPERATOR_GREATER.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater), defaultFlags);
 		module.addNativeFunction(STRING_OPERATOR_GREATER_OR_EQUAL.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater_or_equal), defaultFlags);
 		module.addNativeFunction(STRING_BRACKET_GETTER.makeFlyweightString(), lemon::wrap(&builtins::builtin_string_bracket_getter), defaultFlags);
+		module.addNativeFunction(STRING_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::builtin_string_bracket_setter), defaultFlags);
 	}
 }

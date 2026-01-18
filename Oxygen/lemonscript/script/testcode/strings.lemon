@@ -12,11 +12,18 @@ function void testStrings()
 {
 #if 1
 	// Test for string bracket operator
+	string qs = "?"
+	u8 qc = qs[0]
 	string TestString = "Hello World!"
 	for (u8 k = 0; k < TestString.length(); ++k)
 	{
-		debugLog(TestString[k])
+		debugLog(getStringFromCharacter(TestString[k]))
+		if (k % 2)
+		{
+			TestString[k] = qc
+		}
 	}
+	debugLog(TestString)
 #endif
 
 	// Test for constant arrays & strings

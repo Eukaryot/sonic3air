@@ -356,7 +356,7 @@ int main(int argc, char** argv)
 	{
 		std::cout << "=== Compilation ===\r\n";
 		lemon::CompileOptions options;
-		//options.mOutputOpcodesAsText = L"function_opcodes.txt";
+		options.mOutputOpcodesAsText = L"function_opcodes.txt";
 		Compiler compiler(module, globalsLookup, options);
 		const bool compileSuccess = compiler.loadScript(L"script/mainscript.lemon");
 		if (!compileSuccess)

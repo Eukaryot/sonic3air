@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\lemon\compiler\backend\FunctionCompiler.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\backend\OpcodeOptimization.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\Compiler.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\frontend\CompilerFrontend.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\frontend\TokenProcessing.cpp" />
@@ -70,6 +71,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\basics\GenericManager.h" />
     <ClInclude Include="..\..\source\lemon\compiler\backend\FunctionCompiler.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\backend\OpcodeOptimization.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Errors.h" />
     <ClInclude Include="..\..\source\lemon\compiler\frontend\BlockNodeStack.h" />

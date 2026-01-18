@@ -91,38 +91,38 @@ namespace lemon
 
 		// Parameter builder helper class
 
-		template<typename... Tuple>
-		struct ParamBuilder
+		template<typename CLASS, bool WITH_CONTEXT, typename... Tuple>
+		struct ParameterBuilder
 		{
-			std::tuple<Tuple...> mTuple;
+			using ClassPart   = std::conditional_t<std::is_void_v<CLASS>, std::tuple<>, std::tuple<CLASS*>>;
+			using ContextPart = std::conditional_t<WITH_CONTEXT, std::tuple<const NativeFunction::Context*>, std::tuple<>>;
+			using FullTuple   = decltype(std::tuple_cat(std::declval<ClassPart>(), std::declval<ContextPart>(), std::declval<std::tuple<Tuple...>>()));
+
+			FullTuple mTuple;
 			const NativeFunction::Context& mContext;
 
-			ParamBuilder(const NativeFunction::Context& context) : mContext(context) {}
-
-			template<typename T, typename... Args>
-			void popStackInReverseOrder()
+			ParameterBuilder(const NativeFunction::Context& context) : mContext(context)
 			{
-				// Recursive call right at the start, so we get the reverse order
-				if constexpr (sizeof...(Args) > 0)
+				if constexpr (WITH_CONTEXT)
 				{
-					popStackInReverseOrder<Args...>();
+					std::get<0>(mTuple) = &context;
 				}
-
-				// Pop from stack
-				constexpr size_t index = sizeof...(Tuple) - sizeof...(Args) - 1;
-				std::get<index>(mTuple) = popStackGeneric<T>(mContext);
 			}
-		};
 
-
-		// TODO: Could this get merged with ParamBuilder somehow, or generalized to add arbitrary fixed parameters at the start?
-		template<typename CLASS, typename... Tuple>
-		struct MethodParamBuilder
-		{
-			std::tuple<CLASS*, Tuple...> mTuple;
-			const NativeFunction::Context& mContext;
-
-			MethodParamBuilder(const NativeFunction::Context& context, CLASS& object) : mContext(context) { std::get<0>(mTuple) = &object; }
+			ParameterBuilder(const NativeFunction::Context& context, CLASS* object) : mContext(context)
+			{
+				if constexpr (std::is_void_v<CLASS>)
+				{
+					if constexpr (WITH_CONTEXT)
+						std::get<0>(mTuple) = &context;
+				}
+				else
+				{
+					std::get<0>(mTuple) = object;
+					if constexpr (WITH_CONTEXT)
+						std::get<1>(mTuple) = &context;
+				}
+			}
 
 			template<typename T, typename... Args>
 			void popStackInReverseOrder()
@@ -134,7 +134,8 @@ namespace lemon
 				}
 
 				// Pop from stack
-				constexpr size_t index = sizeof...(Tuple) - sizeof...(Args);
+				constexpr size_t numFixedEntries = (std::is_void_v<CLASS> ? 0 : 1) + (WITH_CONTEXT ? 1 : 0);
+				constexpr size_t index = sizeof...(Tuple) - sizeof...(Args) - 1 + numFixedEntries;
 				std::get<index>(mTuple) = popStackGeneric<T>(mContext);
 			}
 		};
@@ -143,18 +144,20 @@ namespace lemon
 
 		// Function wrappers
 
-		template<typename R, typename... Args>
+		template<bool WITH_CONTEXT, typename R, typename... Args>
 		class FunctionWrapper : public NativeFunction::FunctionWrapper
 		{
 		public:
-			using Pointer = R(*)(Args...);
+			using Pointer = std::conditional_t<WITH_CONTEXT,
+											   R(*)(const NativeFunction::Context*, Args...),
+											   R(*)(Args...) >;
 
 			explicit FunctionWrapper(Pointer pointer) : mPointer(pointer) {}
 
 		protected:
 			void execute(const NativeFunction::Context context) const override
 			{
-				ParamBuilder<Args...> parameters(context);
+				ParameterBuilder<void, WITH_CONTEXT, Args...> parameters(context);
 				if constexpr (sizeof...(Args) > 0)
 				{
 					parameters.template popStackInReverseOrder<Args...>();
@@ -188,18 +191,20 @@ namespace lemon
 
 		// Class method wrapper
 
-		template<typename CLASS, typename R, typename... Args>
+		template<bool WITH_CONTEXT, typename CLASS, typename R, typename... Args>
 		class MethodWrapper : public NativeFunction::FunctionWrapper
 		{
 		public:
-			using Pointer = R(CLASS::*)(Args...);
+			using Pointer = std::conditional_t<WITH_CONTEXT,
+											   R(CLASS::*)(const NativeFunction::Context*, Args...),
+											   R(CLASS::*)(Args...) >;
 
 			explicit MethodWrapper(CLASS& object, Pointer pointer) : mObject(object), mPointer(pointer) {}
 
 		protected:
 			void execute(const NativeFunction::Context context) const override
 			{
-				MethodParamBuilder<CLASS, Args...> parameters(context, mObject);
+				ParameterBuilder<CLASS, WITH_CONTEXT, Args...> parameters(context, &mObject);
 				if constexpr (sizeof...(Args) > 0)
 				{
 					parameters.template popStackInReverseOrder<Args...>();
@@ -238,26 +243,50 @@ namespace lemon
 	template<typename R>
 	static NativeFunction::FunctionWrapper& wrap(R(*pointer)())
 	{
-		return *new internal::FunctionWrapper<R>(pointer);
+		return *new internal::FunctionWrapper<false, R>(pointer);
+	}
+
+	template<typename R>
+	static NativeFunction::FunctionWrapper& wrap(R(*pointer)(const NativeFunction::Context*))
+	{
+		return *new internal::FunctionWrapper<true, R>(pointer);
 	}
 
 	template<typename R, typename... Args>
 	static NativeFunction::FunctionWrapper& wrap(R(*pointer)(Args...))
 	{
-		return *new internal::FunctionWrapper<R, Args...>(pointer);
+		return *new internal::FunctionWrapper<false, R, Args...>(pointer);
+	}
+
+	template<typename R, typename... Args>
+	static NativeFunction::FunctionWrapper& wrap(R(*pointer)(const NativeFunction::Context*, Args...))
+	{
+		return *new internal::FunctionWrapper<true, R, Args...>(pointer);
 	}
 
 
 	template<typename CLASS, typename R>
 	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)())
 	{
-		return *new internal::MethodWrapper<CLASS, R>(object, pointer);
+		return *new internal::MethodWrapper<false, CLASS, R>(object, pointer);
+	}
+
+	template<typename CLASS, typename R>
+	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(const NativeFunction::Context*))
+	{
+		return *new internal::MethodWrapper<true, CLASS, R>(object, pointer);
 	}
 
 	template<typename CLASS, typename R, typename... Args>
 	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(Args...))
 	{
-		return *new internal::MethodWrapper<CLASS, R, Args...>(object, pointer);
+		return *new internal::MethodWrapper<false, CLASS, R, Args...>(object, pointer);
+	}
+
+	template<typename CLASS, typename R, typename... Args>
+	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(const NativeFunction::Context*, Args...))
+	{
+		return *new internal::MethodWrapper<true, CLASS, R, Args...>(object, pointer);
 	}
 
 }

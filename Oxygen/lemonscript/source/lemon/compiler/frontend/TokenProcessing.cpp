@@ -132,6 +132,7 @@ namespace lemon
 		fillCachedBuiltInFunction(mBuiltinStringOperatorGreater,		false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER);
 		fillCachedBuiltInFunction(mBuiltinStringOperatorGreaterOrEqual,	false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER_OR_EQUAL);
 		fillCachedBuiltInFunction(mBuiltinStringBracketGetter,			false, globalsLookup, BuiltInFunctions::STRING_BRACKET_GETTER);
+		fillCachedBuiltInFunction(mBuiltinStringBracketSetter,			false, globalsLookup, BuiltInFunctions::STRING_BRACKET_SETTER);
 
 		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlus,           &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING);
 		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusInt64,      &PredefinedDataTypes::STRING, &PredefinedDataTypes::INT_64, &PredefinedDataTypes::STRING);
@@ -146,7 +147,8 @@ namespace lemon
 		// TODO: This is a very hacky way of doing things...
 		{
 			DataTypeDefinition::BracketOperator& bracketOperator = const_cast<DataTypeDefinition::BracketOperator&>(PredefinedDataTypes::STRING.getBracketOperator());
-			bracketOperator.mGetterNameAndSignatureHash = mBuiltinStringBracketGetter.mFunctions[0]->getNameAndSignatureHash();
+			bracketOperator.mGetter = mBuiltinStringBracketGetter.mFunctions[0];
+			bracketOperator.mSetter = mBuiltinStringBracketSetter.mFunctions[0];
 		}
 	}
 
@@ -875,6 +877,7 @@ namespace lemon
 					token.mParameter = content[0].as<StatementToken>();
 					token.mDataType = variable->getDataType()->getBracketOperator().mValueType;
 
+					assignStatementDataType(*token.mParameter, &PredefinedDataTypes::UINT_32);
 				}
 
 				tokens.erase(i+1);	// Remove parenthesis token

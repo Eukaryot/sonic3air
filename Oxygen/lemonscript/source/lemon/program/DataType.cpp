@@ -24,8 +24,8 @@ namespace lemon
 	StringDataType::StringDataType(uint16 id) :
 		DataTypeDefinition("string", id, Class::STRING, 8, BaseType::UINT_64)
 	{
-		mBracketOperator.mGetterNameAndSignatureHash = 0;	// This gets filled in later
-		mBracketOperator.mSetterNameAndSignatureHash = 0;
+		mBracketOperator.mGetter = nullptr;	// This gets filled in later
+		mBracketOperator.mSetter = nullptr;
 		mBracketOperator.mParameterType = &PredefinedDataTypes::INT_32;
 		mBracketOperator.mValueType = &PredefinedDataTypes::INT_32;
 	}

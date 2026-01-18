@@ -109,6 +109,9 @@ namespace lemon
 			mCurrentLocalVariables[index] = BaseTypeConversion::convert<T, int64>(value);
 		}
 
+		int64 readVariableGeneric(uint32 variableId);
+		void writeVariableGeneric(uint32 variableId, int64 value);
+
 	private:
 		inline static const size_t VALUE_STACK_MAX_SIZE    = 0x100;
 		inline static const size_t VALUE_STACK_FIRST_INDEX = 4;			// Leave 4 elements so that removing too many elements from the stack doesn't break everything immediately
