@@ -141,7 +141,7 @@ namespace lemon
 			return (uint32)stringRef.getString()[index];
 		}
 
-		void builtin_string_bracket_setter(const NativeFunction::Context* context, uint32 value, uint32 variableId, uint32 index)
+		void builtin_string_bracket_setter(const NativeFunction::Context* context, uint32 variableId, uint32 index, uint32 value)
 		{
 			const StringRef stringRef = readStringVariable(*context, variableId);
 			if ((size_t)index > stringRef.getString().length())

@@ -14,16 +14,22 @@ function void testStrings()
 	// Test for string bracket operator
 	string qs = "?"
 	u8 qc = qs[0]
-	string TestString = "Hello World!"
+	string TestString = "Hello World"
 	for (u8 k = 0; k < TestString.length(); ++k)
 	{
 		debugLog(getStringFromCharacter(TestString[k]))
 		if (k % 2)
 		{
-			TestString[k] = qc
+			--k
+			TestString[++k] -= 32		// Converts lowercase to uppercase
+		}
+		else
+		{
+			--k
+			++TestString[++k]
 		}
 	}
-	debugLog(TestString)
+	debugLog(TestString)	// Result should be "IEmLpXOsLe"
 #endif
 
 	// Test for constant arrays & strings

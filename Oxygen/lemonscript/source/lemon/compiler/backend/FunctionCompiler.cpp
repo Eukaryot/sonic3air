@@ -600,14 +600,7 @@ namespace lemon
 
 				switch (bot.mOperator)
 				{
-					case Operator::ASSIGN:
-					{
-						// Assignment to variable
-						compileTokenTreeToOpcodes(*bot.mRight);
-						addCastOpcodeIfNecessary(bot.mRight->mDataType, bot.mLeft->mDataType);
-						compileTokenTreeToOpcodes(*bot.mLeft, false, true);
-						break;
-					}
+					case Operator::ASSIGN:					 compileAssignmentToOpcodes(bot);  break;
 
 					case Operator::ASSIGN_PLUS:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_ADD);	break;
 					case Operator::ASSIGN_MINUS:			 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_SUB);	break;
@@ -773,11 +766,15 @@ namespace lemon
 
 			case MemoryAccessToken::TYPE:
 			{
+				// For writing to a memory access, this implementation should not be reached any more, instead "compileAssignmentToOpcodes" or a similar method is used
+				CHECK_ERROR(!isLValue, "Internal error: Memory write should have been resolved differently", mLineNumber);
 				const MemoryAccessToken& mat = token.as<MemoryAccessToken>();
+
+				// Compile memory address calculation
 				compileTokenTreeToOpcodes(*mat.mAddress);
 
-				const Opcode::Type opcodeType = isLValue ? Opcode::Type::WRITE_MEMORY : Opcode::Type::READ_MEMORY;
-				addOpcode(opcodeType, mat.mDataType);
+				// Opcode to read from memory address
+				addOpcode(Opcode::Type::READ_MEMORY, mat.mDataType);
 				break;
 			}
 
@@ -789,6 +786,10 @@ namespace lemon
 				// Choose the right function depending on isLValue
 				if (isLValue)
 				{
+					// Note that this is partially moved to "compileAssignmentToOpcodes"
+					//  -> TODO: Also implement support in "compileUnaryDecIncToOpcodes" and "compileBinaryAssignmentToOpcodes"
+					//  -> Afterwards, this block can be removed and turned into a "CHECK_ERROR(!isLValue, ...)" - similar to MemoryAccessToken, see case above
+
 					CHECK_ERROR(nullptr != bracket.mSetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
 					// TODO: Also check the setter signature
 
@@ -802,9 +803,6 @@ namespace lemon
 					addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
 
 					addOpcode(Opcode::Type::CALL, bracket.mSetter->getNameAndSignatureHash());
-
-					// TODO: For operators like +=, this likely requires a special case inside "compileBinaryAssignmentToOpcodes" just like with memory access
-					//  -> Otherwise the parameter inside teh brackets is evaluated twice, which might have unintended side-effects
 
 					// Differentiate on whether the setter returns a value or void
 					if (bracket.mSetter->getReturnType()->isVoid())
@@ -859,8 +857,9 @@ namespace lemon
 		//  -> Memory address calculation must only be done once, especially if it has side effects (e.g. "u8[A0++] += 8")
 		if (uot.mArgument->isA<MemoryAccessToken>())
 		{
-			// Compile memory read
 			const MemoryAccessToken& mat = uot.mArgument->as<MemoryAccessToken>();
+
+			// Compile memory address calculation
 			compileTokenTreeToOpcodes(*mat.mAddress);
 
 			// Output READ_MEMORY opcode with parameter that tells it to *not* consume its input
@@ -871,9 +870,42 @@ namespace lemon
 			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, (uot.mOperator == Operator::UNARY_DECREMENT) ? -1 : 1);
 			addOpcode(Opcode::Type::ARITHM_ADD, uot.mDataType);
 
-			// Output WRITE_MEMORY opcode with parameter that tells it to exchange its inputs
-			//  -> Top of stack is value, next is address - but in other cases it's the other way round
-			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType, 1);
+			// Output WRITE_MEMORY opcode
+			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType);
+		}
+		else if (uot.mArgument->isA<BracketAccessToken>())
+		{
+			const BracketAccessToken& bat = uot.mArgument->as<BracketAccessToken>();
+			const DataTypeDefinition::BracketOperator& bracket = bat.mVariable->getDataType()->getBracketOperator();
+
+			CHECK_ERROR(nullptr != bracket.mSetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
+			// TODO: Also check the setter signature
+
+			// First parameter is the variable ID
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
+
+			// Second parameter is the parameter inside the brackets
+			compileTokenTreeToOpcodes(*bat.mParameter);
+			addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+			// Both parameters so far will be needed by the setter again, are but consumed by the getter - so we need to copy them
+			addOpcode(Opcode::Type::DUPLICATE, 2);
+
+			// Call the getter
+			addOpcode(Opcode::Type::CALL, bracket.mGetter->getNameAndSignatureHash());
+
+			// Add arithmetic add opcode with constant -1 or +1
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, (uot.mOperator == Operator::UNARY_DECREMENT) ? -1 : 1);
+			addOpcode(Opcode::Type::ARITHM_ADD, uot.mDataType);
+
+			// Call the setter
+			addOpcode(Opcode::Type::CALL, bracket.mSetter->getNameAndSignatureHash());
+
+			// Differentiate on whether the setter returns a value or void
+			if (bracket.mSetter->getReturnType()->isVoid())
+			{
+				addMoveStackOpcode(1);	// Push a dummy value onto stack
+			}
 		}
 		else
 		{
@@ -889,14 +921,74 @@ namespace lemon
 		}
 	}
 
+	void FunctionCompiler::compileAssignmentToOpcodes(const BinaryOperationToken& bot)
+	{
+		// Special handling for memory access on left side
+		//  -> Just to ensure the memory address gets pushed first, before the right side
+		if (bot.mLeft->isA<MemoryAccessToken>())
+		{
+			const MemoryAccessToken& mat = bot.mLeft->as<MemoryAccessToken>();
+
+			// Compile memory address calculation
+			compileTokenTreeToOpcodes(*mat.mAddress);
+
+			// Compile right, and cast if necessary
+			compileTokenTreeToOpcodes(*bot.mRight);
+			addCastOpcodeIfNecessary(bot.mRight->mDataType, bot.mLeft->mDataType);
+
+			// Output WRITE_MEMORY opcode
+			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType);
+		}
+		else if (bot.mLeft->isA<BracketAccessToken>())
+		{
+			const BracketAccessToken& bat = bot.mLeft->as<BracketAccessToken>();
+			const DataTypeDefinition::BracketOperator& bracket = bat.mVariable->getDataType()->getBracketOperator();
+
+			CHECK_ERROR(nullptr != bracket.mSetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
+			// TODO: Also check the setter signature
+
+			// First parameter is the variable ID
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
+
+			// Second parameter is the parameter inside the brackets
+			compileTokenTreeToOpcodes(*bat.mParameter);
+			addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+			// Third parameter is the value to assign, i.e. the right side of the assignment
+			compileTokenTreeToOpcodes(*bot.mRight);
+			addCastOpcodeIfNecessary(bot.mRight->mDataType, bot.mLeft->mDataType);
+
+			addOpcode(Opcode::Type::CALL, bracket.mSetter->getNameAndSignatureHash());
+
+			// TODO: For operators like +=, this likely requires a special case inside "compileBinaryAssignmentToOpcodes" just like with memory access
+			//  -> Otherwise the parameter inside the brackets is evaluated twice, which might have unintended side-effects
+
+			// Differentiate on whether the setter returns a value or void
+			if (bracket.mSetter->getReturnType()->isVoid())
+			{
+				addMoveStackOpcode(1);	// Push a dummy value onto stack
+			}
+		}
+		else
+		{
+			// Compile right, and cast if necessary
+			compileTokenTreeToOpcodes(*bot.mRight);
+			addCastOpcodeIfNecessary(bot.mRight->mDataType, bot.mLeft->mDataType);
+
+			// Compile left for assignment
+			compileTokenTreeToOpcodes(*bot.mLeft, false, true);
+		}
+	}
+
 	void FunctionCompiler::compileBinaryAssignmentToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType)
 	{
 		// Special handling for memory access on left side
 		//  -> Memory address calculation must only be done once, especially if it has side effects (e.g. "u8[A0++] += 8")
 		if (bot.mLeft->isA<MemoryAccessToken>())
 		{
-			// Compile memory read
 			const MemoryAccessToken& mat = bot.mLeft->as<MemoryAccessToken>();
+
+			// Compile memory address calculation
 			compileTokenTreeToOpcodes(*mat.mAddress);
 
 			// Output READ_MEMORY opcode with parameter that tells it to *not* consume its input, i.e. the memory address
@@ -909,9 +1001,44 @@ namespace lemon
 			// Add arithmetic opcode
 			addOpcode(opcodeType, bot.mDataType);
 
-			// Output WRITE_MEMORY opcode with parameter that tells it to exchange its inputs
-			//  -> Top of stack is value, next is address - but in other cases it's the other way round
-			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType, 1);
+			// Output WRITE_MEMORY opcode
+			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType);
+		}
+		else if (bot.mLeft->isA<BracketAccessToken>())
+		{
+			const BracketAccessToken& bat = bot.mLeft->as<BracketAccessToken>();
+			const DataTypeDefinition::BracketOperator& bracket = bat.mVariable->getDataType()->getBracketOperator();
+
+			CHECK_ERROR(nullptr != bracket.mSetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
+			// TODO: Also check the setter signature
+
+			// First parameter is the variable ID
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
+
+			// Second parameter is the parameter inside the brackets
+			compileTokenTreeToOpcodes(*bat.mParameter);
+			addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+			// Both parameters so far will be needed by the setter again, are but consumed by the getter - so we need to copy them
+			addOpcode(Opcode::Type::DUPLICATE, 2);
+
+			// Call the getter
+			addOpcode(Opcode::Type::CALL, bracket.mGetter->getNameAndSignatureHash());
+
+			// Compile right
+			compileTokenTreeToOpcodes(*bot.mRight);
+
+			// Add arithmetic opcode
+			addOpcode(opcodeType, bot.mDataType);
+
+			// Call the setter
+			addOpcode(Opcode::Type::CALL, bracket.mSetter->getNameAndSignatureHash());
+
+			// Differentiate on whether the setter returns a value or void
+			if (bracket.mSetter->getReturnType()->isVoid())
+			{
+				addMoveStackOpcode(1);	// Push a dummy value onto stack
+			}
 		}
 		else
 		{

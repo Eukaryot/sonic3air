@@ -352,7 +352,7 @@ namespace lemon
 			output << function->getName().getString() << ":\r\n";
 			for (const Opcode& opcode : function->mOpcodes)
 			{
-				String typeString = Opcode::GetTypeString(opcode.mType);
+				String typeString = Opcode::getTypeString(opcode.mType);
 				switch (opcode.mDataType)
 				{
 					case BaseType::VOID:	  break;

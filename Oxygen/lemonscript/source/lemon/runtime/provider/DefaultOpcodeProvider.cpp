@@ -180,14 +180,6 @@ namespace lemon
 		static void exec_WRITE_MEMORY(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			const uint64 address = *context.mControlFlow->mValueStackPtr;
-			OpcodeExecUtils::writeMemory<T>(*context.mControlFlow, address, (T)(*(context.mControlFlow->mValueStackPtr-1)));
-		}
-
-		template<typename T>
-		static void exec_WRITE_MEMORY_EXCHANGED(const RuntimeOpcodeContext context)
-		{
-			--context.mControlFlow->mValueStackPtr;
 			const uint64 address = *(context.mControlFlow->mValueStackPtr - 1);
 			const T value = (T)(*context.mControlFlow->mValueStackPtr);
 			OpcodeExecUtils::writeMemory<T>(*context.mControlFlow, address, value);
@@ -349,6 +341,19 @@ namespace lemon
 		{
 			const NativeFunction& func = *context.mOpcode->getParameter<const NativeFunction*>();
 			func.execute(NativeFunction::Context(*context.mControlFlow));
+		}
+
+		static void exec_DUPLICATE_1(const RuntimeOpcodeContext context)
+		{
+			*context.mControlFlow->mValueStackPtr = *(context.mControlFlow->mValueStackPtr-1);
+			++context.mControlFlow->mValueStackPtr;
+		}
+
+		static void exec_DUPLICATE_2(const RuntimeOpcodeContext context)
+		{
+			*context.mControlFlow->mValueStackPtr = *(context.mControlFlow->mValueStackPtr-2);
+			*(context.mControlFlow->mValueStackPtr+1) = *(context.mControlFlow->mValueStackPtr-1);
+			context.mControlFlow->mValueStackPtr += 2;
 		}
 
 		static void exec_NOT_HANDLED(const RuntimeOpcodeContext context)
@@ -534,14 +539,7 @@ namespace lemon
 
 			case Opcode::Type::WRITE_MEMORY:
 			{
-				if (opcode.mParameter == 0)
-				{
-					SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_WRITE_MEMORY);
-				}
-				else
-				{
-					SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_WRITE_MEMORY_EXCHANGED);
-				}
+				SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_WRITE_MEMORY);
 				break;
 			}
 
@@ -694,6 +692,17 @@ namespace lemon
 
 				runtimeOpcode.mSuccessiveHandledOpcodes = 0;
 				return;
+			}
+
+			case Opcode::Type::DUPLICATE:
+			{
+				switch (opcode.mParameter)
+				{
+					case 1:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_DUPLICATE_1;  break;
+					case 2:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_DUPLICATE_2;  break;
+					default: RMX_ASSERT(false, "Unsupported count");
+				}
+				break;
 			}
 
 			default:

@@ -13,7 +13,7 @@
 namespace lemon
 {
 
-	const char* Opcode::GetTypeString(Type type)
+	const char* Opcode::getTypeString(Type type)
 	{
 		switch (type)
 		{
@@ -52,6 +52,7 @@ namespace lemon
 			case Type::RETURN:				return "RETURN";
 			case Type::EXTERNAL_CALL:		return "EXTERNAL_CALL";
 			case Type::EXTERNAL_JUMP:		return "EXTERNAL_JUMP";
+			case Type::DUPLICATE:			return "DUPLICATE";
 			default:  return "";
 		};
 	}

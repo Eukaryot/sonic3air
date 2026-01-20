@@ -88,14 +88,6 @@ namespace lemon
 		static void exec_OPT_WRITE_MEMORY_DISCARD(const RuntimeOpcodeContext context)
 		{
 			context.mControlFlow->mValueStackPtr -= 2;
-			const uint64 address = *(context.mControlFlow->mValueStackPtr+1);
-			OpcodeExecUtils::writeMemory<T>(*context.mControlFlow, address, (T)(*(context.mControlFlow->mValueStackPtr)));
-		}
-
-		template<typename T>
-		static void exec_OPT_WRITE_MEMORY_EXCHANGED_DISCARD(const RuntimeOpcodeContext context)
-		{
-			context.mControlFlow->mValueStackPtr -= 2;
 			const uint64 address = *(context.mControlFlow->mValueStackPtr);
 			OpcodeExecUtils::writeMemory<T>(*context.mControlFlow, address, (T)(*(context.mControlFlow->mValueStackPtr+1)));
 		}
@@ -363,19 +355,12 @@ namespace lemon
 			}
 
 			// Merge: Write memory and discard its result
-			if (opcodes[0].mType == Opcode::Type::WRITE_MEMORY && opcodes[0].mParameter == 0)
+			if (opcodes[0].mType == Opcode::Type::WRITE_MEMORY)
 			{
 				if (opcodes[1].mType == Opcode::Type::MOVE_STACK && opcodes[1].mParameter == -1)
 				{
 					RuntimeOpcode& runtimeOpcode = buffer.addOpcode(8);
-					if (opcodes[0].mParameter == 0)
-					{
-						SELECT_EXEC_FUNC_BY_DATATYPE_INT(OptimizedOpcodeExec::exec_OPT_WRITE_MEMORY_DISCARD, opcodes[0].mDataType);
-					}
-					else
-					{
-						SELECT_EXEC_FUNC_BY_DATATYPE_INT(OptimizedOpcodeExec::exec_OPT_WRITE_MEMORY_EXCHANGED_DISCARD, opcodes[0].mDataType);
-					}
+					SELECT_EXEC_FUNC_BY_DATATYPE_INT(OptimizedOpcodeExec::exec_OPT_WRITE_MEMORY_DISCARD, opcodes[0].mDataType);
 					outNumOpcodesConsumed = 2;
 					return true;
 				}

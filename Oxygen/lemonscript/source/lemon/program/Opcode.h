@@ -55,6 +55,7 @@ namespace lemon
 			RETURN,
 			EXTERNAL_CALL,
 			EXTERNAL_JUMP,
+			DUPLICATE,
 
 			_NUM_TYPES
 		};
@@ -77,7 +78,7 @@ namespace lemon
 		int64 mParameter = 0;	// For constants, or ID in case of variables and calls
 
 	public:
-		static const char* GetTypeString(Type type);
+		static const char* getTypeString(Type type);
 	};
 
 }

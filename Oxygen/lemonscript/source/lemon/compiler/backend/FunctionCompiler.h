@@ -54,6 +54,7 @@ namespace lemon
 
 		void compileTokenTreeToOpcodes(const StatementToken& token, bool consumeResult = false, bool isLValue = false);
 		void compileUnaryDecIncToOpcodes(const UnaryOperationToken& uot);
+		void compileAssignmentToOpcodes(const BinaryOperationToken& bot);
 		void compileBinaryAssignmentToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType);
 		void compileBinaryOperationToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType);
 
