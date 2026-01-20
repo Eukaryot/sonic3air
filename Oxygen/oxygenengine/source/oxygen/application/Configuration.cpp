@@ -611,7 +611,7 @@ void Configuration::serializeDevMode(JsonSerializer& serializer)
 		serializer.serialize("Enabled", mDevMode.mEnableAtStartup);
 
 		serializer.serialize("LoadSaveState", mLoadSaveState);
-		serializer.serialize("LoadLevel", mLoadLevel);
+		serializer.serializeHexValue("LoadLevel", mLoadLevel, 4);
 		if (serializer.serialize("UseCharacters", mUseCharacters))
 		{
 			if (serializer.isReading())

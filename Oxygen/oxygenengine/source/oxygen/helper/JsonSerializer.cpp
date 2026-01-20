@@ -76,6 +76,19 @@ bool JsonSerializer::serialize(const char* key, std::wstring& value)
 	}
 }
 
+bool JsonSerializer::serializeHexValue(const char* key, int& value, int numHexDigits)
+{
+	if (mReading)
+	{
+		return JsonHelper(*mCurrentJson).tryReadInt(key, value);
+	}
+	else
+	{
+		(*mCurrentJson)[key] = rmx::hexString(value, numHexDigits);
+		return true;
+	}
+}
+
 bool JsonSerializer::serializeComponents(const char* key, Vec2i& value)
 {
 	bool result = true;

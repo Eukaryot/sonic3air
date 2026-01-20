@@ -136,7 +136,7 @@ namespace rmx
 		}
 		else if (value.isString())
 		{
-			output = String(value.asString()).parseInt();
+			output = (int)rmx::parseInteger(String(value.asString()));
 			return true;
 		}
 		return false;
