@@ -178,7 +178,8 @@ void PersistentData::removeKey(uint64 filePathHash, uint64 keyHash)
 
 void PersistentData::initialSetup()
 {
-	FTX::FileSystem->createDirectory(mBasePath);
+	const bool success = FTX::FileSystem->createDirectory(mBasePath);
+	RMX_CHECK(success, "Failed to create \"storage\" folder in app data, game won't be able to save your progress", return);
 
 	std::vector<uint8> content;
 	if (FTX::FileSystem->readFile(mBasePath + L"../persistentdata.bin", content))
