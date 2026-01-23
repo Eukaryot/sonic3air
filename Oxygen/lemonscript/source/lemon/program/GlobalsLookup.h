@@ -96,7 +96,8 @@ namespace lemon
 
 		// Data types
 		inline const std::vector<const DataTypeDefinition*>& getDataTypes() const  { return mDataTypes; }
-		void registerDataType(const CustomDataType* dataTypeDefinition);
+		const DataTypeDefinition* findDataTypeByName(uint64 nameHash) const;
+		void registerDataType(const DataTypeDefinition* dataTypeDefinition);
 		const DataTypeDefinition* readDataType(VectorBinarySerializer& serializer) const;
 		void serializeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition*& dataTypeDefinition) const;
 

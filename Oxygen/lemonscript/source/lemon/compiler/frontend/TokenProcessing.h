@@ -57,6 +57,8 @@ namespace lemon
 
 		bool processConstant(TokenList& tokens, size_t pos);
 
+		const ArrayDataType& getArrayDataType(const DataTypeDefinition& elementType, size_t arraySize);
+
 	private:
 		struct BinaryOperationResult
 		{
@@ -107,6 +109,9 @@ namespace lemon
 
 		BinaryOperationResult getBestOperatorSignature(Operator op, const DataTypeDefinition* leftDataType, const DataTypeDefinition* rightDataType);
 
+		const Function* getBuiltinArrayGetter(const DataTypeDefinition& elementType);
+		const Function* getBuiltinArraySetter(const DataTypeDefinition& elementType);
+
 		void assignStatementDataTypes(TokenList& tokens, const DataTypeDefinition* resultType);
 		const DataTypeDefinition* assignStatementDataType(StatementToken& token, const DataTypeDefinition* resultType);
 
@@ -122,6 +127,9 @@ namespace lemon
 		uint32 mLineNumber = 0;
 
 		CachedBuiltinFunction mBuiltinConstantArrayAccess;
+		CachedBuiltinFunction mBuiltinArrayBracketGetter;
+		CachedBuiltinFunction mBuiltinArrayBracketSetter;
+
 		CachedBuiltinFunction mBuiltinStringOperatorPlus;
 		CachedBuiltinFunction mBuiltinStringOperatorPlusInt64;
 		CachedBuiltinFunction mBuiltinStringOperatorPlusInt64Inv;

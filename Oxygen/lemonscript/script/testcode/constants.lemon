@@ -13,5 +13,7 @@ global float GLOBAL_NEGATIVE_VALUE = -1.2345f
 
 function void testConstants()
 {
+	debugLog("\n== Contants ==")
+
 	debugLog(GLOBAL_NEGATIVE_VALUE)
 }

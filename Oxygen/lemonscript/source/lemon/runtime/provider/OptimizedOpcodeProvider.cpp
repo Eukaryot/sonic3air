@@ -63,8 +63,8 @@ namespace lemon
 		{
 			--context.mControlFlow->mValueStackPtr;
 			const int64 value = *context.mControlFlow->mValueStackPtr;
-			const uint32 variableId = context.getParameter<uint32>();
-			context.writeLocalVariable<int64>(variableId, value);
+			const uint32 variableOffset = context.getParameter<uint32>();
+			context.writeLocalVariable<int64>(variableOffset, value);
 		}
 
 		static void exec_OPT_SET_VARIABLE_VALUE_USER_DISCARD(const RuntimeOpcodeContext context)
@@ -116,6 +116,8 @@ namespace lemon
 			++context.mControlFlow->mValueStackPtr;
 		}
 
+		// Currently unused
+	/*
 		template<typename T>
 		static void exec_OPT_WRITE_MEMORY_FIXED_ADDR(const RuntimeOpcodeContext context)
 		{
@@ -136,6 +138,7 @@ namespace lemon
 			uint8* pointer = context.getParameter<uint8*>();
 			*(T*)pointer = rmx::swapBytes((T)(*(context.mControlFlow->mValueStackPtr-1)));
 		}
+	*/
 
 		template<typename T>
 		static void exec_OPT_ADD_CONSTANT(const RuntimeOpcodeContext context)
@@ -242,7 +245,7 @@ namespace lemon
 	};
 
 
-	bool OptimizedOpcodeProvider::buildRuntimeOpcodeStatic(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime)
+	bool OptimizedOpcodeProvider::buildRuntimeOpcodeStatic(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime, const ScriptFunction& function)
 	{
 		if (numOpcodesAvailable >= 2)
 		{
@@ -312,16 +315,28 @@ namespace lemon
 					const Variable::Type type = (Variable::Type)(variableId >> 28);
 
 					RuntimeOpcode& runtimeOpcode = buffer.addOpcode(8);
-					runtimeOpcode.setParameter(variableId);
 
 					switch (type)
 					{
-						case Variable::Type::LOCAL:		runtimeOpcode.mExecFunc = &OptimizedOpcodeExec::exec_OPT_SET_VARIABLE_VALUE_LOCAL_DISCARD;	break;
-						case Variable::Type::USER:		runtimeOpcode.mExecFunc = &OptimizedOpcodeExec::exec_OPT_SET_VARIABLE_VALUE_USER_DISCARD;	break;
+						case Variable::Type::LOCAL:
+						{
+							const LocalVariable& variable = function.getLocalVariableByID(variableId);
+							runtimeOpcode.setParameter(variable.getLocalMemoryOffset());
+							runtimeOpcode.mExecFunc = &OptimizedOpcodeExec::exec_OPT_SET_VARIABLE_VALUE_LOCAL_DISCARD;
+							break;
+						}
+
+						case Variable::Type::USER:
+						{
+							runtimeOpcode.setParameter(variableId);
+							runtimeOpcode.mExecFunc = &OptimizedOpcodeExec::exec_OPT_SET_VARIABLE_VALUE_USER_DISCARD;
+							break;
+						}
 
 						case Variable::Type::GLOBAL:
 						{
-							int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
+							const GlobalVariable& variable = static_cast<GlobalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
+							int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(variable);
 							runtimeOpcode.setParameter(value);
 
 							switch (BaseTypeHelper::getSizeOfBaseType(opcodes[0].mDataType))
@@ -399,9 +414,11 @@ namespace lemon
 			}
 
 			// Merge: Write memory at a fixed address
+			//  -> TODO: This only works with a WRITE_MEMORY variant that has exchanged parameters
+		/*
 			if (opcodes[0].mType == Opcode::Type::PUSH_CONSTANT)
 			{
-				if (opcodes[1].mType == Opcode::Type::WRITE_MEMORY && opcodes[1].mParameter == 0)
+				if (opcodes[1].mType == Opcode::Type::WRITE_MEMORY)
 				{
 					uint64 address = opcodes[0].mParameter;
 					MemoryAccessHandler::SpecializationResult result;
@@ -429,14 +446,15 @@ namespace lemon
 					return true;
 				}
 			}
+		*/
 		}
 
 		return false;
 	}
 
-	bool OptimizedOpcodeProvider::buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime)
+	bool OptimizedOpcodeProvider::buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime, const ScriptFunction& function)
 	{
-		return buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime);
+		return buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime, function);
 	}
 
 	#undef SELECT_EXEC_FUNC_BY_DATATYPE

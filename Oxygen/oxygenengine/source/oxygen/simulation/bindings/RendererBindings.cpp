@@ -946,7 +946,7 @@ void RendererBindings::registerBindings(lemon::Module& module)
 	lemon::ModuleBindingsBuilder builder(module);
 
 	// Data type
-	SpriteHandleWrapper::mDataType = module.addDataType("SpriteHandle", lemon::BaseType::UINT_32);
+	SpriteHandleWrapper::mDataType = module.addCustomDataType("SpriteHandle", lemon::BaseType::UINT_32);
 
 	// Constants
 	{

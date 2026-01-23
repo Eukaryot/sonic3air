@@ -124,6 +124,9 @@ namespace lemon
 		mTypeCasting(compileOptions)
 	{
 		fillCachedBuiltInFunction(mBuiltinConstantArrayAccess,			true,  globalsLookup, BuiltInFunctions::CONSTANT_ARRAY_ACCESS);
+		fillCachedBuiltInFunction(mBuiltinArrayBracketGetter,			true,  globalsLookup, BuiltInFunctions::ARRAY_BRACKET_GETTER);
+		fillCachedBuiltInFunction(mBuiltinArrayBracketSetter,			true,  globalsLookup, BuiltInFunctions::ARRAY_BRACKET_SETTER);
+
 		fillCachedBuiltInFunction(mBuiltinStringOperatorPlus,			false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS);
 		fillCachedBuiltInFunction(mBuiltinStringOperatorPlusInt64,		false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64);
 		fillCachedBuiltInFunction(mBuiltinStringOperatorPlusInt64Inv,	false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64_INV);
@@ -260,6 +263,41 @@ namespace lemon
 		newToken.mDataType = constant->getDataType();
 		newToken.mValue.set(constant->getValue());
 		return true;
+	}
+
+	const ArrayDataType& TokenProcessing::getArrayDataType(const DataTypeDefinition& elementType, size_t arraySize)
+	{
+		// Get or create array data type
+		const ArrayDataType* arrayDataType = nullptr;
+		{
+			const uint64 dataTypeNameHash = ArrayDataType::buildArrayDataTypeName(elementType, arraySize).getHash();
+			const DataTypeDefinition* existingDataType = mGlobalsLookup.findDataTypeByName(dataTypeNameHash);
+			if (nullptr != existingDataType)
+			{
+				CHECK_ERROR(existingDataType->getClass() == DataTypeDefinition::Class::ARRAY, "There's an existing data type named '" << existingDataType->getName() << "' that is not an array", mLineNumber);
+				arrayDataType = static_cast<const ArrayDataType*>(existingDataType);
+			}
+		}
+
+		if (nullptr == arrayDataType)
+		{
+			const Function* getter = getBuiltinArrayGetter(elementType);
+			const Function* setter = getBuiltinArraySetter(elementType);
+			CHECK_ERROR(nullptr != getter, "Could not find getter implementation for array of type " << elementType.getName(), mLineNumber);
+			CHECK_ERROR(nullptr != setter, "Could not find setter implementation for array of type " << elementType.getName(), mLineNumber);
+
+			ArrayDataType& arrayDT = mModule.addArrayDataType(elementType, arraySize);
+			DataTypeDefinition::BracketOperator& bracketOperator = arrayDT.getBracketOperator();
+			bracketOperator.mParameterType = &PredefinedDataTypes::INT_32;
+			bracketOperator.mValueType = &elementType;
+			bracketOperator.mGetter = getter;
+			bracketOperator.mSetter = setter;
+
+			arrayDataType = &arrayDT;
+			mGlobalsLookup.registerDataType(arrayDataType);
+		}
+
+		return *arrayDataType;
 	}
 
 	void TokenProcessing::insertCastTokenIfNecessary(TokenPtr<StatementToken>& token, const DataTypeDefinition* targetDataType)
@@ -515,32 +553,70 @@ namespace lemon
 					const DataTypeDefinition* varType = token.as<VarTypeToken>().mDataType;
 
 					// Next token must be an identifier
-					CHECK_ERROR(i+1 < tokens.size(), "Type name must not be the last token", mLineNumber);
+					size_t offset = i + 1;
+					CHECK_ERROR(offset < tokens.size(), "Type name must not be the last token", mLineNumber);
 
 					// Next token must be an identifier
-					Token& nextToken = tokens[i+1];
+					Token& nextToken = tokens[offset];
 					if (nextToken.isA<IdentifierToken>())
 					{
-						CHECK_ERROR(varType->getClass() != DataTypeDefinition::Class::VOID, "void variables not allowed", mLineNumber);
+						CHECK_ERROR(varType->getClass() != DataTypeDefinition::Class::VOID, "void variables are not allowed", mLineNumber);
 
-						// Create new variable
-						const IdentifierToken& identifierToken = tokens[i+1].as<IdentifierToken>();
-						CHECK_ERROR(nullptr == findLocalVariable(identifierToken.mName.getHash()), "Variable name '" << identifierToken.mName.getString() << "' already used", mLineNumber);
+						const IdentifierToken& identifierToken = tokens[offset].as<IdentifierToken>();
+						CHECK_ERROR(nullptr == findLocalVariable(identifierToken.mName.getHash()), "Local variable name '" << identifierToken.mName.getString() << "' already used", mLineNumber);
 
 						// Variable may already exist in function (but not in scope, we just checked that)
 						RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
 						LocalVariable* variable = mContext.mFunction->getLocalVariableByIdentifier(identifierToken.mName.getHash());
-						if (nullptr == variable)
+
+						// Check for array definition
+						if (offset+1 < tokens.size() && isParenthesis(tokens[offset+1], ParenthesisType::BRACKET))
 						{
-							variable = &mContext.mFunction->addLocalVariable(identifierToken.mName, varType, mLineNumber);
+							++offset;
+							const ParenthesisToken& pt = tokens[offset].as<ParenthesisToken>();
+							CHECK_ERROR(pt.mContent.size() == 1, "Expected a single value as array size", mLineNumber);
+							const ConstantToken* ct = pt.mContent[0].cast<ConstantToken>();
+							CHECK_ERROR(nullptr != ct, "Expected a constant value as array size", mLineNumber);
+
+							const int arraySize = ct->mValue.get<int32>();
+							CHECK_ERROR(arraySize >= 1, "Invalid array size of " << arraySize, mLineNumber);
+							CHECK_ERROR(arraySize <= 0x100, "Too large array size of " << arraySize << ", limit for local variables is 256 (0x100)", mLineNumber);
+
+							// Get or create array data type
+							const ArrayDataType& arrayDataType = getArrayDataType(*varType, arraySize);
+
+							// Create local variable
+							CHECK_ERROR(nullptr == variable, "Local variable name '" << identifierToken.mName.getString() << "' already used", mLineNumber);
+							variable = &mContext.mFunction->addLocalVariable(identifierToken.mName, &arrayDataType, mLineNumber);
+							mContext.mLocalVariables->push_back(variable);
+
+							// Completely remove all tokens here, as no opcodes need to be created in this place
+							tokens.erase(i, offset);
 						}
-						mContext.mLocalVariables->push_back(variable);
+						else
+						{
+							// Create local variable
 
-						VariableToken& variableToken = tokens.createReplaceAt<VariableToken>(i);
-						variableToken.mVariable = variable;
-						variableToken.mDataType = variable->getDataType();
+							// TODO: If variable already exists, but has a different data type, this can lead to issues
+							//  -> Let's at least check that if there was a different variable already, it's not an array
+							//  -> A better solution would be to allow multiple local variables with the same name; we already made sure that their scopes don't overlap
+							if (nullptr != variable)
+							{
+								CHECK_ERROR(variable->getDataType()->getClass() != DataTypeDefinition::Class::ARRAY, "Local variable name '" << identifierToken.mName.getString() << "' already used", mLineNumber);
+							}
+							else
+							{
+								// Add new local variable
+								variable = &mContext.mFunction->addLocalVariable(identifierToken.mName, varType, mLineNumber);
+							}
+							mContext.mLocalVariables->push_back(variable);
 
-						tokens.erase(i+1);
+							VariableToken& variableToken = tokens.createReplaceAt<VariableToken>(i);
+							variableToken.mVariable = variable;
+							variableToken.mDataType = variable->getDataType();
+
+							tokens.erase(i+1, offset-i);
+						}
 					}
 					break;
 				}
@@ -608,6 +684,7 @@ namespace lemon
 						thisPointerVariable = findVariable(rmx::getMurmur2_64(contextPart));
 						if (nullptr != thisPointerVariable)
 						{
+							// TODO: Support getting the methods from the data type (similar to the bracket operator)
 							candidateFunctions = &mGlobalsLookup.getMethodsByName(thisPointerVariable->getDataType()->getName().getHash() + rmx::getMurmur2_64(namePart));
 							isValidFunctionCall = !candidateFunctions->empty();
 						}
@@ -1340,6 +1417,30 @@ namespace lemon
 			}
 		}
 		return result;
+	}
+
+	const Function* TokenProcessing::getBuiltinArrayGetter(const DataTypeDefinition& elementType)
+	{
+		for (const Function* function : mBuiltinArrayBracketGetter.mFunctions)
+		{
+			if (function->getReturnType() == &elementType)
+			{
+				return function;
+			}
+		}
+		return nullptr;
+	}
+
+	const Function* TokenProcessing::getBuiltinArraySetter(const DataTypeDefinition& elementType)
+	{
+		for (const Function* function : mBuiltinArrayBracketSetter.mFunctions)
+		{
+			if (function->getParameters().size() == 3 && function->getParameters()[2].mDataType == &elementType)
+			{
+				return function;
+			}
+		}
+		return nullptr;
 	}
 
 	void TokenProcessing::assignStatementDataTypes(TokenList& tokens, const DataTypeDefinition* resultType)

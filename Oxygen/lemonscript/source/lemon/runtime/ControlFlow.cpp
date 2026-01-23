@@ -114,7 +114,15 @@ namespace lemon
 			default:
 			case Variable::Type::LOCAL:
 			{
-				return readLocalVariable<int64>(variableId);
+				const LocalVariable& variable = getCurrentFunction()->getLocalVariableByID(variableId);
+				return readLocalVariable<int64>(variable.getLocalMemoryOffset());
+			}
+
+			case Variable::Type::GLOBAL:
+			{
+				const GlobalVariable& variable = static_cast<GlobalVariable&>(mProgram->getGlobalVariableByID(variableId));
+				const int64* valuePtr = getRuntime().accessGlobalVariableValue(variable);
+				return (nullptr != valuePtr) ? *valuePtr : 0;
 			}
 
 			case Variable::Type::USER:
@@ -122,12 +130,6 @@ namespace lemon
 				const UserDefinedVariable& variable = static_cast<UserDefinedVariable&>(mProgram->getGlobalVariableByID(variableId));
 				variable.mGetter(*this);		// This is supposed to write a value to the value stack
 				return popValueStack<int64>();
-			}
-
-			case Variable::Type::GLOBAL:
-			{
-				const int64* valuePtr = getRuntime().accessGlobalVariableValue(mProgram->getGlobalVariableByID(variableId));
-				return (nullptr != valuePtr) ? *valuePtr : 0;
 			}
 
 			case Variable::Type::EXTERNAL:
@@ -147,7 +149,17 @@ namespace lemon
 			default:
 			case Variable::Type::LOCAL:
 			{
-				writeLocalVariable(variableId, value);
+				const LocalVariable& variable = getCurrentFunction()->getLocalVariableByID(variableId);
+				writeLocalVariable(variable.getLocalMemoryOffset(), value);
+				break;
+			}
+
+			case Variable::Type::GLOBAL:
+			{
+				const GlobalVariable& variable = static_cast<GlobalVariable&>(mProgram->getGlobalVariableByID(variableId));
+				int64* valuePtr = getRuntime().accessGlobalVariableValue(variable);
+				if (nullptr != valuePtr)
+					*valuePtr = value;
 				break;
 			}
 
@@ -159,14 +171,6 @@ namespace lemon
 				break;
 			}
 
-			case Variable::Type::GLOBAL:
-			{
-				int64* valuePtr = getRuntime().accessGlobalVariableValue(mProgram->getGlobalVariableByID(variableId));
-				if (nullptr != valuePtr)
-					*valuePtr = value;
-				break;
-			}
-
 			case Variable::Type::EXTERNAL:
 			{
 				const ExternalVariable& variable = static_cast<ExternalVariable&>(mProgram->getGlobalVariableByID(variableId));
@@ -174,6 +178,34 @@ namespace lemon
 				if (nullptr != valuePtr)
 					*valuePtr = value;
 				break;
+			}
+		}
+	}
+
+	uint8* ControlFlow::accessVariableGeneric(uint32 variableId)
+	{
+		const Variable::Type type = (Variable::Type)(variableId >> 28);
+		switch (type)
+		{
+			case Variable::Type::LOCAL:
+			{
+				// This requires local variables with different sizes, currently they're all just one uint64 each
+				//return reinterpret_cast<uint8*>(mCurrentLocalVariables[variableId]);
+
+				RMX_ASSERT(false, "Unhandled variable type for 'accessVariableGeneric'");
+				return nullptr;
+			}
+
+			case Variable::Type::GLOBAL:
+			{
+				const GlobalVariable& variable = static_cast<GlobalVariable&>(mProgram->getGlobalVariableByID(variableId));
+				return reinterpret_cast<uint8*>(getRuntime().accessGlobalVariableValue(variable));
+			}
+
+			default:
+			{
+				RMX_ASSERT(false, "Unhandled variable type for 'accessVariableGeneric'");
+				return nullptr;
 			}
 		}
 	}

@@ -121,8 +121,8 @@ namespace lemon
 
 		static void exec_GET_VARIABLE_VALUE_LOCAL(const RuntimeOpcodeContext context)
 		{
-			const uint32 variableId = context.getParameter<uint32>();
-			*context.mControlFlow->mValueStackPtr = context.readLocalVariable<int64>(variableId);
+			const uint32 variableOffset = context.getParameter<uint32>();
+			*context.mControlFlow->mValueStackPtr = context.readLocalVariable<int64>(variableOffset);
 			++context.mControlFlow->mValueStackPtr;
 		}
 
@@ -143,8 +143,8 @@ namespace lemon
 		static void exec_SET_VARIABLE_VALUE_LOCAL(const RuntimeOpcodeContext context)
 		{
 			const int64 value = *(context.mControlFlow->mValueStackPtr-1);
-			const uint32 variableId = context.getParameter<uint32>();
-			context.writeLocalVariable<int64>(variableId, value);
+			const uint32 variableOffset = context.getParameter<uint32>();
+			context.writeLocalVariable<int64>(variableOffset, value);
 		}
 
 		static void exec_SET_VARIABLE_VALUE_USER(const RuntimeOpcodeContext context)
@@ -364,7 +364,7 @@ namespace lemon
 
 
 
-	void DefaultOpcodeProvider::buildRuntimeOpcodeStatic(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime)
+	void DefaultOpcodeProvider::buildRuntimeOpcodeStatic(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime, const ScriptFunction& function)
 	{
 		const Opcode& opcode = opcodes[0];
 		outNumOpcodesConsumed = 1;
@@ -446,12 +446,24 @@ namespace lemon
 				const Variable::Type type = (Variable::Type)(variableId >> 28);
 				switch (type)
 				{
-					case Variable::Type::LOCAL:		runtimeOpcode.mExecFunc = &OpcodeExec::exec_GET_VARIABLE_VALUE_LOCAL;	break;
-					case Variable::Type::USER:		runtimeOpcode.mExecFunc = &OpcodeExec::exec_GET_VARIABLE_VALUE_USER;	break;
+					case Variable::Type::LOCAL:
+					{
+						const LocalVariable& variable = function.getLocalVariableByID(variableId);
+						runtimeOpcode.setParameter(variable.getLocalMemoryOffset());
+						runtimeOpcode.mExecFunc = &OpcodeExec::exec_GET_VARIABLE_VALUE_LOCAL;
+						break;
+					}
+
+					case Variable::Type::USER:
+					{
+						runtimeOpcode.mExecFunc = &OpcodeExec::exec_GET_VARIABLE_VALUE_USER;
+						break;
+					}
 
 					case Variable::Type::GLOBAL:
 					{
-						int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
+						const GlobalVariable& variable = static_cast<GlobalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
+						int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(variable);
 						runtimeOpcode.setParameter(value);
 
 						switch (BaseTypeHelper::getSizeOfBaseType(opcode.mDataType))
@@ -488,12 +500,24 @@ namespace lemon
 				const Variable::Type type = (Variable::Type)(variableId >> 28);
 				switch (type)
 				{
-					case Variable::Type::LOCAL:		runtimeOpcode.mExecFunc = &OpcodeExec::exec_SET_VARIABLE_VALUE_LOCAL;	 break;
-					case Variable::Type::USER:		runtimeOpcode.mExecFunc = &OpcodeExec::exec_SET_VARIABLE_VALUE_USER;	 break;
+					case Variable::Type::LOCAL:
+					{
+						const LocalVariable& variable = function.getLocalVariableByID(variableId);
+						runtimeOpcode.setParameter(variable.getLocalMemoryOffset());
+						runtimeOpcode.mExecFunc = &OpcodeExec::exec_SET_VARIABLE_VALUE_LOCAL;
+						break;
+					}
+
+					case Variable::Type::USER:
+					{
+						runtimeOpcode.mExecFunc = &OpcodeExec::exec_SET_VARIABLE_VALUE_USER;
+						break;
+					}
 
 					case Variable::Type::GLOBAL:
 					{
-						int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
+						const GlobalVariable& variable = static_cast<GlobalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
+						int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(variable);
 						runtimeOpcode.setParameter(value);
 
 						switch (BaseTypeHelper::getSizeOfBaseType(opcode.mDataType))
@@ -713,9 +737,9 @@ namespace lemon
 		runtimeOpcode.mSuccessiveHandledOpcodes = (runtimeOpcode.mExecFunc == &OpcodeExec::exec_NOT_HANDLED) ? 0 : 1;
 	}
 
-	bool DefaultOpcodeProvider::buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime)
+	bool DefaultOpcodeProvider::buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime, const ScriptFunction& function)
 	{
-		buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime);
+		buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime, function);
 		return true;
 	}
 

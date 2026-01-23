@@ -30,6 +30,9 @@ namespace lemon
 
 	public:
 		static FunctionName CONSTANT_ARRAY_ACCESS;
+		static FunctionName ARRAY_BRACKET_GETTER;
+		static FunctionName ARRAY_BRACKET_SETTER;
+
 		static FunctionName STRING_OPERATOR_PLUS;
 		static FunctionName STRING_OPERATOR_PLUS_INT64;
 		static FunctionName STRING_OPERATOR_PLUS_INT64_INV;

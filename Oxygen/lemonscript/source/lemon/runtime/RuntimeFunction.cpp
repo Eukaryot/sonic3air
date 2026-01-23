@@ -251,7 +251,7 @@ namespace lemon
 		const Program& program = runtime.getProgram();
 		if (program.getOptimizationLevel() >= 2 && nullptr != program.mNativizedOpcodeProvider)
 		{
-			const bool success = program.mNativizedOpcodeProvider->buildRuntimeOpcode(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime);
+			const bool success = program.mNativizedOpcodeProvider->buildRuntimeOpcode(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime, *mFunction);
 			if (success)
 				return;
 		}
@@ -259,13 +259,13 @@ namespace lemon
 		// Runtime opcode generation by merging multiple opcodes where possible
 		if (program.getOptimizationLevel() >= 1)
 		{
-			const bool success = OptimizedOpcodeProvider::buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime);
+			const bool success = OptimizedOpcodeProvider::buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime, *mFunction);
 			if (success)
 				return;
 		}
 
 		// Fallback: Direct translation of one opcode to the respective runtime opcode
-		DefaultOpcodeProvider::buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime);
+		DefaultOpcodeProvider::buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime, *mFunction);
 	}
 
 	const uint8* RuntimeFunction::translateJumpTarget(uint32 targetOpcodeIndex) const

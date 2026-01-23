@@ -66,7 +66,7 @@ namespace lemon
 		{
 			registerDefine(*define);
 		}
-		for (const CustomDataType* dataType : module.mDataTypes)
+		for (const DataTypeDefinition* dataType : module.mDataTypes)
 		{
 			registerDataType(dataType);
 		}
@@ -185,7 +185,18 @@ namespace lemon
 		return mStringLiterals.getStringByHash(hash);
 	}
 
-	void GlobalsLookup::registerDataType(const CustomDataType* dataTypeDefinition)
+	const DataTypeDefinition* GlobalsLookup::findDataTypeByName(uint64 nameHash) const
+	{
+		// TODO: Optimize this by using a map
+		for (const DataTypeDefinition* existingDataType : mDataTypes)
+		{
+			if (existingDataType->getName().getHash() == nameHash)
+				return existingDataType;
+		}
+		return nullptr;
+	}
+
+	void GlobalsLookup::registerDataType(const DataTypeDefinition* dataTypeDefinition)
 	{
 		RMX_ASSERT(dataTypeDefinition->getID() == mDataTypes.size(), "Wrong data type ID");
 		mDataTypes.push_back(dataTypeDefinition);

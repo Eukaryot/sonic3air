@@ -41,20 +41,16 @@ namespace lemon
 		inline FlyweightString getName() const				 { return mName; }
 		inline uint32 getID() const							 { return mID; }
 		inline const DataTypeDefinition* getDataType() const { return mDataType; }
-		inline size_t getStaticMemoryOffset() const			 { return mStaticMemoryOffset; }
-		inline size_t getStaticMemorySize() const			 { return mStaticMemorySize; }
 
 	protected:
 		inline Variable(Type type) : mType(type) {}
 		virtual ~Variable() {}
 
 	private:
-		Type mType;
+		const Type mType;
 		FlyweightString mName;
 		uint32 mID = 0;
 		const DataTypeDefinition* mDataType = nullptr;
-		size_t mStaticMemoryOffset = 0;
-		size_t mStaticMemorySize = 0;
 	};
 
 
@@ -63,7 +59,14 @@ namespace lemon
 	public:
 		inline LocalVariable() : Variable(Type::LOCAL) {}
 
+		inline size_t getLocalMemoryOffset() const	{ return mLocalMemoryOffset; }
+		inline size_t getLocalMemorySize() const	{ return mLocalMemorySize; }
+
 		// Local variables get accessed via the current state's variables stack
+
+	public:
+		size_t mLocalMemoryOffset = 0;
+		size_t mLocalMemorySize = 0;
 	};
 
 
@@ -72,10 +75,15 @@ namespace lemon
 	public:
 		inline GlobalVariable() : Variable(Type::GLOBAL) {}
 
+		inline size_t getStaticMemoryOffset() const	{ return mStaticMemoryOffset; }
+		inline size_t getStaticMemorySize() const	{ return mStaticMemorySize; }
+
 		// Global variables get accessed via the runtime's global variables list
 
 	public:
 		AnyBaseValue mInitialValue;
+		size_t mStaticMemoryOffset = 0;
+		size_t mStaticMemorySize = 0;
 	};
 
 

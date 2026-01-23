@@ -2,6 +2,8 @@
 
 function void testIfElse()
 {
+	debugLog("\n== If else ==")
+
 	u8 a = 0
 	if (a == ONE)
 	{

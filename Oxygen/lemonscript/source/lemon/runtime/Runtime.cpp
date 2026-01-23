@@ -253,7 +253,7 @@ namespace lemon
 		return hash;
 	}
 
-	AnyBaseValue Runtime::getGlobalVariableValue(const Variable& variable)
+	AnyBaseValue Runtime::getGlobalVariableValue(const GlobalVariable& variable)
 	{
 		AnyBaseValue result;
 		const int64* valuePtr = accessGlobalVariableValue(variable);
@@ -262,7 +262,7 @@ namespace lemon
 		return result;
 	}
 
-	void Runtime::setGlobalVariableValue(const Variable& variable, AnyBaseValue value)
+	void Runtime::setGlobalVariableValue(const GlobalVariable& variable, AnyBaseValue value)
 	{
 		int64* valuePtr = accessGlobalVariableValue(variable);
 		if (nullptr != valuePtr)
@@ -271,12 +271,10 @@ namespace lemon
 		}
 	}
 
-	int64* Runtime::accessGlobalVariableValue(const Variable& variable)
+	int64* Runtime::accessGlobalVariableValue(const GlobalVariable& variable)
 	{
-		RMX_CHECK((variable.getID() & 0xf0000000) == 0x10000000, "Variable " << variable.getName() << " is not a global variable", return nullptr);
-		const uint32 index = variable.getID() & 0x0fffffff;
-		RMX_CHECK(index < mProgram->getGlobalVariables().size(), "Variable index " << index << " is not valid", return nullptr);
-		const size_t offset = mProgram->getGlobalVariables()[index]->getStaticMemoryOffset();
+		RMX_CHECK(variable.getType() == Variable::Type::GLOBAL, "Variable " << variable.getName() << " is not a global variable", return nullptr);
+		const size_t offset = variable.getStaticMemoryOffset();
 		return (int64*)&mStaticMemory[offset];
 	}
 
@@ -284,7 +282,7 @@ namespace lemon
 	{
 		if (mSelectedControlFlow->mLocalVariablesSize + runtimeFunction.mFunction->mLocalVariablesByID.size() > ControlFlow::VAR_STACK_LIMIT)
 		{
-			throw std::runtime_error("Reached var stack limit, probably due to recursive function calls");
+			throw std::runtime_error("Reached var stack limit, possibly due to recursive function calls");
 		}
 
 		// Push new state to call stack
@@ -467,7 +465,7 @@ namespace lemon
 			RMX_CHECK(mSelectedControlFlow->mValueStackPtr < &mSelectedControlFlow->mValueStackBuffer[ControlFlow::VALUE_STACK_LAST_INDEX], "Value stack error: Too many elements", mSelectedControlFlow->mValueStackPtr = &mSelectedControlFlow->mValueStackBuffer[0x77]);
 
 			RMX_ASSERT(mSelectedControlFlow->mLocalVariablesSize <= ControlFlow::VAR_STACK_LIMIT, "Reached var stack limit");
-			mSelectedControlFlow->mCurrentLocalVariables = &mSelectedControlFlow->mLocalVariablesBuffer[state.mLocalVariablesStart];
+			mSelectedControlFlow->mCurrentLocalVariables = reinterpret_cast<uint8*>(&mSelectedControlFlow->mLocalVariablesBuffer[state.mLocalVariablesStart]);
 			RMX_ASSERT(nullptr != mSelectedControlFlow->mCurrentLocalVariables, "Reached var stack limit");
 
 			context.mOpcode = (const RuntimeOpcode*)state.mProgramCounter;
@@ -859,9 +857,7 @@ namespace lemon
 					Variable* variable = mProgram->getGlobalVariableByName(nameHash);
 					if (nullptr != variable && variable->getType() == Variable::Type::GLOBAL)
 					{
-						const size_t index = variable->getID() & 0x0fffffff;
-						RMX_CHECK(index < numGlobals, "Invalid global variable index", continue);
-						const size_t offset = mProgram->getGlobalVariables()[index]->getStaticMemoryOffset();
+						const size_t offset = static_cast<GlobalVariable*>(variable)->getStaticMemoryOffset();
 						if (offset < mStaticMemory.size())
 							memcpy(&mStaticMemory[offset], &value, sizeof(int64));
 					}
@@ -874,7 +870,7 @@ namespace lemon
 				{
 					Variable* variable = mProgram->getGlobalVariables()[i];
 					serializer.write(variable->getName().getString());
-					const size_t offset = variable->getStaticMemoryOffset();
+					const size_t offset = (variable->getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable*>(variable)->getStaticMemoryOffset() : 0xffffffff;
 					if (offset < mStaticMemory.size())
 						serializer.write(&mStaticMemory[offset], sizeof(int64));
 					else
@@ -893,8 +889,12 @@ namespace lemon
 				{
 					const int64 value = serializer.read<uint64>();
 					RMX_CHECK(i < numGlobals, "Invalid global variable index", continue);
-					const size_t offset = mProgram->getGlobalVariables()[i]->getStaticMemoryOffset();
-					memcpy(&mStaticMemory[offset], &value, sizeof(int64));
+					Variable* variable = mProgram->getGlobalVariables()[i];
+					if (variable->getType() == Variable::Type::GLOBAL)
+					{
+						const size_t offset = static_cast<GlobalVariable*>(variable)->getStaticMemoryOffset();
+						memcpy(&mStaticMemory[offset], &value, sizeof(int64));
+					}
 				}
 				if (numGlobalsSerialized > numGlobals)
 				{
@@ -920,9 +920,11 @@ namespace lemon
 		size_t totalSize = 0;
 		for (size_t index = 0; index < mProgram->getGlobalVariables().size(); ++index)
 		{
-			Variable& variable = *mProgram->getGlobalVariables()[index];
-			if (variable.getType() == Variable::Type::GLOBAL)	// The other variable types don't use static memory size
+			Variable& var = *mProgram->getGlobalVariables()[index];
+			if (var.getType() == Variable::Type::GLOBAL)	// The other variable types don't use static memory size
 			{
+				GlobalVariable& variable = static_cast<GlobalVariable&>(var);
+
 				size_t variableSize = variable.getDataType()->getBytes();
 				variableSize = (variableSize + 7) / 8 * 8;		// Align to multiples of 8 bytes (i.e. int64 size)
 				variable.mStaticMemoryOffset = totalSize;
@@ -935,11 +937,15 @@ namespace lemon
 
 		for (size_t index = 0; index < mProgram->getGlobalVariables().size(); ++index)
 		{
-			Variable& variable = *mProgram->getGlobalVariables()[index];
-			if (variable.getStaticMemorySize() > 0)
+			Variable& var = *mProgram->getGlobalVariables()[index];
+			if (var.getType() == Variable::Type::GLOBAL)
 			{
-				const int64 value = (variable.getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable&>(variable).mInitialValue.get<int64>() : 0;
-				*(int64*)&mStaticMemory[variable.getStaticMemoryOffset()] = value;
+				GlobalVariable& variable = static_cast<GlobalVariable&>(var);
+				if (variable.getStaticMemorySize() > 0)
+				{
+					const int64 value = (variable.getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable&>(variable).mInitialValue.get<int64>() : 0;
+					*(int64*)&mStaticMemory[variable.getStaticMemoryOffset()] = value;
+				}
 			}
 		}
 	}

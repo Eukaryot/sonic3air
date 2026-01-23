@@ -80,9 +80,9 @@ namespace lemon
 		mStringLiterals.clear();
 
 		// Data types
-		for (const CustomDataType* customDataType : mDataTypes)
+		for (const DataTypeDefinition* dataType : mDataTypes)
 		{
-			delete customDataType;
+			delete dataType;
 		}
 		mDataTypes.clear();
 
@@ -438,7 +438,15 @@ namespace lemon
 		mStringLiterals.push_back(str);
 	}
 
-	const CustomDataType* Module::addDataType(const char* name, BaseType baseType)
+	ArrayDataType& Module::addArrayDataType(const DataTypeDefinition& elementType, size_t arraySize)
+	{
+		const uint16 id = mFirstDataTypeID + (uint16)mDataTypes.size();
+		ArrayDataType* arrayDataType = new ArrayDataType(id, elementType, arraySize);
+		mDataTypes.push_back(arrayDataType);
+		return *arrayDataType;
+	}
+
+	const CustomDataType* Module::addCustomDataType(const char* name, BaseType baseType)
 	{
 		const uint16 id = mFirstDataTypeID + (uint16)mDataTypes.size();
 		CustomDataType* customDataType = new CustomDataType(name, id, baseType);

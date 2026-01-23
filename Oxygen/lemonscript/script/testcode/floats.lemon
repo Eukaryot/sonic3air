@@ -2,6 +2,8 @@
 
 function void testFloats()
 {
+	debugLog("\n== Floats ==")
+
 	// Test for floats
 	debugLog(3.)
 	debugLog(.3)

@@ -107,13 +107,14 @@ namespace lemon
 		//  - 0x13 = Source file info with local paths
 		//  - 0x14 = Label address hooks and disabled address hooks
 		//  - 0x15 = Script feature level of module
+		//  - 0x16 = Data type differentiation between arrays and custom types
 
 		static_assert((size_t)Opcode::Type::_NUM_TYPES == 37);	// Otherwise DEFAULT_OPCODE_BASETYPES needs to get updated
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";	// "Lemonscript Module"
-		const uint16 MINIMUM_VERSION = 0x14;
-		uint16 version = 0x15;
+		const uint16 MINIMUM_VERSION = 0x16;
+		uint16 version = 0x16;
 
 		if (outerSerializer.isReading())
 		{
@@ -384,16 +385,50 @@ namespace lemon
 				{
 					FlyweightString name;
 					name.serialize(serializer);
-					const BaseType baseType = (BaseType)serializer.read<uint8>();
-					module.addDataType(name.getString().data(), baseType);
+					const DataTypeDefinition::Class dataTypeClass = (DataTypeDefinition::Class)serializer.read<uint8>();
+					switch (dataTypeClass)
+					{
+						case DataTypeDefinition::Class::ARRAY:
+						{
+							const DataTypeDefinition* elementType = nullptr;
+							globalsLookup.serializeDataType(serializer, elementType);
+							const uint32 arraySize = serializer.read<uint32>();
+							module.addArrayDataType(*elementType, arraySize);
+							break;
+						}
+
+						case DataTypeDefinition::Class::CUSTOM:
+						{
+							const BaseType baseType = (BaseType)serializer.read<uint8>();
+							module.addCustomDataType(name.getString().data(), baseType);
+							break;
+						}
+					}
 				}
 			}
 			else
 			{
-				for (const CustomDataType* dataType : module.mDataTypes)
+				for (const DataTypeDefinition* dataType : module.mDataTypes)
 				{
 					dataType->getName().serialize(serializer);
-					serializer.writeAs<uint8>(dataType->getBaseType());
+					serializer.writeAs<uint8>(dataType->getClass());
+
+					switch (dataType->getClass())
+					{
+						case DataTypeDefinition::Class::ARRAY:
+						{
+							const DataTypeDefinition* elementType = &static_cast<const ArrayDataType*>(dataType)->mElementType;
+							globalsLookup.serializeDataType(serializer, elementType);
+							serializer.writeAs<uint32>(static_cast<const ArrayDataType*>(dataType)->mArraySize);
+							break;
+						}
+
+						case DataTypeDefinition::Class::CUSTOM:
+						{
+							serializer.writeAs<uint8>(dataType->getBaseType());
+							break;
+						}
+					}
 				}
 			}
 		}

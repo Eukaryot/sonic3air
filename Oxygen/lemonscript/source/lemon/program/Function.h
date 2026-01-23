@@ -149,6 +149,7 @@ namespace lemon
 		// Variables
 		std::map<uint64, LocalVariable*> mLocalVariablesByIdentifier;
 		std::vector<LocalVariable*> mLocalVariablesByID;
+		size_t mLocalVariablesMemorySize = 0;
 
 		// Code
 		std::vector<Opcode> mOpcodes;

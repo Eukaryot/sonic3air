@@ -13,6 +13,15 @@
 namespace lemon
 {
 
+	inline DataTypeDefinition::DataTypeDefinition(std::string_view name, uint16 id, Class class_, size_t bytes, BaseType baseType) :
+		mNameString(name),
+		mID(id),
+		mClass(class_),
+		mBytes(bytes),
+		mBaseType(baseType)
+	{
+	}
+
 	FlyweightString DataTypeDefinition::getName() const
 	{
 		if (!mName.isValid())
@@ -33,6 +42,20 @@ namespace lemon
 	uint16 StringDataType::getDataTypeHash() const
 	{
 		return PredefinedDataTypes::UINT_64.getID();
+	}
+
+
+	ArrayDataType::ArrayDataType(uint16 id, const DataTypeDefinition& elementType, size_t arraySize) :
+		DataTypeDefinition(buildArrayDataTypeName(elementType, arraySize).getString(), id, Class::ARRAY, elementType.getBytes() * arraySize, BaseType::UINT_32),
+		mElementType(elementType),
+		mArraySize(arraySize)
+	{
+	}
+
+	FlyweightString ArrayDataType::buildArrayDataTypeName(const DataTypeDefinition& elementType, size_t arraySize)
+	{
+		const std::string str = std::string(elementType.getName().getString()) + '[' + std::to_string(arraySize) + ']';
+		return FlyweightString(str);
 	}
 
 

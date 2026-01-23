@@ -154,9 +154,9 @@ namespace lemon
 		const FlyweightString* resolveStringByKey(uint64 key) const;
 		uint64 addString(std::string_view str);
 
-		AnyBaseValue getGlobalVariableValue(const Variable& variable);
-		void setGlobalVariableValue(const Variable& variable, AnyBaseValue value);
-		int64* accessGlobalVariableValue(const Variable& variable);
+		AnyBaseValue getGlobalVariableValue(const GlobalVariable& variable);
+		void setGlobalVariableValue(const GlobalVariable& variable, AnyBaseValue value);
+		int64* accessGlobalVariableValue(const GlobalVariable& variable);
 
 		inline const ControlFlow& getMainControlFlow() const  { return *mControlFlows[0]; }
 		inline const ControlFlow& getSelectedControlFlow() const  { return *mSelectedControlFlow; }

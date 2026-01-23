@@ -50,15 +50,15 @@ namespace lemon
 		}
 
 		template<typename T>
-		FORCE_INLINE T readLocalVariable(size_t index) const
+		FORCE_INLINE T readLocalVariable(size_t offset) const
 		{
-			return mControlFlow->readLocalVariable<T>(index);
+			return mControlFlow->readLocalVariable<T>(offset);
 		}
 
 		template<typename T>
-		FORCE_INLINE void writeLocalVariable(size_t index, T value) const
+		FORCE_INLINE void writeLocalVariable(size_t offset, T value) const
 		{
-			return mControlFlow->writeLocalVariable(index, value);
+			return mControlFlow->writeLocalVariable(offset, value);
 		}
 	};
 }

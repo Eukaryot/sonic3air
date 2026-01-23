@@ -95,8 +95,9 @@ namespace lemon
 		void addStringLiteral(FlyweightString str);
 
 		// Data types
-		const std::vector<const CustomDataType*>& getDataTypes() const  { return mDataTypes; }
-		const CustomDataType* addDataType(const char* name, BaseType baseType);
+		const std::vector<const DataTypeDefinition*>& getDataTypes() const  { return mDataTypes; }
+		ArrayDataType& addArrayDataType(const DataTypeDefinition& elementType, size_t arraySize);
+		const CustomDataType* addCustomDataType(const char* name, BaseType baseType);
 
 		// Serialization
 		uint32 buildDependencyHash() const;
@@ -157,7 +158,7 @@ namespace lemon
 
 		// Data types
 		uint16 mFirstDataTypeID = 0;
-		std::vector<const CustomDataType*> mDataTypes;
+		std::vector<const DataTypeDefinition*> mDataTypes;
 
 		// Misc
 		uint64 mCompiledCodeHash = 0;

@@ -2,6 +2,8 @@
 
 function void testObjectHandle()
 {
+	debugLog("\n== Object Handle ==")
+
 	ObjectHandle obj
 	obj = makeObjectHandle(99)
 	obj = increaseObjectHandle(obj)

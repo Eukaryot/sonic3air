@@ -112,6 +112,13 @@ namespace lemon
 		variable.mName = name;
 		variable.mDataType = dataType;
 
+		// Set local memory offset and size
+		const size_t variableSize = (dataType->getBytes() + 7) / 8 * 8;		// Align to multiples of 8 bytes (i.e. int64 size)
+		variable.mLocalMemoryOffset = mLocalVariablesMemorySize;
+		variable.mLocalMemorySize = variableSize;
+		mLocalVariablesMemorySize += variableSize;
+
+		// Register variable
 		mLocalVariablesByIdentifier.emplace(name.getHash(), &variable);
 
 		variable.mID = (uint32)mLocalVariablesByID.size();

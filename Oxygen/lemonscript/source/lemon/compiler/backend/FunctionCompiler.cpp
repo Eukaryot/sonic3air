@@ -100,7 +100,8 @@ namespace lemon
 		mLineNumber = mFunction.mStartLineNumber;
 
 		// Create scope
-		addOpcode(Opcode::Type::MOVE_VAR_STACK, mFunction.mLocalVariablesByID.size());
+		RMX_ASSERT((mFunction.mLocalVariablesMemorySize % 8) == 0, "Expected local variables total size to be a multiple of 8 bytes");
+		addOpcode(Opcode::Type::MOVE_VAR_STACK, mFunction.mLocalVariablesMemorySize / 8);
 
 		// Go through parameters in reverse order
 		for (int index = (int)mFunction.getParameters().size() - 1; index >= 0; --index)
@@ -297,11 +298,11 @@ namespace lemon
 			case Node::Type::BLOCK:
 			{
 				const BlockNode& blockNode = node.as<BlockNode>();
-				// TODO: Get correct number of local variables in this scope
-				const int numVariables = 0;
-				scopeBegin(numVariables);
+				// TODO: Get correct size of local variables in this scope
+				const int memorySize = 0;
+				scopeBegin(memorySize);
 				buildOpcodesFromNodes(blockNode, context);
-				scopeEnd(numVariables);
+				scopeEnd(memorySize);
 				break;
 			}
 
@@ -339,7 +340,7 @@ namespace lemon
 				{
 					addJumpToLabel(Opcode::Type::JUMP_SWITCH, *labelToken);
 				}
-				addOpcode(Opcode::Type::MOVE_VAR_STACK, -1);	// Consume top of stack if none of the jumps did
+				addOpcode(Opcode::Type::MOVE_VAR_STACK, -1);	// Consume top of stack if none of the jumps did -- TODO: Isn't this meant to be MOVE_STACK (via "addMoveStackOpcode") instead?
 				break;
 			}
 
@@ -1088,19 +1089,19 @@ namespace lemon
 		addOpcode(opcodeType, leftToken->mDataType);
 	}
 
-	void FunctionCompiler::scopeBegin(int numVariables)
+	void FunctionCompiler::scopeBegin(int memoryToReserve)
 	{
-		if (numVariables > 0)
+		if (memoryToReserve > 0)
 		{
-			addOpcode(Opcode::Type::MOVE_VAR_STACK, numVariables);
+			addOpcode(Opcode::Type::MOVE_VAR_STACK, memoryToReserve);
 		}
 	}
 
-	void FunctionCompiler::scopeEnd(int numVariables)
+	void FunctionCompiler::scopeEnd(int memoryToFree)
 	{
-		if (numVariables > 0)
+		if (memoryToFree > 0)
 		{
-			addOpcode(Opcode::Type::MOVE_VAR_STACK, -numVariables);
+			addOpcode(Opcode::Type::MOVE_VAR_STACK, -memoryToFree);
 		}
 	}
 

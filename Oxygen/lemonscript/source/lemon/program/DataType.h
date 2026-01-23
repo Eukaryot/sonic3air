@@ -26,25 +26,20 @@ namespace lemon
 			INTEGER,
 			FLOAT,
 			STRING,
+			ARRAY,
 			CUSTOM
 		};
 
 		struct BracketOperator
 		{
-			Function* mGetter = 0;		// Function signature: (uint32 variableID, parameterType parameter) -> valueType
-			Function* mSetter = 0;		// Function signature: (valueType value, uint32 variableID, parameterType parameter) -> void
+			const Function* mGetter = 0;		// Function signature: (uint32 variableID, parameterType parameter) -> valueType
+			const Function* mSetter = 0;		// Function signature: (valueType value, uint32 variableID, parameterType parameter) -> void
 			const DataTypeDefinition* mValueType = nullptr;
 			const DataTypeDefinition* mParameterType = nullptr;
 		};
 
 	public:
-		inline DataTypeDefinition(const char* name, uint16 id, Class class_, size_t bytes, BaseType baseType) :
-			mNameString(name),
-			mID(id),
-			mClass(class_),
-			mBytes(bytes),
-			mBaseType(baseType)
-		{}
+		inline DataTypeDefinition(std::string_view name, uint16 id, Class class_, size_t bytes, BaseType baseType);
 		virtual ~DataTypeDefinition() {}
 
 		template<typename T> const T& as() const  { return static_cast<const T&>(*this); }
@@ -61,13 +56,14 @@ namespace lemon
 
 		virtual uint16 getDataTypeHash() const  { return mID; }
 
-		inline const BracketOperator& getBracketOperator() const	{ return mBracketOperator; }
+		inline BracketOperator& getBracketOperator()			  { return mBracketOperator; }
+		inline const BracketOperator& getBracketOperator() const  { return mBracketOperator; }
 
 	protected:
 		BracketOperator mBracketOperator;
 
 	private:
-		const char* mNameString;
+		std::string_view mNameString;
 		mutable FlyweightString mName;
 
 		uint16 mID = 0;
@@ -135,6 +131,18 @@ namespace lemon
 
 		// Rather unfortunately, the data type hash for string needs to be the same as for u64, for feature level 1 compatibility regarding function overloading
 		uint16 getDataTypeHash() const override;
+	};
+
+
+	struct ArrayDataType : public DataTypeDefinition
+	{
+	public:
+		ArrayDataType(uint16 id, const DataTypeDefinition& elementType, size_t arraySize);
+
+		static FlyweightString buildArrayDataTypeName(const DataTypeDefinition& elementType, size_t arraySize);
+
+		const DataTypeDefinition& mElementType;
+		size_t mArraySize;
 	};
 
 

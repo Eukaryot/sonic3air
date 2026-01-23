@@ -262,14 +262,34 @@ namespace lemon
 							const FlyweightString identifier = tokens[offset].as<IdentifierToken>().mName;
 							++offset;
 
-							// Create global variable
-							GlobalVariable& variable = mModule.addGlobalVariable(identifier, dataType);
-							mGlobalsLookup.registerGlobalVariable(variable);
-
-							if (offset+2 <= tokens.size() && isOperator(tokens[offset], Operator::ASSIGN))
+							// Check for array definition
+							if (offset+3 <= tokens.size() && isOperator(tokens[offset], Operator::BRACKET_LEFT) &&
+								tokens[offset+1].isA<ConstantToken>() && isOperator(tokens[offset+2], Operator::BRACKET_RIGHT))
 							{
-								++offset;
-								variable.mInitialValue = readConstantExpression(tokens, offset, tokens.size(), dataType, lineNumber);
+								CHECK_ERROR(tokens[offset+1].as<ConstantToken>().mDataType == &PredefinedDataTypes::CONST_INT, "Expected an integer as array size", lineNumber);
+								const int arraySize = tokens[offset+1].as<ConstantToken>().mValue.get<int32>();
+								CHECK_ERROR(arraySize >= 1, "Invalid array size of " << arraySize, lineNumber);
+								CHECK_ERROR(arraySize <= 0x10000, "Too large array size of " << arraySize, lineNumber);
+								CHECK_ERROR(offset+3 == tokens.size(), "Syntax error after array definition", lineNumber);
+
+								// Get or create array data type
+								const DataTypeDefinition& arrayDataType = mTokenProcessing.getArrayDataType(*dataType, arraySize);
+
+								// Create global variable
+								GlobalVariable& variable = mModule.addGlobalVariable(identifier, &arrayDataType);
+								mGlobalsLookup.registerGlobalVariable(variable);
+							}
+							else
+							{
+								// Create global variable
+								GlobalVariable& variable = mModule.addGlobalVariable(identifier, dataType);
+								mGlobalsLookup.registerGlobalVariable(variable);
+
+								if (offset+2 <= tokens.size() && isOperator(tokens[offset], Operator::ASSIGN))
+								{
+									++offset;
+									variable.mInitialValue = readConstantExpression(tokens, offset, tokens.size(), dataType, lineNumber);
+								}
 							}
 							break;
 						}

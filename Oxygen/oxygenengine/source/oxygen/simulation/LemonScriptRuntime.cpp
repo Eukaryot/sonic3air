@@ -320,9 +320,9 @@ lemon::AnyBaseValue LemonScriptRuntime::getGlobalVariableValue(lemon::FlyweightS
 {
 	lemon::AnyBaseValue outValue;
 	lemon::Variable* variable = mProgram.getGlobalVariableByHash(variableName.getHash());
-	if (nullptr != variable)
+	if (nullptr != variable && variable->getType() == lemon::Variable::Type::GLOBAL)
 	{
-		const lemon::AnyBaseValue inValue = mInternal.mRuntime.getGlobalVariableValue(*variable);
+		const lemon::AnyBaseValue inValue = mInternal.mRuntime.getGlobalVariableValue(*static_cast<lemon::GlobalVariable*>(variable));
 		lemon::CompileOptions compileOptions;
 		compileOptions.mScriptFeatureLevel = getCurrentExecutionScriptFeatureLevel();
 		const lemon::TypeCasting::CastHandling castHandling = lemon::TypeCasting(compileOptions).castBaseValue(inValue, variable->getDataType(), outValue, dataType, true);
@@ -335,7 +335,7 @@ lemon::AnyBaseValue LemonScriptRuntime::getGlobalVariableValue(lemon::FlyweightS
 void LemonScriptRuntime::setGlobalVariableValue(lemon::FlyweightString variableName, lemon::AnyBaseValue value, const lemon::DataTypeDefinition* dataType)
 {
 	lemon::Variable* variable = mProgram.getGlobalVariableByHash(variableName.getHash());
-	if (nullptr != variable)
+	if (nullptr != variable && variable->getType() == lemon::Variable::Type::GLOBAL)
 	{
 		lemon::AnyBaseValue valueToSet;
 		lemon::CompileOptions compileOptions;
@@ -343,7 +343,7 @@ void LemonScriptRuntime::setGlobalVariableValue(lemon::FlyweightString variableN
 		const lemon::TypeCasting::CastHandling castHandling = lemon::TypeCasting(compileOptions).castBaseValue(value, dataType, valueToSet, variable->getDataType(), true);
 		if (castHandling.mResult == lemon::TypeCasting::CastHandling::Result::INVALID)
 			valueToSet.reset();
-		mInternal.mRuntime.setGlobalVariableValue(*variable, valueToSet);
+		mInternal.mRuntime.setGlobalVariableValue(*static_cast<lemon::GlobalVariable*>(variable), valueToSet);
 	}
 }
 

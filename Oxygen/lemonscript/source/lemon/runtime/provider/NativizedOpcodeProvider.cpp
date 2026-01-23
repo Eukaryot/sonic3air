@@ -22,7 +22,7 @@ namespace lemon
 		(*buildFunction)(mLookupDictionary);
 	}
 
-	bool NativizedOpcodeProvider::buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime)
+	bool NativizedOpcodeProvider::buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime, const ScriptFunction& function)
 	{
 		if (mLookupDictionary.mEntries.empty() || numOpcodesAvailable < (int)Nativizer::MIN_OPCODES)
 			return false;
@@ -89,10 +89,19 @@ namespace lemon
 							break;
 						}
 
+						case Nativizer::LookupEntry::ParameterInfo::Semantics::LOCAL_VARIABLE:
+						{
+							const uint32 variableId = (uint32)opcode.mParameter;
+							const LocalVariable& variable = function.getLocalVariableByID(variableId);
+							runtimeOpcode.setParameter(variable.getLocalMemoryOffset(), parameter.mOffset);
+							break;
+						}
+
 						case Nativizer::LookupEntry::ParameterInfo::Semantics::GLOBAL_VARIABLE:
 						{
 							const uint32 variableId = (uint32)opcode.mParameter;
-							int64* valuePointer = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
+							const GlobalVariable& variable = static_cast<GlobalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
+							int64* valuePointer = const_cast<Runtime&>(runtime).accessGlobalVariableValue(variable);
 							runtimeOpcode.setParameter(valuePointer, parameter.mOffset);
 							break;
 						}

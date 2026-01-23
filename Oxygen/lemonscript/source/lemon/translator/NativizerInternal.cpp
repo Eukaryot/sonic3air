@@ -510,14 +510,19 @@ namespace lemon
 							size_t parameterOffset;
 							switch (type)
 							{
-								case Variable::Type::EXTERNAL:
+								case Variable::Type::LOCAL:
 								{
-									parameterOffset = mParameters.add(opcodeIndex, 8, ParameterInfo::Semantics::EXTERNAL_VARIABLE, opcode.mDataType);
+									parameterOffset = mParameters.add(opcodeIndex, 4, ParameterInfo::Semantics::LOCAL_VARIABLE);
 									break;
 								}
 								case Variable::Type::GLOBAL:
 								{
 									parameterOffset = mParameters.add(opcodeIndex, 8, ParameterInfo::Semantics::GLOBAL_VARIABLE);
+									break;
+								}
+								case Variable::Type::EXTERNAL:
+								{
+									parameterOffset = mParameters.add(opcodeIndex, 8, ParameterInfo::Semantics::EXTERNAL_VARIABLE, opcode.mDataType);
 									break;
 								}
 								default:

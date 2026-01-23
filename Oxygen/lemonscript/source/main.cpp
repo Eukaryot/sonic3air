@@ -344,7 +344,7 @@ int main(int argc, char** argv)
 	module.addNativeFunction("sayHello", wrap(instance, &SomeClass::sayHello));
 	module.addNativeFunction("incTen", wrap(instance, &SomeClass::incTen));
 
-	ObjectHandleWrapper::mObjectHandleDataType = module.addDataType("ObjectHandle", BaseType::UINT_32);
+	ObjectHandleWrapper::mObjectHandleDataType = module.addCustomDataType("ObjectHandle", BaseType::UINT_32);
 	module.addNativeFunction("makeObjectHandle", wrap(&makeObjectHandle));
 	module.addNativeFunction("increaseObjectHandle", wrap(&increaseObjectHandle));
 	module.addNativeMethod("ObjectHandle", "increase", wrap(&increaseObjectHandle));
