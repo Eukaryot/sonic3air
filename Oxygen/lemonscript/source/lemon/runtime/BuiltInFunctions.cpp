@@ -58,16 +58,16 @@ namespace lemon
 
 		size_t getArraySize(Variable& var)
 		{
-			RMX_ASSERT(var.getDataType()->getClass() == DataTypeDefinition::Class::ARRAY, "Array data type is not an array");
-			const ArrayDataType& arrayDataType = *static_cast<const ArrayDataType*>(var.getDataType());
+			RMX_ASSERT(var.getDataType()->isA<ArrayDataType>(), "Array data type is not an array");
+			const ArrayDataType& arrayDataType = var.getDataType()->as<ArrayDataType>();
 			return arrayDataType.mArraySize;
 		}
 
 		template<typename T>
 		bool isValidArrayIndex(Variable& var, uint32 index)
 		{
-			RMX_ASSERT(var.getDataType()->getClass() == DataTypeDefinition::Class::ARRAY, "Array data type is not an array");
-			const ArrayDataType& arrayDataType = *static_cast<const ArrayDataType*>(var.getDataType());
+			RMX_ASSERT(var.getDataType()->isA<ArrayDataType>(), "Array data type is not an array");
+			const ArrayDataType& arrayDataType = var.getDataType()->as<ArrayDataType>();
 			RMX_ASSERT(arrayDataType.mElementType.getBytes() == sizeof(T), "Type mismatch for array");
 			return (index < arrayDataType.mArraySize);
 		}

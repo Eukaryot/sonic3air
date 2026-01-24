@@ -41,7 +41,9 @@ namespace lemon
 		DataTypeDefinition(std::string_view name, uint16 id, Class class_, size_t bytes, BaseType baseType);
 		virtual ~DataTypeDefinition() {}
 
-		template<typename T> const T& as() const  { return static_cast<const T&>(*this); }
+		template<typename T> bool isA() const		{ return getClass() == T::CLASS; }
+		template<typename T> const T& as() const	{ return static_cast<const T&>(*this); }
+		template<typename T> const T* cast() const	{ return isA<T>() ? static_cast<const T*>(*this) : nullptr; }
 
 		FlyweightString getName() const;
 		inline uint16 getID() const			 { return mID; }
@@ -79,6 +81,9 @@ namespace lemon
 	struct VoidDataType : public DataTypeDefinition
 	{
 	public:
+		static const Class CLASS = Class::VOID;
+
+	public:
 		VoidDataType();
 	};
 
@@ -86,12 +91,18 @@ namespace lemon
 	struct AnyDataType : public DataTypeDefinition
 	{
 	public:
+		static const Class CLASS = Class::ANY;
+
+	public:
 		AnyDataType();
 	};
 
 
 	struct IntegerDataType : public DataTypeDefinition
 	{
+	public:
+		static const Class CLASS = Class::INTEGER;
+
 	public:
 		enum class Semantics
 		{
@@ -112,12 +123,18 @@ namespace lemon
 	struct FloatDataType : public DataTypeDefinition
 	{
 	public:
+		static const Class CLASS = Class::FLOAT;
+
+	public:
 		FloatDataType(const char* name, uint16 id, size_t bytes);
 	};
 
 
 	struct StringDataType : public DataTypeDefinition
 	{
+	public:
+		static const Class CLASS = Class::STRING;
+
 	public:
 		explicit StringDataType(uint16 id);
 
@@ -128,6 +145,9 @@ namespace lemon
 
 	struct ArrayDataType : public DataTypeDefinition
 	{
+	public:
+		static const Class CLASS = Class::ARRAY;
+
 	public:
 		ArrayDataType(uint16 id, const DataTypeDefinition& elementType, size_t arraySize);
 
@@ -142,6 +162,9 @@ namespace lemon
 
 	struct CustomDataType : public DataTypeDefinition
 	{
+	public:
+		static const Class CLASS = Class::CUSTOM;
+
 	public:
 		explicit CustomDataType(const char* name, uint16 id, BaseType baseType);
 	};

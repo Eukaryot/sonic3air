@@ -219,7 +219,7 @@ bool LemonScriptRuntime::callAddressHook(uint32 address)
 			{
 				case lemon::Function::Type::SCRIPT:
 				{
-					const lemon::RuntimeFunction* runtimeFunction = mInternal.mRuntime.getRuntimeFunction(*static_cast<const lemon::ScriptFunction*>(function));
+					const lemon::RuntimeFunction* runtimeFunction = mInternal.mRuntime.getRuntimeFunction(function->as<lemon::ScriptFunction>());
 					if (nullptr != runtimeFunction)
 					{
 						mInternal.mRuntime.callRuntimeFunction(*runtimeFunction);

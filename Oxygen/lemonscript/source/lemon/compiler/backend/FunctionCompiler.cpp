@@ -146,7 +146,7 @@ namespace lemon
 		// Make sure it ends with a return in any case
 		if (mOpcodes.empty() || mOpcodes.back().mType != Opcode::Type::RETURN)
 		{
-			CHECK_ERROR(mFunction.getReturnType()->getClass() == DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->getName() << " value", blockNode.getLineNumber());
+			CHECK_ERROR(mFunction.getReturnType()->isA<VoidDataType>(), "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->getName() << " value", blockNode.getLineNumber());
 			addOpcode(Opcode::Type::RETURN);
 		}
 		else
@@ -202,7 +202,7 @@ namespace lemon
 	Opcode& FunctionCompiler::addOpcode(Opcode::Type type, const DataTypeDefinition* dataType, int64 parameter)
 	{
 		BaseType baseType = dataType->getBaseType();
-		if (dataType->getClass() == DataTypeDefinition::Class::INTEGER && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::BOOLEAN)
+		if (dataType->isA<IntegerDataType>() && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::BOOLEAN)
 		{
 			baseType = BaseType::BOOL;
 		}
@@ -367,13 +367,13 @@ namespace lemon
 				const ReturnNode& returnNode = node.as<ReturnNode>();
 				if (returnNode.mStatementToken.valid())
 				{
-					CHECK_ERROR(mFunction.getReturnType()->getClass() != DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' with 'void' return type cannot return a value", node.getLineNumber());
+					CHECK_ERROR(!mFunction.getReturnType()->isA<VoidDataType>(), "Function '" << mFunction.getName() << "' with 'void' return type cannot return a value", node.getLineNumber());
 					compileTokenTreeToOpcodes(*returnNode.mStatementToken);
 					addCastOpcodeIfNecessary(returnNode.mStatementToken->mDataType, mFunction.getReturnType());
 				}
 				else
 				{
-					CHECK_ERROR(mFunction.getReturnType()->getClass() == DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->getName() << " value", node.getLineNumber());
+					CHECK_ERROR(mFunction.getReturnType()->isA<VoidDataType>(), "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->getName() << " value", node.getLineNumber());
 				}
 				addOpcode(Opcode::Type::RETURN);
 				break;
@@ -743,7 +743,7 @@ namespace lemon
 			case VariableToken::TYPE:
 			{
 				const VariableToken& vt = token.as<VariableToken>();
-				if (vt.mDataType->getClass() == DataTypeDefinition::Class::ARRAY)
+				if (vt.mDataType->isA<ArrayDataType>())
 				{
 					// Push variable ID
 					addOpcode(Opcode::Type::PUSH_CONSTANT, vt.mVariable->getID());
@@ -850,7 +850,7 @@ namespace lemon
 				CHECK_ERROR(false, "Token type should be eliminated by now", mLineNumber);
 		}
 
-		if (consumeResult && token.mDataType->getClass() != DataTypeDefinition::Class::VOID)
+		if (consumeResult && !token.mDataType->isA<VoidDataType>())
 		{
 			const int sizeOnStack = (int)token.mDataType->getSizeOnStack();
 			RMX_ASSERT(sizeOnStack != 0, "Invalid stack size of type " << token.mDataType->getName().getString());

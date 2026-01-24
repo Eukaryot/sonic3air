@@ -665,7 +665,7 @@ namespace
 		lemon::AnyTypeWrapper wrapper;
 		wrapper.readFromStack(controlFlow);
 
-		if (decimal && wrapper.mType->getClass() == lemon::DataTypeDefinition::Class::INTEGER)
+		if (decimal && wrapper.mType->isA<lemon::IntegerDataType>())
 		{
 			const std::string valueString = *String(0, "%d", wrapper.mValue.get<int64>());
 			debugLogInternal(valueString);

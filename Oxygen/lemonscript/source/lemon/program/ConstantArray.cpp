@@ -44,7 +44,7 @@ namespace lemon
 		serializer.serializeArraySize(mData);
 		if (serializer.isReading())
 		{
-			if (mElementDataType->getClass() == DataTypeDefinition::Class::FLOAT)
+			if (mElementDataType->isA<FloatDataType>())
 			{
 				switch (mElementDataType->getBytes())
 				{
@@ -95,7 +95,7 @@ namespace lemon
 		}
 		else
 		{
-			if (mElementDataType->getClass() == DataTypeDefinition::Class::FLOAT)
+			if (mElementDataType->isA<FloatDataType>())
 			{
 				switch (mElementDataType->getBytes())
 				{

@@ -145,7 +145,7 @@ protected:
 			mCodeExec.showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(callTarget, 16) + ").");
 			return false;
 		}
-		if (func->getType() == lemon::Function::Type::SCRIPT)
+		if (func->isA<lemon::ScriptFunction>())
 		{
 			CodeExec::CallFrame& callFrame = mCodeExec.mActiveCallFrameTracking->pushCallFrame(CodeExec::CallFrame::Type::SCRIPT_DIRECT);
 			callFrame.mFunction = func;

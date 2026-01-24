@@ -61,11 +61,11 @@ namespace lemon
 
 	void CppWriter::addDataType(String& line, const DataTypeDefinition* dataType)
 	{
-		if (dataType->getClass() == DataTypeDefinition::Class::VOID)
+		if (dataType->isA<VoidDataType>())
 		{
 			line << "void";
 		}
-		else if (dataType->getClass() == DataTypeDefinition::Class::INTEGER)
+		else if (dataType->isA<IntegerDataType>())
 		{
 			const IntegerDataType& integerType = dataType->as<IntegerDataType>();
 			if (integerType.mSemantics == IntegerDataType::Semantics::BOOLEAN)

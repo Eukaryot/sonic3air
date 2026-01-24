@@ -43,10 +43,10 @@ namespace lemon
 		// Functions
 		for (Function* func : mFunctions)
 		{
-			if (func->getType() == Function::Type::NATIVE)
-				mNativeFunctionPool.destroyObject(*static_cast<NativeFunction*>(func));
+			if (func->isA<NativeFunction>())
+				mNativeFunctionPool.destroyObject(func->as<NativeFunction>());
 			else
-				mScriptFunctionPool.destroyObject(*static_cast<ScriptFunction*>(func));
+				mScriptFunctionPool.destroyObject(func->as<ScriptFunction>());
 		}
 		mFunctions.clear();
 		mScriptFunctions.clear();

@@ -116,7 +116,7 @@ namespace lemon
 				{
 					// String argument
 					const FlyweightString* argStoredString = nullptr;
-					if (args[0].mType->getClass() == DataTypeDefinition::Class::STRING || args[0].mType->getClass() == DataTypeDefinition::Class::INTEGER)
+					if (args[0].mType->isA<StringDataType>() || args[0].mType->isA<IntegerDataType>())
 					{
 						lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
 						argStoredString = runtime->resolveStringByKey(args[0].mValue.get<uint64>());

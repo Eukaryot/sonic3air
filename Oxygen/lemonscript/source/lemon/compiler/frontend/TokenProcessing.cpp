@@ -53,7 +53,7 @@ namespace lemon
 		bool tryReplaceConstantsUnary(const ConstantToken& constRight, Operator op, int64& outValue)
 		{
 			// TODO: Support float/double as well here
-			if (constRight.mDataType->getClass() == DataTypeDefinition::Class::INTEGER)
+			if (constRight.mDataType->isA<IntegerDataType>())
 			{
 				switch (op)
 				{
@@ -70,7 +70,7 @@ namespace lemon
 		{
 			// TODO: Support float/double as well here
 			//  -> And possibly also combinations with integers?
-			if (constLeft.mDataType->getClass() == DataTypeDefinition::Class::INTEGER && constRight.mDataType->getClass() == DataTypeDefinition::Class::INTEGER)
+			if (constLeft.mDataType->isA<IntegerDataType>() && constRight.mDataType->isA<IntegerDataType>())
 			{
 				switch (op)
 				{
@@ -275,8 +275,8 @@ namespace lemon
 			const DataTypeDefinition* existingDataType = mGlobalsLookup.findDataTypeByName(dataTypeNameHash);
 			if (nullptr != existingDataType)
 			{
-				CHECK_ERROR(existingDataType->getClass() == DataTypeDefinition::Class::ARRAY, "There's an existing data type named '" << existingDataType->getName() << "' that is not an array", mLineNumber);
-				arrayDataType = static_cast<const ArrayDataType*>(existingDataType);
+				CHECK_ERROR(existingDataType->isA<ArrayDataType>(), "There's an existing data type named '" << existingDataType->getName() << "' that is not an array", mLineNumber);
+				arrayDataType = &existingDataType->as<ArrayDataType>();
 			}
 		}
 
@@ -563,7 +563,7 @@ namespace lemon
 					Token& nextToken = tokens[offset];
 					if (nextToken.isA<IdentifierToken>())
 					{
-						CHECK_ERROR(varType->getClass() != DataTypeDefinition::Class::VOID, "void variables are not allowed", mLineNumber);
+						CHECK_ERROR(!varType->isA<VoidDataType>(), "void variables are not allowed", mLineNumber);
 
 						const IdentifierToken& identifierToken = tokens[offset].as<IdentifierToken>();
 						CHECK_ERROR(nullptr == findLocalVariable(identifierToken.mName.getHash()), "Local variable name '" << identifierToken.mName.getString() << "' already used", mLineNumber);
@@ -605,7 +605,7 @@ namespace lemon
 							//  -> A better solution would be to allow multiple local variables with the same name; we already made sure that their scopes don't overlap
 							if (nullptr != variable)
 							{
-								CHECK_ERROR(variable->getDataType()->getClass() != DataTypeDefinition::Class::ARRAY, "Local variable name '" << identifierToken.mName.getString() << "' already used", mLineNumber);
+								CHECK_ERROR(!variable->getDataType()->isA<ArrayDataType>(), "Local variable name '" << identifierToken.mName.getString() << "' already used", mLineNumber);
 							}
 							else
 							{
@@ -863,7 +863,7 @@ namespace lemon
 				CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
 
 				const DataTypeDefinition* dataType = tokens[i].as<VarTypeToken>().mDataType;
-				CHECK_ERROR(dataType->getClass() == DataTypeDefinition::Class::INTEGER && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::DEFAULT, "Memory access is only possible using basic integer types, but not '" << dataType->getName() << "'", mLineNumber);
+				CHECK_ERROR(dataType->isA<IntegerDataType>() && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::DEFAULT, "Memory access is only possible using basic integer types, but not '" << dataType->getName() << "'", mLineNumber);
 
 				MemoryAccessToken& token = tokens.createReplaceAt<MemoryAccessToken>(i);
 				token.mDataType = dataType;
@@ -1238,7 +1238,7 @@ namespace lemon
 				if (allConstant)
 				{
 					// Compile-time evaluation of native functions that support it
-					if (ft.mFunction->getType() == Function::Type::NATIVE && ft.mFunction->hasFlag(Function::Flag::COMPILE_TIME_CONSTANT))
+					if (ft.mFunction->isA<NativeFunction>() && ft.mFunction->hasFlag(Function::Flag::COMPILE_TIME_CONSTANT))
 					{
 						RMX_CHECK(ft.mParameters.size() == ft.mFunction->getParameters().size(), "Different number of parameters", );
 						static Runtime emptyRuntime;
@@ -1251,7 +1251,7 @@ namespace lemon
 							castCompileTimeConstant(constantToken, parameter.mDataType);
 							controlFlow.pushValueStack(constantToken.mValue);
 						}
-						static_cast<const NativeFunction*>(ft.mFunction)->mFunctionWrapper->execute(NativeFunction::Context(controlFlow));
+						ft.mFunction->as<NativeFunction>().mFunctionWrapper->execute(NativeFunction::Context(controlFlow));
 
 						// Get return value from the stack and write it as constant
 						const DataTypeDefinition* dataType = ft.mDataType;	// Backup in case outTokenPtr is pointing to inputToken
@@ -1323,9 +1323,9 @@ namespace lemon
 					uint32 address = 0;
 					for (const FunctionReference& function : candidateFunctions)
 					{
-						if (function.mFunction->getType() == Function::Type::SCRIPT)
+						if (function.mFunction->isA<ScriptFunction>())
 						{
-							const std::vector<ScriptFunction::AddressHook>& addressHooks = static_cast<const ScriptFunction*>(function.mFunction)->getAddressHooks();
+							const std::vector<ScriptFunction::AddressHook>& addressHooks = function.mFunction->as<ScriptFunction>().getAddressHooks();
 							if (!addressHooks.empty())
 							{
 								address = addressHooks[0].mAddress;
@@ -1469,9 +1469,9 @@ namespace lemon
 		{
 			case ConstantToken::TYPE:
 			{
-				if (token.mDataType->getClass() == DataTypeDefinition::Class::INTEGER)
+				if (token.mDataType->isA<IntegerDataType>())
 				{
-					if (nullptr != resultType && resultType->getClass() == DataTypeDefinition::Class::INTEGER)
+					if (nullptr != resultType && resultType->isA<IntegerDataType>())
 					{
 						// Let the constant use the result data type
 						token.mDataType = resultType;

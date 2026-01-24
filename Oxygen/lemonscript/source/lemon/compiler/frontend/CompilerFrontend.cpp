@@ -160,8 +160,8 @@ namespace lemon
 							const ConstantParserToken& input = parserToken.as<ConstantParserToken>();
 							ConstantToken& constantToken = node.mTokenList.createBack<ConstantToken>();
 							constantToken.mValue = input.mValue;
-							constantToken.mDataType = (input.mBaseType == BaseType::FLOAT)  ? static_cast<const DataTypeDefinition*>(&PredefinedDataTypes::FLOAT) :
-													  (input.mBaseType == BaseType::DOUBLE) ? static_cast<const DataTypeDefinition*>(&PredefinedDataTypes::DOUBLE) : static_cast<const DataTypeDefinition*>(&PredefinedDataTypes::CONST_INT);
+							constantToken.mDataType = (input.mBaseType == BaseType::FLOAT)  ? &PredefinedDataTypes::FLOAT.as<DataTypeDefinition>() :
+													  (input.mBaseType == BaseType::DOUBLE) ? &PredefinedDataTypes::DOUBLE.as<DataTypeDefinition>() : &PredefinedDataTypes::CONST_INT.as<DataTypeDefinition>();
 							break;
 						}
 
@@ -1200,7 +1200,7 @@ namespace lemon
 		}
 
 		// For integers, check if data gets lost by the cast
-		if (constantDataType->getClass() == DataTypeDefinition::Class::INTEGER && dataType->getClass() == DataTypeDefinition::Class::INTEGER)
+		if (constantDataType->isA<IntegerDataType>() && dataType->isA<IntegerDataType>())
 		{
 			if (!DataTypeHelper::isInsideIntegerRange(constantValue.get<int64>(), dataType->as<IntegerDataType>()))
 				CHECK_ERROR(false, "Constant " << constantValue.get<int64>() << " (" << rmx::hexString(constantValue.get<int64>()) << ") can't fit into data type " << dataType->getName().getString() << ", data would get lost", lineNumber);

@@ -171,13 +171,13 @@ namespace lemon
 			}
 		}
 
-		const bool originalIsBaseType = (original->getClass() == DataTypeDefinition::Class::INTEGER || original->getClass() == DataTypeDefinition::Class::FLOAT);
-		const bool targetIsBaseType = (target->getClass() == DataTypeDefinition::Class::INTEGER || target->getClass() == DataTypeDefinition::Class::FLOAT);
+		const bool originalIsBaseType = (original->isA<IntegerDataType>() || original->isA<FloatDataType>());
+		const bool targetIsBaseType = (target->isA<IntegerDataType>() || target->isA<FloatDataType>());
 		if (originalIsBaseType && targetIsBaseType)
 		{
-			if (original->getClass() == DataTypeDefinition::Class::INTEGER)
+			if (original->isA<IntegerDataType>())
 			{
-				if (target->getClass() == DataTypeDefinition::Class::INTEGER)
+				if (target->isA<IntegerDataType>())
 				{
 					// Cast between integers
 					const IntegerDataType& originalInt = original->as<IntegerDataType>();
@@ -239,7 +239,7 @@ namespace lemon
 			}
 			else
 			{
-				if (target->getClass() == DataTypeDefinition::Class::INTEGER)
+				if (target->isA<IntegerDataType>())
 				{
 					// Cast from floating point type to integer
 					//  -> This needs to be done explicitly
@@ -261,13 +261,13 @@ namespace lemon
 			}
 		}
 
-		if (target->getClass() == DataTypeDefinition::Class::ANY)
+		if (target->isA<AnyDataType>())
 		{
 			// Any cast has a very low priority
 			return CastHandling(CastHandling::Result::ANY_CAST, 0xf0);
 		}
 
-		if (original->getClass() == DataTypeDefinition::Class::ARRAY && target == &PredefinedDataTypes::ARRAY_BASE)
+		if (original->isA<ArrayDataType>() && target == &PredefinedDataTypes::ARRAY_BASE)
 		{
 			// Cast from concrete array type to generic array base type
 			return CastHandling(CastHandling::Result::NO_CAST, 0);

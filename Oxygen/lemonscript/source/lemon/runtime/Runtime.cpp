@@ -65,7 +65,7 @@ namespace lemon
 					{
 						const uint64 nameAndSignatureHash = (uint32)opcodes[k].mParameter;
 						const Function* function = program.getFunctionBySignature(nameAndSignatureHash);
-						if (nullptr != function && function->getType() == Function::Type::NATIVE)
+						if (nullptr != function && function->isA<NativeFunction>())
 						{
 							const int programCounter = (int)(k + 1);
 							if (newPC == -1 || std::abs(programCounter - oldPC) < std::abs(newPC - oldPC))
@@ -199,9 +199,9 @@ namespace lemon
 	{
 		for (Function* function : mProgram->getFunctions())
 		{
-			if (function->getType() == Function::Type::SCRIPT)
+			if (function->isA<ScriptFunction>())
 			{
-				getRuntimeFunction(*static_cast<ScriptFunction*>(function));
+				getRuntimeFunction(function->as<ScriptFunction>());
 			}
 		}
 	}
@@ -300,7 +300,7 @@ namespace lemon
 		{
 			case Function::Type::SCRIPT:
 			{
-				const ScriptFunction& func = static_cast<const ScriptFunction&>(function);
+				const ScriptFunction& func = function.as<ScriptFunction>();
 				callRuntimeFunction(*getRuntimeFunction(func));
 				break;
 			}
@@ -308,7 +308,7 @@ namespace lemon
 			case Function::Type::NATIVE:
 			{
 				// Directly execute it
-				const NativeFunction& func = static_cast<const NativeFunction&>(function);
+				const NativeFunction& func = function.as<NativeFunction>();
 				func.execute(NativeFunction::Context(*mSelectedControlFlow));
 				break;
 			}
@@ -317,10 +317,10 @@ namespace lemon
 
 	bool Runtime::callFunctionAtLabel(const Function& function, FlyweightString labelName)
 	{
-		if (function.getType() != Function::Type::SCRIPT)
+		if (!function.isA<ScriptFunction>())
 			return false;
 
-		const ScriptFunction& func = static_cast<const ScriptFunction&>(function);
+		const ScriptFunction& func = function.as<ScriptFunction>();
 		const ScriptFunction::Label* label = func.findLabelByName(labelName);
 		if (nullptr == label)
 			return false;
@@ -376,7 +376,7 @@ namespace lemon
 
 		// Build the function signature hash
 		uint32 signatureHash = Function::getVoidSignatureHash();
-		if (returnType.getClass() != DataTypeDefinition::Class::VOID || !params.mParams.empty())
+		if (!returnType.isA<VoidDataType>() || !params.mParams.empty())
 		{
 			Function::SignatureBuilder builder;
 			builder.clear(returnType);
@@ -766,6 +766,7 @@ namespace lemon
 					const uint64 nameHash = rmx::getMurmur2_64(functionName);
 					uint32 signatureHash = serializer.read<uint32>();
 					const Function* function = mProgram->getFunctionBySignature(nameHash + signatureHash, 0);	// Note that this does not support function overloading, but maybe that's no problem at all
+
 				#if 1
 					// This is only added (in early 2022) for compatibility with older save states and can be removed again somewhere down the line
 					if (nullptr == function && signatureHash == 0xd202ef8d)		// Signature hash for void functions has changed
@@ -774,14 +775,16 @@ namespace lemon
 						function = mProgram->getFunctionBySignature(nameHash + signatureHash, 0);	// Note that this does not support function overloading, but maybe that's no problem at all
 					}
 				#endif
-					if (nullptr == function || function->getType() != Function::Type::SCRIPT)
+
+					if (nullptr == function || !function->isA<ScriptFunction>())
 					{
 						if (nullptr != outError)
 							*outError = "Could not match function signature for script function of name '" + std::string(functionName) + "'";
 						controlFlow.mCallStack.clear();
 						return false;
 					}
-					RuntimeFunction* runtimeFunction = getRuntimeFunction(static_cast<const ScriptFunction&>(*function));
+
+					RuntimeFunction* runtimeFunction = getRuntimeFunction(function->as<ScriptFunction>());
 					controlFlow.mCallStack[i].mRuntimeFunction = runtimeFunction;
 					controlFlow.mCallStack[i].mProgramCounter = runtimeFunction->translateToRuntimeProgramCounter(serializer.read<uint32>());
 

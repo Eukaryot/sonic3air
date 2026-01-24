@@ -258,9 +258,9 @@ void LemonScriptProgram::resolveLocation(ResolvedLocation& outResolvedLocation, 
 
 void LemonScriptProgram::resolveLocation(ResolvedLocation& outResolvedLocation, const lemon::Function& function, uint32 programCounter)
 {
-	if (function.getType() == lemon::Function::Type::SCRIPT)
+	if (function.isA<lemon::ScriptFunction>())
 	{
-		const lemon::ScriptFunction& scriptFunc = static_cast<const lemon::ScriptFunction&>(function);
+		const lemon::ScriptFunction& scriptFunc = function.as<lemon::ScriptFunction>();
 		if (programCounter < scriptFunc.mOpcodes.size())
 		{
 			outResolvedLocation.mSourceFileInfo = scriptFunc.mSourceFileInfo;
@@ -591,7 +591,7 @@ void LemonScriptProgram::evaluateDefines()
 			{
 				const uint32 address = (uint32)tokens[2].as<lemon::ConstantToken>().mValue.get<uint64>();
 				const lemon::DataTypeDefinition& dataType = *tokens[0].as<lemon::VarTypeToken>().mDataType;
-				if (dataType.getClass() == lemon::DataTypeDefinition::Class::INTEGER)
+				if (dataType.isA<lemon::IntegerDataType>())
 				{
 					GlobalDefine& var = vectorAdd(mGlobalDefines);
 					var.mName = define->getName();

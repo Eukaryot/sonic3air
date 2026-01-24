@@ -417,9 +417,9 @@ namespace lemon
 					{
 						case DataTypeDefinition::Class::ARRAY:
 						{
-							const DataTypeDefinition* elementType = &static_cast<const ArrayDataType*>(dataType)->mElementType;
+							const DataTypeDefinition* elementType = &dataType->as<ArrayDataType>().mElementType;
 							globalsLookup.serializeDataType(serializer, elementType);
-							serializer.writeAs<uint32>(static_cast<const ArrayDataType*>(dataType)->mArraySize);
+							serializer.writeAs<uint32>(dataType->as<ArrayDataType>().mArraySize);
 							break;
 						}
 
@@ -612,13 +612,13 @@ namespace lemon
 				const Function& function = *module.mFunctions[i];
 
 				uint8 flags = 0;
-				flags |= FLAG_NATIVE_FUNCTION * (function.getType() == Function::Type::NATIVE);
+				flags |= FLAG_NATIVE_FUNCTION * (function.isA<NativeFunction>());
 				flags |= FLAG_HAS_ALIAS_NAMES * (!function.mAliasNames.empty());
 				flags |= FLAG_HAS_RETURN_TYPE * (function.mReturnType != &PredefinedDataTypes::VOID);
 				flags |= FLAG_HAS_PARAMETERS  * (!function.mParameters.empty());
-				if (function.getType() == Function::Type::SCRIPT)
+				if (function.isA<ScriptFunction>())
 				{
-					const ScriptFunction& scriptFunc = static_cast<const ScriptFunction&>(function);
+					const ScriptFunction& scriptFunc = function.as<ScriptFunction>();
 					flags |= FLAG_HAS_LABELS		* (!scriptFunc.mLabels.empty());
 					flags |= FLAG_HAS_ADDRESS_HOOKS * (!scriptFunc.mAddressHooks.empty());
 					flags |= FLAG_HAS_PRAGMAS		* (!scriptFunc.mPragmas.empty());
@@ -653,10 +653,10 @@ namespace lemon
 					}
 				}
 
-				if (function.getType() == Function::Type::SCRIPT)
+				if (function.isA<ScriptFunction>())
 				{
 					// Load script function
-					const ScriptFunction& scriptFunc = static_cast<const ScriptFunction&>(function);
+					const ScriptFunction& scriptFunc = function.as<ScriptFunction>();
 
 					// Source information
 					serializer.writeAs<uint16>(scriptFunc.mSourceFileInfo->mIndex);

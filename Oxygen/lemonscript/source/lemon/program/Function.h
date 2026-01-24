@@ -70,6 +70,12 @@ namespace lemon
 		inline Type getType() const  { return mType; }
 		inline uint32 getID() const  { return mID; }
 
+		template<typename T> bool isA() const		{ return getType() == T::TYPE; }
+		template<typename T> T& as()				{ return static_cast<T&>(*this); }
+		template<typename T> const T& as() const	{ return static_cast<const T&>(*this); }
+		template<typename T> T* cast()				{ return isA<T>() ? static_cast<T*>(*this) : nullptr; }
+		template<typename T> const T* cast() const	{ return isA<T>() ? static_cast<const T*>(*this) : nullptr; }
+
 		inline BitFlagSet<Flag> getFlags() const  { return mFlags; }
 		inline bool hasFlag(Flag flag) const	  { return mFlags.isSet(flag); }
 
@@ -109,6 +115,9 @@ namespace lemon
 
 	class ScriptFunction : public Function
 	{
+	public:
+		static const Type TYPE = Type::SCRIPT;
+
 	public:
 		struct AddressHook
 		{
@@ -176,6 +185,9 @@ namespace lemon
 
 	class NativeFunction : public Function
 	{
+	public:
+		static const Type TYPE = Type::NATIVE;
+
 	public:
 		struct Context
 		{

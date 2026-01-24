@@ -706,7 +706,7 @@ namespace lemon
 				{
 					// If this is a native function, replace with a runtime opcode that just executes the function without the usual overheads
 					const Function* function = runtime.getProgram().getFunctionBySignature((uint64)opcode.mParameter);
-					if (nullptr != function && function->getType() == Function::Type::NATIVE && function->hasFlag(Function::Flag::ALLOW_INLINE_EXECUTION))
+					if (nullptr != function && function->isA<NativeFunction>() && function->hasFlag(Function::Flag::ALLOW_INLINE_EXECUTION))
 					{
 						runtimeOpcode.mExecFunc = &OpcodeExec::exec_INLINE_NATIVE_CALL;
 						runtimeOpcode.setParameter((uint64)function);
