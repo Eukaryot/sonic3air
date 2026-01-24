@@ -58,12 +58,6 @@ namespace lemon
 			const void* mPointer = nullptr;
 		};
 
-		struct FunctionReference
-		{
-			Function* mFunction = nullptr;
-			bool mIsDeprecated = false;
-		};
-
 	public:
 		GlobalsLookup();
 

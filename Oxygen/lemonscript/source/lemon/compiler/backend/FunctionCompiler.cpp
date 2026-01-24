@@ -743,8 +743,16 @@ namespace lemon
 			case VariableToken::TYPE:
 			{
 				const VariableToken& vt = token.as<VariableToken>();
-				const Opcode::Type opcodeType = isLValue ? Opcode::Type::SET_VARIABLE_VALUE : Opcode::Type::GET_VARIABLE_VALUE;
-				addOpcode(opcodeType, vt.mDataType, vt.mVariable->getID());
+				if (vt.mDataType->getClass() == DataTypeDefinition::Class::ARRAY)
+				{
+					// Push variable ID
+					addOpcode(Opcode::Type::PUSH_CONSTANT, vt.mVariable->getID());
+				}
+				else
+				{
+					const Opcode::Type opcodeType = isLValue ? Opcode::Type::SET_VARIABLE_VALUE : Opcode::Type::GET_VARIABLE_VALUE;
+					addOpcode(opcodeType, vt.mDataType, vt.mVariable->getID());
+				}
 				break;
 			}
 

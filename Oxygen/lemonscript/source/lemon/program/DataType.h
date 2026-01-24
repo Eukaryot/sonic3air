@@ -9,13 +9,12 @@
 #pragma once
 
 #include "lemon/program/BaseType.h"
+#include "lemon/program/FunctionReference.h"
 #include "lemon/utility/FlyweightString.h"
 
 
 namespace lemon
 {
-	class Function;
-
 	struct DataTypeDefinition
 	{
 	public:
@@ -39,7 +38,7 @@ namespace lemon
 		};
 
 	public:
-		inline DataTypeDefinition(std::string_view name, uint16 id, Class class_, size_t bytes, BaseType baseType);
+		DataTypeDefinition(std::string_view name, uint16 id, Class class_, size_t bytes, BaseType baseType);
 		virtual ~DataTypeDefinition() {}
 
 		template<typename T> const T& as() const  { return static_cast<const T&>(*this); }
@@ -59,8 +58,12 @@ namespace lemon
 		inline BracketOperator& getBracketOperator()			  { return mBracketOperator; }
 		inline const BracketOperator& getBracketOperator() const  { return mBracketOperator; }
 
+		const std::vector<FunctionReference>& getMethodsByName(uint64 methodNameHash) const;
+		void addMethod(uint64 nameHash, Function& func);
+
 	protected:
 		BracketOperator mBracketOperator;
+		std::unordered_map<uint64, std::vector<FunctionReference>> mMethodsByName;		// Key is just the hashed function name (without context name)
 
 	private:
 		std::string_view mNameString;
@@ -76,18 +79,14 @@ namespace lemon
 	struct VoidDataType : public DataTypeDefinition
 	{
 	public:
-		inline VoidDataType() :
-			DataTypeDefinition("void", 0, Class::VOID, 0, BaseType::VOID)
-		{}
+		VoidDataType();
 	};
 
 
 	struct AnyDataType : public DataTypeDefinition
 	{
 	public:
-		inline AnyDataType() :
-			DataTypeDefinition("any", 1, Class::ANY, 16, BaseType::UINT_64)
-		{}
+		AnyDataType();
 	};
 
 
@@ -106,21 +105,14 @@ namespace lemon
 		const uint8 mSizeBits = 0;	// 0 for 8-bit data types, 1 for 16-bit, 2 for 32-bit, 3 for 64-bit
 
 	public:
-		inline IntegerDataType(const char* name, uint16 id, size_t bytes, Semantics semantics, bool isSigned, BaseType baseType) :
-			DataTypeDefinition(name, id, Class::INTEGER, bytes, baseType),
-			mSemantics(semantics),
-			mSizeBits((bytes == 1) ? 0 : (bytes == 2) ? 1 : (bytes == 4) ? 2 : 3),
-			mIsSigned(isSigned)
-		{}
+		IntegerDataType(const char* name, uint16 id, size_t bytes, Semantics semantics, bool isSigned, BaseType baseType);
 	};
 
 
 	struct FloatDataType : public DataTypeDefinition
 	{
 	public:
-		inline FloatDataType(const char* name, uint16 id, size_t bytes) :
-			DataTypeDefinition(name, id, Class::FLOAT, bytes, (bytes == 4) ? BaseType::FLOAT : BaseType::DOUBLE)
-		{}
+		FloatDataType(const char* name, uint16 id, size_t bytes);
 	};
 
 
@@ -144,6 +136,8 @@ namespace lemon
 		const DataTypeDefinition& mElementType;
 		size_t mArraySize;
 	};
+
+	struct ArrayBaseWrapper { uint32 mVariableID = 0; };	// TODO: Move this somewhere else
 
 
 	struct CustomDataType : public DataTypeDefinition
@@ -174,6 +168,8 @@ namespace lemon
 		inline static const FloatDataType DOUBLE	  = FloatDataType("double", 12, 8);
 
 		inline static const StringDataType STRING	  = StringDataType(13);
+
+		inline static const CustomDataType ARRAY_BASE = CustomDataType("$array_base", 14, BaseType::INT_32);
 
 	public:
 		static const DataTypeDefinition* getDataTypeDefinitionForBaseType(BaseType baseType);

@@ -129,6 +129,7 @@ namespace lemon
 		CachedBuiltinFunction mBuiltinConstantArrayAccess;
 		CachedBuiltinFunction mBuiltinArrayBracketGetter;
 		CachedBuiltinFunction mBuiltinArrayBracketSetter;
+		CachedBuiltinFunction mBuiltinArrayLength;
 
 		CachedBuiltinFunction mBuiltinStringOperatorPlus;
 		CachedBuiltinFunction mBuiltinStringOperatorPlusInt64;

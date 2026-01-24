@@ -9,10 +9,9 @@ function void testArrays()
 
 	// Global arrays
 	{
-		// Something like this may be implemented later?
-		//debugLog(someGlobalArray.length())
+		debugLog(someGlobalArray.length())
 
-		for (u8 i = 0; i < 10; ++i)
+		for (u8 i = 0; i < 10; ++i)		// Intentionally access invalid indices
 		{
 			someGlobalArray[i] = i
 			someGlobalArray[i] *= i

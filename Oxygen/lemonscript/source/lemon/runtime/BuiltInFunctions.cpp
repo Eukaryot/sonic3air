@@ -56,6 +56,13 @@ namespace lemon
 			return StringRef(constantArrays[id]->getElement(index).get<uint64>());
 		}
 
+		size_t getArraySize(Variable& var)
+		{
+			RMX_ASSERT(var.getDataType()->getClass() == DataTypeDefinition::Class::ARRAY, "Array data type is not an array");
+			const ArrayDataType& arrayDataType = *static_cast<const ArrayDataType*>(var.getDataType());
+			return arrayDataType.mArraySize;
+		}
+
 		template<typename T>
 		bool isValidArrayIndex(Variable& var, uint32 index)
 		{
@@ -153,6 +160,31 @@ namespace lemon
 		void array_bracket_setter(const NativeFunction::Context* context, uint32 variableId, uint32 index, StringRef value)
 		{
 			array_bracket_setter(context, variableId, index, value.getHash());
+		}
+
+		uint32 array_length(const NativeFunction::Context* context, ArrayBaseWrapper array)
+		{
+			const Variable::Type type = (Variable::Type)(array.mVariableID >> 28);
+			switch (type)
+			{
+				case Variable::Type::LOCAL:
+				{
+					LocalVariable& var = context->mControlFlow.getCurrentFunction()->getLocalVariableByID(array.mVariableID);
+					return getArraySize(var);
+				}
+
+				case Variable::Type::GLOBAL:
+				{
+					GlobalVariable& var = static_cast<GlobalVariable&>(context->mControlFlow.getProgram().getGlobalVariableByID(array.mVariableID));
+					return getArraySize(var);
+				}
+
+				default:
+				{
+					RMX_ASSERT(false, "Unsupported type of variable");
+					return 0;
+				}
+			}
 		}
 
 		StringRef string_operator_plus(StringRef str1, StringRef str2)
@@ -265,6 +297,7 @@ namespace lemon
 	BuiltInFunctions::FunctionName BuiltInFunctions::CONSTANT_ARRAY_ACCESS("#builtin_constant_array_access");
 	BuiltInFunctions::FunctionName BuiltInFunctions::ARRAY_BRACKET_GETTER("#builtin_array_bracket_getter");
 	BuiltInFunctions::FunctionName BuiltInFunctions::ARRAY_BRACKET_SETTER("#builtin_array_bracket_setter");
+	BuiltInFunctions::FunctionName BuiltInFunctions::ARRAY_LENGTH("#builtin_array_length");
 
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_PLUS("#builtin_string_operator_plus");
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_PLUS_INT64("#builtin_string_operator_plus_int64");
@@ -317,6 +350,8 @@ namespace lemon
 		module.addNativeFunction(ARRAY_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_setter<float>), defaultFlags);
 		module.addNativeFunction(ARRAY_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_setter<double>), defaultFlags);
 		module.addNativeFunction(ARRAY_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_setter<StringRef>), defaultFlags);
+
+		module.addNativeFunction(ARRAY_LENGTH.makeFlyweightString(), lemon::wrap(&builtins::array_length), defaultFlags);
 
 		module.addNativeFunction(STRING_OPERATOR_PLUS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus), defaultFlags);
 		module.addNativeFunction(STRING_OPERATOR_PLUS_INT64.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus_int64), defaultFlags);

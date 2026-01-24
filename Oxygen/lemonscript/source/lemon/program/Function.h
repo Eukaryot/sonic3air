@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "lemon/program/FunctionReference.h"
 #include "lemon/program/Opcode.h"
 #include "lemon/program/SourceFileInfo.h"
 #include "lemon/program/Variable.h"

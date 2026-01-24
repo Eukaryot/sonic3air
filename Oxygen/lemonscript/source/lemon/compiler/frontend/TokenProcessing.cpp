@@ -93,12 +93,12 @@ namespace lemon
 
 		void fillCachedBuiltInFunction(TokenProcessing::CachedBuiltinFunction& outCached, bool allowMultiple, const GlobalsLookup& globalsLookup, const BuiltInFunctions::FunctionName& functionName)
 		{
-			const std::vector<GlobalsLookup::FunctionReference>& functions = globalsLookup.getFunctionsByName(functionName.mHash);
+			const std::vector<FunctionReference>& functions = globalsLookup.getFunctionsByName(functionName.mHash);
 			RMX_ASSERT(!functions.empty(), "Unable to find built-in function '" << functionName.mName << "'");
 			RMX_ASSERT(allowMultiple || functions.size() == 1, "Multiple definitions for built-in function '" << functionName.mName << "'");
 
 			outCached.mFunctions.clear();
-			for (const GlobalsLookup::FunctionReference& ref : functions)
+			for (const FunctionReference& ref : functions)
 			{
 				outCached.mFunctions.push_back(ref.mFunction);
 			}
@@ -126,6 +126,7 @@ namespace lemon
 		fillCachedBuiltInFunction(mBuiltinConstantArrayAccess,			true,  globalsLookup, BuiltInFunctions::CONSTANT_ARRAY_ACCESS);
 		fillCachedBuiltInFunction(mBuiltinArrayBracketGetter,			true,  globalsLookup, BuiltInFunctions::ARRAY_BRACKET_GETTER);
 		fillCachedBuiltInFunction(mBuiltinArrayBracketSetter,			true,  globalsLookup, BuiltInFunctions::ARRAY_BRACKET_SETTER);
+		fillCachedBuiltInFunction(mBuiltinArrayLength,					false, globalsLookup, BuiltInFunctions::ARRAY_LENGTH);
 
 		fillCachedBuiltInFunction(mBuiltinStringOperatorPlus,			false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS);
 		fillCachedBuiltInFunction(mBuiltinStringOperatorPlusInt64,		false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64);
@@ -292,6 +293,8 @@ namespace lemon
 			bracketOperator.mValueType = &elementType;
 			bracketOperator.mGetter = getter;
 			bracketOperator.mSetter = setter;
+
+			arrayDT.addMethod(rmx::constMurmur2_64("length"), *mBuiltinArrayLength.mFunctions[0]);
 
 			arrayDataType = &arrayDT;
 			mGlobalsLookup.registerDataType(arrayDataType);
@@ -641,7 +644,7 @@ namespace lemon
 				const Function* function = nullptr;
 				const Variable* thisPointerVariable = nullptr;
 
-				const std::vector<GlobalsLookup::FunctionReference>* candidateFunctions = &mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
+				const std::vector<FunctionReference>* candidateFunctions = &mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
 				if (!candidateFunctions->empty())
 				{
 					// Is it a global function
@@ -654,8 +657,8 @@ namespace lemon
 					isBaseCall = true;
 
 					const std::string_view baseName = identifierToken.mName.getString().substr(5);
-					const std::vector<GlobalsLookup::FunctionReference>& candidates = mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(baseName));
-					for (const GlobalsLookup::FunctionReference& candidate : candidates)
+					const std::vector<FunctionReference>& candidates = mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(baseName));
+					for (const FunctionReference& candidate : candidates)
 					{
 						// Base function signature must be the same as current function's
 						if (candidate.mFunction->getSignatureHash() == mContext.mFunction->getSignatureHash() && candidate.mFunction != mContext.mFunction)
@@ -684,14 +687,19 @@ namespace lemon
 						thisPointerVariable = findVariable(rmx::getMurmur2_64(contextPart));
 						if (nullptr != thisPointerVariable)
 						{
-							// TODO: Support getting the methods from the data type (similar to the bracket operator)
-							candidateFunctions = &mGlobalsLookup.getMethodsByName(thisPointerVariable->getDataType()->getName().getHash() + rmx::getMurmur2_64(namePart));
+							// First try getting the methods from the data type, then from global definitions
+							const uint64 nameHash = rmx::getMurmur2_64(namePart);
+							candidateFunctions = &thisPointerVariable->getDataType()->getMethodsByName(nameHash);
+							if (candidateFunctions->empty())
+							{
+								candidateFunctions = &mGlobalsLookup.getMethodsByName(thisPointerVariable->getDataType()->getName().getHash() + nameHash);
+							}
 							isValidFunctionCall = !candidateFunctions->empty();
 						}
 
 						if (!isValidFunctionCall)
 						{
-							// Special handling for "array.length()"
+							// Special handling for constant array "length()" method
 							//  -> TODO: Unify this with the method-like function call stuff above
 							if (namePart == "length" && content.empty())
 							{
@@ -807,9 +815,9 @@ namespace lemon
 					else
 					{
 						// Find best-fitting correct function overload
-						const GlobalsLookup::FunctionReference* bestFit = nullptr;
+						const FunctionReference* bestFit = nullptr;
 						uint32 bestPriority = 0xff000000;
-						for (const GlobalsLookup::FunctionReference& candidateFunction : *candidateFunctions)
+						for (const FunctionReference& candidateFunction : *candidateFunctions)
 						{
 							const uint32 priority = mTypeCasting.getPriorityOfSignature(parameterTypes, candidateFunction.mFunction->getParameters());
 							if (priority < bestPriority)
@@ -1233,8 +1241,9 @@ namespace lemon
 					if (ft.mFunction->getType() == Function::Type::NATIVE && ft.mFunction->hasFlag(Function::Flag::COMPILE_TIME_CONSTANT))
 					{
 						RMX_CHECK(ft.mParameters.size() == ft.mFunction->getParameters().size(), "Different number of parameters", );
-						Runtime emptyRuntime;
-						ControlFlow controlFlow(emptyRuntime);
+						static Runtime emptyRuntime;
+						static ControlFlow controlFlow(emptyRuntime);
+						controlFlow.reset();
 						for (size_t k = 0; k < ft.mParameters.size(); ++k)
 						{
 							ConstantToken& constantToken = *ft.mParameters[k].as<ConstantToken>();
@@ -1275,7 +1284,7 @@ namespace lemon
 				IdentifierToken& identifierToken = content[0].as<IdentifierToken>();
 
 				bool anyFound = false;
-				const GlobalsLookup::FunctionReference* function = mGlobalsLookup.getFunctionByNameAndSignature(identifierToken.mName.getHash(), Function::getVoidSignatureHash(), &anyFound);
+				const FunctionReference* function = mGlobalsLookup.getFunctionByNameAndSignature(identifierToken.mName.getHash(), Function::getVoidSignatureHash(), &anyFound);
 				if (nullptr == function)
 				{
 					if (anyFound)
@@ -1308,11 +1317,11 @@ namespace lemon
 				if (content.size() == 1 && content[0].isA<IdentifierToken>())
 				{
 					IdentifierToken& identifierToken = content[0].as<IdentifierToken>();
-					const std::vector<GlobalsLookup::FunctionReference>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
+					const std::vector<FunctionReference>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
 					CHECK_ERROR(!candidateFunctions.empty(), "Unknown function '" << identifierToken.mName.getString() << "' in addressof", mLineNumber);
 
 					uint32 address = 0;
-					for (const GlobalsLookup::FunctionReference& function : candidateFunctions)
+					for (const FunctionReference& function : candidateFunctions)
 					{
 						if (function.mFunction->getType() == Function::Type::SCRIPT)
 						{

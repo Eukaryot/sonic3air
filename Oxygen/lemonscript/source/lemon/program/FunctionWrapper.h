@@ -46,6 +46,7 @@ namespace lemon
 		template<> const DataTypeDefinition* getDataType<float>();
 		template<> const DataTypeDefinition* getDataType<double>();
 		template<> const DataTypeDefinition* getDataType<StringRef>();
+		template<> const DataTypeDefinition* getDataType<ArrayBaseWrapper>();
 		template<> const DataTypeDefinition* getDataType<AnyTypeWrapper>();
 	}
 
@@ -76,6 +77,16 @@ namespace lemon
 
 		template<>
 		StringRef popStackGeneric(const NativeFunction::Context context);
+
+
+
+		// Template specializations for ArrayBaseWrapper, representing all array types in script
+
+		template<>
+		void pushStackGeneric<ArrayBaseWrapper>(ArrayBaseWrapper value, const NativeFunction::Context context);
+
+		template<>
+		ArrayBaseWrapper popStackGeneric(const NativeFunction::Context context);
 
 
 

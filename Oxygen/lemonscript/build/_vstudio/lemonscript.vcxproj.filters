@@ -371,6 +371,9 @@
     <ClInclude Include="..\..\source\lemon\compiler\backend\OpcodeOptimization.h">
       <Filter>lemon\compiler\backend</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\FunctionReference.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="lemonscript.natvis" />

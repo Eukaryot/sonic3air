@@ -43,20 +43,21 @@ namespace lemon
 
 	namespace traits
 	{
-		template<> const DataTypeDefinition* getDataType<void>()			{ return &PredefinedDataTypes::VOID; }
-		template<> const DataTypeDefinition* getDataType<bool>()			{ return &PredefinedDataTypes::BOOL; }
-		template<> const DataTypeDefinition* getDataType<int8>()			{ return &PredefinedDataTypes::INT_8; }
-		template<> const DataTypeDefinition* getDataType<uint8>()			{ return &PredefinedDataTypes::UINT_8; }
-		template<> const DataTypeDefinition* getDataType<int16>()			{ return &PredefinedDataTypes::INT_16; }
-		template<> const DataTypeDefinition* getDataType<uint16>()			{ return &PredefinedDataTypes::UINT_16; }
-		template<> const DataTypeDefinition* getDataType<int32>()			{ return &PredefinedDataTypes::INT_32; }
-		template<> const DataTypeDefinition* getDataType<uint32>()			{ return &PredefinedDataTypes::UINT_32; }
-		template<> const DataTypeDefinition* getDataType<int64>()			{ return &PredefinedDataTypes::INT_64; }
-		template<> const DataTypeDefinition* getDataType<uint64>()			{ return &PredefinedDataTypes::UINT_64; }
-		template<> const DataTypeDefinition* getDataType<float>()			{ return &PredefinedDataTypes::FLOAT; }
-		template<> const DataTypeDefinition* getDataType<double>()			{ return &PredefinedDataTypes::DOUBLE; }
-		template<> const DataTypeDefinition* getDataType<StringRef>()		{ return &PredefinedDataTypes::STRING; }
-		template<> const DataTypeDefinition* getDataType<AnyTypeWrapper>()	{ return &PredefinedDataTypes::ANY; }
+		template<> const DataTypeDefinition* getDataType<void>()			 { return &PredefinedDataTypes::VOID; }
+		template<> const DataTypeDefinition* getDataType<bool>()			 { return &PredefinedDataTypes::BOOL; }
+		template<> const DataTypeDefinition* getDataType<int8>()			 { return &PredefinedDataTypes::INT_8; }
+		template<> const DataTypeDefinition* getDataType<uint8>()			 { return &PredefinedDataTypes::UINT_8; }
+		template<> const DataTypeDefinition* getDataType<int16>()			 { return &PredefinedDataTypes::INT_16; }
+		template<> const DataTypeDefinition* getDataType<uint16>()			 { return &PredefinedDataTypes::UINT_16; }
+		template<> const DataTypeDefinition* getDataType<int32>()			 { return &PredefinedDataTypes::INT_32; }
+		template<> const DataTypeDefinition* getDataType<uint32>()			 { return &PredefinedDataTypes::UINT_32; }
+		template<> const DataTypeDefinition* getDataType<int64>()			 { return &PredefinedDataTypes::INT_64; }
+		template<> const DataTypeDefinition* getDataType<uint64>()			 { return &PredefinedDataTypes::UINT_64; }
+		template<> const DataTypeDefinition* getDataType<float>()			 { return &PredefinedDataTypes::FLOAT; }
+		template<> const DataTypeDefinition* getDataType<double>()			 { return &PredefinedDataTypes::DOUBLE; }
+		template<> const DataTypeDefinition* getDataType<StringRef>()		 { return &PredefinedDataTypes::STRING; }
+		template<> const DataTypeDefinition* getDataType<ArrayBaseWrapper>() { return &PredefinedDataTypes::ARRAY_BASE; }
+		template<> const DataTypeDefinition* getDataType<AnyTypeWrapper>()	 { return &PredefinedDataTypes::ANY; }
 	}
 
 	namespace internal
@@ -75,6 +76,22 @@ namespace lemon
 			const FlyweightString* str = context.mControlFlow.getRuntime().resolveStringByKey(stringHash);
 			return (nullptr != str) ? StringRef(*str) : StringRef();
 		}
+
+
+		template<>
+		void pushStackGeneric(ArrayBaseWrapper value, const NativeFunction::Context context)
+		{
+			context.mControlFlow.pushValueStack<uint32>(value.mVariableID);
+		};
+
+		template<>
+		ArrayBaseWrapper popStackGeneric(const NativeFunction::Context context)
+		{
+			ArrayBaseWrapper result;
+			result.mVariableID = context.mControlFlow.popValueStack<uint32>();
+			return result;
+		}
+
 
 		template<>
 		void pushStackGeneric(AnyTypeWrapper value, const NativeFunction::Context context)

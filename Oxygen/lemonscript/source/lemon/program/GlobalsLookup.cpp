@@ -84,14 +84,14 @@ namespace lemon
 		return mapFind(mAllIdentifiers, nameHash);
 	}
 
-	const std::vector<GlobalsLookup::FunctionReference>& GlobalsLookup::getFunctionsByName(uint64 nameHash) const
+	const std::vector<FunctionReference>& GlobalsLookup::getFunctionsByName(uint64 nameHash) const
 	{
 		static const std::vector<FunctionReference> EMPTY_FUNCTIONS;
 		const auto it = mFunctionsByName.find(nameHash);
 		return (it == mFunctionsByName.end()) ? EMPTY_FUNCTIONS : it->second;
 	}
 
-	const GlobalsLookup::FunctionReference* GlobalsLookup::getFunctionByNameAndSignature(uint64 nameHash, uint32 signatureHash, bool* outAnyFound) const
+	const FunctionReference* GlobalsLookup::getFunctionByNameAndSignature(uint64 nameHash, uint32 signatureHash, bool* outAnyFound) const
 	{
 		const std::vector<FunctionReference>& candidateFunctions = getFunctionsByName(nameHash);
 		if (candidateFunctions.empty())
@@ -113,7 +113,7 @@ namespace lemon
 		return nullptr;
 	}
 
-	const std::vector<GlobalsLookup::FunctionReference>& GlobalsLookup::getMethodsByName(uint64 contextNameHash) const
+	const std::vector<FunctionReference>& GlobalsLookup::getMethodsByName(uint64 contextNameHash) const
 	{
 		static const std::vector<FunctionReference> EMPTY_FUNCTIONS;
 		const auto it = mMethodsByName.find(contextNameHash);

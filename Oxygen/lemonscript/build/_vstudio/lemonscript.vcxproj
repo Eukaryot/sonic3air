@@ -99,6 +99,7 @@
     <ClInclude Include="..\..\source\lemon\program\DataType.h" />
     <ClInclude Include="..\..\source\lemon\program\Define.h" />
     <ClInclude Include="..\..\source\lemon\program\Function.h" />
+    <ClInclude Include="..\..\source\lemon\program\FunctionReference.h" />
     <ClInclude Include="..\..\source\lemon\program\FunctionWrapper.h" />
     <ClInclude Include="..\..\source\lemon\program\GlobalsLookup.h" />
     <ClInclude Include="..\..\source\lemon\program\Module.h" />

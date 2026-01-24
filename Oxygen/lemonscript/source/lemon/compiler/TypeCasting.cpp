@@ -267,6 +267,12 @@ namespace lemon
 			return CastHandling(CastHandling::Result::ANY_CAST, 0xf0);
 		}
 
+		if (original->getClass() == DataTypeDefinition::Class::ARRAY && target == &PredefinedDataTypes::ARRAY_BASE)
+		{
+			// Cast from concrete array type to generic array base type
+			return CastHandling(CastHandling::Result::NO_CAST, 0);
+		}
+
 		return CastHandling(CastHandling::Result::INVALID, 0xff);
 	}
 
