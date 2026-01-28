@@ -21,7 +21,7 @@
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/Simulation.h"
 
-#include <lemon/program/Function.h>
+#include <lemon/program/function/Function.h>
 
 
 namespace

@@ -8,7 +8,7 @@
 
 #include "lemon/pch.h"
 #include "lemon/runtime/BuiltInFunctions.h"
-#include "lemon/program/FunctionWrapper.h"
+#include "lemon/program/function/FunctionWrapper.h"
 #include "lemon/program/Module.h"
 #include "lemon/program/Program.h"
 #include "lemon/utility/FastStringStream.h"
@@ -92,7 +92,7 @@ namespace lemon
 
 				case Variable::Type::GLOBAL:
 				{
-					GlobalVariable& var = static_cast<GlobalVariable&>(context->mControlFlow.getProgram().getGlobalVariableByID(variableId));
+					GlobalVariable& var = context->mControlFlow.getProgram().getGlobalVariableByID(variableId).as<GlobalVariable>();
 					if (!isValidArrayIndex<T>(var, index))
 					{
 						return 0;
@@ -137,7 +137,7 @@ namespace lemon
 
 				case Variable::Type::GLOBAL:
 				{
-					GlobalVariable& var = static_cast<GlobalVariable&>(context->mControlFlow.getProgram().getGlobalVariableByID(variableId));
+					GlobalVariable& var = context->mControlFlow.getProgram().getGlobalVariableByID(variableId).as<GlobalVariable>();
 					if (!isValidArrayIndex<T>(var, index))
 					{
 						return;
@@ -175,7 +175,7 @@ namespace lemon
 
 				case Variable::Type::GLOBAL:
 				{
-					GlobalVariable& var = static_cast<GlobalVariable&>(context->mControlFlow.getProgram().getGlobalVariableByID(array.mVariableID));
+					GlobalVariable& var = context->mControlFlow.getProgram().getGlobalVariableByID(array.mVariableID).as<GlobalVariable>();
 					return getArraySize(var);
 				}
 

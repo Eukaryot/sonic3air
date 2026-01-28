@@ -11,7 +11,7 @@
 #include "lemon/program/Constant.h"
 #include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
-#include "lemon/program/Function.h"
+#include "lemon/program/function/Function.h"
 #include "lemon/program/StringRef.h"
 #include "lemon/compiler/PreprocessorDefinition.h"
 

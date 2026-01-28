@@ -12,16 +12,18 @@
 #include "lemon/program/Constant.h"
 #include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
-#include "lemon/program/Function.h"
+#include "lemon/program/function/NativeFunction.h"
 #include "lemon/program/SourceFileInfo.h"
 #include "lemon/program/StringRef.h"
-#include <unordered_map>
+#include "lemon/program/Variable.h"
 
 
 namespace lemon
 {
 	class GlobalsLookup;
 	class PreprocessorDefinitionMap;
+	class ScriptFunction;
+
 
 	class API_EXPORT Module
 	{

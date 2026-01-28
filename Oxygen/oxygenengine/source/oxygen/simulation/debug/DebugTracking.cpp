@@ -16,7 +16,7 @@
 #include "oxygen/application/Application.h"
 #include "oxygen/rendering/parts/palette/PaletteManager.h"
 
-#include <lemon/program/Function.h>
+#include <lemon/program/function/Function.h>
 #include <lemon/runtime/RuntimeFunction.h>
 
 

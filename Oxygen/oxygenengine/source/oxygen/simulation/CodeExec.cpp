@@ -20,7 +20,7 @@
 #include "oxygen/simulation/GameRecorder.h"
 #include "oxygen/simulation/SaveStateSerializer.h"
 
-#include <lemon/program/Function.h>
+#include <lemon/program/function/Function.h>
 #include <lemon/runtime/Runtime.h>
 #include <lemon/runtime/RuntimeFunction.h>
 

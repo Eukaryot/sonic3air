@@ -7,7 +7,7 @@
 */
 
 #include "lemon/pch.h"
-#include "lemon/program/Function.h"
+#include "lemon/program/function/ScriptFunction.h"
 #include "lemon/program/Module.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/runtime/Runtime.h"
@@ -17,69 +17,6 @@
 
 namespace lemon
 {
-	namespace detail
-	{
-		uint32 getVoidSignatureHash()
-		{
-			uint32 value = PredefinedDataTypes::VOID.getDataTypeHash();
-			return rmx::getFNV1a_32((const uint8*)&value, sizeof(uint32));
-		}
-	}
-
-
-	void Function::SignatureBuilder::clear(const DataTypeDefinition& returnType)
-	{
-		mData.clear();
-		mData.push_back(returnType.getDataTypeHash());
-	}
-
-	void Function::SignatureBuilder::addParameterType(const DataTypeDefinition& dataType)
-	{
-		mData.push_back(dataType.getDataTypeHash());
-	}
-
-	uint32 Function::SignatureBuilder::getSignatureHash()
-	{
-		uint32 hash = rmx::getFNV1a_32((const uint8*)&mData[0], mData.size() * sizeof(uint32));
-		while (hash == 0)		// That should be a really rare case anyway
-		{
-			mData.push_back(0xcd000000);		// Just add anything to get away from hash 0
-			hash = rmx::getFNV1a_32((const uint8*)&mData[0], mData.size() * sizeof(uint32));
-		}
-		return hash;
-	}
-
-
-	void Function::setParametersByTypes(const std::vector<const DataTypeDefinition*>& parameterTypes)
-	{
-		mParameters.clear();
-		mParameters.resize(parameterTypes.size());
-		for (size_t i = 0; i < parameterTypes.size(); ++i)
-		{
-			mParameters[i].mDataType = parameterTypes[i];
-		}
-		mSignatureHash = 0;
-	}
-
-	uint32 Function::getVoidSignatureHash()
-	{
-		static const uint32 signatureHash = detail::getVoidSignatureHash();
-		return signatureHash;
-	}
-
-	uint32 Function::getSignatureHash() const
-	{
-		if (mSignatureHash == 0)
-		{
-			static SignatureBuilder builder;
-			builder.clear(*mReturnType);
-			for (const Parameter& parameter : mParameters)
-				builder.addParameterType(*parameter.mDataType);
-			mSignatureHash = builder.getSignatureHash();
-		}
-		return mSignatureHash;
-	}
-
 
 	ScriptFunction::~ScriptFunction()
 	{
@@ -234,37 +171,6 @@ namespace lemon
 				dataHasher.addData((uint64)opcode.mParameter);
 		}
 		return dataHasher.getHash();
-	}
-
-
-	void NativeFunction::setFunction(const FunctionWrapper& functionWrapper)
-	{
-		mFunctionWrapper = &functionWrapper;
-		mReturnType = functionWrapper.getReturnType();
-		setParametersByTypes(functionWrapper.getParameterTypes());
-	}
-
-	NativeFunction& NativeFunction::setParameterInfo(size_t index, const std::string& identifier)
-	{
-		RMX_ASSERT(index < mParameters.size(), "Invalid parameter index " << index);
-		RMX_ASSERT(!mParameters[index].mName.isValid(), "Parameter identifier is already set for index " << index);
-		mParameters[index].mName.set(identifier);
-		return *this;
-	}
-
-	void NativeFunction::execute(const Context context) const
-	{
-		RuntimeDetailHandler* runtimeDetailHandler = context.mControlFlow.getRuntime().getRuntimeDetailHandler();
-		if (nullptr != runtimeDetailHandler)
-		{
-			runtimeDetailHandler->preExecuteExternalFunction(*this, context.mControlFlow);
-			mFunctionWrapper->execute(context);
-			runtimeDetailHandler->postExecuteExternalFunction(*this, context.mControlFlow);
-		}
-		else
-		{
-			mFunctionWrapper->execute(context);
-		}
 	}
 
 }

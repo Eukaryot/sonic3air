@@ -19,7 +19,7 @@
 #include "oxygen/simulation/LemonScriptProgram.h"
 #include "oxygen/simulation/Simulation.h"
 
-#include <lemon/program/Function.h>
+#include <lemon/program/function/Function.h>
 
 
 WatchesWindow::WatchesWindow() :

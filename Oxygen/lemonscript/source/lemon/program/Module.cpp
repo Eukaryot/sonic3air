@@ -10,6 +10,7 @@
 #include "lemon/program/Module.h"
 #include "lemon/program/ModuleSerializer.h"
 #include "lemon/program/GlobalsLookup.h"
+#include "lemon/program/function/ScriptFunction.h"
 
 #include <iomanip>
 

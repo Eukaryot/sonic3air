@@ -14,7 +14,7 @@
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/RuntimeEnvironment.h"
 
-#include <lemon/program/FunctionWrapper.h>
+#include <lemon/program/function/FunctionWrapper.h>
 #include <lemon/program/Module.h>
 #include <lemon/program/ModuleBindingsBuilder.h>
 

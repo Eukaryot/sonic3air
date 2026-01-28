@@ -11,7 +11,7 @@
 #include "oxygen/simulation/bindings/LemonScriptBindings.h"
 
 #include <lemon/compiler/PreprocessorDefinition.h>
-#include <lemon/program/FunctionWrapper.h>
+#include <lemon/program/function/FunctionWrapper.h>
 
 
 class EmulatorInterface;

@@ -12,6 +12,7 @@
 #include "lemon/runtime/RuntimeOpcodeContext.h"
 #include "lemon/program/Program.h"
 #include "lemon/program/StringRef.h"
+#include "lemon/program/function/NativeFunction.h"
 
 
 namespace lemon
@@ -273,7 +274,7 @@ namespace lemon
 
 	int64* Runtime::accessGlobalVariableValue(const GlobalVariable& variable)
 	{
-		RMX_CHECK(variable.getType() == Variable::Type::GLOBAL, "Variable " << variable.getName() << " is not a global variable", return nullptr);
+		RMX_CHECK(variable.isA<GlobalVariable>(), "Variable " << variable.getName() << " is not a global variable", return nullptr);
 		const size_t offset = variable.getStaticMemoryOffset();
 		return (int64*)&mStaticMemory[offset];
 	}
@@ -858,9 +859,9 @@ namespace lemon
 					const int64 value = serializer.read<uint64>();
 					const uint64 nameHash = rmx::getMurmur2_64(name);
 					Variable* variable = mProgram->getGlobalVariableByName(nameHash);
-					if (nullptr != variable && variable->getType() == Variable::Type::GLOBAL)
+					if (nullptr != variable && variable->isA<GlobalVariable>())
 					{
-						const size_t offset = static_cast<GlobalVariable*>(variable)->getStaticMemoryOffset();
+						const size_t offset = variable->as<GlobalVariable>().getStaticMemoryOffset();
 						if (offset < mStaticMemory.size())
 							memcpy(&mStaticMemory[offset], &value, sizeof(int64));
 					}
@@ -873,7 +874,7 @@ namespace lemon
 				{
 					Variable* variable = mProgram->getGlobalVariables()[i];
 					serializer.write(variable->getName().getString());
-					const size_t offset = (variable->getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable*>(variable)->getStaticMemoryOffset() : 0xffffffff;
+					const size_t offset = (variable->isA<GlobalVariable>()) ? variable->as<GlobalVariable>().getStaticMemoryOffset() : 0xffffffff;
 					if (offset < mStaticMemory.size())
 						serializer.write(&mStaticMemory[offset], sizeof(int64));
 					else
@@ -893,9 +894,9 @@ namespace lemon
 					const int64 value = serializer.read<uint64>();
 					RMX_CHECK(i < numGlobals, "Invalid global variable index", continue);
 					Variable* variable = mProgram->getGlobalVariables()[i];
-					if (variable->getType() == Variable::Type::GLOBAL)
+					if (variable->isA<GlobalVariable>())
 					{
-						const size_t offset = static_cast<GlobalVariable*>(variable)->getStaticMemoryOffset();
+						const size_t offset = variable->as<GlobalVariable>().getStaticMemoryOffset();
 						memcpy(&mStaticMemory[offset], &value, sizeof(int64));
 					}
 				}
@@ -924,10 +925,9 @@ namespace lemon
 		for (size_t index = 0; index < mProgram->getGlobalVariables().size(); ++index)
 		{
 			Variable& var = *mProgram->getGlobalVariables()[index];
-			if (var.getType() == Variable::Type::GLOBAL)	// The other variable types don't use static memory size
+			if (var.isA<GlobalVariable>())	// The other variable types don't use static memory size
 			{
-				GlobalVariable& variable = static_cast<GlobalVariable&>(var);
-
+				GlobalVariable& variable = var.as<GlobalVariable>();
 				size_t variableSize = variable.getDataType()->getBytes();
 				variableSize = (variableSize + 7) / 8 * 8;		// Align to multiples of 8 bytes (i.e. int64 size)
 				variable.mStaticMemoryOffset = totalSize;
@@ -941,12 +941,12 @@ namespace lemon
 		for (size_t index = 0; index < mProgram->getGlobalVariables().size(); ++index)
 		{
 			Variable& var = *mProgram->getGlobalVariables()[index];
-			if (var.getType() == Variable::Type::GLOBAL)
+			if (var.isA<GlobalVariable>())
 			{
-				GlobalVariable& variable = static_cast<GlobalVariable&>(var);
+				GlobalVariable& variable = var.as<GlobalVariable>();
 				if (variable.getStaticMemorySize() > 0)
 				{
-					const int64 value = (variable.getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable&>(variable).mInitialValue.get<int64>() : 0;
+					const int64 value = variable.mInitialValue.get<int64>();
 					*(int64*)&mStaticMemory[variable.getStaticMemoryOffset()] = value;
 				}
 			}

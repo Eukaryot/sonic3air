@@ -9,7 +9,7 @@
 #include "lemon/pch.h"
 #include "lemon/translator/NativizerInternal.h"
 #include "lemon/translator/SourceCodeWriter.h"
-#include "lemon/program/Function.h"
+#include "lemon/program/function/Function.h"
 #include "lemon/program/OpcodeHelper.h"
 
 
@@ -128,9 +128,9 @@ namespace lemon
 
 					case Variable::Type::USER:
 					{
-						line += "static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableByID(";
+						line += "context.mControlFlow->getProgram().getGlobalVariableByID(";
 						outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
-						line += ")).setValue(";
+						line += ").as<GlobalVariable>().setValue(";
 						closeParenthesis = true;
 						break;
 					}
@@ -225,9 +225,9 @@ namespace lemon
 
 					case Variable::Type::USER:
 					{
-						line += "static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableByID(";
+						line += "context.mControlFlow->getProgram().getGlobalVariableByID(";
 						outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
-						line += ")).getValue()";
+						line += ").as<GlobalVariable>().getValue()";
 						break;
 					}
 

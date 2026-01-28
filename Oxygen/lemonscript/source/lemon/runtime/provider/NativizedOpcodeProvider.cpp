@@ -100,7 +100,7 @@ namespace lemon
 						case Nativizer::LookupEntry::ParameterInfo::Semantics::GLOBAL_VARIABLE:
 						{
 							const uint32 variableId = (uint32)opcode.mParameter;
-							const GlobalVariable& variable = static_cast<GlobalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
+							const GlobalVariable& variable = runtime.getProgram().getGlobalVariableByID(variableId).as<GlobalVariable>();
 							int64* valuePointer = const_cast<Runtime&>(runtime).accessGlobalVariableValue(variable);
 							runtimeOpcode.setParameter(valuePointer, parameter.mOffset);
 							break;
@@ -109,7 +109,7 @@ namespace lemon
 						case Nativizer::LookupEntry::ParameterInfo::Semantics::EXTERNAL_VARIABLE:
 						{
 							const uint32 variableId = (uint32)opcode.mParameter;
-							const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
+							const ExternalVariable& variable = runtime.getProgram().getGlobalVariableByID(variableId).as<ExternalVariable>();
 							runtimeOpcode.setParameter(variable.mAccessor(), parameter.mOffset);
 							break;
 						}

@@ -10,6 +10,7 @@
 
 #include "lemon/basics/GenericManager.h"
 #include "lemon/compiler/TokenTypes.h"
+#include "lemon/program/function/ScriptFunction.h"
 
 
 namespace lemon

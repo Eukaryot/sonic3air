@@ -40,8 +40,10 @@
     <ClCompile Include="..\..\source\lemon\program\ConstantArray.cpp" />
     <ClCompile Include="..\..\source\lemon\program\DataType.cpp" />
     <ClCompile Include="..\..\source\lemon\program\Define.cpp" />
-    <ClCompile Include="..\..\source\lemon\program\Function.cpp" />
-    <ClCompile Include="..\..\source\lemon\program\FunctionWrapper.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\function\Function.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\function\FunctionWrapper.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\function\NativeFunction.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\function\ScriptFunction.cpp" />
     <ClCompile Include="..\..\source\lemon\program\GlobalsLookup.cpp" />
     <ClCompile Include="..\..\source\lemon\program\Module.cpp" />
     <ClCompile Include="..\..\source\lemon\program\ModuleSerializer.cpp" />
@@ -98,9 +100,11 @@
     <ClInclude Include="..\..\source\lemon\program\ConstantArray.h" />
     <ClInclude Include="..\..\source\lemon\program\DataType.h" />
     <ClInclude Include="..\..\source\lemon\program\Define.h" />
-    <ClInclude Include="..\..\source\lemon\program\Function.h" />
-    <ClInclude Include="..\..\source\lemon\program\FunctionReference.h" />
-    <ClInclude Include="..\..\source\lemon\program\FunctionWrapper.h" />
+    <ClInclude Include="..\..\source\lemon\program\function\Function.h" />
+    <ClInclude Include="..\..\source\lemon\program\function\FunctionReference.h" />
+    <ClInclude Include="..\..\source\lemon\program\function\FunctionWrapper.h" />
+    <ClInclude Include="..\..\source\lemon\program\function\NativeFunction.h" />
+    <ClInclude Include="..\..\source\lemon\program\function\ScriptFunction.h" />
     <ClInclude Include="..\..\source\lemon\program\GlobalsLookup.h" />
     <ClInclude Include="..\..\source\lemon\program\Module.h" />
     <ClInclude Include="..\..\source\lemon\program\ModuleBindingsBuilder.h" />

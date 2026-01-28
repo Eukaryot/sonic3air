@@ -8,7 +8,7 @@
 
 #include "lemon/pch.h"
 #include "lemon/translator/SourceCodeWriter.h"
-#include "lemon/program/Function.h"
+#include "lemon/program/function/Function.h"
 
 
 namespace lemon

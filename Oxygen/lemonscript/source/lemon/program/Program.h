@@ -10,16 +10,16 @@
 
 #include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
-#include "lemon/program/Function.h"
-#include <unordered_map>
+#include "lemon/program/function/Function.h"
 
 
 namespace lemon
 {
-	class Module;
-	class StringLookup;
-	class NativizedOpcodeProvider;
 	class MemoryAccessHandler;
+	class Module;
+	class NativizedOpcodeProvider;
+	class ScriptFunction;
+	class StringLookup;
 
 	class API_EXPORT Program
 	{

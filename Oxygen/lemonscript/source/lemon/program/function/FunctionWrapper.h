@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "lemon/program/Function.h"
+#include "lemon/program/function/NativeFunction.h"
 #include "lemon/runtime/Runtime.h"
 #include "lemon/utility/AnyBaseValue.h"
 

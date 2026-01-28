@@ -120,21 +120,21 @@ namespace lemon
 
 			case Variable::Type::GLOBAL:
 			{
-				const GlobalVariable& variable = static_cast<GlobalVariable&>(mProgram->getGlobalVariableByID(variableId));
+				const GlobalVariable& variable = mProgram->getGlobalVariableByID(variableId).as<GlobalVariable>();
 				const int64* valuePtr = getRuntime().accessGlobalVariableValue(variable);
 				return (nullptr != valuePtr) ? *valuePtr : 0;
 			}
 
 			case Variable::Type::USER:
 			{
-				const UserDefinedVariable& variable = static_cast<UserDefinedVariable&>(mProgram->getGlobalVariableByID(variableId));
+				const UserDefinedVariable& variable = mProgram->getGlobalVariableByID(variableId).as<UserDefinedVariable>();
 				variable.mGetter(*this);		// This is supposed to write a value to the value stack
 				return popValueStack<int64>();
 			}
 
 			case Variable::Type::EXTERNAL:
 			{
-				const ExternalVariable& variable = static_cast<ExternalVariable&>(mProgram->getGlobalVariableByID(variableId));
+				const ExternalVariable& variable = mProgram->getGlobalVariableByID(variableId).as<ExternalVariable>();
 				const int64* valuePtr = variable.mAccessor();
 				return (nullptr != valuePtr) ? *valuePtr : 0;
 			}
@@ -156,7 +156,7 @@ namespace lemon
 
 			case Variable::Type::GLOBAL:
 			{
-				const GlobalVariable& variable = static_cast<GlobalVariable&>(mProgram->getGlobalVariableByID(variableId));
+				const GlobalVariable& variable = mProgram->getGlobalVariableByID(variableId).as<GlobalVariable>();
 				int64* valuePtr = getRuntime().accessGlobalVariableValue(variable);
 				if (nullptr != valuePtr)
 					*valuePtr = value;
@@ -165,7 +165,7 @@ namespace lemon
 
 			case Variable::Type::USER:
 			{
-				const UserDefinedVariable& variable = static_cast<UserDefinedVariable&>(mProgram->getGlobalVariableByID(variableId));
+				const UserDefinedVariable& variable = mProgram->getGlobalVariableByID(variableId).as<UserDefinedVariable>();
 				pushValueStack(value);
 				variable.mSetter(*this);		// This is supposed to read a value from the value stack
 				break;
@@ -173,7 +173,7 @@ namespace lemon
 
 			case Variable::Type::EXTERNAL:
 			{
-				const ExternalVariable& variable = static_cast<ExternalVariable&>(mProgram->getGlobalVariableByID(variableId));
+				const ExternalVariable& variable = mProgram->getGlobalVariableByID(variableId).as<ExternalVariable>();
 				int64* valuePtr = variable.mAccessor();
 				if (nullptr != valuePtr)
 					*valuePtr = value;
@@ -198,7 +198,7 @@ namespace lemon
 
 			case Variable::Type::GLOBAL:
 			{
-				const GlobalVariable& variable = static_cast<GlobalVariable&>(mProgram->getGlobalVariableByID(variableId));
+				const GlobalVariable& variable = mProgram->getGlobalVariableByID(variableId).as<GlobalVariable>();
 				return reinterpret_cast<uint8*>(getRuntime().accessGlobalVariableValue(variable));
 			}
 

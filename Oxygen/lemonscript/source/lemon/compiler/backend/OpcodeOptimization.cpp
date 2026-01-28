@@ -8,7 +8,7 @@
 
 #include "lemon/pch.h"
 #include "lemon/compiler/backend/OpcodeOptimization.h"
-#include "lemon/program/Function.h"
+#include "lemon/program/function/ScriptFunction.h"
 #include "lemon/program/Opcode.h"
 
 

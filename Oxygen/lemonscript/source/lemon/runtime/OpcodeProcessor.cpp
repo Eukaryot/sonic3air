@@ -8,7 +8,9 @@
 
 #include "lemon/pch.h"
 #include "lemon/runtime/OpcodeProcessor.h"
+#include "lemon/program/Opcode.h"
 #include "lemon/program/Program.h"
+#include "lemon/program/function/ScriptFunction.h"
 
 
 namespace lemon

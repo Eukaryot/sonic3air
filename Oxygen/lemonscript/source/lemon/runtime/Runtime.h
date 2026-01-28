@@ -8,15 +8,16 @@
 
 #pragma once
 
-#include "lemon/program/Function.h"
+#include "lemon/program/function/ScriptFunction.h"
 #include "lemon/program/StringRef.h"
 #include "lemon/runtime/ControlFlow.h"
 
 
 namespace lemon
 {
-	class Program;
+	class GlobalVariable;
 	class NativeFunction;
+	class Program;
 	class Variable;
 	struct RuntimeOpcode;
 

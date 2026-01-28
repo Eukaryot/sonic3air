@@ -9,7 +9,7 @@
 #pragma once
 
 #include "lemon/program/BaseType.h"
-#include "lemon/program/FunctionReference.h"
+#include "lemon/program/function/FunctionReference.h"
 #include "lemon/utility/FlyweightString.h"
 
 

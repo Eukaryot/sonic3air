@@ -10,7 +10,7 @@
 
 #include "oxygen/simulation/bindings/LemonScriptBindings.h"
 
-#include <lemon/program/Function.h>
+#include <lemon/program/function/ScriptFunction.h>
 
 
 class Mod;

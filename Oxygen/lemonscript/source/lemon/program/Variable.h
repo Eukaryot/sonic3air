@@ -42,6 +42,12 @@ namespace lemon
 		inline uint32 getID() const							 { return mID; }
 		inline const DataTypeDefinition* getDataType() const { return mDataType; }
 
+		template<typename T> bool isA() const		{ return getType() == T::TYPE; }
+		template<typename T> T& as()				{ return static_cast<T&>(*this); }
+		template<typename T> const T& as() const	{ return static_cast<const T&>(*this); }
+		template<typename T> T* cast()				{ return isA<T>() ? static_cast<T*>(*this) : nullptr; }
+		template<typename T> const T* cast() const	{ return isA<T>() ? static_cast<const T*>(*this) : nullptr; }
+
 	protected:
 		inline Variable(Type type) : mType(type) {}
 		virtual ~Variable() {}
@@ -56,6 +62,9 @@ namespace lemon
 
 	class API_EXPORT LocalVariable : public Variable
 	{
+	public:
+		static const Type TYPE = Type::LOCAL;
+
 	public:
 		inline LocalVariable() : Variable(Type::LOCAL) {}
 
@@ -72,6 +81,9 @@ namespace lemon
 
 	class API_EXPORT GlobalVariable : public Variable
 	{
+	public:
+		static const Type TYPE = Type::GLOBAL;
+
 	public:
 		inline GlobalVariable() : Variable(Type::GLOBAL) {}
 
@@ -90,6 +102,9 @@ namespace lemon
 	class API_EXPORT UserDefinedVariable : public Variable
 	{
 	public:
+		static const Type TYPE = Type::USER;
+
+	public:
 		inline UserDefinedVariable() : Variable(Type::USER) {}
 
 	public:
@@ -102,6 +117,9 @@ namespace lemon
 
 	class API_EXPORT ExternalVariable : public Variable
 	{
+	public:
+		static const Type TYPE = Type::EXTERNAL;
+
 	public:
 		inline ExternalVariable() : Variable(Type::EXTERNAL) {}
 

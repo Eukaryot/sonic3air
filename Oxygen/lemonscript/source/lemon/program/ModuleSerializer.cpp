@@ -8,8 +8,10 @@
 
 #include "lemon/pch.h"
 #include "lemon/program/ModuleSerializer.h"
-#include "lemon/program/Module.h"
 #include "lemon/program/GlobalsLookup.h"
+#include "lemon/program/Module.h"
+#include "lemon/program/Opcode.h"
+#include "lemon/program/function/ScriptFunction.h"
 
 
 namespace lemon
@@ -261,7 +263,7 @@ namespace lemon
 			size_t i = 0;
 			for (; i < module.mGlobalVariables.size(); ++i)
 			{
-				if (module.mGlobalVariables[i]->getType() == Variable::Type::GLOBAL)
+				if (module.mGlobalVariables[i]->isA<lemon::GlobalVariable>())
 					break;
 			}
 			serializer.writeAs<uint32>(i);		// Number of user-defined variables
@@ -272,8 +274,8 @@ namespace lemon
 			for (; i < module.mGlobalVariables.size(); ++i)
 			{
 				const Variable& variable = *module.mGlobalVariables[i];
-				RMX_CHECK(variable.getType() == Variable::Type::GLOBAL, "Mix of global variables and others", return false);
-				const GlobalVariable& globalVariable = static_cast<const GlobalVariable&>(variable);
+				RMX_CHECK(variable.isA<GlobalVariable>(), "Mix of global variables and others", return false);
+				const GlobalVariable& globalVariable = variable.as<GlobalVariable>();
 
 				variable.getName().serialize(serializer);
 				serializer.write(variable.getDataType()->getID());
