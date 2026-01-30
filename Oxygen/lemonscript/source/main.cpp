@@ -9,7 +9,7 @@
 #define RMX_LIB
 
 #include "lemon/compiler/Compiler.h"
-#include "lemon/program/FunctionWrapper.h"
+#include "lemon/program/function/FunctionWrapper.h"
 #include "lemon/program/GlobalsLookup.h"
 #include "lemon/program/Module.h"
 #include "lemon/program/Program.h"
