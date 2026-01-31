@@ -13556,7 +13556,7 @@ static void exec_923eeb6d2cf192bb(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: GamePause.UpdateFadeOut, line 358
+// First occurrence: GamePause.UpdateFadeOut, line 361
 static void exec_85900842afa22858(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((float)*context.getParameter<float*>());
@@ -13565,14 +13565,14 @@ static void exec_85900842afa22858(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: GamePause.DrawMenu, line 369
+// First occurrence: GamePause.DrawMenu, line 368
 static void exec_50f8d49ad33b5323(const RuntimeOpcodeContext context)
 {
 	context.writeLocalVariable<float>(context.getParameter<uint32>(), context.readValueStack<float>(-1));
 	context.moveValueStack(-1);
 }
 
-// First occurrence: GamePause.DrawMenu, line 375
+// First occurrence: GamePause.DrawMenu, line 374
 static void exec_2f503cbdd586635c(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint8)*context.getParameter<uint8*>());
@@ -13582,7 +13582,7 @@ static void exec_2f503cbdd586635c(const RuntimeOpcodeContext context)
 	context.writeLocalVariable<uint8>(context.getParameter<uint32>(24), var4.get<uint8>());
 }
 
-// First occurrence: GamePause.DrawMenu, line 377
+// First occurrence: GamePause.DrawMenu, line 376
 static void exec_160c5d42878fc787(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint64>(-1, (uint64)context.readValueStack<uint16>(-1));
@@ -13592,7 +13592,7 @@ static void exec_160c5d42878fc787(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: GamePause.DrawMenu, line 377
+// First occurrence: GamePause.DrawMenu, line 376
 static void exec_fec78582bcf40f15(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint64)(context.readValueStack<uint64>(-2) + context.readValueStack<uint64>(-1)));
@@ -13601,7 +13601,7 @@ static void exec_fec78582bcf40f15(const RuntimeOpcodeContext context)
 	context.moveValueStack(-2);
 }
 
-// First occurrence: GamePause.DrawMenu, line 378
+// First occurrence: GamePause.DrawMenu, line 377
 static void exec_5b8f288a8816c9c6(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint8)context.readLocalVariable<uint8>(context.getParameter<uint32>()));
@@ -13612,7 +13612,7 @@ static void exec_5b8f288a8816c9c6(const RuntimeOpcodeContext context)
 	context.moveValueStack(-1);
 }
 
-// First occurrence: GamePause.DrawMenu, line 383
+// First occurrence: GamePause.DrawMenu, line 382
 static void exec_e91122a54b1c26c8(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint64>(0, (uint64)context.getParameter<int64>());
@@ -13625,7 +13625,7 @@ static void exec_e91122a54b1c26c8(const RuntimeOpcodeContext context)
 	context.moveValueStack(6);
 }
 
-// First occurrence: GamePause.DrawMenu, line 384
+// First occurrence: GamePause.DrawMenu, line 383
 static void exec_49e0eff6b7837787(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint64>(0, (uint64)context.getParameter<int64>());
@@ -13639,7 +13639,7 @@ static void exec_49e0eff6b7837787(const RuntimeOpcodeContext context)
 	context.moveValueStack(6);
 }
 
-// First occurrence: GamePause.DrawMenu, line 392
+// First occurrence: GamePause.DrawMenu, line 391
 static void exec_a2cfe640511e670f(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint8)*context.getParameter<uint8*>());
@@ -13648,7 +13648,7 @@ static void exec_a2cfe640511e670f(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: GamePause.DrawMenu, line 392
+// First occurrence: GamePause.DrawMenu, line 391
 static void exec_cb7e744cabd9e866(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((float)context.readLocalVariable<float>(context.getParameter<uint32>()));
@@ -13657,7 +13657,7 @@ static void exec_cb7e744cabd9e866(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: GamePause.DrawMenu, line 395
+// First occurrence: GamePause.DrawMenu, line 394
 static void exec_772ff3412aa7d46d(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint64>(0, (uint64)context.getParameter<int64>());
@@ -13673,7 +13673,7 @@ static void exec_772ff3412aa7d46d(const RuntimeOpcodeContext context)
 	context.moveValueStack(5);
 }
 
-// First occurrence: GamePause.DrawMenu, line 395
+// First occurrence: GamePause.DrawMenu, line 394
 static void exec_bcf09a09bd8647c1(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint32>(0, context.readLocalVariable<uint32>(context.getParameter<uint32>()));
@@ -13684,7 +13684,7 @@ static void exec_bcf09a09bd8647c1(const RuntimeOpcodeContext context)
 	context.moveValueStack(5);
 }
 
-// First occurrence: GamePause.DrawMenu, line 405
+// First occurrence: GamePause.DrawMenu, line 404
 static void exec_ea4f0d3bd489948c(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint16)context.readLocalVariable<uint16>(context.getParameter<uint32>()));
@@ -13696,7 +13696,7 @@ static void exec_ea4f0d3bd489948c(const RuntimeOpcodeContext context)
 	context.moveValueStack(2);
 }
 
-// First occurrence: GamePause.DrawMenu, line 405
+// First occurrence: GamePause.DrawMenu, line 404
 static void exec_6ca47501f3a23343(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint64)(context.readValueStack<uint64>(-2) + context.readValueStack<uint64>(-1)));
@@ -13706,7 +13706,7 @@ static void exec_6ca47501f3a23343(const RuntimeOpcodeContext context)
 	context.moveValueStack(-2);
 }
 
-// First occurrence: GamePause.DrawMenu, line 406
+// First occurrence: GamePause.DrawMenu, line 405
 static void exec_8c8ce398a4d747b7(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint16)1);
@@ -13719,7 +13719,7 @@ static void exec_8c8ce398a4d747b7(const RuntimeOpcodeContext context)
 	context.moveValueStack(-1);
 }
 
-// First occurrence: GamePause.DrawMenu, line 408
+// First occurrence: GamePause.DrawMenu, line 407
 static void exec_02e335479b1c57e7(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint8)context.readLocalVariable<uint8>(context.getParameter<uint32>()));
@@ -13727,7 +13727,7 @@ static void exec_02e335479b1c57e7(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: GamePause.DrawMenu, line 410
+// First occurrence: GamePause.DrawMenu, line 409
 static void exec_5988c359dc9cd853(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint64>(0, (uint64)context.getParameter<int64>());
@@ -13744,7 +13744,7 @@ static void exec_5988c359dc9cd853(const RuntimeOpcodeContext context)
 	context.moveValueStack(8);
 }
 
-// First occurrence: GamePause.DrawMenu, line 425
+// First occurrence: GamePause.DrawMenu, line 424
 static void exec_335f53be651d0e49(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint8)context.readLocalVariable<uint8>(context.getParameter<uint32>()));
@@ -13753,7 +13753,7 @@ static void exec_335f53be651d0e49(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: GamePause.DrawMenu, line 427
+// First occurrence: GamePause.DrawMenu, line 426
 static void exec_9f102dda26dcba5c(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint32)context.readLocalVariable<uint32>(context.getParameter<uint32>()));
@@ -13767,7 +13767,7 @@ static void exec_9f102dda26dcba5c(const RuntimeOpcodeContext context)
 	context.moveValueStack(2);
 }
 
-// First occurrence: GamePause.DrawMenu, line 427
+// First occurrence: GamePause.DrawMenu, line 426
 static void exec_6f33213e4e67aab3(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint64)(context.readValueStack<uint64>(-2) + context.readValueStack<uint64>(-1)));
@@ -13776,7 +13776,7 @@ static void exec_6f33213e4e67aab3(const RuntimeOpcodeContext context)
 	context.moveValueStack(-2);
 }
 
-// First occurrence: GamePause.DrawMenu, line 429
+// First occurrence: GamePause.DrawMenu, line 428
 static void exec_0a8f2632e1481d44(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint64>(0, (uint64)context.getParameter<int64>());
@@ -13792,7 +13792,7 @@ static void exec_0a8f2632e1481d44(const RuntimeOpcodeContext context)
 	context.moveValueStack(5);
 }
 
-// First occurrence: GamePause.DrawMenu, line 431
+// First occurrence: GamePause.DrawMenu, line 430
 static void exec_84577d04b729a9f8(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((uint16)context.readLocalVariable<uint16>(context.getParameter<uint32>()));
@@ -13804,7 +13804,7 @@ static void exec_84577d04b729a9f8(const RuntimeOpcodeContext context)
 	context.writeLocalVariable<uint8>(context.getParameter<uint32>(20), var5.get<uint8>());
 }
 
-// First occurrence: GamePause.DrawMenu, line 438
+// First occurrence: GamePause.DrawMenu, line 437
 static void exec_a36666880077ac3b(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var0((float)*context.getParameter<float*>());
@@ -13813,7 +13813,7 @@ static void exec_a36666880077ac3b(const RuntimeOpcodeContext context)
 	context.writeLocalVariable<float>(context.getParameter<uint32>(16), var2.get<float>());
 }
 
-// First occurrence: GamePause.DrawMenu, line 439
+// First occurrence: GamePause.DrawMenu, line 438
 static void exec_8ede0cc8d5ca8dc7(const RuntimeOpcodeContext context)
 {
 	const AnyBaseValue var1((uint16)(context.readValueStack<uint16>(-1) - (uint16)(context.getParameter<int64>())));
@@ -13824,7 +13824,7 @@ static void exec_8ede0cc8d5ca8dc7(const RuntimeOpcodeContext context)
 	context.moveValueStack(3);
 }
 
-// First occurrence: GamePause.DrawMenu, line 441
+// First occurrence: GamePause.DrawMenu, line 440
 static void exec_77a84e2fb0fb198b(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<int64>(0, 0);
@@ -13839,7 +13839,7 @@ static void exec_77a84e2fb0fb198b(const RuntimeOpcodeContext context)
 	context.moveValueStack(7);
 }
 
-// First occurrence: GamePause.DrawMenu, line 442
+// First occurrence: GamePause.DrawMenu, line 441
 static void exec_58bb9cefa5ec2553(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint64>(0, (uint64)context.getParameter<int64>());
@@ -13853,7 +13853,7 @@ static void exec_58bb9cefa5ec2553(const RuntimeOpcodeContext context)
 	context.moveValueStack(6);
 }
 
-// First occurrence: GamePause.DrawMenu, line 443
+// First occurrence: GamePause.DrawMenu, line 442
 static void exec_d180cfb27a31f0b5(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint64>(0, (uint64)context.getParameter<int64>());
