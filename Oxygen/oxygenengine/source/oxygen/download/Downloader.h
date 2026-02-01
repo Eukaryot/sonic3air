@@ -12,6 +12,10 @@
 #include <atomic>
 #include <thread>
 
+#ifdef PLATFORM_WEB
+struct emscripten_fetch_t;
+#endif
+
 
 class Downloader
 {
@@ -53,4 +57,8 @@ private:
 	FileHandle mOutputFile;
 	std::atomic<uint64> mBytesDownloaded = 0;
 	std::atomic<bool> mThreadRunning = false;
+
+#ifdef PLATFORM_WEB
+	emscripten_fetch_t* mFetch = nullptr;
+#endif
 };

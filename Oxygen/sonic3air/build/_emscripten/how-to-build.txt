@@ -14,17 +14,17 @@ Setup and build with Emscripten, sharing the entire repo (current directory) wit
 
 
 Package the files (Development):
-	- docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) --name sonic3air_build emscripten_gl /bin/bash -c "cd /src/Oxygen/sonic3air/; python3 /emsdk/upstream/emscripten/tools/file_packager.py build/_emscripten/dist/sonic3air.data --js-output=build/_emscripten/dist/loader.js --preload ___internal@/sonic3air/___internal config.json@/sonic3air/config.json data@/sonic3air/data oxygenproject.json@/sonic3air/oxygenproject.json scripts@/sonic3air/scripts --use-preload-cache"
+	- docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) --name sonic3air_build emscripten_gl /bin/bash -c "cd /src/Oxygen/sonic3air/; python3 /emsdk/upstream/emscripten/tools/file_packager.py build/_emscripten/dist/sonic3air.data --js-output=build/_emscripten/dist/loader.js --preload config.json@/sonic3air/config.json scripts@/sonic3air/scripts data@/sonic3air/data ../oxygenengine/data@/sonic3air/data oxygenproject.json@/sonic3air/oxygenproject.json --use-preload-cache"
 
 
 Package the files (End user):
 	With audioremastered.bin
 	------------------------
-	- docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) --name sonic3air_build emscripten_gl /bin/bash -c "cd /src/Oxygen/sonic3air/; python3 /emsdk/upstream/emscripten/tools/file_packager.py build/_emscripten/dist/sonic3air.data --js-output=build/_emscripten/dist/loader.js --preload config.json@/sonic3air/config.json audiodata.bin@/sonic3air/data/audiodata.bin audioremaster.bin@/sonic3air/data/audioremaster.bin enginedata.bin@/sonic3air/data/enginedata.bin gamedata.bin@/sonic3air/data/gamedata.bin data/metadata.json@/sonic3air/data/metadata.json data/font@/sonic3air/data/font saves/scripts.bin@/sonic3air/data/scripts.bin config.json@/sonic3air/config.json --use-preload-cache"
+	- docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) --name sonic3air_build emscripten_gl /bin/bash -c "cd /src/Oxygen/sonic3air/; python3 /emsdk/upstream/emscripten/tools/file_packager.py build/_emscripten/dist/sonic3air.data --js-output=build/_emscripten/dist/loader.js --preload _master_image_template/config.json@/sonic3air/config.json audiodata.bin@/sonic3air/data/audiodata.bin audioremaster.bin@/sonic3air/data/audioremaster.bin enginedata.bin@/sonic3air/data/enginedata.bin gamedata.bin@/sonic3air/data/gamedata.bin data/metadata.json@/sonic3air/data/metadata.json data/font@/sonic3air/data/font saves/scripts.bin@/sonic3air/data/scripts.bin config.json@/sonic3air/config.json --use-preload-cache"
 	
 	Without audioremaster.bin (Extra downloads option will let user download it from the server)
 	-------------------------
-	- docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) --name sonic3air_build emscripten_gl /bin/bash -c "cd /src/Oxygen/sonic3air/; python3 /emsdk/upstream/emscripten/tools/file_packager.py build/_emscripten/dist/sonic3air.data --js-output=build/_emscripten/dist/loader.js --preload config.json@/sonic3air/config.json audiodata.bin@/sonic3air/data/audiodata.bin enginedata.bin@/sonic3air/data/enginedata.bin gamedata.bin@/sonic3air/data/gamedata.bin data/metadata.json@/sonic3air/data/metadata.json data/font@/sonic3air/data/font saves/scripts.bin@/sonic3air/data/scripts.bin config.json@/sonic3air/config.json --use-preload-cache"
+	- docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) --name sonic3air_build emscripten_gl /bin/bash -c "cd /src/Oxygen/sonic3air/; python3 /emsdk/upstream/emscripten/tools/file_packager.py build/_emscripten/dist/sonic3air.data --js-output=build/_emscripten/dist/loader.js --preload _master_image_template/config.json@/sonic3air/config.json audiodata.bin@/sonic3air/data/audiodata.bin enginedata.bin@/sonic3air/data/enginedata.bin gamedata.bin@/sonic3air/data/gamedata.bin data/metadata.json@/sonic3air/data/metadata.json data/font@/sonic3air/data/font saves/scripts.bin@/sonic3air/data/scripts.bin config.json@/sonic3air/config.json --use-preload-cache"
 
 
 === Build under Emscripten directly ===

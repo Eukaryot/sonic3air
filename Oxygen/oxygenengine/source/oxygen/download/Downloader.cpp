@@ -31,6 +31,10 @@
 #elif defined(PLATFORM_ANDROID)
 	#define PLATFORM_SUPPORTS_DOWNLOADER
 	#include "oxygen/platform/android/AndroidJavaInterface.h"
+
+#elif defined(PLATFORM_WEB)
+	#define PLATFORM_SUPPORTS_DOWNLOADER
+	#include <emscripten/fetch.h>
 #endif
 
 
@@ -57,7 +61,11 @@ void Downloader::setupDownload(std::string_view url, std::wstring_view outputFil
 void Downloader::startDownload()
 {
 	mState = State::RUNNING;
+#ifdef PLATFORM_WEB
+	performDownloadStatic(this);
+#else
 	mThread = new std::thread(&Downloader::performDownloadStatic, this);
+#endif
 }
 
 void Downloader::stopDownload()
@@ -70,6 +78,16 @@ void Downloader::stopDownload()
 		delete mThread;
 		mThread = nullptr;
 	}
+
+#ifdef PLATFORM_WEB
+	if (nullptr != mFetch)
+	{
+		emscripten_fetch_close(mFetch);
+		mFetch = nullptr;
+	}
+#endif
+
+	mOutputFile.close();
 
 	if (mState == State::RUNNING || mState == State::FAILED)
 	{
@@ -133,6 +151,69 @@ void Downloader::performDownload()
 	else
 	{
 		// TODO: Delete the output file
+		mState = State::FAILED;
+	}
+
+#elif defined(PLATFORM_WEB)
+
+	mThreadRunning = true;
+
+	emscripten_fetch_attr_t fetchAttr;
+	emscripten_fetch_attr_init(&fetchAttr);
+	strcpy(fetchAttr.requestMethod, "GET");
+	fetchAttr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+	fetchAttr.onsuccess = [](emscripten_fetch_t* fetch)
+	{
+		Downloader* downloader = reinterpret_cast<Downloader*>(fetch->userData);
+		if (fetch == downloader->mFetch)
+			downloader->mFetch = nullptr;
+
+		// Write the complete downloaded data to file
+		if (fetch->numBytes > 0 && nullptr != fetch->data)
+		{
+			downloader->mOutputFile.open(Configuration::instance().mAppDataPath + downloader->mOutputFilename, FILE_ACCESS_WRITE);
+			if (downloader->mOutputFile.isOpen())
+			{
+				downloader->mOutputFile.write(fetch->data, (size_t)fetch->numBytes);
+				downloader->mOutputFile.close();
+				downloader->mBytesDownloaded = fetch->numBytes;
+			}
+		}
+
+		if (downloader->mThreadRunning)
+		{
+			downloader->mThreadRunning = false;
+			downloader->mState = State::DONE;
+		}
+		emscripten_fetch_close(fetch);
+	};
+	fetchAttr.onerror = [](emscripten_fetch_t* fetch)
+	{
+		Downloader* downloader = reinterpret_cast<Downloader*>(fetch->userData);
+		if (fetch == downloader->mFetch)
+			downloader->mFetch = nullptr;
+
+		if (downloader->mThreadRunning)
+		{
+			downloader->mThreadRunning = false;
+			downloader->mState = State::FAILED;
+		}
+		emscripten_fetch_close(fetch);
+	};
+	fetchAttr.onprogress = [](emscripten_fetch_t* fetch)
+	{
+		Downloader* downloader = reinterpret_cast<Downloader*>(fetch->userData);
+		if (!downloader->mThreadRunning)
+			return;
+
+		// Update progress counter (data is not written until success callback)
+		downloader->mBytesDownloaded = fetch->dataOffset + fetch->numBytes;
+	};
+	fetchAttr.userData = this;
+	mFetch = emscripten_fetch(&fetchAttr, mURL.c_str());
+	if (nullptr == mFetch)
+	{
+		mThreadRunning = false;
 		mState = State::FAILED;
 	}
 

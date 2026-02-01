@@ -4154,12 +4154,12 @@
 			isa = PBXGroup;
 			children = (
 				9EF8623D2AD626EA006EB284 /* crowdcontrol */,
-				9ECAAA3D27D1C63E00A32EEF /* GameClient.cpp */,
 				9ECAAA3F27D1C63E00A32EEF /* GameClient.h */,
-				9ECAAA4027D1C63E00A32EEF /* GhostSync.cpp */,
+				9ECAAA3D27D1C63E00A32EEF /* GameClient.cpp */,
 				9ECAAA3E27D1C63E00A32EEF /* GhostSync.h */,
-				9ECAAA4127D1C63E00A32EEF /* UpdateCheck.cpp */,
+				9ECAAA4027D1C63E00A32EEF /* GhostSync.cpp */,
 				9ECAAA4227D1C63E00A32EEF /* UpdateCheck.h */,
+				9ECAAA4127D1C63E00A32EEF /* UpdateCheck.cpp */,
 			);
 			path = client;
 			sourceTree = "<group>";
