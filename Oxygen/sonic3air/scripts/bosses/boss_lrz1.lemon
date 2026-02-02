@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -801,7 +801,12 @@ function void fn078c14()
 		objA0.flags2a |= 0x40
 	}
 
+#if STANDALONE
+	// Fix for boss damage palette flash, #contributed by mrgrassman14
+	Boss.updateHitFlashing(6, 0x078ca6, 0x078cb2, 0x078cbe)
+#else
 	Boss.updateHitFlashing(6, 0x078ca6, 0x078cb2, 0x078cb6)
+#endif
 
 	--objA0.state
 	if (objA0.state == 0)

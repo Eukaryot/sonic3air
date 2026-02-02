@@ -16,6 +16,7 @@
 namespace lemon
 {
 	class MemoryAccessHandler;
+	class Module;
 	class Program;
 	class Runtime;
 	class RuntimeFunction;
@@ -57,8 +58,10 @@ namespace lemon
 		inline const CArray<ControlFlow::State>& getCallStack() const  { return mCallStack; }
 
 		void getCallStack(std::vector<ControlFlow::Location>& outLocations) const;
+		void getRecentExecutionLocation(Location& outLocation) const;
 		void getCurrentExecutionLocation(Location& outLocation) const;
 		const ScriptFunction* getCurrentFunction() const;
+		const Module* getCurrentModule() const;
 
 		inline size_t getValueStackSize() const  { return mValueStackPtr - mValueStackStart; }
 
@@ -94,11 +97,33 @@ namespace lemon
 			mValueStackPtr += change;
 		}
 
+		template<typename T>
+		FORCE_INLINE T readLocalVariable(size_t offset) const
+		{
+			return *accessLocalVariable<T>(offset);
+		}
+
+		template<typename T>
+		FORCE_INLINE void writeLocalVariable(size_t offset, T value) const
+		{
+			*accessLocalVariable<T>(offset) = value;
+		}
+
+		template<typename T>
+		FORCE_INLINE T* accessLocalVariable(size_t offset) const
+		{
+			return reinterpret_cast<T*>(mCurrentLocalVariables + offset);
+		}
+
+		int64 readVariableGeneric(uint32 variableId);
+		void writeVariableGeneric(uint32 variableId, int64 value);
+		uint8* accessVariableGeneric(uint32 variableId);
+
 	private:
-		inline static const size_t VALUE_STACK_MAX_SIZE    = 128;
+		inline static const size_t VALUE_STACK_MAX_SIZE    = 0x100;
 		inline static const size_t VALUE_STACK_FIRST_INDEX = 4;			// Leave 4 elements so that removing too many elements from the stack doesn't break everything immediately
 		inline static const size_t VALUE_STACK_LAST_INDEX  = VALUE_STACK_MAX_SIZE - 8;
-		inline static const size_t VAR_STACK_LIMIT         = 1024;
+		inline static const size_t VAR_STACK_LIMIT         = 0x4000;
 
 		Runtime& mRuntime;
 		const Program* mProgram = nullptr;
@@ -111,7 +136,7 @@ namespace lemon
 		size_t mLocalVariablesSize = 0;							// Current used size of the local variables buffer
 
 		// Only as optimization for OpcodeExec
-		int64* mCurrentLocalVariables = nullptr;
+		uint8* mCurrentLocalVariables = nullptr;
 		MemoryAccessHandler* mMemoryAccessHandler = nullptr;
 	};
 

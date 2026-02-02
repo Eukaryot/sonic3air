@@ -46,6 +46,7 @@ namespace lemon
 		Opcode& addOpcode(Opcode::Type type, BaseType dataType, int64 parameter = 0);
 		Opcode& addOpcode(Opcode::Type type, const DataTypeDefinition* dataType, int64 parameter = 0);
 		void addCastOpcodeIfNecessary(const DataTypeDefinition* sourceType, const DataTypeDefinition* targetType);
+		void addMoveStackOpcode(int stackChange);
 		Opcode& addJumpToLabel(Opcode::Type type, const LabelToken& labelToken);
 
 		void buildOpcodesFromNodes(const BlockNode& blockNode, NodeContext& context);
@@ -53,14 +54,13 @@ namespace lemon
 
 		void compileTokenTreeToOpcodes(const StatementToken& token, bool consumeResult = false, bool isLValue = false);
 		void compileUnaryDecIncToOpcodes(const UnaryOperationToken& uot);
+		void compileAssignmentToOpcodes(const BinaryOperationToken& bot);
 		void compileBinaryAssignmentToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType);
 		void compileBinaryOperationToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType);
 
 		void scopeBegin(int numVariables);
 		void scopeEnd(int numVariables);
 
-		void optimizeOpcodes();
-		void cleanupNOPs();
 		void assignOpcodeFlags();
 
 	private:

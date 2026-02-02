@@ -1,9 +1,14 @@
 {
+	// NOTE:
+	//  Some properties here in config.json are also stored in settings.json in the save data directory.
+	//  If a property is set in both files, which one is actually used by the game will depend on the platform:
+	//    - On desktop platforms (Windows, Linux, Mac), config.json is preferred. That also means that if a property is not set
+	//      in config.json, it uses the last saved value from settings.json, and NOT the default value.
+	//    - On other platforms the config.json usually is not directly accessible at all, so settings.json is always preferred.
+
+
 	// Default window size
 	"WindowSize": "1200 x 672",
-
-	// Audio output sample rate, valid values: 11025, 22050, 44100, 48000
-	"AudioSampleRate": "48000",
 
 	// Platform override ("1": desktop, "2": mobile, "-1": auto-selection)
 	"PlatformFlags": "-1",
@@ -11,7 +16,8 @@
 	// Dev mode
 	"DevMode":
 	{
-		"Enabled": "0",				// Set to "1" to enable developer mode (see Oxygen Handbook in "bonus/oxygenengine" folder for details)
+		// Use the options menu (in the System tab) to enable dev mode
+		// See Oxygen Handbook in "bonus/oxygenengine" folder for details on dev mode
 		"EnforceDebugMode": "0",	// Set to "1" to enable in-game debug mode whenever dev mode is active, independently from what's set in the Options menu
 		"SkipExitConfirmation": "0"	// Set to "1" to skip the confirmation when exiting the game from pause menu
 	},

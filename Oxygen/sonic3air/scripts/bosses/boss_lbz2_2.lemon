@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -277,7 +277,7 @@ function void fn073058()
 	{
 		objA0.position.y.u16 = D0.u16
 		DrawObject()
-		u16[A0 + 0x48] = 0
+		objA0.flags2a &= ~0x80	// Fix for Robotnik head animation, #contributed by mrgrassman14
 	}
 	else
 	{

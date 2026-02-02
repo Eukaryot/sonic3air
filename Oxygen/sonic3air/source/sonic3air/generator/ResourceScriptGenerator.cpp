@@ -14,7 +14,7 @@
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LemonScriptProgram.h"
 
-#include <lemon/program/Function.h>
+#include <lemon/program/function/Function.h>
 
 
 namespace

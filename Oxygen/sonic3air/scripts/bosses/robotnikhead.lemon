@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -175,6 +175,12 @@ function void fn067cba()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if ((u8[A1 + 0x2a] & 0x80) == 0)
 	{
+	#if STANDALONE
+		// Use correct animation speed for Egg Robo, #contributed by mrgrassman14
+		if (isMainCharacter(CHARACTER_KNUCKLES))
+			Object.animationProgress(0x0681d0)
+		else
+	#endif
 		Object.animationProgress(0x0681cc)
 	}
 

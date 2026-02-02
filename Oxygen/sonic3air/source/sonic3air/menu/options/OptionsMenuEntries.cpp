@@ -323,6 +323,7 @@ void UpdateCheckMenuEntry::renderEntry(RenderContext& renderContext_)
 	OptionsMenuEntry::renderEntry(renderContext);
 }
 
+
 void SoundtrackMenuEntry::renderEntry(RenderContext& renderContext_)
 {
 	renderInternal(renderContext_, Color::WHITE, Color::YELLOW);
@@ -346,6 +347,7 @@ void SoundtrackMenuEntry::renderEntry(RenderContext& renderContext_)
 		}
 	#endif
 }
+
 
 void SoundtrackDownloadMenuEntry::renderEntry(RenderContext& renderContext_)
 {
@@ -429,4 +431,26 @@ void SoundtrackDownloadMenuEntry::triggerButton()
 bool SoundtrackDownloadMenuEntry::shouldBeShown()
 {
 	return (ConfigurationImpl::instance().mActiveSoundtrack == 1 && Downloader::isDownloaderSupported() && !AudioOut::instance().hasLoadedRemasteredSoundtrack());
+}
+
+
+DevModeMenuEntry::DevModeMenuEntry()
+{
+	setUseSmallFont(true);
+}
+
+void DevModeMenuEntry::renderEntry(RenderContext& renderContext_)
+{
+	OptionsMenuRenderContext& renderContext = renderContext_.as<OptionsMenuRenderContext>();
+	Drawer& drawer = *renderContext.mDrawer;
+
+	renderInternal(renderContext_, Color::WHITE, Color::YELLOW);
+
+	if ((mOptions[mSelectedIndex].mValue != 0) != Configuration::instance().mDevMode.mEnabled)
+	{
+		const int baseX = renderContext.mCurrentPosition.x;
+		int& py = renderContext.mCurrentPosition.y;
+		py += 14;
+		drawer.printText(global::mOxyfontSmall, Recti(baseX, py, 0, 10), "App restart required to switch Dev Mode on or off!", 5, Color(1.0f, 0.8f, 0.6f, renderContext.mTabAlpha));
+	}
 }

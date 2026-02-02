@@ -33,6 +33,19 @@ namespace lemon
 			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING),
 			BinaryOperatorSignature(&PredefinedDataTypes::ANY,	   &PredefinedDataTypes::ANY,	  &PredefinedDataTypes::ANY)
 		};
+
+		static const std::vector<BinaryOperatorSignature> signaturesAssignmentInt =
+		{
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8)
+		};
+
 		static const std::vector<BinaryOperatorSignature> signaturesSymmetric =
 		{
 			// TODO: This is oversimplified, there are cases like multiply and left-shift (and probably also add / subtract) that require different handling
@@ -48,6 +61,19 @@ namespace lemon
 			BinaryOperatorSignature(&PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE),
 			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING)		// TODO: Strings need their own binary operations (and only few of them make actual sense...)
 		};
+
+		static const std::vector<BinaryOperatorSignature> signaturesSymmetricInt =
+		{
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8)
+		};
+
 		static const std::vector<BinaryOperatorSignature> signaturesComparison =
 		{
 			// Result types are always bool
@@ -63,6 +89,7 @@ namespace lemon
 			BinaryOperatorSignature(&PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::BOOL),
 			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::BOOL)		// TODO: Strings need their own comparison operations
 		};
+
 		static const std::vector<BinaryOperatorSignature> signaturesTrinary =
 		{
 			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64),
@@ -83,8 +110,14 @@ namespace lemon
 			case OperatorHelper::OperatorType::ASSIGNMENT:
 				return signaturesAssignment;
 
+			case OperatorHelper::OperatorType::ASSIGNMENT_INT:
+				return signaturesAssignmentInt;
+
 			case OperatorHelper::OperatorType::SYMMETRIC:
 				return signaturesSymmetric;
+
+			case OperatorHelper::OperatorType::SYMMETRIC_INT:
+				return signaturesSymmetricInt;
 
 			case OperatorHelper::OperatorType::COMPARISON:
 				return signaturesComparison;
@@ -138,13 +171,13 @@ namespace lemon
 			}
 		}
 
-		const bool originalIsBaseType = (original->getClass() == DataTypeDefinition::Class::INTEGER || original->getClass() == DataTypeDefinition::Class::FLOAT);
-		const bool targetIsBaseType = (target->getClass() == DataTypeDefinition::Class::INTEGER || target->getClass() == DataTypeDefinition::Class::FLOAT);
+		const bool originalIsBaseType = (original->isA<IntegerDataType>() || original->isA<FloatDataType>());
+		const bool targetIsBaseType = (target->isA<IntegerDataType>() || target->isA<FloatDataType>());
 		if (originalIsBaseType && targetIsBaseType)
 		{
-			if (original->getClass() == DataTypeDefinition::Class::INTEGER)
+			if (original->isA<IntegerDataType>())
 			{
-				if (target->getClass() == DataTypeDefinition::Class::INTEGER)
+				if (target->isA<IntegerDataType>())
 				{
 					// Cast between integers
 					const IntegerDataType& originalInt = original->as<IntegerDataType>();
@@ -206,7 +239,7 @@ namespace lemon
 			}
 			else
 			{
-				if (target->getClass() == DataTypeDefinition::Class::INTEGER)
+				if (target->isA<IntegerDataType>())
 				{
 					// Cast from floating point type to integer
 					//  -> This needs to be done explicitly
@@ -228,10 +261,16 @@ namespace lemon
 			}
 		}
 
-		if (target->getClass() == DataTypeDefinition::Class::ANY)
+		if (target->isA<AnyDataType>())
 		{
 			// Any cast has a very low priority
 			return CastHandling(CastHandling::Result::ANY_CAST, 0xf0);
+		}
+
+		if (original->isA<ArrayDataType>() && target == &PredefinedDataTypes::ARRAY_BASE)
+		{
+			// Cast from concrete array type to generic array base type
+			return CastHandling(CastHandling::Result::NO_CAST, 0);
 		}
 
 		return CastHandling(CastHandling::Result::INVALID, 0xff);

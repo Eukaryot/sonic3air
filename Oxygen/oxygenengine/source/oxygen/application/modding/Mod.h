@@ -59,6 +59,7 @@ public:
 		std::string mDisplayName;
 		std::string mMinimumVersion;
 		bool mIsRequired = false;
+		bool mIsConflict = false;
 		int mRelativePriority = 0;
 	};
 

@@ -577,7 +577,7 @@ AudioPlayer::PlayingSound* AudioPlayer::playAudioInternal(SourceRegistration* so
 
 	// Check for channel overrides
 	const bool isOverridden = isChannelOverridden(channelId, contextId);
-	const float volume = isOverridden ? 0.0f : 1.0f;
+	const float volume = isOverridden ? 0.0f : sourceReg->mVolume;
 
 	// Start playing that sound
 	PlayingSound* playingSound = nullptr;
@@ -600,7 +600,6 @@ AudioPlayer::PlayingSound* AudioPlayer::playAudioInternal(SourceRegistration* so
 	if (isOverridden)
 	{
 		playingSound->mState = PlayingSound::State::OVERRIDDEN;
-		playingSound->mAudioRef.setPause(true);
 		playingSound->mRelativeVolume = 0.0f;
 		playingSound->mBaseVolume = 1.0f;
 	}
@@ -622,6 +621,13 @@ AudioPlayer::PlayingSound* AudioPlayer::playAudioInternal(SourceRegistration* so
 
 	// Success
 	playingSound->mBaseSourceReg = sourceReg;
+
+	// Now start actual playback (unless overridden)
+	if (!isOverridden)
+	{
+		playingSound->mAudioRef.setPause(false);
+	}
+
 	return playingSound;
 }
 
@@ -677,7 +683,7 @@ AudioPlayer::PlayingSound* AudioPlayer::startOrContinuePlayback(SourceRegistrati
 AudioPlayer::PlayingSound* AudioPlayer::startPlaybackInternal(SourceRegistration& sourceReg, AudioSourceBase& audioSource, float volume, float time, int contextId, int channelId)
 {
 	// Startup audio source and get the audio buffer
-	AudioBuffer* audioBuffer = audioSource.startup(0.1f);
+	AudioBuffer* audioBuffer = audioSource.startup();
 	if (nullptr == audioBuffer)
 		return nullptr;
 
@@ -687,6 +693,7 @@ AudioPlayer::PlayingSound* AudioPlayer::startPlaybackInternal(SourceRegistration
 	options.mStreaming = true;
 	options.mVolume = volume;
 	options.mAudioMixerId = contextId + 0x11;	// Translate "AudioOutBase::Context" to "AudioOutBase::AudioMixerId"
+	options.mStartPaused = true;
 
 	AudioReference audioRef;
 	FTX::Audio->lockAudio();
@@ -717,6 +724,7 @@ AudioPlayer::PlayingSound* AudioPlayer::startPlaybackInternal(SourceRegistration
 		memset(oldData, 0xdd, sizeof(PlayingSound) * mPlayingSounds.size());
 	}
 #endif
+
 	PlayingSound& sound = vectorAdd(mPlayingSounds);
 	sound.mUniqueId = ++mLastUniqueId;
 	sound.mAudioRef = audioRef;
@@ -927,6 +935,9 @@ void AudioPlayer::applyAudioModifierSingle(SoundIterator& iterator, std::string_
 
 			// Remove old playing sound
 			iterator.removeCurrent();
+
+			// Now start actual playback
+			newSound->mAudioRef.setPause(false);
 		}
 	}
 }
@@ -953,7 +964,7 @@ void AudioPlayer::startAutoStreamer(AudioSourceBase& audioSource, float currentT
 	else if (!audioSource.isStreaming())
 	{
 		// Startup the audio source if it's not playing yet
-		audioSource.startup(0.0f);
+		audioSource.startup();
 	}
 
 	AutoStreamer& autoStreamer = vectorAdd(mAutoStreamers);

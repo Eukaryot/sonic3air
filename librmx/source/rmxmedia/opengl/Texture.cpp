@@ -27,6 +27,19 @@ Texture::Texture(const String& filename)
 	load(filename);
 }
 
+Texture::Texture(Texture&& other)
+{
+	mHandle = other.mHandle;
+	other.mHandle = 0;
+
+	mType = other.mType;
+	mFormat = other.mFormat;
+	mWidth = other.mWidth;
+	mHeight = other.mHeight;
+	mFilterLinear = other.mFilterLinear;
+	mHasMipmaps = other.mHasMipmaps;
+}
+
 Texture::~Texture()
 {
 	if (mHandle != 0)
@@ -49,7 +62,7 @@ void Texture::initialize()
 bool Texture::checkHandle() const
 {
 #ifdef DEBUG
-	if (mHandle && !glIsTexture(mHandle))
+	if (mHandle != 0 && !glIsTexture(mHandle))
 	{
 		RMX_ASSERT(false, "Texture handle is not a texture");
 		mHandle = 0;

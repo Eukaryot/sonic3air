@@ -9,7 +9,7 @@
 #define RMX_LIB
 
 #include "lemon/compiler/Compiler.h"
-#include "lemon/program/FunctionWrapper.h"
+#include "lemon/program/function/FunctionWrapper.h"
 #include "lemon/program/GlobalsLookup.h"
 #include "lemon/program/Module.h"
 #include "lemon/program/Program.h"
@@ -344,7 +344,7 @@ int main(int argc, char** argv)
 	module.addNativeFunction("sayHello", wrap(instance, &SomeClass::sayHello));
 	module.addNativeFunction("incTen", wrap(instance, &SomeClass::incTen));
 
-	ObjectHandleWrapper::mObjectHandleDataType = module.addDataType("ObjectHandle", BaseType::UINT_32);
+	ObjectHandleWrapper::mObjectHandleDataType = module.addCustomDataType("ObjectHandle", BaseType::UINT_32);
 	module.addNativeFunction("makeObjectHandle", wrap(&makeObjectHandle));
 	module.addNativeFunction("increaseObjectHandle", wrap(&increaseObjectHandle));
 	module.addNativeMethod("ObjectHandle", "increase", wrap(&increaseObjectHandle));
@@ -356,6 +356,7 @@ int main(int argc, char** argv)
 	{
 		std::cout << "=== Compilation ===\r\n";
 		lemon::CompileOptions options;
+		options.mOutputOpcodesAsText = L"function_opcodes.txt";
 		Compiler compiler(module, globalsLookup, options);
 		const bool compileSuccess = compiler.loadScript(L"script/mainscript.lemon");
 		if (!compileSuccess)

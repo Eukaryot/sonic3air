@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -273,7 +273,7 @@ function void DataSelect.setup()
 	VDP.Config.setVerticalScrolling(false, 0)	// Horizontal scrolling mode without scroll mask
 	VDP.Config.setRenderingModeConfiguration(false)
 	VDP.Config.setPlayfieldSizeInPixels(1024, 256)
-	VDP.Config.setupWindowPlane(true, 0)
+	VDP.Config.setWindowPlaneSplitY(true, 0)
 
 	zeroMemory(0xffffac00, 0x400)
 	zeroMemory(0xffffb000, 0x2000)

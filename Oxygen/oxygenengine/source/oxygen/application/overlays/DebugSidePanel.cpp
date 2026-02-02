@@ -21,7 +21,7 @@
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/Simulation.h"
 
-#include <lemon/program/Function.h>
+#include <lemon/program/function/Function.h>
 
 
 namespace
@@ -488,8 +488,8 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					{
 						if (visualizationSorting)
 						{
-							const std::wstring& filenameA = (a.second->getType() == lemon::Function::Type::SCRIPT) ? static_cast<const lemon::ScriptFunction*>(a.second)->mSourceFileInfo->mFilename : L"";
-							const std::wstring& filenameB = (b.second->getType() == lemon::Function::Type::SCRIPT) ? static_cast<const lemon::ScriptFunction*>(b.second)->mSourceFileInfo->mFilename : L"";
+							const std::wstring& filenameA = (a.second->isA<lemon::ScriptFunction>()) ? a.second->as<lemon::ScriptFunction>().mSourceFileInfo->mFilename : L"";
+							const std::wstring& filenameB = (b.second->isA<lemon::ScriptFunction>()) ? b.second->as<lemon::ScriptFunction>().mSourceFileInfo->mFilename : L"";
 							if (filenameA != filenameB)
 							{
 								return (filenameA < filenameB);
@@ -508,7 +508,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 				for (const auto& pair : sortedFunctions)
 				{
-					const String filename = (pair.second->getType() == lemon::Function::Type::SCRIPT) ? WString(static_cast<const lemon::ScriptFunction*>(pair.second)->mSourceFileInfo->mFilename).toString() : "";
+					const String filename = (pair.second->isA<lemon::ScriptFunction>()) ? WString(pair.second->as<lemon::ScriptFunction>().mSourceFileInfo->mFilename).toString() : "";
 					String line;
 					if (visualizationSorting && !filename.empty())
 						line << filename << " | ";

@@ -21,10 +21,27 @@
 #include <thread>
 
 
+static const bool CLIENT_USE_IPv6 = false;
+static const bool CLIENT_USE_UDP  = true;
+
+#if 1
+	static const std::string SERVER_NAME = "gameserver.sonic3air.org";
+#else
+	static const std::string SERVER_NAME = (SERVER_PROTOCOL_FAMILY >= Sockets::ProtocolFamily::IPv6) ? "::1" : "127.0.0.1";
+#endif
+
+
 class TestClient : public ConnectionListenerInterface
 {
 public:
-	void runClient();
+	enum class RunMode
+	{
+		CHECK_SERVER,	// Check if game server is running and responds to packets
+		TESTING_STUFF	// Just for development, like testing new features
+	};
+
+public:
+	bool runClient(RunMode runMode);
 
 protected:
 	virtual NetConnection* createNetConnection(ConnectionManager& connectionManager, const SocketAddress& senderAddress) override
@@ -73,8 +90,12 @@ private:
 		JOIN_REQUEST_SENT,
 		READY_TO_SEND_MESSAGE,
 		MESSAGE_SENT,
+		DONE_SUCCESS,
+		DONE_FAILURE
 	};
 
+private:
+	RunMode mRunMode = RunMode::CHECK_SERVER;
 	State mState = State::NONE;
 	NetConnection mConnection;
 	network::GetExternalAddressRequest mGetExternalAddressRequest;
@@ -82,18 +103,21 @@ private:
 };
 
 
-void TestClient::runClient()
+bool TestClient::runClient(RunMode runMode)
 {
-	// Switch between UDP and TCP usage
-#if 1
-	UDPSocket udpSocket;
-	if (!udpSocket.bindToAnyPort(CLIENT_USE_IPv6 ? Sockets::ProtocolFamily::IPv6 : Sockets::ProtocolFamily::IPv4))
-		RMX_ERROR("Socket bind to any port failed", return);
-	ConnectionManager connectionManager(&udpSocket, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE);
-#else
-	ConnectionManager connectionManager(nullptr, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE);
-#endif
+	mRunMode = runMode;
 
+	// Setup for either UDP or TCP usage
+	UDPSocket udpSocket;
+	UDPSocket* udpSocketToUse = nullptr;
+	if (CLIENT_USE_UDP)
+	{
+		if (!udpSocket.bindToAnyPort(CLIENT_USE_IPv6 ? Sockets::ProtocolFamily::IPv6 : Sockets::ProtocolFamily::IPv4))
+			RMX_ERROR("Socket bind to any port failed", return false);
+		udpSocketToUse = &udpSocket;
+	}
+
+	ConnectionManager connectionManager(udpSocketToUse, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE);
 #ifdef DEBUG
 	setupDebugSettings(connectionManager.mDebugSettings);
 #endif
@@ -103,11 +127,11 @@ void TestClient::runClient()
 	{
 		std::string serverIP;
 		if (!Sockets::resolveToIP(SERVER_NAME, serverIP, CLIENT_USE_IPv6))
-			RMX_ERROR("Unable to resolve server name " << SERVER_NAME, return);
+			RMX_ERROR("Unable to resolve server name " << SERVER_NAME, return false);
 		serverAddress.set(serverIP, connectionManager.hasUDPSocket() ? UDP_SERVER_PORT : TCP_SERVER_PORT);
 	}
 	if (!mConnection.startConnectTo(connectionManager, serverAddress))
-		RMX_ERROR("Starting a connection failed", return);
+		RMX_ERROR("Starting a connection failed", return false);
 
 	mState = State::WAITING_FOR_CONNECTION;
 
@@ -115,8 +139,8 @@ void TestClient::runClient()
 	uint64 lastMessageTimestamp = 0;
 	while (true)
 	{
-		if (mConnection.getState() == NetConnection::State::EMPTY)
-			break;
+		if (mConnection.getState() == NetConnection::State::EMPTY || mConnection.getState() == NetConnection::State::DISCONNECTED)
+			return false;
 
 		const uint64 currentTimestamp = ConnectionManager::getCurrentTimestamp();
 		const uint64 millisecondsElapsed = currentTimestamp - lastTimestamp;
@@ -130,7 +154,13 @@ void TestClient::runClient()
 
 		// Update client state
 		updateClient();
+
+		// Stop on success or failure
+		if (mState >= State::DONE_SUCCESS)
+			break;
 	}
+
+	return (mState == State::DONE_SUCCESS);
 }
 
 void TestClient::updateClient()
@@ -153,6 +183,12 @@ void TestClient::updateClient()
 			if (mGetExternalAddressRequest.hasResponse())
 			{
 				RMX_LOG_INFO("Received own external address: IP = " << mGetExternalAddressRequest.mResponse.mIP << ", Port = " << mGetExternalAddressRequest.mResponse.mPort);
+
+				if (mRunMode == RunMode::CHECK_SERVER)
+				{
+					mState = State::DONE_SUCCESS;
+					break;
+				}
 
 				// Send request to join a channel
 				mJoinChannelRequest.mQuery.mChannelName = "test-channel";
@@ -202,10 +238,16 @@ int main(int argc, char** argv)
 	randomize();
 	rmx::Logging::addLogger(*new rmx::StdCoutLogger());
 	Sockets::startupSockets();
+
+	bool success = false;
 	{
 		TestClient client;
-		client.runClient();
+		success = client.runClient(TestClient::RunMode::CHECK_SERVER);
 	}
+
 	Sockets::shutdownSockets();
-	return 0;
+	const char* message = (success ? "Server check successful" : "Server check failed!");
+	RMX_LOG_INFO(message);
+	RMX_CHECK(success, "Server check failed!", );
+	return success ? 0 : 1;
 }

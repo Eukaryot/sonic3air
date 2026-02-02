@@ -9,7 +9,7 @@
 #pragma once
 
 #include "lemon/compiler/Definitions.h"
-#include "lemon/compiler/GenericManager.h"
+#include "lemon/basics/GenericManager.h"
 #include "lemon/compiler/Operators.h"
 #include "lemon/program/DataType.h"
 #include "lemon/utility/AnyBaseValue.h"
@@ -39,23 +39,20 @@ namespace lemon
 
 		inline Type getType() const  { return (Type)genericmanager::Element<ParserToken>::getType(); }
 
-		template<typename T> bool isA() const { return getType() == T::TYPE; }
-
-		template<typename T> const T& as() const { return *static_cast<const T*>(this); }
-		template<typename T> T& as() { return *static_cast<T*>(this); }
-
 	protected:
-		inline ParserToken(Type type) : genericmanager::Element<ParserToken>((uint32)type) {}
+		inline ParserToken(uint32 type) : genericmanager::Element<ParserToken>((uint32)type) {}
 	};
+
+
+
+	#define DEFINE_LEMON_PARSER_TOKEN_TYPE(_class_, _type_) \
+		DEFINE_GENERIC_MANAGER_ELEMENT_TYPE(ParserToken, ParserToken, _class_, (uint32)_type_)
 
 
 	class KeywordParserToken : public ParserToken
 	{
 	public:
-		static const Type TYPE = Type::KEYWORD;
-
-	public:
-		inline KeywordParserToken() : ParserToken(TYPE) {}
+		DEFINE_LEMON_PARSER_TOKEN_TYPE(KeywordParserToken, Type::KEYWORD)
 
 	public:
 		Keyword mKeyword = Keyword::_INVALID;
@@ -65,10 +62,7 @@ namespace lemon
 	class VarTypeParserToken : public ParserToken
 	{
 	public:
-		static const Type TYPE = Type::VARTYPE;
-
-	public:
-		inline VarTypeParserToken() : ParserToken(TYPE) {}
+		DEFINE_LEMON_PARSER_TOKEN_TYPE(VarTypeParserToken, Type::VARTYPE)
 
 	public:
 		const DataTypeDefinition* mDataType = nullptr;
@@ -78,10 +72,7 @@ namespace lemon
 	class OperatorParserToken : public ParserToken
 	{
 	public:
-		static const Type TYPE = Type::OPERATOR;
-
-	public:
-		inline OperatorParserToken() : ParserToken(TYPE) {}
+		DEFINE_LEMON_PARSER_TOKEN_TYPE(OperatorParserToken, Type::OPERATOR)
 
 	public:
 		Operator mOperator = Operator::_INVALID;
@@ -91,10 +82,7 @@ namespace lemon
 	class PragmaParserToken : public ParserToken
 	{
 	public:
-		static const Type TYPE = Type::PRAGMA;
-
-	public:
-		inline PragmaParserToken() : ParserToken(TYPE) {}
+		DEFINE_LEMON_PARSER_TOKEN_TYPE(PragmaParserToken, Type::PRAGMA)
 
 	public:
 		std::string mContent;
@@ -104,10 +92,7 @@ namespace lemon
 	class LabelParserToken : public ParserToken
 	{
 	public:
-		static const Type TYPE = Type::LABEL;
-
-	public:
-		inline LabelParserToken() : ParserToken(TYPE) {}
+		DEFINE_LEMON_PARSER_TOKEN_TYPE(LabelParserToken, Type::LABEL)
 
 	public:
 		FlyweightString mName;
@@ -117,10 +102,7 @@ namespace lemon
 	class ConstantParserToken : public ParserToken
 	{
 	public:
-		static const Type TYPE = Type::CONSTANT;
-
-	public:
-		inline ConstantParserToken() : ParserToken(TYPE) {}
+		DEFINE_LEMON_PARSER_TOKEN_TYPE(ConstantParserToken, Type::CONSTANT)
 
 	public:
 		AnyBaseValue mValue { 0 };
@@ -131,10 +113,7 @@ namespace lemon
 	class StringLiteralParserToken : public ParserToken
 	{
 	public:
-		static const Type TYPE = Type::STRING_LITERAL;
-
-	public:
-		inline StringLiteralParserToken() : ParserToken(TYPE) {}
+		DEFINE_LEMON_PARSER_TOKEN_TYPE(StringLiteralParserToken, Type::STRING_LITERAL)
 
 	public:
 		FlyweightString mString;
@@ -144,10 +123,7 @@ namespace lemon
 	class IdentifierParserToken : public ParserToken
 	{
 	public:
-		static const Type TYPE = Type::IDENTIFIER;
-
-	public:
-		inline IdentifierParserToken() : ParserToken(TYPE) {}
+		DEFINE_LEMON_PARSER_TOKEN_TYPE(IdentifierParserToken, Type::IDENTIFIER)
 
 	public:
 		FlyweightString mName;
@@ -157,5 +133,8 @@ namespace lemon
 	class ParserTokenList : public genericmanager::ElementList<ParserToken, 32>
 	{
 	};
+
+
+	#undef DEFINE_LEMON_PARSER_TOKEN_TYPE
 
 }

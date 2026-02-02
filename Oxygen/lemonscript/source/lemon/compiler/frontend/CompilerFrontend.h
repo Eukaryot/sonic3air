@@ -23,8 +23,11 @@ namespace lemon
 	class BlockNode;
 	class UndefinedNode;
 	class FunctionNode;
+	class PragmaNode;
 	class TokenList;
 	struct LineNumberTranslation;
+	struct NodesIterator;
+
 
 	class CompilerFrontend
 	{
@@ -71,8 +74,6 @@ namespace lemon
 			}
 		};
 
-		struct NodesIterator;
-
 	private:
 		// Node building
 		void buildNodesFromCodeLines(BlockNode& blockNode, const std::vector<std::string_view>& lines);
@@ -90,7 +91,7 @@ namespace lemon
 
 		// Misc
 		bool processGlobalPragma(const std::string& content);
-		AnyBaseValue readConstantExpression(const TokenList& tokens, size_t& pos, size_t endPos, const DataTypeDefinition* dataType, uint32 lineNumber);
+		AnyBaseValue readConstantExpression(TokenList& tokens, size_t& pos, size_t endPos, const DataTypeDefinition* dataType, uint32 lineNumber);
 
 	private:
 		Module& mModule;
@@ -99,6 +100,7 @@ namespace lemon
 		CompileOptions& mCompileOptions;
 		TokenProcessing& mTokenProcessing;
 		std::vector<FunctionNode*>& mFunctionNodes;
+		std::vector<const PragmaNode*> mCurrentPragmas;
 	};
 
 }

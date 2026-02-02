@@ -51,6 +51,8 @@ namespace lemon
 		bool loadScriptInternal(const std::wstring& localPath, const std::wstring& filename, std::vector<std::string_view>& outLines, std::unordered_set<uint64>& includedPathHashes);
 		void runCompilerBackend(std::vector<FunctionNode*>& functionNodes);
 
+		void writeOpcodesAsText(const std::wstring_view outputFilename);
+
 	private:
 		static inline Compiler* mActiveInstance = nullptr;
 

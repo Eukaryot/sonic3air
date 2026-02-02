@@ -125,10 +125,10 @@ void TextInputHandler::keyboard(const rmx::KeyboardEvent& ev)
 		{
 			if (PlatformFunctions::hasClipboardSupport() && (SDL_GetModState() & KMOD_CTRL) != 0)
 			{
-				WString text;
+				std::wstring text;
 				if (PlatformFunctions::pasteFromClipboard(text))
 				{
-					insertText(std::wstring_view(*text, text.length()));
+					insertText(text);
 				}
 			}
 			break;
@@ -138,7 +138,7 @@ void TextInputHandler::keyboard(const rmx::KeyboardEvent& ev)
 
 void TextInputHandler::textinput(const rmx::TextInputEvent& ev)
 {
-	insertText(std::wstring_view(*ev.text, ev.text.length()));
+	insertText(ev.text);
 }
 
 void TextInputHandler::insertText(std::wstring_view text)

@@ -10,14 +10,13 @@
 #include "oxygen/application/audio/AudioSourceBase.h"
 
 
-AudioBuffer* AudioSourceBase::startup(float precacheTime)
+AudioBuffer* AudioSourceBase::startup()
 {
 	if (mState == State::INACTIVE || isDynamic())
 	{
 		// Initial startup or reset from scratch
 		mState = startupInternal();
 		mReadTime = 0.0f;
-		progress(precacheTime);
 	}
 	return &mAudioBuffer;
 }

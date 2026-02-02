@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -83,14 +83,6 @@ function void fn083708()
 					DrawOrUnloadObject()
 					return
 				}
-			#if STANDALONE
-				else if (objA1.velocity.x != 0)
-				{
-					// Only needed for the hint
-					u8 maximum = 0x50 + abs(s8(global.framecounter & 0x1f) - 0x10) * 0x02
-					u8[A0 + 0x49] = min(u8[A0 + 0x49] + 4, maximum)
-				}
-			#endif
 			}
 			else
 			{
@@ -99,9 +91,6 @@ function void fn083708()
 				// As a bug fix, also check "countdown_value" to make sure it's not the exact frame where the signpost hit the ground, but a later one
 				//  -> Otherwise hidden monitors can get locked too early
 				unload = unload && (s16[A1 + 0x2e] < 0x40)
-
-				// Only needed for the hint
-				u8[A0 + 0x49] = (u8[A0 + 0x49] > 4) ? (u8[A0 + 0x49] - 4) : 0
 			#endif
 
 				if (unload)
@@ -113,12 +102,39 @@ function void fn083708()
 			}
 
 		#if STANDALONE
-			if (Game.getSetting(SETTING_HIDDEN_MONITOR_HINT) && u8[A0 + 0x49] > 0x20)
+			// Monitor hint system... #contributed by Dynamic Lemons
+			if (Game.getSetting(SETTING_HIDDEN_MONITOR_HINT))
 			{
-				// Draw a hint
-				px = objA0.position.x.u16 - camera.foreground.x.u16 - 0x10
-				py = objA0.position.y.u16 - camera.foreground.y.u16 - 0x10
-				Renderer.drawVdpSpriteWithAlpha(px, py, 0x0f, sprite_attribute.PRIORITY | 0x04c4, 0xd000, u8[A0 + 0x49] - 0x20)
+				if (u8[A0 + 0x49] == 0)
+				{
+					s16 diff = objA1.position.x.u16 - objA0.position.x.u16
+					if (diff >= -56 && diff < 56 && abs(objA1.velocity.x) < 0x100 && allocDynamicObjectStd())
+					{
+						objA1.update_address = 0x01a64a
+						objA1.position.x.u16 = objA0.position.x.u16 + (getRandomNumber() % 33) - 16
+						objA1.position.y.u16 = objA0.position.y.u16 + (getRandomNumber() % 33) - 16
+
+						objA1.sprite_priority = 0x80
+						objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06bc)
+						objA1.mapping_offset = 0x01a99a
+						objA1.base_state = 0x06
+						objA1.render_flags = render_flag.WORLD
+
+						u32 A0_o = A0
+						u32 A1_o = A1
+						A0 = A1_o
+						A1 = A0_o
+						Object.animationUpdate(0x01a992)
+						A0 = A0_o
+						A1 = A1_o
+
+						u8[A0 + 0x49] = getRandomNumber() % 90
+					}
+				}
+				else
+				{
+					--u8[A0 + 0x49]
+				}
 			}
 		#endif
 		}

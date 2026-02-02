@@ -50,15 +50,15 @@ namespace lemon
 		}
 
 		template<typename T>
-		FORCE_INLINE T readLocalVariable(size_t index) const
+		FORCE_INLINE T readLocalVariable(size_t offset) const
 		{
-			return BaseTypeConversion::convert<int64, T>(mControlFlow->mCurrentLocalVariables[index]);
+			return mControlFlow->readLocalVariable<T>(offset);
 		}
 
 		template<typename T>
-		FORCE_INLINE void writeLocalVariable(size_t index, T value) const
+		FORCE_INLINE void writeLocalVariable(size_t offset, T value) const
 		{
-			mControlFlow->mCurrentLocalVariables[index] = BaseTypeConversion::convert<T, int64>(value);
+			return mControlFlow->writeLocalVariable(offset, value);
 		}
 	};
 }

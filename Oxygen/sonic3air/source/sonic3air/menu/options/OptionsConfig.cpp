@@ -95,6 +95,13 @@ void OptionsConfig::buildSystem()
 	}
 #endif
 
+#if defined(SUPPORT_IMGUI) && !defined(PLATFORM_WEB)	// Hide the file browser option in the Web version, as it already has its own file manager with more functionality
+	CATEGORY("Data Management")
+	{
+		configBuilder.addSetting("Open File Browser", option::_OPEN_FILE_BROWSER);
+	}
+#endif
+
 	CATEGORY("More Info")
 	{
 		configBuilder.addSetting("Open Game Homepage", option::_OPEN_HOMEPAGE);
@@ -113,6 +120,13 @@ void OptionsConfig::buildSystem()
 			.addOption("Auto (Default)", -1)
 			.addOption("Disabled", 0)
 			.addOption("Enabled", 1);
+	}
+
+	CATEGORY("Dev Mode")
+	{
+		configBuilder.addSetting("Dev Mode", option::DEV_MODE)
+			.addOption("Off", 0)
+			.addOption("On", 1);
 	}
 }
 
@@ -226,7 +240,7 @@ void OptionsConfig::buildAudio()
 		const char* volumeName[] = { "Overall Volume:", "Music Volume:", "Sound Volume:" };
 		for (int k = 0; k < 3; ++k)
 		{
-			configBuilder.addSetting(volumeName[k], (option::Option)(option::AUDIO_VOLUME + k))
+			configBuilder.addSetting(volumeName[k], (option::Option)(option::MASTER_VOLUME + k))
 				.addOption("Off", 0)
 				.addNumberOptions(5, 100, 5, "%");
 		}
@@ -624,6 +638,10 @@ void OptionsConfig::buildTweaks()
 		configBuilder.addSetting("Monitor Behavior:", option::MONITOR_BEHAVIOR)
 			.addOption("Default", 0)
 			.addOption("Fall down when hit", 1);
+
+		configBuilder.addSetting("Hidden Monitors:", option::HIDDEN_MONITOR_HINT)
+			.addOption("No hint", 0)
+			.addOption("Sparkle near signpost", 1);
 	}
 
 	CATEGORY("Special Stages")
@@ -650,6 +668,45 @@ void OptionsConfig::buildTweaks()
 			.addOption("No glitch fixes", 0)
 			.addOption("Only basic fixes", 1)
 			.addOption("All (recommended)", 2);
+	}
+
+	CATEGORY("Other Enhancements")
+	{
+		configBuilder.addSetting("Object Pushing Speed:", option::FASTER_PUSH)
+			.addOption("Original", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("Score Tally Speed-Up:", option::LEVELRESULT_SCORE)
+			.addOption("Off", 0)
+			.addOption("On", 1);
+
+		configBuilder.addSetting("LBZ Tube Transport:", option::LBZ_TUBETRANSPORT)
+			.addOption("Original Speed", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("MHZ Elevator:", option::MHZ_ELEVATOR)
+			.addOption("Original Speed", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("FBZ Door Opening:", option::FBZ_SCREWDOORS)
+			.addOption("Original Speed", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("SOZ Pyramid Rising:", option::SOZ_PYRAMID)
+			.addOption("Original Speed", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("AIZ Knuckles Intro:", option::AIZ_INTRO_KNUCKLES)
+			.addOption("Off", 0)
+			.addOption("On", 1);
+
+		configBuilder.addSetting("FBZ Cylinder Behavior:", option::FBZ_ENTERCYLINDER)
+			.addOption("Original", 0)
+			.addOption("Can enter from top", 1);
+
+		configBuilder.addSetting("Offscreen Player 2:", option::PLAYER2_OFFSCREEN)
+			.addOption("Not shown", 0)
+			.addOption("Show at border", 1);
 	}
 }
 

@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -559,6 +559,9 @@ function void fn068e8c()
 function void fn068e98()
 {
 	setupObjectAttributesBasic(0x069056)
+#if STANDALONE
+	MoveAndFlipWithParent() // Fix for boss debris facing left even if the boss is facing right, #contributed by mrgrassman14
+#endif
 
 	objA0.update_address = 0x085102
 	objA0.animation.sprite = 14 + (objA0.subtype2c >> 1)

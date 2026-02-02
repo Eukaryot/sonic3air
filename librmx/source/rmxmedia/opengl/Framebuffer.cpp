@@ -155,13 +155,8 @@ void Framebuffer::attachRenderbuffer(GLenum attachment, GLuint handle)
 
 void Framebuffer::createRenderbuffer(GLenum attachment, GLenum internalformat)
 {
-	Renderbuffer* renderbuffer = nullptr;
-	Renderbuffer** found = mapFind(mRenderbuffers, attachment);
-	if (nullptr != found)
-	{
-		renderbuffer = *found;
-	}
-	else
+	Renderbuffer* renderbuffer = mapFindOrDefault(mRenderbuffers, attachment, nullptr);
+	if (nullptr == renderbuffer)
 	{
 		renderbuffer = new Renderbuffer();
 		mRenderbuffers.emplace(attachment, renderbuffer);

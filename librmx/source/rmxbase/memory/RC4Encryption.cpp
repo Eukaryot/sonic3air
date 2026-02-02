@@ -36,7 +36,7 @@ void RC4Encryption::encrypt(const void* source, void* dest, int length, const vo
 		j = (j + sbox[i]) & 0xff;
 		SWAP(sbox[i], sbox[j]);
 
-		int k = sbox[(sbox[i] + sbox[j]) & 0xff];
+		k = sbox[(sbox[i] + sbox[j]) & 0xff];
 		dst[m] = src[m] ^ k;
 	}
 }

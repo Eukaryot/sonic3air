@@ -32,6 +32,7 @@ namespace
 
 void ConfigurationImpl::fillDefaultGameProfile(GameProfile& gameProfile)
 {
+	gameProfile.mIdentifier = "S3AIR";
 	gameProfile.mShortName = "Sonic 3 A.I.R.";
 	gameProfile.mFullName = "Sonic 3 - Angel Island Revisited";
 
@@ -109,27 +110,25 @@ void ConfigurationImpl::serializeSettingsInternal(JsonSerializer& serializer)
 	}
 
 	// Audio
-	serializer.serialize("Audio_MusicVolume", mMusicVolume);
-	serializer.serialize("Audio_SoundVolume", mSoundVolume);
-	serializer.serialize("ActiveSoundtrack", mActiveSoundtrack);
+	if (serializer.beginObject("Audio"))
+	{
+		serializer.serialize("ActiveSoundtrack", mActiveSoundtrack);
+		serializer.endObject();
+	}
+	else if (serializer.isReading())
+	{
+		// Legacy support for old, more flat way of storing settings (before Jan 2026)
+		serializer.serialize("ActiveSoundtrack", mActiveSoundtrack);
+	}
 
 	// Input
 	serializer.serialize("GamepadVisualStyle", mGamepadVisualStyle);
 
 	// Game simulation
+	serializer.serialize("SimulationFrequency", mSimulationFrequency);
 	if (serializer.isReading())
 	{
-		if (serializer.serialize("SimulationFrequency", mSimulationFrequency))
-		{
-			mSimulationFrequency = clamp(mSimulationFrequency, 30, 240);
-		}
-	}
-	else
-	{
-		if (mSimulationFrequency != 60)
-		{
-			serializer.serialize("SimulationFrequency", mSimulationFrequency);
-		}
+		mSimulationFrequency = clamp(mSimulationFrequency, 30, 240);
 	}
 
 	// Time Attack
@@ -200,7 +199,7 @@ void ConfigurationImpl::serializeSettingsInternal(JsonSerializer& serializer)
 					continue;
 
 				int value = mLocalGameSettings.getValue(pair.first);
-				if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::HIDDEN && value == setting.mDefaultValue)
+				if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::HIDDEN && value == setting.mDefaultValue && !serializer.getCurrentJson().isMember(setting.mIdentifier))
 					continue;
 
 				serializer.serialize(setting.mIdentifier.c_str(), value);

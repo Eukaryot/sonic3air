@@ -19,12 +19,14 @@ class ModManager : public SingleInstance<ModManager>
 public:
 	~ModManager();
 
+	inline const std::wstring& getModsBasePath() const  { return mBasePath; }
+
 	inline const std::vector<Mod*>& getAllMods() const	   { return mAllMods; }
 	inline const std::vector<Mod*>& getActiveMods() const  { return mActiveMods; }	// Sorted in inverse priority, i.e. highest prio mods are at the end of the list
 	inline const std::unordered_map<uint64, Mod*>& getActiveModsByNameHash() const	{ return mActiveModsByNameHash; }
 	inline const std::unordered_map<uint64, Mod*>& getModsByIDHash() const			{ return mModsByIDHash; }
 
-	Mod* findModByIDHash(uint64 idHash) const  { Mod*const* ptr = mapFind(mModsByIDHash, idHash); return (nullptr != ptr) ? *ptr : nullptr; }
+	Mod* findModByIDHash(uint64 idHash) const  { return mapFindOrDefault(mModsByIDHash, idHash, nullptr); }
 
 	void startup();
 	void clear();
@@ -38,6 +40,9 @@ public:
 	void copyModSettingsFromConfig();
 	void copyModSettingsToConfig();
 
+	bool addZipFileProvider(const std::wstring& zipLocalPath);
+	bool tryRemoveZipFileProvider(const std::wstring& zipLocalPath);
+
 private:
 	struct FoundMod
 	{
@@ -50,7 +55,6 @@ private:
 	bool scanMods();
 	void scanDirectoryRecursive(std::vector<FoundMod>& outFoundMods, const std::wstring& localPath);
 	void findZipsRecursively(std::vector<std::wstring>& outZipPaths, const std::wstring& localPath, int maxDepth);
-	bool processModZipFile(const std::wstring& zipLocalPath);
 	void onActiveModsChanged(bool duringStartup = false);
 
 private:

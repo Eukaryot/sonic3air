@@ -47,7 +47,7 @@ bool OggAudioSource::load(const std::wstring& filename)
 	mInputStream = FTX::FileSystem->createInputStream(filename);
 	if (nullptr == mInputStream)
 	{
-		RMX_ERROR("Failed to load audio file '" << *WString(filename).toString() << "'", );
+		RMX_ERROR("Failed to load audio file '" << *WString(filename).toString() << "': File not found", );
 		return false;
 	}
 	return true;
@@ -229,7 +229,7 @@ void OggAudioSource::progressInternal(float precacheTime)
 	// Update job priority
 	setJobPriority(mPrecacheTime - mAudioBuffer.getLengthInSec());
 
-	if (Configuration::instance().mUseAudioThreading)
+	if (Configuration::instance().mAudio.mUseAudioThreading)
 	{
 		// Add to job manager if not done yet
 		if (!isJobRegistered())

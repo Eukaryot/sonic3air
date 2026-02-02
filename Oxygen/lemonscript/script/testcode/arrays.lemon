@@ -1,0 +1,42 @@
+
+global u16 someGlobalArray[8]
+global string globalStringArray[100]
+
+
+function void testArrays()
+{
+	debugLog("\n== Arrays ==")
+
+	// Global arrays
+	{
+		debugLog(someGlobalArray.length())
+
+		for (u8 i = 0; i < 10; ++i)		// Intentionally access invalid indices
+		{
+			someGlobalArray[i] = i
+			someGlobalArray[i] *= i
+			++someGlobalArray[i]
+		}
+		for (u8 i = 0; i < 10; ++i)
+		{
+			debugLog(someGlobalArray[i])
+		}
+
+		globalStringArray[1] = "This is"
+		globalStringArray[1] += " a test."
+		debugLog(globalStringArray[1])
+	}
+
+	// Local arrays
+	{
+		s64 localArray[13]
+		u8 index = 10
+
+		localArray[index] = 0x9999
+		debugLog(localArray[index])
+
+		--index
+		localArray[++index] -= 0x1111
+		debugLog(localArray[index])
+	}
+}

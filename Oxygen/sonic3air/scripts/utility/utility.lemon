@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -400,20 +400,21 @@ function u32 applyGlobalComponentTint_BGR32(u32 color)
 // VDP Access                                            //
 //-------------------------------------------------------//
 
-function u32 VDPHelper.getDirectWriteCode(u16 address, u16 mode)
+function u32 VDPHelper.getDirectWriteCode(u16 address, u32 mode)
 {
-	u32 higherBits = (address & 0x3fff) | mode
+	u32 higherBits = (address & 0x3fff)
 	u32 lowerBits  = (address & 0xc000) >> 14
-	return (higherBits << 16) + lowerBits
+	return (higherBits << 16) | lowerBits | mode
 }
 
 function u32 VDPHelper.getDirectVRAMWriteCode(u16 vramAddress)
 {
-	return VDPHelper.getDirectWriteCode(vramAddress, 0x4000)
+	return VDPHelper.getDirectWriteCode(vramAddress, 0x40000000)
 }
 
 function u16 VDPHelper.getVRAMAddressFromWriteCode(u32 code)
 {
+	// Note that the mode flags get lost here
 	u32 higherBits = (code >> 16)
 	u32 lowerBits  = (code & 0xffff)
 	return (higherBits & 0x3fff) + ((lowerBits & 0x0003) << 14)
@@ -434,25 +435,9 @@ function void VDP.Config.enableHInt(bool enable)
 
 #else
 
-function void VDP.setupVRAMWrite(u16 vramAddress)
+function void VDP.setupVRAMRead(u16 vramAddress)
 {
-	u32[0xc00004] = VDPHelper.getDirectVRAMWriteCode(vramAddress)
-}
-
-function void VDP.setupVSRAMWrite(u16 vsramAddress)
-{
-	u32[0xc00004] = 0x40000010 | ((vsramAddress & 0x3fff) << 16) | ((vsramAddress & 0xc000) >> 14)
-}
-
-function void VDP.setupCRAMWrite(u16 cramAddress)
-{
-	// TODO: Support cramAddress parameter
-	u32[0xc00004] = 0xc0000000
-}
-
-function void VDP.setWriteIncrement(u8 increment)
-{
-	u16[0xc00004] = 0x8f00 + increment
+	u32[0xc00004] = VDPHelper.getDirectWriteCode(vramAddress, 0x00000000)	// Mode 0x00000000 is VRAM read mode
 }
 
 function u16 VDP.readData16()
@@ -463,6 +448,26 @@ function u16 VDP.readData16()
 function u32 VDP.readData32()
 {
 	return u32[0xc00000]
+}
+
+function void VDP.setupVRAMWrite(u16 vramAddress)
+{
+	u32[0xc00004] = VDPHelper.getDirectWriteCode(vramAddress, 0x40000000)	// Mode 0x40000000 is VRAM write mode
+}
+
+function void VDP.setupVSRAMWrite(u16 vsramAddress)
+{
+	u32[0xc00004] = VDPHelper.getDirectWriteCode(vsramAddress, 0x40000010)	// Mode 0x40000010 is VSRAM write mode
+}
+
+function void VDP.setupCRAMWrite(u16 cramAddress)
+{
+	u32[0xc00004] = VDPHelper.getDirectWriteCode(cramAddress, 0xc0000000)	// Mode 0xc0000000 is CRAM write mode
+}
+
+function void VDP.setWriteIncrement(u8 increment)
+{
+	u16[0xc00004] = 0x8f00 + increment
 }
 
 function void VDP.writeData16(u16 value)
@@ -630,7 +635,13 @@ function void VDP.Config.setPlayfieldSizeInPixels(u16 width, u16 height)
 	u16[0xc00004] = 0x9000 + data
 }
 
-function void VDP.Config.setupWindowPlane(bool useWindowPlane, u16 splitY)
+function void VDP.Config.setWindowPlaneSplitX(bool rightSideWindow, u16 splitX)
+{
+	u8 data = (rightSideWindow * 0x80) + (splitX / 16)
+	u16[0xc00004] = 0x9100 + data
+}
+
+function void VDP.Config.setWindowPlaneSplitY(bool useWindowPlane, u16 splitY)
 {
 	u8 data = (useWindowPlane * 0x80) + (splitY / 8)
 	u16[0xc00004] = 0x9200 + data

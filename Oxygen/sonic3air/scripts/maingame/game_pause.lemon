@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -131,6 +131,11 @@ function void GamePause.Menu()
 		// Inner loop will be exited once the player selected an entry in the menu
 		while (true)
 		{
+			// During pause, use lifetime context 1 for everything rendered by the pause menu and afterwards (in "PostFrameUpdate" and by ghost sync)
+			//  -> This allows for selectively clearing these sprites, texts, etc. in each frame without touching the game's rendered content
+			Renderer.resetLifetimeContext(1)
+			Renderer.setLifetimeContext(1)
+
 			float deltaSeconds = 1.0f / 60.0f
 			totalTime += deltaSeconds
 
@@ -151,10 +156,6 @@ function void GamePause.Menu()
 			{
 				GamePause.DrawMenu(totalTime)
 			}
-			else
-			{
-				Renderer.resetLifetimeContext(1)
-			}
 
 			enableCustomPlaneReset = false	// Maintain custom planes that were set before the pause
 			waitForNextFrame()
@@ -165,7 +166,7 @@ function void GamePause.Menu()
 
 			if (screenshotModeActive)
 			{
-				if (Input.buttonPressed(0, BUTTON_Y))
+				if (Input.buttonPressed(0, BUTTON_A) || Input.buttonPressed(0, BUTTON_B) || Input.buttonPressed(0, BUTTON_X) || Input.buttonPressed(0, BUTTON_Y) || Input.buttonPressed(0, BUTTON_START) || Input.buttonPressed(0, BUTTON_BACK))
 					screenshotModeActive = false
 			}
 			else
@@ -348,6 +349,9 @@ function void GamePause.UpdateFadeOut()
 	if (global.game.paused)
 		return
 
+	Renderer.resetLifetimeContext(1)
+	Renderer.setLifetimeContext(1)
+
 	// Fade-out
 	float deltaSeconds = 1.0f / 60.0f
 	GamePause.visibility = max(GamePause.visibility - deltaSeconds * 12.0f, 0.0f)
@@ -357,10 +361,6 @@ function void GamePause.UpdateFadeOut()
 	if (GamePause.visibility > 0.0f)
 	{
 		GamePause.DrawMenu(0.0f)
-	}
-	else
-	{
-		Renderer.resetLifetimeContext(1)
 	}
 }
 
@@ -376,10 +376,8 @@ function void GamePause.DrawMenu(float time)
 	u16 rightAnchor = getScreenWidth() + Math.roundToInt((1.0f - GamePause.visibility) * 160)
 	u16 py = getScreenHeight() - numEntries * LINE_HEIGHT
 
-	// Use lifetime context 1 for everything rendered by the pause menu
-	//  -> This allows for selectively clearing these sprites, texts, etc. in each frame without touching the game's rendered content
-	Renderer.resetLifetimeContext(1)
-	Renderer.setLifetimeContext(1)
+	// Ensure that the game pause menu always renders onto the full screen, #contributed by nabbup / Ramona
+	Renderer.resetViewport(0xfeff)
 
 	Renderer.drawSprite("pause_screen_upper", rightAnchor - 210, 0, 0, SPRITE_FLAG_PRIO | SPRITE_FLAG_NO_GLOBAL_TINT, 0xff00)
 	Renderer.drawSprite("pause_screen_lower", rightAnchor - 190, py - 8, 0, SPRITE_FLAG_PRIO | SPRITE_FLAG_NO_GLOBAL_TINT, 0xff00)

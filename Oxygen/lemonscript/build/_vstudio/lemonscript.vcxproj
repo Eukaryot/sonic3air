@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\lemon\compiler\backend\FunctionCompiler.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\backend\OpcodeOptimization.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\Compiler.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\frontend\CompilerFrontend.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\frontend\TokenProcessing.cpp" />
@@ -35,11 +36,14 @@
     <ClCompile Include="..\..\source\lemon\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\BaseType.cpp" />
     <ClCompile Include="..\..\source\lemon\program\ConstantArray.cpp" />
     <ClCompile Include="..\..\source\lemon\program\DataType.cpp" />
     <ClCompile Include="..\..\source\lemon\program\Define.cpp" />
-    <ClCompile Include="..\..\source\lemon\program\Function.cpp" />
-    <ClCompile Include="..\..\source\lemon\program\FunctionWrapper.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\function\Function.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\function\FunctionWrapper.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\function\NativeFunction.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\function\ScriptFunction.cpp" />
     <ClCompile Include="..\..\source\lemon\program\GlobalsLookup.cpp" />
     <ClCompile Include="..\..\source\lemon\program\Module.cpp" />
     <ClCompile Include="..\..\source\lemon\program\ModuleSerializer.cpp" />
@@ -60,18 +64,22 @@
     <ClCompile Include="..\..\source\lemon\translator\NativizerInternal.cpp" />
     <ClCompile Include="..\..\source\lemon\translator\SourceCodeWriter.cpp" />
     <ClCompile Include="..\..\source\lemon\translator\Translator.cpp" />
+    <ClCompile Include="..\..\source\lemon\utility\DataTypeHelper.cpp" />
     <ClCompile Include="..\..\source\lemon\utility\FlyweightString.cpp" />
     <ClCompile Include="..\..\source\lemon\utility\PragmaSplitter.cpp" />
     <ClCompile Include="..\..\source\lemon\utility\StringFormatter.cpp" />
     <ClCompile Include="..\..\source\lemon\utility\StringFormatterLegacy.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\lemon\basics\GenericManager.h" />
     <ClInclude Include="..\..\source\lemon\compiler\backend\FunctionCompiler.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\backend\OpcodeOptimization.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Errors.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\frontend\BlockNodeStack.h" />
     <ClInclude Include="..\..\source\lemon\compiler\frontend\CompilerFrontend.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\frontend\NodesIterator.h" />
     <ClInclude Include="..\..\source\lemon\compiler\frontend\TokenProcessing.h" />
-    <ClInclude Include="..\..\source\lemon\compiler\GenericManager.h" />
     <ClInclude Include="..\..\source\lemon\compiler\LineNumberTranslation.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Node.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Definitions.h" />
@@ -92,8 +100,11 @@
     <ClInclude Include="..\..\source\lemon\program\ConstantArray.h" />
     <ClInclude Include="..\..\source\lemon\program\DataType.h" />
     <ClInclude Include="..\..\source\lemon\program\Define.h" />
-    <ClInclude Include="..\..\source\lemon\program\Function.h" />
-    <ClInclude Include="..\..\source\lemon\program\FunctionWrapper.h" />
+    <ClInclude Include="..\..\source\lemon\program\function\Function.h" />
+    <ClInclude Include="..\..\source\lemon\program\function\FunctionReference.h" />
+    <ClInclude Include="..\..\source\lemon\program\function\FunctionWrapper.h" />
+    <ClInclude Include="..\..\source\lemon\program\function\NativeFunction.h" />
+    <ClInclude Include="..\..\source\lemon\program\function\ScriptFunction.h" />
     <ClInclude Include="..\..\source\lemon\program\GlobalsLookup.h" />
     <ClInclude Include="..\..\source\lemon\program\Module.h" />
     <ClInclude Include="..\..\source\lemon\program\ModuleBindingsBuilder.h" />
@@ -121,6 +132,7 @@
     <ClInclude Include="..\..\source\lemon\translator\SourceCodeWriter.h" />
     <ClInclude Include="..\..\source\lemon\translator\Translator.h" />
     <ClInclude Include="..\..\source\lemon\utility\AnyBaseValue.h" />
+    <ClInclude Include="..\..\source\lemon\utility\DataTypeHelper.h" />
     <ClInclude Include="..\..\source\lemon\utility\FastStringStream.h" />
     <ClInclude Include="..\..\source\lemon\utility\FlyweightString.h" />
     <ClInclude Include="..\..\source\lemon\utility\PragmaSplitter.h" />

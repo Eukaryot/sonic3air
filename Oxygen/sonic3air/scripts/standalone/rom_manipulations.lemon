@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -15,10 +15,12 @@ function void ApplyROMManipulations()
 	ROMManipulation.RepairSpriteMappings()
 	ROMManipulation.RepairAnimations()
 	ROMManipulation.CutsceneKnucklesPalette()
+	ROMManipulation.AIZ.MusicFix()
 	ROMManipulation.AIZ1.KnucklesIntroCritters()
 	ROMManipulation.AIZ2.StartPosition()
 	ROMManipulation.AIZ2.BlimpSequenceBombs()
 	ROMManipulation.HCZ.SetBottomHeight()
+	ROMManipulation.MGZ1.BossExplosionFix()
 	ROMManipulation.CNZ2.KnucklesPreBossCutscene()
 	ROMManipulation.HPZ.SecondMuralChunks()
 	ROMManipulation.SSZ.LevelLayoutWidescreen()
@@ -128,6 +130,19 @@ function void ROMManipulation.CutsceneKnucklesPalette()
 }
 
 
+function void ROMManipulation.AIZ.MusicFix()
+{
+	// Fix for bugged PSG data in the AIZ 1 and 2 emulated music data, #contributed by Legobouwer
+	//  -> The issue is caused by the music using smpsFMAlterVol (E5, E6) instead of smpsPSGAlterVol (EC); this code corrects this for both acts
+	u8[0x2c9a0b] = 0xec
+	u8[0x2c9a35] = 0xec
+	u8[0x2cadba] = 0xec
+	u8[0x2cadd3] = 0xec
+	u8[0x2cafc3] = 0xec
+	u8[0x2cafdc] = 0xec
+}
+
+
 function void ROMManipulation.AIZ1.KnucklesIntroCritters()
 {
 	// Use AIZ critters and not the MHZ critters in Knuckles' intro, #contributed by iCloudius
@@ -230,6 +245,13 @@ function void ROMManipulation.HCZ.SetBottomHeight()
 		u16[0x01bce4] = 0x0c00 - getScreenHeight()
 	else
 		u16[0x01bce4] = 0x1000
+}
+
+function void ROMManipulation.MGZ1.BossExplosionFix()
+{
+	// Fix for incorrect explosion graphics #contributed by mrgrassman14
+	u16[0x088b94] = 0xa5c0	// Change target VRAM address for pointy rock graphics
+	u16[0x088b12] = 0x452e	// Make pointy rock object use new VRAM address
 }
 
 function void ROMManipulation.CNZ2.KnucklesPreBossCutscene()

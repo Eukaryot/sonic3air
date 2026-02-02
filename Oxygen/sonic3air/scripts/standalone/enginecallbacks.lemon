@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -205,3 +205,49 @@ function void restartTimeAttack()
 
 	yieldInWhiteScreen()
 }
+
+
+
+//-------------------------------------------------------//
+// CrowdControl integration                              //
+//-------------------------------------------------------//
+
+constant u8 CCStatusCode.SUCCESS		= 0x00		// The effect executed successfully
+constant u8 CCStatusCode.FAILURE		= 0x01		// The effect failed to trigger, but is still available for use; viewer(s) will be refunded
+constant u8 CCStatusCode.UNAVAILABLE	= 0x02		// Same as FAILURE but the effect is no longer available for use for the remainder of the game
+constant u8 CCStatusCode.RETRY			= 0x03		// The effect cannot be triggered right now, try again in a few seconds - note: this is the "normal" failure response
+constant u8 CCStatusCode.PAUSED			= 0x06		// The timed effect has been paused and is now waiting
+constant u8 CCStatusCode.RESUME			= 0x07		// The timed effect has been resumed and is counting down again
+constant u8 CCStatusCode.FINISHED		= 0x08		// The timed effect has finished
+
+
+function void CrowdControl.triggerEffect(u32 id, string code, s32 quantity, s32 duration)
+{
+	/*
+	 * When implementing a CrowdControl effect, please implement your own override of "CrowdControl.triggerEffect" as follows:
+	 *
+	 *	- Check the code parameter for whether it's an effect code that your mod can handle
+	 *
+	 *	- If you can handle the effect code:
+	 *		- Send back a response using "CrowdControl.sendResponse" like this:
+	 *			CrowdControl.sendResponse(id, CCStatusCode.SUCCESS, "")
+	 *		- Then return *without* calling "base.CrowdControl.triggerEffect"
+	 *
+	 *	- If you don't handle the effect code:
+	 *		- Call "base.CrowdControl.triggerEffect" after your own code evaluations, like this:
+	 *			base.CrowdControl.triggerEffect(id, code, quantity, duration)
+	 *		- Do not call "CrowdControl.sendResponse" in this case
+	 */
+
+	// Default implementation in case the code could not be handled by any mod:
+	//  Tell CrowdControl that the code is not supported / available
+	CrowdControl.sendResponse(id, CCStatusCode.UNAVAILABLE, "")
+}
+
+
+#if !GAMEAPP
+	// When running in Oxygen Engine, CrowdControl is not available (yet?), so this dummy implementation is required
+	function void CrowdControl.sendResponse(u32 id, u8 status, string message)
+	{
+	}
+#endif

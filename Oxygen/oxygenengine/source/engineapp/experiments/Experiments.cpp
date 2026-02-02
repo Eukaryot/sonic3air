@@ -58,7 +58,7 @@ void Experiments::onPostFrameUpdate()
 
 
 	static int16 soundBuffer[0x10000];
-	
+
 	std::vector<uint32> writes;
 	for (AudioData& audioData : mCurrentFrame->mAudioData)
 	{

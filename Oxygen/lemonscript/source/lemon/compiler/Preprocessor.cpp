@@ -106,17 +106,11 @@ namespace lemon
 						{
 							if (rmx::startsWith(rest, "define ") && rest.length() >= 8)
 							{
-								if (blockStack.shouldConsiderContent())
-								{
-									processDefinition(rest.substr(7), parser);
-								}
+								processDefinition(rest.substr(7), parser);
 							}
 							else if (rmx::startsWith(rest, "error ") && rest.length() >= 7)
 							{
-								if (blockStack.shouldConsiderContent())
-								{
-									CHECK_ERROR(false, rest.substr(6), mLineNumber);
-								}
+								CHECK_ERROR(false, rest.substr(6), mLineNumber);
 							}
 							else
 							{
@@ -358,12 +352,12 @@ namespace lemon
 	{
 		switch (token.getType())
 		{
-			case Token::Type::CONSTANT:
+			case ConstantToken::TYPE:
 			{
 				return token.as<ConstantToken>().mValue.get<int64>();
 			}
 
-			case Token::Type::PARENTHESIS:
+			case ParenthesisToken::TYPE:
 			{
 				const ParenthesisToken& pt = token.as<ParenthesisToken>();
 				CHECK_ERROR(pt.mParenthesisType == ParenthesisType::PARENTHESIS, "Brackets are not allowed in preprocessor condition", mLineNumber);
@@ -372,7 +366,7 @@ namespace lemon
 				return evaluateConstantToken(pt.mContent[0].as<StatementToken>());
 			}
 
-			case Token::Type::BINARY_OPERATION:
+			case BinaryOperationToken::TYPE:
 			{
 				const BinaryOperationToken& bot = token.as<BinaryOperationToken>();
 				switch (bot.mOperator)
@@ -392,7 +386,7 @@ namespace lemon
 				break;
 			}
 
-			case Token::Type::UNARY_OPERATION:
+			case UnaryOperationToken::TYPE:
 			{
 				const UnaryOperationToken& uot = token.as<UnaryOperationToken>();
 				switch (uot.mOperator)

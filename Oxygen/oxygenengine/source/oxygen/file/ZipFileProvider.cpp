@@ -226,7 +226,7 @@ struct ZipFileProvDetail
 
 struct ZipFileProvider::Internal
 {
-	unzFile mZipFile;
+	unzFile mZipFile = nullptr;
 	unz_global_info64 mGlobalInfo;
 	FileStructureTree mFileStructureTree;
 	std::vector<const FileStructureTree::Entry*> mEntriesBuffer;
@@ -259,12 +259,22 @@ ZipFileProvider::ZipFileProvider(const std::wstring& zipFilename) :
 	}
 	else
 	{
+		if (nullptr != mInternal.mZipFile)
+		{
+			unzClose(mInternal.mZipFile);
+			mInternal.mZipFile = nullptr;
+		}
 		RMX_LOG_INFO("Failed to load zip file '" << WString(zipFilename).toStdString() << "'");
 	}
 }
 
 ZipFileProvider::~ZipFileProvider()
 {
+	if (nullptr != mInternal.mZipFile)
+	{
+		unzClose(mInternal.mZipFile);
+		mInternal.mZipFile = nullptr;
+	}
 	delete &mInternal;
 }
 

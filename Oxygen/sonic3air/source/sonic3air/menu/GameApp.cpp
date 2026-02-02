@@ -28,6 +28,8 @@
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/helper/FileHelper.h"
+#include "oxygen/menu/imgui/ImGuiManager.h"
+#include "oxygen/menu/imgui/implementations/ImGuiFileBrowser.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/rendering/utils/RenderUtils.h"
 #include "oxygen/simulation/EmulatorInterface.h"
@@ -339,6 +341,25 @@ void GameApp::showSkippableCutsceneWindow(bool show)
 			mGameView->addChild(*mSkippableCutsceneWindow);
 	}
 	mSkippableCutsceneWindow->show(show);
+}
+
+bool GameApp::supportsFileBrowser()
+{
+#if defined(SUPPORT_IMGUI)
+	return true;
+#else
+	return false;
+#endif
+}
+
+bool GameApp::openFileBrowser()
+{
+#if defined(SUPPORT_IMGUI)
+	ImGuiManager::instance().getOrAddImGuiContentProvider<ImGuiFileBrowser>(100);
+	return true;
+#else
+	return false;
+#endif
 }
 
 void GameApp::gotoPhase(int phaseNumber)

@@ -54,6 +54,9 @@ public:
 	virtual void initialize();
 	virtual void deinitialize();
 
+	virtual void beginFrame();
+	virtual void endFrame();
+
 	virtual void sdlEvent(const SDL_Event& ev);
 	virtual void mouse(const rmx::MouseEvent& ev);
 	virtual void keyboard(const rmx::KeyboardEvent& ev);

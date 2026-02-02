@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -108,7 +108,11 @@ function void fn027424()
 		{
 			// Let the water rise (in Knuckles' area)
 			global.level_flag02 = 1
+		#if STANDALONE
+			water.height.target = 0x065e	// Adjust water height to match Sonic's, #contributed by mrgrassman14
+		#else
 			water.height.target = 0x0660
+		#endif
 			if (super.active)
 			{
 				water.height.changerate = 2

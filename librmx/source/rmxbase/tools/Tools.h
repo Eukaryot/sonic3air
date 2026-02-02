@@ -110,18 +110,24 @@ namespace rmx
 	std::string hexString(uint64 value, const char* prefix = "0x");
 	std::string hexString(uint64 value, uint32 minDigits, const char* prefix = "0x");
 
-	// Check if an std::string starts/ends with a given other string
-	bool startsWith(const std::string& fullString, const std::string& prefix);
-	bool startsWith(const std::wstring& fullString, const std::wstring& prefix);
+	// Check if an std::string starts with a given other string
 	bool startsWith(std::string_view fullString, std::string_view prefix);
 	bool startsWith(std::wstring_view fullString, std::wstring_view prefix);
-	bool endsWith(const std::string& fullString, const std::string& suffix);
-	bool endsWith(const std::wstring& fullString, const std::wstring& suffix);
-	bool endsWith(std::string_view fullString, std::string_view prefix);
-	bool endsWith(std::wstring_view fullString, std::wstring_view prefix);
+	bool startsWithCaseInsensitive(std::string_view fullString, std::string_view prefix);
+	bool startsWithCaseInsensitive(std::wstring_view fullString, std::wstring_view prefix);
+
+	// Check if an std::string ends with a given other string
+	bool endsWith(std::string_view fullString, std::string_view suffix);
+	bool endsWith(std::wstring_view fullString, std::wstring_view suffix);
+	bool endsWithCaseInsensitive(std::string_view fullString, std::string_view suffix);
+	bool endsWithCaseInsensitive(std::wstring_view fullString, std::wstring_view suffix);
 
 	// Check if an std::string contains a given other string
 	bool containsCaseInsensitive(std::string_view fullString, std::string_view substring);
+
+	// UTF8 conversion
+	std::wstring convertFromUTF8(std::string_view str);
+	std::string convertToUTF8(std::wstring_view str);
 
 
 	// Return a string with current date and time, like "2022-06-29_11-42-48"

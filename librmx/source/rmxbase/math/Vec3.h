@@ -34,6 +34,7 @@ public:
 	explicit Vec3(const TYPE* vec)	{ FORi(data[i] = vec[i]); }
 
 	Vec3(const Vec3& source) : x(source.x), y(source.y), z(source.z) {}
+	Vec3(const Vec2<TYPE>& source, TYPE z_) : x(source.x), y(source.y), z(z_) {}
 	Vec3(TYPE x_, TYPE y_, TYPE z_) : x(x_), y(y_), z(z_) {}
 
 	template<typename T> explicit Vec3(const Vec3<T>& source)
@@ -119,6 +120,14 @@ public:
 	TYPE sqrDist(const Vec3& other) const
 	{
 		return sqrDist(*this, other);
+	}
+
+	static float getDirectionAndDistance(Vec3& outDirection, const Vec3& start, const Vec3& end)
+	{
+		const Vec3 difference = end - start;
+		const float length = difference.length();
+		outDirection = difference / length;
+		return length;
 	}
 
 	static TYPE dot(const Vec3& source1, const Vec3& source2)

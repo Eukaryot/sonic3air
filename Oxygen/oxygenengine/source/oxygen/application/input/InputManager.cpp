@@ -11,7 +11,7 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/Configuration.h"
-#include "oxygen/devmode/ImGuiIntegration.h"
+#include "oxygen/menu/imgui/ImGuiIntegration.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/utils/RenderUtils.h"
 #include "oxygen/simulation/LogDisplay.h"
@@ -334,7 +334,7 @@ void InputManager::updateInput(float timeElapsed)
 
 	// Update touches
 	mActiveTouches.clear();
-	if (mTouchInputEnabled)
+	if (mTouchInputEnabled && !FTX::System->wasEventConsumed())
 	{
 		const int touchDevices = SDL_GetNumTouchDevices();
 		for (int k = 0; k < touchDevices; ++k)
@@ -398,7 +398,7 @@ void InputManager::updateInput(float timeElapsed)
 					if (control->mRepeatTimeout <= 0.0f)
 					{
 						control->mRepeat = true;
-						control->mRepeatTimeout = std::max(control->mRepeatTimeout + 0.125f, 0.05f);
+						control->mRepeatTimeout = std::max(control->mRepeatTimeout + 0.1f, 0.04f);
 					}
 				}
 				mAnythingPressed = true;
@@ -1007,7 +1007,7 @@ bool InputManager::isPressed(const ControlInput& input)
 				// Ignore key presses while Alt is down
 				if (!FTX::keyState(SDLK_LALT) && !FTX::keyState(SDLK_RALT))
 				{
-					if (!ImGuiIntegration::isCapturingKeyboard())
+					if (!ImGuiIntegration::instance().isCapturingKeyboard())
 						return true;
 				}
 			}

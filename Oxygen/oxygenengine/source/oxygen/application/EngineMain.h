@@ -45,6 +45,7 @@ public:
 	virtual AudioOutBase& createAudioOut() = 0;
 
 	virtual bool onEnginePreStartup() = 0;
+	virtual bool isDedicatedApplication() { return false; }		// This is expected to be true for dedicated game applications, like S3AIR
 	virtual bool setupCustomGameProfile() = 0;
 
 	virtual void startupGame(EmulatorInterface& emulatorInterface) = 0;
@@ -110,6 +111,9 @@ private:
 
 	void initDirectories();
 	bool initConfigAndSettings();
+	void loadConfigJson();
+	void updateGameProfilePaths();
+
 	bool initFileSystem();
 	bool loadFilePackages(bool forceReload);
 	bool loadFilePackageByIndex(size_t index, bool forceReload);

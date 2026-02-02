@@ -111,6 +111,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntryInt(option::GHOST_SYNC_RENDERING,		&config.mGameServerImpl.mGhostSync.mGhostRendering);
 		setupOptionEntryBool(option::SHOW_CONTROLS_DISPLAY,		&config.mShowControlsDisplay);
 		setupOptionEntryInt(option::SCRIPT_OPTIMIZATION,		&config.mScriptOptimizationLevel);
+		setupOptionEntryBool(option::DEV_MODE,					&config.mDevMode.mEnableAtStartup);
 		setupOptionEntryInt(option::GAME_RECORDING_MODE,		&config.mGameRecorder.mRecordingMode);
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
 		setupOptionEntryInt(option::BACKDROP,					&config.mBackdrop);
@@ -125,9 +126,9 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntryInt(option::TIMEATTACK_INSTANTRESTART,	&config.mInstantTimeAttackRestart);
 		setupOptionEntryInt(option::GAME_SPEED,					&config.mSimulationFrequency);
 
-		setupOptionEntryPercent(option::AUDIO_VOLUME,			&config.mAudioVolume);
-		setupOptionEntryPercent(option::MUSIC_VOLUME,			&config.mMusicVolume);
-		setupOptionEntryPercent(option::SOUND_VOLUME,			&config.mSoundVolume);
+		setupOptionEntryPercent(option::MASTER_VOLUME,			&config.mAudio.mMasterVolume);
+		setupOptionEntryPercent(option::MUSIC_VOLUME,			&config.mAudio.mMusicVolume);
+		setupOptionEntryPercent(option::SOUND_VOLUME,			&config.mAudio.mSoundVolume);
 		setupOptionEntryPercent(option::VGAMEPAD_OPACITY,		&config.mVirtualGamepad.mOpacity);
 		setupOptionEntryPercent(option::CONTROLLER_RUMBLE_P1,	&config.mControllerRumbleIntensity[0]);
 		setupOptionEntryPercent(option::CONTROLLER_RUMBLE_P2,	&config.mControllerRumbleIntensity[1]);
@@ -189,6 +190,16 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::SUPER_PEELOUT,				SharedDatabase::Setting::SETTING_SUPER_PEELOUT);
 		setupOptionEntry(option::DEBUG_MODE,				SharedDatabase::Setting::SETTING_DEBUG_MODE);
 		setupOptionEntry(option::TITLE_SCREEN,				SharedDatabase::Setting::SETTING_TITLE_SCREEN);
+		setupOptionEntry(option::HIDDEN_MONITOR_HINT,		SharedDatabase::Setting::SETTING_HIDDEN_MONITOR_HINT);
+		setupOptionEntry(option::FASTER_PUSH,				SharedDatabase::Setting::SETTING_FASTER_PUSH);
+		setupOptionEntry(option::LEVELRESULT_SCORE,			SharedDatabase::Setting::SETTING_LEVELRESULT_SCORE);
+		setupOptionEntry(option::PLAYER2_OFFSCREEN,			SharedDatabase::Setting::SETTING_PLAYER2_OFFSCREEN);
+		setupOptionEntry(option::AIZ_INTRO_KNUCKLES,		SharedDatabase::Setting::SETTING_AIZ_INTRO_KNUCKLES);
+		setupOptionEntry(option::LBZ_TUBETRANSPORT,			SharedDatabase::Setting::SETTING_LBZ_TUBETRANSPORT);
+		setupOptionEntry(option::MHZ_ELEVATOR,				SharedDatabase::Setting::SETTING_MHZ_ELEVATOR);
+		setupOptionEntry(option::FBZ_ENTERCYLINDER,			SharedDatabase::Setting::SETTING_FBZ_ENTERCYLINDER);
+		setupOptionEntry(option::FBZ_SCREWDOORS,			SharedDatabase::Setting::SETTING_FBZ_SCREWDOORS);
+		setupOptionEntry(option::SOZ_PYRAMID,				SharedDatabase::Setting::SETTING_SOZ_PYRAMID);
 
 		setupOptionEntryBitmask(option::LEVELMUSIC_CNZ1,	SharedDatabase::Setting::SETTING_CNZ_PROTOTYPE_MUSIC);
 		setupOptionEntryBitmask(option::LEVELMUSIC_CNZ2,	SharedDatabase::Setting::SETTING_CNZ_PROTOTYPE_MUSIC);
@@ -422,7 +433,7 @@ void OptionsMenu::update(float timeElapsed)
 		mOptionEntries[option::FRAME_SYNC].loadValue();
 		mOptionEntries[option::FILTERING].loadValue();
 		mOptionEntries[option::BG_BLUR].loadValue();
-		mOptionEntries[option::AUDIO_VOLUME].loadValue();
+		mOptionEntries[option::MASTER_VOLUME].loadValue();
 		mOptionEntries[option::RENDERER].mGameMenuEntry->setSelectedIndexByValue((int)config.mRenderMethod);
 
 		if (mActiveMenu == &mTabMenuEntries && (keys.Down.justPressedOrRepeat() || keys.Up.justPressedOrRepeat()))
@@ -694,6 +705,12 @@ void OptionsMenu::update(float timeElapsed)
 									playSoundtest(*mPlayingSoundTest);
 								}
 							}
+							break;
+						}
+
+						case option::_OPEN_FILE_BROWSER:
+						{
+							GameApp::instance().openFileBrowser();
 							break;
 						}
 
@@ -1135,6 +1152,16 @@ void OptionsMenu::createOptionMenuEntry(GameMenuEntries& entries, const OptionsC
 			GameMenuEntry& entry = entries.addEntry<AdvancedOptionMenuEntry>()
 				.setDefaultValue(-1)
 				.initEntry(setting.mName, option::GAME_RECORDING_MODE)
+				.addOptions(setting);
+			break;
+		}
+
+		case option::DEV_MODE:
+		{
+			entries.addEntry<LabelMenuEntry>().initEntry("Dev Mode is providing debugging and mod development tools.\nIf you just want to play the game or use mods, leave it disabled.", Color(1.0f, 0.8f, 0.6f));
+
+			GameMenuEntry& entry = entries.addEntry<DevModeMenuEntry>()
+				.initEntry(setting.mName, option::DEV_MODE)
 				.addOptions(setting);
 			break;
 		}

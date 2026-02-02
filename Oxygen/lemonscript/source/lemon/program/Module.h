@@ -12,16 +12,18 @@
 #include "lemon/program/Constant.h"
 #include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
-#include "lemon/program/Function.h"
+#include "lemon/program/function/NativeFunction.h"
 #include "lemon/program/SourceFileInfo.h"
 #include "lemon/program/StringRef.h"
-#include <unordered_map>
+#include "lemon/program/Variable.h"
 
 
 namespace lemon
 {
 	class GlobalsLookup;
 	class PreprocessorDefinitionMap;
+	class ScriptFunction;
+
 
 	class API_EXPORT Module
 	{
@@ -43,6 +45,9 @@ namespace lemon
 
 		inline const std::string& getModuleName() const  { return mModuleName; }
 		inline uint64 getModuleId() const  { return mModuleId; }
+
+		inline uint32 getScriptFeatureLevel() const  { return mScriptFeatureLevel; }
+		inline void setScriptFeatureLevel(uint32 scriptFeatureLevel)  { mScriptFeatureLevel = scriptFeatureLevel; }
 
 		inline AppendedInfo* getAppendedInfo() const  { return mAppendedInfo; }
 
@@ -92,8 +97,9 @@ namespace lemon
 		void addStringLiteral(FlyweightString str);
 
 		// Data types
-		const std::vector<const CustomDataType*>& getDataTypes() const  { return mDataTypes; }
-		const CustomDataType* addDataType(const char* name, BaseType baseType);
+		const std::vector<const DataTypeDefinition*>& getDataTypes() const  { return mDataTypes; }
+		ArrayDataType& addArrayDataType(const DataTypeDefinition& elementType, size_t arraySize);
+		const CustomDataType* addCustomDataType(const char* name, BaseType baseType);
 
 		// Serialization
 		uint32 buildDependencyHash() const;
@@ -113,6 +119,7 @@ namespace lemon
 	private:
 		std::string mModuleName;
 		uint64 mModuleId = 0;
+		uint32 mScriptFeatureLevel = 2;
 
 		AppendedInfo* mAppendedInfo = nullptr;
 
@@ -153,7 +160,7 @@ namespace lemon
 
 		// Data types
 		uint16 mFirstDataTypeID = 0;
-		std::vector<const CustomDataType*> mDataTypes;
+		std::vector<const DataTypeDefinition*> mDataTypes;
 
 		// Misc
 		uint64 mCompiledCodeHash = 0;

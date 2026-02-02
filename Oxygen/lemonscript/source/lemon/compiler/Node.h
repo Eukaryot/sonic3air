@@ -8,8 +8,9 @@
 
 #pragma once
 
-#include "lemon/compiler/GenericManager.h"
+#include "lemon/basics/GenericManager.h"
 #include "lemon/compiler/TokenTypes.h"
+#include "lemon/program/function/ScriptFunction.h"
 
 
 namespace lemon
@@ -45,16 +46,11 @@ namespace lemon
 
 		inline Type getType() const  { return (Type)genericmanager::Element<Node>::getType(); }
 
-		template<typename T> bool isA() const { return getType() == T::TYPE; }
-
-		template<typename T> const T& as() const { return *static_cast<const T*>(this); }
-		template<typename T> T& as() { return *static_cast<T*>(this); }
-
-		inline uint32 getLineNumber() const  { return mLineNumber; }
+		inline uint32 getLineNumber() const			  { return mLineNumber; }
 		inline void setLineNumber(uint32 lineNumber)  { mLineNumber = lineNumber; }
 
 	protected:
-		inline Node(Type type) : genericmanager::Element<Node>((uint32)type) {}
+		inline explicit Node(uint32 type) : genericmanager::Element<Node>(type) {}
 
 	private:
 		uint32 mLineNumber = 0;
@@ -86,15 +82,16 @@ namespace lemon
 
 
 
+	#define DEFINE_LEMON_NODE_TYPE(_class_, _type_) \
+		DEFINE_GENERIC_MANAGER_ELEMENT_TYPE(Node, Node, _class_, (uint32)_type_)
+
+
 	// Concrete node types
 
 	class API_EXPORT UndefinedNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::UNDEFINED;
-
-	public:
-		inline UndefinedNode() : Node(TYPE) {}
+		DEFINE_LEMON_NODE_TYPE(UndefinedNode, Type::UNDEFINED)
 
 	public:
 		TokenList mTokenList;
@@ -104,11 +101,7 @@ namespace lemon
 	class API_EXPORT BlockNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::BLOCK;
-
-	public:
-		inline BlockNode() : Node(TYPE) {}
-		inline virtual ~BlockNode() {}
+		DEFINE_LEMON_NODE_TYPE(BlockNode, Type::BLOCK)
 
 	public:
 		NodeList mNodes;
@@ -118,10 +111,7 @@ namespace lemon
 	class PragmaNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::PRAGMA;
-
-	public:
-		inline PragmaNode() : Node(TYPE) {}
+		DEFINE_LEMON_NODE_TYPE(PragmaNode, Type::PRAGMA)
 
 	public:
 		std::string mContent;
@@ -131,11 +121,7 @@ namespace lemon
 	class FunctionNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::FUNCTION;
-
-	public:
-		inline FunctionNode() : Node(TYPE) {}
-		inline ~FunctionNode() {}
+		DEFINE_LEMON_NODE_TYPE(FunctionNode, Type::FUNCTION)
 
 	public:
 		ScriptFunction* mFunction = nullptr;
@@ -146,23 +132,18 @@ namespace lemon
 	class LabelNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::LABEL;
-
-	public:
-		inline LabelNode() : Node(TYPE) {}
+		DEFINE_LEMON_NODE_TYPE(LabelNode, Type::LABEL)
 
 	public:
 		FlyweightString mLabel;
+		std::vector<ScriptFunction::AddressHook> mAddressHooks;
 	};
 
 
 	class JumpNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::JUMP;
-
-	public:
-		inline JumpNode() : Node(TYPE) {}
+		DEFINE_LEMON_NODE_TYPE(JumpNode, Type::JUMP)
 
 	public:
 		TokenPtr<LabelToken> mLabelToken;
@@ -172,10 +153,7 @@ namespace lemon
 	class JumpIndirectNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::JUMP_INDIRECT;
-
-	public:
-		inline JumpIndirectNode() : Node(TYPE) {}
+		DEFINE_LEMON_NODE_TYPE(JumpIndirectNode, Type::JUMP_INDIRECT)
 
 	public:
 		TokenPtr<StatementToken> mIndexToken;
@@ -186,30 +164,21 @@ namespace lemon
 	class BreakNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::BREAK;
-
-	public:
-		inline BreakNode() : Node(TYPE) {}
+		DEFINE_LEMON_NODE_TYPE(BreakNode, Type::BREAK)
 	};
 
 
 	class ContinueNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::CONTINUE;
-
-	public:
-		inline ContinueNode() : Node(TYPE) {}
+		DEFINE_LEMON_NODE_TYPE(ContinueNode, Type::CONTINUE)
 	};
 
 
 	class ReturnNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::RETURN;
-
-	public:
-		inline ReturnNode() : Node(TYPE) {}
+		DEFINE_LEMON_NODE_TYPE(ReturnNode, Type::RETURN)
 
 	public:
 		TokenPtr<StatementToken> mStatementToken;
@@ -219,7 +188,7 @@ namespace lemon
 	class ExternalNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::EXTERNAL;
+		DEFINE_LEMON_NODE_TYPE(ExternalNode, Type::EXTERNAL)
 
 	public:
 		enum class SubType : uint8
@@ -227,9 +196,6 @@ namespace lemon
 			EXTERNAL_CALL,
 			EXTERNAL_JUMP
 		};
-
-	public:
-		inline ExternalNode() : Node(TYPE) {}
 
 	public:
 		TokenPtr<StatementToken> mStatementToken;
@@ -240,10 +206,7 @@ namespace lemon
 	class StatementNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::STATEMENT;
-
-	public:
-		inline StatementNode() : Node(TYPE) {}
+		DEFINE_LEMON_NODE_TYPE(StatementNode, Type::STATEMENT)
 
 	public:
 		TokenPtr<StatementToken> mStatementToken;
@@ -253,10 +216,7 @@ namespace lemon
 	class IfStatementNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::IF_STATEMENT;
-
-	public:
-		inline IfStatementNode() : Node(TYPE) {}
+		DEFINE_LEMON_NODE_TYPE(IfStatementNode, Type::IF_STATEMENT)
 
 	public:
 		TokenPtr<StatementToken> mConditionToken;
@@ -268,10 +228,7 @@ namespace lemon
 	class WhileStatementNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::WHILE_STATEMENT;
-
-	public:
-		inline WhileStatementNode() : Node(TYPE) {}
+		DEFINE_LEMON_NODE_TYPE(WhileStatementNode, Type::WHILE_STATEMENT)
 
 	public:
 		TokenPtr<StatementToken> mConditionToken;
@@ -282,10 +239,7 @@ namespace lemon
 	class ForStatementNode : public Node
 	{
 	public:
-		static const Type TYPE = Type::FOR_STATEMENT;
-
-	public:
-		inline ForStatementNode() : Node(TYPE) {}
+		DEFINE_LEMON_NODE_TYPE(ForStatementNode, Type::FOR_STATEMENT)
 
 	public:
 		TokenPtr<StatementToken> mInitialToken;
@@ -294,5 +248,7 @@ namespace lemon
 		NodePtr<Node> mContent;
 	};
 
+
+	#undef DEFINE_LEMON_NODE_TYPE
 
 }

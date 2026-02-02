@@ -39,10 +39,13 @@ public:
 
 	inline bool isValid() const		{ return (nullptr != mImplementation); }
 	void invalidate();
+	void ensureValidity();
 
 	template<typename T>
 	T* getImplementation() const	{ return static_cast<T*>(mImplementation); }
 	void setImplementation(DrawerTextureImplementation* implementation);
+
+	uint32 getUniqueID() const		{ return mUniqueID; }
 
 	const Vec2i& getSize() const	{ return mSize; }
 	int getWidth() const			{ return mSize.x; }
@@ -50,6 +53,7 @@ public:
 
 	void clearBitmap();
 
+	const Bitmap& getBitmap() const;
 	Bitmap& accessBitmap();
 	void bitmapUpdated();
 	void setupAsRenderTarget(uint32 width, uint32 height);
@@ -60,6 +64,7 @@ public:
 private:
 	Drawer* mRegisteredOwner = nullptr;
 	size_t mRegisteredIndex = 0;
+	uint32 mUniqueID = 0;
 
 	Bitmap mBitmap;		// Holding the texture content, except if this is an OpenGL render target
 	Vec2i mSize;		// Resolution of the texture -- either the size of the bitmap or of an OpenGL render target

@@ -103,6 +103,11 @@ namespace
 		mWriteAddress = cramAddress;
 	}
 
+	// Oxygen Engine doesn't differentiate read or write mode
+	void VDP_setupVRAMRead(uint16 vramAddress)   { VDP_setupVRAMWrite(vramAddress); }
+	void VDP_setupVSRAMRead(uint16 vsramAddress) { VDP_setupVSRAMWrite(vsramAddress); }
+	void VDP_setupCRAMRead(uint16 cramAddress)	 { VDP_setupCRAMWrite(cramAddress); }
+
 	void VDP_setWriteIncrement(uint16 increment)
 	{
 		mWriteIncrement = increment;
@@ -311,9 +316,15 @@ namespace
 		RenderParts::instance().getPlaneManager().setPlayfieldSizeInPixels(Vec2i(width, height));
 	}
 
-	void VDP_Config_setupWindowPlane(uint8 useWindowPlane, uint16 splitY)
+	void VDP_Config_setWindowPlaneSplitX(uint8 rightSideWindow, uint16 splitX)
 	{
-		RenderParts::instance().getPlaneManager().setupPlaneW(useWindowPlane != 0, splitY);
+		RenderParts::instance().getPlaneManager().setWindowPlaneSplitX(rightSideWindow != 0, splitX);
+		RenderParts::instance().getScrollOffsetsManager().setPlaneWScrollOffset(Vec2i(0, 0));	// Reset scroll offset to default
+	}
+
+	void VDP_Config_setWindowPlaneSplitY(uint8 bottomWindow, uint16 splitY)
+	{
+		RenderParts::instance().getPlaneManager().setWindowPlaneSplitY(bottomWindow != 0, splitY);
 		RenderParts::instance().getScrollOffsetsManager().setPlaneWScrollOffset(Vec2i(0, 0));	// Reset scroll offset to default
 	}
 
@@ -352,7 +363,7 @@ namespace
 		RenderParts::instance().getPaletteManager().writePaletteEntryPacked(0, index, color);
 	}
 
-	void Renderer_enableSecondaryPalette(uint8 line)
+	void Renderer_enableSecondaryPalette(uint16 line)
 	{
 		RenderParts::instance().getPaletteManager().setPaletteSplitPositionY(line);
 	}
@@ -413,6 +424,11 @@ namespace
 	{
 		RMX_CHECK(lifetimeContext <= 2, "Lifetime context must be between 0 and 2", return);
 		RenderParts::instance().getSpriteManager().setCurrentLifetimeContext((RenderItem::LifetimeContext)lifetimeContext);
+	}
+
+	void Renderer_setCollectLegacyVdpSprites(bool enable)
+	{
+		RenderParts::instance().getSpriteManager().setLegacyVdpSpriteMode(enable);
 	}
 
 	void Renderer_drawVdpSprite(int16 px, int16 py, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue)
@@ -930,7 +946,7 @@ void RendererBindings::registerBindings(lemon::Module& module)
 	lemon::ModuleBindingsBuilder builder(module);
 
 	// Data type
-	SpriteHandleWrapper::mDataType = module.addDataType("SpriteHandle", lemon::BaseType::UINT_32);
+	SpriteHandleWrapper::mDataType = module.addCustomDataType("SpriteHandle", lemon::BaseType::UINT_32);
 
 	// Constants
 	{
@@ -978,6 +994,15 @@ void RendererBindings::registerBindings(lemon::Module& module)
 
 
 		// VDP emulation
+		builder.addNativeFunction("VDP.setupVRAMRead", lemon::wrap(&VDP_setupVRAMRead), defaultFlags)
+			.setParameters("vramAddress");
+
+		builder.addNativeFunction("VDP.setupVSRAMRead", lemon::wrap(&VDP_setupVSRAMRead), defaultFlags)
+			.setParameters("vramAddress");
+
+		builder.addNativeFunction("VDP.setupCRAMRead", lemon::wrap(&VDP_setupCRAMRead), defaultFlags)
+			.setParameters("vramAddress");
+
 		builder.addNativeFunction("VDP.setupVRAMWrite", lemon::wrap(&VDP_setupVRAMWrite), defaultFlags)
 			.setParameters("vramAddress");
 
@@ -1047,8 +1072,11 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		builder.addNativeFunction("VDP.Config.setPlayfieldSizeInPixels", lemon::wrap(&VDP_Config_setPlayfieldSizeInPixels), defaultFlags)
 			.setParameters("width", "height");
 
-		builder.addNativeFunction("VDP.Config.setupWindowPlane", lemon::wrap(&VDP_Config_setupWindowPlane), defaultFlags)
-			.setParameters("useWindowPlane", "splitY");
+		builder.addNativeFunction("VDP.Config.setWindowPlaneSplitX", lemon::wrap(&VDP_Config_setWindowPlaneSplitX), defaultFlags)
+			.setParameters("rightSideWindow", "splitX");
+
+		builder.addNativeFunction("VDP.Config.setWindowPlaneSplitY", lemon::wrap(&VDP_Config_setWindowPlaneSplitY), defaultFlags)
+			.setParameters("bottomWindow", "splitY");
 
 		builder.addNativeFunction("VDP.Config.setPlaneWScrollOffset", lemon::wrap(&VDP_Config_setPlaneWScrollOffset), defaultFlags)
 			.setParameters("x", "y");
@@ -1105,6 +1133,9 @@ void RendererBindings::registerBindings(lemon::Module& module)
 
 		builder.addNativeFunction("Renderer.setLifetimeContext", lemon::wrap(&Renderer_setLifetimeContext), defaultFlags)
 			.setParameters("lifetimeContext");
+
+		builder.addNativeFunction("Renderer.setCollectLegacyVdpSprites", lemon::wrap(&Renderer_setCollectLegacyVdpSprites), defaultFlags)
+			.setParameters("enable");
 
 		builder.addNativeFunction("Renderer.drawVdpSprite", lemon::wrap(&Renderer_drawVdpSprite), defaultFlags)
 			.setParameters("px", "py", "encodedSize", "patternIndex", "renderQueue");

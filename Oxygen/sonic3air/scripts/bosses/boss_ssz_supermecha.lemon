@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -1615,7 +1615,11 @@ function void fn07ce90()
 	A2 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A2 + 0x04] & 0x01)
 	{
-		D2.s16 = -D2.s16
+	#if STANDALONE
+		D1.s16 = -D1.s16	// Fix for incorrectly positioned debris if Mecha Sonic is facing right, #contributed by mrgrassman14
+	#else
+		D2.s16 = -D2.s16 
+	#endif
 		objA0.render_flags |= render_flag.FLIP_X
 	}
 

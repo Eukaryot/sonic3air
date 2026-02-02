@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "lemon/program/Function.h"
+#include "lemon/program/function/Function.h"
 #include "lemon/compiler/Operators.h"
 #include "lemon/utility/AnyBaseValue.h"
 

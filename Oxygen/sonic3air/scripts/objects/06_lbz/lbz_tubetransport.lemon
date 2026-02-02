@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -182,6 +182,9 @@ function void fn029e42()
 	}
 	else
 	{
+	#if STANDALONE
+		u8[A0 + 0x2a] = 0x08	// Fix for rare bug that would skip the spinning down animation, #contributed by mrgrassman14
+	#endif
 		u8[A4] += 2
 		playSound(SFX_ROLL)
 		fn029eb2()

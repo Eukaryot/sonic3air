@@ -55,8 +55,10 @@ namespace lemon
 		{
 			RMX_ASSERT(mFunctions.size() == function->getID(), "Mismatch between expected (" << mFunctions.size() << ") and actual function ID (" << function->getID() << ")");
 			mFunctions.push_back(function);
-			if (function->getType() == Function::Type::SCRIPT)
-				mScriptFunctions.push_back(static_cast<ScriptFunction*>(function));
+			if (function->isA<ScriptFunction>())
+			{
+				mScriptFunctions.push_back(&function->as<ScriptFunction>());
+			}
 
 			mFunctionsByName[function->getName().getHash()].push_back(function);
 			std::vector<Function*>& funcs = mFunctionsBySignature[function->getNameAndSignatureHash()];

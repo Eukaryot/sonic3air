@@ -18,6 +18,7 @@ namespace lemon
 	struct RuntimeOpcode;
 	struct RuntimeOpcodeBuffer;
 	struct RuntimeOpcodeContext;
+	class ScriptFunction;
 
 
 	typedef void(*ExecFunc)(const RuntimeOpcodeContext context);
@@ -25,7 +26,7 @@ namespace lemon
 	class API_EXPORT RuntimeOpcodeProvider
 	{
 	public:
-		virtual bool buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime) = 0;
+		virtual bool buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime, const ScriptFunction& function) = 0;
 	};
 
 

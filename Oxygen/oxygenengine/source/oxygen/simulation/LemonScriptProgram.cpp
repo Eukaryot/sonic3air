@@ -187,7 +187,7 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(std::strin
 	}
 
 	// Scan for function pragmas defining hooks
-	evaluateFunctionPragmas();
+	collectHooksFromFunctions();
 
 	if (EngineMain::getDelegate().useDeveloperFeatures())
 	{
@@ -258,9 +258,9 @@ void LemonScriptProgram::resolveLocation(ResolvedLocation& outResolvedLocation, 
 
 void LemonScriptProgram::resolveLocation(ResolvedLocation& outResolvedLocation, const lemon::Function& function, uint32 programCounter)
 {
-	if (function.getType() == lemon::Function::Type::SCRIPT)
+	if (function.isA<lemon::ScriptFunction>())
 	{
-		const lemon::ScriptFunction& scriptFunc = static_cast<const lemon::ScriptFunction&>(function);
+		const lemon::ScriptFunction& scriptFunc = function.as<lemon::ScriptFunction>();
 		if (programCounter < scriptFunc.mOpcodes.size())
 		{
 			outResolvedLocation.mSourceFileInfo = scriptFunc.mSourceFileInfo;
@@ -517,13 +517,14 @@ LemonScriptProgram::LoadingResult LemonScriptProgram::loadScriptModule(lemon::Mo
 	return LoadingResult::FAILED_CONTINUE;
 }
 
-void LemonScriptProgram::evaluateFunctionPragmas()
+void LemonScriptProgram::collectHooksFromFunctions()
 {
 	mInternal.mAddressHooks.clear();
 
-	// Go through all functions and have a look at their pragmas
+	// Go through all functions
 	for (const lemon::ScriptFunction* function : mInternal.mProgram.getScriptFunctions())
 	{
+		// Have a look at their pragmas for update hooks
 		for (const std::string& pragma : function->mPragmas)
 		{
 			lemon::PragmaSplitter pragmaSplitter(pragma);
@@ -549,10 +550,22 @@ void LemonScriptProgram::evaluateFunctionPragmas()
 		}
 
 		// Create address hooks
-		for (uint32 addressHook : function->mAddressHooks)
+		for (const lemon::ScriptFunction::AddressHook& addressHook : function->mAddressHooks)
 		{
-			Hook& hook = addHook(Hook::Type::ADDRESS, addressHook);
+			Hook& hook = addHook(Hook::Type::ADDRESS, addressHook.mAddress);
 			hook.mFunction = function;
+			// Note that "addressHook.mDisabled" is only meant for emulation, and intentionally ignored in Oxygen
+		}
+
+		// Create label address hooks
+		for (const lemon::ScriptFunction::Label& label : function->getLabels())
+		{
+			for (const lemon::ScriptFunction::AddressHook& addressHook : label.mLabelAddressHooks)
+			{
+				Hook& hook = addHook(Hook::Type::ADDRESS, addressHook.mAddress);
+				hook.mFunction = function;
+				hook.mLabel = &label;
+			}
 		}
 	}
 }
@@ -578,7 +591,7 @@ void LemonScriptProgram::evaluateDefines()
 			{
 				const uint32 address = (uint32)tokens[2].as<lemon::ConstantToken>().mValue.get<uint64>();
 				const lemon::DataTypeDefinition& dataType = *tokens[0].as<lemon::VarTypeToken>().mDataType;
-				if (dataType.getClass() == lemon::DataTypeDefinition::Class::INTEGER)
+				if (dataType.isA<lemon::IntegerDataType>())
 				{
 					GlobalDefine& var = vectorAdd(mGlobalDefines);
 					var.mName = define->getName();

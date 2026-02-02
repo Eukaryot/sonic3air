@@ -186,6 +186,7 @@ bool SpriteAtlasBase::internalAdd(uint32 key, const Vec2i& size)
 
 	RMX_ASSERT(mSprites.count(key) == 0, "Double usage of the same key in sprite atlas");
 	SpriteInfo& spriteInfo = mSprites[key];
+	spriteInfo.mKey = key;
 	spriteInfo.mPageIndex = pageIndex;
 	spriteInfo.mRect = node->mRect;
 
@@ -194,8 +195,7 @@ bool SpriteAtlasBase::internalAdd(uint32 key, const Vec2i& size)
 
 SpriteAtlasBase::SpriteInfo* SpriteAtlasBase::getSpriteInfo(uint32 key)
 {
-	const auto it = mSprites.find(key);
-	return (it == mSprites.end()) ? nullptr : &it->second;
+	return mapFind(mSprites, key);
 }
 
 bool SpriteAtlasBase::compareSpriteInfoBySize(const SpriteInfo& first, const SpriteInfo& second)

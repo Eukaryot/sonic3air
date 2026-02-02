@@ -209,8 +209,10 @@
     <ClCompile Include="..\..\source\rmxmedia\font\FontProcessor.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\font\FontSource.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\framework\AppFramework.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\framework\FTX_System.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\framework\GuiBase.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\framework\InputContext.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\framework\SystemManager.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\framework\VideoManager.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\opengl\Framebuffer.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\opengl\GLTools.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\opengl\OpenGLFontOutput.cpp" />
@@ -241,8 +243,10 @@
     <ClInclude Include="..\..\source\rmxmedia\font\FontProcessor.h" />
     <ClInclude Include="..\..\source\rmxmedia\font\FontSource.h" />
     <ClInclude Include="..\..\source\rmxmedia\framework\AppFramework.h" />
-    <ClInclude Include="..\..\source\rmxmedia\framework\FTX_System.h" />
     <ClInclude Include="..\..\source\rmxmedia\framework\GuiBase.h" />
+    <ClInclude Include="..\..\source\rmxmedia\framework\InputContext.h" />
+    <ClInclude Include="..\..\source\rmxmedia\framework\SystemManager.h" />
+    <ClInclude Include="..\..\source\rmxmedia\framework\VideoManager.h" />
     <ClInclude Include="..\..\source\rmxmedia\opengl\Framebuffer.h" />
     <ClInclude Include="..\..\source\rmxmedia\opengl\GLTools.h" />
     <ClInclude Include="..\..\source\rmxmedia\opengl\OpenGLFontOutput.h" />

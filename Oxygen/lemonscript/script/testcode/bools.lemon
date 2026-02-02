@@ -1,0 +1,12 @@
+
+
+function void testBools()
+{
+	debugLog("\n== Bools ==")
+
+	A0 = 0x0873
+	bool flag1 = (A0 & 0x0800)		// Should be true, but isn't
+	bool flag2 = (A0 & 0x0800) != 0
+	debugLog(flag1)
+	debugLog(flag2)
+}

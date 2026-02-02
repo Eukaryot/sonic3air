@@ -175,10 +175,10 @@ FORCE_INLINE void strCpy(wchar_t* dst, int dstSize, const wchar_t* src)	{ wcscpy
 
 
 // Comparisons
-FORCE_INLINE int compare(int first, int second)		{ return (first < second) ? -1 : (first > second) ? +1 : 0; }
-FORCE_INLINE int compare(float first, float second)	{ return (first < second) ? -1 : (first > second) ? +1 : 0; }
-FORCE_INLINE int compare(void* first, void* second)	{ return (first < second) ? -1 : (first > second) ? +1 : 0; }
-FORCE_INLINE int compare(bool first, bool second)	{ return (first == second) ? 0 : second ? +1 : -1; }
+FORCE_INLINE int compare(int first, int second)					{ return (first < second) ? -1 : (first > second) ? +1 : 0; }
+FORCE_INLINE int compare(float first, float second)				{ return (first < second) ? -1 : (first > second) ? +1 : 0; }
+FORCE_INLINE int compare(const void* first, const void* second)	{ return (first < second) ? -1 : (first > second) ? +1 : 0; }
+FORCE_INLINE int compare(bool first, bool second)				{ return (first == second) ? 0 : second ? +1 : -1; }
 
 #define COMPARE_CASCADE(x) \
 { \

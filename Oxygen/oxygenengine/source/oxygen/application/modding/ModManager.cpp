@@ -24,7 +24,7 @@ ModManager::~ModManager()
 void ModManager::startup()
 {
 	// Update base path (actually only needs to be done once, it shouldn't change afterwards anyways)
-	mBasePath = Configuration::instance().mAppDataPath + L"mods/";
+	mBasePath = Configuration::instance().mGameAppDataPath + L"mods/";
 
 	// First go through all mod directories recursively to gather all installed mods
 	scanMods();
@@ -46,15 +46,14 @@ void ModManager::startup()
 			const uint64 hash = rmx::getMurmur2_64(localPath);
 
 			// Search for this mod in the previously found mods
-			Mod** found = mapFind(mModsByLocalDirectoryHash, hash);
-			if (nullptr == found)
+			Mod* mod = mapFindOrDefault(mModsByLocalDirectoryHash, hash, nullptr);
+			if (nullptr == mod)
 			{
 				// Not found... we could make this an error / failed mod
 			}
 			else
 			{
 				// Make this mod active
-				Mod* mod = *found;
 				mod->mState = Mod::State::ACTIVE;
 				mActiveMods.emplace_back(mod);
 			}
@@ -206,6 +205,48 @@ void ModManager::copyModSettingsToConfig()
 	}
 }
 
+bool ModManager::addZipFileProvider(const std::wstring& zipLocalPath)
+{
+	const auto it = mZipFileProviders.find(zipLocalPath);
+	if (it != mZipFileProviders.end())
+	{
+		// Already added, nothing else to do
+		return true;
+	}
+
+	// Create a new zip file provider
+	ZipFileProvider* provider = new ZipFileProvider(mBasePath + zipLocalPath);
+	if (provider->isLoaded())
+	{
+		// Mount using the zip file name as a virtual folder name
+		FTX::FileSystem->addMountPoint(*provider, mBasePath + zipLocalPath + L"/", L"", 0x100);
+		mZipFileProviders[zipLocalPath] = provider;
+
+		// Done
+		RMX_LOG_INFO("Loaded mod zip file: " << WString(zipLocalPath).toStdString());
+		return true;
+	}
+	else
+	{
+		// Failure
+		RMX_LOG_INFO("Failed to load mod zip file: " << WString(zipLocalPath).toStdString());
+		delete provider;
+		return false;
+	}
+}
+
+bool ModManager::tryRemoveZipFileProvider(const std::wstring& zipLocalPath)
+{
+	const auto it = mZipFileProviders.find(zipLocalPath);
+	if (it == mZipFileProviders.end())
+		return false;
+
+	// Note that destroying the file provider will automatically remove its mount points
+	delete it->second;
+	mZipFileProviders.erase(it);
+	return true;
+}
+
 bool ModManager::scanMods()
 {
 	// Mark all existing mods as dirty first
@@ -220,7 +261,7 @@ bool ModManager::scanMods()
 		findZipsRecursively(zipPaths, L"", 3);
 		for (const std::wstring& zipPath : zipPaths)
 		{
-			processModZipFile(zipPath);
+			addZipFileProvider(zipPath);
 		}
 	}
 
@@ -399,36 +440,6 @@ void ModManager::findZipsRecursively(std::vector<std::wstring>& outZipPaths, con
 				}
 			}
 		}
-	}
-}
-
-bool ModManager::processModZipFile(const std::wstring& zipLocalPath)
-{
-	const auto it = mZipFileProviders.find(zipLocalPath);
-	if (it != mZipFileProviders.end())
-	{
-		// Already added, nothing else to do
-		return true;
-	}
-
-	// Create a new zip file provider
-	ZipFileProvider* provider = new ZipFileProvider(mBasePath + zipLocalPath);
-	if (provider->isLoaded())
-	{
-		// Mount using the zip file name as a virtual folder name
-		FTX::FileSystem->addMountPoint(*provider, mBasePath + zipLocalPath + L"/", L"", 0x100);
-		mZipFileProviders[zipLocalPath] = provider;
-
-		// Done
-		RMX_LOG_INFO("Loaded mod zip file: " << WString(zipLocalPath).toStdString());
-		return true;
-	}
-	else
-	{
-		// Failure
-		RMX_LOG_INFO("Failed to load mod zip file: " << WString(zipLocalPath).toStdString());
-		delete provider;
-		return false;
 	}
 }
 

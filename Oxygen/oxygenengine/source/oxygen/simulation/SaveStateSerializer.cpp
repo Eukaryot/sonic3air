@@ -248,8 +248,15 @@ bool SaveStateSerializer::readGensxState(VectorBinarySerializer& serializer)
 			uint8 vdp_reg[0x20];
 			serializer.serialize(vdp_reg, 0x20);
 
+			mRenderParts.setActiveDisplay((vdp_reg[0x01] & 0x40) != 0);
+
 			mRenderParts.getPlaneManager().setNameTableBaseA(uint16(vdp_reg[0x02] >> 3) << 13);
+			mRenderParts.getPlaneManager().setNameTableBaseW(uint16(vdp_reg[0x03]) << 10);
 			mRenderParts.getPlaneManager().setNameTableBaseB(uint16(vdp_reg[0x04]) << 13);
+
+			mRenderParts.getSpriteManager().setSpriteAttributeTableBase(uint16(vdp_reg[0x05]) << 9);
+
+			mRenderParts.getPaletteManager().setBackdropColorIndex(vdp_reg[0x07]);
 
 			const uint8 scrollMasks[4] = { 0x00, 0x07, 0xf8, 0xff };
 			mRenderParts.getScrollOffsetsManager().setVerticalScrolling((vdp_reg[0x0b] & 0x04) != 0);
@@ -260,6 +267,16 @@ bool SaveStateSerializer::readGensxState(VectorBinarySerializer& serializer)
 			const uint16 playfieldWidths[4]  = { 256, 512, 256, 1024 };
 			const uint16 playfieldHeights[4] = { 256, 512, 768, 1024 };
 			mRenderParts.getPlaneManager().setPlayfieldSizeInPixels(Vec2i(playfieldWidths[vdp_reg[0x10] & 3], playfieldHeights[(vdp_reg[0x10] >> 4) & 3]));
+
+			const bool isPlaneWRightOfSplitX = (vdp_reg[0x11] & 0x80) != 0;
+			const uint16 splitX = (vdp_reg[0x11] & 0x7f) * 16;
+			mRenderParts.getPlaneManager().setWindowPlaneSplitX(isPlaneWRightOfSplitX, splitX);
+
+			const bool isPlaneWBelowSplitY = (vdp_reg[0x12] & 0x80) != 0;
+			const uint16 splitY = (vdp_reg[0x12] & 0x7f) * 8;
+			mRenderParts.getPlaneManager().setWindowPlaneSplitY(isPlaneWBelowSplitY, splitY);
+
+			mRenderParts.getScrollOffsetsManager().setPlaneWScrollOffset(Vec2i(0, 0));	// Reset scroll offset to default
 		}
 
 		serializer.skip(0x26);		// VDP state: rest
@@ -272,7 +289,9 @@ bool SaveStateSerializer::readGensxState(VectorBinarySerializer& serializer)
 		emulatorInterface.getRegister(i) = serializer.read<uint32>();
 	}
 
-	serializer.skip(14);	// PC, SR, USP, ISP
+	mLastReadPC = serializer.read<uint32>();
+
+	serializer.skip(10);	// SR, USP, ISP
 	serializer.skip(12);	// Cycles, int-level, stopped
 	serializer.skip(76);	// More Z80 state
 	serializer.skip(44);	// MD cartridge ext

@@ -106,7 +106,7 @@ namespace lemon
 			const BaseType baseType = readMemoryOpcode.mDataType;
 
 			MemoryAccessHandler::SpecializationResult result;
-			memoryAccessHandler.getDirectAccessSpecialization(result, address, DataTypeHelper::getSizeOfBaseType(baseType), false);
+			memoryAccessHandler.getDirectAccessSpecialization(result, address, BaseTypeHelper::getSizeOfBaseType(baseType), false);
 			if (result.mResult == MemoryAccessHandler::SpecializationResult::Result::HAS_SPECIALIZATION)
 			{
 				outInfo.mConsumedOpcodes = 2;

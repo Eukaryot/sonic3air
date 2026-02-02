@@ -126,6 +126,26 @@ void GuiBase::deinitialize()
 	endIteratingChildren();
 }
 
+void GuiBase::beginFrame()
+{
+	beginIteratingChildren();
+	for (int k = (int)mChildren.size() - 1; k >= 0; --k)	// Iterate in reverse order
+	{
+		mChildren[k]->beginFrame();
+	}
+	endIteratingChildren();
+}
+
+void GuiBase::endFrame()
+{
+	beginIteratingChildren();
+	for (int k = (int)mChildren.size() - 1; k >= 0; --k)	// Iterate in reverse order
+	{
+		mChildren[k]->endFrame();
+	}
+	endIteratingChildren();
+}
+
 void GuiBase::sdlEvent(const SDL_Event& ev)
 {
 	beginIteratingChildren();

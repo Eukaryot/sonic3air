@@ -51,7 +51,7 @@ public:
 	PlaneGeometry(const Recti& activeRect, int planeIndex, bool priorityFlag, uint8 scrollOffsets, uint16 renderQueue);
 
 public:
-	int mPlaneIndex = 0;
+	int mPlaneIndex = 0;			// Plane index: 0 = plane B, 1 = plane A, 2 = plane W
 	bool mPriorityFlag = false;
 	Recti mActiveRect;
 	uint8 mScrollOffsets = 0;

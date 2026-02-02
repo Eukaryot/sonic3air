@@ -31,13 +31,16 @@
     <Filter Include="lemon\compiler\parser">
       <UniqueIdentifier>{bb405800-486c-4cfb-9b24-da9a021501c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lemon\basics">
+      <UniqueIdentifier>{e8cf751e-41fd-49fb-a6cf-a392a9be71cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lemon\program\function">
+      <UniqueIdentifier>{95579a0c-7ea0-4793-9d01-cc6d971e1a28}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\lemon\compiler\Compiler.cpp">
       <Filter>lemon\compiler</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\lemon\program\Function.cpp">
-      <Filter>lemon\program</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\lemon\program\Program.cpp">
       <Filter>lemon\program</Filter>
@@ -50,9 +53,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\lemon\runtime\StandardLibrary.cpp">
       <Filter>lemon\runtime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\lemon\program\FunctionWrapper.cpp">
-      <Filter>lemon\program</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\lemon\pch.cpp">
       <Filter>lemon</Filter>
@@ -162,6 +162,27 @@
     <ClCompile Include="..\..\source\lemon\utility\StringFormatterLegacy.cpp">
       <Filter>lemon\utility</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\lemon\utility\DataTypeHelper.cpp">
+      <Filter>lemon\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\BaseType.cpp">
+      <Filter>lemon\program</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\backend\OpcodeOptimization.cpp">
+      <Filter>lemon\compiler\backend</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\function\Function.cpp">
+      <Filter>lemon\program\function</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\function\FunctionWrapper.cpp">
+      <Filter>lemon\program\function</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\function\NativeFunction.cpp">
+      <Filter>lemon\program\function</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\function\ScriptFunction.cpp">
+      <Filter>lemon\program\function</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h">
@@ -182,12 +203,6 @@
     <ClInclude Include="..\..\source\lemon\program\Define.h">
       <Filter>lemon\program</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\lemon\program\Function.h">
-      <Filter>lemon\program</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\lemon\program\FunctionWrapper.h">
-      <Filter>lemon\program</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\lemon\program\Opcode.h">
       <Filter>lemon\program</Filter>
     </ClInclude>
@@ -199,9 +214,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\runtime\Runtime.h">
       <Filter>lemon\runtime</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\lemon\compiler\GenericManager.h">
-      <Filter>lemon\compiler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\runtime\StandardLibrary.h">
       <Filter>lemon\runtime</Filter>
@@ -346,6 +358,36 @@
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\utility\StringFormatterLegacy.h">
       <Filter>lemon\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\basics\GenericManager.h">
+      <Filter>lemon\basics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\frontend\NodesIterator.h">
+      <Filter>lemon\compiler\frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\frontend\BlockNodeStack.h">
+      <Filter>lemon\compiler\frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\utility\DataTypeHelper.h">
+      <Filter>lemon\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\backend\OpcodeOptimization.h">
+      <Filter>lemon\compiler\backend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\function\Function.h">
+      <Filter>lemon\program\function</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\function\FunctionReference.h">
+      <Filter>lemon\program\function</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\function\FunctionWrapper.h">
+      <Filter>lemon\program\function</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\function\NativeFunction.h">
+      <Filter>lemon\program\function</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\function\ScriptFunction.h">
+      <Filter>lemon\program\function</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -30,7 +30,7 @@ public:
 	};
 
 public:
-	void initialize(Variation variation, bool alphaTest);
+	void initialize(Variation variation);
 	void draw(const PlaneGeometry& geometry, const Vec2i& gameResolution, int waterSurfaceHeight, RenderParts& renderParts, const OpenGLRenderResources& resources);
 
 private:

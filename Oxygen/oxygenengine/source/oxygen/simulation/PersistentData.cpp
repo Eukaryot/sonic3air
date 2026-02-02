@@ -13,8 +13,10 @@
 
 namespace
 {
-	const char* FORMAT_IDENTIFIER = "OXY.PDATA";
-	const uint16 FORMAT_VERSION = 0x0100;		// First version
+	static const char* FORMAT_IDENTIFIER = "OXY.PDATA";
+	static const uint16 FORMAT_VERSION = 0x0100;		// First version
+
+	static const size_t MAX_ENTRY_SIZE = 0x100000;		// Maximum is 1 MB per entry
 }
 
 
@@ -125,7 +127,7 @@ void PersistentData::setDataPartial(std::string_view filePath, std::string_view 
 {
 	// Sanity check
 	const size_t dataEnd = offset + data.size();
-	RMX_CHECK(dataEnd < 0x100000, "Persistent data save is too large (" << dataEnd << " bytes including offset", return);
+	RMX_CHECK(dataEnd < MAX_ENTRY_SIZE, "Persistent data save is too large (" << dataEnd << " bytes including offset", return);
 
 	const uint64 filePathHash = rmx::getMurmur2_64(filePath);
 	const uint64 keyHash = rmx::getMurmur2_64(key);
@@ -176,7 +178,8 @@ void PersistentData::removeKey(uint64 filePathHash, uint64 keyHash)
 
 void PersistentData::initialSetup()
 {
-	FTX::FileSystem->createDirectory(mBasePath);
+	const bool success = FTX::FileSystem->createDirectory(mBasePath);
+	RMX_CHECK(success, "Failed to create \"storage\" folder in app data, game won't be able to save your progress", return);
 
 	std::vector<uint8> content;
 	if (FTX::FileSystem->readFile(mBasePath + L"../persistentdata.bin", content))
@@ -229,7 +232,7 @@ void PersistentData::setDataInternal(std::string_view filePath, uint64 filePathH
 		// Sanity checks
 		{
 			const WString path = String(filePath).toWString();
-			RMX_CHECK(rmx::FileIO::isValidFileName(path), "Persistent data file path '" << filePath << "' contains illegal characters for file names (like \" < > : | ? * )", return);
+			RMX_CHECK(rmx::FileIO::isValidPathName(path), "Persistent data file path '" << filePath << "' contains illegal characters for file names (like \" < > : | ? * )", return);
 			RMX_CHECK(path.findString(L"..") == -1, "Persistent data file path '" << filePath << "' must not contain \"..\"", return);
 		}
 
@@ -306,14 +309,14 @@ bool PersistentData::serializeFile(File& file, VectorBinarySerializer& serialize
 	}
 
 	// Data entries
-	serializer.serializeArraySize(file.mEntries, 0xffffffff);
+	serializer.serializeArraySize(file.mEntries, 0x10000);
 	if (serializer.isReading())
 	{
 		for (Entry& entry : file.mEntries)
 		{
 			serializer.serialize(entry.mKey);
 			entry.mKeyHash = rmx::getMurmur2_64(entry.mKey);
-			serializer.readData(entry.mData);
+			serializer.readData(entry.mData, MAX_ENTRY_SIZE);
 		}
 	}
 	else

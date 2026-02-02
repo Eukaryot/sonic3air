@@ -8,15 +8,16 @@
 
 #pragma once
 
+#include "lemon/program/function/ScriptFunction.h"
 #include "lemon/program/StringRef.h"
 #include "lemon/runtime/ControlFlow.h"
 
 
 namespace lemon
 {
-	class Function;
-	class Program;
+	class GlobalVariable;
 	class NativeFunction;
+	class Program;
 	class Variable;
 	struct RuntimeOpcode;
 
@@ -154,9 +155,9 @@ namespace lemon
 		const FlyweightString* resolveStringByKey(uint64 key) const;
 		uint64 addString(std::string_view str);
 
-		AnyBaseValue getGlobalVariableValue(const Variable& variable);
-		void setGlobalVariableValue(const Variable& variable, AnyBaseValue value);
-		int64* accessGlobalVariableValue(const Variable& variable);
+		AnyBaseValue getGlobalVariableValue(const GlobalVariable& variable);
+		void setGlobalVariableValue(const GlobalVariable& variable, AnyBaseValue value);
+		int64* accessGlobalVariableValue(const GlobalVariable& variable);
 
 		inline const ControlFlow& getMainControlFlow() const  { return *mControlFlows[0]; }
 		inline const ControlFlow& getSelectedControlFlow() const  { return *mSelectedControlFlow; }
@@ -165,10 +166,12 @@ namespace lemon
 		void callRuntimeFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex = 0);
 		void callFunction(const Function& function, size_t baseCallIndex = 0);
 		bool callFunctionAtLabel(const Function& function, FlyweightString labelName);
+		bool callFunctionAtLabel(const ScriptFunction& function, const ScriptFunction::Label& label);
 		bool callFunctionByName(FlyweightString functionName, FlyweightString labelName = FlyweightString());
 		bool callFunctionWithParameters(FlyweightString functionName, const FunctionCallParameters& params);
 		bool returnFromFunction();
 
+		bool canExecuteSteps() const;
 		void executeSteps(ExecuteConnector& result, size_t stepsLimit, size_t minimumCallStackSize);
 		const Function* handleResultCall(const RuntimeOpcode& runtimeOpcode);
 
@@ -204,6 +207,7 @@ namespace lemon
 		std::vector<ControlFlow*> mControlFlows;		// Contains at least one control flow at all times = the main control flow at index 0
 		ControlFlow* mSelectedControlFlow = nullptr;	// The currently selected control flow used by methods like "executeSteps" and "callFunction"; this must always be a valid pointer
 
+		bool mEncounteredBuildError = false;			// Set if there was a fatal error in runtime function building
 		bool mReceivedStopSignal = false;
 		const RuntimeOpcode*const* mCurrentOpcodePtr = nullptr;
 	};

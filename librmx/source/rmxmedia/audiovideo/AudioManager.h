@@ -52,6 +52,7 @@ namespace rmx
 			float mPosition = 0.0f;
 			bool mLoop = false;
 			bool mStreaming = false;
+			bool mStartPaused = false;
 		};
 
 	public:

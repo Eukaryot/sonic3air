@@ -81,11 +81,11 @@ bool Simulation::startup()
 
 	// Optionally load save state
 	mStateLoaded.clear();
-	if (success && EngineMain::getDelegate().useDeveloperFeatures() && !config.mLoadSaveState.empty())
+	if (success && EngineMain::getDelegate().useDeveloperFeatures() && !config.mLoadSaveState.empty() && config.mStartPhase == 3)
 	{
 		success = loadState(config.mSaveStatesDirLocal + config.mLoadSaveState + L".state", false);
 		if (!success)
-			loadState(config.mSaveStatesDir + config.mLoadSaveState + L".state");
+			loadState(config.mSaveStatesDir + config.mLoadSaveState + L".state", false);
 	}
 	RMX_LOG_INFO("Runtime environment ready");
 
@@ -485,7 +485,7 @@ bool Simulation::generateFrame()
 		{
 			// Generate a keyframe every 10 frames, to allow for quick rewinds during game recording playback as well
 			const int keyframeFrequency = 10;
-			if (((mFrameNumber + 1) % keyframeFrequency) == 0 && !mGameRecorder.isKeyframe(mFrameNumber + 1))
+			if (((mFrameNumber + 1) % keyframeFrequency) == 0 && !mGameRecorder.isKeyframe(mFrameNumber + 1) && mGameRecorder.canAddFrame(mFrameNumber + 1))
 			{
 				GameRecorder::InputData inputData;
 				controlsIn.writeCurrentState(inputData.mInputs);
@@ -611,7 +611,7 @@ uint32 Simulation::saveGameRecording(WString* outFilename)
 	{
 		filename = L"gamerecording_" + String(timeString).toStdWString() + L".bin";
 	}
-	filename = Configuration::instance().mAppDataPath + L"gamerecordings/" + filename;
+	filename = Configuration::instance().mGameAppDataPath + L"gamerecordings/" + filename;
 
 	if (!mGameRecorder.saveRecording(filename, 180))
 		return 0;

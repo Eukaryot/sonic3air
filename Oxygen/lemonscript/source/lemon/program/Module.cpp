@@ -10,6 +10,7 @@
 #include "lemon/program/Module.h"
 #include "lemon/program/ModuleSerializer.h"
 #include "lemon/program/GlobalsLookup.h"
+#include "lemon/program/function/ScriptFunction.h"
 
 #include <iomanip>
 
@@ -27,7 +28,6 @@ namespace lemon
 		mModuleId(rmx::getMurmur2_64(name) & 0xffffffffffff0000ull),
 		mAppendedInfo(appendedInfo)
 	{
-		static_assert((size_t)Opcode::Type::_NUM_TYPES == 36);	// Otherwise DEFAULT_OPCODE_BASETYPES needs to get updated
 	}
 
 	Module::~Module()
@@ -44,10 +44,10 @@ namespace lemon
 		// Functions
 		for (Function* func : mFunctions)
 		{
-			if (func->getType() == Function::Type::NATIVE)
-				mNativeFunctionPool.destroyObject(*static_cast<NativeFunction*>(func));
+			if (func->isA<NativeFunction>())
+				mNativeFunctionPool.destroyObject(func->as<NativeFunction>());
 			else
-				mScriptFunctionPool.destroyObject(*static_cast<ScriptFunction*>(func));
+				mScriptFunctionPool.destroyObject(func->as<ScriptFunction>());
 		}
 		mFunctions.clear();
 		mScriptFunctions.clear();
@@ -81,9 +81,9 @@ namespace lemon
 		mStringLiterals.clear();
 
 		// Data types
-		for (const CustomDataType* customDataType : mDataTypes)
+		for (const DataTypeDefinition* dataType : mDataTypes)
 		{
-			delete customDataType;
+			delete dataType;
 		}
 		mDataTypes.clear();
 
@@ -95,6 +95,8 @@ namespace lemon
 
 	void Module::startCompiling(const GlobalsLookup& globalsLookup)
 	{
+		mScriptFeatureLevel = 1;	// Default for compiled scripts is feature level 1 unless the script explicitly defines feature level 2
+
 		if (mFunctions.empty())
 		{
 			// It's the same here as for variables, see below
@@ -437,7 +439,15 @@ namespace lemon
 		mStringLiterals.push_back(str);
 	}
 
-	const CustomDataType* Module::addDataType(const char* name, BaseType baseType)
+	ArrayDataType& Module::addArrayDataType(const DataTypeDefinition& elementType, size_t arraySize)
+	{
+		const uint16 id = mFirstDataTypeID + (uint16)mDataTypes.size();
+		ArrayDataType* arrayDataType = new ArrayDataType(id, elementType, arraySize);
+		mDataTypes.push_back(arrayDataType);
+		return *arrayDataType;
+	}
+
+	const CustomDataType* Module::addCustomDataType(const char* name, BaseType baseType)
 	{
 		const uint16 id = mFirstDataTypeID + (uint16)mDataTypes.size();
 		CustomDataType* customDataType = new CustomDataType(name, id, baseType);

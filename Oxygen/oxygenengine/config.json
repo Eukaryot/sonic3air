@@ -3,8 +3,8 @@
 	// Path to game project to load
 	//"LoadProject": "../oxygen_sonic1",
 	//"LoadProject": "../oxygen_sonic2",
-	"LoadProject": "../sonic3air",
-	//"LoadProject": "../oxygen_tje2",
+	"LoadProject": "../oxygen_tje2",
+	//"LoadProject": "../sonic3air",
 
 	// Dev mode
 	"DevMode":
@@ -16,13 +16,9 @@
 	"PlatformFlags": "-1",
 
 	// Video
-	"WindowSize": "1200 x 740",
+	"WindowSize": "1600 x 960",
 	"GameScreen": "400 x 224",		// Can be changed with numpad multiply/divide
 	"Filtering": "0",				// Can be toggled with Alt + F
-	"FullEmulationRendering": "1",	// Can be toggled with R key
-
-	// Audio
-	"AudioSampleRate": "48000",
 
 	// Game recorder
 	"GameRecording":

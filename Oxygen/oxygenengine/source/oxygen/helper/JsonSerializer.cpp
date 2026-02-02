@@ -71,7 +71,20 @@ bool JsonSerializer::serialize(const char* key, std::wstring& value)
 	}
 	else
 	{
-		(*mCurrentJson)[key] = WString(value).toUTF8().toStdString();
+		(*mCurrentJson)[key] = rmx::convertToUTF8(value);
+		return true;
+	}
+}
+
+bool JsonSerializer::serializeHexValue(const char* key, int& value, int numHexDigits)
+{
+	if (mReading)
+	{
+		return JsonHelper(*mCurrentJson).tryReadInt(key, value);
+	}
+	else
+	{
+		(*mCurrentJson)[key] = rmx::hexString(value, numHexDigits);
 		return true;
 	}
 }

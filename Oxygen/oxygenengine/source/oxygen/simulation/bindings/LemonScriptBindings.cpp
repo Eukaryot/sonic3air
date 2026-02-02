@@ -25,7 +25,7 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/overlays/DebugSidePanel.h"
 #include "oxygen/application/video/VideoOut.h"
-#include "oxygen/devmode/ImGuiIntegration.h"
+#include "oxygen/menu/imgui/ImGuiIntegration.h"
 #include "oxygen/helper/RandomNumberGenerator.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/resources/PaletteCollection.h"
@@ -219,6 +219,50 @@ namespace
 		const uint32 result = emulatorInterface.readMemory32(A7);
 		A7 += 4;
 		return result;
+	}
+
+	void pre_call1()
+	{
+		push(0);
+	}
+
+	void pre_call2(uint32 returnAddress)
+	{
+		push(returnAddress);
+	}
+
+	void asm_return()
+	{
+		pop();
+	}
+
+
+	uint32 createStackFrame(uint32 value, int16 offset)
+	{
+		uint32& A7 = getEmulatorInterface().getRegister(15);
+		push(value);						// Store original register value
+		const uint32 stackPointer = A7;		// Current stack pointer will be preserved by assigning the returned value
+		A7 += offset;						// Make some space on the stack
+		return stackPointer;
+	}
+
+	uint32 resolveStackFrame(uint32 value)
+	{
+		uint32& A7 = getEmulatorInterface().getRegister(15);
+		A7 = value;
+		return pop();
+	}
+
+	void createStackFrame_A6(int16 offset)
+	{
+		uint32& A6 = getEmulatorInterface().getRegister(14);
+		A6 = createStackFrame(A6, offset);
+	}
+
+	void resolveStackFrame_A6()
+	{
+		uint32& A6 = getEmulatorInterface().getRegister(14);
+		A6 = resolveStackFrame(A6);
 	}
 
 
@@ -621,7 +665,7 @@ namespace
 		lemon::AnyTypeWrapper wrapper;
 		wrapper.readFromStack(controlFlow);
 
-		if (decimal && wrapper.mType->getClass() == lemon::DataTypeDefinition::Class::INTEGER)
+		if (decimal && wrapper.mType->isA<lemon::IntegerDataType>())
 		{
 			const std::string valueString = *String(0, "%d", wrapper.mValue.get<int64>());
 			debugLogInternal(valueString);
@@ -887,9 +931,7 @@ namespace
 	{
 		if (modName.isValid())
 		{
-			Mod*const* modPtr = mapFind(ModManager::instance().getActiveModsByNameHash(), modName.getHash());
-			if (nullptr != modPtr)
-				return *modPtr;
+			return mapFindOrDefault(ModManager::instance().getActiveModsByNameHash(), modName.getHash(), nullptr);
 		}
 		return nullptr;
 	}
@@ -912,7 +954,7 @@ namespace
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
 			const int key = index + '0';
-			const bool result = (FTX::keyState(key) && FTX::keyChange(key) && !FTX::keyState(SDLK_LALT) && !FTX::keyState(SDLK_RALT) && !ImGuiIntegration::isCapturingKeyboard());
+			const bool result = (FTX::keyState(key) && !FTX::keyState(SDLK_LALT) && !FTX::keyState(SDLK_RALT) && !ImGuiIntegration::instance().isCapturingKeyboard());
 			controlFlow.pushValueStack<uint8>(result ? 1 : 0);
 		}
 		else
@@ -948,7 +990,7 @@ namespace
 				std::wstring outputFilename = String(filename.getString()).toStdWString();
 				const bool containsAnySlash = (outputFilename.find('/') != std::wstring::npos || outputFilename.find('\\') != std::wstring::npos);
 				RMX_CHECK(!containsAnySlash, "The file name passed to debugDumpToFile was '" << filename.getString() << "', which contains a file path. This is not allowed, please use a file name only!", return);
-				RMX_CHECK(rmx::FileIO::isValidFileName(outputFilename), "The file name passed to debugDumpToFile was '" << filename.getString() << "', which contains illegal characters for file names (like \" < > : | ? * )", return);
+				RMX_CHECK(rmx::FileIO::isValidPathName(outputFilename), "The file name passed to debugDumpToFile was '" << filename.getString() << "', which contains illegal characters for file names (like \" < > : | ? * )", return);
 
 				outputFilename = Configuration::instance().mAppDataPath + L"output/" + outputFilename;
 
@@ -1103,8 +1145,10 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 {
 	lemon::ModuleBindingsBuilder builder(module);
 
-	// Basic functions
 	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
+	const BitFlagSet<lemon::Function::Flag> excludedFlags(lemon::Function::Flag::EXCLUDE_FROM_DEFINITIONS);
+
+	// Basic functions
 	builder.addNativeFunction("assert", lemon::wrap(&scriptAssert1), defaultFlags);
 	builder.addNativeFunction("assert", lemon::wrap(&scriptAssert2), defaultFlags);
 
@@ -1123,9 +1167,11 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			module.addExternalVariable(registerNamesDAR[i] + ".s32", &lemon::PredefinedDataTypes::INT_32,  std::bind(accessRegister, i));
 		}
 
+
 		// Query flags
 		builder.addNativeFunction("_equal", lemon::wrap(&checkFlags_equal), defaultFlags);
 		builder.addNativeFunction("_negative", lemon::wrap(&checkFlags_negative), defaultFlags);
+
 
 		// Explictly set flags
 		builder.addNativeFunction("_setZeroFlagByValue", lemon::wrap(&setZeroFlagByValue), defaultFlags)
@@ -1158,9 +1204,28 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameters("startAddress", "bytes", "value");
 
 
-		// Push and pop
+		// Stack handling
 		builder.addNativeFunction("push", lemon::wrap(&push), defaultFlags);
+
 		builder.addNativeFunction("pop", lemon::wrap(&pop), defaultFlags);
+
+		builder.addNativeFunction("pre_call", lemon::wrap(&pre_call1), excludedFlags);							// Excluded by default because it's only relevant for certain projects
+
+		builder.addNativeFunction("pre_call", lemon::wrap(&pre_call2), excludedFlags)							// Excluded by default because it's only relevant for certain projects
+			.setParameters("returnAddress");
+
+		builder.addNativeFunction("asm_return", lemon::wrap(&asm_return), excludedFlags);						// Excluded by default because it's only relevant for certain projects
+
+		builder.addNativeFunction("createStackFrame", lemon::wrap(&createStackFrame), excludedFlags)			// Excluded by default because it's only relevant for certain projects
+			.setParameters("value", "offset");
+
+		builder.addNativeFunction("createStackFrame_A6", lemon::wrap(&createStackFrame_A6), excludedFlags)		// Excluded by default because it's only relevant for certain projects
+			.setParameters("offset");
+
+		builder.addNativeFunction("resolveStackFrame", lemon::wrap(&resolveStackFrame), excludedFlags)			// Excluded by default because it's only relevant for certain projects
+			.setParameters("value");
+
+		builder.addNativeFunction("resolveStackFrame_A6", lemon::wrap(&resolveStackFrame_A6), excludedFlags);	// Excluded by default because it's only relevant for certain projects
 
 
 		// Persistent data

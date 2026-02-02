@@ -21,8 +21,9 @@
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/simulation/PersistentData.h"
 #if defined(PLATFORM_ANDROID)
-	#include "oxygen/platform/AndroidJavaInterface.h"
+	#include "oxygen/platform/android/AndroidJavaInterface.h"
 #endif
+
 
 GameLoader::UpdateResult GameLoader::updateLoading()
 {
@@ -75,7 +76,7 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 					}
 
 				#elif defined(PLATFORM_ANDROID)
-					javaInterface.openRomFileSelectionDialog();
+					javaInterface.openRomFileSelectionDialog(gameProfile.mRomInfos[0].mSteamGameName);
 					mState = State::WAITING_FOR_ROM;
 					return UpdateResult::CONTINUE;
 

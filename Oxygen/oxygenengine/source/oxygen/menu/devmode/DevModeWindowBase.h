@@ -1,0 +1,65 @@
+﻿/*
+*	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
+*	Copyright (C) 2017-2025 by Eukaryot
+*
+*	Published under the GNU GPLv3 open source software license, see license.txt
+*	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+#pragma once
+
+#include "oxygen/menu/imgui/ImGuiDefinitions.h"
+
+#if defined(SUPPORT_IMGUI)
+
+#include "oxygen/menu/imgui/ImGuiContentProvider.h"
+
+class DevModeMainWindow;
+
+
+class DevModeWindowBase : public ImGuiContentProvider
+{
+friend class DevModeMainWindow;
+
+public:
+	enum class Category
+	{
+		SIMULATION,
+		GRAPHICS,
+		MISC
+	};
+
+public:
+	static void allowDragScrolling();
+
+public:
+	DevModeWindowBase(std::string_view title, Category category, ImGuiWindowFlags windowFlags);
+	virtual ~DevModeWindowBase() {}
+
+	inline bool getIsWindowOpen() const  { return mIsWindowOpen; }
+	void setIsWindowOpen(bool open);
+
+	virtual bool shouldBeAvailable()  { return true; }
+	virtual void onChangedIsWindowOpen(bool open)  {}
+	virtual bool buildWindow();
+	virtual void buildContent() = 0;
+
+	virtual void buildImGuiContent() override  { buildWindow(); }
+
+	inline float getUIScale() const  { return mUIScale; }
+
+protected:
+	const std::string mTitle;
+	const Category mCategory = Category::MISC;
+	bool mCanBeClosed = true;
+
+	bool mIsWindowOpen = false;
+	bool mLastWindowOpen = false;
+	ImGuiWindowFlags mImGuiWindowFlags = 0;
+
+	DevModeMainWindow* mDevModeMainWindow = nullptr;
+
+	float mUIScale = 1.0f;
+};
+
+#endif

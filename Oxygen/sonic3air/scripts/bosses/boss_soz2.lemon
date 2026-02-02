@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -176,7 +176,17 @@ function void fn0777f0()
 
 	objA0.base_state = u8[A0 + 0x42]
 	u8[A0 + 0x28] = 0
+
+#if STANDALONE
+	// Fixes Robotnik/Egg Robo being stuck on hurt frame if damaged right before the armor flies back on, #contribued by mrgrassman14
+	u8[A0 + 0x20] = 0
+	u8[A0 + 0x2a] &= ~0x40
+
+	// Fix for boss palette damage flash, #contributed by mrgrassman14
+	Boss.updateHitFlashing(5, 0x07826c, 0x078276, 0x078280, 0x01)
+#else
 	Boss.updateHitFlashing(3, 0x07826c, 0x078276, 0x078276, 0x01)
+#endif
 }
 
 

@@ -46,7 +46,7 @@ PaletteManager::PaletteManager()
 
 void PaletteManager::preFrameUpdate()
 {
-	mSplitPositionY = 0xffff;
+	mSplitPositionY = 0x1fff;
 	mUsesGlobalComponentTint = false;
 	mGlobalComponentTintColor = Color::WHITE;
 	mGlobalComponentAddedColor = Color::TRANSPARENT;
@@ -122,7 +122,7 @@ void PaletteManager::writePaletteEntryPacked(int paletteIndex, uint16 colorIndex
 	mMainPalette[1].setPaletteEntryPacked(colorIndex, color, packedColor);
 }
 
-void PaletteManager::setPaletteSplitPositionY(uint8 py)
+void PaletteManager::setPaletteSplitPositionY(int py)
 {
 	mSplitPositionY = py;
 }

@@ -318,7 +318,7 @@ void PaletteBitmap::convertToRGBA(Bitmap& output, const uint32* palette, size_t 
 	}
 }
 
-void PaletteBitmap::memcpyRect(uint8* dst, int dwid, uint8* src, int swid, int wid, int hgt)
+void PaletteBitmap::memcpyRect(uint8* dst, int dwid, const uint8* src, int swid, int wid, int hgt)
 {
 	for (int y = 0; y < hgt; ++y)
 	{

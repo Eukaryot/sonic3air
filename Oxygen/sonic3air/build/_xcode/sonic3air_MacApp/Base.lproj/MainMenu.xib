@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16096" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16096"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24506"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -691,7 +692,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" texturedBackground="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="427" y="563" width="564" height="288"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1410"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="564" height="288"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -705,7 +706,7 @@
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="s3kcart_eu" id="qLt-qo-0jc"/>
                     </imageView>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="gV2-up-Zem">
-                        <rect key="frame" x="265" y="144" width="281" height="134"/>
+                        <rect key="frame" x="265" y="150" width="281" height="134"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="134" id="Uri-v5-XTM"/>
                             <constraint firstAttribute="width" constant="277" id="iA4-Mk-d69"/>
@@ -720,20 +721,20 @@ Please choose an option below to continue:</string>
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Arz-v5-Qvc">
-                        <rect key="frame" x="322" y="13" width="172" height="32"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="21" id="04A-eK-4NK"/>
-                        </constraints>
+                        <rect key="frame" x="328" y="20" width="156" height="21"/>
                         <buttonCell key="cell" type="push" title="Manually Select File..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="CF7-Ih-fkg">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="04A-eK-4NK"/>
+                        </constraints>
                         <connections>
                             <action selector="btnPickRomFile:" target="Xv1-XA-G00" id="WJi-ZU-5kH"/>
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="d7X-A6-7ZV">
-                        <rect key="frame" x="319" y="108" width="179" height="32"/>
+                        <rect key="frame" x="325" y="118" width="163" height="24"/>
                         <buttonCell key="cell" type="push" title="Visit Steam Store Page" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="hM4-jB-gDx">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -743,7 +744,7 @@ Please choose an option below to continue:</string>
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Fk-Kv-LSI">
-                        <rect key="frame" x="336" y="75" width="145" height="32"/>
+                        <rect key="frame" x="342" y="82" width="133" height="24"/>
                         <buttonCell key="cell" type="push" title="Use Steam Game" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="uDc-Ri-6dx">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>

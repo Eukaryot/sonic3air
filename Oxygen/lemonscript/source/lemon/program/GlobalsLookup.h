@@ -11,7 +11,7 @@
 #include "lemon/program/Constant.h"
 #include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
-#include "lemon/program/Function.h"
+#include "lemon/program/function/Function.h"
 #include "lemon/program/StringRef.h"
 #include "lemon/compiler/PreprocessorDefinition.h"
 
@@ -58,12 +58,6 @@ namespace lemon
 			const void* mPointer = nullptr;
 		};
 
-		struct FunctionReference
-		{
-			Function* mFunction = nullptr;
-			bool mIsDeprecated = false;
-		};
-
 	public:
 		GlobalsLookup();
 
@@ -96,7 +90,8 @@ namespace lemon
 
 		// Data types
 		inline const std::vector<const DataTypeDefinition*>& getDataTypes() const  { return mDataTypes; }
-		void registerDataType(const CustomDataType* dataTypeDefinition);
+		const DataTypeDefinition* findDataTypeByName(uint64 nameHash) const;
+		void registerDataType(const DataTypeDefinition* dataTypeDefinition);
 		const DataTypeDefinition* readDataType(VectorBinarySerializer& serializer) const;
 		void serializeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition*& dataTypeDefinition) const;
 

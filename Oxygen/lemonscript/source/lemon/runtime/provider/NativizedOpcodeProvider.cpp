@@ -22,7 +22,7 @@ namespace lemon
 		(*buildFunction)(mLookupDictionary);
 	}
 
-	bool NativizedOpcodeProvider::buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime)
+	bool NativizedOpcodeProvider::buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime, const ScriptFunction& function)
 	{
 		if (mLookupDictionary.mEntries.empty() || numOpcodesAvailable < (int)Nativizer::MIN_OPCODES)
 			return false;
@@ -89,10 +89,19 @@ namespace lemon
 							break;
 						}
 
+						case Nativizer::LookupEntry::ParameterInfo::Semantics::LOCAL_VARIABLE:
+						{
+							const uint32 variableId = (uint32)opcode.mParameter;
+							const LocalVariable& variable = function.getLocalVariableByID(variableId);
+							runtimeOpcode.setParameter(variable.getLocalMemoryOffset(), parameter.mOffset);
+							break;
+						}
+
 						case Nativizer::LookupEntry::ParameterInfo::Semantics::GLOBAL_VARIABLE:
 						{
 							const uint32 variableId = (uint32)opcode.mParameter;
-							int64* valuePointer = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
+							const GlobalVariable& variable = runtime.getProgram().getGlobalVariableByID(variableId).as<GlobalVariable>();
+							int64* valuePointer = const_cast<Runtime&>(runtime).accessGlobalVariableValue(variable);
 							runtimeOpcode.setParameter(valuePointer, parameter.mOffset);
 							break;
 						}
@@ -100,7 +109,7 @@ namespace lemon
 						case Nativizer::LookupEntry::ParameterInfo::Semantics::EXTERNAL_VARIABLE:
 						{
 							const uint32 variableId = (uint32)opcode.mParameter;
-							const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
+							const ExternalVariable& variable = runtime.getProgram().getGlobalVariableByID(variableId).as<ExternalVariable>();
 							runtimeOpcode.setParameter(variable.mAccessor(), parameter.mOffset);
 							break;
 						}
@@ -110,7 +119,7 @@ namespace lemon
 							// TODO: "opcode.mDataType" refers to the PUSH_CONSTANT opcode, so it actually does not tell us the correct data type; however, this shouldn't be much of a problem for now
 							const uint64 address = opcode.mParameter;
 							MemoryAccessHandler::SpecializationResult result;
-							runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, DataTypeHelper::getSizeOfBaseType(opcode.mDataType), false);	// No support for write access here
+							runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, BaseTypeHelper::getSizeOfBaseType(opcode.mDataType), false);	// No support for write access here
 							RMX_ASSERT(result.mResult == MemoryAccessHandler::SpecializationResult::Result::HAS_SPECIALIZATION, "No memory access specialization found even though this was previously checked");
 							runtimeOpcode.setParameter(result.mDirectAccessPointer, parameter.mOffset);
 							break;

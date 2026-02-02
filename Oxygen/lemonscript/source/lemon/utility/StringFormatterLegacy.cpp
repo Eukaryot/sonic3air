@@ -9,7 +9,7 @@
 #include "lemon/pch.h"
 #include "lemon/utility/StringFormatterLegacy.h"
 #include "lemon/utility/FastStringStream.h"
-#include "lemon/program/FunctionWrapper.h"
+#include "lemon/program/function/FunctionWrapper.h"
 
 
 namespace lemon
@@ -31,6 +31,9 @@ namespace lemon
 					else
 						value = roundToInt(arg.mValue.get<double>());
 					break;
+
+				default:
+					return;
 			}
 
 			if (formatCharacter == 'd')
@@ -61,6 +64,9 @@ namespace lemon
 					else
 						output.addDouble(arg.mValue.get<double>());
 					break;
+
+				default:
+					return;
 			}
 		}
 	}
@@ -110,7 +116,7 @@ namespace lemon
 				{
 					// String argument
 					const FlyweightString* argStoredString = nullptr;
-					if (args[0].mType->getClass() == DataTypeDefinition::Class::STRING || args[0].mType->getClass() == DataTypeDefinition::Class::INTEGER)
+					if (args[0].mType->isA<StringDataType>() || args[0].mType->isA<IntegerDataType>())
 					{
 						lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
 						argStoredString = runtime->resolveStringByKey(args[0].mValue.get<uint64>());

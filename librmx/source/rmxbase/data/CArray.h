@@ -19,7 +19,7 @@ public:
 
 public:
 	CArray() : list(nullptr), size(0), count(0)  {}
-	CArray(TYPE* ptr, size_t cnt) : list(nullptr), count(0), size(0)  { add(ptr, cnt); }
+	CArray(const TYPE* ptr, size_t cnt) : list(nullptr), count(0), size(0)  { add(ptr, cnt); }
 	~CArray()  { SAFE_DELETE_ARRAY(list); }
 
 	void clear()
@@ -93,14 +93,14 @@ public:
 
 	TYPE* get(size_t num)
 	{
-		if (num < 0 || num >= count)
+		if (num >= count)
 			return 0;
 		return &list[num];
 	}
 
 	const TYPE* get(size_t num) const
 	{
-		if (num < 0 || num >= count)
+		if (num >= count)
 			return 0;
 		return &list[num];
 	}

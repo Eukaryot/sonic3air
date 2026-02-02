@@ -210,7 +210,6 @@ void GameView::initialize()
 	const Vec2i& resolution = Configuration::instance().mGameScreen;
 
 	RMX_LOG_INFO("Creating game screen texture");
-	EngineMain::instance().getDrawer().createTexture(mFinalGameTexture);
 	mFinalGameTexture.setupAsRenderTarget(resolution.x, resolution.y);
 }
 
@@ -694,10 +693,6 @@ void GameView::render()
 	// Debug visualizations
 	if (mDebugVisualizations.mEnabled)
 	{
-		if (!mDebugVisualizationsOverlay.isValid())
-		{
-			drawer.createTexture(mDebugVisualizationsOverlay);
-		}
 		Bitmap& bitmap = mDebugVisualizationsOverlay.accessBitmap();
 		bitmap.resize(gameScreenRect.width, gameScreenRect.height);
 		bitmap.clear(0);
@@ -856,5 +851,5 @@ void GameView::setLogDisplay(const String& string, float time)
 void GameView::setGameSpeed(float speed)
 {
 	mSimulation.setSpeed(speed);
-	setLogDisplay(String(0, "Emulator speed: %.02f", speed));
+	setLogDisplay(String(0, "Simulation speed: %.02f", speed));
 }

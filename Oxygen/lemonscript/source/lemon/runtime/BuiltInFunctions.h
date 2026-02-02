@@ -30,6 +30,10 @@ namespace lemon
 
 	public:
 		static FunctionName CONSTANT_ARRAY_ACCESS;
+		static FunctionName ARRAY_BRACKET_GETTER;
+		static FunctionName ARRAY_BRACKET_SETTER;
+		static FunctionName ARRAY_LENGTH;
+
 		static FunctionName STRING_OPERATOR_PLUS;
 		static FunctionName STRING_OPERATOR_PLUS_INT64;
 		static FunctionName STRING_OPERATOR_PLUS_INT64_INV;
@@ -37,6 +41,8 @@ namespace lemon
 		static FunctionName STRING_OPERATOR_LESS_OR_EQUAL;
 		static FunctionName STRING_OPERATOR_GREATER;
 		static FunctionName STRING_OPERATOR_GREATER_OR_EQUAL;
+		static FunctionName STRING_BRACKET_GETTER;
+		static FunctionName STRING_BRACKET_SETTER;
 
 	public:
 		static void registerBuiltInFunctions(Module& module);

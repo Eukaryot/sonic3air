@@ -165,8 +165,7 @@ FontCollection::~FontCollection()
 Font* FontCollection::getFontByKey(uint64 keyHash)
 {
 	// Try to find in map
-	Font** font = mapFind(mFontsByKeyHash, keyHash);
-	return (nullptr != font) ? *font : nullptr;
+	return mapFindOrDefault(mFontsByKeyHash, keyHash, nullptr);
 }
 
 Font* FontCollection::createFontByKey(std::string_view key)

@@ -10,13 +10,12 @@
 
 #include "oxygen/simulation/bindings/LemonScriptBindings.h"
 
-#include <lemon/utility/FlyweightString.h>
+#include <lemon/program/function/ScriptFunction.h>
 
 
 class Mod;
 namespace lemon
 {
-	class Function;
 	class GlobalsLookup;
 	class Program;
 	class RuntimeFunction;
@@ -72,13 +71,14 @@ public:
 		{
 			PRE_UPDATE,		// Called once per frame
 			POST_UPDATE,	// Called once per frame
-			ADDRESS			// Reacts on program counter address
+			ADDRESS			// Reacts to program counter address
 		};
 
 		Type   mType = Type::ADDRESS;
 		uint32 mAddress = 0;
 		uint32 mIndex = 0;
-		const lemon::ScriptFunction* mFunction = nullptr;	// Only really used for update hooks
+		const lemon::ScriptFunction* mFunction = nullptr;
+		const lemon::ScriptFunction::Label* mLabel = nullptr;	// Only used for address-hooks at labels inside functions
 	};
 
 public:
@@ -118,7 +118,7 @@ private:
 private:
 	LoadingResult loadAllScriptModules(const LoadOptions& loadOptions, std::string_view baseScriptFilename, const std::vector<const Mod*>& modsToLoad);
 	LoadingResult loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename);
-	void evaluateFunctionPragmas();
+	void collectHooksFromFunctions();
 	void evaluateDefines();
 
 	Hook& addHook(Hook::Type type, uint32 address);

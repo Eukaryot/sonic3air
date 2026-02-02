@@ -274,16 +274,27 @@ void SharedDatabase::setupSettings()
 	addSetting(IDPARAMS(Setting::SETTING_CANCEL_FLIGHT), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_SUPER_CANCEL), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_INSTA_SHIELD), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_LEVELRESULT_SCORE), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_HYPER_TAILS), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_SHIELD_TYPES), Setting::SerializationType::ALWAYS);
 
 	addSetting(IDPARAMS(Setting::SETTING_AIZ_BLIMPSEQUENCE), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_AIZ_INTRO_KNUCKLES), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_HCZ_WATERPIPE), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_LBZ_TUBETRANSPORT), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_LBZ_CUPELEVATOR), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_LBZ_BIGARMS), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_MHZ_ELEVATOR), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_FBZ_ENTERCYLINDER), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_FBZ_SCREWDOORS), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_FASTER_PUSH), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_SOZ_PYRAMID), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_LRZ2_BOSS), Setting::SerializationType::ALWAYS);
 
 	addSetting(IDPARAMS(Setting::SETTING_EXTENDED_HUD), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_SMOOTH_ROTATION), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_SPEEDUP_AFTERIMGS), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_PLAYER2_OFFSCREEN), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_BS_VISUAL_STYLE), Setting::SerializationType::ALWAYS);
 
 	addSetting(IDPARAMS(Setting::SETTING_INFINITE_LIVES), Setting::SerializationType::ALWAYS);
@@ -297,6 +308,7 @@ void SharedDatabase::setupSettings()
 	addSetting(IDPARAMS(Setting::SETTING_BS_REPEAT_ON_FAIL), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_DISABLE_GHOST_SPAWN), Setting::SerializationType::ALWAYS);
 
+	addSetting(IDPARAMS(Setting::SETTING_HIDDEN_MONITOR_HINT), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_SUPERFAST_RUNANIM), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_MONITOR_STYLE), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_HYPER_DASH_CONTROLS), Setting::SerializationType::ALWAYS);

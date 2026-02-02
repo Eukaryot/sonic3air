@@ -62,16 +62,15 @@ void OpenGLFontOutput::buildVertexGroups(VertexGroups& outVertexGroups, const st
 			continue;
 
 		const uint32 character = info.mUnicode;
-		auto it = mHandleMap.find(character);
-		if (it == mHandleMap.end())
+		const SpriteHandleInfo* spriteHandleInfo = mapFind(mHandleMap, character);
+		if (nullptr == spriteHandleInfo)
 		{
 			if (!loadTexture(info))
 				continue;
-			it = mHandleMap.find(character);
+			spriteHandleInfo = mapFind(mHandleMap, character);
 		}
-		const SpriteHandleInfo& spriteHandleInfo = it->second;
 
-		const bool result = mAtlas.getSprite(spriteHandleInfo.mAtlasHandle, sprite);
+		const bool result = mAtlas.getSprite(spriteHandleInfo->mAtlasHandle, sprite);
 		RMX_ASSERT(result, "Failed to get sprite from atlas");
 		if (!result)
 			continue;
@@ -90,10 +89,10 @@ void OpenGLFontOutput::buildVertexGroups(VertexGroups& outVertexGroups, const st
 		outVertexGroups.mVertexGroups.back().mNumVertices += 6;
 		Vertex* vertices = &outVertexGroups.mVertices[firstIndex];
 
-		const float x0 = info.mPosition.x - (float)spriteHandleInfo.mBorderLeft;
-		const float x1 = info.mPosition.x + (float)(info.mBitmap->getWidth() + spriteHandleInfo.mBorderRight);
-		const float y0 = info.mPosition.y - (float)spriteHandleInfo.mBorderTop;
-		const float y1 = info.mPosition.y + (float)(info.mBitmap->getHeight() + spriteHandleInfo.mBorderBottom);
+		const float x0 = info.mPosition.x - (float)spriteHandleInfo->mBorderLeft;
+		const float x1 = info.mPosition.x + (float)(info.mBitmap->getWidth() + spriteHandleInfo->mBorderRight);
+		const float y0 = info.mPosition.y - (float)spriteHandleInfo->mBorderTop;
+		const float y1 = info.mPosition.y + (float)(info.mBitmap->getHeight() + spriteHandleInfo->mBorderBottom);
 
 		vertices[0].mPosition.set(x0, y0);
 		vertices[1].mPosition.set(x0, y1);

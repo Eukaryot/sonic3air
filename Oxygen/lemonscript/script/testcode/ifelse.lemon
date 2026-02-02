@@ -1,0 +1,29 @@
+
+
+function void testIfElse()
+{
+	debugLog("\n== If else ==")
+
+	u8 a = 0
+	if (a == ONE)
+	{
+		Log = 1
+	}
+	else if (a == 2)
+		Log = 2
+	else if (a != 0)
+		if (a == 3)
+			Log = 3
+		else
+		{
+		}
+
+	if (a != 0)
+		if (a == 3)
+			Log = 3
+		else
+		{
+		}
+	else
+		Log = 0
+}

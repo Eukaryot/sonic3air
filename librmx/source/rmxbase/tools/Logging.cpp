@@ -10,7 +10,7 @@
 
 #if defined(PLATFORM_WINDOWS)
 	#define WIN32_LEAN_AND_MEAN
-	#include <CleanWindowsInclude.h>
+	#include "CleanWindowsInclude.h"
 #elif defined(PLATFORM_ANDROID)
 	#include <android/log.h>
 #elif defined(PLATFORM_VITA)
@@ -116,7 +116,6 @@ namespace rmx
 
 		if (renameExisting && FTX::FileSystem->exists(filename))
 		{
-			const time_t time = FTX::FileSystem->getFileTime(filename);
 			std::wstring directory;
 			std::wstring name;
 			std::wstring extension;

@@ -69,7 +69,7 @@ void DynOutputStream::clear()
 	mPageEnd = nullptr;
 }
 
-void DynOutputStream::AccessPage(int pageIndex)
+void DynOutputStream::accessPage(int pageIndex)
 {
 	for (int i = (int)mPages.size(); i <= pageIndex; ++i)
 		mPages.push_back(nullptr);
@@ -85,7 +85,7 @@ void DynOutputStream::setPosition(int pos)
 {
 	assert(pos >= 0);
 	mCurrPage = pos / mPageSize;
-	AccessPage(mCurrPage);
+	accessPage(mCurrPage);
 	mCursor += (pos % mPageSize);
 }
 
@@ -116,7 +116,7 @@ int DynOutputStream::write(const void* ptr, int len)
 
 		if (mCursor)
 			++mCurrPage;
-		AccessPage(mCurrPage);
+		accessPage(mCurrPage);
 	}
 	return len;
 }

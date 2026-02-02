@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -412,7 +412,7 @@ function void fn04e8a4()
 	VDP.zeroVRAM(0x300)
 
 	VDP.Config.setNameTableBasePlaneW(0x8000)
-	VDP.Config.setupWindowPlane(true, 40)
+	VDP.Config.setWindowPlaneSplitY(true, 40)
 	gfx.plane_update_routine = 0
 
 #if STANDALONE
@@ -458,7 +458,7 @@ function void fn04e8e8()
 		}
 	}
 
-	VDP.Config.setupWindowPlane(false, 0)	// Disable window plane
+	VDP.Config.setWindowPlaneSplitY(false, 0)	// Disable window plane
 	gfx.plane_update_routine = 0
 }
 

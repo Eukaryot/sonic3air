@@ -20,6 +20,7 @@ namespace lemon
 		// Options to be set before compilation
 		const DataTypeDefinition* mExternalAddressType = &PredefinedDataTypes::UINT_64;
 		std::wstring mOutputCombinedSource;
+		std::wstring mOutputOpcodesAsText;
 		std::wstring mOutputNativizedSource;
 		std::wstring mOutputTranslatedSource;
 		bool mConsumeProcessedPragmas = true;

@@ -155,6 +155,7 @@ typedef enum
 {
     VIDEO_DEVICE_QUIRK_DISABLE_DISPLAY_MODE_SWITCHING = 0x01,
     VIDEO_DEVICE_QUIRK_DISABLE_UNSET_FULLSCREEN_ON_MINIMIZE = 0x02,
+    VIDEO_DEVICE_QUIRK_FULLSCREEN_ONLY = 0x04,
 } DeviceQuirkFlags;
 
 struct SDL_VideoDevice
@@ -354,8 +355,7 @@ struct SDL_VideoDevice
     SDL_bool checked_texture_framebuffer;
     SDL_bool is_dummy;
     SDL_bool suspend_screensaver;
-    SDL_Window *wakeup_window;
-    SDL_mutex *wakeup_lock; /* Initialized only if WaitEventTimeout/SendWakeupEvent are supported */
+    void *wakeup_window;
     int num_displays;
     SDL_VideoDisplay *displays;
     SDL_Window *windows;

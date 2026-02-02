@@ -93,9 +93,6 @@ static void WIN_DeleteDevice(SDL_VideoDevice *device)
         SDL_UnloadObject(data->shcoreDLL);
     }
 #endif
-    if (device->wakeup_lock) {
-        SDL_DestroyMutex(device->wakeup_lock);
-    }
     SDL_free(device->driverdata);
     SDL_free(device);
 }
@@ -120,7 +117,6 @@ static SDL_VideoDevice *WIN_CreateDevice(void)
         return NULL;
     }
     device->driverdata = data;
-    device->wakeup_lock = SDL_CreateMutex();
 
 #if !defined(__XBOXONE__) && !defined(__XBOXSERIES__)
     data->userDLL = SDL_LoadObject("USER32.DLL");
@@ -139,6 +135,9 @@ static SDL_VideoDevice *WIN_CreateDevice(void)
         data->GetDpiForWindow = (UINT (WINAPI *)(HWND))SDL_LoadFunction(data->userDLL, "GetDpiForWindow");
         data->AreDpiAwarenessContextsEqual = (BOOL (WINAPI *)(DPI_AWARENESS_CONTEXT, DPI_AWARENESS_CONTEXT))SDL_LoadFunction(data->userDLL, "AreDpiAwarenessContextsEqual");
         data->IsValidDpiAwarenessContext = (BOOL (WINAPI *)(DPI_AWARENESS_CONTEXT))SDL_LoadFunction(data->userDLL, "IsValidDpiAwarenessContext");
+        data->GetDisplayConfigBufferSizes = (LONG (WINAPI *)(UINT32,UINT32*,UINT32* ))SDL_LoadFunction(data->userDLL, "GetDisplayConfigBufferSizes");
+        data->QueryDisplayConfig = (LONG (WINAPI *)(UINT32,UINT32*,DISPLAYCONFIG_PATH_INFO*,UINT32*,DISPLAYCONFIG_MODE_INFO*,DISPLAYCONFIG_TOPOLOGY_ID*))SDL_LoadFunction(data->userDLL, "QueryDisplayConfig");
+        data->DisplayConfigGetDeviceInfo = (LONG (WINAPI *)(DISPLAYCONFIG_DEVICE_INFO_HEADER*))SDL_LoadFunction(data->userDLL, "DisplayConfigGetDeviceInfo");
         /* *INDENT-ON* */ /* clang-format on */
     } else {
         SDL_ClearError();

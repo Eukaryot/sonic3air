@@ -11,6 +11,7 @@
 #ifdef RMX_WITH_OPENGL_SUPPORT
 
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
+#include "oxygen/drawing/opengl/OpenGLUpscaler.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/rendering/opengl/shaders/SimpleRectColoredShader.h"
 #include "oxygen/rendering/opengl/shaders/SimpleRectIndexedShader.h"
@@ -34,6 +35,9 @@ struct OpenGLDrawerResources::Internal
 	SimpleRectTexturedShader	mSimpleRectTexturedShader[4];		// Enumerated using enum Variant
 	SimpleRectTexturedUVShader	mSimpleRectTexturedUVShader[4];		// Enumerated using enum Variant
 	SimpleRectIndexedShader		mSimpleRectIndexedShader[4];		// Enumerated using enum Variant
+
+	// Upscalers
+	std::vector<OpenGLUpscaler*> mUpscalers;
 
 	// Vertex array objects
 	opengl::VertexArrayObject mSimpleQuadVAO;
@@ -68,6 +72,14 @@ void OpenGLDrawerResources::startup()
 		}
 	}
 
+	// Load upscalers
+	for (int k = 0; k < 4; ++k)
+	{
+		OpenGLUpscaler* upscaler = new OpenGLUpscaler((OpenGLUpscaler::Type)k, *this);
+		upscaler->startup();
+		mInternal.mUpscalers.push_back(upscaler);
+	}
+
 	// Setup simple quad VAO, consisting of two triangles
 	{
 		opengl::VertexArrayObject& vao = mInternal.mSimpleQuadVAO;
@@ -87,6 +99,11 @@ void OpenGLDrawerResources::startup()
 
 void OpenGLDrawerResources::shutdown()
 {
+	for (OpenGLUpscaler* upscaler : mInternal.mUpscalers)
+	{
+		upscaler->shutdown();
+	}
+	mInternal.mUpscalers.clear();
 }
 
 void OpenGLDrawerResources::clearAllCaches()
@@ -252,6 +269,47 @@ bool OpenGLDrawerResources::updatePalette(PaletteData& data, const PaletteBase& 
 const Vec2i& OpenGLDrawerResources::getPaletteTextureSize() const
 {
 	return PALETTE_TEXTURE_SIZE;
+}
+
+OpenGLUpscaler& OpenGLDrawerResources::getUpscaler()
+{
+	OpenGLUpscaler::Type upscalerType = OpenGLUpscaler::Type::DEFAULT;
+
+	const int filtering = Configuration::instance().mFiltering;
+	const int scanlines = Configuration::instance().mScanlines;
+	if (scanlines > 0 && filtering < 3)
+	{
+		upscalerType = OpenGLUpscaler::Type::SOFT;
+	}
+	else
+	{
+		switch (filtering)
+		{
+			default:
+			case 0:
+				upscalerType = OpenGLUpscaler::Type::DEFAULT;
+				break;
+
+			case 1:
+			case 2:
+				upscalerType = OpenGLUpscaler::Type::SOFT;
+				break;
+
+		#if !defined(PLATFORM_VITA)
+			case 3:
+				upscalerType = OpenGLUpscaler::Type::XBRZ;
+				break;
+
+			case 4:
+			case 5:
+			case 6:
+				upscalerType = OpenGLUpscaler::Type::HQX;
+				break;
+		#endif
+		}
+	}
+
+	return *mInternal.mUpscalers[(int)upscalerType];
 }
 
 bool OpenGLDrawerResources::updatePaletteBitmap(const PaletteBase& palette, Bitmap& bitmap, int offsetY, uint16& changeCounter)

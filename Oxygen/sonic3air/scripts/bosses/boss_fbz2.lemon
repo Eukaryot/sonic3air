@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -391,6 +391,9 @@ function void fn070990()
 	else
 	{
 		objA0.base_state = 0x04
+	#if STANDALONE
+		u16[A0 + 0x14] = 0x0690		// Center boss arms on the platform for all characters, #contributed by mrgrassman14
+	#endif
 		fn0709a8()
 	}
 }
@@ -621,6 +624,9 @@ function void fn070b74()
 //# address-hook(0x070b80) end(0x070b86)
 function void fn070b80()
 {
+#if STANDALONE
+	fn085a5a()	// Prevent flamethrower from overlaying dome and explosions when defeated, #contributed by mrgrassman14
+#endif
 	MoveWithParent()
 	fn08498c()
 }

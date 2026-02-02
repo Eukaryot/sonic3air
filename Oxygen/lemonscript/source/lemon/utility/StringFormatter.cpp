@@ -9,7 +9,7 @@
 #include "lemon/pch.h"
 #include "lemon/utility/StringFormatter.h"
 #include "lemon/utility/FastStringStream.h"
-#include "lemon/program/FunctionWrapper.h"
+#include "lemon/program/function/FunctionWrapper.h"
 
 
 namespace lemon

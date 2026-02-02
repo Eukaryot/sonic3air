@@ -34,8 +34,6 @@ public:
 	void reset() override;
 	void resetGame() override;
 
-	void realtimeUpdate(float secondsPassed) override;
-
 	void playAudioDirect(uint64 sfxId, SoundRegType type, int contextBase = CONTEXT_INGAME, AudioReference* outAudioReference = nullptr);
 
 	void setMenuMusic(uint64 sfxId);
@@ -65,9 +63,6 @@ private:
 	void playAudioInternal(const SfxHandling& handling, uint64 sfxId, int contextBase, AudioReference* outAudioReference);
 
 private:
-	float			  mMusicVolume = 1.0f;
-	float			  mSoundVolume = 1.0f;
-
 	uint64			  mMenuMusicId = -1;
 	CustomAudioMixer* mIngameAudioMixer = nullptr;
 };

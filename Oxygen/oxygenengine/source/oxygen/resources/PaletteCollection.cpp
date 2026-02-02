@@ -39,11 +39,8 @@ const PaletteBase* PaletteCollection::getPalette(uint64 key, uint8 line) const
 	if (nullptr != palette)
 		return palette;
 
-	PaletteBase*const* palettePtr = mapFind(mRedirections, key + line);
-	if (nullptr != palettePtr)
-		return *palettePtr;
-
-	return nullptr;
+	palette = mapFindOrDefault(mRedirections, key + line, nullptr);
+	return palette;
 }
 
 void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool isModded)
@@ -63,12 +60,15 @@ void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool i
 
 		std::vector<uint8> content;
 		if (!FTX::FileSystem->readFile(fileEntry.mPath + fileEntry.mFilename, content))
+		{
+			RMX_ERROR("Failed to load PNG at '" << *WString(fileEntry.mPath + fileEntry.mFilename).toString() << "': File loading failed", );
 			continue;
+		}
 
 		Bitmap bitmap;
 		if (!bitmap.load(fileEntry.mPath + fileEntry.mFilename))
 		{
-			RMX_ERROR("Failed to load PNG at '" << *WString(fileEntry.mPath + fileEntry.mFilename).toString() << "'", );
+			RMX_ERROR("Failed to load PNG at '" << *WString(fileEntry.mPath + fileEntry.mFilename).toString() << "': Format not supported", );
 			continue;
 		}
 

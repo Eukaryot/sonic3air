@@ -1,4 +1,12 @@
 {
+	// NOTE:
+	//  Some properties here in config.json are also stored in settings.json in the save data directory.
+	//  If a property is set in both files, which one is actually used by the game will depend on the platform:
+	//    - On desktop platforms (Windows, Linux, Mac), config.json is preferred. That also means that if a property is not set
+	//      in config.json, it uses the last saved value from settings.json, and NOT the default value.
+	//    - On other platforms the config.json usually is not directly accessible at all, so settings.json is always preferred.
+
+
 	// Paths
 	"ScriptsDir":     "scripts",
 	"MainScriptName": "main.lemon",
@@ -15,14 +23,10 @@
 	"GameScreen": "400 x 224",		// Can be changed with numpad multiply/divide
 	"Filtering": "0",				// Can be toggled with Alt + F
 
-	// Audio
-	"AudioSampleRate": "48000",
-
 	// Dev mode
 	"DevMode":
 	{
 		// For infos on dev mode (developer mode) see Oxygen Handbook in "bonus/oxygenengine" folder
-		"Enabled": "1",					// Set to "1" to enable dev mode
 		"EnforceDebugMode": "1",		// Set to "1" to enable in-game debug mode whenever dev mode is active, independently from what's set in the Options menu
 		"SkipExitConfirmation": "1",	// Set to "1" to skip the confirmation when exiting the game from pause menu
 

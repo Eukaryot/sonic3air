@@ -8,8 +8,8 @@ else {
 }
 
 android {
-    compileSdkVersion 34
-    ndkVersion "26.0.10792818"
+    compileSdkVersion 36
+    ndkVersion "29.0.14206865"
     defaultConfig {
         if (buildAsApplication) {
             namespace "org.eukaryot.sonic3air"
@@ -17,7 +17,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 29     // Can't go higher, as requestLegacyExternalStorage in the manifest won't work otherwise
         versionCode 1
-        versionName "24.02.02.0"
+        versionName "25.12.31.0"
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_APP_PLATFORM=android-23", "-DANDROID_STL=c++_static"

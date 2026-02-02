@@ -49,6 +49,7 @@ namespace lemon
 				enum class Semantics
 				{
 					INTEGER,
+					LOCAL_VARIABLE,
 					GLOBAL_VARIABLE,
 					EXTERNAL_VARIABLE,
 					FIXED_MEMORY_ADDRESS

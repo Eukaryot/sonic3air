@@ -11,7 +11,7 @@
 #include "oxygen/simulation/bindings/LemonScriptBindings.h"
 
 #include <lemon/compiler/PreprocessorDefinition.h>
-#include <lemon/program/FunctionWrapper.h>
+#include <lemon/program/function/FunctionWrapper.h>
 
 
 class EmulatorInterface;
@@ -82,6 +82,8 @@ public:
 	std::string getOwnCurrentScriptLocationString() const;
 
 private:
+	uint32 getCurrentExecutionScriptFeatureLevel() const;
+
 	static std::string buildScriptLocationString(const lemon::ControlFlow& controlFlow);
 	static uint32 getLineNumberInFile(const lemon::ScriptFunction& function, size_t programCounter);
 

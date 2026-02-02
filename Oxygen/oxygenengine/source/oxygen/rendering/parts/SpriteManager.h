@@ -79,13 +79,13 @@ public:
 	inline const std::vector<RenderItem*>& getRenderItems(RenderItem::LifetimeContext context) const  { return mLifetimeContexts[(int)context].mItems; }
 	inline const std::vector<RenderItem*>& getAddedItems() const  { return mAddedItems.mItems; }
 
-	inline uint16 getSpriteAttributeTableBase() const  { return mSpriteAttributeTableBase; }
-	inline void setSpriteAttributeTableBase(uint16 vramAddress)  { mSpriteAttributeTableBase = vramAddress; }
+	inline uint16 getSpriteAttributeTableBase() const			{ return mSpriteAttributeTableBase; }
+	inline void setSpriteAttributeTableBase(uint16 vramAddress)	{ mSpriteAttributeTableBase = vramAddress; }
+
+	inline bool getLegacyVdpSpriteMode() const					{ return mLegacyVdpSpriteMode; }
+	inline void setLegacyVdpSpriteMode(bool enable)				{ mLegacyVdpSpriteMode = enable; }
 
 	void serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion);
-
-public:
-	bool mLegacyVdpSpriteMode = false;
 
 private:
 	struct ItemSet
@@ -115,6 +115,7 @@ private:
 	Space mLogicalSpriteSpace = Space::SCREEN;
 	uint8 mResetRenderItemsBitmask = 0;
 	uint16 mSpriteAttributeTableBase = 0xf800;	// Only used in legacy VDP sprite mode
+	bool mLegacyVdpSpriteMode = false;
 
 	PoolOfRenderItems mPoolOfRenderItems;
 

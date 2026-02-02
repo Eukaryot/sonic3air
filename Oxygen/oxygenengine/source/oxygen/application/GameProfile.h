@@ -14,6 +14,8 @@
 class GameProfile final : public SingleInstance<GameProfile>
 {
 public:
+	typedef std::pair<uint32, uint32> AddressRange;
+
 	struct RomCheck
 	{
 		uint32 mSize = 0;
@@ -25,7 +27,7 @@ public:
 		std::wstring mSteamRomName;
 		uint64 mHeaderChecksum = 0;
 		std::vector<std::pair<uint32, uint8>> mOverwrites;		// First value: address -- second value: byte value to write there
-		std::vector<std::pair<uint32, uint32>> mBlankRegions;	// First value: start address -- second value: end address (included)
+		std::vector<AddressRange> mBlankRegions;				// Start address and end address are both included
 		std::wstring mDiffFileName;
 	};
 
@@ -45,7 +47,7 @@ public:
 	};
 	struct StackLookupEntry
 	{
-		std::vector<uint32> mAsmStack;
+		std::vector<AddressRange> mAsmStack;		// Start address and end address are both included in the ranges
 		std::vector<LemonStackEntry> mLemonStack;
 	};
 
@@ -55,6 +57,7 @@ public:
 
 public:
 	// Meta data
+	std::string mIdentifier;
 	std::string mShortName;
 	std::string mFullName;
 
@@ -69,6 +72,7 @@ public:
 	std::vector<DataPackage> mDataPackages;
 
 	// Emulation-relevant data
+	bool mPushPopAddressOnCall = false;
 	std::pair<uint32, uint32> mAsmStackRange;
 	std::vector<StackLookupEntry> mStackLookups;
 };

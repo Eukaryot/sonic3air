@@ -18,7 +18,8 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/download/DownloadManager.h"
-#include "oxygen/devmode/ImGuiIntegration.h"
+#include "oxygen/menu/imgui/ImGuiIntegration.h"
+#include "oxygen/menu/devmode/DevModeMainWindow.h"
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/software/SoftwareDrawer.h"
 #include "oxygen/file/PackedFileProvider.h"
@@ -35,7 +36,7 @@
 #include "oxygen/simulation/PersistentData.h"
 #include "oxygen/simulation/Simulation.h"
 #if defined(PLATFORM_ANDROID)
-	#include "oxygen/platform/AndroidJavaInterface.h"
+	#include "oxygen/platform/android/AndroidJavaInterface.h"
 #endif
 
 
@@ -97,7 +98,7 @@ EngineMain::~EngineMain()
 
 void EngineMain::execute()
 {
-	// Startup the Oxygen engine part that is independent from the application / project
+	// Startup the Oxygen Engine part that is independent from the application / project
 	if (startupEngine())
 	{
 		// Enter the application run loop
@@ -158,9 +159,9 @@ uint32 EngineMain::getPlatformFlags() const
 	else
 	{
 		uint32 flags = 0;
-	#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MAC) || defined(PLATFORM_LINUX)
+	#if defined(PLATFORM_IS_DESKTOP)
 		flags |= 0x0001;
-	#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(PLATFORM_IOS)
+	#elif defined(PLATFORM_IS_MOBILE)
 		flags |= 0x0002;
 	#endif
 		return flags;
@@ -183,7 +184,8 @@ void EngineMain::switchToRenderMethod(Configuration::RenderMethod newRenderMetho
 		// Check OpenGL in the config again, it could have changed - namely if OpenGL initialization failed
 		nowUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
 
-		ImGuiIntegration::onWindowRecreated(nowUsingOpenGL);
+		if (ImGuiIntegration::hasInstance())
+			ImGuiIntegration::instance().onWindowRecreated(nowUsingOpenGL);
 	}
 
 	if (nowUsingOpenGL)
@@ -284,15 +286,16 @@ bool EngineMain::startupEngine()
 
 	// Audio
 	RMX_LOG_INFO("Audio initialization...");
-	FTX::Audio->initialize(config.mAudioSampleRate, 2, 1024);
+	FTX::Audio->initialize(config.mAudio.mSampleRate, 2, 1024);
 
 	RMX_LOG_INFO("Startup of AudioOut");
 	mAudioOut = &EngineMain::getDelegate().createAudioOut();
 	mAudioOut->startup();
 
-	// ImGui integration
-	ImGuiIntegration::setEnabled(config.mDevMode.mEnabled);
-	ImGuiIntegration::startup();
+	// Networking
+	RMX_LOG_INFO("Networking initialization...");
+	const bool useIPv6 = false;
+	mInternal.mEngineServerClient.setupClient(useIPv6);
 
 	// Done
 	RMX_LOG_INFO("Engine startup successful");
@@ -312,8 +315,6 @@ void EngineMain::run()
 
 void EngineMain::shutdown()
 {
-	ImGuiIntegration::shutdown();
-
 	destroyWindow();
 
 	// Shutdown subsystems
@@ -397,8 +398,8 @@ void EngineMain::initDirectories()
 		}
 	}
 
-	config.mSaveStatesDirLocal = config.mAppDataPath + L"savestates/";
-	config.mPersistentDataBasePath = config.mAppDataPath + L"storage/";
+	// Fill some paths with fallback values, even though we haven't loaded a game profile yet
+	updateGameProfilePaths();
 }
 
 bool EngineMain::initConfigAndSettings()
@@ -408,18 +409,7 @@ bool EngineMain::initConfigAndSettings()
 	config.initialization();
 
 	RMX_LOG_INFO("Loading configuration");
-	if (FTX::FileSystem->exists(config.mAppDataPath + L"config.json"))
-	{
-		config.loadConfiguration(config.mAppDataPath + L"config.json");
-	}
-	else
-	{
-#if (defined(PLATFORM_MAC) || defined(PLATFORM_IOS)) && defined(ENDUSER)
-		config.loadConfiguration(config.mGameDataPath + L"/config.json");
-#else
-		config.loadConfiguration(L"config.json");
-#endif
-	}
+	loadConfigJson();
 
 	// Setup a custom game profile (like S3AIR does) or load the "oxygenproject.json"
 	const bool hasCustomGameProfile = mDelegate.setupCustomGameProfile();
@@ -436,11 +426,31 @@ bool EngineMain::initConfigAndSettings()
 		RMX_CHECK(loadedProject, "Failed to load game profile from '" << *WString(config.mProjectPath).toString() << "oxygenproject.json'", );
 	}
 
+	updateGameProfilePaths();
+
+	// Load settings
 	RMX_LOG_INFO("Loading settings");
 	const bool loadedSettings = config.loadSettings(config.mAppDataPath + L"settings.json", Configuration::SettingsType::STANDARD);
 	config.loadSettings(config.mAppDataPath + L"settings_input.json", Configuration::SettingsType::INPUT);
-	config.loadSettings(config.mAppDataPath + L"settings_global.json", Configuration::SettingsType::GLOBAL);
-	if (!loadedSettings)
+	if (loadedSettings)
+	{
+	#if defined(PLATFORM_IS_DESKTOP)
+		// Load config.json once again on top, so that config.json is preferred over settings.json
+		if (!hasCustomGameProfile && !mArguments.mProjectPath.empty() && FTX::FileSystem->exists(mArguments.mProjectPath + L"oxygenproject.json"))
+		{
+			// Load project path's config.json, if there is one
+			config.loadConfiguration(mArguments.mProjectPath + L"config.json");
+		}
+		else
+		{
+			loadConfigJson();
+		}
+	#endif
+
+		// Remove old "settings_global.json", which was only used for legacy compatibility
+		FTX::FileSystem->removeFile(config.mAppDataPath + L"settings_global.json");
+	}
+	else
 	{
 		// Save default settings once immediately
 		config.saveSettings();
@@ -451,6 +461,9 @@ bool EngineMain::initConfigAndSettings()
 	{
 		config.mDisplayIndex = mArguments.mDisplayIndex;
 	}
+
+	// Enable dev mode if requested
+	config.mDevMode.mEnabled = config.mDevMode.mEnableAtStartup;
 
 	// Evaluate fail-safe mode
 	if (config.mFailSafeMode)
@@ -470,7 +483,7 @@ bool EngineMain::initConfigAndSettings()
 #if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_VITA)
 	// Use fullscreen, with no borders please
 	//  -> Note that this doesn't work for the web version, if running in mobile browsers - we rely on a window with fixed size (see config.json) there
-	config.mWindowMode = Configuration::WindowMode::EXCLUSIVE_FULLSCREEN;
+	config.mWindowMode = Configuration::WindowMode::FULLSCREEN_EXCLUSIVE;
 #endif
 
 	RMX_LOG_INFO(((config.mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Using pure software renderer" :
@@ -478,20 +491,72 @@ bool EngineMain::initConfigAndSettings()
 	return true;
 }
 
+void EngineMain::loadConfigJson()
+{
+	Configuration& config = Configuration::instance();
+	if (FTX::FileSystem->exists(config.mAppDataPath + L"config.json"))
+	{
+		config.loadConfiguration(config.mAppDataPath + L"config.json");
+	}
+	else
+	{
+	#if (defined(PLATFORM_MAC) || defined(PLATFORM_IOS)) && defined(ENDUSER)
+		config.loadConfiguration(config.mGameDataPath + L"/config.json");
+	#else
+		config.loadConfiguration(L"config.json");
+	#endif
+	}
+}
+
+void EngineMain::updateGameProfilePaths()
+{
+	Configuration& config = Configuration::instance();
+
+	// Use an project-specific app data sub-folder path, unless the application defined its own app data folder (like the S3AIR executable does)
+	if ((mDelegate.getAppMetaData().mAppDataFolder != L"OxygenEngine") || mInternal.mGameProfile.mIdentifier.empty())
+	{
+		config.mGameAppDataPath = config.mAppDataPath;
+	}
+	else
+	{
+		config.mGameAppDataPath = config.mAppDataPath + L"_" + String(mInternal.mGameProfile.mIdentifier).toStdWString() + L"/";
+	}
+
+	// Update dependent paths
+	config.mSaveStatesDirLocal = config.mGameAppDataPath + L"savestates/";
+	config.mPersistentDataBasePath = config.mGameAppDataPath + L"storage/";
+}
+
 bool EngineMain::initFileSystem()
 {
-	// Create mod data folder (the default mod directory)
 	Configuration& config = Configuration::instance();
-	FTX::FileSystem->createDirectory(config.mAppDataPath + L"mods");
 
-	// Add real file system provider for the game data path, if it isn't located in local "data" directory
+	if (mDelegate.isDedicatedApplication())
+	{
+		// Add Oxygen Engine data path if it exists in the expected place
+		//  -> This is relevant when starting an external project app (like S3AIR) during development
+		const std::wstring engineBasePath = L"../oxygenengine/";
+		if (FTX::FileSystem->exists(engineBasePath))
+		{
+			rmx::RealFileProvider* provider = new rmx::RealFileProvider();
+			FTX::FileSystem->addManagedFileProvider(*provider);
+			FTX::FileSystem->addMountPoint(*provider, L"data/", engineBasePath + L"data/", 0x10);
+		}
+	}
+
+	// In case the game data path isn't located in local "data" directory, add a real file system provider for it
 	//  -> This is relevant for Oxygen Engine using an external game data path
+	//  -> Also, the Mac build of S3AIR requires this logic, as game data is in a different subdirectory inside the app container than the binary
+	//  -> In other cases (such as S3AIR on other platforms), no additional real file provider is needed, so this part is skipped
 	if (config.mGameDataPath != L"data" && config.mGameDataPath != L"./data")
 	{
 		rmx::RealFileProvider* provider = new rmx::RealFileProvider();
 		FTX::FileSystem->addManagedFileProvider(*provider);
 		FTX::FileSystem->addMountPoint(*provider, L"data/", config.mGameDataPath + L'/', 0x10);
 	}
+
+	// Create mod data folder (the default mod directory)
+	FTX::FileSystem->createDirectory(config.mGameAppDataPath + L"mods");
 
 	// Add package providers
 	return loadFilePackages(false);

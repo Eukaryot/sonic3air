@@ -66,11 +66,13 @@ namespace
 		// Allow re-use of the port
 		setSocketOptionBool(socket, SOL_SOCKET, SO_REUSEADDR, true);
 
+	#if !defined(PLATFORM_SWITCH)	// The IPv6 part won't compile on Switch, but isn't really needed there anyways
 		if (protocolFamily >= Sockets::ProtocolFamily::IPv6)
 		{
 			// Optionally allow IPv4 + IPv6 dual stack support on the socket
 			setSocketOptionBool(socket, IPPROTO_IPV6, IPV6_V6ONLY, protocolFamily != Sockets::ProtocolFamily::DualStack);
 		}
+	#endif
 	}
 }
 
@@ -110,7 +112,8 @@ bool Sockets::resolveToIP(const std::string& hostName, std::string& outIP, bool 
 	// Resolve host name to an IP
 	addrinfo* addrInfo = nullptr;
 	addrinfo hintsAddrInfo = {};
-	if (::getaddrinfo(hostName.c_str(), nullptr, &hintsAddrInfo, &addrInfo) == 0)
+	const int result = ::getaddrinfo(hostName.c_str(), nullptr, &hintsAddrInfo, &addrInfo);
+	if (result == 0)
 	{
 		addrinfo* firstAddrInfo = addrInfo;
 

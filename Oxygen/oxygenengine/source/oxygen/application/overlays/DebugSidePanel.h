@@ -75,7 +75,7 @@ private:
 private:
 	Font mSmallFont;
 
-	std::vector<DebugSidePanelCategory*> mCategories;			// All categories, including teh custom ones
+	std::vector<DebugSidePanelCategory*> mCategories;			// All categories, including the custom ones
 	std::vector<CustomDebugSidePanelCategory*> mCustomCategories;
 	size_t mActiveCategoryIndex = 0;
 

@@ -166,7 +166,6 @@ void ModsMenu::initialize()
 				Bitmap* sourceLarge = !icon64px.empty() ? &icon64px : !icon16px.empty() ? &icon16px : nullptr;
 				if (nullptr != sourceLarge)
 				{
-					EngineMain::instance().getDrawer().createTexture(res.mLargeIcon);
 					res.mLargeIcon.accessBitmap().rescale(*sourceLarge, 64, 64);
 					res.mLargeIcon.bitmapUpdated();
 				}
@@ -174,11 +173,9 @@ void ModsMenu::initialize()
 				Bitmap* sourceSmall = !icon16px.empty() ? &icon16px : !icon64px.empty() ? &icon64px : nullptr;
 				if (nullptr != sourceSmall)
 				{
-					EngineMain::instance().getDrawer().createTexture(res.mSmallIcon);
 					res.mSmallIcon.accessBitmap().rescale(*sourceSmall, 16, 16);
 					res.mSmallIcon.bitmapUpdated();
 
-					EngineMain::instance().getDrawer().createTexture(res.mSmallIconGray);
 					{
 						Bitmap& bitmap = res.mSmallIconGray.accessBitmap();
 						bitmap = res.mSmallIcon.accessBitmap();
@@ -873,14 +870,24 @@ void ModsMenu::refreshDependencies(ModMenuEntry& modMenuEntry, size_t modIndex)
 		const bool otherShouldBeHigherPrio = (otherModInfo.mRelativePriority > 0);
 		if (foundIndex != ~0)
 		{
-			// Check relative priority
-			const bool otherIsHigherPrio = (foundIndex < modIndex);
-			if (otherIsHigherPrio != otherShouldBeHigherPrio)
+			if (otherModInfo.mIsConflict)
 			{
-				// Show warning
+				// Show error
 				ModMenuEntry::Remark& remark = vectorAdd(modMenuEntry.mRemarks);
-				remark.mIsError = otherModInfo.mIsRequired;
-				remark.mText = std::string("This mod needs to be placed ") + (otherShouldBeHigherPrio ? "below" : "above") + " \"" + otherMod->mDisplayName + "\"";
+				remark.mIsError = true;
+				remark.mText = std::string("This mod does not work together with \"") + otherMod->mDisplayName + "\", please deactivate one of both";
+			}
+			else
+			{
+				// Check relative priority
+				const bool otherIsHigherPrio = (foundIndex < modIndex);
+				if (otherIsHigherPrio != otherShouldBeHigherPrio)
+				{
+					// Show warning
+					ModMenuEntry::Remark& remark = vectorAdd(modMenuEntry.mRemarks);
+					remark.mIsError = otherModInfo.mIsRequired;
+					remark.mText = std::string("This mod needs to be placed ") + (otherShouldBeHigherPrio ? "below" : "above") + " \"" + otherMod->mDisplayName + "\"";
+				}
 			}
 		}
 		else

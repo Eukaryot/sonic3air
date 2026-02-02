@@ -9,7 +9,7 @@
 #include "lemon/pch.h"
 #include "lemon/translator/NativizerInternal.h"
 #include "lemon/translator/SourceCodeWriter.h"
-#include "lemon/program/Function.h"
+#include "lemon/program/function/Function.h"
 #include "lemon/program/OpcodeHelper.h"
 
 
@@ -128,9 +128,9 @@ namespace lemon
 
 					case Variable::Type::USER:
 					{
-						line += "static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableByID(";
+						line += "context.mControlFlow->getProgram().getGlobalVariableByID(";
 						outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
-						line += ")).setValue(";
+						line += ").as<GlobalVariable>().setValue(";
 						closeParenthesis = true;
 						break;
 					}
@@ -225,9 +225,9 @@ namespace lemon
 
 					case Variable::Type::USER:
 					{
-						line += "static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableByID(";
+						line += "context.mControlFlow->getProgram().getGlobalVariableByID(";
 						outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
-						line += ")).getValue()";
+						line += ").as<GlobalVariable>().getValue()";
 						break;
 					}
 
@@ -253,7 +253,7 @@ namespace lemon
 			case Node::Type::MEMORY_FIXED:
 			{
 				const bool swapBytes = (node.mValue & 0x01) != 0;
-				const size_t bytes = DataTypeHelper::getSizeOfBaseType(node.mDataType);
+				const size_t bytes = BaseTypeHelper::getSizeOfBaseType(node.mDataType);
 				if (swapBytes && bytes >= 2)
 				{
 					line += *String(0, "swapBytes%d(", bytes * 8);
@@ -510,14 +510,19 @@ namespace lemon
 							size_t parameterOffset;
 							switch (type)
 							{
-								case Variable::Type::EXTERNAL:
+								case Variable::Type::LOCAL:
 								{
-									parameterOffset = mParameters.add(opcodeIndex, 8, ParameterInfo::Semantics::EXTERNAL_VARIABLE, opcode.mDataType);
+									parameterOffset = mParameters.add(opcodeIndex, 4, ParameterInfo::Semantics::LOCAL_VARIABLE);
 									break;
 								}
 								case Variable::Type::GLOBAL:
 								{
 									parameterOffset = mParameters.add(opcodeIndex, 8, ParameterInfo::Semantics::GLOBAL_VARIABLE);
+									break;
+								}
+								case Variable::Type::EXTERNAL:
+								{
+									parameterOffset = mParameters.add(opcodeIndex, 8, ParameterInfo::Semantics::EXTERNAL_VARIABLE, opcode.mDataType);
 									break;
 								}
 								default:
@@ -557,15 +562,13 @@ namespace lemon
 
 						case Opcode::Type::WRITE_MEMORY:
 						{
-							const bool exchangedInputs = (opcode.mParameter != 0);
 							{
 								// Main assignment
 								Assignment& assignment = vectorAdd(mAssignments);
 								assignment.mDest			= &mNodes.emplace_back(Assignment::Node::Type::MEMORY, opcode.mDataType);
-								assignment.mDest->mChild[0]	= &mNodes.emplace_back(Assignment::Node::Type::VALUE_STACK, BaseType::UINT_32, stackPosition - (exchangedInputs ? 2 : 1));
-								assignment.mSource			= &mNodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition - (exchangedInputs ? 1 : 2));
+								assignment.mDest->mChild[0]	= &mNodes.emplace_back(Assignment::Node::Type::VALUE_STACK, BaseType::UINT_32, stackPosition - 2);
+								assignment.mSource			= &mNodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition - 1);
 							}
-							if (exchangedInputs)
 							{
 								// Add another assignment to copy the value to the top-of-stack, where it might be expected by the next assignments
 								Assignment& assignment = vectorAdd(mAssignments);

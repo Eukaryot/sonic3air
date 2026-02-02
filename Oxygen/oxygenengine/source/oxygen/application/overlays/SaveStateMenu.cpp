@@ -117,7 +117,7 @@ void SaveStateMenu::keyboard(const rmx::KeyboardEvent& ev)
 			{
 				onAccept(true, true);
 				InputManager::instance().updateInput(0.0f);		// This clears the changed state of "Enter"
-				ControlsIn::instance().setAllIgnores();	// Just to make sure any current key pressed (especially "Enter") won't have an effect in the simulation
+				ControlsIn::instance().setAllIgnores();			// Just to make sure any current key pressed (especially "Enter") won't have an effect in the simulation
 				break;
 			}
 
@@ -167,7 +167,7 @@ void SaveStateMenu::textinput(const rmx::TextInputEvent& ev)
 	if (mEditing && mHighlightedIndex < mEntries.size())
 	{
 		Entry& entry = mEntries[mHighlightedIndex];
-		entry.mName += *ev.text;
+		entry.mName += ev.text;
 	}
 }
 
@@ -190,7 +190,11 @@ void SaveStateMenu::update(float timeElapsed)
 		changeHighlightedIndex(+1);
 	}
 
-	if (!mEditing)
+	if (mEditing)
+	{
+		Application::instance().requestActiveTextInput();
+	}
+	else
 	{
 		if (controller.A.justPressed())
 		{
@@ -209,7 +213,7 @@ void SaveStateMenu::render()
 
 	drawer.drawRect(FTX::screenRect(), Color::fromABGR32(0xe0000000));
 
-	Rectf rect((float)(FTX::screenWidth() / 2 - 280), 30, 0, 0);
+	Rectf rect((float)(FTX::screenWidth() / 2 - 280), roundToFloat(30.0f - mScrollOffset), 0, 0);
 	drawer.printText(mFont, rect, mForLoading ? "LOAD STATE" : "SAVE STATE");
 	rect.addPos(16, 40);
 
@@ -259,6 +263,11 @@ void SaveStateMenu::render()
 		drawer.drawRect(rct, mPreview);
 	}
 
+	const float scrollMin = mScrollOffset + (float)(highlightedPositionY - FTX::screenHeight() * 3 / 4);
+	const float scrollMax = scrollMin + (float)(FTX::screenHeight() / 2);
+	const float scrollOffsetTarget = std::max(clamp(mScrollOffset, scrollMin, scrollMax), 0.0f);
+	mScrollOffset += (scrollOffsetTarget - mScrollOffset) * FTX::getTimeDifference() * 20.0f;
+
 	drawer.performRendering();
 }
 
@@ -296,10 +305,6 @@ void SaveStateMenu::setHighlightedIndex(uint32 highlightedIndex)
 			Bitmap bmp;
 			if (bmp.load(mSaveStateDirectory[(size_t)entry.mType] + L"/" + entry.mName + L".state.bmp"))
 			{
-				if (!mPreview.isValid())
-				{
-					EngineMain::instance().getDrawer().createTexture(mPreview);
-				}
 				mPreview.accessBitmap() = bmp;
 				mPreview.bitmapUpdated();
 				mHasPreview = true;

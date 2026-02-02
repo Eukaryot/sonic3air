@@ -25,6 +25,8 @@ namespace rmx
 			size_t mSize = 0;
 		};
 
+		static inline std::error_code mLastErrorCode;
+
 	public:
 		static bool exists(std::wstring_view path);
 		static bool isFile(std::wstring_view path);
@@ -38,8 +40,12 @@ namespace rmx
 		static InputStream* createInputStream(std::wstring_view filename);
 
 		static bool renameFile(const std::wstring& oldFilename, const std::wstring& newFilename);
+		static bool renameDirectory(const std::wstring& oldFilename, const std::wstring& newFilename);
+
 		static bool removeFile(std::wstring_view path);
-		static void createDirectory(std::wstring_view path);
+		static bool removeDirectory(std::wstring_view path);
+
+		static bool createDirectory(std::wstring_view path);
 
 		static void listFiles(std::wstring_view path, bool recursive, std::vector<FileEntry>& outFileEntries);
 		static void listFilesByMask(std::wstring_view filemask, bool recursive, std::vector<FileEntry>& outFileEntries);
@@ -50,7 +56,9 @@ namespace rmx
 		static std::wstring_view normalizePath(std::wstring_view path, std::wstring& tempBuffer, bool isDirectory);
 
 		static bool isValidFileName(std::wstring_view filename);
+		static bool isValidPathName(std::wstring_view pathname);
 		static void sanitizeFileName(std::wstring& filename);
+		static void sanitizePathName(std::wstring& pathname);
 
 		static std::wstring getCurrentDirectory();
 		static void setCurrentDirectory(std::wstring_view path);

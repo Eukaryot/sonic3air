@@ -85,7 +85,7 @@ struct OpenGLRenderer::Internal
 	SimpleCopyScreenShader		mSimpleCopyScreenShader;
 	SimpleRectOverdrawShader	mSimpleRectOverdrawShader;
 	PostFXBlurShader			mPostFxBlurShader;
-	RenderPlaneShader			mRenderPlaneShader[RenderPlaneShader::_NUM_VARIATIONS][2];	// Using RenderPlaneShader::Variation enumeration, and alpha test off/on for second index
+	RenderPlaneShader			mRenderPlaneShader[RenderPlaneShader::_NUM_VARIATIONS];	// Using RenderPlaneShader::Variation enumeration
 	RenderVdpSpriteShader		mRenderVdpSpriteShader;
 	RenderPaletteSpriteShader	mRenderPaletteSpriteShader[2];		// Two variations: With or without alpha test
 	RenderComponentSpriteShader mRenderComponentSpriteShader[2];
@@ -133,10 +133,7 @@ void OpenGLRenderer::initialize()
 
 	for (int i = 0; i < RenderPlaneShader::_NUM_VARIATIONS; ++i)
 	{
-		for (int k = 0; k < 2; ++k)
-		{
-			mInternal.mRenderPlaneShader[i][k].initialize((RenderPlaneShader::Variation)i, k != 0);
-		}
+		mInternal.mRenderPlaneShader[i].initialize((RenderPlaneShader::Variation)i);
 	}
 	mInternal.mRenderVdpSpriteShader.initialize();
 	for (int k = 0; k < 2; ++k)
@@ -196,7 +193,6 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 		glClearColor(color.r, color.g, color.b, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDepthMask(GL_FALSE);
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glDisable(GL_SCISSOR_TEST);
 	}
 
@@ -214,10 +210,16 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 				// For blur effect, we need to render everything in background into the processing buffer
 				mIsRenderingToProcessingBuffer = true;
 				glBindFramebuffer(GL_FRAMEBUFFER, mProcessingBuffer.getHandle());
+
+				// Also clear the processing buffer with the backdrop color
+				glClear(GL_COLOR_BUFFER_BIT);
 				break;
 			}
 		}
 	}
+
+	// Reset clear color to black for the full screen
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Check if sprite masking needed
 	const bool usingSpriteMask = isUsingSpriteMask(geometries);
@@ -368,13 +370,12 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			mDrawerResources.setBlendMode(BlendMode::OPAQUE);
 
 			// For backmost layer, ignore alpha completely
-			const bool useAlphaTest = (pg.mPlaneIndex != 0 || pg.mPriorityFlag);
 			mDrawerResources.setBlendMode(BlendMode::ONE_BIT);
 			ScrollOffsetsManager& som = mRenderParts.getScrollOffsetsManager();
 			const RenderPlaneShader::Variation variation = (pg.mPlaneIndex == PlaneManager::PLANE_W) ? RenderPlaneShader::PS_SIMPLE :
 															som.getHorizontalScrollNoRepeat(pg.mScrollOffsets) ? RenderPlaneShader::PS_NO_REPEAT :
 															som.getVerticalScrolling() ? RenderPlaneShader::PS_VERTICAL_SCROLLING : RenderPlaneShader::PS_HORIZONTAL_SCROLLING;
-			RenderPlaneShader& shader = mInternal.mRenderPlaneShader[variation][useAlphaTest ? 1 : 0];
+			RenderPlaneShader& shader = mInternal.mRenderPlaneShader[variation];
 
 			shader.draw(pg, mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mRenderParts, mRenderResources);
 			mLastRenderedGeometryType = Geometry::Type::PLANE;
