@@ -72,7 +72,7 @@ void GameApp::initialize()
 	simulation.setRunning(false);
 
 	gotoPhase(Configuration::instance().mStartPhase);
-	if (Configuration::instance().mLoadLevel >= 0)
+	if (Configuration::instance().mLoadLevel >= 0 && Configuration::instance().mLoadLevel <= 0xffff)
 	{
 		Game::instance().startIntoLevel(Game::Mode::UNDEFINED, 0, Configuration::instance().mLoadLevel, Configuration::instance().mUseCharacters);
 	}
