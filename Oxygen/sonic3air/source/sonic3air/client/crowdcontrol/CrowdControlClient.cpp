@@ -115,6 +115,9 @@ void CrowdControlClient::evaluateRequestJson(const Json::Value& requestJson)
 			// Note that we're not sending a response right away, but scripts will have to handle that by calling "CrowdControl.sendResponse"
 			break;
 		}
+
+		default:
+			break;
 	}
 }
 

@@ -405,6 +405,9 @@ namespace lemon
 							module.addCustomDataType(name.getString().data(), baseType);
 							break;
 						}
+
+						default:
+							break;
 					}
 				}
 			}
@@ -430,6 +433,9 @@ namespace lemon
 							serializer.writeAs<uint8>(dataType->getBaseType());
 							break;
 						}
+
+						default:
+							break;
 					}
 				}
 			}

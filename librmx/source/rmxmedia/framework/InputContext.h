@@ -47,9 +47,6 @@ namespace rmx
 	friend class SystemManager;
 
 	public:
-		InputContext();
-		~InputContext();
-
 		inline size_t getBitIndex(int key) const { return (key & 0x01ff) + ((key & SDLK_SCANCODE_MASK) >> 21); }
 		inline bool getKeyState(int key) const	 { return mKeyState.isBitSet(getBitIndex(key)); }
 		inline bool getKeyChange(int key) const	 { return mKeyChange.isBitSet(getBitIndex(key)); }

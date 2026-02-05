@@ -13,15 +13,6 @@
 namespace rmx
 {
 
-	InputContext::InputContext()
-	{
-		memset(this, 0, sizeof(InputContext));
-	}
-
-	InputContext::~InputContext()
-	{
-	}
-
 	void InputContext::copy(const InputContext& source)
 	{
 		*this = source;
