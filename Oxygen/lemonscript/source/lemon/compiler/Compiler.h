@@ -38,14 +38,14 @@ namespace lemon
 		Compiler(Module& module, GlobalsLookup& globalsLookup, const CompileOptions& compileOptions);
 		~Compiler();
 
-		bool loadScript(const std::wstring& path);
+		bool loadScript(std::wstring_view path);
 
 		void addWarning(CompilerWarning::Code warningCode, std::string_view warningMessage, uint32 lineNumber);
 
 		inline const std::vector<ErrorMessage>& getErrors() const  { return mErrors; }
 
 	private:
-		bool loadCodeLines(std::vector<std::string_view>& outLines, const std::wstring& path);
+		bool loadCodeLines(std::vector<std::string_view>& outLines, std::wstring_view path);
 		bool compileLines(const std::vector<std::string_view>& lines);
 
 		bool loadScriptInternal(const std::wstring& localPath, const std::wstring& filename, std::vector<std::string_view>& outLines, std::unordered_set<uint64>& includedPathHashes);

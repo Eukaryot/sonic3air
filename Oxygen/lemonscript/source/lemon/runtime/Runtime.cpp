@@ -353,6 +353,9 @@ namespace lemon
 
 	bool Runtime::callFunctionByName(FlyweightString functionName, FlyweightString labelName)
 	{
+		if (nullptr == mProgram)
+			return false;
+
 		const uint64 nameAndSignatureHash = functionName.getHash() + Function::getVoidSignatureHash();
 		const Function* function = mProgram->getFunctionBySignature(nameAndSignatureHash);
 		if (nullptr != function)
@@ -373,6 +376,9 @@ namespace lemon
 
 	bool Runtime::callFunctionWithParameters(FlyweightString functionName, const FunctionCallParameters& params)
 	{
+		if (nullptr == mProgram)
+			return false;
+
 		const DataTypeDefinition& returnType = (nullptr != params.mReturnType) ? *params.mReturnType : PredefinedDataTypes::VOID;
 
 		// Build the function signature hash

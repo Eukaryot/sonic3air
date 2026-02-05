@@ -115,7 +115,7 @@ bool LemonScriptProgram::hasValidProgram() const
 	return !mInternal.mProgram.getModules().empty();
 }
 
-LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(std::string_view baseScriptFilename, const LoadOptions& loadOptions)
+LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(std::wstring_view baseScriptFilename, const LoadOptions& loadOptions)
 {
 	// Select script mods to load
 	std::vector<const Mod*> modsToLoad;
@@ -144,12 +144,14 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(std::strin
 	}
 
 	// Loop to immediately retry script loading after compilation failed
-	while (true)
+	LoadingResult loadingResult = LoadingResult::FAILED_RETRY;
+	while (loadingResult == LoadingResult::FAILED_RETRY)
 	{
-		const LoadingResult loadingResult = loadAllScriptModules(loadOptions, mainScriptReloadNeeded ? baseScriptFilename : "", modsToLoad);
-		if (loadingResult != LoadingResult::FAILED_RETRY)
-			break;
+		loadingResult = loadAllScriptModules(loadOptions, mainScriptReloadNeeded ? baseScriptFilename : L"", modsToLoad);
 	}
+
+	if (loadingResult != LoadingResult::SUCCESS)
+		return LoadScriptsResult::FAILED;
 
 	// Build lemon script program from modules
 	mInternal.mProgram.addModule(mInternal.mLemonCoreModule);
@@ -278,7 +280,7 @@ void LemonScriptProgram::resolveLocation(ResolvedLocation& outResolvedLocation, 
 	}
 }
 
-LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(const LoadOptions& loadOptions, std::string_view baseScriptFilename, const std::vector<const Mod*>& modsToLoad)
+LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(const LoadOptions& loadOptions, std::wstring_view baseScriptFilename, const std::vector<const Mod*>& modsToLoad)
 {
 	Configuration& config = Configuration::instance();
 	lemon::GlobalsLookup globalsLookup = mInternal.mGlobalsLookupCoreOnly;	// Copy the definitions from the two core modules
@@ -295,7 +297,6 @@ LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(const
 		const uint32 coreModuleDependencyHash = mInternal.mLemonCoreModule.buildDependencyHash() + mInternal.mOxygenCoreModule.buildDependencyHash();
 
 		// Load scripts
-		std::vector<uint8> buffer;
 		bool scriptsLoaded = false;
 
 		if (EngineMain::getDelegate().useDeveloperFeatures())
@@ -304,58 +305,36 @@ LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(const
 			// Deserialize from cache (so that debug builds don't have to compile themselves, which is quite slow there)
 			if (!config.mForceCompileScripts && !config.mCompiledScriptSavePath.empty())
 			{
-				if (FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer))
-				{
-					VectorBinarySerializer serializer(true, buffer);
-					scriptsLoaded = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
-					RMX_CHECK(scriptsLoaded, "Failed to deserialize scripts, possibly because the compiled script file '" << WString(config.mCompiledScriptSavePath).toStdString() << "' is using an older format", );
-				}
+				scriptsLoaded = loadBaseScriptFromCache(globalsLookup, coreModuleDependencyHash, loadOptions);
 			}
 		#endif
 
-			// Compile scripts from the sources, if they're present
+			// With dev mode on, prefer loading from sources (unless already loaded from cache)
+			//  -> This is primarly meant for main game development, and also applies when building from source
+			//  -> Note that with a normal game installation, this fails; which is okay, as we can expect loading from scripts.bin to succeed, which is faster anyways
 			if (!scriptsLoaded)
 			{
-				if (FTX::FileSystem->exists(baseScriptFilename))
-				{
-					// Compile module
-					loadingResult = loadScriptModule(mInternal.mScriptModule, globalsLookup, *String(baseScriptFilename).toWString());
+				scriptsLoaded = loadBaseScriptFromSource(globalsLookup, baseScriptFilename, coreModuleDependencyHash, loadOptions, loadingResult);
+			}
 
-					// If there are no script functions at all, we consider that a failure
-					scriptsLoaded = (loadingResult == LoadingResult::SUCCESS) && !mInternal.mScriptModule.getScriptFunctions().empty();
-
-					if (scriptsLoaded)
-					{
-						if (!config.mCompiledScriptSavePath.empty())
-						{
-							// Save compiled scripts
-							buffer.clear();
-							VectorBinarySerializer serializer(false, buffer);
-							const bool success = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
-							RMX_CHECK(success, "Failed to serialize scripts", );
-							FTX::FileSystem->saveFile(config.mCompiledScriptSavePath, buffer);	// In order to use these scripts, they have to be manually moved to the "data" folder
-						}
-					}
-					else
-					{
-						mInternal.mScriptModule.clear();
-					}
-				}
+			// If that failed, load from scripts.bin
+			if (!scriptsLoaded)
+			{
+				scriptsLoaded = loadBaseScriptFromBinary(globalsLookup, L"data/scripts.bin", coreModuleDependencyHash, loadOptions);
 			}
 		}
-
-		// Deserialize from compiled scripts
-		if (!scriptsLoaded && !config.mForceCompileScripts)
+		else
 		{
-			bool loaded = FTX::FileSystem->readFile(L"data/scripts.bin", buffer);
-			if (!loaded && !config.mCompiledScriptSavePath.empty())
-				loaded = FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer);
-
-			if (loaded)
+			// Without dev mode, prefer loading from scripts.bin
+			if (!scriptsLoaded)
 			{
-				VectorBinarySerializer serializer(true, buffer);
-				scriptsLoaded = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
-				RMX_CHECK(scriptsLoaded, "Failed to load 'scripts.bin'", );
+				scriptsLoaded = loadBaseScriptFromBinary(globalsLookup, L"data/scripts.bin", coreModuleDependencyHash, loadOptions);
+			}
+
+			// If that failed, try to load from sources as a fallback
+			if (!scriptsLoaded)
+			{
+				scriptsLoaded = loadBaseScriptFromSource(globalsLookup, baseScriptFilename, coreModuleDependencyHash, loadOptions, loadingResult);
 			}
 		}
 
@@ -424,7 +403,70 @@ LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(const
 	return loadingResult;
 }
 
-LemonScriptProgram::LoadingResult LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename)
+bool LemonScriptProgram::loadBaseScriptFromSource(lemon::GlobalsLookup& globalsLookup, std::wstring_view filename, uint32 coreModuleDependencyHash, const LoadOptions& loadOptions, LoadingResult& outLoadingResult)
+{
+	// Compile scripts from the sources, if they're present
+	if (!FTX::FileSystem->exists(filename))
+		return false;
+
+	// Compile module
+	outLoadingResult = loadScriptModule(mInternal.mScriptModule, globalsLookup, filename);
+
+	// If there are no script functions at all, we consider that a failure
+	if (outLoadingResult != LoadingResult::SUCCESS || mInternal.mScriptModule.getScriptFunctions().empty())
+	{
+		mInternal.mScriptModule.clear();
+		return false;
+	}
+
+	Configuration& config = Configuration::instance();
+	if (!config.mCompiledScriptSavePath.empty())
+	{
+		// Save compiled scripts
+		std::vector<uint8> buffer;
+		VectorBinarySerializer serializer(false, buffer);
+		const bool success = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
+		RMX_CHECK(success, "Failed to serialize scripts", );
+		FTX::FileSystem->saveFile(config.mCompiledScriptSavePath, buffer);	// In order to use these scripts, they have to be manually moved to the "data" folder
+	}
+	return true;
+}
+
+bool LemonScriptProgram::loadBaseScriptFromBinary(lemon::GlobalsLookup& globalsLookup, std::wstring_view filename, uint32 coreModuleDependencyHash, const LoadOptions& loadOptions)
+{
+	// Deserialize from compiled scripts
+	std::vector<uint8> buffer;
+	bool loaded = FTX::FileSystem->readFile(filename, buffer);
+
+	Configuration& config = Configuration::instance();
+	if (!loaded && !config.mCompiledScriptSavePath.empty())
+	{
+		loaded = FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer);
+	}
+
+	if (!loaded)
+		return false;
+
+	VectorBinarySerializer serializer(true, buffer);
+	loaded = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
+	RMX_CHECK(loaded, "Failed to load 'scripts.bin'", );
+	return loaded;
+}
+
+bool LemonScriptProgram::loadBaseScriptFromCache(lemon::GlobalsLookup& globalsLookup, uint32 coreModuleDependencyHash, const LoadOptions& loadOptions)
+{
+	std::vector<uint8> buffer;
+	Configuration& config = Configuration::instance();
+	if (!FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer))
+		return false;
+	
+	VectorBinarySerializer serializer(true, buffer);
+	const bool scriptsLoaded = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
+	RMX_CHECK(scriptsLoaded, "Failed to deserialize scripts, possibly because the compiled script file '" << WString(config.mCompiledScriptSavePath).toStdString() << "' is using an older format", );
+	return scriptsLoaded;
+}
+
+LemonScriptProgram::LoadingResult LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, std::wstring_view filename)
 {
 	// Compile script source
 	lemon::CompileOptions options;

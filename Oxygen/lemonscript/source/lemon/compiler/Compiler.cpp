@@ -64,7 +64,7 @@ namespace lemon
 		genericmanager::Manager<Token>::shrinkAllPools();
 	}
 
-	bool Compiler::loadScript(const std::wstring& path)
+	bool Compiler::loadScript(std::wstring_view path)
 	{
 		// Set active instance, and reset it when leaving this function
 		RMX_ASSERT(nullptr == mActiveInstance, "Compiler active instance already set");
@@ -127,7 +127,7 @@ namespace lemon
 		vectorAdd(warning->mOccurrences).mLineNumber = lineNumber;
 	}
 
-	bool Compiler::loadCodeLines(std::vector<std::string_view>& outLines, const std::wstring& path)
+	bool Compiler::loadCodeLines(std::vector<std::string_view>& outLines, std::wstring_view path)
 	{
 		// Split into base path and file name
 		WString basePath;
