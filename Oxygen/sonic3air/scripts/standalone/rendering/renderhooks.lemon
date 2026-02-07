@@ -790,7 +790,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 	{
 		u8 character = (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f39e) ? CHARACTER_SONIC : CHARACTER_TAILS
 		u8 atex = 0x40 + character * 0x20
-		u8 animationSprite = (character == CHARACTER_SONIC) ? (objA0.animation.sprite-1) : (character == CHARACTER_TAILS) ? (objA0.animation.sprite-5) : (objA0.animation.sprite-10)
+		u8 animationSprite = (character == CHARACTER_SONIC) ? (objA0.animation.sprite-1) : (objA0.update_address == 0x05f400) ? (objA0.animation.sprite-5) : (objA0.animation.sprite-10)
 		u64 key = stringformat((objA0.update_address == 0x05f400) ? "%s_tails_ending_0x%02x" : "%s_ending_0x%02x", getCharacterSpriteKey(character, false), animationSprite)
 		if (Renderer.hasCustomSprite(key))
 		{
@@ -1238,3 +1238,4 @@ function bool Standalone.shouldUseFrameInterpolation(u32 objAddress)
 	// Otherwise allow it
 	return true
 }
+
