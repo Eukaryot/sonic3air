@@ -887,27 +887,28 @@ namespace lemon
 				// Could be a constant array, or a variable with bracket operator
 				const ConstantArray* constantArray = nullptr;
 				const Variable* variable = nullptr;
-				if (nullptr != identifierToken.mResolved)
-				{
-					if (identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT_ARRAY)
-					{
-						constantArray = &identifierToken.mResolved->as<ConstantArray>();
-					}
-					else if (identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::VARIABLE)
-					{
-						variable = &identifierToken.mResolved->as<Variable>();
-					}
-				}
 
-				if (nullptr == constantArray && nullptr == variable)
+				// Check for local constant array
+				constantArray = findInList(*mContext.mLocalConstantArrays, identifierToken.mName.getHash());
+				if (nullptr == constantArray)
 				{
-					// Check for local constant array
-					constantArray = findInList(*mContext.mLocalConstantArrays, identifierToken.mName.getHash());
-					if (nullptr == constantArray)
+					// Check for local variables
+					variable = findInList(*mContext.mLocalVariables, identifierToken.mName.getHash());
+					if (nullptr == variable)
 					{
-						// Check for local variables
-						variable = findInList(*mContext.mLocalVariables, identifierToken.mName.getHash());
-						CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
+						// Check the identifier for a global constant array or variable
+						if (nullptr != identifierToken.mResolved)
+						{
+							if (identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT_ARRAY)
+							{
+								constantArray = &identifierToken.mResolved->as<ConstantArray>();
+							}
+							else if (identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::VARIABLE)
+							{
+								variable = &identifierToken.mResolved->as<Variable>();
+							}
+							CHECK_ERROR(nullptr != constantArray || nullptr != variable, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
+						}
 					}
 				}
 
@@ -993,17 +994,17 @@ namespace lemon
 			Token& token = tokens[i];
 			if (token.isA<IdentifierToken>())
 			{
-				// Check the identifier
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
-				const Variable* variable = nullptr;
-				if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::VARIABLE)
+
+				// First check for a local variable in any case
+				const Variable* variable = findLocalVariable(identifierToken.mName.getHash());
+				if (nullptr == variable)
 				{
-					variable = &identifierToken.mResolved->as<Variable>();
-				}
-				else
-				{
-					// Check for local variable
-					variable = findLocalVariable(identifierToken.mName.getHash());
+					// Check the identifier for a global variable
+					if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::VARIABLE)
+					{
+						variable = &identifierToken.mResolved->as<Variable>();
+					}
 					CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
 				}
 
