@@ -156,7 +156,10 @@ bool FileHelper::loadBitmap(Bitmap& bitmap, const std::wstring& filename, bool s
 		std::vector<uint8> content;
 	#ifndef PLATFORM_VITA
 		if (!FTX::FileSystem->readFile(filename, content))
+		{
+			RMX_ERROR("Shader file not found: '" << WString(filename).toStdString() << "'", );
 			return false;
+		}
 	#else
 		std::string filename_str = WString(filename).toStdString();
 		char realp[512] = {0};

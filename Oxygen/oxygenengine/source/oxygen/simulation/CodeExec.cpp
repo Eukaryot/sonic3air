@@ -326,6 +326,8 @@ void CodeExec::cleanScriptDebug()
 
 bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 {
+	const Configuration& config = Configuration::instance();
+
 	if (retainRuntimeState)
 	{
 		// If the runtime is already active, save its current state
@@ -345,12 +347,12 @@ bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 	}
 	mExecutionState = ExecutionState::INACTIVE;
 
-	const Configuration& config = Configuration::instance();
+	// Load scripts
 	LemonScriptProgram::LoadOptions options;
 	options.mEnforceFullReload = enforceFullReload;
 	options.mModuleSelection = EngineMain::getDelegate().mayLoadScriptMods() ? LemonScriptProgram::LoadOptions::ModuleSelection::ALL_MODS : LemonScriptProgram::LoadOptions::ModuleSelection::BASE_GAME_ONLY;
 	options.mAppVersion = EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber;
-	const WString mainScriptPath = config.mScriptsDir + config.mMainScriptName;
+	const std::wstring mainScriptPath = config.mScriptsDir + config.mMainScriptName;
 
 	const LemonScriptProgram::LoadScriptsResult result = mLemonScriptProgram.loadScripts(mainScriptPath, options);
 	if (result == LemonScriptProgram::LoadScriptsResult::PROGRAM_CHANGED)

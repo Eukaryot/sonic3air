@@ -273,7 +273,12 @@ bool Configuration::loadConfiguration(const std::wstring& filename)
 	bool wait = false;
 	if (loaded && serializer.serialize("WaitForDebugger", wait) && wait)
 	{
-		PlatformFunctions::showMessageBox("Waiting for debugger", "Attach debugger now, or don't...");
+		static bool alreadyWaited = false;
+		if (!alreadyWaited)		// This is needed because we enter config.json loading twice during startup, but waiting for debugger is meant to be done just once
+		{
+			PlatformFunctions::showMessageBox("Waiting for debugger", "Attach debugger now, or don't...");
+			alreadyWaited = true;
+		}
 	}
 #endif
 

@@ -358,8 +358,11 @@ LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(const
 		else
 		{
 			// Failed to load scripts
-			if (loadingResult == LoadingResult::SUCCESS)		// If loading result was not explicitly set, do that now
+			if (loadingResult == LoadingResult::SUCCESS)		// If loading result was not explicitly set, do that now; also output an error as probably none was shown yet
+			{
 				loadingResult = LoadingResult::FAILED_CONTINUE;
+				RMX_ERROR("Failed to load base scripts", );
+			}
 			return loadingResult;
 		}
 	}

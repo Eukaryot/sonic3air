@@ -71,7 +71,7 @@ bool EngineDelegate::onEnginePreStartup()
 		Configuration& config = Configuration::instance();
 		const bool check = FTX::FileSystem->exists(config.mGameDataPath + L"/gamedata.bin");
 	#else
-		const bool check = (FTX::FileSystem->exists(L"data/content.json") || FTX::FileSystem->exists(L"data/gamedata.bin"));
+		const bool check = (FTX::FileSystem->exists(L"data/metadata.json") || FTX::FileSystem->exists(L"data/gamedata.bin"));
 	#endif
 		if (!check)
 		{
