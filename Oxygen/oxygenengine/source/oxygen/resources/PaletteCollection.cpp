@@ -76,8 +76,8 @@ void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool i
 		name.remove(name.length() - 4, 4);
 
 		const uint64 paletteKey = rmx::getMurmur2_64(name);		// Hash is the key of the first palette, the others are enumerated from there
-		const int numLines = std::min(bitmap.getHeight(), 64);
-		const int numColorsPerLine = std::min(bitmap.getWidth(), 64);
+		const int numLines = std::min(bitmap.getHeight(), 256);
+		const int numColorsPerLine = std::min(bitmap.getWidth(), 256);
 
 		for (int line = 0; line < numLines; ++line)
 		{
