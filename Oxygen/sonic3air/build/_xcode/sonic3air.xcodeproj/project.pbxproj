@@ -105,8 +105,6 @@
 		9E0C5EFF247DD83C000105D0 /* Program.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B61245F886B00114DEB /* Program.cpp */; };
 		9E0C5F00247DD83E000105D0 /* GlobalsLookup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B62245F886B00114DEB /* GlobalsLookup.cpp */; };
 		9E0C5F01247DD841000105D0 /* Module.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B64245F886B00114DEB /* Module.cpp */; };
-		9E0C5F02247DD845000105D0 /* Function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B68245F886B00114DEB /* Function.cpp */; };
-		9E0C5F03247DD848000105D0 /* FunctionWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B69245F886B00114DEB /* FunctionWrapper.cpp */; };
 		9E0C5F04247DD84E000105D0 /* Preprocessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B70245F886B00114DEB /* Preprocessor.cpp */; };
 		9E0C5F05247DD851000105D0 /* Compiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B72245F886B00114DEB /* Compiler.cpp */; };
 		9E0C5F06247DDF81000105D0 /* Node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B75245F886B00114DEB /* Node.cpp */; };
@@ -187,8 +185,6 @@
 		9E1D5F792475733F003B1774 /* rmxbase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7A96245F882600114DEB /* rmxbase.cpp */; };
 		9E1D5F7C2475733F003B1774 /* PatternManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8597245F89C400114DEB /* PatternManager.cpp */; };
 		9E1D5F7E2475733F003B1774 /* RenderUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E858C245F89C400114DEB /* RenderUtils.cpp */; };
-		9E1D5F802475733F003B1774 /* FunctionWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B69245F886B00114DEB /* FunctionWrapper.cpp */; };
-		9E1D5F812475733F003B1774 /* Function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B68245F886B00114DEB /* Function.cpp */; };
 		9E1D5F832475733F003B1774 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BE2245F88D200114DEB /* Game.cpp */; };
 		9E1D5F852475733F003B1774 /* RuntimeFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B56245F886B00114DEB /* RuntimeFunction.cpp */; };
 		9E1D5F862475733F003B1774 /* SoftwareDrawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8534245F89C300114DEB /* SoftwareDrawer.cpp */; };
@@ -618,8 +614,6 @@
 		9E5FD8E927EC0C1F00CD430A /* TypeCasting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ECAAA2027D1C25E00A32EEF /* TypeCasting.cpp */; };
 		9E5FD8EA27EC0C3600CD430A /* DataType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB8FCA92554E9BA00061D5E /* DataType.cpp */; };
 		9E5FD8EB27EC0C3600CD430A /* Define.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ECAAA0F27D1C24E00A32EEF /* Define.cpp */; };
-		9E5FD8EC27EC0C3600CD430A /* Function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B68245F886B00114DEB /* Function.cpp */; };
-		9E5FD8ED27EC0C3600CD430A /* FunctionWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B69245F886B00114DEB /* FunctionWrapper.cpp */; };
 		9E5FD8EE27EC0C3600CD430A /* StringRef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E995D3925F9CFAF00F4B934 /* StringRef.cpp */; };
 		9E5FD8EF27EC0C3600CD430A /* ConstantArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ECAAA1027D1C24E00A32EEF /* ConstantArray.cpp */; };
 		9E5FD8F027EC0C3600CD430A /* GlobalsLookup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B62245F886B00114DEB /* GlobalsLookup.cpp */; };
@@ -665,6 +659,31 @@
 		9E6D244E2982219D00140342 /* BaseType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D24452982219D00140342 /* BaseType.cpp */; };
 		9E6D244F2982219D00140342 /* BaseType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D24452982219D00140342 /* BaseType.cpp */; };
 		9E6D24502982219D00140342 /* BaseType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D24452982219D00140342 /* BaseType.cpp */; };
+		9E6D3DFF2F3596D10066EE55 /* ScriptFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DFD2F3596D10066EE55 /* ScriptFunction.cpp */; };
+		9E6D3E002F3596D10066EE55 /* FunctionWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DF92F3596D10066EE55 /* FunctionWrapper.cpp */; };
+		9E6D3E012F3596D10066EE55 /* Function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DF62F3596D10066EE55 /* Function.cpp */; };
+		9E6D3E022F3596D10066EE55 /* NativeFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DFB2F3596D10066EE55 /* NativeFunction.cpp */; };
+		9E6D3E032F3596D10066EE55 /* ScriptFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DFD2F3596D10066EE55 /* ScriptFunction.cpp */; };
+		9E6D3E042F3596D10066EE55 /* FunctionWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DF92F3596D10066EE55 /* FunctionWrapper.cpp */; };
+		9E6D3E052F3596D10066EE55 /* Function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DF62F3596D10066EE55 /* Function.cpp */; };
+		9E6D3E062F3596D10066EE55 /* NativeFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DFB2F3596D10066EE55 /* NativeFunction.cpp */; };
+		9E6D3E072F3596D10066EE55 /* ScriptFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DFD2F3596D10066EE55 /* ScriptFunction.cpp */; };
+		9E6D3E082F3596D10066EE55 /* FunctionWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DF92F3596D10066EE55 /* FunctionWrapper.cpp */; };
+		9E6D3E092F3596D10066EE55 /* Function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DF62F3596D10066EE55 /* Function.cpp */; };
+		9E6D3E0A2F3596D10066EE55 /* NativeFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DFB2F3596D10066EE55 /* NativeFunction.cpp */; };
+		9E6D3E0B2F3596D10066EE55 /* ScriptFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DFD2F3596D10066EE55 /* ScriptFunction.cpp */; };
+		9E6D3E0C2F3596D10066EE55 /* FunctionWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DF92F3596D10066EE55 /* FunctionWrapper.cpp */; };
+		9E6D3E0D2F3596D10066EE55 /* Function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DF62F3596D10066EE55 /* Function.cpp */; };
+		9E6D3E0E2F3596D10066EE55 /* NativeFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3DFB2F3596D10066EE55 /* NativeFunction.cpp */; };
+		9E6D3E112F3597670066EE55 /* OpcodeOptimization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3E102F3597670066EE55 /* OpcodeOptimization.cpp */; };
+		9E6D3E122F3597670066EE55 /* OpcodeOptimization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3E102F3597670066EE55 /* OpcodeOptimization.cpp */; };
+		9E6D3E132F3597670066EE55 /* OpcodeOptimization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3E102F3597670066EE55 /* OpcodeOptimization.cpp */; };
+		9E6D3E142F3597670066EE55 /* OpcodeOptimization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D3E102F3597670066EE55 /* OpcodeOptimization.cpp */; };
+		9E6D3E152F3597DF0066EE55 /* Opcode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E0CCAB22518F7BF0007288E /* Opcode.cpp */; };
+		9E6D3E162F3597DF0066EE55 /* Opcode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E0CCAB22518F7BF0007288E /* Opcode.cpp */; };
+		9E6D3E172F3597DF0066EE55 /* Opcode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E0CCAB22518F7BF0007288E /* Opcode.cpp */; };
+		9E6D3E182F3597DF0066EE55 /* Opcode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E0CCAB22518F7BF0007288E /* Opcode.cpp */; };
+		9E6D3E192F359A5C0066EE55 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E0EFFA42B01CFDC0078ACB6 /* libcurl.tbd */; };
 		9E7525202A14582000158C14 /* GeneralMenuEntries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75251D2A14582000158C14 /* GeneralMenuEntries.cpp */; };
 		9E7525212A14582000158C14 /* GeneralMenuEntries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75251D2A14582000158C14 /* GeneralMenuEntries.cpp */; };
 		9E7525222A14582000158C14 /* GeneralMenuEntries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75251D2A14582000158C14 /* GeneralMenuEntries.cpp */; };
@@ -844,8 +863,6 @@
 		9EB069B3248088B20080AC49 /* Program.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B61245F886B00114DEB /* Program.cpp */; };
 		9EB069B4248088B20080AC49 /* GlobalsLookup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B62245F886B00114DEB /* GlobalsLookup.cpp */; };
 		9EB069B5248088B20080AC49 /* Module.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B64245F886B00114DEB /* Module.cpp */; };
-		9EB069B6248088B20080AC49 /* Function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B68245F886B00114DEB /* Function.cpp */; };
-		9EB069B7248088B20080AC49 /* FunctionWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B69245F886B00114DEB /* FunctionWrapper.cpp */; };
 		9EB069B8248088B20080AC49 /* Preprocessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B70245F886B00114DEB /* Preprocessor.cpp */; };
 		9EB069B9248088B20080AC49 /* Compiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B72245F886B00114DEB /* Compiler.cpp */; };
 		9EB069BA248088B20080AC49 /* Node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B75245F886B00114DEB /* Node.cpp */; };
@@ -1733,6 +1750,17 @@
 		9E6D24442982219D00140342 /* ModuleSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModuleSerializer.h; sourceTree = "<group>"; };
 		9E6D24452982219D00140342 /* BaseType.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BaseType.cpp; sourceTree = "<group>"; };
 		9E6D24462982219D00140342 /* BaseType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseType.h; sourceTree = "<group>"; };
+		9E6D3DF52F3596D10066EE55 /* Function.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Function.h; sourceTree = "<group>"; };
+		9E6D3DF62F3596D10066EE55 /* Function.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Function.cpp; sourceTree = "<group>"; };
+		9E6D3DF72F3596D10066EE55 /* FunctionReference.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FunctionReference.h; sourceTree = "<group>"; };
+		9E6D3DF82F3596D10066EE55 /* FunctionWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FunctionWrapper.h; sourceTree = "<group>"; };
+		9E6D3DF92F3596D10066EE55 /* FunctionWrapper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FunctionWrapper.cpp; sourceTree = "<group>"; };
+		9E6D3DFA2F3596D10066EE55 /* NativeFunction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NativeFunction.h; sourceTree = "<group>"; };
+		9E6D3DFB2F3596D10066EE55 /* NativeFunction.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NativeFunction.cpp; sourceTree = "<group>"; };
+		9E6D3DFC2F3596D10066EE55 /* ScriptFunction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScriptFunction.h; sourceTree = "<group>"; };
+		9E6D3DFD2F3596D10066EE55 /* ScriptFunction.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ScriptFunction.cpp; sourceTree = "<group>"; };
+		9E6D3E0F2F3597670066EE55 /* OpcodeOptimization.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpcodeOptimization.h; sourceTree = "<group>"; };
+		9E6D3E102F3597670066EE55 /* OpcodeOptimization.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = OpcodeOptimization.cpp; sourceTree = "<group>"; };
 		9E6E7A4A245F722F00114DEB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		9E6E7A4B245F722F00114DEB /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
 		9E6E7A4D245F723000114DEB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -1787,16 +1815,12 @@
 		9E6E7B62245F886B00114DEB /* GlobalsLookup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GlobalsLookup.cpp; sourceTree = "<group>"; };
 		9E6E7B63245F886B00114DEB /* Define.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Define.h; sourceTree = "<group>"; };
 		9E6E7B64245F886B00114DEB /* Module.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Module.cpp; sourceTree = "<group>"; };
-		9E6E7B65245F886B00114DEB /* FunctionWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FunctionWrapper.h; sourceTree = "<group>"; };
 		9E6E7B66245F886B00114DEB /* DataType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataType.h; sourceTree = "<group>"; };
 		9E6E7B67245F886B00114DEB /* Variable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Variable.h; sourceTree = "<group>"; };
-		9E6E7B68245F886B00114DEB /* Function.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Function.cpp; sourceTree = "<group>"; };
-		9E6E7B69245F886B00114DEB /* FunctionWrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FunctionWrapper.cpp; sourceTree = "<group>"; };
 		9E6E7B6A245F886B00114DEB /* Program.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Program.h; sourceTree = "<group>"; };
 		9E6E7B6B245F886B00114DEB /* Module.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Module.h; sourceTree = "<group>"; };
 		9E6E7B6C245F886B00114DEB /* GlobalsLookup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlobalsLookup.h; sourceTree = "<group>"; };
 		9E6E7B6D245F886B00114DEB /* Opcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Opcode.h; sourceTree = "<group>"; };
-		9E6E7B6E245F886B00114DEB /* Function.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Function.h; sourceTree = "<group>"; };
 		9E6E7B70245F886B00114DEB /* Preprocessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Preprocessor.cpp; sourceTree = "<group>"; };
 		9E6E7B71245F886B00114DEB /* Compiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Compiler.h; sourceTree = "<group>"; };
 		9E6E7B72245F886B00114DEB /* Compiler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Compiler.cpp; sourceTree = "<group>"; };
@@ -2482,6 +2506,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E6D3E192F359A5C0066EE55 /* libcurl.tbd in Frameworks */,
 				9EC1F78E28178F0B0073C39E /* CoreAudio.framework in Frameworks */,
 				9EA8214E2D040EC7001A3E9E /* CoreHaptics.framework in Frameworks */,
 				9EC1F79328178FF10073C39E /* Carbon.framework in Frameworks */,
@@ -2771,6 +2796,22 @@
 				9E9FBBD92824C9B20050EA3E /* Main.storyboard */,
 			);
 			path = sonic3air_iosApp;
+			sourceTree = "<group>";
+		};
+		9E6D3DFE2F3596D10066EE55 /* function */ = {
+			isa = PBXGroup;
+			children = (
+				9E6D3DF52F3596D10066EE55 /* Function.h */,
+				9E6D3DF62F3596D10066EE55 /* Function.cpp */,
+				9E6D3DF72F3596D10066EE55 /* FunctionReference.h */,
+				9E6D3DF82F3596D10066EE55 /* FunctionWrapper.h */,
+				9E6D3DF92F3596D10066EE55 /* FunctionWrapper.cpp */,
+				9E6D3DFA2F3596D10066EE55 /* NativeFunction.h */,
+				9E6D3DFB2F3596D10066EE55 /* NativeFunction.cpp */,
+				9E6D3DFC2F3596D10066EE55 /* ScriptFunction.h */,
+				9E6D3DFD2F3596D10066EE55 /* ScriptFunction.cpp */,
+			);
+			path = function;
 			sourceTree = "<group>";
 		};
 		9E6E7A3E245F722F00114DEB = {
@@ -3063,10 +3104,7 @@
 				9EB8FCA92554E9BA00061D5E /* DataType.cpp */,
 				9E6E7B63245F886B00114DEB /* Define.h */,
 				9ECAAA0F27D1C24E00A32EEF /* Define.cpp */,
-				9E6E7B6E245F886B00114DEB /* Function.h */,
-				9E6E7B68245F886B00114DEB /* Function.cpp */,
-				9E6E7B65245F886B00114DEB /* FunctionWrapper.h */,
-				9E6E7B69245F886B00114DEB /* FunctionWrapper.cpp */,
+				9E6D3DFE2F3596D10066EE55 /* function */,
 				9E6E7B6C245F886B00114DEB /* GlobalsLookup.h */,
 				9E6E7B62245F886B00114DEB /* GlobalsLookup.cpp */,
 				9E6E7B6B245F886B00114DEB /* Module.h */,
@@ -4061,8 +4099,10 @@
 		9EBAFBD12980D6BA004F13AA /* backend */ = {
 			isa = PBXGroup;
 			children = (
-				9EBAFBD32980D6BA004F13AA /* FunctionCompiler.cpp */,
 				9EBAFBD22980D6BA004F13AA /* FunctionCompiler.h */,
+				9EBAFBD32980D6BA004F13AA /* FunctionCompiler.cpp */,
+				9E6D3E0F2F3597670066EE55 /* OpcodeOptimization.h */,
+				9E6D3E102F3597670066EE55 /* OpcodeOptimization.cpp */,
 			);
 			path = backend;
 			sourceTree = "<group>";
@@ -4709,7 +4749,6 @@
 				9EBAFAEB2980D5E6004F13AA /* Logging.cpp in Sources */,
 				9E7E28DD25EF21370021AE3A /* FileStructureTree.cpp in Sources */,
 				9EBAFB092980D5E6004F13AA /* BitmapCodecPNG.cpp in Sources */,
-				9E0C5F03247DD848000105D0 /* FunctionWrapper.cpp in Sources */,
 				9E0C5F1A247DDFC1000105D0 /* json_writer.cpp in Sources */,
 				9EBAFBB22980D63E004F13AA /* AudioBuffer.cpp in Sources */,
 				9E0C5EE4247DD7CC000105D0 /* GameMenuBase.cpp in Sources */,
@@ -4754,6 +4793,10 @@
 				9ED1834E28789EFF00506AEB /* RenderPlaneShader.cpp in Sources */,
 				9E0C5EE7247DD7D7000105D0 /* TimeAttackResultsMenu.cpp in Sources */,
 				9E0C5EBC247DD723000105D0 /* SpriteManager.cpp in Sources */,
+				9E6D3E0B2F3596D10066EE55 /* ScriptFunction.cpp in Sources */,
+				9E6D3E0C2F3596D10066EE55 /* FunctionWrapper.cpp in Sources */,
+				9E6D3E0D2F3596D10066EE55 /* Function.cpp in Sources */,
+				9E6D3E0E2F3596D10066EE55 /* NativeFunction.cpp in Sources */,
 				9E0C5EFB247DD82C000105D0 /* StandardLibrary.cpp in Sources */,
 				9E0C5E8F247DD663000105D0 /* DrawCollection.cpp in Sources */,
 				9EBAFAE12980D5E6004F13AA /* FileProvider.cpp in Sources */,
@@ -4768,6 +4811,7 @@
 				9EBAFB992980D63E004F13AA /* GuiBase.cpp in Sources */,
 				9EF862432AD62823006EB284 /* CrowdControlClient.cpp in Sources */,
 				9E0C5EF1247DD7FD000105D0 /* PlayerProgress.cpp in Sources */,
+				9E6D3E162F3597DF0066EE55 /* Opcode.cpp in Sources */,
 				9E0CCB0A251910740007288E /* NativizedCode.inc in Sources */,
 				9EBAFAAA2980D5E6004F13AA /* OutputStream.cpp in Sources */,
 				9E0C5ECA247DD75E000105D0 /* OggAudioSource.cpp in Sources */,
@@ -4806,6 +4850,7 @@
 				9ECAAA7B27D1C7C600A32EEF /* CryptoFunctions.cpp in Sources */,
 				9ECAAA8B27D1C7C600A32EEF /* Sockets.cpp in Sources */,
 				9E0C5EFC247DD82F000105D0 /* Runtime.cpp in Sources */,
+				9E6D3E122F3597670066EE55 /* OpcodeOptimization.cpp in Sources */,
 				9EBAFAC82980D5E6004F13AA /* FileIO.cpp in Sources */,
 				9E0C5EC5247DD749000105D0 /* DebugSidePanelCategory.cpp in Sources */,
 				9E0C5F06247DDF81000105D0 /* Node.cpp in Sources */,
@@ -4899,7 +4944,6 @@
 				9E0C5ED1247DD77A000105D0 /* Application.cpp in Sources */,
 				9EBAFAA02980D5E6004F13AA /* BinarySerializer.cpp in Sources */,
 				9E0C5EEA247DD7E2000105D0 /* MenuBackground.cpp in Sources */,
-				9E0C5F02247DD845000105D0 /* Function.cpp in Sources */,
 				9E7E28D525EF21370021AE3A /* PackedFileProvider.cpp in Sources */,
 				9E0C5EF3247DD802000105D0 /* TimeAttackData.cpp in Sources */,
 				9EC668CE25D779CE00A42FC2 /* InputManager.cpp in Sources */,
@@ -5005,6 +5049,7 @@
 				9EBAFA902980D5E6004F13AA /* VectorBinarySerializer.cpp in Sources */,
 				9E1D5F722475733F003B1774 /* SpriteManager.cpp in Sources */,
 				9E2279FB2F0B6DED000B7C6D /* OpenGLUpscaler.cpp in Sources */,
+				9E6D3E142F3597670066EE55 /* OpcodeOptimization.cpp in Sources */,
 				9ECB71AE24C131F700A8B55E /* OptionsEntry.cpp in Sources */,
 				9E453AF625B91FB60012BADC /* GameLoader.cpp in Sources */,
 				9E1D5F742475733F003B1774 /* Token.cpp in Sources */,
@@ -5030,11 +5075,9 @@
 				9E1D5F7E2475733F003B1774 /* RenderUtils.cpp in Sources */,
 				9EC668CD25D779CE00A42FC2 /* InputManager.cpp in Sources */,
 				9ECAAA2B27D1C25E00A32EEF /* TypeCasting.cpp in Sources */,
-				9E1D5F802475733F003B1774 /* FunctionWrapper.cpp in Sources */,
 				9EB2F81A24967A2A007482F3 /* AudioSourceManager.cpp in Sources */,
 				9EF862382AD62656006EB284 /* DebugTracking.cpp in Sources */,
 				9E265022254B0A4D0000A100 /* user_manager.cpp in Sources */,
-				9E1D5F812475733F003B1774 /* Function.cpp in Sources */,
 				9EBAFB7A2980D63E004F13AA /* Shader.cpp in Sources */,
 				9E1D5F832475733F003B1774 /* Game.cpp in Sources */,
 				9E1D5F852475733F003B1774 /* RuntimeFunction.cpp in Sources */,
@@ -5227,6 +5270,10 @@
 				9ECB71B024C131FB00A8B55E /* OptionsMenu.cpp in Sources */,
 				9E82C77A26BDF29A00ADDBD3 /* BackdropView.cpp in Sources */,
 				9E265010254B0A4D0000A100 /* storage_manager.cpp in Sources */,
+				9E6D3E072F3596D10066EE55 /* ScriptFunction.cpp in Sources */,
+				9E6D3E082F3596D10066EE55 /* FunctionWrapper.cpp in Sources */,
+				9E6D3E092F3596D10066EE55 /* Function.cpp in Sources */,
+				9E6D3E0A2F3596D10066EE55 /* NativeFunction.cpp in Sources */,
 				9E1D5FF62475733F003B1774 /* DrawCollection.cpp in Sources */,
 				9E1D5FF72475733F003B1774 /* json_writer.cpp in Sources */,
 				9E1D5FF82475733F003B1774 /* ym2612.cpp in Sources */,
@@ -5234,6 +5281,7 @@
 				9ED1835C28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */,
 				9E1D5FFA2475733F003B1774 /* OpenGLDrawerResources.cpp in Sources */,
 				9EBAFB6B2980D63E004F13AA /* Framebuffer.cpp in Sources */,
+				9E6D3E152F3597DF0066EE55 /* Opcode.cpp in Sources */,
 				9E7E28D825EF21370021AE3A /* ZipFileProvider.cpp in Sources */,
 				9EA8205E2D040635001A3E9E /* PaletteManager.cpp in Sources */,
 				9EA8205F2D040635001A3E9E /* Palette.cpp in Sources */,
@@ -5366,6 +5414,7 @@
 				9E5FD8FA27EC0C5500CD430A /* NativizedOpcodeProvider.cpp in Sources */,
 				9E5FD8D827EC0BEE00CD430A /* SkippableCutsceneWindow.cpp in Sources */,
 				9E5FD8C227EC0A5B00CD430A /* SharedDatabase.cpp in Sources */,
+				9E6D3E182F3597DF0066EE55 /* Opcode.cpp in Sources */,
 				9EBAFB5F2980D63E004F13AA /* FileProviderSDL.cpp in Sources */,
 				9E5FD8A627EC098400CD430A /* LogDisplay.cpp in Sources */,
 				9E5FD8D327EC0BE200CD430A /* OptionsMenuEntries.cpp in Sources */,
@@ -5422,7 +5471,6 @@
 				9E5FD84927EC084C00CD430A /* AudioOutBase.cpp in Sources */,
 				9EBAFBAF2980D63E004F13AA /* AudioMixer.cpp in Sources */,
 				9E6D244B2982219D00140342 /* ModuleSerializer.cpp in Sources */,
-				9E5FD8ED27EC0C3600CD430A /* FunctionWrapper.cpp in Sources */,
 				9E5FD8C727EC0A6300CD430A /* Game.cpp in Sources */,
 				9E5FD8EB27EC0C3600CD430A /* Define.cpp in Sources */,
 				9E5FD86627EC089700CD430A /* VideoOut.cpp in Sources */,
@@ -5438,6 +5486,7 @@
 				9EBAFB102980D5E6004F13AA /* BitmapCodecBMP.cpp in Sources */,
 				9ED1835028789EFF00506AEB /* RenderPlaneShader.cpp in Sources */,
 				9E6D2442298220CB00140342 /* NativizerInternal.cpp in Sources */,
+				9E6D3E132F3597670066EE55 /* OpcodeOptimization.cpp in Sources */,
 				9E5FD8C927EC0BB500CD430A /* BlueSpheresRendering.cpp in Sources */,
 				9E227ACC2F0B6F16000B7C6D /* Renderer.cpp in Sources */,
 				9E5FD8F527EC0C4E00CD430A /* Runtime.cpp in Sources */,
@@ -5488,6 +5537,10 @@
 				9E5FD89227EC08FD00CD430A /* PatternManager.cpp in Sources */,
 				9EBAFBB92980D63E004F13AA /* AudioManager.cpp in Sources */,
 				9E5FD86227EC089200CD430A /* MemoryHexView.cpp in Sources */,
+				9E6D3DFF2F3596D10066EE55 /* ScriptFunction.cpp in Sources */,
+				9E6D3E002F3596D10066EE55 /* FunctionWrapper.cpp in Sources */,
+				9E6D3E012F3596D10066EE55 /* Function.cpp in Sources */,
+				9E6D3E022F3596D10066EE55 /* NativeFunction.cpp in Sources */,
 				9EBAFC042980DF01004F13AA /* PackageBuilder.cpp in Sources */,
 				9EBAFB062980D5E6004F13AA /* BitmapCodecJPG.cpp in Sources */,
 				9E5FD8B127EC09A000CD430A /* WebSocketWrapper.cpp in Sources */,
@@ -5577,7 +5630,6 @@
 				9E5FD8AA27EC098400CD430A /* LemonScriptRuntime.cpp in Sources */,
 				9E5FD8DB27EC0BF600CD430A /* PauseMenu.cpp in Sources */,
 				9E5FD85B27EC088500CD430A /* ModManager.cpp in Sources */,
-				9E5FD8EC27EC0C3600CD430A /* Function.cpp in Sources */,
 				9E5FD84A27EC084E00CD430A /* AudioPlayer.cpp in Sources */,
 				9E5FD8AB27EC098E00CD430A /* ym2612.cpp in Sources */,
 				9E5FD86427EC089200CD430A /* ProfilingView.cpp in Sources */,
@@ -5689,7 +5741,6 @@
 				9ED1832128789ED000506AEB /* SpriteDump.cpp in Sources */,
 				9EB06A3124808A930080AC49 /* ControlsIn.cpp in Sources */,
 				9EBAFA972980D5E6004F13AA /* String.cpp in Sources */,
-				9EB069B6248088B20080AC49 /* Function.cpp in Sources */,
 				9EBAFABF2980D5E6004F13AA /* ErrorHandler.cpp in Sources */,
 				9EBAFBE62980D6BA004F13AA /* Parser.cpp in Sources */,
 				9EB06A0624808A1C0080AC49 /* OpenGLDrawer.cpp in Sources */,
@@ -5779,6 +5830,10 @@
 				9EB06A4824808ABE0080AC49 /* FileHelper.cpp in Sources */,
 				9EB06A3F24808AAD0080AC49 /* GameProfile.cpp in Sources */,
 				9EB06A3724808A9D0080AC49 /* MemoryHexView.cpp in Sources */,
+				9E6D3E032F3596D10066EE55 /* ScriptFunction.cpp in Sources */,
+				9E6D3E042F3596D10066EE55 /* FunctionWrapper.cpp in Sources */,
+				9E6D3E052F3596D10066EE55 /* Function.cpp in Sources */,
+				9E6D3E062F3596D10066EE55 /* NativeFunction.cpp in Sources */,
 				9EBAFB862980D63E004F13AA /* VertexArrayObject.cpp in Sources */,
 				9EB06A3924808AA50080AC49 /* OggAudioSource.cpp in Sources */,
 				9EBAFB9A2980D63E004F13AA /* GuiBase.cpp in Sources */,
@@ -5789,6 +5844,7 @@
 				9EB06A0724808A1C0080AC49 /* OpenGLDrawerTexture.cpp in Sources */,
 				9EBAFB6D2980D63E004F13AA /* Framebuffer.cpp in Sources */,
 				9EA8208E2D040720001A3E9E /* SimulationState.cpp in Sources */,
+				9E6D3E172F3597DF0066EE55 /* Opcode.cpp in Sources */,
 				9EBAFAF12980D5E6004F13AA /* Tools.cpp in Sources */,
 				9EB06A0A24808A2C0080AC49 /* ResourcesCache.cpp in Sources */,
 				9EB06A3624808A9D0080AC49 /* DebugSidePanel.cpp in Sources */,
@@ -5854,6 +5910,7 @@
 				9E227A592F0B6E47000B7C6D /* CustomSidePanelWindow.cpp in Sources */,
 				9E227A5A2F0B6E47000B7C6D /* PersistentDataWindow.cpp in Sources */,
 				9E227A5B2F0B6E47000B7C6D /* ImGuiHelpers.cpp in Sources */,
+				9E6D3E112F3597670066EE55 /* OpcodeOptimization.cpp in Sources */,
 				9E227A5C2F0B6E47000B7C6D /* NetworkingWindow.cpp in Sources */,
 				9E227A5D2F0B6E47000B7C6D /* ImGuiSoftwareRenderer.cpp in Sources */,
 				9E227AEA2F0B70E5000B7C6D /* InputContext.cpp in Sources */,
@@ -5888,7 +5945,6 @@
 				9ECAAA7427D1C7C600A32EEF /* ReceivedPacketCache.cpp in Sources */,
 				9EA821442D040AB6001A3E9E /* PaletteBitmap.cpp in Sources */,
 				9ECAAA2927D1C25E00A32EEF /* Operators.cpp in Sources */,
-				9EB069B7248088B20080AC49 /* FunctionWrapper.cpp in Sources */,
 				9E0CCAF12518FF360007288E /* ProfilingView.cpp in Sources */,
 				9EB06A1724808A590080AC49 /* RenderResources.cpp in Sources */,
 				9ECAAA1A27D1C24E00A32EEF /* ConstantArray.cpp in Sources */,
@@ -6106,7 +6162,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 24.12.05.0;
+				MARKETING_VERSION = 26.01.31.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -6155,7 +6211,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 24.12.05.0;
+				MARKETING_VERSION = 26.01.31.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -6210,7 +6266,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 24.12.05.0;
+				MARKETING_VERSION = 26.01.31.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air.sonic3air-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -6268,7 +6324,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 24.12.05.0;
+				MARKETING_VERSION = 26.01.31.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air.sonic3air-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -6433,7 +6489,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 24.12.05.0;
+				MARKETING_VERSION = 26.01.31.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air.oxygenApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -6478,7 +6534,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 24.12.05.0;
+				MARKETING_VERSION = 26.01.31.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air.oxygenApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
