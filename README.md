@@ -69,6 +69,7 @@ Source code contributions by:
 * gl33ntwine
 * Rinnegatamante
 * MDashK
+* CodenameGamma
 
 Remastered soundtrack by:
 * G Spindash
@@ -89,6 +90,8 @@ Game scripts & other contributions by:
 * mrgrassman14
 * Vague Rant
 * PaperTriangle
+* Crappy Productions
+* AtomicRey
 
 Additional thanks:
 * All contributors of the Sonic 3 / Sonic & Knuckles Disassembly (https://github.com/sonicretro/skdisasm), which has proven itself a valuable source of information on S3&K code

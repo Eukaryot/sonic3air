@@ -785,7 +785,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		return true
 	}
 
-	// Character sprites in best ending final scene
+	// Character sprites in best ending final scene (with a fix for Tails #contributed by Crappy Productions)
 	if (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f39e || objA0.update_address == 0x05f3da || objA0.update_address == 0x05f400)
 	{
 		u8 character = (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f39e) ? CHARACTER_SONIC : CHARACTER_TAILS
@@ -1238,4 +1238,3 @@ function bool Standalone.shouldUseFrameInterpolation(u32 objAddress)
 	// Otherwise allow it
 	return true
 }
-
