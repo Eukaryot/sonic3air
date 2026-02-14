@@ -320,21 +320,27 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 		return false;
 	JsonSerializer serializer(true, root);
 
-	if (settingsType == SettingsType::INPUT)
+	switch (settingsType)
 	{
-		// Input devices
-		readInputDevices(root, mInputDeviceDefinitions);
-	}
-	else
-	{
-		// All kinds of stuff
-		serializeStandardSettings(serializer);
+		case SettingsType::STANDARD:
+		{
+			// All kinds of stuff
+			serializeStandardSettings(serializer);
 
-		// Dev mode
-		serializeDevMode(serializer);
+			// Dev mode
+			serializeDevMode(serializer);
 
-		// Mod settings
-		loadModSettings(root, mModSettings);
+			// Mod settings
+			loadModSettings(root, mModSettings);
+			break;
+		}
+
+		case SettingsType::INPUT:
+		{
+			// Input devices
+			readInputDevices(root, mInputDeviceDefinitions);
+			break;
+		}
 	}
 
 	// Call subclass implementation

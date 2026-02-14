@@ -78,6 +78,9 @@ bool ConfigurationImpl::loadConfigurationInternal(JsonSerializer& serializer)
 
 bool ConfigurationImpl::loadSettingsInternal(JsonSerializer& serializer, SettingsType settingsType)
 {
+	if (settingsType != SettingsType::STANDARD)
+		return true;
+
 	serializeSettingsInternal(serializer);
 
 	if (mGameServerBase.mServerHostName == "sonic3air.org")
