@@ -198,9 +198,19 @@ namespace lemon
 
 	void GlobalsLookup::registerDataType(const DataTypeDefinition* dataTypeDefinition)
 	{
-		RMX_ASSERT(dataTypeDefinition->getID() == mDataTypes.size(), "Wrong data type ID");
-		mDataTypes.push_back(dataTypeDefinition);
-		mAllIdentifiers[dataTypeDefinition->getName().getHash()].set(dataTypeDefinition);
+		// Check if data type was already added (which happens for data types added during compilation, like arrays)
+		const uint64 nameHash = dataTypeDefinition->getName().getHash();
+		const Identifier* existing = mapFind(mAllIdentifiers, nameHash);
+		if (nullptr != existing)
+		{
+			RMX_CHECK(existing->getType() == Identifier::Type::DATA_TYPE, "Data type name '" << dataTypeDefinition->getName() << "' was already used for a different global identifier", );
+		}
+		else
+		{
+			RMX_ASSERT(dataTypeDefinition->getID() == mDataTypes.size(), "Wrong data type ID");
+			mDataTypes.push_back(dataTypeDefinition);
+			mAllIdentifiers[nameHash].set(dataTypeDefinition);
+		}
 	}
 
 	const DataTypeDefinition* GlobalsLookup::readDataType(VectorBinarySerializer& serializer) const
