@@ -60,7 +60,7 @@ private:
 		int mCost = 0;
 		int mDuration = 0;
 		int mQuantity = 0;
-			// There's also the "parameter" object that might be interesting...
+		std::string mViewer;
 	};
 
 private:

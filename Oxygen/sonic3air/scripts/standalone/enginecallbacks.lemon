@@ -221,7 +221,7 @@ constant u8 CCStatusCode.RESUME			= 0x07		// The timed effect has been resumed a
 constant u8 CCStatusCode.FINISHED		= 0x08		// The timed effect has finished
 
 
-function void CrowdControl.triggerEffect(u32 id, string code, s32 quantity, s32 duration)
+function void CrowdControl.triggerEffect(u32 id, string code, s32 quantity, s32 duration, string viewer)
 {
 	/*
 	 * When implementing a CrowdControl effect, please implement your own override of "CrowdControl.triggerEffect" as follows:
@@ -235,7 +235,7 @@ function void CrowdControl.triggerEffect(u32 id, string code, s32 quantity, s32 
 	 *
 	 *	- If you don't handle the effect code:
 	 *		- Call "base.CrowdControl.triggerEffect" after your own code evaluations, like this:
-	 *			base.CrowdControl.triggerEffect(id, code, quantity, duration)
+	 *			base.CrowdControl.triggerEffect(id, code, quantity, duration, viewer)
 	 *		- Do not call "CrowdControl.sendResponse" in this case
 	 */
 
