@@ -1017,7 +1017,7 @@ function bool fn00d458()
 				--D1.u16
 			#if STANDALONE
 				if (D1.s16 < 0 || D1.s16 > D6.u16)	// Fixes that you could select zones that aren't selectable for the character (like DDZ for Knuckles); #contributed by AtomicRey
-			#else
+			#endif
 				{
 					D1.u16 = D6.u16
 				}
