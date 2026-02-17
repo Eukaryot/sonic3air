@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,6 +10,7 @@
 #include "lemon/program/Module.h"
 #include "lemon/program/ModuleSerializer.h"
 #include "lemon/program/GlobalsLookup.h"
+#include "lemon/program/function/ScriptFunction.h"
 
 #include <iomanip>
 
@@ -27,7 +28,6 @@ namespace lemon
 		mModuleId(rmx::getMurmur2_64(name) & 0xffffffffffff0000ull),
 		mAppendedInfo(appendedInfo)
 	{
-		static_assert((size_t)Opcode::Type::_NUM_TYPES == 36);	// Otherwise DEFAULT_OPCODE_BASETYPES needs to get updated
 	}
 
 	Module::~Module()
@@ -44,10 +44,10 @@ namespace lemon
 		// Functions
 		for (Function* func : mFunctions)
 		{
-			if (func->getType() == Function::Type::NATIVE)
-				mNativeFunctionPool.destroyObject(*static_cast<NativeFunction*>(func));
+			if (func->isA<NativeFunction>())
+				mNativeFunctionPool.destroyObject(func->as<NativeFunction>());
 			else
-				mScriptFunctionPool.destroyObject(*static_cast<ScriptFunction*>(func));
+				mScriptFunctionPool.destroyObject(func->as<ScriptFunction>());
 		}
 		mFunctions.clear();
 		mScriptFunctions.clear();
@@ -81,9 +81,9 @@ namespace lemon
 		mStringLiterals.clear();
 
 		// Data types
-		for (const CustomDataType* customDataType : mDataTypes)
+		for (const DataTypeDefinition* dataType : mDataTypes)
 		{
-			delete customDataType;
+			delete dataType;
 		}
 		mDataTypes.clear();
 
@@ -439,7 +439,15 @@ namespace lemon
 		mStringLiterals.push_back(str);
 	}
 
-	const CustomDataType* Module::addDataType(const char* name, BaseType baseType)
+	ArrayDataType& Module::addArrayDataType(const DataTypeDefinition& elementType, size_t arraySize)
+	{
+		const uint16 id = mFirstDataTypeID + (uint16)mDataTypes.size();
+		ArrayDataType* arrayDataType = new ArrayDataType(id, elementType, arraySize);
+		mDataTypes.push_back(arrayDataType);
+		return *arrayDataType;
+	}
+
+	const CustomDataType* Module::addCustomDataType(const char* name, BaseType baseType)
 	{
 		const uint16 id = mFirstDataTypeID + (uint16)mDataTypes.size();
 		CustomDataType* customDataType = new CustomDataType(name, id, baseType);

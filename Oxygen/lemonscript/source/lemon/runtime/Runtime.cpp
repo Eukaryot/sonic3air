@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -12,6 +12,7 @@
 #include "lemon/runtime/RuntimeOpcodeContext.h"
 #include "lemon/program/Program.h"
 #include "lemon/program/StringRef.h"
+#include "lemon/program/function/NativeFunction.h"
 
 
 namespace lemon
@@ -65,7 +66,7 @@ namespace lemon
 					{
 						const uint64 nameAndSignatureHash = (uint32)opcodes[k].mParameter;
 						const Function* function = program.getFunctionBySignature(nameAndSignatureHash);
-						if (nullptr != function && function->getType() == Function::Type::NATIVE)
+						if (nullptr != function && function->isA<NativeFunction>())
 						{
 							const int programCounter = (int)(k + 1);
 							if (newPC == -1 || std::abs(programCounter - oldPC) < std::abs(newPC - oldPC))
@@ -199,9 +200,9 @@ namespace lemon
 	{
 		for (Function* function : mProgram->getFunctions())
 		{
-			if (function->getType() == Function::Type::SCRIPT)
+			if (function->isA<ScriptFunction>())
 			{
-				getRuntimeFunction(*static_cast<ScriptFunction*>(function));
+				getRuntimeFunction(function->as<ScriptFunction>());
 			}
 		}
 	}
@@ -253,7 +254,7 @@ namespace lemon
 		return hash;
 	}
 
-	AnyBaseValue Runtime::getGlobalVariableValue(const Variable& variable)
+	AnyBaseValue Runtime::getGlobalVariableValue(const GlobalVariable& variable)
 	{
 		AnyBaseValue result;
 		const int64* valuePtr = accessGlobalVariableValue(variable);
@@ -262,7 +263,7 @@ namespace lemon
 		return result;
 	}
 
-	void Runtime::setGlobalVariableValue(const Variable& variable, AnyBaseValue value)
+	void Runtime::setGlobalVariableValue(const GlobalVariable& variable, AnyBaseValue value)
 	{
 		int64* valuePtr = accessGlobalVariableValue(variable);
 		if (nullptr != valuePtr)
@@ -271,12 +272,10 @@ namespace lemon
 		}
 	}
 
-	int64* Runtime::accessGlobalVariableValue(const Variable& variable)
+	int64* Runtime::accessGlobalVariableValue(const GlobalVariable& variable)
 	{
-		RMX_CHECK((variable.getID() & 0xf0000000) == 0x10000000, "Variable " << variable.getName() << " is not a global variable", return nullptr);
-		const uint32 index = variable.getID() & 0x0fffffff;
-		RMX_CHECK(index < mProgram->getGlobalVariables().size(), "Variable index " << index << " is not valid", return nullptr);
-		const size_t offset = mProgram->getGlobalVariables()[index]->getStaticMemoryOffset();
+		RMX_CHECK(variable.isA<GlobalVariable>(), "Variable " << variable.getName() << " is not a global variable", return nullptr);
+		const size_t offset = variable.getStaticMemoryOffset();
 		return (int64*)&mStaticMemory[offset];
 	}
 
@@ -284,7 +283,7 @@ namespace lemon
 	{
 		if (mSelectedControlFlow->mLocalVariablesSize + runtimeFunction.mFunction->mLocalVariablesByID.size() > ControlFlow::VAR_STACK_LIMIT)
 		{
-			throw std::runtime_error("Reached var stack limit, probably due to recursive function calls");
+			throw std::runtime_error("Reached var stack limit, possibly due to recursive function calls");
 		}
 
 		// Push new state to call stack
@@ -302,7 +301,7 @@ namespace lemon
 		{
 			case Function::Type::SCRIPT:
 			{
-				const ScriptFunction& func = static_cast<const ScriptFunction&>(function);
+				const ScriptFunction& func = function.as<ScriptFunction>();
 				callRuntimeFunction(*getRuntimeFunction(func));
 				break;
 			}
@@ -310,7 +309,7 @@ namespace lemon
 			case Function::Type::NATIVE:
 			{
 				// Directly execute it
-				const NativeFunction& func = static_cast<const NativeFunction&>(function);
+				const NativeFunction& func = function.as<NativeFunction>();
 				func.execute(NativeFunction::Context(*mSelectedControlFlow));
 				break;
 			}
@@ -319,10 +318,10 @@ namespace lemon
 
 	bool Runtime::callFunctionAtLabel(const Function& function, FlyweightString labelName)
 	{
-		if (function.getType() != Function::Type::SCRIPT)
+		if (!function.isA<ScriptFunction>())
 			return false;
 
-		const ScriptFunction& func = static_cast<const ScriptFunction&>(function);
+		const ScriptFunction& func = function.as<ScriptFunction>();
 		const ScriptFunction::Label* label = func.findLabelByName(labelName);
 		if (nullptr == label)
 			return false;
@@ -354,6 +353,9 @@ namespace lemon
 
 	bool Runtime::callFunctionByName(FlyweightString functionName, FlyweightString labelName)
 	{
+		if (nullptr == mProgram)
+			return false;
+
 		const uint64 nameAndSignatureHash = functionName.getHash() + Function::getVoidSignatureHash();
 		const Function* function = mProgram->getFunctionBySignature(nameAndSignatureHash);
 		if (nullptr != function)
@@ -374,11 +376,14 @@ namespace lemon
 
 	bool Runtime::callFunctionWithParameters(FlyweightString functionName, const FunctionCallParameters& params)
 	{
+		if (nullptr == mProgram)
+			return false;
+
 		const DataTypeDefinition& returnType = (nullptr != params.mReturnType) ? *params.mReturnType : PredefinedDataTypes::VOID;
 
 		// Build the function signature hash
 		uint32 signatureHash = Function::getVoidSignatureHash();
-		if (returnType.getClass() != DataTypeDefinition::Class::VOID || !params.mParams.empty())
+		if (!returnType.isA<VoidDataType>() || !params.mParams.empty())
 		{
 			Function::SignatureBuilder builder;
 			builder.clear(returnType);
@@ -467,7 +472,7 @@ namespace lemon
 			RMX_CHECK(mSelectedControlFlow->mValueStackPtr < &mSelectedControlFlow->mValueStackBuffer[ControlFlow::VALUE_STACK_LAST_INDEX], "Value stack error: Too many elements", mSelectedControlFlow->mValueStackPtr = &mSelectedControlFlow->mValueStackBuffer[0x77]);
 
 			RMX_ASSERT(mSelectedControlFlow->mLocalVariablesSize <= ControlFlow::VAR_STACK_LIMIT, "Reached var stack limit");
-			mSelectedControlFlow->mCurrentLocalVariables = &mSelectedControlFlow->mLocalVariablesBuffer[state.mLocalVariablesStart];
+			mSelectedControlFlow->mCurrentLocalVariables = reinterpret_cast<uint8*>(&mSelectedControlFlow->mLocalVariablesBuffer[state.mLocalVariablesStart]);
 			RMX_ASSERT(nullptr != mSelectedControlFlow->mCurrentLocalVariables, "Reached var stack limit");
 
 			context.mOpcode = (const RuntimeOpcode*)state.mProgramCounter;
@@ -768,6 +773,7 @@ namespace lemon
 					const uint64 nameHash = rmx::getMurmur2_64(functionName);
 					uint32 signatureHash = serializer.read<uint32>();
 					const Function* function = mProgram->getFunctionBySignature(nameHash + signatureHash, 0);	// Note that this does not support function overloading, but maybe that's no problem at all
+
 				#if 1
 					// This is only added (in early 2022) for compatibility with older save states and can be removed again somewhere down the line
 					if (nullptr == function && signatureHash == 0xd202ef8d)		// Signature hash for void functions has changed
@@ -776,14 +782,16 @@ namespace lemon
 						function = mProgram->getFunctionBySignature(nameHash + signatureHash, 0);	// Note that this does not support function overloading, but maybe that's no problem at all
 					}
 				#endif
-					if (nullptr == function || function->getType() != Function::Type::SCRIPT)
+
+					if (nullptr == function || !function->isA<ScriptFunction>())
 					{
 						if (nullptr != outError)
 							*outError = "Could not match function signature for script function of name '" + std::string(functionName) + "'";
 						controlFlow.mCallStack.clear();
 						return false;
 					}
-					RuntimeFunction* runtimeFunction = getRuntimeFunction(static_cast<const ScriptFunction&>(*function));
+
+					RuntimeFunction* runtimeFunction = getRuntimeFunction(function->as<ScriptFunction>());
 					controlFlow.mCallStack[i].mRuntimeFunction = runtimeFunction;
 					controlFlow.mCallStack[i].mProgramCounter = runtimeFunction->translateToRuntimeProgramCounter(serializer.read<uint32>());
 
@@ -857,11 +865,9 @@ namespace lemon
 					const int64 value = serializer.read<uint64>();
 					const uint64 nameHash = rmx::getMurmur2_64(name);
 					Variable* variable = mProgram->getGlobalVariableByName(nameHash);
-					if (nullptr != variable && variable->getType() == Variable::Type::GLOBAL)
+					if (nullptr != variable && variable->isA<GlobalVariable>())
 					{
-						const size_t index = variable->getID() & 0x0fffffff;
-						RMX_CHECK(index < numGlobals, "Invalid global variable index", continue);
-						const size_t offset = mProgram->getGlobalVariables()[index]->getStaticMemoryOffset();
+						const size_t offset = variable->as<GlobalVariable>().getStaticMemoryOffset();
 						if (offset < mStaticMemory.size())
 							memcpy(&mStaticMemory[offset], &value, sizeof(int64));
 					}
@@ -874,7 +880,7 @@ namespace lemon
 				{
 					Variable* variable = mProgram->getGlobalVariables()[i];
 					serializer.write(variable->getName().getString());
-					const size_t offset = variable->getStaticMemoryOffset();
+					const size_t offset = (variable->isA<GlobalVariable>()) ? variable->as<GlobalVariable>().getStaticMemoryOffset() : 0xffffffff;
 					if (offset < mStaticMemory.size())
 						serializer.write(&mStaticMemory[offset], sizeof(int64));
 					else
@@ -893,8 +899,12 @@ namespace lemon
 				{
 					const int64 value = serializer.read<uint64>();
 					RMX_CHECK(i < numGlobals, "Invalid global variable index", continue);
-					const size_t offset = mProgram->getGlobalVariables()[i]->getStaticMemoryOffset();
-					memcpy(&mStaticMemory[offset], &value, sizeof(int64));
+					Variable* variable = mProgram->getGlobalVariables()[i];
+					if (variable->isA<GlobalVariable>())
+					{
+						const size_t offset = variable->as<GlobalVariable>().getStaticMemoryOffset();
+						memcpy(&mStaticMemory[offset], &value, sizeof(int64));
+					}
 				}
 				if (numGlobalsSerialized > numGlobals)
 				{
@@ -920,9 +930,10 @@ namespace lemon
 		size_t totalSize = 0;
 		for (size_t index = 0; index < mProgram->getGlobalVariables().size(); ++index)
 		{
-			Variable& variable = *mProgram->getGlobalVariables()[index];
-			if (variable.getType() == Variable::Type::GLOBAL)	// The other variable types don't use static memory size
+			Variable& var = *mProgram->getGlobalVariables()[index];
+			if (var.isA<GlobalVariable>())	// The other variable types don't use static memory size
 			{
+				GlobalVariable& variable = var.as<GlobalVariable>();
 				size_t variableSize = variable.getDataType()->getBytes();
 				variableSize = (variableSize + 7) / 8 * 8;		// Align to multiples of 8 bytes (i.e. int64 size)
 				variable.mStaticMemoryOffset = totalSize;
@@ -935,11 +946,15 @@ namespace lemon
 
 		for (size_t index = 0; index < mProgram->getGlobalVariables().size(); ++index)
 		{
-			Variable& variable = *mProgram->getGlobalVariables()[index];
-			if (variable.getStaticMemorySize() > 0)
+			Variable& var = *mProgram->getGlobalVariables()[index];
+			if (var.isA<GlobalVariable>())
 			{
-				const int64 value = (variable.getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable&>(variable).mInitialValue.get<int64>() : 0;
-				*(int64*)&mStaticMemory[variable.getStaticMemoryOffset()] = value;
+				GlobalVariable& variable = var.as<GlobalVariable>();
+				if (variable.getStaticMemorySize() > 0)
+				{
+					const int64 value = variable.mInitialValue.get<int64>();
+					*(int64*)&mStaticMemory[variable.getStaticMemoryOffset()] = value;
+				}
 			}
 		}
 	}

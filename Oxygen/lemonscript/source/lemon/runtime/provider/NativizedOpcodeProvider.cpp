@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -22,7 +22,7 @@ namespace lemon
 		(*buildFunction)(mLookupDictionary);
 	}
 
-	bool NativizedOpcodeProvider::buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime)
+	bool NativizedOpcodeProvider::buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime, const ScriptFunction& function)
 	{
 		if (mLookupDictionary.mEntries.empty() || numOpcodesAvailable < (int)Nativizer::MIN_OPCODES)
 			return false;
@@ -89,10 +89,19 @@ namespace lemon
 							break;
 						}
 
+						case Nativizer::LookupEntry::ParameterInfo::Semantics::LOCAL_VARIABLE:
+						{
+							const uint32 variableId = (uint32)opcode.mParameter;
+							const LocalVariable& variable = function.getLocalVariableByID(variableId);
+							runtimeOpcode.setParameter(variable.getLocalMemoryOffset(), parameter.mOffset);
+							break;
+						}
+
 						case Nativizer::LookupEntry::ParameterInfo::Semantics::GLOBAL_VARIABLE:
 						{
 							const uint32 variableId = (uint32)opcode.mParameter;
-							int64* valuePointer = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
+							const GlobalVariable& variable = runtime.getProgram().getGlobalVariableByID(variableId).as<GlobalVariable>();
+							int64* valuePointer = const_cast<Runtime&>(runtime).accessGlobalVariableValue(variable);
 							runtimeOpcode.setParameter(valuePointer, parameter.mOffset);
 							break;
 						}
@@ -100,7 +109,7 @@ namespace lemon
 						case Nativizer::LookupEntry::ParameterInfo::Semantics::EXTERNAL_VARIABLE:
 						{
 							const uint32 variableId = (uint32)opcode.mParameter;
-							const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
+							const ExternalVariable& variable = runtime.getProgram().getGlobalVariableByID(variableId).as<ExternalVariable>();
 							runtimeOpcode.setParameter(variable.mAccessor(), parameter.mOffset);
 							break;
 						}

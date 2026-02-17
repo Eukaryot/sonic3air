@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -57,6 +57,8 @@ namespace lemon
 
 		bool processConstant(TokenList& tokens, size_t pos);
 
+		const ArrayDataType& getArrayDataType(const DataTypeDefinition& elementType, size_t arraySize);
+
 	private:
 		struct BinaryOperationResult
 		{
@@ -107,6 +109,9 @@ namespace lemon
 
 		BinaryOperationResult getBestOperatorSignature(Operator op, const DataTypeDefinition* leftDataType, const DataTypeDefinition* rightDataType);
 
+		const Function* getBuiltinArrayGetter(const DataTypeDefinition& elementType);
+		const Function* getBuiltinArraySetter(const DataTypeDefinition& elementType);
+
 		void assignStatementDataTypes(TokenList& tokens, const DataTypeDefinition* resultType);
 		const DataTypeDefinition* assignStatementDataType(StatementToken& token, const DataTypeDefinition* resultType);
 
@@ -122,6 +127,10 @@ namespace lemon
 		uint32 mLineNumber = 0;
 
 		CachedBuiltinFunction mBuiltinConstantArrayAccess;
+		CachedBuiltinFunction mBuiltinArrayBracketGetter;
+		CachedBuiltinFunction mBuiltinArrayBracketSetter;
+		CachedBuiltinFunction mBuiltinArrayLength;
+
 		CachedBuiltinFunction mBuiltinStringOperatorPlus;
 		CachedBuiltinFunction mBuiltinStringOperatorPlusInt64;
 		CachedBuiltinFunction mBuiltinStringOperatorPlusInt64Inv;

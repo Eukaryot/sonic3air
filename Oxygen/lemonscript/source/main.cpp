@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,7 +9,7 @@
 #define RMX_LIB
 
 #include "lemon/compiler/Compiler.h"
-#include "lemon/program/FunctionWrapper.h"
+#include "lemon/program/function/FunctionWrapper.h"
 #include "lemon/program/GlobalsLookup.h"
 #include "lemon/program/Module.h"
 #include "lemon/program/Program.h"
@@ -344,7 +344,7 @@ int main(int argc, char** argv)
 	module.addNativeFunction("sayHello", wrap(instance, &SomeClass::sayHello));
 	module.addNativeFunction("incTen", wrap(instance, &SomeClass::incTen));
 
-	ObjectHandleWrapper::mObjectHandleDataType = module.addDataType("ObjectHandle", BaseType::UINT_32);
+	ObjectHandleWrapper::mObjectHandleDataType = module.addCustomDataType("ObjectHandle", BaseType::UINT_32);
 	module.addNativeFunction("makeObjectHandle", wrap(&makeObjectHandle));
 	module.addNativeFunction("increaseObjectHandle", wrap(&increaseObjectHandle));
 	module.addNativeMethod("ObjectHandle", "increase", wrap(&increaseObjectHandle));

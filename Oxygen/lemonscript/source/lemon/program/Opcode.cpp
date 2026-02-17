@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license: see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -13,7 +13,7 @@
 namespace lemon
 {
 
-	const char* Opcode::GetTypeString(Type type)
+	const char* Opcode::getTypeString(Type type)
 	{
 		switch (type)
 		{
@@ -52,6 +52,7 @@ namespace lemon
 			case Type::RETURN:				return "RETURN";
 			case Type::EXTERNAL_CALL:		return "EXTERNAL_CALL";
 			case Type::EXTERNAL_JUMP:		return "EXTERNAL_JUMP";
+			case Type::DUPLICATE:			return "DUPLICATE";
 			default:  return "";
 		};
 	}

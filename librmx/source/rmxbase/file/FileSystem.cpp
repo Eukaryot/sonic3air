@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -232,7 +232,7 @@ namespace rmx
 			{
 				// Handle the special case that the mount point includes the given path
 				//  -> In this case, we want the mount point itself to act as a virtual directory
-				if (startsWith(mountPoint.mMountPoint, mTempPath2))
+				if (!mTempPath2.empty() && startsWith(mountPoint.mMountPoint, mTempPath2))
 				{
 					const size_t startPos = mTempPath2.size();
 					size_t endPos = startPos;

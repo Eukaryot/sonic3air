@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,7 +10,7 @@
 
 #include "oxygen/simulation/bindings/LemonScriptBindings.h"
 
-#include <lemon/program/Function.h>
+#include <lemon/program/function/ScriptFunction.h>
 
 
 class Mod;
@@ -89,7 +89,7 @@ public:
 	lemon::Program& getInternalLemonProgram();
 
 	bool hasValidProgram() const;
-	LoadScriptsResult loadScripts(std::string_view baseScriptFilename, const LoadOptions& loadOptions);
+	LoadScriptsResult loadScripts(std::wstring_view baseScriptFilename, const LoadOptions& loadOptions);
 
 	const Hook* checkForUpdateHook(bool post);
 	const Hook* checkForAddressHook(uint32 address);
@@ -116,8 +116,14 @@ private:
 	};
 
 private:
-	LoadingResult loadAllScriptModules(const LoadOptions& loadOptions, std::string_view baseScriptFilename, const std::vector<const Mod*>& modsToLoad);
-	LoadingResult loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename);
+	LoadingResult loadAllScriptModules(const LoadOptions& loadOptions, std::wstring_view baseScriptFilename, const std::vector<const Mod*>& modsToLoad);
+
+	bool loadBaseScriptFromSource(lemon::GlobalsLookup& globalsLookup, std::wstring_view filename, uint32 coreModuleDependencyHash, const LoadOptions& loadOptions, LoadingResult& outLoadingResult);
+	bool loadBaseScriptFromBinary(lemon::GlobalsLookup& globalsLookup, std::wstring_view filename, uint32 coreModuleDependencyHash, const LoadOptions& loadOptions);
+	bool loadBaseScriptFromCache(lemon::GlobalsLookup& globalsLookup, uint32 coreModuleDependencyHash, const LoadOptions& loadOptions);
+
+	LoadingResult loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, std::wstring_view filename);
+
 	void collectHooksFromFunctions();
 	void evaluateDefines();
 

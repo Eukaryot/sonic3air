@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,16 +10,16 @@
 
 #include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
-#include "lemon/program/Function.h"
-#include <unordered_map>
+#include "lemon/program/function/Function.h"
 
 
 namespace lemon
 {
-	class Module;
-	class StringLookup;
-	class NativizedOpcodeProvider;
 	class MemoryAccessHandler;
+	class Module;
+	class NativizedOpcodeProvider;
+	class ScriptFunction;
+	class StringLookup;
 
 	class API_EXPORT Program
 	{

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -12,16 +12,18 @@
 #include "lemon/program/Constant.h"
 #include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
-#include "lemon/program/Function.h"
+#include "lemon/program/function/NativeFunction.h"
 #include "lemon/program/SourceFileInfo.h"
 #include "lemon/program/StringRef.h"
-#include <unordered_map>
+#include "lemon/program/Variable.h"
 
 
 namespace lemon
 {
 	class GlobalsLookup;
 	class PreprocessorDefinitionMap;
+	class ScriptFunction;
+
 
 	class API_EXPORT Module
 	{
@@ -95,8 +97,9 @@ namespace lemon
 		void addStringLiteral(FlyweightString str);
 
 		// Data types
-		const std::vector<const CustomDataType*>& getDataTypes() const  { return mDataTypes; }
-		const CustomDataType* addDataType(const char* name, BaseType baseType);
+		const std::vector<const DataTypeDefinition*>& getDataTypes() const  { return mDataTypes; }
+		ArrayDataType& addArrayDataType(const DataTypeDefinition& elementType, size_t arraySize);
+		const CustomDataType* addCustomDataType(const char* name, BaseType baseType);
 
 		// Serialization
 		uint32 buildDependencyHash() const;
@@ -157,7 +160,7 @@ namespace lemon
 
 		// Data types
 		uint16 mFirstDataTypeID = 0;
-		std::vector<const CustomDataType*> mDataTypes;
+		std::vector<const DataTypeDefinition*> mDataTypes;
 
 		// Misc
 		uint64 mCompiledCodeHash = 0;

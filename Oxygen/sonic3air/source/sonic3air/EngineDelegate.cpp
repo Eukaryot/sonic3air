@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -71,7 +71,7 @@ bool EngineDelegate::onEnginePreStartup()
 		Configuration& config = Configuration::instance();
 		const bool check = FTX::FileSystem->exists(config.mGameDataPath + L"/gamedata.bin");
 	#else
-		const bool check = (FTX::FileSystem->exists(L"data/content.json") || FTX::FileSystem->exists(L"data/gamedata.bin"));
+		const bool check = (FTX::FileSystem->exists(L"data/metadata.json") || FTX::FileSystem->exists(L"data/gamedata.bin"));
 	#endif
 		if (!check)
 		{

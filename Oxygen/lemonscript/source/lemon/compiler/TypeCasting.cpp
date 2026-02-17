@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -171,13 +171,13 @@ namespace lemon
 			}
 		}
 
-		const bool originalIsBaseType = (original->getClass() == DataTypeDefinition::Class::INTEGER || original->getClass() == DataTypeDefinition::Class::FLOAT);
-		const bool targetIsBaseType = (target->getClass() == DataTypeDefinition::Class::INTEGER || target->getClass() == DataTypeDefinition::Class::FLOAT);
+		const bool originalIsBaseType = (original->isA<IntegerDataType>() || original->isA<FloatDataType>());
+		const bool targetIsBaseType = (target->isA<IntegerDataType>() || target->isA<FloatDataType>());
 		if (originalIsBaseType && targetIsBaseType)
 		{
-			if (original->getClass() == DataTypeDefinition::Class::INTEGER)
+			if (original->isA<IntegerDataType>())
 			{
-				if (target->getClass() == DataTypeDefinition::Class::INTEGER)
+				if (target->isA<IntegerDataType>())
 				{
 					// Cast between integers
 					const IntegerDataType& originalInt = original->as<IntegerDataType>();
@@ -239,7 +239,7 @@ namespace lemon
 			}
 			else
 			{
-				if (target->getClass() == DataTypeDefinition::Class::INTEGER)
+				if (target->isA<IntegerDataType>())
 				{
 					// Cast from floating point type to integer
 					//  -> This needs to be done explicitly
@@ -261,10 +261,16 @@ namespace lemon
 			}
 		}
 
-		if (target->getClass() == DataTypeDefinition::Class::ANY)
+		if (target->isA<AnyDataType>())
 		{
 			// Any cast has a very low priority
 			return CastHandling(CastHandling::Result::ANY_CAST, 0xf0);
+		}
+
+		if (original->isA<ArrayDataType>() && target == &PredefinedDataTypes::ARRAY_BASE)
+		{
+			// Cast from concrete array type to generic array base type
+			return CastHandling(CastHandling::Result::NO_CAST, 0);
 		}
 
 		return CastHandling(CastHandling::Result::INVALID, 0xff);

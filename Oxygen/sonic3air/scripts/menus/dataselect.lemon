@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2025 by Eukaryot
+	Copyright (C) 2017-2026 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -1015,7 +1015,9 @@ function bool fn00d458()
 			{
 				playSound(SFX_CLICK)
 				--D1.u16
-				if (D1.s16 < 0)
+			#if STANDALONE
+				if (D1.s16 < 0 || D1.s16 > D6.u16)	// Fixes that you could select zones that aren't selectable for the character (like DDZ for Knuckles); #contributed by AtomicRey
+			#endif
 				{
 					D1.u16 = D6.u16
 				}

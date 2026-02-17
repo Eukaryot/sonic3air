@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -32,7 +32,7 @@
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/Simulation.h"
 
-#include <lemon/program/FunctionWrapper.h>
+#include <lemon/program/function/FunctionWrapper.h>
 #include <lemon/program/Module.h>
 #include <lemon/program/ModuleBindingsBuilder.h>
 

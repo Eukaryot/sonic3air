@@ -1,7 +1,7 @@
 
 // Hyllian's xBRZ freescale multipass shader
 //   - Adapted for use in Oxygen Engine
-//  Copyright (C) 2018-2025 by Eukaryot
+//  Copyright (C) 2018-2026 by Eukaryot
 //
 // This shader is derived from original "xbrz-freescale-pass0.glsl" from https://github.com/libretro/glsl-shaders/tree/master/xbrz/shaders/xbrz-freescale-multipass
 // Used under GNU General Public License v2, see additional license info below.

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,7 +8,7 @@
 
 #include "lemon/pch.h"
 #include "lemon/runtime/BuiltInFunctions.h"
-#include "lemon/program/FunctionWrapper.h"
+#include "lemon/program/function/FunctionWrapper.h"
 #include "lemon/program/Module.h"
 #include "lemon/program/Program.h"
 #include "lemon/utility/FastStringStream.h"
@@ -54,6 +54,137 @@ namespace lemon
 			const std::vector<ConstantArray*>& constantArrays = runtime->getProgram().getConstantArrays();
 			RMX_CHECK(id < constantArrays.size(), "Invalid constant array ID " << id << " (must be below " << constantArrays.size() << ")", return StringRef());
 			return StringRef(constantArrays[id]->getElement(index).get<uint64>());
+		}
+
+		size_t getArraySize(Variable& var)
+		{
+			RMX_ASSERT(var.getDataType()->isA<ArrayDataType>(), "Array data type is not an array");
+			const ArrayDataType& arrayDataType = var.getDataType()->as<ArrayDataType>();
+			return arrayDataType.mArraySize;
+		}
+
+		template<typename T>
+		bool isValidArrayIndex(Variable& var, uint32 index)
+		{
+			RMX_ASSERT(var.getDataType()->isA<ArrayDataType>(), "Array data type is not an array");
+			const ArrayDataType& arrayDataType = var.getDataType()->as<ArrayDataType>();
+			RMX_ASSERT(arrayDataType.mElementType.getBytes() == sizeof(T), "Type mismatch for array");
+			return (index < arrayDataType.mArraySize);
+		}
+
+		template<typename T>
+		T array_bracket_getter(const NativeFunction::Context* context, uint32 variableId, uint32 index)
+		{
+			const Variable::Type type = (Variable::Type)(variableId >> 28);
+			switch (type)
+			{
+				case Variable::Type::LOCAL:
+				{
+					LocalVariable& var = context->mControlFlow.getCurrentFunction()->getLocalVariableByID(variableId);
+					if (!isValidArrayIndex<T>(var, index))
+					{
+						return 0;
+					}
+
+					const T* data = context->mControlFlow.accessLocalVariable<T>(var.getLocalMemoryOffset());
+					return data[index];
+				}
+
+				case Variable::Type::GLOBAL:
+				{
+					GlobalVariable& var = context->mControlFlow.getProgram().getGlobalVariableByID(variableId).as<GlobalVariable>();
+					if (!isValidArrayIndex<T>(var, index))
+					{
+						return 0;
+					}
+
+					const T* data = reinterpret_cast<T*>(context->mControlFlow.getRuntime().accessGlobalVariableValue(var));
+					return data[index];
+				}
+
+				default:
+				{
+					RMX_ASSERT(false, "Unsupported type of variable");
+					return 0;
+				}
+			}
+		}
+
+		template<>
+		StringRef array_bracket_getter(const NativeFunction::Context* context, uint32 variableId, uint32 index)
+		{
+			return StringRef(array_bracket_getter<uint64>(context, variableId, index));
+		}
+
+		template<typename T>
+		void array_bracket_setter(const NativeFunction::Context* context, uint32 variableId, uint32 index, T value)
+		{
+			const Variable::Type type = (Variable::Type)(variableId >> 28);
+			switch (type)
+			{
+				case Variable::Type::LOCAL:
+				{
+					LocalVariable& var = context->mControlFlow.getCurrentFunction()->getLocalVariableByID(variableId);
+					if (!isValidArrayIndex<T>(var, index))
+					{
+						return;
+					}
+
+					T* data = context->mControlFlow.accessLocalVariable<T>(var.getLocalMemoryOffset());
+					data[index] = value;
+					break;
+				}
+
+				case Variable::Type::GLOBAL:
+				{
+					GlobalVariable& var = context->mControlFlow.getProgram().getGlobalVariableByID(variableId).as<GlobalVariable>();
+					if (!isValidArrayIndex<T>(var, index))
+					{
+						return;
+					}
+
+					T* data = reinterpret_cast<T*>(context->mControlFlow.getRuntime().accessGlobalVariableValue(var));
+					data[index] = value;
+					break;
+				}
+
+				default:
+				{
+					RMX_ASSERT(false, "Unsupported type of variable");
+					break;
+				}
+			}
+		}
+
+		template<>
+		void array_bracket_setter(const NativeFunction::Context* context, uint32 variableId, uint32 index, StringRef value)
+		{
+			array_bracket_setter(context, variableId, index, value.getHash());
+		}
+
+		uint32 array_length(const NativeFunction::Context* context, ArrayBaseWrapper array)
+		{
+			const Variable::Type type = (Variable::Type)(array.mVariableID >> 28);
+			switch (type)
+			{
+				case Variable::Type::LOCAL:
+				{
+					LocalVariable& var = context->mControlFlow.getCurrentFunction()->getLocalVariableByID(array.mVariableID);
+					return getArraySize(var);
+				}
+
+				case Variable::Type::GLOBAL:
+				{
+					GlobalVariable& var = context->mControlFlow.getProgram().getGlobalVariableByID(array.mVariableID).as<GlobalVariable>();
+					return getArraySize(var);
+				}
+
+				default:
+				{
+					RMX_ASSERT(false, "Unsupported type of variable");
+					return 0;
+				}
+			}
 		}
 
 		StringRef string_operator_plus(StringRef str1, StringRef str2)
@@ -141,7 +272,7 @@ namespace lemon
 			return (uint32)stringRef.getString()[index];
 		}
 
-		void builtin_string_bracket_setter(const NativeFunction::Context* context, uint32 value, uint32 variableId, uint32 index)
+		void builtin_string_bracket_setter(const NativeFunction::Context* context, uint32 variableId, uint32 index, uint32 value)
 		{
 			const StringRef stringRef = readStringVariable(*context, variableId);
 			if ((size_t)index > stringRef.getString().length())
@@ -164,6 +295,10 @@ namespace lemon
 
 
 	BuiltInFunctions::FunctionName BuiltInFunctions::CONSTANT_ARRAY_ACCESS("#builtin_constant_array_access");
+	BuiltInFunctions::FunctionName BuiltInFunctions::ARRAY_BRACKET_GETTER("#builtin_array_bracket_getter");
+	BuiltInFunctions::FunctionName BuiltInFunctions::ARRAY_BRACKET_SETTER("#builtin_array_bracket_setter");
+	BuiltInFunctions::FunctionName BuiltInFunctions::ARRAY_LENGTH("#builtin_array_length");
+
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_PLUS("#builtin_string_operator_plus");
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_PLUS_INT64("#builtin_string_operator_plus_int64");
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_PLUS_INT64_INV("#builtin_string_operator_plus_int64_inv");
@@ -191,6 +326,32 @@ namespace lemon
 		module.addNativeFunction(CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<float>), defaultFlags);
 		module.addNativeFunction(CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<double>), defaultFlags);
 		module.addNativeFunction(CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<StringRef>), defaultFlags);
+
+		module.addNativeFunction(ARRAY_BRACKET_GETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_getter<int8>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_GETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_getter<uint8>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_GETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_getter<int16>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_GETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_getter<uint16>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_GETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_getter<int32>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_GETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_getter<uint32>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_GETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_getter<int64>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_GETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_getter<uint64>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_GETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_getter<float>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_GETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_getter<double>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_GETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_getter<StringRef>), defaultFlags);
+
+		module.addNativeFunction(ARRAY_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_setter<int8>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_setter<uint8>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_setter<int16>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_setter<uint16>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_setter<int32>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_setter<uint32>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_setter<int64>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_setter<uint64>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_setter<float>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_setter<double>), defaultFlags);
+		module.addNativeFunction(ARRAY_BRACKET_SETTER.makeFlyweightString(), lemon::wrap(&builtins::array_bracket_setter<StringRef>), defaultFlags);
+
+		module.addNativeFunction(ARRAY_LENGTH.makeFlyweightString(), lemon::wrap(&builtins::array_length), defaultFlags);
 
 		module.addNativeFunction(STRING_OPERATOR_PLUS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus), defaultFlags);
 		module.addNativeFunction(STRING_OPERATOR_PLUS_INT64.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus_int64), defaultFlags);

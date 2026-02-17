@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -66,7 +66,7 @@ namespace lemon
 		{
 			registerDefine(*define);
 		}
-		for (const CustomDataType* dataType : module.mDataTypes)
+		for (const DataTypeDefinition* dataType : module.mDataTypes)
 		{
 			registerDataType(dataType);
 		}
@@ -84,14 +84,14 @@ namespace lemon
 		return mapFind(mAllIdentifiers, nameHash);
 	}
 
-	const std::vector<GlobalsLookup::FunctionReference>& GlobalsLookup::getFunctionsByName(uint64 nameHash) const
+	const std::vector<FunctionReference>& GlobalsLookup::getFunctionsByName(uint64 nameHash) const
 	{
 		static const std::vector<FunctionReference> EMPTY_FUNCTIONS;
 		const auto it = mFunctionsByName.find(nameHash);
 		return (it == mFunctionsByName.end()) ? EMPTY_FUNCTIONS : it->second;
 	}
 
-	const GlobalsLookup::FunctionReference* GlobalsLookup::getFunctionByNameAndSignature(uint64 nameHash, uint32 signatureHash, bool* outAnyFound) const
+	const FunctionReference* GlobalsLookup::getFunctionByNameAndSignature(uint64 nameHash, uint32 signatureHash, bool* outAnyFound) const
 	{
 		const std::vector<FunctionReference>& candidateFunctions = getFunctionsByName(nameHash);
 		if (candidateFunctions.empty())
@@ -113,7 +113,7 @@ namespace lemon
 		return nullptr;
 	}
 
-	const std::vector<GlobalsLookup::FunctionReference>& GlobalsLookup::getMethodsByName(uint64 contextNameHash) const
+	const std::vector<FunctionReference>& GlobalsLookup::getMethodsByName(uint64 contextNameHash) const
 	{
 		static const std::vector<FunctionReference> EMPTY_FUNCTIONS;
 		const auto it = mMethodsByName.find(contextNameHash);
@@ -185,11 +185,32 @@ namespace lemon
 		return mStringLiterals.getStringByHash(hash);
 	}
 
-	void GlobalsLookup::registerDataType(const CustomDataType* dataTypeDefinition)
+	const DataTypeDefinition* GlobalsLookup::findDataTypeByName(uint64 nameHash) const
 	{
-		RMX_ASSERT(dataTypeDefinition->getID() == mDataTypes.size(), "Wrong data type ID");
-		mDataTypes.push_back(dataTypeDefinition);
-		mAllIdentifiers[dataTypeDefinition->getName().getHash()].set(dataTypeDefinition);
+		// TODO: Optimize this by using a map
+		for (const DataTypeDefinition* existingDataType : mDataTypes)
+		{
+			if (existingDataType->getName().getHash() == nameHash)
+				return existingDataType;
+		}
+		return nullptr;
+	}
+
+	void GlobalsLookup::registerDataType(const DataTypeDefinition* dataTypeDefinition)
+	{
+		// Check if data type was already added (which happens for data types added during compilation, like arrays)
+		const uint64 nameHash = dataTypeDefinition->getName().getHash();
+		const Identifier* existing = mapFind(mAllIdentifiers, nameHash);
+		if (nullptr != existing)
+		{
+			RMX_CHECK(existing->getType() == Identifier::Type::DATA_TYPE, "Data type name '" << dataTypeDefinition->getName() << "' was already used for a different global identifier", );
+		}
+		else
+		{
+			RMX_ASSERT(dataTypeDefinition->getID() == mDataTypes.size(), "Wrong data type ID");
+			mDataTypes.push_back(dataTypeDefinition);
+			mAllIdentifiers[nameHash].set(dataTypeDefinition);
+		}
 	}
 
 	const DataTypeDefinition* GlobalsLookup::readDataType(VectorBinarySerializer& serializer) const

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "lemon/program/Function.h"
+#include "lemon/program/function/NativeFunction.h"
 #include "lemon/runtime/Runtime.h"
 #include "lemon/utility/AnyBaseValue.h"
 
@@ -46,6 +46,7 @@ namespace lemon
 		template<> const DataTypeDefinition* getDataType<float>();
 		template<> const DataTypeDefinition* getDataType<double>();
 		template<> const DataTypeDefinition* getDataType<StringRef>();
+		template<> const DataTypeDefinition* getDataType<ArrayBaseWrapper>();
 		template<> const DataTypeDefinition* getDataType<AnyTypeWrapper>();
 	}
 
@@ -76,6 +77,16 @@ namespace lemon
 
 		template<>
 		StringRef popStackGeneric(const NativeFunction::Context context);
+
+
+
+		// Template specializations for ArrayBaseWrapper, representing all array types in script
+
+		template<>
+		void pushStackGeneric<ArrayBaseWrapper>(ArrayBaseWrapper value, const NativeFunction::Context context);
+
+		template<>
+		ArrayBaseWrapper popStackGeneric(const NativeFunction::Context context);
 
 
 

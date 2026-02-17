@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -273,7 +273,12 @@ bool Configuration::loadConfiguration(const std::wstring& filename)
 	bool wait = false;
 	if (loaded && serializer.serialize("WaitForDebugger", wait) && wait)
 	{
-		PlatformFunctions::showMessageBox("Waiting for debugger", "Attach debugger now, or don't...");
+		static bool alreadyWaited = false;
+		if (!alreadyWaited)		// This is needed because we enter config.json loading twice during startup, but waiting for debugger is meant to be done just once
+		{
+			PlatformFunctions::showMessageBox("Waiting for debugger", "Attach debugger now, or don't...");
+			alreadyWaited = true;
+		}
 	}
 #endif
 
@@ -315,21 +320,27 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 		return false;
 	JsonSerializer serializer(true, root);
 
-	if (settingsType == SettingsType::INPUT)
+	switch (settingsType)
 	{
-		// Input devices
-		readInputDevices(root, mInputDeviceDefinitions);
-	}
-	else
-	{
-		// All kinds of stuff
-		serializeStandardSettings(serializer);
+		case SettingsType::STANDARD:
+		{
+			// All kinds of stuff
+			serializeStandardSettings(serializer);
 
-		// Dev mode
-		serializeDevMode(serializer);
+			// Dev mode
+			serializeDevMode(serializer);
 
-		// Mod settings
-		loadModSettings(root, mModSettings);
+			// Mod settings
+			loadModSettings(root, mModSettings);
+			break;
+		}
+
+		case SettingsType::INPUT:
+		{
+			// Input devices
+			readInputDevices(root, mInputDeviceDefinitions);
+			break;
+		}
 	}
 
 	// Call subclass implementation
@@ -611,7 +622,7 @@ void Configuration::serializeDevMode(JsonSerializer& serializer)
 		serializer.serialize("Enabled", mDevMode.mEnableAtStartup);
 
 		serializer.serialize("LoadSaveState", mLoadSaveState);
-		serializer.serialize("LoadLevel", mLoadLevel);
+		serializer.serializeHexValue("LoadLevel", mLoadLevel, 4);
 		if (serializer.serialize("UseCharacters", mUseCharacters))
 		{
 			if (serializer.isReading())

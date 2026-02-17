@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -209,12 +209,19 @@ namespace rmx
 			explicit FileNameCharacterValidityLookup(bool allowSlash)
 			{
 				for (int k = 32; k < 128; ++k)		// Exclude non-printable ASCII characters
+				{
 					mIsCharacterValid.setBit(k);
-				const std::wstring invalidCharacters = L"/\"<>:|?*";		// Technically not all of these characters are problematic on all platforms, but we treat them all as illegal to avoid cross-platform issues
+				}
+				const std::wstring invalidCharacters = L"\"<>:|?*";		// Technically not all of these characters are problematic on all platforms, but we treat them all as illegal to avoid cross-platform issues
 				for (wchar_t ch : invalidCharacters)
+				{
 					mIsCharacterValid.clearBit(ch);
+				}
 				if (!allowSlash)
+				{
 					mIsCharacterValid.clearBit(L'/');
+					mIsCharacterValid.clearBit(L'\\');
+				}
 			}
 
 			bool isValid(wchar_t ch) const  { return ch >= 128 || mIsCharacterValid.isBitSet(ch); }

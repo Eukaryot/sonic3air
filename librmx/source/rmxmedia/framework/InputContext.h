@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -47,9 +47,6 @@ namespace rmx
 	friend class SystemManager;
 
 	public:
-		InputContext();
-		~InputContext();
-
 		inline size_t getBitIndex(int key) const { return (key & 0x01ff) + ((key & SDLK_SCANCODE_MASK) >> 21); }
 		inline bool getKeyState(int key) const	 { return mKeyState.isBitSet(getBitIndex(key)); }
 		inline bool getKeyChange(int key) const	 { return mKeyChange.isBitSet(getBitIndex(key)); }

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -13,12 +13,57 @@
 namespace lemon
 {
 
+	inline DataTypeDefinition::DataTypeDefinition(std::string_view name, uint16 id, Class class_, size_t bytes, BaseType baseType) :
+		mNameString(name),
+		mID(id),
+		mClass(class_),
+		mBytes(bytes),
+		mBaseType(baseType)
+	{}
+
 	FlyweightString DataTypeDefinition::getName() const
 	{
 		if (!mName.isValid())
 			mName.set(mNameString);
 		return mName;
 	}
+
+	const std::vector<FunctionReference>& DataTypeDefinition::getMethodsByName(uint64 methodNameHash) const
+	{
+		static const std::vector<FunctionReference> EMPTY_FUNCTIONS;
+		const auto it = mMethodsByName.find(methodNameHash);
+		return (it == mMethodsByName.end()) ? EMPTY_FUNCTIONS : it->second;
+	}
+
+	void DataTypeDefinition::addMethod(uint64 nameHash, Function& func)
+	{
+		FunctionReference& ref = vectorAdd(mMethodsByName[nameHash]);
+		ref.mFunction = &func;
+		ref.mIsDeprecated = false;
+	}
+
+
+	VoidDataType::VoidDataType() :
+		DataTypeDefinition("void", 0, Class::VOID, 0, BaseType::VOID)
+	{}
+
+
+	AnyDataType::AnyDataType() :
+		DataTypeDefinition("any", 1, Class::ANY, 16, BaseType::UINT_64)
+	{}
+
+
+	IntegerDataType::IntegerDataType(const char* name, uint16 id, size_t bytes, Semantics semantics, bool isSigned, BaseType baseType) :
+		DataTypeDefinition(name, id, Class::INTEGER, bytes, baseType),
+		mSemantics(semantics),
+		mSizeBits((bytes == 1) ? 0 : (bytes == 2) ? 1 : (bytes == 4) ? 2 : 3),
+		mIsSigned(isSigned)
+	{}
+
+
+	FloatDataType::FloatDataType(const char* name, uint16 id, size_t bytes) :
+		DataTypeDefinition(name, id, Class::FLOAT, bytes, (bytes == 4) ? BaseType::FLOAT : BaseType::DOUBLE)
+	{}
 
 
 	StringDataType::StringDataType(uint16 id) :
@@ -33,6 +78,19 @@ namespace lemon
 	uint16 StringDataType::getDataTypeHash() const
 	{
 		return PredefinedDataTypes::UINT_64.getID();
+	}
+
+
+	ArrayDataType::ArrayDataType(uint16 id, const DataTypeDefinition& elementType, size_t arraySize) :
+		DataTypeDefinition(buildArrayDataTypeName(elementType, arraySize).getString(), id, Class::ARRAY, elementType.getBytes() * arraySize, BaseType::UINT_32),
+		mElementType(elementType),
+		mArraySize(arraySize)
+	{}
+
+	FlyweightString ArrayDataType::buildArrayDataTypeName(const DataTypeDefinition& elementType, size_t arraySize)
+	{
+		const std::string str = std::string(elementType.getName().getString()) + '[' + std::to_string(arraySize) + ']';
+		return FlyweightString(str);
 	}
 
 

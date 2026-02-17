@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -100,7 +100,8 @@ namespace lemon
 		mLineNumber = mFunction.mStartLineNumber;
 
 		// Create scope
-		addOpcode(Opcode::Type::MOVE_VAR_STACK, mFunction.mLocalVariablesByID.size());
+		RMX_ASSERT((mFunction.mLocalVariablesMemorySize % 8) == 0, "Expected local variables total size to be a multiple of 8 bytes");
+		addOpcode(Opcode::Type::MOVE_VAR_STACK, mFunction.mLocalVariablesMemorySize / 8);
 
 		// Go through parameters in reverse order
 		for (int index = (int)mFunction.getParameters().size() - 1; index >= 0; --index)
@@ -145,7 +146,7 @@ namespace lemon
 		// Make sure it ends with a return in any case
 		if (mOpcodes.empty() || mOpcodes.back().mType != Opcode::Type::RETURN)
 		{
-			CHECK_ERROR(mFunction.getReturnType()->getClass() == DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->getName() << " value", blockNode.getLineNumber());
+			CHECK_ERROR(mFunction.getReturnType()->isA<VoidDataType>(), "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->getName() << " value", blockNode.getLineNumber());
 			addOpcode(Opcode::Type::RETURN);
 		}
 		else
@@ -201,7 +202,7 @@ namespace lemon
 	Opcode& FunctionCompiler::addOpcode(Opcode::Type type, const DataTypeDefinition* dataType, int64 parameter)
 	{
 		BaseType baseType = dataType->getBaseType();
-		if (dataType->getClass() == DataTypeDefinition::Class::INTEGER && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::BOOLEAN)
+		if (dataType->isA<IntegerDataType>() && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::BOOLEAN)
 		{
 			baseType = BaseType::BOOL;
 		}
@@ -297,11 +298,11 @@ namespace lemon
 			case Node::Type::BLOCK:
 			{
 				const BlockNode& blockNode = node.as<BlockNode>();
-				// TODO: Get correct number of local variables in this scope
-				const int numVariables = 0;
-				scopeBegin(numVariables);
+				// TODO: Get correct size of local variables in this scope
+				const int memorySize = 0;
+				scopeBegin(memorySize);
 				buildOpcodesFromNodes(blockNode, context);
-				scopeEnd(numVariables);
+				scopeEnd(memorySize);
 				break;
 			}
 
@@ -339,7 +340,7 @@ namespace lemon
 				{
 					addJumpToLabel(Opcode::Type::JUMP_SWITCH, *labelToken);
 				}
-				addOpcode(Opcode::Type::MOVE_VAR_STACK, -1);	// Consume top of stack if none of the jumps did
+				addOpcode(Opcode::Type::MOVE_VAR_STACK, -1);	// Consume top of stack if none of the jumps did -- TODO: Isn't this meant to be MOVE_STACK (via "addMoveStackOpcode") instead?
 				break;
 			}
 
@@ -366,13 +367,13 @@ namespace lemon
 				const ReturnNode& returnNode = node.as<ReturnNode>();
 				if (returnNode.mStatementToken.valid())
 				{
-					CHECK_ERROR(mFunction.getReturnType()->getClass() != DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' with 'void' return type cannot return a value", node.getLineNumber());
+					CHECK_ERROR(!mFunction.getReturnType()->isA<VoidDataType>(), "Function '" << mFunction.getName() << "' with 'void' return type cannot return a value", node.getLineNumber());
 					compileTokenTreeToOpcodes(*returnNode.mStatementToken);
 					addCastOpcodeIfNecessary(returnNode.mStatementToken->mDataType, mFunction.getReturnType());
 				}
 				else
 				{
-					CHECK_ERROR(mFunction.getReturnType()->getClass() == DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->getName() << " value", node.getLineNumber());
+					CHECK_ERROR(mFunction.getReturnType()->isA<VoidDataType>(), "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->getName() << " value", node.getLineNumber());
 				}
 				addOpcode(Opcode::Type::RETURN);
 				break;
@@ -600,14 +601,7 @@ namespace lemon
 
 				switch (bot.mOperator)
 				{
-					case Operator::ASSIGN:
-					{
-						// Assignment to variable
-						compileTokenTreeToOpcodes(*bot.mRight);
-						addCastOpcodeIfNecessary(bot.mRight->mDataType, bot.mLeft->mDataType);
-						compileTokenTreeToOpcodes(*bot.mLeft, false, true);
-						break;
-					}
+					case Operator::ASSIGN:					 compileAssignmentToOpcodes(bot);  break;
 
 					case Operator::ASSIGN_PLUS:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_ADD);	break;
 					case Operator::ASSIGN_MINUS:			 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_SUB);	break;
@@ -749,8 +743,16 @@ namespace lemon
 			case VariableToken::TYPE:
 			{
 				const VariableToken& vt = token.as<VariableToken>();
-				const Opcode::Type opcodeType = isLValue ? Opcode::Type::SET_VARIABLE_VALUE : Opcode::Type::GET_VARIABLE_VALUE;
-				addOpcode(opcodeType, vt.mDataType, vt.mVariable->getID());
+				if (vt.mDataType->isA<ArrayDataType>())
+				{
+					// Push variable ID
+					addOpcode(Opcode::Type::PUSH_CONSTANT, vt.mVariable->getID());
+				}
+				else
+				{
+					const Opcode::Type opcodeType = isLValue ? Opcode::Type::SET_VARIABLE_VALUE : Opcode::Type::GET_VARIABLE_VALUE;
+					addOpcode(opcodeType, vt.mDataType, vt.mVariable->getID());
+				}
 				break;
 			}
 
@@ -773,11 +775,15 @@ namespace lemon
 
 			case MemoryAccessToken::TYPE:
 			{
+				// For writing to a memory access, this implementation should not be reached any more, instead "compileAssignmentToOpcodes" or a similar method is used
+				CHECK_ERROR(!isLValue, "Internal error: Memory write should have been resolved differently", mLineNumber);
 				const MemoryAccessToken& mat = token.as<MemoryAccessToken>();
+
+				// Compile memory address calculation
 				compileTokenTreeToOpcodes(*mat.mAddress);
 
-				const Opcode::Type opcodeType = isLValue ? Opcode::Type::WRITE_MEMORY : Opcode::Type::READ_MEMORY;
-				addOpcode(opcodeType, mat.mDataType);
+				// Opcode to read from memory address
+				addOpcode(Opcode::Type::READ_MEMORY, mat.mDataType);
 				break;
 			}
 
@@ -789,6 +795,10 @@ namespace lemon
 				// Choose the right function depending on isLValue
 				if (isLValue)
 				{
+					// Note that this is partially moved to "compileAssignmentToOpcodes"
+					//  -> TODO: Also implement support in "compileUnaryDecIncToOpcodes" and "compileBinaryAssignmentToOpcodes"
+					//  -> Afterwards, this block can be removed and turned into a "CHECK_ERROR(!isLValue, ...)" - similar to MemoryAccessToken, see case above
+
 					CHECK_ERROR(nullptr != bracket.mSetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
 					// TODO: Also check the setter signature
 
@@ -802,9 +812,6 @@ namespace lemon
 					addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
 
 					addOpcode(Opcode::Type::CALL, bracket.mSetter->getNameAndSignatureHash());
-
-					// TODO: For operators like +=, this likely requires a special case inside "compileBinaryAssignmentToOpcodes" just like with memory access
-					//  -> Otherwise the parameter inside teh brackets is evaluated twice, which might have unintended side-effects
 
 					// Differentiate on whether the setter returns a value or void
 					if (bracket.mSetter->getReturnType()->isVoid())
@@ -843,7 +850,7 @@ namespace lemon
 				CHECK_ERROR(false, "Token type should be eliminated by now", mLineNumber);
 		}
 
-		if (consumeResult && token.mDataType->getClass() != DataTypeDefinition::Class::VOID)
+		if (consumeResult && !token.mDataType->isA<VoidDataType>())
 		{
 			const int sizeOnStack = (int)token.mDataType->getSizeOnStack();
 			RMX_ASSERT(sizeOnStack != 0, "Invalid stack size of type " << token.mDataType->getName().getString());
@@ -859,8 +866,9 @@ namespace lemon
 		//  -> Memory address calculation must only be done once, especially if it has side effects (e.g. "u8[A0++] += 8")
 		if (uot.mArgument->isA<MemoryAccessToken>())
 		{
-			// Compile memory read
 			const MemoryAccessToken& mat = uot.mArgument->as<MemoryAccessToken>();
+
+			// Compile memory address calculation
 			compileTokenTreeToOpcodes(*mat.mAddress);
 
 			// Output READ_MEMORY opcode with parameter that tells it to *not* consume its input
@@ -871,9 +879,42 @@ namespace lemon
 			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, (uot.mOperator == Operator::UNARY_DECREMENT) ? -1 : 1);
 			addOpcode(Opcode::Type::ARITHM_ADD, uot.mDataType);
 
-			// Output WRITE_MEMORY opcode with parameter that tells it to exchange its inputs
-			//  -> Top of stack is value, next is address - but in other cases it's the other way round
-			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType, 1);
+			// Output WRITE_MEMORY opcode
+			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType);
+		}
+		else if (uot.mArgument->isA<BracketAccessToken>())
+		{
+			const BracketAccessToken& bat = uot.mArgument->as<BracketAccessToken>();
+			const DataTypeDefinition::BracketOperator& bracket = bat.mVariable->getDataType()->getBracketOperator();
+
+			CHECK_ERROR(nullptr != bracket.mSetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
+			// TODO: Also check the setter signature
+
+			// First parameter is the variable ID
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
+
+			// Second parameter is the parameter inside the brackets
+			compileTokenTreeToOpcodes(*bat.mParameter);
+			addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+			// Both parameters so far will be needed by the setter again, are but consumed by the getter - so we need to copy them
+			addOpcode(Opcode::Type::DUPLICATE, 2);
+
+			// Call the getter
+			addOpcode(Opcode::Type::CALL, bracket.mGetter->getNameAndSignatureHash());
+
+			// Add arithmetic add opcode with constant -1 or +1
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, (uot.mOperator == Operator::UNARY_DECREMENT) ? -1 : 1);
+			addOpcode(Opcode::Type::ARITHM_ADD, uot.mDataType);
+
+			// Call the setter
+			addOpcode(Opcode::Type::CALL, bracket.mSetter->getNameAndSignatureHash());
+
+			// Differentiate on whether the setter returns a value or void
+			if (bracket.mSetter->getReturnType()->isVoid())
+			{
+				addMoveStackOpcode(1);	// Push a dummy value onto stack
+			}
 		}
 		else
 		{
@@ -889,14 +930,74 @@ namespace lemon
 		}
 	}
 
+	void FunctionCompiler::compileAssignmentToOpcodes(const BinaryOperationToken& bot)
+	{
+		// Special handling for memory access on left side
+		//  -> Just to ensure the memory address gets pushed first, before the right side
+		if (bot.mLeft->isA<MemoryAccessToken>())
+		{
+			const MemoryAccessToken& mat = bot.mLeft->as<MemoryAccessToken>();
+
+			// Compile memory address calculation
+			compileTokenTreeToOpcodes(*mat.mAddress);
+
+			// Compile right, and cast if necessary
+			compileTokenTreeToOpcodes(*bot.mRight);
+			addCastOpcodeIfNecessary(bot.mRight->mDataType, bot.mLeft->mDataType);
+
+			// Output WRITE_MEMORY opcode
+			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType);
+		}
+		else if (bot.mLeft->isA<BracketAccessToken>())
+		{
+			const BracketAccessToken& bat = bot.mLeft->as<BracketAccessToken>();
+			const DataTypeDefinition::BracketOperator& bracket = bat.mVariable->getDataType()->getBracketOperator();
+
+			CHECK_ERROR(nullptr != bracket.mSetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
+			// TODO: Also check the setter signature
+
+			// First parameter is the variable ID
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
+
+			// Second parameter is the parameter inside the brackets
+			compileTokenTreeToOpcodes(*bat.mParameter);
+			addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+			// Third parameter is the value to assign, i.e. the right side of the assignment
+			compileTokenTreeToOpcodes(*bot.mRight);
+			addCastOpcodeIfNecessary(bot.mRight->mDataType, bot.mLeft->mDataType);
+
+			addOpcode(Opcode::Type::CALL, bracket.mSetter->getNameAndSignatureHash());
+
+			// TODO: For operators like +=, this likely requires a special case inside "compileBinaryAssignmentToOpcodes" just like with memory access
+			//  -> Otherwise the parameter inside the brackets is evaluated twice, which might have unintended side-effects
+
+			// Differentiate on whether the setter returns a value or void
+			if (bracket.mSetter->getReturnType()->isVoid())
+			{
+				addMoveStackOpcode(1);	// Push a dummy value onto stack
+			}
+		}
+		else
+		{
+			// Compile right, and cast if necessary
+			compileTokenTreeToOpcodes(*bot.mRight);
+			addCastOpcodeIfNecessary(bot.mRight->mDataType, bot.mLeft->mDataType);
+
+			// Compile left for assignment
+			compileTokenTreeToOpcodes(*bot.mLeft, false, true);
+		}
+	}
+
 	void FunctionCompiler::compileBinaryAssignmentToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType)
 	{
 		// Special handling for memory access on left side
 		//  -> Memory address calculation must only be done once, especially if it has side effects (e.g. "u8[A0++] += 8")
 		if (bot.mLeft->isA<MemoryAccessToken>())
 		{
-			// Compile memory read
 			const MemoryAccessToken& mat = bot.mLeft->as<MemoryAccessToken>();
+
+			// Compile memory address calculation
 			compileTokenTreeToOpcodes(*mat.mAddress);
 
 			// Output READ_MEMORY opcode with parameter that tells it to *not* consume its input, i.e. the memory address
@@ -909,9 +1010,44 @@ namespace lemon
 			// Add arithmetic opcode
 			addOpcode(opcodeType, bot.mDataType);
 
-			// Output WRITE_MEMORY opcode with parameter that tells it to exchange its inputs
-			//  -> Top of stack is value, next is address - but in other cases it's the other way round
-			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType, 1);
+			// Output WRITE_MEMORY opcode
+			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType);
+		}
+		else if (bot.mLeft->isA<BracketAccessToken>())
+		{
+			const BracketAccessToken& bat = bot.mLeft->as<BracketAccessToken>();
+			const DataTypeDefinition::BracketOperator& bracket = bat.mVariable->getDataType()->getBracketOperator();
+
+			CHECK_ERROR(nullptr != bracket.mSetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
+			// TODO: Also check the setter signature
+
+			// First parameter is the variable ID
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
+
+			// Second parameter is the parameter inside the brackets
+			compileTokenTreeToOpcodes(*bat.mParameter);
+			addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+			// Both parameters so far will be needed by the setter again, are but consumed by the getter - so we need to copy them
+			addOpcode(Opcode::Type::DUPLICATE, 2);
+
+			// Call the getter
+			addOpcode(Opcode::Type::CALL, bracket.mGetter->getNameAndSignatureHash());
+
+			// Compile right
+			compileTokenTreeToOpcodes(*bot.mRight);
+
+			// Add arithmetic opcode
+			addOpcode(opcodeType, bot.mDataType);
+
+			// Call the setter
+			addOpcode(Opcode::Type::CALL, bracket.mSetter->getNameAndSignatureHash());
+
+			// Differentiate on whether the setter returns a value or void
+			if (bracket.mSetter->getReturnType()->isVoid())
+			{
+				addMoveStackOpcode(1);	// Push a dummy value onto stack
+			}
 		}
 		else
 		{
@@ -961,19 +1097,19 @@ namespace lemon
 		addOpcode(opcodeType, leftToken->mDataType);
 	}
 
-	void FunctionCompiler::scopeBegin(int numVariables)
+	void FunctionCompiler::scopeBegin(int memoryToReserve)
 	{
-		if (numVariables > 0)
+		if (memoryToReserve > 0)
 		{
-			addOpcode(Opcode::Type::MOVE_VAR_STACK, numVariables);
+			addOpcode(Opcode::Type::MOVE_VAR_STACK, memoryToReserve);
 		}
 	}
 
-	void FunctionCompiler::scopeEnd(int numVariables)
+	void FunctionCompiler::scopeEnd(int memoryToFree)
 	{
-		if (numVariables > 0)
+		if (memoryToFree > 0)
 		{
-			addOpcode(Opcode::Type::MOVE_VAR_STACK, -numVariables);
+			addOpcode(Opcode::Type::MOVE_VAR_STACK, -memoryToFree);
 		}
 	}
 

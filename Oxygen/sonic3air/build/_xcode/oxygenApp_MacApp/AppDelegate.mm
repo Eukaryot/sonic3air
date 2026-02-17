@@ -8,6 +8,7 @@
 #include "engineapp/pch.h"
 #include "engineapp/EngineDelegate.h"
 
+#include "oxygen/application/ArgumentsReader.h"
 #include "oxygen/platform/PlatformFunctions.h"
 
 @interface AppDelegate ()
@@ -33,24 +34,25 @@
 	argv[0] =(char*)[appPath UTF8String];
 	argv[1] =(char*)[appPath.stringByDeletingLastPathComponent UTF8String];
 
-	// Create engine delegate and angine main instance
-	{
-		EngineDelegate myDelegate;
-		EngineMain myMain(myDelegate);
-		EngineMain::earlySetup();
-		
-		//Prepopulate with Steam ROM, if they want a different one this is the dev version so they can use config files.
-		NSString* steamRomPath = [NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Steam/SteamApps/common/Sega Classics/uncompressed ROMs/Sonic_Knuckles_wSonic3.bin"];
-		Configuration& config = Configuration::instance();
-		config.mAppDataPath = *String(appFolder.UTF8String).toWString();
-		if([NSFileManager.defaultManager fileExistsAtPath:steamRomPath]){
-			std::wstring userRom = *String(steamRomPath.UTF8String).toWString();
-			config.mRomPath = userRom;
-			config.mLastRomPath = userRom;
-		}
-
-		myMain.execute(argc, argv);
+	// Create engine delegate and engine main instance
+	ArgumentsReader arguments;
+	arguments.read(argc, argv);
+	
+	EngineDelegate myDelegate;
+	EngineMain myMain(myDelegate, arguments);
+	EngineMain::earlySetup();
+	
+	//Prepopulate with Steam ROM, if they want a different one this is the dev version so they can use config files.
+	NSString* steamRomPath = [NSHomeDirectory() stringByAppendingString:@"/Library/Application Support/Steam/SteamApps/common/Sega Classics/uncompressed ROMs/Sonic_Knuckles_wSonic3.bin"];
+	Configuration& config = Configuration::instance();
+	config.mAppDataPath = *String(appFolder.UTF8String).toWString();
+	if([NSFileManager.defaultManager fileExistsAtPath:steamRomPath]){
+		std::wstring userRom = *String(steamRomPath.UTF8String).toWString();
+		config.mRomPath = userRom;
+		config.mLastRomPath = userRom;
 	}
+
+	myMain.execute();
 	
 	//The execute call is blocking, so if we reach this point the user closed the game and we should kill the UI too.
 	[NSApplication.sharedApplication terminate:self];

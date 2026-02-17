@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -41,46 +41,69 @@ namespace lemon
 		inline FlyweightString getName() const				 { return mName; }
 		inline uint32 getID() const							 { return mID; }
 		inline const DataTypeDefinition* getDataType() const { return mDataType; }
-		inline size_t getStaticMemoryOffset() const			 { return mStaticMemoryOffset; }
-		inline size_t getStaticMemorySize() const			 { return mStaticMemorySize; }
+
+		template<typename T> bool isA() const		{ return getType() == T::TYPE; }
+		template<typename T> T& as()				{ return static_cast<T&>(*this); }
+		template<typename T> const T& as() const	{ return static_cast<const T&>(*this); }
+		template<typename T> T* cast()				{ return isA<T>() ? static_cast<T*>(*this) : nullptr; }
+		template<typename T> const T* cast() const	{ return isA<T>() ? static_cast<const T*>(*this) : nullptr; }
 
 	protected:
 		inline Variable(Type type) : mType(type) {}
 		virtual ~Variable() {}
 
 	private:
-		Type mType;
+		const Type mType;
 		FlyweightString mName;
 		uint32 mID = 0;
 		const DataTypeDefinition* mDataType = nullptr;
-		size_t mStaticMemoryOffset = 0;
-		size_t mStaticMemorySize = 0;
 	};
 
 
 	class API_EXPORT LocalVariable : public Variable
 	{
 	public:
+		static const Type TYPE = Type::LOCAL;
+
+	public:
 		inline LocalVariable() : Variable(Type::LOCAL) {}
 
+		inline size_t getLocalMemoryOffset() const	{ return mLocalMemoryOffset; }
+		inline size_t getLocalMemorySize() const	{ return mLocalMemorySize; }
+
 		// Local variables get accessed via the current state's variables stack
+
+	public:
+		size_t mLocalMemoryOffset = 0;
+		size_t mLocalMemorySize = 0;
 	};
 
 
 	class API_EXPORT GlobalVariable : public Variable
 	{
 	public:
+		static const Type TYPE = Type::GLOBAL;
+
+	public:
 		inline GlobalVariable() : Variable(Type::GLOBAL) {}
+
+		inline size_t getStaticMemoryOffset() const	{ return mStaticMemoryOffset; }
+		inline size_t getStaticMemorySize() const	{ return mStaticMemorySize; }
 
 		// Global variables get accessed via the runtime's global variables list
 
 	public:
 		AnyBaseValue mInitialValue;
+		size_t mStaticMemoryOffset = 0;
+		size_t mStaticMemorySize = 0;
 	};
 
 
 	class API_EXPORT UserDefinedVariable : public Variable
 	{
+	public:
+		static const Type TYPE = Type::USER;
+
 	public:
 		inline UserDefinedVariable() : Variable(Type::USER) {}
 
@@ -94,6 +117,9 @@ namespace lemon
 
 	class API_EXPORT ExternalVariable : public Variable
 	{
+	public:
+		static const Type TYPE = Type::EXTERNAL;
+
 	public:
 		inline ExternalVariable() : Variable(Type::EXTERNAL) {}
 

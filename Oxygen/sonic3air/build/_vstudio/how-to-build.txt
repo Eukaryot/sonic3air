@@ -24,10 +24,11 @@ Each of them needs to be built once.
 
 The easiest way to do so is as follows:
 
-- Open the batch script at "framework/external/build_externals_windows.bat" with a text editor
-	and change "msbuildPath" to point to your Visual Studio installation's MSBuild.exe.
+- Open the batch script at "framework/external/get_msbuild_path.bat" with a text editor
+	and change either "msbuildPathCom" or "msbuildPathPro" (depending or whether you use the
+	Community or Professional edition) to point to your Visual Studio installation's MSBuild.exe.
 
-- Then execute the batch script.
+- Then execute the "build_externals_windows.bat" batch script next to it.
 
 - If everything went fine, the "framework/lib" directory should now be populated with
 	sub-directories "x64", "x64d", "x86", "x86d" with each containing "curl", "imgui", "libogg",

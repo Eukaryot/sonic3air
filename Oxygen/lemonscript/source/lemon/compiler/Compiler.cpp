@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -64,7 +64,7 @@ namespace lemon
 		genericmanager::Manager<Token>::shrinkAllPools();
 	}
 
-	bool Compiler::loadScript(const std::wstring& path)
+	bool Compiler::loadScript(std::wstring_view path)
 	{
 		// Set active instance, and reset it when leaving this function
 		RMX_ASSERT(nullptr == mActiveInstance, "Compiler active instance already set");
@@ -127,7 +127,7 @@ namespace lemon
 		vectorAdd(warning->mOccurrences).mLineNumber = lineNumber;
 	}
 
-	bool Compiler::loadCodeLines(std::vector<std::string_view>& outLines, const std::wstring& path)
+	bool Compiler::loadCodeLines(std::vector<std::string_view>& outLines, std::wstring_view path)
 	{
 		// Split into base path and file name
 		WString basePath;
@@ -352,7 +352,7 @@ namespace lemon
 			output << function->getName().getString() << ":\r\n";
 			for (const Opcode& opcode : function->mOpcodes)
 			{
-				String typeString = Opcode::GetTypeString(opcode.mType);
+				String typeString = Opcode::getTypeString(opcode.mType);
 				switch (opcode.mDataType)
 				{
 					case BaseType::VOID:	  break;

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -20,7 +20,7 @@
 #include "oxygen/simulation/GameRecorder.h"
 #include "oxygen/simulation/SaveStateSerializer.h"
 
-#include <lemon/program/Function.h>
+#include <lemon/program/function/Function.h>
 #include <lemon/runtime/Runtime.h>
 #include <lemon/runtime/RuntimeFunction.h>
 
@@ -145,7 +145,7 @@ protected:
 			mCodeExec.showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(callTarget, 16) + ").");
 			return false;
 		}
-		if (func->getType() == lemon::Function::Type::SCRIPT)
+		if (func->isA<lemon::ScriptFunction>())
 		{
 			CodeExec::CallFrame& callFrame = mCodeExec.mActiveCallFrameTracking->pushCallFrame(CodeExec::CallFrame::Type::SCRIPT_DIRECT);
 			callFrame.mFunction = func;
@@ -326,6 +326,8 @@ void CodeExec::cleanScriptDebug()
 
 bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 {
+	const Configuration& config = Configuration::instance();
+
 	if (retainRuntimeState)
 	{
 		// If the runtime is already active, save its current state
@@ -345,14 +347,14 @@ bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 	}
 	mExecutionState = ExecutionState::INACTIVE;
 
-	const Configuration& config = Configuration::instance();
+	// Load scripts
 	LemonScriptProgram::LoadOptions options;
 	options.mEnforceFullReload = enforceFullReload;
 	options.mModuleSelection = EngineMain::getDelegate().mayLoadScriptMods() ? LemonScriptProgram::LoadOptions::ModuleSelection::ALL_MODS : LemonScriptProgram::LoadOptions::ModuleSelection::BASE_GAME_ONLY;
 	options.mAppVersion = EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber;
-	const WString mainScriptPath = config.mScriptsDir + config.mMainScriptName;
+	const std::wstring mainScriptPath = config.mScriptsDir + config.mMainScriptName;
 
-	const LemonScriptProgram::LoadScriptsResult result = mLemonScriptProgram.loadScripts(mainScriptPath.toStdString(), options);
+	const LemonScriptProgram::LoadScriptsResult result = mLemonScriptProgram.loadScripts(mainScriptPath, options);
 	if (result == LemonScriptProgram::LoadScriptsResult::PROGRAM_CHANGED)
 	{
 		lemon::Runtime::setActiveEnvironment(&mRuntimeEnvironment);

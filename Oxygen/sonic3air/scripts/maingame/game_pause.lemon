@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2025 by Eukaryot
+	Copyright (C) 2017-2026 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -166,7 +166,7 @@ function void GamePause.Menu()
 
 			if (screenshotModeActive)
 			{
-				if (Input.buttonPressed(0, BUTTON_Y))
+				if (Input.buttonPressed(0, BUTTON_A) || Input.buttonPressed(0, BUTTON_B) || Input.buttonPressed(0, BUTTON_X) || Input.buttonPressed(0, BUTTON_Y) || Input.buttonPressed(0, BUTTON_START) || Input.buttonPressed(0, BUTTON_BACK))
 					screenshotModeActive = false
 			}
 			else
@@ -349,6 +349,9 @@ function void GamePause.UpdateFadeOut()
 	if (global.game.paused)
 		return
 
+	Renderer.resetLifetimeContext(1)
+	Renderer.setLifetimeContext(1)
+
 	// Fade-out
 	float deltaSeconds = 1.0f / 60.0f
 	GamePause.visibility = max(GamePause.visibility - deltaSeconds * 12.0f, 0.0f)
@@ -358,10 +361,6 @@ function void GamePause.UpdateFadeOut()
 	if (GamePause.visibility > 0.0f)
 	{
 		GamePause.DrawMenu(0.0f)
-	}
-	else
-	{
-		Renderer.resetLifetimeContext(1)
 	}
 }
 

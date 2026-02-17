@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -18,6 +18,7 @@ namespace lemon
 	struct RuntimeOpcode;
 	struct RuntimeOpcodeBuffer;
 	struct RuntimeOpcodeContext;
+	class ScriptFunction;
 
 
 	typedef void(*ExecFunc)(const RuntimeOpcodeContext context);
@@ -25,7 +26,7 @@ namespace lemon
 	class API_EXPORT RuntimeOpcodeProvider
 	{
 	public:
-		virtual bool buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime) = 0;
+		virtual bool buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime, const ScriptFunction& function) = 0;
 	};
 
 

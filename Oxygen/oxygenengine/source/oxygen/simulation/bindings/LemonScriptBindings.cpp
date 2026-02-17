@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -665,7 +665,7 @@ namespace
 		lemon::AnyTypeWrapper wrapper;
 		wrapper.readFromStack(controlFlow);
 
-		if (decimal && wrapper.mType->getClass() == lemon::DataTypeDefinition::Class::INTEGER)
+		if (decimal && wrapper.mType->isA<lemon::IntegerDataType>())
 		{
 			const std::string valueString = *String(0, "%d", wrapper.mValue.get<int64>());
 			debugLogInternal(valueString);

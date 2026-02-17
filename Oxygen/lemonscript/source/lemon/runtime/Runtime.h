@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,15 +8,16 @@
 
 #pragma once
 
-#include "lemon/program/Function.h"
+#include "lemon/program/function/ScriptFunction.h"
 #include "lemon/program/StringRef.h"
 #include "lemon/runtime/ControlFlow.h"
 
 
 namespace lemon
 {
-	class Program;
+	class GlobalVariable;
 	class NativeFunction;
+	class Program;
 	class Variable;
 	struct RuntimeOpcode;
 
@@ -154,9 +155,9 @@ namespace lemon
 		const FlyweightString* resolveStringByKey(uint64 key) const;
 		uint64 addString(std::string_view str);
 
-		AnyBaseValue getGlobalVariableValue(const Variable& variable);
-		void setGlobalVariableValue(const Variable& variable, AnyBaseValue value);
-		int64* accessGlobalVariableValue(const Variable& variable);
+		AnyBaseValue getGlobalVariableValue(const GlobalVariable& variable);
+		void setGlobalVariableValue(const GlobalVariable& variable, AnyBaseValue value);
+		int64* accessGlobalVariableValue(const GlobalVariable& variable);
 
 		inline const ControlFlow& getMainControlFlow() const  { return *mControlFlows[0]; }
 		inline const ControlFlow& getSelectedControlFlow() const  { return *mSelectedControlFlow; }

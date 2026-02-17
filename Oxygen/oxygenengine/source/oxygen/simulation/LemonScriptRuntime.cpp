@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -219,7 +219,7 @@ bool LemonScriptRuntime::callAddressHook(uint32 address)
 			{
 				case lemon::Function::Type::SCRIPT:
 				{
-					const lemon::RuntimeFunction* runtimeFunction = mInternal.mRuntime.getRuntimeFunction(*static_cast<const lemon::ScriptFunction*>(function));
+					const lemon::RuntimeFunction* runtimeFunction = mInternal.mRuntime.getRuntimeFunction(function->as<lemon::ScriptFunction>());
 					if (nullptr != runtimeFunction)
 					{
 						mInternal.mRuntime.callRuntimeFunction(*runtimeFunction);
@@ -320,9 +320,9 @@ lemon::AnyBaseValue LemonScriptRuntime::getGlobalVariableValue(lemon::FlyweightS
 {
 	lemon::AnyBaseValue outValue;
 	lemon::Variable* variable = mProgram.getGlobalVariableByHash(variableName.getHash());
-	if (nullptr != variable)
+	if (nullptr != variable && variable->isA<lemon::GlobalVariable>())
 	{
-		const lemon::AnyBaseValue inValue = mInternal.mRuntime.getGlobalVariableValue(*variable);
+		const lemon::AnyBaseValue inValue = mInternal.mRuntime.getGlobalVariableValue(variable->as<lemon::GlobalVariable>());
 		lemon::CompileOptions compileOptions;
 		compileOptions.mScriptFeatureLevel = getCurrentExecutionScriptFeatureLevel();
 		const lemon::TypeCasting::CastHandling castHandling = lemon::TypeCasting(compileOptions).castBaseValue(inValue, variable->getDataType(), outValue, dataType, true);
@@ -335,7 +335,7 @@ lemon::AnyBaseValue LemonScriptRuntime::getGlobalVariableValue(lemon::FlyweightS
 void LemonScriptRuntime::setGlobalVariableValue(lemon::FlyweightString variableName, lemon::AnyBaseValue value, const lemon::DataTypeDefinition* dataType)
 {
 	lemon::Variable* variable = mProgram.getGlobalVariableByHash(variableName.getHash());
-	if (nullptr != variable)
+	if (nullptr != variable && variable->isA<lemon::GlobalVariable>())
 	{
 		lemon::AnyBaseValue valueToSet;
 		lemon::CompileOptions compileOptions;
@@ -343,7 +343,7 @@ void LemonScriptRuntime::setGlobalVariableValue(lemon::FlyweightString variableN
 		const lemon::TypeCasting::CastHandling castHandling = lemon::TypeCasting(compileOptions).castBaseValue(value, dataType, valueToSet, variable->getDataType(), true);
 		if (castHandling.mResult == lemon::TypeCasting::CastHandling::Result::INVALID)
 			valueToSet.reset();
-		mInternal.mRuntime.setGlobalVariableValue(*variable, valueToSet);
+		mInternal.mRuntime.setGlobalVariableValue(variable->as<lemon::GlobalVariable>(), valueToSet);
 	}
 }
 
