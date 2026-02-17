@@ -191,55 +191,88 @@ function void ActSelect.DrawBackground()
 	Renderer.enableDefaultPlane(3, false)
 }
 
+function void ActSelect.DrawCharacterPreview(s16 px, s16 py, u16 renderQueue)
+{
+	Renderer.drawSprite("charselectionbox", px + 3, py + 3, 0, 0x00, renderQueue)
+	Renderer.drawSprite(ActSelect.GetCharacterCombinationSprite(levelselect.characters), px, py, 0, 0x00, renderQueue + 2)
+}
+
+function string ActSelect.GetMenuText(u8 entryIndex, u8 selectedEntry, u8 selectedZone, u8 selectedAct)
+{
+	string text
+	if (entryIndex == 0)
+	{
+		text = ActSelect.GetZoneName(selectedZone)
+	}
+	else if (entryIndex == 1)
+	{
+		if (ActSelect.GetNumActs(selectedZone) == 1)
+			text = "Single Act"
+		else
+			text = stringformat("Act %d", selectedAct + 1)
+	}
+	else if (entryIndex == 2)
+	{
+		text = ActSelect.GetCharacterCombinationName(levelselect.characters)
+	}
+	else
+	{
+		text = "Back"
+	}
+	return text
+}
+
+function bool ActSelect.ShouldShowArrow(bool left, u8 entryIndex, u8 selectedEntry, u8 selectedZone, u8 selectedAct)
+{
+	bool result = false
+	if (entryIndex == 0)
+	{
+		if (left)
+			result = (selectedZone > 0)
+		else
+			result = (selectedZone < ActSelect.GetNumZones() - 1)
+	}
+	else if (entryIndex == 1)
+	{
+		if (left)
+			result = (selectedZone > 0 || selectedAct > 0)
+		else
+			result = (selectedZone < ActSelect.GetNumZones() - 1 || selectedAct < ActSelect.GetNumActs(selectedZone) - 1)
+	}
+	else if (entryIndex == 2)
+	{
+		if (left)
+			result = (levelselect.characters > 0)
+		else
+			result = (levelselect.characters < ActSelect.GetNumCharacterCombinations() - 1)
+	}
+	return result
+}
+
+function void ActSelect.DrawMenuText(s16 px, s16 py, string text, u32 color, u16 renderQueue)
+{
+	Renderer.drawText(ActSelect.MENU_FONT, px, py, text, color, 5, 0, renderQueue, false, true)
+}
 
 function void ActSelect.DrawMenu(u8 selectedEntry, u8 selectedZone, u8 selectedAct, s16 anchorX)
 {
 	// Title text
-	Renderer.drawText(ActSelect.TITLE_FONT, anchorX, 12, "ACT SELECT", 0xffffffff, 5, 0, 0xf010, false, true)
+	ActSelect.DrawMenuText(anchorX, 12, "ACT SELECT", 0xffffffff, 0xf010)
 
 	// Character preview
-	{
-		s16 px = max(anchorX - 125, 52)		// Move to the right in 4:3
-		Renderer.drawSprite("charselectionbox", px + 3, 159, 0, 0x00, 0xf002)
-		Renderer.drawSprite(ActSelect.GetCharacterCombinationSprite(levelselect.characters), px, 156, 0, 0x00, 0xf004)
-	}
+	ActSelect.DrawCharacterPreview(max(anchorX - 125, 52), 156, 0xf002)
 
 	// Render menu texts
 	constant array<s16> TEXT_LINE_Y = { 121, 143, 165, 203 }
-	for (u32 entryIndex = 0; entryIndex < 4; ++entryIndex)
+	for (u8 entryIndex = 0; entryIndex < 4; ++entryIndex)
 	{
 		bool isSelected = (entryIndex == selectedEntry)
 		u32 color = isSelected ? 0xffff00ff : 0xffffffe8
 
-		bool canGoLeft = false
-		bool canGoRight = false
+		bool canGoLeft = ActSelect.ShouldShowArrow(true, entryIndex, selectedEntry, selectedZone, selectedAct)
+		bool canGoRight = ActSelect.ShouldShowArrow(false, entryIndex, selectedEntry, selectedZone, selectedAct)
 
-		string text
-		if (entryIndex == 0)
-		{
-			text = ActSelect.GetZoneName(selectedZone)
-			canGoLeft = (selectedZone > 0)
-			canGoRight = (selectedZone < ActSelect.GetNumZones() - 1)
-		}
-		else if (entryIndex == 1)
-		{
-			if (ActSelect.GetNumActs(selectedZone) == 1)
-				text = "Single Act"
-			else
-				text = stringformat("Act %d", selectedAct + 1)
-			canGoLeft = (selectedZone > 0 || selectedAct > 0)
-			canGoRight = (selectedZone < ActSelect.GetNumZones() - 1 || selectedAct < ActSelect.GetNumActs(selectedZone) - 1)
-		}
-		else if (entryIndex == 2)
-		{
-			text = ActSelect.GetCharacterCombinationName(levelselect.characters)
-			canGoLeft = (levelselect.characters > 0)
-			canGoRight = (levelselect.characters < ActSelect.GetNumCharacterCombinations() - 1)
-		}
-		else
-		{
-			text = "Back"
-		}
+		string text = ActSelect.GetMenuText(entryIndex, selectedEntry, selectedZone, selectedAct)
 
 		s16 px = anchorX
 		s16 py = TEXT_LINE_Y[entryIndex]
@@ -253,31 +286,148 @@ function void ActSelect.DrawMenu(u8 selectedEntry, u8 selectedZone, u8 selectedA
 		}
 
 		if (canGoLeft)
-			Renderer.drawText(ActSelect.MENU_FONT, px - 50 - arrowAnimOffset, py, "<", color, 5, 0, 0xf000, false, true)
+			ActSelect.DrawMenuText(px - 50 - arrowAnimOffset, py, "<", color)
 		if (canGoRight)
-			Renderer.drawText(ActSelect.MENU_FONT, px + 110 + arrowAnimOffset, py, ">", color, 5, 0, 0xf000, false, true)
+			ActSelect.DrawMenuText(px + 110 + arrowAnimOffset, py, ">", color)
 
-		Renderer.drawText(ActSelect.MENU_FONT, px + 29, py, text, color, 5, 0, 0xf000, false, true)
+		ActSelect.DrawMenuText(px + 29, py, text, color, 0xf000)
 	}	
 }
 
+function void ActSelect.LoadPalettes()
+{
+	copyMemory(0xfffffc00, 0x39d262, 0x20)
+	for (u32 i = 0; i < 0x20; ++i)
+	{
+		u16[0xfffffc00 + i * 2] = blendColorsPacked(u16[0xfffffc00 + i * 2], 0x0eee, 0x80)
+	}
+
+	copyMemory(0xfffffc80, 0xfffffc00, 0x20)
+	for (u32 i = 0; i < 0x20; ++i)
+	{
+		Renderer.setPaletteColor(i, unpackColor(u16[0xfffffc80 + i * 2]))
+	}
+}
+
+function void ActSelect.DrawZonePreview(string key, s16 px, s16 py, u16 renderQueue)
+{
+	SpriteHandle spr = Renderer.addSpriteHandle(key, px, py, renderQueue)
+	spr.setPrimaryPalette(key, 0)
+	spr.setFlags(SPRITE_FLAG_FULLY_OPAQUE)
+	spr.setUseGlobalComponentTint(true)
+}
+
+function void ActSelect.DrawBorder()
+{
+	Renderer.drawSprite("level_preview_border_left", 0, 8, 0, 0x00, 0xf008)
+	Renderer.drawSpriteTransformed("level_preview_border_center", getScreenWidth() / 2, 8, 0, 0x00, 0xf008, 0xffffffff, float(getScreenWidth() - 20) / 10.0f, 0.0f, 0.0f, 1.0f)
+	Renderer.drawSprite("level_preview_border_right", getScreenWidth(), 8, 0, 0x00, 0xf008)
+}
+
+function s8 ActSelect.GetCurrentInput(s8 lastPressedInput)
+{
+	s8 currentInput = -1
+	if (Input.buttonPressed(BUTTON_UP))
+		currentInput = BUTTON_UP
+	else if (Input.buttonPressed(BUTTON_DOWN))
+		currentInput = BUTTON_DOWN
+	else if (Input.buttonPressed(BUTTON_LEFT))
+		currentInput = BUTTON_LEFT
+	else if (Input.buttonPressed(BUTTON_RIGHT))
+		currentInput = BUTTON_RIGHT
+	else if (lastPressedInput >= 0 && Input.buttonDown(lastPressedInput))
+		currentInput = lastPressedInput
+	
+	return currentInput
+}
+
+function u8 ActSelect.GetSelectedEntry(u8 selectedEntry, s8 currentInput)
+{
+	s8 entryChange = (currentInput == BUTTON_UP) ? -1 : (currentInput == BUTTON_DOWN) ? 1 : 0
+	if (entryChange != 0)
+	{
+		Audio.playAudio(0x5b)
+		selectedEntry = (selectedEntry + 4 + entryChange) % 4
+	}
+	return selectedEntry
+}
+
+function u8 ActSelect.GetSelectedZone_Act(u8 selectedEntry, u8 selectedZone, u8 selectedAct, s8 currentInput)
+{
+	// Calculates the selected zone and act, and returns them as a bit-packed u16 (the same as global.zone_act).
+	s8 optionChange = (currentInput == BUTTON_LEFT) ? -1 : (currentInput == BUTTON_RIGHT) ? 1 : 0
+	if (optionChange != 0)
+	{
+		u8 oldZone = selectedZone
+		u8 oldAct = selectedAct
+		u16 oldCharacters = levelselect.characters
+
+		if (selectedEntry == 0)
+		{
+			selectedZone = clamp(s16(selectedZone) + optionChange, 0, ActSelect.GetNumZones() - 1)
+			selectedAct = clamp(selectedAct, 0, ActSelect.GetNumActs(selectedZone) - 1)
+		}
+		else if (selectedEntry == 1)
+		{
+			if (optionChange < 0)
+			{
+				if (selectedAct > 0)
+				{
+					--selectedAct
+				}
+				else if (selectedZone > 0)
+				{
+					--selectedZone
+					selectedAct = ActSelect.GetNumActs(selectedZone) - 1
+				}
+			}
+			else
+			{
+				if (selectedAct < ActSelect.GetNumActs(selectedZone) - 1)
+				{
+					++selectedAct
+				}
+				else if (selectedZone < ActSelect.GetNumZones() - 1)
+				{
+					++selectedZone
+					selectedAct = 0
+				}
+			}
+		}
+	}
+	u16 zone_act = (u16(selectedZone) << 8) | u16(selectedAct)
+	return zone_act
+}
+
+function u16 ActSelect.GetSelectedCharacter(u8 selectedEntry, s8 currentInput)
+{
+	u16 selectedCharacter = levelselect.characters
+	if (selectedEntry == 2)
+	{
+		s8 optionChange = (currentInput == BUTTON_LEFT) ? -1 : (currentInput == BUTTON_RIGHT) ? 1 : 0
+		selectedCharacter = clamp(s16(levelselect.characters) + optionChange, 0, ActSelect.GetNumCharacterCombinations() - 1)
+	}
+	return selectedCharacter
+}
+
+function u8 ActSelect.GetMenuResult(u8 selectedEntry)
+{
+	u8 result = 0
+	if (Input.buttonPressed(BUTTON_START))
+	{
+		result = (selectedEntry == 3) ? 2 : 1
+	}
+	else if (Input.buttonPressed(BUTTON_B) || Input.buttonPressed(BUTTON_BACK))
+	{
+		result = 2
+	}
+	return result
+}
 
 function void ActSelect.Menu(u8 fadeInMethod)
 {
 	// Load palette for the background
-	{
-		copyMemory(0xfffffc00, 0x39d262, 0x20)
-		for (u32 i = 0; i < 0x20; ++i)
-		{
-			u16[0xfffffc00 + i * 2] = blendColorsPacked(u16[0xfffffc00 + i * 2], 0x0eee, 0x80)
-		}
-
-		copyMemory(0xfffffc80, 0xfffffc00, 0x20)
-		for (u32 i = 0; i < 0x20; ++i)
-		{
-			Renderer.setPaletteColor(i, unpackColor(u16[0xfffffc80 + i * 2]))
-		}
-	}
+	ActSelect.LoadPalettes()
 
 	playMusic(MUSIC_DATASELECT)
 
@@ -337,14 +487,9 @@ function void ActSelect.Menu(u8 fadeInMethod)
 			// Render the preview sprites
 			s16 offset = -Math.roundToInt((1.0f - Math.cos(previewAnimationPosition * PI_FLOAT)) * 40.0f)
 			string key
-			{
-				key = ActSelect.GetZonePreviewKey(selectedZone, selectedAct, previewImage)
 
-				SpriteHandle spr = Renderer.addSpriteHandle(key, s16(getScreenWidth() - 480) / 2 + offset, 18, 0xf004)
-				spr.setPrimaryPalette(key, 0)
-				spr.setFlags(SPRITE_FLAG_FULLY_OPAQUE)
-				spr.setUseGlobalComponentTint(true)
-			}
+			key = ActSelect.GetZonePreviewKey(selectedZone, selectedAct, previewImage)
+			ActSelect.DrawZonePreview(key, s16(getScreenWidth() - 480) / 2 + offset, 18, 0xf004)
 
 			if (previewAnimationPosition > 0.0f)
 			{
@@ -353,19 +498,12 @@ function void ActSelect.Menu(u8 fadeInMethod)
 
 				offset += 80
 				key = ActSelect.GetZonePreviewKey(selectedZone, selectedAct, previewImage + 1)
-
-				SpriteHandle spr = Renderer.addSpriteHandle(key, s16(getScreenWidth() - 480) / 2 + offset, 18, 0xf006)
-				spr.setPrimaryPalette(key, 0)
-				spr.setFlags(SPRITE_FLAG_FULLY_OPAQUE)
-				spr.setUseGlobalComponentTint(true)
+				ActSelect.DrawZonePreview(key, s16(getScreenWidth() - 480) / 2 + offset, 18, 0xf006)
 
 				Renderer.resetViewport(0xf007)
 			}
 
-			// Render the border
-			Renderer.drawSprite("level_preview_border_left", 0, 8, 0, 0x00, 0xf008)
-			Renderer.drawSpriteTransformed("level_preview_border_center", getScreenWidth() / 2, 8, 0, 0x00, 0xf008, 0xffffffff, float(getScreenWidth() - 20) / 10.0f, 0.0f, 0.0f, 1.0f)
-			Renderer.drawSprite("level_preview_border_right", getScreenWidth(), 8, 0, 0x00, 0xf008)
+			ActSelect.DrawBorder()
 		}
 
 		ActSelect.DrawMenu(selectedEntry, selectedZone, selectedAct, anchorX)
@@ -373,21 +511,9 @@ function void ActSelect.Menu(u8 fadeInMethod)
 		waitForNextFrame()
 
 		// Handle key repeat
-		s8 currentInput = -1
+		s8 currentInput = ActSelect.GetCurrentInput(lastPressedInput)
+		lastPressedInput = currentInput
 		{
-			if (Input.buttonPressed(BUTTON_UP))
-				currentInput = BUTTON_UP
-			else if (Input.buttonPressed(BUTTON_DOWN))
-				currentInput = BUTTON_DOWN
-			else if (Input.buttonPressed(BUTTON_LEFT))
-				currentInput = BUTTON_LEFT
-			else if (Input.buttonPressed(BUTTON_RIGHT))
-				currentInput = BUTTON_RIGHT
-			else if (lastPressedInput >= 0 && Input.buttonDown(lastPressedInput))
-				currentInput = lastPressedInput
-
-			lastPressedInput = currentInput
-
 			if (currentInput == -1)
 			{
 				// No input at all, so reset key repeat
@@ -409,78 +535,29 @@ function void ActSelect.Menu(u8 fadeInMethod)
 			}
 		}
 
-		s8 entryChange = (currentInput == BUTTON_UP) ? -1 : (currentInput == BUTTON_DOWN) ? 1 : 0
-		if (entryChange != 0)
+		selectedEntry = ActSelect.GetSelectedEntry(selectedEntry, currentInput)
+		u8 oldZone = selectedZone
+		u8 oldAct = selectedAct
+		u16 zone_act = ActSelect.GetSelectedZone_Act(selectedEntry, selectedZone, selectedAct, currentInput)
+		selectedAct = u8(zone_act & 0xff)
+		selectedZone = u8(zone_act >> 8)
+		
+		u8 oldCharacters = levelselect.characters
+		levelselect.characters = ActSelect.GetSelectedCharacter(selectedEntry, currentInput)
+
+		if (selectedZone != oldZone || selectedAct != oldAct)
 		{
 			Audio.playAudio(0x5b)
-			selectedEntry = (selectedEntry + 4 + entryChange) % 4
+			previewAnimationDelay = 0.0f
+			previewAnimationPosition = 0.0f
+			previewImage = 0
 		}
-
-		s8 optionChange = (currentInput == BUTTON_LEFT) ? -1 : (currentInput == BUTTON_RIGHT) ? 1 : 0
-		if (optionChange != 0)
+		else if (levelselect.characters != oldCharacters)
 		{
-			u8 oldZone = selectedZone
-			u8 oldAct = selectedAct
-			u16 oldCharacters = levelselect.characters
-
-			if (selectedEntry == 0)
-			{
-				selectedZone = clamp(s16(selectedZone) + optionChange, 0, ActSelect.GetNumZones() - 1)
-				selectedAct = clamp(selectedAct, 0, ActSelect.GetNumActs(selectedZone) - 1)
-			}
-			else if (selectedEntry == 1)
-			{
-				if (optionChange < 0)
-				{
-					if (selectedAct > 0)
-					{
-						--selectedAct
-					}
-					else if (selectedZone > 0)
-					{
-						--selectedZone
-						selectedAct = ActSelect.GetNumActs(selectedZone) - 1
-					}
-				}
-				else
-				{
-					if (selectedAct < ActSelect.GetNumActs(selectedZone) - 1)
-					{
-						++selectedAct
-					}
-					else if (selectedZone < ActSelect.GetNumZones() - 1)
-					{
-						++selectedZone
-						selectedAct = 0
-					}
-				}
-			}
-			else if (selectedEntry == 2)
-			{
-				levelselect.characters = clamp(s16(levelselect.characters) + optionChange, 0, ActSelect.GetNumCharacterCombinations() - 1)
-			}
-
-			if (selectedZone != oldZone || selectedAct != oldAct)
-			{
-				Audio.playAudio(0x5b)
-				previewAnimationDelay = 0.0f
-				previewAnimationPosition = 0.0f
-				previewImage = 0
-			}
-			else if (levelselect.characters != oldCharacters)
-			{
-				Audio.playAudio(0x5b)
-			}
+			Audio.playAudio(0x5b)
 		}
 
-		if (Input.buttonPressed(BUTTON_START))
-		{
-			result = (selectedEntry == 3) ? RESULT_GO_BACK : RESULT_START_GAME
-		}
-		else if (Input.buttonPressed(BUTTON_B) || Input.buttonPressed(BUTTON_BACK))
-		{
-			result = 2
-		}
+		result = ActSelect.GetMenuResult(selectedEntry)
 	}
 
 	if (result == RESULT_START_GAME)
