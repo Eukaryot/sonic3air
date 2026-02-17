@@ -5211,231 +5211,18 @@ function void Character.OnCollisionWithDynamicObject()
 			}
 		}
 
-		if (u8[A1 + 0x29] != 0)
-		{
-			char.velocity.x = -char.velocity.x
-			char.velocity.y = -char.velocity.y
-			char.groundspeed = -char.groundspeed
-			u8[A1 + 0x1c] = A0.u8
-			u8[A1 + 0x25] = u8[A1 + 0x28]
-			u8[A1 + 0x28] = 0
-			--u8[A1 + 0x29]
-			if (u8[A1 + 0x29] == 0)
-			{
-				u8[A1 + 0x2a] |= 0x80
-			}
-
-			if (char.character == CHARACTER_KNUCKLES)
-			{
-				if (char.double_jump_state == 1)
-				{
-					char.double_jump_state = 2		// Knuckles glide drop state
-					char.state = char.state.KNUX_FALLING
-
-					if (char.velocity.x >= 0)
-						char.flags |= char.flag.FACING_LEFT
-					else
-						char.flags &= ~char.flag.FACING_LEFT
-
-					char.hitbox_extends.x = char.hitbox.default.x
-					char.hitbox_extends.y = char.hitbox.default.y
-				}
-			}
-		}
-		else
-		{
-			if (u8[A1 + 0x2a] & 0x04)
-			{
-				A2 = 0xffff0000 + u16[A1 + 0x3c]
-				u8[A2] &= ~(1 << u8[A1 + 0x3b])
-			}
-
-			u8[A1 + 0x2a] |= 0x80
-
-			// Grant bonus points
-			Enemy.addScore(A1, 0x010216)
-
-			objA1.update_address = addressof(SmallExplosion.BaseUpdate)
-			u8[A1 + 0x05] = 0
-			if (char.velocity.y < 0)
-			{
-				char.velocity.y += 0x100
-			}
-			else if (char.position.y.u16 >= objA1.position.y.u16)
-			{
-				char.velocity.y -= 0x100
-			}
-			else
-			{
-				char.velocity.y = -char.velocity.y
-			}
-		}
+		Character.OnNormalCollision()
 	}
 	else if (D1.u8 == collision.flag.ITEM)
 	{
 		D0.u8 = (objA1.collision_attributes & collision_attributes.size)
 		if (D0.u8 != collision.size.16x16)
 		{
-			// Collect ring, but only after 30 invulnerability frames
-			//  -> Remember that the "char.invuln.countdown" timer starts at 120
-			u8 timer = competition_mode.active ? char.invuln.countdown : u8[0xffffb000 + 0x34]
-			if (timer < 90)
-			{
-				u8[A1 + 0x05] = 0x04
-			}
+			Character.OnRingCollision()
 		}
 		else
 		{
-			// This part seems to be for monitors specifically
-			s16 vy = (global.inv_gravity) ? -char.velocity.y : char.velocity.y
-		#if STANDALONE
-			// Calculate if the player is moving up, specifically relative to the monitor
-			vy = char.velocity.y - objA1.velocity.y
-		#endif
-			bool movingUp = (objA1.render_flags & render_flag.FLIP_Y) ? (vy > 0) : (vy < 0)
-		#if STANDALONE
-			movingUp = (vy < 0)		// Velocity is normalised for inverted gravity anyway, so no need for fancy conditional checks
-
-			// If player and monitor are at different orientations, check if player is moving down instead of up
-			if ((objA1.render_flags & render_flag.FLIP_Y) != (char.render_flags & render_flag.FLIP_Y))
-			{
-				movingUp = !movingUp
-
-				if (char.flags & char.flag.IN_AIR)
-					objA1.flags2a &= ~object.flag.P1_PUSHING
-			}
-
-			movingUp = (movingUp && (abs(char.position.x.u16 - objA1.position.x.u16) < 0x12 || char.state == char.state.ROLLING))		// only bounce at a certain distance, otherwise push the player away when falling, #contributed by GFX32
-		#endif
-			if (movingUp)
-			{
-			#if STANDALONE
-				if ((objA1.flags2a & object.flag.P1_PUSHING) && (char.flags & char.flag.IN_AIR))
-				{
-					// In S3AIR, do not allow S&K's monitor opening from the side
-					//  -> This is done to be more consistent with other Sonic games, incl. Sonic 1, 2, CD, Mania and even Sonic 3 alone
-					//  -> The first check above tells us if the character is on a side of the monitor
-					//  -> The second one makes sure that you can always ground-based roll into a monitor (see e.g. first invincibility in MHZ 1, when spindashing into it from the right)
-					return
-				}
-				else if (Game.getSetting(SETTING_MONITOR_BEHAVIOR) == 0)
-				{
-					// All you really need for Sonic & Knuckles monitor Behavior. everything else relevant is handled elsewhere
-					char.velocity.y = -char.velocity.y
-				}
-				else
-				{
-					// Improved code to prevent crushing and allow bouncing on ground, #contributed by GFX32
-
-					// If the player is below the monitor, it should bounce.
-					bool isBelow = (char.position.y.u16 > (objA1.position.y.u16 + objA1.hitbox_extends.y))
-
-					if (objA1.render_flags & render_flag.FLIP_Y)
-						isBelow = (char.position.y.u16 < (objA1.position.y.u16 - objA1.hitbox_extends.y))
-
-					// Not when spindashing!
-					if (char.state == char.state.SPINDASH)
-						isBelow = false
-
-					if (isBelow)
-					{
-						// Hit monitor from below, make it fall
-						u8[A1 + 0x3c] = 1
-
-						char.velocity.y = -char.velocity.y
-						objA1.velocity.y = -0x180
-
-						// Calculate how far the monitor is inside the player, then separate them; this attempts to prevent crushing collision on subsequent frames.
-						s16 dy = (objA1.position.y.u16 + objA1.hitbox_extends.y) - (char.position.y.u16 - char.hitbox_extends.y)
-
-						if (objA1.render_flags & render_flag.FLIP_Y)
-							dy = (objA1.position.y.u16 - objA1.hitbox_extends.y) - (char.position.y.u16 + char.hitbox_extends.y)
-
-						// Only push the player when in midair
-						if (char.flags & char.flag.IN_AIR)
-						{
-							dy /= 2
-							char.position.y.u16 += dy
-						}
-						objA1.position.y.u16 -= dy
-
-						if (u8[A1 + 0x3c] == 0)
-							u8[A1 + 0x3c] = 4
-
-						return
-					}
-				}
-			#else
-				if (objA1.flags2a & char.flag.IN_AIR)
-				{
-					// This block is a bit broken due to the above check, and falling monitors can crush the player, and is this really what we want?
-
-					if ((objA1.render_flags & render_flag.FLIP_Y) == 0)
-					{
-						if (char.position.y.u16 - 0x10 < objA1.position.y.u16)
-							return
-					}
-					else
-					{
-						if (char.position.y.u16 + 0x10 >= objA1.position.y.u16)
-							return
-					}
-
-					char.velocity.y = -char.velocity.y
-					objA1.velocity.y = -0x180
-					if (u8[A1 + 0x3c] == 0)
-						u8[A1 + 0x3c] = 4
-
-					return
-				}
-			#endif
-			}
-
-			if (A0 != 0xffffb000 && competition_mode.active == 0)
-			{
-				// Sorry player 2, you can't open monitors in normal game
-				return
-			}
-
-			bool canOpenMonitor = false
-			if (char.state == char.state.ROLLING)
-			{
-				canOpenMonitor = true
-			}
-		#if STANDALONE
-			else if (Game.getSetting(SETTING_DROPDASH) && char.character == CHARACTER_SONIC && char.state == char.state.SONIC_DROPDASH)
-			{
-				canOpenMonitor = true
-			}
-			else if (char.state == char.state.SPINDASH)
-			{
-				canOpenMonitor = true
-			}
-			else if (objA1.velocity.y < 0)
-			{
-				// Make monitors break over the player's head at different orientations. #contributed by Dynamic Lemons
-				if ((global.inv_gravity != (objA1.render_flags & render_flag.FLIP_Y) != 0))
-					canOpenMonitor = true
-			}
-		#endif
-			else if (char.character == CHARACTER_KNUCKLES)
-			{
-				// Check if Knuckles glides into the monitor
-				canOpenMonitor = (char.double_jump_state == 1 || char.double_jump_state == 3)
-			}
-
-			if (canOpenMonitor)
-			{
-			#if STANDALONE
-				if (!movingUp)
-			#endif
-				{
-					// Bounce off
-					char.velocity.y = -char.velocity.y
-				}
-				objA1.base_state = 0x04		// Set monitor state to broken
-				objA1.monitor.character_address = A0.u16		// RAM address of character
-			}
+			Character.OnMonitorCollision()
 		}
 	}
 	else if (D1.u8 == collision.flag.THREAT)
@@ -5449,7 +5236,6 @@ function void Character.OnCollisionWithDynamicObject()
 		fn0103ba()
 	}
 }
-
 
 //# address-hook(0x01021e) end(0x010288)
 function void Character.OnThreatCollision()
@@ -5519,6 +5305,233 @@ function void Character.OnThreatCollisionInner()
 	{
 		A2 = A1
 		Character.GettingHurt()
+	}
+}
+
+function void Character.OnNormalCollision()
+{
+	if (u8[A1 + 0x29] != 0)
+	{
+		char.velocity.x = -char.velocity.x
+		char.velocity.y = -char.velocity.y
+		char.groundspeed = -char.groundspeed
+		u8[A1 + 0x1c] = A0.u8
+		u8[A1 + 0x25] = u8[A1 + 0x28]
+		u8[A1 + 0x28] = 0
+		--u8[A1 + 0x29]
+		if (u8[A1 + 0x29] == 0)
+		{
+			u8[A1 + 0x2a] |= 0x80
+		}
+
+		if (char.character == CHARACTER_KNUCKLES)
+		{
+			if (char.double_jump_state == 1)
+			{
+				char.double_jump_state = 2		// Knuckles glide drop state
+				char.state = char.state.KNUX_FALLING
+
+				if (char.velocity.x >= 0)
+					char.flags |= char.flag.FACING_LEFT
+				else
+					char.flags &= ~char.flag.FACING_LEFT
+
+				char.hitbox_extends.x = char.hitbox.default.x
+				char.hitbox_extends.y = char.hitbox.default.y
+			}
+		}
+	}
+	else
+	{
+		if (u8[A1 + 0x2a] & 0x04)
+		{
+			A2 = 0xffff0000 + u16[A1 + 0x3c]
+			u8[A2] &= ~(1 << u8[A1 + 0x3b])
+		}
+
+		u8[A1 + 0x2a] |= 0x80
+
+		// Grant bonus points
+		Enemy.addScore(A1, 0x010216)
+
+		objA1.update_address = addressof(SmallExplosion.BaseUpdate)
+		u8[A1 + 0x05] = 0
+		if (char.velocity.y < 0)
+		{
+			char.velocity.y += 0x100
+		}
+		else if (char.position.y.u16 >= objA1.position.y.u16)
+		{
+			char.velocity.y -= 0x100
+		}
+		else
+		{
+			char.velocity.y = -char.velocity.y
+		}
+	}
+}
+
+function void Character.OnRingCollision()
+{
+	// Collect ring, but only after 30 invulnerability frames
+	//  -> Remember that the "char.invuln.countdown" timer starts at 120
+	u8 timer = competition_mode.active ? char.invuln.countdown : u8[0xffffb000 + 0x34]
+	if (timer < 90)
+	{
+		u8[A1 + 0x05] = 0x04
+	}
+}
+
+function void Character.OnMonitorCollision()
+{
+	s16 vy = (global.inv_gravity) ? -char.velocity.y : char.velocity.y
+#if STANDALONE
+	// Calculate if the player is moving up, specifically relative to the monitor
+	vy = char.velocity.y - objA1.velocity.y
+#endif
+	bool movingUp = (objA1.render_flags & render_flag.FLIP_Y) ? (vy > 0) : (vy < 0)
+#if STANDALONE
+	movingUp = (vy < 0)		// Velocity is normalised for inverted gravity anyway, so no need for fancy conditional checks
+
+	// If player and monitor are at different orientations, check if player is moving down instead of up
+	if ((objA1.render_flags & render_flag.FLIP_Y) != (char.render_flags & render_flag.FLIP_Y))
+	{
+		movingUp = !movingUp
+
+		if (char.flags & char.flag.IN_AIR)
+			objA1.flags2a &= ~object.flag.P1_PUSHING
+	}
+
+	movingUp = (movingUp && (abs(char.position.x.u16 - objA1.position.x.u16) < 0x12 || char.state == char.state.ROLLING))		// only bounce at a certain distance, otherwise push the player away when falling, #contributed by GFX32
+#endif
+	if (movingUp)
+	{
+	#if STANDALONE
+		if ((objA1.flags2a & object.flag.P1_PUSHING) && (char.flags & char.flag.IN_AIR))
+		{
+			// In S3AIR, do not allow S&K's monitor opening from the side
+			//  -> This is done to be more consistent with other Sonic games, incl. Sonic 1, 2, CD, Mania and even Sonic 3 alone
+			//  -> The first check above tells us if the character is on a side of the monitor
+			//  -> The second one makes sure that you can always ground-based roll into a monitor (see e.g. first invincibility in MHZ 1, when spindashing into it from the right)
+			return
+		}
+		if (Game.getSetting(SETTING_MONITOR_BEHAVIOR) == 0)
+		{
+			// All you really need for Sonic & Knuckles monitor Behavior. Everything else relevant is handled elsewhere
+			char.velocity.y = -char.velocity.y
+		}
+		else
+		{
+			// Improved code to prevent crushing and allow bouncing on ground, #contributed by GFX32
+
+			// If the player is below the monitor, it should bounce.
+			bool isBelow = (char.position.y.u16 > (objA1.position.y.u16 + objA1.hitbox_extends.y))
+
+			if (objA1.render_flags & render_flag.FLIP_Y)
+				isBelow = (char.position.y.u16 < (objA1.position.y.u16 - objA1.hitbox_extends.y))
+
+			// Not when spindashing!
+			if (char.state == char.state.SPINDASH)
+				isBelow = false
+
+			if (isBelow)
+			{
+				// Hit monitor from below, make it fall
+				u8[A1 + 0x3c] = 1
+
+				char.velocity.y = -char.velocity.y
+				objA1.velocity.y = -0x180
+
+				// Calculate how far the monitor is inside the player, then separate them; this attempts to prevent crushing collision on subsequent frames.
+				s16 dy = (objA1.position.y.u16 + objA1.hitbox_extends.y) - (char.position.y.u16 - char.hitbox_extends.y)
+
+				if (objA1.render_flags & render_flag.FLIP_Y)
+					dy = (objA1.position.y.u16 - objA1.hitbox_extends.y) - (char.position.y.u16 + char.hitbox_extends.y)
+
+				// Only push the player when in midair
+				if (char.flags & char.flag.IN_AIR)
+				{
+					dy /= 2
+					char.position.y.u16 += dy
+				}
+				objA1.position.y.u16 -= dy
+
+				if (u8[A1 + 0x3c] == 0)
+					u8[A1 + 0x3c] = 4
+
+				return
+			}
+		}
+	#else
+		if (objA1.flags2a & char.flag.IN_AIR)
+		{
+			// This block is a bit broken due to the above check, and falling monitors can crush the player, and is this really what we want?
+
+			if ((objA1.render_flags & render_flag.FLIP_Y) == 0)
+			{
+				if (char.position.y.u16 - 0x10 < objA1.position.y.u16)
+					return
+			}
+			else
+			{
+				if (char.position.y.u16 + 0x10 >= objA1.position.y.u16)
+					return
+			}
+
+			char.velocity.y = -char.velocity.y
+			objA1.velocity.y = -0x180
+			if (u8[A1 + 0x3c] == 0)
+				u8[A1 + 0x3c] = 4
+
+			return
+		}
+	#endif
+	}
+
+	if (A0 != 0xffffb000 && competition_mode.active == 0)
+	{
+		// Sorry player 2, you can't open monitors in normal game
+		return
+	}
+
+	bool canOpenMonitor = false
+	if (char.state == char.state.ROLLING)
+	{
+		canOpenMonitor = true
+	}
+#if STANDALONE
+	else if (Game.getSetting(SETTING_DROPDASH) && char.character == CHARACTER_SONIC && char.state == char.state.SONIC_DROPDASH)
+	{
+		canOpenMonitor = true
+	}
+	else if (char.state == char.state.SPINDASH)
+	{
+		canOpenMonitor = true
+	}
+	else if (objA1.velocity.y < 0)
+	{
+		// Make monitors break over the player's head at different orientations. #contributed by Dynamic Lemons
+		if ((global.inv_gravity != (objA1.render_flags & render_flag.FLIP_Y) != 0))
+			canOpenMonitor = true
+	}
+#endif
+	else if (char.character == CHARACTER_KNUCKLES)
+	{
+		// Check if Knuckles glides into the monitor
+		canOpenMonitor = (char.double_jump_state == 1 || char.double_jump_state == 3)
+	}
+
+	if (canOpenMonitor)
+	{
+	#if STANDALONE
+		if (!movingUp)
+	#endif
+		{
+			// Bounce off
+			char.velocity.y = -char.velocity.y
+		}
+		objA1.base_state = 0x04		// Set monitor state to broken
+		objA1.monitor.character_address = A0.u16		// RAM address of character
 	}
 }
 
