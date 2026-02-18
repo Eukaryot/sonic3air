@@ -208,8 +208,15 @@ namespace rmx
 	}
 
 
-	uint64 parseInteger(const String& input, size_t& pos)
+	int64 parseInteger(const String& input, size_t& pos)
 	{
+		bool negative = false;
+		if (input[0] == '-')
+		{
+			++pos;
+			negative = true;
+		}
+
 		uint64 result = 0;
 		uint64 base = 10;
 		if ((int)pos+1 < input.length() && input[pos] == '0' && input[pos+1] == 'x')
@@ -234,10 +241,10 @@ namespace rmx
 
 			result = result * base + nextDigit;
 		}
-		return result;
+		return negative ? -(int64)result : result;
 	}
 
-	uint64 parseInteger(const String& input)
+	int64 parseInteger(const String& input)
 	{
 		size_t pos = 0;
 		return parseInteger(input, pos);
