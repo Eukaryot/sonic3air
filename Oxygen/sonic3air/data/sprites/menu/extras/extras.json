@@ -1,0 +1,7 @@
+{
+	"bg_levelselect": { "File": "levelselect_bg.bmp" },
+	"bg_levelselect_top": { "File": "levelselect_bg.bmp", "Rect": "0,0,512,30" },
+	"achievements_frame": { "File": "achievements_frame.png" },
+	"extras_frame": { "File": "extras_frame.png" },
+	"tails_yawning": { "File": "tails_yawning.png" }
+}
