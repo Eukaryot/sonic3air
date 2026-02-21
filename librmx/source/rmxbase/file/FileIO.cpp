@@ -34,6 +34,9 @@
 	#include <dirent.h>
 	#include <sys/stat.h>
 #endif
+#if defined(PLATFORM_WEB)
+	#include <emscripten.h>
+#endif
 
 
 namespace rmx
@@ -363,6 +366,15 @@ namespace rmx
 			stream.write((char*)data, size);
 		}
 		stream.close();
+
+		#if defined(PLATFORM_WEB)
+			EM_ASM({
+				FS.syncfs(false, function(err)
+				{
+					if (err) console.error('FS.syncfs failed:', err);
+				});
+			});
+		#endif
 		return true;
 	}
 

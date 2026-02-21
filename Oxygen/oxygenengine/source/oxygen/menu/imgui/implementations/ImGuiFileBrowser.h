@@ -32,10 +32,10 @@ public:
 	virtual bool shouldBlockOtherProviders() const override  { return true; }
 
 	void buildWindowContent();
+	void refreshFileEntries();
 
 private:
 	void updateFullPath();
-	void refreshFileEntries();
 
 	void drawFileBrowser();
 

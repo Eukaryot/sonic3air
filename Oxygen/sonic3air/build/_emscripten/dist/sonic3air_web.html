@@ -13,6 +13,17 @@
 	text-align:center;
 	font-size: 0.9em;
 }
+.file_upload{
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: rgba(20,20,20,0.75);
+	border-radius: 10px;
+	padding: 20px;
+	text-align: center;
+	z-index: 10000;
+}
 input[type="file"] {display: none;}
 .fileSelector {
   display: inline-block;
@@ -24,7 +35,7 @@ input[type="file"] {display: none;}
   padding: 5px 8px;
   outline: none;
   white-space: nowrap;
-  -webkit-user-select: none;
+  user-select: none;
   cursor: pointer;
   text-shadow: 1px 1px #555;
   font-size: 32px;
@@ -48,7 +59,7 @@ input[type="file"] {display: none;}
   padding: 5px 8px;
   outline: none;
   white-space: nowrap;
-  -webkit-user-select: none;
+  user-select: none;
   cursor: pointer;
   text-shadow: 1px 1px #555;
   font-size: 32px;
@@ -62,6 +73,48 @@ input[type="file"] {display: none;}
 }
 #root{
 	color: black;
+}
+#fileUpload{
+	display: inline-block;
+    background: #222;
+    background: linear-gradient(0deg, #111 0%, #444 100%);
+	border: 1px solid #999;
+	border-radius: 5px;
+	margin: 10px 5px;
+	padding: 10px 15px;
+	outline: none;
+	white-space: nowrap;
+	user-select: none;
+	cursor: pointer;
+	text-shadow: 1px 1px #555;
+	font-size: 24px;
+	color: white;
+}
+#fileUpload:hover {
+	border-color: black;
+}
+#fileUpload:active {
+	background: linear-gradient(0deg, #333 0%, #555 100%);
+}
+.cancelButton {
+	display: inline-block;
+	background: #444;
+	background: linear-gradient(0deg, #222 0%, #555 100%);
+	border: 1px solid #999;
+	border-radius: 5px;
+	margin: 10px 5px;
+	padding: 10px 15px;
+	outline: none;
+	cursor: pointer;
+	text-shadow: 1px 1px #555;
+	font-size: 24px;
+	color: white;
+}
+.cancelButton:hover {
+	border-color: black;
+}
+.cancelButton:active {
+	background: linear-gradient(0deg, #444 0%, #666 100%);
 }
 #ios_workaround{
 	width: 100%;
@@ -77,10 +130,9 @@ input[type="file"] {display: none;}
 	background-color: rgba(0,0,0,50%);
 }
 </style>
-<script src="browserfs.min.js"></script>
 <script>
-	//This wrapper around the wasm build of the game is intentionally not obfuscated.
-	//Feel free to use it as an example of how to interact with emscripten WebAssembly builds for other projects.
+    //This wrapper around the wasm build of the game is intentionally not obfuscated.
+    //Feel free to use it as an example of how to interact with emscripten WebAssembly builds for other projects.
 var hasRemasteredAudio = false;
 function startGame(){
 	callMain();
@@ -149,55 +201,22 @@ function onPageLoaded(){
 }
 
 function onGameExit(){
+	//We shouldn't be able to get to this point anymore because I removed the Exit option, 
+	//but if it crashes or something the user can still get a Restart button to reload the page.
 	var restartBits = document.getElementsByClassName('restart');
 	for (var i = 0; i < restartBits.length; i++) {
 		restartBits[i].classList.remove('hidden');
 	}
-	if(hasRemasteredAudio === false){
-		var extraBits = document.getElementsByClassName('extraDownloads');
-		for (var i = 0; i < extraBits.length; i++) {
-			extraBits[i].classList.remove('hidden');
-		}
-	}
-	
+
 	var gameView = document.getElementById("gameView");
 	gameView.classList.add('hidden');
 	var rootView = document.getElementById("root");
 	rootView.classList.remove('hidden');
 	
-	//Add file manager to existing page so we don't cause a page navigation which would enable the swipe back gesture
-	var jsRuntime = document.createElement('script');
-	jsRuntime.setAttribute('src', 'fileManagerRuntime.js');
-	document.body.appendChild(jsRuntime);
-	
-	var jsReact = document.createElement('script');
-	jsReact.setAttribute('src', 'react.js');
-	document.body.appendChild(jsReact);
-	
-	var jsFileman = document.createElement('script');
-	jsFileman.setAttribute('src', 'filemanager.js');
-	document.body.appendChild(jsFileman);
-	
 	exitRuntime();
 }
 
 function onDownloadsComplete(){
-	//Before we mount BrowserFS, we need to patch abort() to bypass a bug in the implementation of stat().
-	//In Vanilla Emscripten FS, if you call stat() for a file that does not exist, it throws an exception with error code 44.
-	//But BrowserFS does not throw a compatible exception, so I'm going to cheat and make it compatible.
-	//Ideally I should fix BrowserFS and send them a pull request, but this solution is a quick fix until I do.
-	var originalAbort = abort;
-	abort = function(what){
-		if(what.stack.indexOf('browserfs')>0){
-			what.errno = 44;
-			return;
-		}
-		originalAbort(what);
-	}
-	
-	//Now that we've worked around the bug, let's mount BrowserFS
-	var BFS = new BrowserFS.EmscriptenFS(Module.FS, Module.PATH, Module.ERRNO_CODES);
-	FS.mount(BFS, {root: '/'}, '/sonic3air/savedata/'); //Mount BrowserFS root into /sonic3air/savedata
 	FS.chdir("/sonic3air");
 	hasRemasteredAudio = (FS.analyzePath("/sonic3air/savedata/audioremaster.bin", true).exists === true);
 	if(hasRemasteredAudio === true){
@@ -231,36 +250,6 @@ function hidePageUI(){
 	for (var i = 0; i < uiElements.length; i++) {
 		uiElements[i].style.display = 'none';
 	}
-}
-
-function showExtraDownloads(){
-	var extraBits = document.getElementsByClassName('extraDownloadsSection');
-	for (var i = 0; i < extraBits.length; i++) {
-		extraBits[i].classList.remove('hidden');
-	}
-	
-	extraBits = document.getElementsByClassName('restart');
-	for (var i = 0; i < extraBits.length; i++) {
-		extraBits[i].classList.add('hidden');
-	}
-	
-	extraBits = document.getElementById('root');
-	extraBits.classList.add('hidden');
-}
-
-function hideExtraDownloads(){
-	let extraBits = document.getElementsByClassName('extraDownloadsSection');
-	for (var i = 0; i < extraBits.length; i++) {
-		extraBits[i].classList.add('hidden');
-	}
-	
-	extraBits = document.getElementsByClassName('restart');
-	for (var i = 0; i < extraBits.length; i++) {
-		extraBits[i].classList.remove('hidden');
-	}
-	
-	extraBits = document.getElementById('root');
-	extraBits.classList.remove('hidden');
 }
 
 async function downloadRemastered(){
@@ -326,17 +315,124 @@ function installS3kFile(fileInput) {
 		//If this call throws an exception with error code 20, it means the ROM already exists.
 		//But that shouldn't happen because we wouldn't be calling this if it already existed.
         Module['FS_createDataFile']('/sonic3air/savedata/', 'Sonic_Knuckles_wSonic3.bin', data, true, true, true);
-		
-		hidePageUI();
-		
-		//Save into IndexedDB
-		var internalFolder = FS.analyzePath("/sonic3air/___internal/");
-		if(!internalFolder.exists){
-			FS.mkdir('/sonic3air/___internal/');
-		}
-		startGame();
+		FS.syncfs(function (err) {
+			hidePageUI();
+			
+			//Save into IndexedDB
+			var internalFolder = FS.analyzePath("/sonic3air/___internal/");
+			if(!internalFolder.exists){
+				FS.mkdir('/sonic3air/___internal/');
+			}
+			startGame();
+  		});
     };
     fr.readAsArrayBuffer(file);
+}
+
+function triggerFileSelect(){
+	// Show the file upload dialog box. iOS requires the user to tap the input button themselves, it can't be invoked programmatically.
+	var fileUploadDiv = document.querySelector('.file_upload');
+	if (fileUploadDiv) {
+		fileUploadDiv.classList.remove('hidden');
+	}
+}
+
+function cancelFileSelect(){
+	var fileUploadDiv = document.querySelector('.file_upload');
+	if (fileUploadDiv) {
+		fileUploadDiv.classList.add('hidden');
+	}
+}
+
+function addFile(fileInput) {
+	if (fileInput.files.length == 0)
+		return;
+	var file = fileInput.files[0];
+
+	// Hide the file upload dialog box after selection
+	cancelFileSelect();
+
+	var uploadPath = window.__s3airFileUploadPath || '/sonic3air/savedata/';
+	if (uploadPath.endsWith('/') == false) {
+		uploadPath += '/';
+	}
+
+	var fr = new FileReader();
+	fr.onload = function () {
+		var data = new Uint8Array(fr.result);
+		Module['FS_createDataFile'](uploadPath, file.name, data, true, true, true);
+		FS.syncfs(function (err) {
+			if (!err) {
+				notifyFileImportDone();
+			}
+  		});
+	};
+	fr.readAsArrayBuffer(file);
+}
+
+function notifyFileImportDone() {
+	if (Module && Module._ImGuiFileBrowser_OnWebImportDone) {
+		Module._ImGuiFileBrowser_OnWebImportDone();
+		return;
+	}
+	if (Module && Module.ccall) {
+		try {
+			Module.ccall('ImGuiFileBrowser_OnWebImportDone', null, [], []);
+			return;
+		} catch (e) {
+			// Ignore and fall through.
+		}
+	}
+}
+
+function fileManagerPromptRename(oldName, currentPath, isFile) {
+	setTimeout(function() {
+		var title = isFile ? 'Rename file:' : 'Rename folder:';
+		var value = prompt(title, oldName);
+		if (value === null) {
+			return;
+		}
+		value = value.trim();
+		if (value.length === 0 || value === oldName) {
+			return;
+		}
+		if (/[\\/\*\?:\|<>\"]/.test(value)) {
+			return;
+		}
+		try {
+			FS.rename(currentPath + oldName, currentPath + value);
+			notifyFileImportDone();
+		} catch (e) {
+			console.warn('Rename failed:', e);
+		}
+	}, 0);
+}
+
+function fileManagerExportFile(filePath){
+	if (!filePath) {
+		return;
+	}
+
+	try {
+		var data = FS.readFile(filePath, { encoding: 'binary' });
+		var filename = filePath.split('/').filter(Boolean).pop() || 'download.bin';
+		var blob = new Blob([data], { type: 'application/octet-stream' });
+		var blobUrl = URL.createObjectURL(blob);
+
+		var link = document.createElement('a');
+		link.style.display = 'none';
+		link.href = blobUrl;
+		link.download = filename;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+
+		setTimeout(function () {
+			URL.revokeObjectURL(blobUrl);
+		}, 0);
+	} catch (e) {
+		console.warn('Export failed:', e);
+	}
 }
 </script>
 </head>
@@ -352,7 +448,15 @@ function installS3kFile(fileInput) {
 	<label for="fileSelector" class="fileSelector">
 	    Select File...
 	</label>
-	<input id="fileSelector" class="fileSelector" type="file" onChange="installS3kFile(this);"}/>
+	<input id="fileSelector" class="fileSelector" type="file" onChange="installS3kFile(this);"/>
+</div>
+<div class="file_upload hidden">
+	<div style="margin-bottom: 15px; font-size: 1.2em;">Select a file to import:</div>
+	<label for="fileUploadInput" id="fileUpload">
+	    Select File...
+	</label>
+	<input id="fileUploadInput" type="file" onChange="addFile(this);"/>
+	<button type="button" onclick="cancelFileSelect()" class="cancelButton">Cancel</button>
 </div>
 <div class="restart hidden">
 	<button type="button" onclick="location.reload()">Restart Game</button>
@@ -418,32 +522,19 @@ var Module = {
     totalDependencies: 0,
     monitorRunDependencies: function(e) {
         this.totalDependencies = Math.max(this.totalDependencies, e), Module.setStatus(e ? "Preparing... (" + (this.totalDependencies - e) + "/" + this.totalDependencies + ")" : "All downloads complete.")
-		if(!e){
-			if(FS.analyzePath("/sonic3air/config.json", true).exists === true){
-				//Done downloading or retrieving from IDBFS the game data
-				FS.mkdir('/sonic3air/savedata');
-				
-				//BrowserFS.configure() takes some time to run so we need to make sure it's done before we try to mount it.
-				BrowserFS.configure({
-					fs: "AsyncMirror",
-					options: {
-						sync: { fs: "InMemory" },
-						async: { fs: "IndexedDB",
-							options: {
-								storeName : "sonic3air_savedata"
-							}
-						}
+        if(!e){
+            if(FS.analyzePath("/sonic3air/config.json", true).exists === true){
+                //Done downloading or retrieving from IDBFS the game data
+                FS.mkdir('/sonic3air/savedata');
+                FS.mount(IDBFS, {}, '/sonic3air/savedata');
+				FS.syncfs(true, function(err) {
+					if(err) {
+						console.warn('IDBFS sync error:', err);
 					}
-				}, function(e) {
-					if (e) {
-						throw e; // An error occurred.
-					}
-					// Otherwise, BrowserFS is ready to use!
 					onDownloadsComplete();
 				});
-				
-			}
-		}
+            }
+        }
     }
 };
 Module.setStatus("Downloading..."), window.onerror = function(e) {

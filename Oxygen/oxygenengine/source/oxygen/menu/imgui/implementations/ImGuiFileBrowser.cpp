@@ -21,6 +21,8 @@
 
 #if defined(PLATFORM_ANDROID)
 	#include "oxygen/platform/android/AndroidJavaInterface.h"
+#elif defined(PLATFORM_WEB)
+	#include <emscripten.h>
 #endif
 
 #if defined(PLATFORM_WINDOWS)
@@ -36,6 +38,9 @@ namespace
 {
 	static const ImVec4 FILE_COLOR(0.6f, 0.8f, 1.0f, 1.0f);		// Only used if file name is meant to be highlighted
 	static const ImVec4 FOLDER_COLOR(1.0f, 1.0f, 0.6f, 1.0f);
+#if defined(PLATFORM_WEB)
+	ImGuiFileBrowser* sActiveFileBrowser = nullptr;
+#endif
 
 	void drawFileSize(uint64 fileSize)
 	{
@@ -104,7 +109,6 @@ namespace
 	}
 }
 
-
 ImGuiFileBrowser::ImGuiFileBrowser()
 {
 	FileHelper::loadTexture(mFolderIconTexture, L"data/images/menu/filebrowser/icon_folder_32.png");
@@ -114,6 +118,9 @@ ImGuiFileBrowser::ImGuiFileBrowser()
 
 void ImGuiFileBrowser::buildImGuiContent()
 {
+#if defined(PLATFORM_WEB)
+	sActiveFileBrowser = this;
+#endif
 	if (ImGui::Begin("Fullscreen File Browser", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
 	{
 		ImGui::SetWindowPos(ImVec2((float)FTX::screenWidth() * 0.05f, (float)FTX::screenHeight() * 0.01f), ImGuiCond_Always);
@@ -272,6 +279,16 @@ void ImGuiFileBrowser::refreshFileEntries()
 	mRefreshFileEntries = false;
 }
 
+#if defined(PLATFORM_WEB)
+	extern "C" EMSCRIPTEN_KEEPALIVE void ImGuiFileBrowser_OnWebImportDone()
+	{
+		if (sActiveFileBrowser != nullptr)
+		{
+			sActiveFileBrowser->refreshFileEntries();
+		}
+	}
+#endif
+
 void ImGuiFileBrowser::drawFileBrowser()
 {
 	const std::wstring* clickedDirectory = nullptr;
@@ -302,7 +319,7 @@ void ImGuiFileBrowser::drawFileBrowser()
 		mActionsMenuPosition.y += mUIScale * 23.0f;
 	}
 
-#if defined(PLATFORM_ANDROID) || defined(DEBUG)
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(DEBUG)
 	// "Import file" button
 	ImGui::SameLine();
 	if (ImGui::Button("Import file..."))
@@ -310,6 +327,12 @@ void ImGuiFileBrowser::drawFileBrowser()
 	#if defined(PLATFORM_ANDROID)
 		AndroidJavaInterface& javaInterface = AndroidJavaInterface::instance();
 		javaInterface.openFileSelectionDialog();
+	#elif defined(PLATFORM_WEB)
+		const std::string uploadPath = rmx::convertToUTF8(mFullPath);
+		EM_ASM({
+			window.__s3airFileUploadPath = UTF8ToString($0);
+			triggerFileSelect();
+		}, uploadPath.c_str());
 	#endif
 	}
 #endif
@@ -616,17 +639,25 @@ void ImGuiFileBrowser::drawActionsMenu(bool openMenuNow)
 			}
 			ImGui::EndDisabled();
 
-		#if defined(PLATFORM_ANDROID)
+		#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
 			ImGui::Separator();
 
 			if (ImGui::Button("Export file...", BUTTON_SIZE))
 			{
+				#if defined(PLATFORM_ANDROID)
 				std::vector<uint8> contents;
 				if (FTX::FileSystem->readFile(mOpenActionsForFile->mPath + mOpenActionsForFile->mFilename, contents))
 				{
 					AndroidJavaInterface& javaInterface = AndroidJavaInterface::instance();
 					javaInterface.openFileExportDialog(mOpenActionsForFile->mFilename, contents);
 				}
+				#elif defined(PLATFORM_WEB)
+				const std::wstring filePath = mOpenActionsForFile->mPath + mOpenActionsForFile->mFilename;
+				const std::string filePathUtf8 = rmx::convertToUTF8(filePath);
+				EM_ASM({
+					window.fileManagerExportFile(UTF8ToString($0));
+				}, filePathUtf8.c_str());
+				#endif
 				ImGui::CloseCurrentPopup();
 			}
 		#endif
@@ -718,6 +749,25 @@ void ImGuiFileBrowser::drawRenamingPopup(bool openPopupNow)
 {
 	static ImGuiHelpers::WideInputString newNameInput;
 	bool performRenaming = false;
+
+#if defined(PLATFORM_WEB)
+	if (openPopupNow)
+	{
+		if (nullptr == mOpenActionsForFile && nullptr == mOpenActionsForDirectory)
+		{
+			return;
+		}
+
+		const bool isFile = (nullptr != mOpenActionsForFile);
+		const std::wstring oldName = isFile ? mOpenActionsForFile->mFilename : *mOpenActionsForDirectory;
+		const std::string oldNameUtf8 = rmx::convertToUTF8(oldName);
+		const std::string currentPathUtf8 = rmx::convertToUTF8(mFullPath);
+		EM_ASM({
+			window.fileManagerPromptRename(UTF8ToString($0), UTF8ToString($1), $2);
+		}, oldNameUtf8.c_str(), currentPathUtf8.c_str(), isFile ? 1 : 0);
+		return;
+	}
+#endif
 
 	if (openPopupNow)
 	{
