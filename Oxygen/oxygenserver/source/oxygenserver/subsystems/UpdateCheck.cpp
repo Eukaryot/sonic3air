@@ -37,11 +37,11 @@ UpdateCheck::UpdateCheck()
 		definition.mUpdateURL = "https://sonic3air.org";
 	}
 
-#if 0
+#if 1
 	// Preview version
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x23111800;
+		definition.mVersionNumber = 0x26022800;
 		definition.mReleaseChannel = ReleaseChannel::PREVIEW;
 		definition.addPlatform(Platform::WINDOWS);
 		definition.addPlatform(Platform::MAC);
