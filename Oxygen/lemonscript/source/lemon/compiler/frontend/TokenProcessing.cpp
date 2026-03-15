@@ -907,8 +907,8 @@ namespace lemon
 							{
 								variable = &identifierToken.mResolved->as<Variable>();
 							}
-							CHECK_ERROR(nullptr != constantArray || nullptr != variable, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
 						}
+						CHECK_ERROR(nullptr != constantArray || nullptr != variable, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
 					}
 				}
 
