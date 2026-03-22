@@ -25,6 +25,13 @@
   <ItemGroup>
     <None Include="..\..\script\mainscript.lemon" />
     <None Include="..\..\script\script01.lemon" />
+    <None Include="..\..\script\testcode\arrays.lemon" />
+    <None Include="..\..\script\testcode\bools.lemon" />
+    <None Include="..\..\script\testcode\constants.lemon" />
+    <None Include="..\..\script\testcode\floats.lemon" />
+    <None Include="..\..\script\testcode\ifelse.lemon" />
+    <None Include="..\..\script\testcode\objecthandle.lemon" />
+    <None Include="..\..\script\testcode\strings.lemon" />
     <None Include="..\..\script\unittests.lemon" />
     <None Include="..\..\source\NativizedCode.inc" />
   </ItemGroup>

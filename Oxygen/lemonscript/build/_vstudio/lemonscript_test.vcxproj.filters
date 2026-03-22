@@ -6,19 +6,43 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\source\NativizedCode.inc" />
-    <None Include="..\..\script\unittests.lemon">
-      <Filter>script</Filter>
-    </None>
     <None Include="..\..\script\mainscript.lemon">
       <Filter>script</Filter>
     </None>
     <None Include="..\..\script\script01.lemon">
       <Filter>script</Filter>
     </None>
+    <None Include="..\..\script\testcode\ifelse.lemon">
+      <Filter>script\testcode</Filter>
+    </None>
+    <None Include="..\..\script\testcode\objecthandle.lemon">
+      <Filter>script\testcode</Filter>
+    </None>
+    <None Include="..\..\script\testcode\strings.lemon">
+      <Filter>script\testcode</Filter>
+    </None>
+    <None Include="..\..\script\testcode\arrays.lemon">
+      <Filter>script\testcode</Filter>
+    </None>
+    <None Include="..\..\script\testcode\bools.lemon">
+      <Filter>script\testcode</Filter>
+    </None>
+    <None Include="..\..\script\testcode\constants.lemon">
+      <Filter>script\testcode</Filter>
+    </None>
+    <None Include="..\..\script\testcode\floats.lemon">
+      <Filter>script\testcode</Filter>
+    </None>
+    <None Include="..\..\script\unittests.lemon">
+      <Filter>script</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="script">
       <UniqueIdentifier>{5f7b3add-d3da-4165-9193-c915507cf69a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script\testcode">
+      <UniqueIdentifier>{8d46234b-017c-446c-9636-307f84669c5e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -33,9 +33,10 @@ namespace lemon
 	{
 		enum class Code
 		{
-			UNDEFINED					= 0,		// Should not be used at all
-			DEPRECATED_FUNCTION			= 0x0100,
-			DEPRECATED_FUNCTION_ALIAS	= 0x0101,
+			UNDEFINED						= 0,		// Should not be used at all
+			DEPRECATED_FUNCTION				= 0x0100,
+			DEPRECATED_FUNCTION_ALIAS		= 0x0101,
+			UNDEFINED_ORDER_OF_OPERATIONS	= 0x0200,	// When the order of operations is undefined, but matters as one of the operations influences the result of the other
 		};
 
 		struct Occurrence

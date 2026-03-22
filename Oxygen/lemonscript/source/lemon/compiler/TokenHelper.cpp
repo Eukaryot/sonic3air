@@ -31,4 +31,10 @@ namespace lemon
 	{
 		return (token.isA<ParenthesisToken>() && token.as<ParenthesisToken>().mParenthesisType == parenthesisType);
 	}
+
+	bool isAssignment(const Token& token)
+	{
+		const BinaryOperationToken* bot = token.cast<BinaryOperationToken>();
+		return (nullptr != bot && OperatorHelper::isAssignment(bot->mOperator));
+	}
 }

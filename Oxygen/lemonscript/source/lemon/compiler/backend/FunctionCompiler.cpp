@@ -9,7 +9,9 @@
 #include "lemon/pch.h"
 #include "lemon/compiler/backend/FunctionCompiler.h"
 #include "lemon/compiler/backend/OpcodeOptimization.h"
+#include "lemon/compiler/Compiler.h"
 #include "lemon/compiler/Node.h"
+#include "lemon/compiler/TokenHelper.h"
 #include "lemon/compiler/TokenTypes.h"
 #include "lemon/compiler/TypeCasting.h"
 #include "lemon/compiler/Utility.h"
@@ -938,6 +940,8 @@ namespace lemon
 		{
 			const MemoryAccessToken& mat = bot.mLeft->as<MemoryAccessToken>();
 
+			checkForUndefinedOrderOfOperations(*mat.mAddress, *bot.mRight);
+
 			// Compile memory address calculation
 			compileTokenTreeToOpcodes(*mat.mAddress);
 
@@ -955,6 +959,8 @@ namespace lemon
 
 			CHECK_ERROR(nullptr != bracket.mSetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
 			// TODO: Also check the setter signature
+
+			checkForUndefinedOrderOfOperations(*bat.mParameter, *bot.mRight);
 
 			// First parameter is the variable ID
 			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
@@ -997,6 +1003,8 @@ namespace lemon
 		{
 			const MemoryAccessToken& mat = bot.mLeft->as<MemoryAccessToken>();
 
+			checkForUndefinedOrderOfOperations(*mat.mAddress, *bot.mRight);
+
 			// Compile memory address calculation
 			compileTokenTreeToOpcodes(*mat.mAddress);
 
@@ -1020,6 +1028,8 @@ namespace lemon
 
 			CHECK_ERROR(nullptr != bracket.mSetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
 			// TODO: Also check the setter signature
+
+			checkForUndefinedOrderOfOperations(*bat.mParameter, *bot.mRight);
 
 			// First parameter is the variable ID
 			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
@@ -1095,6 +1105,41 @@ namespace lemon
 		// Not the token's own data type, that does not work for comparisons
 		//  -> TODO: This is potentially dangerous for u8 * s8 multiplications!
 		addOpcode(opcodeType, leftToken->mDataType);
+	}
+
+	void FunctionCompiler::checkForUndefinedOrderOfOperations(const StatementToken& token1, const StatementToken& token2, bool alsoCheckReverseOrder) const
+	{
+		if (isAssignment(token1))
+		{
+			const VariableToken* var1 = token1.as<BinaryOperationToken>().mLeft->cast<VariableToken>();
+			if (nullptr == var1)
+				return;
+
+			const Token* foundToken = findInTokenTree(token2,
+				[&var1](const Token& token)
+			{
+				const VariableToken* var2 = token.cast<VariableToken>();
+				return (nullptr != var2 && var1->mVariable == var2->mVariable);
+			});
+
+			if (nullptr != foundToken)
+			{
+				ADD_WARNING(CompilerWarning::Code::UNDEFINED_ORDER_OF_OPERATIONS, "Variable '" << var1->mVariable->getName() << "' is both changed and used in the same statement, but the order of these operations is not defined", mLineNumber);
+				return;
+			}
+		}
+
+		if (alsoCheckReverseOrder)
+		{
+			if (token2.isA<ValueCastToken>())
+			{
+				checkForUndefinedOrderOfOperations(*token2.as<ValueCastToken>().mArgument, token1, false);
+			}
+			else
+			{
+				checkForUndefinedOrderOfOperations(token2, token1, false);
+			}
+		}
 	}
 
 	void FunctionCompiler::scopeBegin(int memoryToReserve)

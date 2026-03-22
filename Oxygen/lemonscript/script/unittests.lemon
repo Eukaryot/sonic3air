@@ -6,6 +6,7 @@ function void runTests()
 	runIntegerArithmeticTests()
 	runFloatArithmeticTests()
 	runConstantArraysTest()
+	runArraysTest()
 
 	debugLog("Done with all tests")
 }
@@ -151,4 +152,46 @@ function bool constantArraysTestC()
 	for (u8 k = 0; k < CONSTANT_ARRAY_LOCAL.length(); ++k)
 		sum = sum + CONSTANT_ARRAY_LOCAL[k]
 	return (sum == "Hello World!")
+}
+
+
+
+// ----- Arrays -----
+
+function void runArraysTest()
+{
+	if (!arraysTestA())
+		debugLog("Arrays test A failed")
+	if (!arraysTestB())
+		debugLog("Arrays test B failed")
+}
+
+function bool arraysTestA()
+{
+	u16 arr[10]
+	for (u16 k = 0; k < 30; ++k)	// Test both valid and invalid indices
+	{
+		if (arr[k] != 0)
+			return false
+		arr[k] = k + 13
+	}
+	for (u16 k = 0; k < 30; ++k)
+	{
+		u16 expectedValue = (k < arr.length()) ? (k + 13) : 0
+		if (arr[k] != expectedValue)
+			return false
+	}
+	return true
+}
+
+function bool arraysTestB()
+{
+	u16 arr[10]
+	u8 index = 2
+
+	// Order of operations is not defined in this case, so this should create a compiler warning
+	//  -> However, we still test it for what we expect from the current implementation,
+	//     namely that the left side is executed first
+	arr[index += 1] = index
+	return (arr[2] == 0) && (arr[3] == 3)
 }

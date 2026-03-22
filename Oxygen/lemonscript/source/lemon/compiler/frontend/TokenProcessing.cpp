@@ -1525,9 +1525,8 @@ namespace lemon
 			case BinaryOperationToken::TYPE:
 			{
 				BinaryOperationToken& bot = token.as<BinaryOperationToken>();
-				const OperatorHelper::OperatorType opType = OperatorHelper::getOperatorType(bot.mOperator);
-				const bool isSymmetric = (opType == OperatorHelper::OperatorType::SYMMETRIC || opType == OperatorHelper::OperatorType::SYMMETRIC_INT);
-				const bool isAssignment = (opType == OperatorHelper::OperatorType::ASSIGNMENT || opType == OperatorHelper::OperatorType::ASSIGNMENT_INT);
+				const bool isSymmetric = OperatorHelper::isSymmetric(bot.mOperator);
+				const bool isAssignment = OperatorHelper::isAssignment(bot.mOperator);
 				const DataTypeDefinition* expectedType = isSymmetric ? resultType : nullptr;
 
 				const DataTypeDefinition* leftDataType = assignStatementDataType(*bot.mLeft, expectedType);
@@ -1545,7 +1544,7 @@ namespace lemon
 					// Default behavior: Use the found signature
 					bot.mDataType = result.mSignature->mResult;
 
-					if (opType != OperatorHelper::OperatorType::TRINARY)
+					if (OperatorHelper::getOperatorType(bot.mOperator) != OperatorHelper::OperatorType::TRINARY)
 					{
 						// Add implicit casts where needed
 						insertCastTokenIfNecessary(bot.mLeft, result.mSignature->mLeft);

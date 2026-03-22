@@ -58,6 +58,8 @@ namespace lemon
 		void compileBinaryAssignmentToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType);
 		void compileBinaryOperationToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType);
 
+		void checkForUndefinedOrderOfOperations(const StatementToken& token1, const StatementToken& token2, bool alsoCheckReverseOrder = true) const;
+
 		void scopeBegin(int numVariables);
 		void scopeEnd(int numVariables);
 
