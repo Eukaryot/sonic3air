@@ -1,4 +1,4 @@
-var _cacheName = 'sonic3air-v20260228';
+var _cacheName = 'sonic3air-v20260328';
 var _cacheFiles = [
 	'sonic3air_web.html',
 	'sonic3air_web.js',
@@ -7,7 +7,7 @@ var _cacheFiles = [
 	'manifest.json',
 	'icon.png'
 ];
-	
+
 self.addEventListener('install', (e) => {
 	console.log('[Service Worker] Install');
 	e.waitUntil(
