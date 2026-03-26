@@ -34,6 +34,7 @@ public:
 		NORMAL_GAME,	// Normal game (started from the menu)
 		ACT_SELECT,		// Act Select mode
 		TIME_ATTACK,	// Time Attack mode
+		EXTRAS,			// Extras mode
 		COMPETITION,	// Competition mode
 		BLUE_SPHERE,	// Blue Sphere game mode
 		MAIN_MENU_BG	// Main menu background
@@ -56,6 +57,7 @@ public:
 	void startIntoTitleScreen();
 	void startIntoDataSelect();
 	void startIntoActSelect();
+	void startIntoExtras();
 	void startIntoLevel(Mode mode, uint32 submode, uint16 zoneAndAct, uint8 characters);
 	void restartLevel();
 	void restartAtCheckpoint();
