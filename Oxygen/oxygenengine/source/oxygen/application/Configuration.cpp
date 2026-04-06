@@ -633,6 +633,8 @@ void Configuration::serializeDevMode(JsonSerializer& serializer)
 
 		if (serializer.beginObject("DevModeUI"))
 		{
+			serializer.serialize("GameViewScale", mDevMode.mGameViewScale);
+			serializer.serializeVectorAsString("GameViewAlignment", mDevMode.mGameViewAlignment);
 			serializer.serialize("Scale", mDevMode.mUIScale);
 			serializer.serializeHexColorRGB("AccentColor", mDevMode.mUIAccentColor);
 			serializer.serialize("ScrollByDragging", mDevMode.mScrollByDragging);

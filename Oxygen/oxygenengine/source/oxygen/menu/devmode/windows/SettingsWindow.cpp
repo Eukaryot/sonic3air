@@ -125,7 +125,10 @@ void SettingsWindow::buildContent()
 	{
 		ImGuiHelpers::ScopedIndent si;
 
-		ImGui::SliderFloat("Size", &config.mDevMode.mGameViewScale, 0.2f, 1.0f, "%.2f");
+		ImGui::SliderFloat("Size", &config.mDevMode.mGameViewScale, 0.2f, 2.0f, "%.2f");
+		ImGui::SameLine();
+		if (ImGui::Button("Reset"))
+			config.mDevMode.mGameViewScale = 1.0f;
 
 		ImGui::SliderFloat("Alignment X", &config.mDevMode.mGameViewAlignment.x, -1.0f, 1.0f, "%.3f");
 		ImGui::SameLine();
