@@ -86,7 +86,7 @@ void DebugLogWindow::buildContent()
 						continue;
 					}
 
-					const uint32 key = (((uint32)entry.mEntries.size() << 16) + ((uint32)i << 24)) ^ (uint32)rmx::getMurmur2_64(singleEntry.mValue) ^ (uint32)(rmx::getMurmur2_64(pair.first) << 1);
+					const uint32 key = (((uint32)entry.mEntries.size() << 20) + ((uint32)i << 16)) ^ (uint32)rmx::getMurmur2_64(singleEntry.mValue) ^ (uint32)(rmx::getMurmur2_64(pair.first) << 1);
 
 					ImGui::PushID(key);
 					ImGui::PushStyleColor(ImGuiCol_Text, color);
