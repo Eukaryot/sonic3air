@@ -19,25 +19,16 @@ UpdateCheck::UpdateCheck()
 	// Stable version
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x24020201;
+		definition.mVersionNumber = 0x26032800;
 		definition.mReleaseChannel = ReleaseChannel::STABLE;
 		definition.addPlatform(Platform::WINDOWS);
 		definition.addPlatform(Platform::MAC);
 		definition.addPlatform(Platform::LINUX);
 		definition.addPlatform(Platform::ANDROID);
-		definition.mUpdateURL = "https://sonic3air.org";
-	}
-
-	// Stable version (Web)
-	{
-		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x24020200;
-		definition.mReleaseChannel = ReleaseChannel::STABLE;
 		definition.addPlatform(Platform::WEB);
 		definition.mUpdateURL = "https://sonic3air.org";
 	}
 
-#if 1
 	// Preview version
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
@@ -50,7 +41,6 @@ UpdateCheck::UpdateCheck()
 		definition.addPlatform(Platform::WEB);
 		definition.mUpdateURL = "https://sonic3air.org";
 	}
-#endif
 
 	// Test build (Windows)
 	{
