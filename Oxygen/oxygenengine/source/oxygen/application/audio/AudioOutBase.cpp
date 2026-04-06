@@ -35,8 +35,23 @@ void AudioOutBase::startup()
 
 	// Load audio definitions
 	//  -> No mods yet here, that's coming later in "handleGameLoaded"
-	mAudioCollection.loadFromJson(L"data/audio/original", L"audio_default.json", AudioCollection::Package::ORIGINAL);
-	reloadRemasteredSoundtrack();
+	if (FTX::FileSystem->exists(L"data/audio/original"))
+	{
+		// Game is used differentiation between original and remastered soundtrack (namely S3AIR)
+		mAudioCollection.loadFromJson(L"data/audio/original", L"audio_default.json", AudioCollection::Package::ORIGINAL);
+		reloadRemasteredSoundtrack();
+	}
+	else
+	{
+		// Simply load any JSON from "data/audio"
+		std::vector<rmx::FileIO::FileEntry> fileEntries;
+		fileEntries.reserve(8);
+		FTX::FileSystem->listFilesByMask(L"data/audio/*.json", true, fileEntries);
+		for (const rmx::FileIO::FileEntry& fileEntry : fileEntries)
+		{
+			mAudioCollection.loadFromJson(fileEntry.mPath, fileEntry.mFilename, AudioCollection::Package::ORIGINAL);
+		}
+	}
 
 	// Startup
 	mAudioPlayer.startup();
