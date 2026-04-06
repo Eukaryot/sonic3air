@@ -552,27 +552,28 @@ void GameView::update(float timeElapsed)
 	{
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
-			if (!FTX::System->wasEventConsumed() && (FTX::keyChange(',') || FTX::keyChange('.') || FTX::keyChange('-')))
+			if (!FTX::System->wasEventConsumed() && (FTX::keyChange(',') || FTX::keyChange('.') || FTX::keyChange('-') || FTX::keyChange(SDLK_LALT) || FTX::keyChange(SDLK_RALT)))
 			{
 				mDebugVisualizations.mDebugOutput = -1;
 				if (FTX::keyState(','))
 				{
 					// Debug output for plane B
-					mDebugVisualizations.mDebugOutput = 0;
+					mDebugVisualizations.mDebugOutput = PlaneManager::PLANE_B;
 				}
 				else if (FTX::keyState('.'))
 				{
 					// Debug output for plane A or W
-					mDebugVisualizations.mDebugOutput = (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT)) ? 2 : 1;
+					mDebugVisualizations.mDebugOutput = (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT)) ? PlaneManager::PLANE_W : PlaneManager::PLANE_A;
 				}
 				else if (FTX::keyState('-'))
 				{
 					// Debug output for patterns
-					mDebugVisualizations.mDebugOutput = 3;
+					mDebugVisualizations.mDebugOutput = PlaneManager::PLANE_DEBUG;
 				}
 			}
 
 			DebugTracking& debugTracking = Application::instance().getSimulation().getCodeExec().getDebugTracking();
+			debugTracking.clearScriptLogValue("$plane");
 			debugTracking.clearScriptLogValue("~index");
 			debugTracking.clearScriptLogValue("~addr");
 			debugTracking.clearScriptLogValue("~ptrn");
@@ -582,7 +583,7 @@ void GameView::update(float timeElapsed)
 				// Get the mouse position inside the debug output
 				PlaneManager& planeManager = VideoOut::instance().getRenderParts().getPlaneManager();
 				Rectf rect;
-				if (mDebugVisualizations.mDebugOutput <= PlaneManager::PLANE_A)
+				if (mDebugVisualizations.mDebugOutput <= PlaneManager::PLANE_W)
 				{
 					const Vec2i playfieldSize = planeManager.getPlayfieldSizeInPixels();
 					rect = RenderUtils::getLetterBoxRect(mRect, (float)playfieldSize.x / (float)playfieldSize.y);
@@ -597,7 +598,11 @@ void GameView::update(float timeElapsed)
 				{
 					const uint32 index = (int)(relativePosition.x * 64.0f) + (int)(relativePosition.y * 32.0f) * 64;
 					debugTracking.updateScriptLogValue("~index", rmx::hexString(index, 4));
-					if (mDebugVisualizations.mDebugOutput < 2)
+
+					static const char* PLANE_NAMES[4] = { "Plane B", "Plane A", "Plane W", "VRAM Patterns" };
+					debugTracking.updateScriptLogValue("$plane", PLANE_NAMES[mDebugVisualizations.mDebugOutput - PlaneManager::PLANE_B]);
+
+					if (mDebugVisualizations.mDebugOutput <= PlaneManager::PLANE_W)
 					{
 						const uint16 address = planeManager.getPatternVRAMAddress(mDebugVisualizations.mDebugOutput, (uint16)index);
 						const uint16 pattern = planeManager.getPatternAtIndex(mDebugVisualizations.mDebugOutput, (uint16)index);

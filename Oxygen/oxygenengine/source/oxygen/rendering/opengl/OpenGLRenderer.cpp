@@ -262,7 +262,7 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 void OpenGLRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
 {
 	// Debug rendering
-	if (debugDrawMode <= PlaneManager::PLANE_A)
+	if (debugDrawMode <= PlaneManager::PLANE_W)
 	{
 		const Vec2i playfieldSize = mRenderParts.getPlaneManager().getPlayfieldSizeInPixels();
 		glViewport_Recti(RenderUtils::getLetterBoxRect(rect, (float)playfieldSize.x / (float)playfieldSize.y));

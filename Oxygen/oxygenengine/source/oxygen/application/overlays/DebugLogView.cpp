@@ -90,9 +90,12 @@ void DebugLogView::render()
 				const Color color(brightness, brightness, brightness);
 
 				rect.x = logRect.x + 10;
-				drawer.printText(mFont, rect, (pair.first + ":"), 1, color);
+				if (pair.first[0] != '$')
+				{
+					drawer.printText(mFont, rect, (pair.first + ":"), 1, color);
+					rect.x += maxKeyWidth;
+				}
 
-				rect.x += maxKeyWidth;
 				if (hasCurrent)
 				{
 					for (const DebugTracking::ScriptLogSingleEntry& singleEntry : entry.mEntries)
