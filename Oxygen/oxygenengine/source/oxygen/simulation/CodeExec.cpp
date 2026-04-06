@@ -450,12 +450,12 @@ void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enfo
 		if (!success || mLemonScriptRuntime.getCallStackSize() == 0)
 		{
 			// Start from scratch
-			mLemonScriptRuntime.callFunctionByName("scriptMainEntryPoint", true);
+			mLemonScriptRuntime.callFunctionByName("Engine.scriptMainEntryPoint", true);
 		}
 	}
 
 	// Execute init once
-	mLemonScriptRuntime.callFunctionByName("Init", false);
+	mLemonScriptRuntime.callFunctionByName("Engine.onScriptInitialization", false);
 
 	EngineMain::getDelegate().onRuntimeInit(*this);
 

@@ -12,6 +12,11 @@
 // Called by C++ code (engine or S3AIR application)      //
 //-------------------------------------------------------//
 
+function void Engine.onScriptInitialization()
+{
+	Init()
+}
+
 function void Init()
 {
 	//global.chaos_emeralds = 7

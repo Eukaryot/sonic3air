@@ -12,6 +12,11 @@
 // Entry functions for Standalone                        //
 //-------------------------------------------------------//
 
+function void Engine.scriptMainEntryPoint()
+{
+	scriptMainEntryPoint()
+}
+
 function void scriptMainEntryPoint()
 {
 	if (SHCSplash.shouldShowUpAfterStartup())
