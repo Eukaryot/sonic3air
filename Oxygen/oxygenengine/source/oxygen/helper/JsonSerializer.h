@@ -29,6 +29,7 @@ public:
 	bool serializeHexValue(const char* key, int& value, int numHexDigits);
 	bool serializeComponents(const char* key, Vec2i& value);
 	bool serializeVectorAsSizeString(const char* key, Vec2i& value);
+	bool serializeVectorAsString(const char* key, Vec2f& value);
 	bool serializeHexColorRGB(const char* key, Color& value);
 	bool serializeArray(const char* key, std::vector<std::string>& value);
 

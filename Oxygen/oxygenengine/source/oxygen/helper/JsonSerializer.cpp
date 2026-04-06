@@ -119,6 +119,30 @@ bool JsonSerializer::serializeVectorAsSizeString(const char* key, Vec2i& value)
 	}
 }
 
+bool JsonSerializer::serializeVectorAsString(const char* key, Vec2f& value)
+{
+	if (mReading)
+	{
+		std::string str;
+		serialize(key, str);
+		std::vector<String> components;
+		String(str).split(components, ',');
+		if (components.size() < 2)
+			return false;
+
+		components[0].trimWhitespace();
+		components[1].trimWhitespace();
+		value.x = (float)atof(*components[0]);
+		value.y = (float)atof(*components[1]);
+		return true;
+	}
+	else
+	{
+		std::string str = *String(0, "%f, %f", value.x, value.y);
+		return serialize(key, str);
+	}
+}
+
 bool JsonSerializer::serializeHexColorRGB(const char* key, Color& value)
 {
 	std::string str;
