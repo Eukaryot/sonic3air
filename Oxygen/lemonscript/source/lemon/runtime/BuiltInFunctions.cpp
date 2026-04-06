@@ -170,13 +170,13 @@ namespace lemon
 				case Variable::Type::LOCAL:
 				{
 					LocalVariable& var = context->mControlFlow.getCurrentFunction()->getLocalVariableByID(array.mVariableID);
-					return getArraySize(var);
+					return (uint32)getArraySize(var);
 				}
 
 				case Variable::Type::GLOBAL:
 				{
 					GlobalVariable& var = context->mControlFlow.getProgram().getGlobalVariableByID(array.mVariableID).as<GlobalVariable>();
-					return getArraySize(var);
+					return (uint32)getArraySize(var);
 				}
 
 				default:
