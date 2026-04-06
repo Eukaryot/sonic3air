@@ -441,8 +441,23 @@ void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enfo
 			{
 				std::string str;
 				for (uint32 i : callstack)
-					str += " " + rmx::hexString(i, 8, "");
-				RMX_ERROR("Save state stack could not be represented in lemon script:\n" + str, );
+				{
+					if (!str.empty())
+						str += ", ";
+					str += "\"" + rmx::hexString(i, 6) + "\"";
+				}
+
+			#if defined(PLATFORM_IS_DESKTOP)
+				if (EngineMain::getDelegate().useDeveloperFeatures())
+				{
+					SDL_SetClipboardText(str.c_str());
+					RMX_ERROR("Save state stack could not be represented in lemon script:\n" << str << "\n\nSave state stack was copied to the clipboard.", );
+				}
+				else
+			#endif
+				{
+					RMX_ERROR("Save state stack could not be represented in lemon script:\n" << str, );
+				}
 			}
 		}
 
