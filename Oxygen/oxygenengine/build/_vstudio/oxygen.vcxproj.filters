@@ -592,6 +592,9 @@
     <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\WatchesWindow.cpp">
       <Filter>menu\devmode\windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\audio\ChipWritesAudioSource.cpp">
+      <Filter>application\audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -1116,6 +1119,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\platform\PlatformFlags.h">
       <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\audio\ChipWritesAudioSource.h">
+      <Filter>application\audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

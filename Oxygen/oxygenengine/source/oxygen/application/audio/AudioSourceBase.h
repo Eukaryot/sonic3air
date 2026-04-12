@@ -11,9 +11,17 @@
 #include <rmxmedia.h>
 
 
-class AudioSourceBase
+class AudioSourceBase : public rmx::JobBase
 {
 public:
+	enum class AudioSourceType
+	{
+		UNDEFINED,
+		CHIP_WRITES,
+		EMULATION,
+		OGG_VORBIS
+	};
+
 	enum class CachingType
 	{
 		STREAMING_STATIC,	// Static sound, it's the same on each playback, and hence can be cached (e.g. normal music and most sound effects)
@@ -22,10 +30,10 @@ public:
 	};
 
 public:
-	AudioSourceBase(CachingType cachingType) : mCachingType(cachingType) {}
-	virtual ~AudioSourceBase() {}
+	AudioSourceBase(AudioSourceType type, CachingType cachingType);
+	virtual ~AudioSourceBase();
 
-	virtual bool isEmulationAudioSource() const	 { return false; }
+	inline AudioSourceType getAudioSourceType() const  { return mAudioSourceType; }
 
 	inline bool isDynamic() const			{ return (mCachingType != CachingType::STREAMING_STATIC); }
 	inline bool needsMinimalLag() const		{ return (mCachingType == CachingType::FULL_DYNAMIC); }
@@ -41,8 +49,8 @@ public:
 	AudioBuffer* startup();
 	void progress(float precacheTime);
 
-	void setLastUsedTimestamp(float timestamp)	  { mLastUsedTimestamp = timestamp; }
-	virtual bool checkForUnload(float timestamp)  { return false; }
+	void setLastUsedTimestamp(float timestamp)  { mLastUsedTimestamp = timestamp; }
+	virtual bool checkForUnload(float timestamp);
 
 	virtual float mapAudioRefPositionToTrackPosition(float audioRefPosition) const  { return audioRefPosition; }
 
@@ -57,13 +65,17 @@ protected:
 	};
 
 protected:
+	virtual void resetInternal() = 0;
 	virtual State startupInternal() = 0;
 	virtual void progressInternal(float targetTime) = 0;
 
 protected:
-	AudioBuffer mAudioBuffer;
+	AudioSourceType mAudioSourceType = AudioSourceType::UNDEFINED;
 	CachingType mCachingType = CachingType::STREAMING_STATIC;
+
+	AudioBuffer mAudioBuffer;
 	State mState = State::INACTIVE;
 	float mReadTime = 0.0f;
 	float mLastUsedTimestamp = 0.0f;
+	SDL_mutex* mMutex = nullptr;
 };

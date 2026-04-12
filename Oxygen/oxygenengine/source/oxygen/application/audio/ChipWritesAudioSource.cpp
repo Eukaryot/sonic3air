@@ -7,7 +7,7 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/application/audio/EmulationAudioSource.h"
+#include "oxygen/application/audio/ChipWritesAudioSource.h"
 #include "oxygen/application/Configuration.h"
 
 #if defined(PLATFORM_VITA) // For the emergency unloads
@@ -17,80 +17,80 @@
 #endif
 
 
-EmulationAudioSource::EmulationAudioSource(CachingType cachingType) :
-	AudioSourceBase(AudioSourceType::EMULATION, cachingType)
+ChipWritesAudioSource::ChipWritesAudioSource(bool useCaching) :
+	AudioSourceBase(AudioSourceType::CHIP_WRITES, useCaching ? CachingType::STREAMING_DYNAMIC : CachingType::STREAMING_STATIC)
 {
 	// Without caching, audio buffer content can be deleted as soon as it was played
 	mAudioBuffer.setPersistent(!isDynamic());
 }
 
-EmulationAudioSource::~EmulationAudioSource()
+ChipWritesAudioSource::~ChipWritesAudioSource()
 {
 }
 
-bool EmulationAudioSource::initWithSfxId(uint8 soundId)
+bool ChipWritesAudioSource::load(std::wstring_view filename)
 {
-	mSoundId = soundId;
-	return true;
-}
+	if (filename.empty())
+		return false;
 
-bool EmulationAudioSource::initWithCustomAddress(uint8 soundId, uint32 sourceAddress)
-{
-	mSoundId = soundId;
-	mSourceAddress = sourceAddress;
-	mSoundDriver.setSourceAddress(sourceAddress);
-	return true;
-}
-
-bool EmulationAudioSource::initWithCustomContent(uint8 soundId, const std::wstring& filename, uint32 contentOffset)
-{
-	mSoundId = soundId;
-	mFilename = filename;
-
-	if (!mFilename.empty())
+	std::vector<uint8> content;
+	if (!FTX::FileSystem->readFile(filename, content))
 	{
-		if (!FTX::FileSystem->readFile(filename, mCompressedContent))
+		RMX_ERROR("Failed to load audio file '" << *WString(filename).toString() << "': File not found", );
+		return false;
+	}
+
+	VectorBinarySerializer serializer(true, content);
+	mSoundChipWritesByFrame.emplace_back();
+
+	while (serializer.getRemaining() >= 4)
+	{
+		const uint32 input = serializer.read<uint32>();
+		if (input == 0)
 		{
-			RMX_ERROR("Failed to load audio file '" << *WString(filename).toString() << "': File not found", );
-			return false;
+			// Go to next frame
+			mSoundChipWritesByFrame.emplace_back();
+			continue;
 		}
-		mSoundDriver.setFixedContent(&mCompressedContent[0], (uint32)mCompressedContent.size(), contentOffset);
+
+		const uint32 cycles = (input & 0x7fffffff) >> 17;
+		const uint8 data = input & 0xff;
+		if (input & 0x80000000)
+		{
+			SoundChipWrite& scw = vectorAdd(mSoundChipWritesByFrame.back());
+			scw.mTarget = SoundChipWrite::Target::SN76489;
+			scw.mData = data;
+			scw.mCycles = cycles;
+			scw.mFrameNumber = (uint16)(mSoundChipWritesByFrame.size() - 1);
+		}
+		else
+		{
+			const uint16 address = (input >> 8) & 0x1ff;
+
+			SoundChipWrite& scw = vectorAdd(mSoundChipWritesByFrame.back());
+			scw.mTarget = (address & 0x100) ? SoundChipWrite::Target::YAMAHA_FMII : SoundChipWrite::Target::YAMAHA_FMI;
+			scw.mAddress = (uint8)address;
+			scw.mData = data;
+			scw.mCycles = cycles;
+			scw.mFrameNumber = (uint16)(mSoundChipWritesByFrame.size() - 1);
+		}
 	}
+
+	// Remove silence at the end
+	while (!mSoundChipWritesByFrame.empty() && mSoundChipWritesByFrame.back().empty())
+	{
+		mSoundChipWritesByFrame.pop_back();
+	}
+
 	return true;
 }
 
-void EmulationAudioSource::resetContent()
+void ChipWritesAudioSource::resetInternal()
 {
-	if (isJobRegistered())
-	{
-		FTX::JobManager->removeJob(*this);
-	}
-
-	mState = State::INACTIVE;	// This will also lead to audio buffer getting cleared
+	mCurrentFrame = 0;
 }
 
-void EmulationAudioSource::injectPlaySound(uint8 soundId)
-{
-	// Note: This should only be called for dynamic sounds
-	SDL_LockMutex(mMutex);
-	mSoundDriver.playSound(soundId);
-	mState = State::STREAMING;
-	SDL_UnlockMutex(mMutex);
-}
-
-void EmulationAudioSource::injectTempoSpeedup(uint8 tempoSpeedup)
-{
-	SDL_LockMutex(mMutex);
-	mSoundDriver.setTempoSpeedup(tempoSpeedup);
-	SDL_UnlockMutex(mMutex);
-}
-
-void EmulationAudioSource::resetInternal()
-{
-	mSoundDriver.reset();
-}
-
-AudioSourceBase::State EmulationAudioSource::startupInternal()
+AudioSourceBase::State ChipWritesAudioSource::startupInternal()
 {
 	if (isJobRegistered())
 	{
@@ -103,14 +103,12 @@ AudioSourceBase::State EmulationAudioSource::startupInternal()
 	mAudioBuffer.unlock();
 
 	mSoundEmulation.init(Configuration::instance().mAudio.mSampleRate, 60.0);
-	mSoundDriver.reset();
-	mSoundDriver.playSound(mSoundId);
 	SDL_UnlockMutex(mMutex);
 
 	return State::STREAMING;
 }
 
-void EmulationAudioSource::progressInternal(float precacheTime)
+void ChipWritesAudioSource::progressInternal(float precacheTime)
 {
 	mPrecacheTime = precacheTime;
 
@@ -135,7 +133,7 @@ void EmulationAudioSource::progressInternal(float precacheTime)
 	}
 }
 
-bool EmulationAudioSource::jobFunc()
+bool ChipWritesAudioSource::jobFunc()
 {
 	// This method is executed by a worker thread
 	SDL_LockMutex(mMutex);
@@ -146,14 +144,16 @@ bool EmulationAudioSource::jobFunc()
 	const float targetTime = clamp(mPrecacheTime, 0.025f, mAudioBuffer.getLengthInSec() + 0.002f);
 	while (mAudioBuffer.getLengthInSec() < targetTime && shouldJobBeRunning())
 	{
-		const SoundDriver::UpdateResult updateResult = mSoundDriver.update();
-		const std::vector<SoundChipWrite>& writes = mSoundDriver.getSoundChipWrites();
-		bool isPlaying = (updateResult == SoundDriver::UpdateResult::CONTINUE);
+		bool isPlaying = (mCurrentFrame < mSoundChipWritesByFrame.size());
+
+		static std::vector<SoundChipWrite> EMPTY_LIST;
+		const std::vector<SoundChipWrite>& writes = isPlaying ? mSoundChipWritesByFrame[mCurrentFrame] : EMPTY_LIST;
+		++mCurrentFrame;
 
 		static int16 soundBuffer[0x10000];
 		const uint32 length = mSoundEmulation.update(soundBuffer, writes);	// Returns length in samples
 
-		if (updateResult == SoundDriver::UpdateResult::FINISHED)
+		if (!isPlaying)
 		{
 			// Check if sound chips still produce output
 			for (uint32 i = 0; i < length * 2; ++i)

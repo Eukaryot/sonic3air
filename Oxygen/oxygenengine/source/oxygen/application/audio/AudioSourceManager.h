@@ -27,6 +27,7 @@ public:
 	size_t getMemoryUsage() const;
 
 private:
+	AudioSourceBase* addChipWritesAudioSource(std::wstring_view filename, bool useCaching = true);
 	AudioSourceBase* addEmulationAudioSource(uint8 soundId, AudioSourceBase::CachingType cachingType, const std::wstring& filename = L"", uint32 sourceAddress = 0, uint32 contentOffset = 0);
 	AudioSourceBase* addOggAudioSource(const std::wstring& filename, bool useCaching = true, bool isLooping = false, int loopStart = -1);
 

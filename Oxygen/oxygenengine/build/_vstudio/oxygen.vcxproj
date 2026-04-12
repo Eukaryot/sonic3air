@@ -25,6 +25,7 @@
     <ClCompile Include="..\..\source\oxygen\application\audio\AudioPlayer.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\audio\AudioSourceBase.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\audio\AudioSourceManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\audio\ChipWritesAudioSource.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\audio\EmulationAudioSource.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\audio\OggAudioSource.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\Configuration.cpp" />
@@ -189,6 +190,7 @@
     <ClInclude Include="..\..\source\oxygen\application\audio\AudioPlayer.h" />
     <ClInclude Include="..\..\source\oxygen\application\audio\AudioSourceBase.h" />
     <ClInclude Include="..\..\source\oxygen\application\audio\AudioSourceManager.h" />
+    <ClInclude Include="..\..\source\oxygen\application\audio\ChipWritesAudioSource.h" />
     <ClInclude Include="..\..\source\oxygen\application\audio\EmulationAudioSource.h" />
     <ClInclude Include="..\..\source\oxygen\application\audio\OggAudioSource.h" />
     <ClInclude Include="..\..\source\oxygen\application\Configuration.h" />

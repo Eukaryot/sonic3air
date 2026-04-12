@@ -653,7 +653,7 @@ AudioPlayer::PlayingSound* AudioPlayer::startOrContinuePlayback(SourceRegistrati
 		return nullptr;
 	}
 
-	if (audioSource->isEmulationAudioSource())
+	if (audioSource->getAudioSourceType() == AudioSourceBase::AudioSourceType::EMULATION)
 	{
 		RMX_CHECK(soundId < 0x100, "Emulation audio is only supported for audio IDs between 0x00 and 0xff", return nullptr);
 
@@ -865,7 +865,7 @@ void AudioPlayer::applyAudioModifierSingle(SoundIterator& iterator, std::string_
 	if (!playingSound.mAudioRef.valid())
 		return;
 
-	if (playingSound.mAudioSource->isEmulationAudioSource())
+	if (playingSound.mAudioSource->getAudioSourceType() == AudioSourceBase::AudioSourceType::EMULATION)
 	{
 		// Emulated audio source: Only music tempo speedup is supported
 		uint8 tempoSpeedup = 0;

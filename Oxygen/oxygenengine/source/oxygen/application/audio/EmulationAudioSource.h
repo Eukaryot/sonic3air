@@ -13,13 +13,11 @@
 #include "oxygen/simulation/sound/SoundDriver.h"
 
 
-class EmulationAudioSource : public AudioSourceBase, public rmx::JobBase
+class EmulationAudioSource : public AudioSourceBase
 {
 public:
-	EmulationAudioSource(CachingType cachingType);
+	explicit EmulationAudioSource(CachingType cachingType);
 	~EmulationAudioSource();
-
-	virtual bool isEmulationAudioSource() const override { return true; }
 
 	bool initWithSfxId(uint8 soundId);
 	bool initWithCustomAddress(uint8 soundId, uint32 sourceAddress);
@@ -29,9 +27,8 @@ public:
 	void injectPlaySound(uint8 soundId);
 	void injectTempoSpeedup(uint8 tempoSpeedup);
 
-	virtual bool checkForUnload(float timestamp) override;
-
 protected:
+	virtual void resetInternal() override;
 	virtual State startupInternal() override;
 	virtual void progressInternal(float targetTime) override;
 
@@ -47,6 +44,5 @@ private:
 	SoundEmulation mSoundEmulation;
 	SoundDriver mSoundDriver;
 
-	SDL_mutex* mMutex = nullptr;
 	float mPrecacheTime = 0.0f;
 };
