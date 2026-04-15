@@ -870,6 +870,17 @@ void ImGuiFileBrowser::drawCreateDirectoryPopup(bool openPopupNow)
 	bool performCreation = false;
 	static ImGuiHelpers::WideInputString directoryNameInput;
 
+#if defined(PLATFORM_WEB)
+	if (openPopupNow)
+	{
+		const std::string parentPath = rmx::convertToUTF8(mFullPath);
+		EM_ASM({
+			window.fileManagerPromptRename("", UTF8ToString($0), 0, 1);
+		}, parentPath.c_str());
+		return;
+	}
+#endif
+
 	if (openPopupNow)
 	{
 		ImGui::OpenPopup("FileBrowser_CreateDirectory");
