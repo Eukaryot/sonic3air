@@ -274,6 +274,9 @@ function void DataSelect.setup()
 	VDP.Config.setRenderingModeConfiguration(false)
 	VDP.Config.setPlayfieldSizeInPixels(1024, 256)
 	VDP.Config.setWindowPlaneSplitY(true, 0)
+#if STANDALONE
+	VDP.Config.setPlaneWScrollOffset(0, 0)
+#endif
 
 	zeroMemory(0xffffac00, 0x400)
 	zeroMemory(0xffffb000, 0x2000)

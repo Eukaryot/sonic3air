@@ -319,13 +319,16 @@ namespace
 	void VDP_Config_setWindowPlaneSplitX(uint8 rightSideWindow, uint16 splitX)
 	{
 		RenderParts::instance().getPlaneManager().setWindowPlaneSplitX(rightSideWindow != 0, splitX);
-		RenderParts::instance().getScrollOffsetsManager().setPlaneWScrollOffset(Vec2i(0, 0));	// Reset scroll offset to default
 	}
 
 	void VDP_Config_setWindowPlaneSplitY(uint8 bottomWindow, uint16 splitY)
 	{
 		RenderParts::instance().getPlaneManager().setWindowPlaneSplitY(bottomWindow != 0, splitY);
-		RenderParts::instance().getScrollOffsetsManager().setPlaneWScrollOffset(Vec2i(0, 0));	// Reset scroll offset to default
+	}
+
+	void VDP_Config_setRenderPlaneABehindW(bool renderPlaneABehindW)
+	{
+		RenderParts::instance().getPlaneManager().setRenderPlaneABehindW(renderPlaneABehindW);
 	}
 
 	void VDP_Config_setPlaneWScrollOffset(uint16 x, uint8 y)
@@ -1080,6 +1083,9 @@ void RendererBindings::registerBindings(lemon::Module& module)
 
 		builder.addNativeFunction("VDP.Config.setPlaneWScrollOffset", lemon::wrap(&VDP_Config_setPlaneWScrollOffset), defaultFlags)
 			.setParameters("x", "y");
+
+		builder.addNativeFunction("VDP.Config.setRenderPlaneABehindW", lemon::wrap(&VDP_Config_setRenderPlaneABehindW), defaultFlags)
+			.setParameters("renderPlaneABehindW");
 
 		builder.addNativeFunction("VDP.Config.setSpriteAttributeTableBase", lemon::wrap(&VDP_Config_setSpriteAttributeTableBase), defaultFlags)
 			.setParameters("vramAddress");

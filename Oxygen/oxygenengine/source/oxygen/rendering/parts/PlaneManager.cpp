@@ -264,29 +264,115 @@ void PlaneManager::setWindowPlaneSplitY(bool bottomWindow, uint16 splitY)
 	mPlaneAWSplitY = splitY;
 }
 
-Recti PlaneManager::getPlaneRect(int planeIndex, const Recti& fullscreenRect) const
+void PlaneManager::setRenderPlaneABehindW(bool renderPlaneABehindW)
 {
-	Recti output = fullscreenRect;
-	switch (planeIndex)
-	{
-		case PLANE_A:
-		case PLANE_W:
-		{
-			// TODO: Support mPlaneAWSplitX and mIsPlaneWRightOfSplitX
+	mRenderPlaneABehindW = renderPlaneABehindW;
+}
 
-			if (mIsPlaneWBelowSplitY == (planeIndex == PLANE_W))
+void PlaneManager::getPlaneRects(std::vector<PlaneRect>& output, const Recti& fullscreenRect) const
+{
+	output.clear();
+
+	const int splitX = clamp(mPlaneAWSplitX, 0, fullscreenRect.width);
+	const int splitY = clamp(mPlaneAWSplitY, 0, fullscreenRect.height);
+
+	Recti rectA = fullscreenRect;	// Rectangle where plane A is rendered (unless it's enforced to be fullscreen in any case)
+	Recti invA;						// Component-wise "inverse" of that rectangle: includes exactly the remaining intervals in both x and y directions individually
+	{
+		if (mIsPlaneWRightOfSplitX)
+		{
+			rectA.width = splitX;
+			invA.x = splitX;
+			invA.width = fullscreenRect.width - splitX;
+		}
+		else
+		{
+			invA.width = splitX;
+			rectA.x = splitX;
+			rectA.width = fullscreenRect.width - splitX;
+		}
+
+		if (mIsPlaneWBelowSplitY)
+		{
+			rectA.height = splitY;
+			invA.y = splitY;
+			invA.height = fullscreenRect.height - splitY;
+		}
+		else
+		{
+			invA.height = splitY;
+			rectA.y = splitY;
+			rectA.height = fullscreenRect.height - splitY;
+		}
+	}
+
+	// Plane B
+	PlaneRect& planeRectB = vectorAdd(output);
+	planeRectB.mPlane = PLANE_B;
+	planeRectB.mRect = fullscreenRect;
+
+	if (mRenderPlaneABehindW || !rectA.isEmpty())
+	{
+		// Plane A
+		PlaneRect& planeRectA = vectorAdd(output);
+		planeRectA.mPlane = PLANE_A;
+		planeRectA.mRect = mRenderPlaneABehindW ? fullscreenRect : rectA;
+	}
+
+	if (rectA != fullscreenRect)
+	{
+		// Plane W
+		PlaneRect& planeRectW = vectorAdd(output);
+		planeRectW.mPlane = PLANE_W;
+		planeRectW.mRect = fullscreenRect;
+
+		if (rectA.isEmpty())
+		{
+			// Plane W is fullscreen
+		}
+		else if (rectA.width == fullscreenRect.width)
+		{
+			// Plane W is full width, but limited height
+			planeRectW.mRect.y = invA.y;
+			planeRectW.mRect.height = invA.height;
+		}
+		else if (rectA.height == fullscreenRect.height)
+		{
+			// Plane W is full height, but limited width
+			planeRectW.mRect.x = invA.x;
+			planeRectW.mRect.width = invA.width;
+		}
+		else
+		{
+			// The screen is split both horizontally and vertically, and three of the four areas are covered by plane W
+			PlaneRect& planeRectW2 = vectorAdd(output);
+			planeRectW2.mPlane = PLANE_W;
+			planeRectW2.mRect = fullscreenRect;
+
+			if (rectA.y == 0)
 			{
-				output.y = mPlaneAWSplitY;
-				output.height -= mPlaneAWSplitY;
+				// Upper part is limited width
+				planeRectW.mRect.x = invA.x;
+				planeRectW.mRect.width = invA.width;
+				planeRectW.mRect.height = rectA.height;
+
+				// Lower part is full width
+				planeRectW2.mRect.y = invA.y;
+				planeRectW2.mRect.height = invA.height;
 			}
 			else
 			{
-				output.height = mPlaneAWSplitY;
+				// Upper part is full width
+				planeRectW.mRect.height = invA.height;
+
+				// Lower part is limited width
+				planeRectW2.mRect.x = invA.x;
+				planeRectW2.mRect.width = invA.width;
+				planeRectW2.mRect.y = rectA.y;
+				planeRectW2.mRect.height = rectA.height;
 			}
-			break;
 		}
 	}
-	return output;
 }
 
 void PlaneManager::dumpAsPaletteBitmap(PaletteBitmap& output, int planeIndex, bool highlightPrioPatterns) const
@@ -371,6 +457,11 @@ void PlaneManager::serializeSaveState(VectorBinarySerializer& serializer, uint8 
 		serializer.serialize(mNameTableBaseW);
 		serializer.serializeAs<uint8>(mIsPlaneWBelowSplitY);
 		serializer.serialize(mPlaneAWSplitY);
+
+		if (formatVersion >= 7)
+		{
+			serializer.serializeAs<uint8>(mRenderPlaneABehindW);
+		}
 
 		for (int k = 0; k < 4; ++k)
 		{

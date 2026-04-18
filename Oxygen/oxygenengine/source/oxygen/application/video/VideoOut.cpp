@@ -271,48 +271,37 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 	{
 		const PlaneManager& pm = mRenderParts->getPlaneManager();
 		const Recti fullscreenRect(0, 0, mGameResolution.x, mGameResolution.y);
-		Recti rectForPlaneB = pm.getPlaneRect(PlaneManager::PLANE_B, fullscreenRect);
-		Recti rectForPlaneA = pm.getPlaneRect(PlaneManager::PLANE_A, fullscreenRect);
-		Recti rectForPlaneW = pm.getPlaneRect(PlaneManager::PLANE_W, fullscreenRect);
 
-		// Plane B non-prio
-		if (mRenderParts->mLayerRendering[0] && pm.isDefaultPlaneEnabled(0))
-		{
-			geometries.push_back(&mGeometryFactory.createPlaneGeometry(rectForPlaneB, PlaneManager::PLANE_B, false, PlaneManager::PLANE_B, 0x1000));
-		}
+		static std::vector<PlaneManager::PlaneRect> planeRects;
+		pm.getPlaneRects(planeRects, fullscreenRect);
 
-		// Plane A (and possibly plane W) non-prio
-		if (mRenderParts->mLayerRendering[1] && pm.isDefaultPlaneEnabled(1))
+		// Render default planes
+		for (int pass = 0; pass < 2; ++pass)
 		{
-			if (rectForPlaneA.height > 0)
-			{
-				geometries.push_back(&mGeometryFactory.createPlaneGeometry(rectForPlaneA, PlaneManager::PLANE_A, false, PlaneManager::PLANE_A, 0x2000));
-			}
-			if (rectForPlaneW.height > 0)
-			{
-				geometries.push_back(&mGeometryFactory.createPlaneGeometry(rectForPlaneW, PlaneManager::PLANE_W, false, 0xff, 0x2000));
-			}
-		}
+			const bool priorityFlag = (pass == 1);
 
-		// Plane B prio
-		if (mRenderParts->mLayerRendering[4] && pm.isDefaultPlaneEnabled(2))
-		{
-			geometries.push_back(&mGeometryFactory.createPlaneGeometry(rectForPlaneB, PlaneManager::PLANE_B, true, PlaneManager::PLANE_B, 0x3000));
-		}
+			for (const PlaneManager::PlaneRect& planeRect : planeRects)
+			{
+				const int layerIndex = ((planeRect.mPlane == PlaneManager::PLANE_B) ? 0 : 1) + (priorityFlag ? 4 : 0);
 
-		// Plane A (and possibly plane W) prio
-		if (mRenderParts->mLayerRendering[5] && pm.isDefaultPlaneEnabled(3))
-		{
-			if (rectForPlaneA.height > 0)
-			{
-				geometries.push_back(&mGeometryFactory.createPlaneGeometry(rectForPlaneA, PlaneManager::PLANE_A, true, PlaneManager::PLANE_A, 0x4000));
-			}
-			if (rectForPlaneW.height > 0)
-			{
-				geometries.push_back(&mGeometryFactory.createPlaneGeometry(rectForPlaneW, PlaneManager::PLANE_W, true, 0xff, 0x4000));
+				if (mRenderParts->mLayerRendering[layerIndex] && pm.isDefaultPlaneEnabled(planeRect.mPlane))
+				{
+					uint8 scrollOffsets = (uint8)planeRect.mPlane;
+					int renderQueue;
+					switch (planeRect.mPlane)
+					{
+						default:
+						case PlaneManager::PLANE_B:  renderQueue = priorityFlag ? 0x3000 : 0x1000;  break;
+						case PlaneManager::PLANE_A:  renderQueue = priorityFlag ? 0x4000 : 0x2000;  break;
+						case PlaneManager::PLANE_W:  renderQueue = priorityFlag ? 0x4200 : 0x2200;  scrollOffsets = 0xff;  break;
+					}
+
+					geometries.push_back(&mGeometryFactory.createPlaneGeometry(planeRect.mRect, planeRect.mPlane, priorityFlag, scrollOffsets, renderQueue));
+				}
 			}
 		}
 
+		// render custom planes
 		if (!pm.getCustomPlanes().empty())
 		{
 			for (const auto& customPlane : pm.getCustomPlanes())
