@@ -385,25 +385,30 @@ function notifyFileImportDone() {
 	}
 }
 
-function fileManagerPromptRename(oldName, currentPath, isFile) {
+function fileManagerPromptRename(oldName, currentPath, isFile, isCreateDirectory) {
 	setTimeout(function() {
-		var title = isFile ? 'Rename file:' : 'Rename folder:';
-		var value = prompt(title, oldName);
+		var createDirMode = !!isCreateDirectory;
+		var title = createDirMode ? 'Create folder:' : (isFile ? 'Rename file:' : 'Rename folder:');
+		var value = prompt(title, oldName || '');
 		if (value === null) {
 			return;
 		}
 		value = value.trim();
-		if (value.length === 0 || value === oldName) {
+		if (value.length === 0 || (!createDirMode && value === oldName)) {
 			return;
 		}
 		if (/[\\/\*\?:\|<>\"]/.test(value)) {
 			return;
 		}
 		try {
-			FS.rename(currentPath + oldName, currentPath + value);
+			if (createDirMode) {
+				FS.mkdir(currentPath + value);
+			} else {
+				FS.rename(currentPath + oldName, currentPath + value);
+			}
 			notifyFileImportDone();
 		} catch (e) {
-			console.warn('Rename failed:', e);
+			console.warn(createDirMode ? 'Create folder failed:' : 'Rename failed:', e);
 		}
 	}, 0);
 }
