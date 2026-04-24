@@ -1,0 +1,40 @@
+﻿/*
+*	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
+*	Copyright (C) 2017-2026 by Eukaryot
+*
+*	Published under the GNU GPLv3 open source software license, see license.txt
+*	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+#pragma once
+
+#include "oxygen/menu/loui/LouiWidget.h"
+
+class Font;
+
+
+namespace loui
+{
+	class SimpleButton : public Widget
+	{
+	public:
+		enum class ButtonState
+		{
+			NORMAL,
+			HOVERED,
+			PRESSED,
+		};
+
+	public:
+		SimpleButton& init(const std::string_view text, FontWrapper& font, Vec2i size);
+
+		virtual void update(UpdateInfo& updateInfo) override;
+		virtual void render(RenderInfo& renderInfo) override;
+
+	protected:
+		std::string mText;
+		FontWrapper* mFont = nullptr;
+
+		ButtonState mButtonState = ButtonState::NORMAL;
+	};
+}

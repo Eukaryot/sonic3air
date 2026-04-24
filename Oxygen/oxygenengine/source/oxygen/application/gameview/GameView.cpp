@@ -12,6 +12,7 @@
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/audio/AudioOutBase.h"
+#include "oxygen/application/menu/SharedFonts.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/drawing/DrawerTexture.h"
 #include "oxygen/helper/FileHelper.h"
@@ -780,7 +781,8 @@ void GameView::render()
 		const double averageTime = Profiling::getRootRegion().mAverageTime;
 		if (averageTime > 0.0)
 		{
-			drawer.printText(EngineMain::getDelegate().getDebugFont(3), Vec2i(gameScreenRect.width - 3, 2), String(0, "%d FPS", roundToInt((float)(1.0 / averageTime))), 3);
+			Font& font = SharedFonts::smallFontOutline.getFontSafe();
+			drawer.printText(font, Vec2i(gameScreenRect.width - 3, 2), String(0, "%d FPS", roundToInt((float)(1.0 / averageTime))), 3);
 		}
 	}
 

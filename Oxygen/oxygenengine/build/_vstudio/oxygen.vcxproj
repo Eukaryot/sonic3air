@@ -39,7 +39,6 @@
     <ClCompile Include="..\..\source\oxygen\application\input\InputRecorder.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\RumbleEffectQueue.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\GameSetupScreen.cpp" />
-    <ClCompile Include="..\..\source\oxygen\application\menu\MenuItems.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\OxygenMenu.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\modding\Mod.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\modding\ModManager.cpp" />
@@ -105,6 +104,12 @@
     <ClCompile Include="..\..\source\oxygen\menu\imgui\ImGuiManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\imgui\ImGuiSoftwareRenderer.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\imgui\implementations\ImGuiFileBrowser.cpp" />
+    <ClCompile Include="..\..\source\oxygen\menu\loui\basics\SimpleButton.cpp" />
+    <ClCompile Include="..\..\source\oxygen\menu\loui\basics\SimpleLabel.cpp" />
+    <ClCompile Include="..\..\source\oxygen\menu\loui\basics\SimpleSelection.cpp" />
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiFontWrapper.cpp" />
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiVerticalLayout.cpp" />
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiWidget.cpp" />
     <ClCompile Include="..\..\source\oxygen\network\EngineServerClient.cpp" />
     <ClCompile Include="..\..\source\oxygen\network\netplay\ExternalAddressQuery.cpp" />
     <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayClient.cpp" />
@@ -204,8 +209,8 @@
     <ClInclude Include="..\..\source\oxygen\application\input\InputRecorder.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\RumbleEffectQueue.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\GameSetupScreen.h" />
-    <ClInclude Include="..\..\source\oxygen\application\menu\MenuItems.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\OxygenMenu.h" />
+    <ClInclude Include="..\..\source\oxygen\application\menu\SharedFonts.h" />
     <ClInclude Include="..\..\source\oxygen\application\modding\Mod.h" />
     <ClInclude Include="..\..\source\oxygen\application\modding\ModManager.h" />
     <ClInclude Include="..\..\source\oxygen\application\overlays\BackdropView.h" />
@@ -275,6 +280,13 @@
     <ClInclude Include="..\..\source\oxygen\menu\imgui\ImGuiManager.h" />
     <ClInclude Include="..\..\source\oxygen\menu\imgui\ImGuiSoftwareRenderer.h" />
     <ClInclude Include="..\..\source\oxygen\menu\imgui\implementations\ImGuiFileBrowser.h" />
+    <ClInclude Include="..\..\source\oxygen\menu\loui\basics\SimpleButton.h" />
+    <ClInclude Include="..\..\source\oxygen\menu\loui\basics\SimpleLabel.h" />
+    <ClInclude Include="..\..\source\oxygen\menu\loui\basics\SimpleSelection.h" />
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiDefinitions.h" />
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiFontWrapper.h" />
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiVerticalLayout.h" />
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiWidget.h" />
     <ClInclude Include="..\..\source\oxygen\network\EngineServerClient.h" />
     <ClInclude Include="..\..\source\oxygen\network\netplay\ExternalAddressQuery.h" />
     <ClInclude Include="..\..\source\oxygen\network\netplay\NetplayClient.h" />

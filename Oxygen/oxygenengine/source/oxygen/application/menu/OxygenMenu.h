@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "oxygen/application/menu/MenuItems.h"
+#include "oxygen/menu/loui/LouiVerticalLayout.h"
 #include <rmxmedia.h>
 
 
@@ -24,5 +24,6 @@ public:
 	virtual void render() override;
 
 private:
-	MenuItemContainer mMenuItems;
+	loui::UpdateInfo mUpdateInfo;
+	loui::VerticalLayout mRootWidget;
 };

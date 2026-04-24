@@ -63,7 +63,7 @@ struct FontKey : public FontSourceKey
 };
 
 
-class Font
+class Font : public rmx::WeakPtrTarget
 {
 public:
 	struct TypeInfo

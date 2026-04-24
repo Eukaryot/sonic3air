@@ -115,6 +115,12 @@
     <Filter Include="menu\devmode\windows">
       <UniqueIdentifier>{89c3dd34-ae44-4bd5-9227-c171ac17b9c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="menu\loui">
+      <UniqueIdentifier>{3b47f5e9-3779-49dd-974a-4564e129c41d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="menu\loui\basics">
+      <UniqueIdentifier>{19461d4c-3765-47c3-acb5-c5fd886dc3c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -344,9 +350,6 @@
       <Filter>application\menu</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\menu\OxygenMenu.cpp">
-      <Filter>application\menu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\application\menu\MenuItems.cpp">
       <Filter>application\menu</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\overlays\CheatSheetOverlay.cpp">
@@ -595,6 +598,24 @@
     <ClCompile Include="..\..\source\oxygen\application\audio\ChipWritesAudioSource.cpp">
       <Filter>application\audio</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiWidget.cpp">
+      <Filter>menu\loui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiFontWrapper.cpp">
+      <Filter>menu\loui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\basics\SimpleButton.cpp">
+      <Filter>menu\loui\basics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\basics\SimpleLabel.cpp">
+      <Filter>menu\loui\basics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\basics\SimpleSelection.cpp">
+      <Filter>menu\loui\basics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiVerticalLayout.cpp">
+      <Filter>menu\loui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -836,9 +857,6 @@
       <Filter>application\menu</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\menu\OxygenMenu.h">
-      <Filter>application\menu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\application\menu\MenuItems.h">
       <Filter>application\menu</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\overlays\CheatSheetOverlay.h">
@@ -1122,6 +1140,30 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\audio\ChipWritesAudioSource.h">
       <Filter>application\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiWidget.h">
+      <Filter>menu\loui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiDefinitions.h">
+      <Filter>menu\loui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiFontWrapper.h">
+      <Filter>menu\loui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\menu\SharedFonts.h">
+      <Filter>application\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\basics\SimpleButton.h">
+      <Filter>menu\loui\basics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\basics\SimpleLabel.h">
+      <Filter>menu\loui\basics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\basics\SimpleSelection.h">
+      <Filter>menu\loui\basics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiVerticalLayout.h">
+      <Filter>menu\loui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

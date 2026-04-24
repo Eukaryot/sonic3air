@@ -75,7 +75,6 @@ public:
 	virtual void onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer) = 0;
 	virtual void onGameRecordingHeaderSave(std::vector<uint8>& buffer) = 0;
 
-	virtual Font& getDebugFont(int size) = 0;
 	virtual void fillDebugVisualization(Bitmap& bitmap, int& mode) = 0;
 };
 

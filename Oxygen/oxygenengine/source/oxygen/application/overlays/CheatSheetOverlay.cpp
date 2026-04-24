@@ -9,6 +9,7 @@
 #include "oxygen/pch.h"
 #include "oxygen/application/overlays/CheatSheetOverlay.h"
 #include "oxygen/application/EngineMain.h"
+#include "oxygen/application/menu/SharedFonts.h"
 
 
 CheatSheetOverlay::CheatSheetOverlay()
@@ -49,7 +50,7 @@ void CheatSheetOverlay::render()
 	const Color alphaWhite(1.0f, 1.0f, 1.0f, alpha);
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
-	Font& font = EngineMain::getDelegate().getDebugFont(10);
+	Font& font = SharedFonts::oxyFontRegularShaded.getFontSafe();
 
 	static const std::vector<const char*> texts =
 	{

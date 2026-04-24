@@ -52,7 +52,6 @@ public:
 	void onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer) override;
 	void onGameRecordingHeaderSave(std::vector<uint8>& buffer) override;
 
-	Font& getDebugFont(int size) override;
 	void fillDebugVisualization(Bitmap& bitmap, int& mode) override;
 
 private:

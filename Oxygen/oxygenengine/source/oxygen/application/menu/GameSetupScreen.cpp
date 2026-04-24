@@ -8,6 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/application/menu/GameSetupScreen.h"
+#include "oxygen/application/menu/SharedFonts.h"
 #include "oxygen/application/EngineMain.h"
 
 
@@ -37,7 +38,7 @@ void GameSetupScreen::render()
 	GuiBase::render();
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
-	Font& font = EngineMain::getDelegate().getDebugFont(10);
+	Font& font = SharedFonts::oxyFontRegularShaded.getFontSafe();
 
 	drawer.drawRect(getRect(), Color(0.1f, 0.2f, 0.4f));
 

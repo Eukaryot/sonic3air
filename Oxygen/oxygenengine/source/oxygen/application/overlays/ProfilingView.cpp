@@ -10,6 +10,7 @@
 #include "oxygen/application/overlays/ProfilingView.h"
 #include "oxygen/application/audio/AudioOutBase.h"
 #include "oxygen/application/audio/AudioPlayer.h"
+#include "oxygen/application/menu/SharedFonts.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/helper/Profiling.h"
@@ -69,7 +70,7 @@ void ProfilingView::render()
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
 	Profiling::Region& rootRegion = Profiling::getRootRegion();
-	Font& font = EngineMain::getDelegate().getDebugFont(10);
+	Font& font = SharedFonts::oxyFontRegularShaded.getFontSafe();
 
 	static std::vector<std::pair<Profiling::Region*, int>> regions;
 	Profiling::listRegionsRecursive(regions);
