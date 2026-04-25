@@ -33,14 +33,10 @@ namespace loui
 		mInnerSize = cursor.y;
 	}
 
-	void VerticalLayout::scrollToRect(const Recti& localRect)
+	void VerticalLayout::scrollToRect(const Recti& localRect, bool animated)
 	{
-		const int oldScrollPos = mScrollPosition;
-		mScrollPosition = std::max(mScrollPosition, localRect.y + localRect.height - mRelativeRect.height);
-		mScrollPosition = std::min(mScrollPosition, localRect.y);
-		mScrollPosition = clamp(mScrollPosition, 0, mInnerSize - mRelativeRect.height);
-
-		if (mScrollPosition != oldScrollPos)
+		const bool scrolling = mScrollingController.scrollToMakeVisible(localRect.y, localRect.height, animated);
+		if (scrolling && !animated)
 		{
 			refreshLayout();
 		}
@@ -61,28 +57,61 @@ namespace loui
 
 	void VerticalLayout::update(UpdateInfo& updateInfo)
 	{
+		if (mDraggedByMouse)
+		{
+			if (mUseScrolling && updateInfo.mLeftMouseButton.isPressed())
+			{
+				updateInfo.mMousePosConsumed = true;
+				updateInfo.mLeftMouseButton.consume();
+
+				if (mScrollingController.scrollRelative(mLastMouseY - updateInfo.mMousePosition.y))
+				{
+					refreshLayout();
+				}
+			}
+			else
+			{
+				mDraggedByMouse = false;
+			}
+		}
+
 		Widget::update(updateInfo);
 
 		// Change selection
 		if (isSelected())
 		{
-			if (updateInfo.mButtonUp.justPressed() || updateInfo.mButtonDown.justPressed())
+			if (updateInfo.mButtonUp.justPressedOrRepeat() || updateInfo.mButtonDown.justPressedOrRepeat())
 			{
-				const int direction = updateInfo.mButtonUp.justPressed() ? -1 : 1;
+				const int direction = updateInfo.mButtonUp.justPressedOrRepeat() ? -1 : 1;
 				changeSelectedChildindex(direction);
 			}
 		}
 
-		// Scroll with mouse wheel
 		if (mUseScrolling)
 		{
-			if (!updateInfo.mMouseWheelConsumed && updateInfo.mMouseWheel != 0)
+			mScrollingController.setScrollAreaSize(mInnerSize, mRelativeRect.height);
+
+			if (mScrollingController.update(updateInfo.mDeltaSeconds))
 			{
-				mScrollPosition -= updateInfo.mMouseWheel * mWheelScrollSpeed;
-				mScrollPosition = clamp(mScrollPosition, 0, std::max(mInnerSize - mRelativeRect.height, 0));
 				refreshLayout();
 			}
+
+			// Scroll with mouse wheel
+			if (!updateInfo.mMouseWheelConsumed && updateInfo.mMouseWheel != 0)
+			{
+				if (mScrollingController.scrollRelative(-updateInfo.mMouseWheel * mWheelScrollSpeed))
+				{
+					refreshLayout();
+				}
+			}
+
+			if (updateInfo.mLeftMouseButton.justPressed())
+			{
+				mDraggedByMouse = true;
+			}
 		}
+
+		mLastMouseY = updateInfo.mMousePosition.y;
 	}
 
 	void VerticalLayout::render(RenderInfo& renderInfo)

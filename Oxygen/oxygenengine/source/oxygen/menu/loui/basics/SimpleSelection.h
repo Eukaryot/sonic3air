@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "oxygen/menu/loui/basics/SimpleButton.h"
-#include "oxygen/menu/loui/basics/SimpleLabel.h"
+#include "oxygen/menu/loui/LouiButton.h"
+#include "oxygen/menu/loui/LouiLabel.h"
 
 
 namespace loui
@@ -19,6 +19,8 @@ namespace loui
 	public:
 		SimpleSelection& init(const std::string_view text, FontWrapper& font, Vec2i size);
 
+		void setValue(int newValue);
+
 		virtual void update(UpdateInfo& updateInfo) override;
 		virtual void render(RenderInfo& renderInfo) override;
 
@@ -26,10 +28,10 @@ namespace loui
 		virtual void applyLayouting() override;
 
 	protected:
-		SimpleLabel mTitleLabel;
-		SimpleLabel mValueLabel;
-		SimpleButton mButtonLeft;
-		SimpleButton mButtonRight;
+		Label mTitleLabel;
+		Label mValueLabel;
+		Button mButtonLeft;
+		Button mButtonRight;
 
 		bool mIsHovered = false;
 		int mValue = 1;

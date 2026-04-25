@@ -24,15 +24,18 @@ namespace loui
 	{
 		bool mPressed = false;
 		bool mPrevious = false;
+		bool mRepeat = false;
+		float mRepeatTimeout = 0.0f;
 		bool mConsumed = false;
 
-		inline bool isPressed() const	  { return mPressed; }
-		inline bool hasChanged() const	  { return mPressed != mPrevious; }
-		inline bool justPressed() const   { return mPressed && !mPrevious; }
-		inline bool justReleased() const  { return !mPressed && mPrevious; }
+		inline bool isPressed() const			{ return mPressed; }
+		inline bool hasChanged() const			{ return mPressed != mPrevious; }
+		inline bool justPressed() const			{ return mPressed && !mPrevious; }
+		inline bool justPressedOrRepeat() const	{ return justPressed() || mRepeat; }
+		inline bool justReleased() const		{ return !mPressed && mPrevious; }
 
-		inline void updateState(bool pressed)  { mPrevious = mPressed; mPressed = pressed; mConsumed = false; }
 		inline void consume()  { mPressed = false; mConsumed = true; }
+		void updateState(bool pressed, float deltaSeconds);
 	};
 
 

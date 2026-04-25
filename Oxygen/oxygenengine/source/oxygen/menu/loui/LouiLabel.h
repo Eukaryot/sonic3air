@@ -13,10 +13,12 @@
 
 namespace loui
 {
-	class SimpleLabel : public Widget
+	class Label : public Widget
 	{
 	public:
-		SimpleLabel& init(const std::string_view text, FontWrapper& font, Vec2i size);
+		Label& init(const std::string_view text, FontWrapper& font, Vec2i size);
+
+		void setText(std::string_view text);
 
 		virtual void update(UpdateInfo& updateInfo) override;
 		virtual void render(RenderInfo& renderInfo) override;

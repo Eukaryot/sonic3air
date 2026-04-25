@@ -13,8 +13,8 @@
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
-#include "oxygen/menu/loui/basics/SimpleButton.h"
-#include "oxygen/menu/loui/basics/SimpleLabel.h"
+#include "oxygen/menu/loui/LouiButton.h"
+#include "oxygen/menu/loui/LouiLabel.h"
 #include "oxygen/menu/loui/basics/SimpleSelection.h"
 
 
@@ -32,17 +32,17 @@ void OxygenMenu::initialize()
 	mRootWidget.setScrolling(true);
 
 	loui::FontWrapper& font = SharedFonts::oxyFontSmallShadow;
-	const Vec2i buttonSize(80, 16);
+	const Vec2i buttonSize(120, 16);
 	
-	mRootWidget.createChildWidget<loui::SimpleLabel>()
+	mRootWidget.createChildWidget<loui::Label>()
 		.init("Title", font, buttonSize)
 		.setOuterMargin(1, 1, 0, 0);
 	
-	mRootWidget.createChildWidget<loui::SimpleButton>()
+	mRootWidget.createChildWidget<loui::Button>()
 		.init("Button 1", font, buttonSize)
 		.setOuterMargin(1, 1, 0, 0);
 
-	mRootWidget.createChildWidget<loui::SimpleButton>()
+	mRootWidget.createChildWidget<loui::Button>()
 		.init("Button 2", font, buttonSize)
 		.setOuterMargin(1, 5, 0, 0);
 
@@ -79,15 +79,15 @@ void OxygenMenu::update(float timeElapsed)
 	mUpdateInfo.mMouseWheel = FTX::mouseWheel();
 	mUpdateInfo.mMousePosConsumed = !hasMousePos;
 	mUpdateInfo.mMouseWheelConsumed = !hasMousePos;
-	mUpdateInfo.mLeftMouseButton.updateState(FTX::mouseState(rmx::MouseButton::Left));
-	mUpdateInfo.mButtonUp.updateState(controller.Up.isPressed());
-	mUpdateInfo.mButtonDown.updateState(controller.Down.isPressed());
-	mUpdateInfo.mButtonLeft.updateState(controller.Left.isPressed());
-	mUpdateInfo.mButtonRight.updateState(controller.Right.isPressed());
-	mUpdateInfo.mButtonA.updateState(controller.A.isPressed());
-	mUpdateInfo.mButtonB.updateState(controller.B.isPressed());
-	mUpdateInfo.mButtonX.updateState(controller.X.isPressed());
-	mUpdateInfo.mButtonY.updateState(controller.Y.isPressed());
+	mUpdateInfo.mLeftMouseButton.updateState(FTX::mouseState(rmx::MouseButton::Left), timeElapsed);
+	mUpdateInfo.mButtonUp.updateState(controller.Up.isPressed(), timeElapsed);
+	mUpdateInfo.mButtonDown.updateState(controller.Down.isPressed(), timeElapsed);
+	mUpdateInfo.mButtonLeft.updateState(controller.Left.isPressed(), timeElapsed);
+	mUpdateInfo.mButtonRight.updateState(controller.Right.isPressed(), timeElapsed);
+	mUpdateInfo.mButtonA.updateState(controller.A.isPressed(), timeElapsed);
+	mUpdateInfo.mButtonB.updateState(controller.B.isPressed(), timeElapsed);
+	mUpdateInfo.mButtonX.updateState(controller.X.isPressed(), timeElapsed);
+	mUpdateInfo.mButtonY.updateState(controller.Y.isPressed(), timeElapsed);
 
 	// Use a copy of update info
 	loui::UpdateInfo updateInfo = mUpdateInfo;

@@ -604,16 +604,22 @@
     <ClCompile Include="..\..\source\oxygen\menu\loui\LouiFontWrapper.cpp">
       <Filter>menu\loui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\menu\loui\basics\SimpleButton.cpp">
-      <Filter>menu\loui\basics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\menu\loui\basics\SimpleLabel.cpp">
-      <Filter>menu\loui\basics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\menu\loui\basics\SimpleSelection.cpp">
       <Filter>menu\loui\basics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\menu\loui\LouiVerticalLayout.cpp">
+      <Filter>menu\loui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiScrollingController.cpp">
+      <Filter>menu\loui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiDefinitions.cpp">
+      <Filter>menu\loui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiButton.cpp">
+      <Filter>menu\loui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiLabel.cpp">
       <Filter>menu\loui</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1153,16 +1159,19 @@
     <ClInclude Include="..\..\source\oxygen\application\menu\SharedFonts.h">
       <Filter>application\menu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\menu\loui\basics\SimpleButton.h">
-      <Filter>menu\loui\basics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\menu\loui\basics\SimpleLabel.h">
-      <Filter>menu\loui\basics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\menu\loui\basics\SimpleSelection.h">
       <Filter>menu\loui\basics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\menu\loui\LouiVerticalLayout.h">
+      <Filter>menu\loui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiScrollingController.h">
+      <Filter>menu\loui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiButton.h">
+      <Filter>menu\loui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiLabel.h">
       <Filter>menu\loui</Filter>
     </ClInclude>
   </ItemGroup>

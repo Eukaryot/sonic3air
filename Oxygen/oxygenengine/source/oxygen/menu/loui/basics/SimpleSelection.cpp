@@ -15,29 +15,30 @@ namespace loui
 {
 	SimpleSelection& SimpleSelection::init(const std::string_view text, FontWrapper& font, Vec2i size)
 	{
-		const int x0 = 0;
-		const int x1 = size.x * 40/100;
-		const int x2 = size.x * 60/100;
-		const int x3 = size.x * 80/100;
-		const int x4 = size.x;
+		mRelativeRect.setSize(size);
 
 		mTitleLabel.init(text, font, Vec2i());
-		mTitleLabel.setRelativeRect(Recti(x0, 0, x1 - x0, size.y));
 		addChildWidget(mTitleLabel, false);
 
-		mValueLabel.init("0", font, Vec2i());
-		mValueLabel.setRelativeRect(Recti(x2, 0, x3 - x2, size.y));
+		mValueLabel.init("1", font, Vec2i());
 		addChildWidget(mValueLabel, false);
 
-		mButtonLeft.init("<", font, Vec2i());
-		mButtonLeft.setRelativeRect(Recti(x1, 0, x2 - x1, size.y));
+		mButtonLeft.init("<", font, Vec2i(), true);
 		addChildWidget(mButtonLeft, false);
 
-		mButtonRight.init(">", font, Vec2i());
-		mButtonRight.setRelativeRect(Recti(x3, 0, x4 - x3, size.y));
+		mButtonRight.init(">", font, Vec2i(), true);
 		addChildWidget(mButtonRight, false);
 
 		return *this;
+	}
+
+	void SimpleSelection::setValue(int newValue)
+	{
+		if (mValue == newValue)
+			return;
+
+		mValue = newValue;
+		mValueLabel.setText(String(0, "%d", mValue));
 	}
 
 	void SimpleSelection::update(UpdateInfo& updateInfo)
@@ -45,13 +46,22 @@ namespace loui
 		Widget::update(updateInfo);
 
 		mIsHovered = (!updateInfo.mMousePosConsumed && mFinalScreenRect.contains(updateInfo.mMousePosition));
+
+		if (mButtonLeft.wasPressed() || (isSelected() && updateInfo.mButtonLeft.justPressedOrRepeat()))
+		{
+			setValue(mValue - 1);
+		}
+		if (mButtonRight.wasPressed() || (isSelected() && updateInfo.mButtonRight.justPressedOrRepeat()))
+		{
+			setValue(mValue + 1);
+		}
 	}
 
 	void SimpleSelection::render(RenderInfo& renderInfo)
 	{
 		if (mIsHovered)
 		{
-			renderInfo.mDrawer.drawRect(mFinalScreenRect, Color(0.6f, 0.7f, 0.8f, 0.5f));
+			renderInfo.mDrawer.drawRect(mFinalScreenRect, Color(0.6f, 0.7f, 0.8f, 0.1f));
 		}
 		else if (mIsSelected)
 		{
@@ -71,8 +81,8 @@ namespace loui
 
 		mTitleLabel.setRelativeRect (Recti(x0, 0, x1 - x0, mRelativeRect.height));
 		mValueLabel.setRelativeRect (Recti(x2, 0, x3 - x2, mRelativeRect.height));
-		mButtonLeft.setRelativeRect (Recti(x1, 0, x2 - x1, mRelativeRect.height));
-		mButtonRight.setRelativeRect(Recti(x3, 0, x4 - x3, mRelativeRect.height));
+		mButtonLeft.setRelativeRect (Recti(x1, 0, x2 - x1, mRelativeRect.height).withBorder(-3));
+		mButtonRight.setRelativeRect(Recti(x3, 0, x4 - x3, mRelativeRect.height).withBorder(-3));
 
 		Vec2i basePosition = mFinalScreenRect.getPos();
 		basePosition.x += mInnerPadding.mLeft;

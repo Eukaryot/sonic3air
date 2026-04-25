@@ -15,7 +15,7 @@ class Font;
 
 namespace loui
 {
-	class SimpleButton : public Widget
+	class Button : public Widget
 	{
 	public:
 		enum class ButtonState
@@ -26,7 +26,11 @@ namespace loui
 		};
 
 	public:
-		SimpleButton& init(const std::string_view text, FontWrapper& font, Vec2i size);
+		Button& init(const std::string_view text, FontWrapper& font, Vec2i size, bool repeatable = false);
+
+		inline bool wasPressed() const  { return mWasPressed; }
+
+		void setText(std::string_view text);
 
 		virtual void update(UpdateInfo& updateInfo) override;
 		virtual void render(RenderInfo& renderInfo) override;
@@ -34,7 +38,10 @@ namespace loui
 	protected:
 		std::string mText;
 		FontWrapper* mFont = nullptr;
+		bool mRepeatable = false;
 
 		ButtonState mButtonState = ButtonState::NORMAL;
+		bool mButtonDown = false;
+		bool mWasPressed = false;
 	};
 }

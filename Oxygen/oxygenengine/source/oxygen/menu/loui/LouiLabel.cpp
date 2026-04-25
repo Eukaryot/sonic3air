@@ -7,13 +7,13 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/menu/loui/basics/SimpleLabel.h"
+#include "oxygen/menu/loui/LouiLabel.h"
 #include "oxygen/menu/loui/LouiFontWrapper.h"
 
 
 namespace loui
 {
-	SimpleLabel& SimpleLabel::init(const std::string_view text, FontWrapper& font, Vec2i size)
+	Label& Label::init(const std::string_view text, FontWrapper& font, Vec2i size)
 	{
 		mText = text;
 		mFont = &font;
@@ -22,12 +22,17 @@ namespace loui
 		return *this;
 	}
 
-	void SimpleLabel::update(UpdateInfo& updateInfo)
+	void Label::setText(std::string_view text)
+	{
+		mText = text;
+	}
+
+	void Label::update(UpdateInfo& updateInfo)
 	{
 		Widget::update(updateInfo);
 	}
 
-	void SimpleLabel::render(RenderInfo& renderInfo)
+	void Label::render(RenderInfo& renderInfo)
 	{
 		Widget::render(renderInfo);
 
