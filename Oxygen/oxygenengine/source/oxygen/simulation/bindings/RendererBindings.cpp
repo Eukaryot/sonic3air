@@ -155,7 +155,7 @@ namespace
 			case WriteTarget::VRAM:
 			{
 				if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
-					LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress, 2);
+					LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress, 2, value);
 
 				getEmulatorInterface().writeVRam16(mWriteAddress, value);
 				break;
@@ -194,7 +194,14 @@ namespace
 			// Optimized version of the code below
 			if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
 			{
-				LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress, bytes);
+				uint32 value = 0;
+				if (bytes == 2)
+				{
+					const uint8* ptr = emulatorInterface.getMemoryPointer(address, false, bytes);
+					if (nullptr != ptr)
+						value = *(uint16*)ptr;
+				}
+				LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress, bytes, value);
 			}
 
 			emulatorInterface.copyFromMemoryToVRam(mWriteAddress, address, bytes);
@@ -205,7 +212,10 @@ namespace
 			if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
 			{
 				for (uint16 i = 0; i < bytes; i += 2)
-					LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress + mWriteIncrement * i/2, 2);
+				{
+					const uint16 value = emulatorInterface.readMemory16(address + i);
+					LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress + mWriteIncrement * i/2, 2, value);
+				}
 			}
 
 			for (uint16 i = 0; i < bytes; i += 2)
@@ -223,7 +233,9 @@ namespace
 		RMX_CHECK(uint32(vramAddress) + bytes <= 0x10000, "Invalid VRAM access from " << rmx::hexString(vramAddress, 8) << " to " << rmx::hexString(uint32(vramAddress)+bytes-1, 8) << " in VDP_fillVRAMbyDMA", return);
 
 		if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
-			LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(vramAddress, bytes);
+		{
+			LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(vramAddress, bytes, fillValue);
+		}
 
 		getEmulatorInterface().fillVRam(vramAddress, fillValue, bytes);
 		mWriteAddress = vramAddress + bytes;
@@ -232,7 +244,9 @@ namespace
 	void VDP_zeroVRAM(uint16 bytes)
 	{
 		if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
-			LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress, bytes);
+		{
+			LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress, bytes, 0);
+		}
 
 		VDP_fillVRAMbyDMA(0, mWriteAddress, bytes);
 	}
@@ -350,7 +364,9 @@ namespace
 	void setVRAM(uint16 vramAddress, uint16 value)
 	{
 		if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
-			LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(vramAddress, 2);
+		{
+			LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(vramAddress, 2, value);
+		}
 
 		getEmulatorInterface().writeVRam16(vramAddress, value);
 	}

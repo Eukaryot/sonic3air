@@ -90,34 +90,43 @@ void VRAMWritesWindow::buildContent()
 			}
 
 			const uint64 key = ((uint64)write->mAddress << 32) + write->mSize;
-			String line(0, "0x%04x (0x%02x bytes) at %s", write->mAddress, write->mSize, write->mLocation.toString(codeExec).c_str());
+			String line;
+			if (write->mSize == 2)
+			{
+				line.formatString("[0x%04x] = 0x%02x (2 bytes) at %s", write->mAddress, write->mValue, write->mLocation.toString(codeExec).c_str());
+			}
+			else
+			{
+				line.formatString("[0x%04x] (0x%02x bytes) at %s", write->mAddress, write->mSize, write->mLocation.toString(codeExec).c_str());
+			}
+
 			ImVec4 color(1.0f, 1.0f, 1.0f, 1.0f);
 			if (write->mAddress >= startAddressPlaneA && write->mAddress < endAddressPlaneA)
 			{
 				if (!mShowPlaneA)
 					continue;
-				line = String("[Plane A] ") + line;
+				line = String("Plane A:   ") + line;
 				color = ImVec4(1.0f, 1.0f, 0.75f, 1.0f);
 			}
 			else if (write->mAddress >= startAddressPlaneB && write->mAddress < endAddressPlaneB)
 			{
 				if (!mShowPlaneB)
 					continue;
-				line = String("[Plane B] ") + line;
+				line = String("Plane B:   ") + line;
 				color = ImVec4(1.0f, 0.75f, 1.0f, 1.0f);
 			}
 			else if (write->mAddress >= startAddressScrollOffsets && write->mAddress < endAddressScrollOffsets)
 			{
 				if (!mShowScroll)
 					continue;
-				line = String("[Scroll Offsets] ") + line;
+				line = String("Scroll Offsets:   ") + line;
 				color = ImVec4(0.75f, 1.0f, 1.0f, 1.0f);
 			}
 			else if (write->mAddress >= startAddressSAT && write->mAddress < endAddressSAT)
 			{
 				if (!mShowSAT)
 					continue;
-				line = String("[Sprites] ") + line;
+				line = String("Sprites:   ") + line;
 				color = ImVec4(0.75f, 0.75f, 1.0f, 1.0f);
 			}
 			else

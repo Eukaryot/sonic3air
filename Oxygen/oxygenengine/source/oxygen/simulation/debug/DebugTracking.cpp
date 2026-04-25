@@ -363,7 +363,7 @@ void DebugTracking::onWatchTriggered(size_t watchIndex, uint32 address, uint16 b
 	Application::instance().getSimulation().sendBreakSignal(Simulation::BreakCondition::WATCH_HIT);
 }
 
-void DebugTracking::onVRAMWrite(uint16 address, uint16 bytes)
+void DebugTracking::onVRAMWrite(uint16 address, uint16 bytes, uint16 value)
 {
 	// Not more than the limit
 	if (mVRAMWrites.size() >= mVRAMWrites.capacity())
@@ -389,6 +389,7 @@ void DebugTracking::onVRAMWrite(uint16 address, uint16 bytes)
 	VRAMWrite& write = mVRAMWritePool.rentObject();
 	write.mAddress = address;
 	write.mSize = bytes;
+	write.mValue = value;
 	write.mLocation = location;
 	write.mCallFrameIndex = getCurrentCallFrameIndex();
 	mVRAMWrites.push_back(&write);
