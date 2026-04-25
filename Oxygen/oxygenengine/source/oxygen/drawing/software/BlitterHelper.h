@@ -535,7 +535,7 @@ struct BlitterHelper
 	template<bool ALPHA_BLENDING, bool USE_TINT_COLOR>
 	static inline void blitBitmapWithScaling(BitmapViewMutable<uint32>& destBitmap, Recti destRect, const BitmapViewMutable<uint32>& sourceBitmap, Recti sourceRect, uint32 tintColor)
 	{
-		if (destBitmap.isEmpty() || sourceRect.isEmpty())
+		if (destBitmap.isEmpty() || destRect.isEmpty() || sourceRect.isEmpty())
 			return;
 
 		int lastSourceY = -1;

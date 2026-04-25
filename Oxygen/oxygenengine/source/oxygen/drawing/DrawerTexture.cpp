@@ -74,13 +74,13 @@ void DrawerTexture::bitmapUpdated()
 	}
 }
 
-void DrawerTexture::setupAsRenderTarget(uint32 width, uint32 height)
+void DrawerTexture::setupAsRenderTarget(const Vec2i& size)
 {
 	// Any change?
-	if (mSetupAsRenderTarget && (uint32)mSize.x == width && (uint32)mSize.y == height)
+	if (mSetupAsRenderTarget && mSize == size)
 		return;
 
-	mSize.set(width, height);
+	mSize = size;
 	mSetupAsRenderTarget = true;
 
 	ensureValidity();

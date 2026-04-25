@@ -42,6 +42,7 @@ namespace loui
 	struct UpdateInfo
 	{
 		float mDeltaSeconds = 0.0f;
+		bool mLastInputWasMouse = false;
 
 		// Mouse related input data (also used for touch input)
 		BinaryInput mLeftMouseButton;

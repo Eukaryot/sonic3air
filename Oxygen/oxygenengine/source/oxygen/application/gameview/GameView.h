@@ -81,14 +81,13 @@ private:
 	Simulation& mSimulation;
 
 	ScaledScreenRect mGameViewport;
+	DrawerTexture mFinalGameTexture;
 
 	float mFadeValue = 1.0f;
 	float mFadeChange = 0.0f;
 	float mWhiteOverlayAlpha = 0.0f;
 
 	StillImage mStillImage;
-
-	DrawerTexture mFinalGameTexture;
 
 	float mRewindTimer = 0.0f;
 	int mRewindCounter = 0;

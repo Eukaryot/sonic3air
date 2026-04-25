@@ -104,8 +104,8 @@ namespace loui
 				break;
 			}
 
-			case ButtonState::HOVERED:		color.set(0.6f, 0.7f, 0.8f, 0.5f);  break;
-			case ButtonState::PRESSED:		color.set(0.2f, 0.4f, 0.6f, 0.5f);  break;
+			case ButtonState::HOVERED:	color.set(0.6f, 0.7f, 0.8f, 0.5f);  break;
+			case ButtonState::PRESSED:	color.set(0.2f, 0.4f, 0.6f, 0.5f);  break;
 		}
 
 		renderInfo.mDrawer.drawRect(mFinalScreenRect, color);

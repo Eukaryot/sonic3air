@@ -56,7 +56,8 @@ public:
 	const Bitmap& getBitmap() const;
 	Bitmap& accessBitmap();
 	void bitmapUpdated();
-	void setupAsRenderTarget(uint32 width, uint32 height);
+
+	void setupAsRenderTarget(const Vec2i& size);
 	void writeContentToBitmap(Bitmap& outBitmap);
 
 	void swap(DrawerTexture& other);

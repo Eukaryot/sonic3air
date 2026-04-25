@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "oxygen/drawing/DrawerTexture.h"
+#include "oxygen/helper/ScaledScreenRect.h"
 #include "oxygen/menu/loui/LouiVerticalLayout.h"
 #include <rmxmedia.h>
 
@@ -15,8 +17,8 @@
 class OxygenMenu : public GuiBase
 {
 public:
-	OxygenMenu();
-	~OxygenMenu();
+	inline bool isVisible() const  { return mIsVisible; }
+	void setVisible(bool visible);
 
 	virtual void initialize() override;
 	virtual void deinitialize() override;
@@ -24,6 +26,15 @@ public:
 	virtual void render() override;
 
 private:
+	int getMenuScale() const;
+
+private:
+	ScaledScreenRect mOxygenMenuViewport;
+	DrawerTexture mOxygenMenuTexture;
+	int mMenuScale = 1;
+
 	loui::UpdateInfo mUpdateInfo;
 	loui::VerticalLayout mRootWidget;
+
+	bool mIsVisible = false;
 };

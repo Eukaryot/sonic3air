@@ -44,7 +44,7 @@ void VideoOut::startup()
 	mGameResolution = Configuration::instance().mGameScreen;
 
 	RMX_LOG_INFO("VideoOut: Setup of game screen");
-	mGameScreenTexture.setupAsRenderTarget(mGameResolution.x, mGameResolution.y);
+	mGameScreenTexture.setupAsRenderTarget(mGameResolution);
 
 	if (nullptr == mRenderParts)
 	{
@@ -131,7 +131,7 @@ void VideoOut::setScreenSize(uint32 width, uint32 height)
 	mGameResolution.x = width;
 	mGameResolution.y = height;
 
-	mGameScreenTexture.setupAsRenderTarget(mGameResolution.x, mGameResolution.y);
+	mGameScreenTexture.setupAsRenderTarget(mGameResolution);
 
 	mActiveRenderer->setGameResolution(mGameResolution);
 

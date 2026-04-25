@@ -162,7 +162,7 @@ void GameView::initialize()
 	const Vec2i& resolution = Configuration::instance().mGameScreen;
 
 	RMX_LOG_INFO("Creating game screen texture");
-	mFinalGameTexture.setupAsRenderTarget(resolution.x, resolution.y);
+	mFinalGameTexture.setupAsRenderTarget(resolution);
 }
 
 void GameView::deinitialize()
@@ -580,7 +580,7 @@ void GameView::render()
 	VideoOut& videoOut = VideoOut::instance();
 	const Recti gameScreenRect = VideoOut::instance().getScreenRect();
 	mGameViewport.setResolution(gameScreenRect.getSize());
-	mFinalGameTexture.setupAsRenderTarget(gameScreenRect.width, gameScreenRect.height);
+	mFinalGameTexture.setupAsRenderTarget(gameScreenRect.getSize());
 
 	// Refresh simulation output image
 	if (mStillImage.mMode != StillImageMode::NONE)

@@ -216,7 +216,7 @@ void SoftwareRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
 	mRenderParts.getPlaneManager().dumpAsPaletteBitmap(paletteBitmap, debugDrawMode, highlightPrioPatterns);
 
 	const Vec2i bitmapSize = paletteBitmap.getSize();
-	mGameScreenTexture.setupAsRenderTarget(bitmapSize.x, bitmapSize.y);
+	mGameScreenTexture.setupAsRenderTarget(bitmapSize);
 	gameScreenBitmap.create(bitmapSize);
 
 	// Convert from palette bitmap to RGBA
@@ -250,8 +250,8 @@ void SoftwareRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
 	drawer.drawUpscaledRect(RenderUtils::getLetterBoxRect(rect, (float)bitmapSize.x / (float)bitmapSize.y), mGameScreenTexture);
 	drawer.performRendering();
 
-	mGameScreenTexture.setupAsRenderTarget(oldSize.x, oldSize.y);
-	gameScreenBitmap.create(oldSize.x, oldSize.y);
+	mGameScreenTexture.setupAsRenderTarget(oldSize);
+	gameScreenBitmap.create(oldSize);
 }
 
 void SoftwareRenderer::renderGeometry(const Geometry& geometry)

@@ -44,6 +44,7 @@ namespace loui
 		RMX_ASSERT(nullptr == widget.mParentWidget, "Double insertion of widget");
 		mChildWidgets.push_back(&widget);
 		widget.mParentWidget = this;
+		widget.mAutoDelete = autoDelete;
 		mLayoutDirty = true;
 	}
 

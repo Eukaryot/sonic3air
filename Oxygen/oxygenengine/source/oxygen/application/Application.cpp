@@ -108,7 +108,9 @@ void Application::initialize()
 	#endif
 	}
 
-	//mOxygenMenu = &mGameView->createChild<OxygenMenu>();
+	mOxygenMenu = &createChild<OxygenMenu>();
+	//mOxygenMenu->setVisible(true);
+
 	mProfilingView = &createChild<ProfilingView>();
 	mCheatSheetOverlay = &createChild<CheatSheetOverlay>();
 
