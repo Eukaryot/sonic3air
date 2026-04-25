@@ -76,6 +76,7 @@
     <ClCompile Include="..\..\source\oxygen\helper\JsonSerializer.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Profiling.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\RandomNumberGenerator.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\ScaledScreenRect.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\TextInputHandler.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Transform2D.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\devmode\DevModeMainWindow.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="..\..\source\oxygen\helper\JsonSerializer.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Profiling.h" />
     <ClInclude Include="..\..\source\oxygen\helper\RandomNumberGenerator.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\ScaledScreenRect.h" />
     <ClInclude Include="..\..\source\oxygen\helper\TextInputHandler.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Transform2D.h" />
     <ClInclude Include="..\..\source\oxygen\menu\devmode\DevModeMainWindow.h" />

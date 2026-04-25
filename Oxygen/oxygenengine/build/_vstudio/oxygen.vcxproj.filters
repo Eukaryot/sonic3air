@@ -622,6 +622,9 @@
     <ClCompile Include="..\..\source\oxygen\menu\loui\LouiLabel.cpp">
       <Filter>menu\loui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\ScaledScreenRect.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -1173,6 +1176,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\menu\loui\LouiLabel.h">
       <Filter>menu\loui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\ScaledScreenRect.h">
+      <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

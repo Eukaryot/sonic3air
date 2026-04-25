@@ -19,7 +19,6 @@ namespace
 }
 
 
-
 Recti RenderUtils::getLetterBoxRect(const Recti& frameRect, float aspectRatio)
 {
 	Recti rect = frameRect;

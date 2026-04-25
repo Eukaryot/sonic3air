@@ -803,8 +803,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 						{
 							if (mMouseOverKey == key)
 							{
-								Rectf translatedRect;
-								Application::instance().getGameView().translateRectIntoScreenCoords(translatedRect, objectRect);
+								const Rectf translatedRect = Application::instance().getGameView().getGameViewport().getScreenRectFromInner(objectRect);
 								drawer.drawRect(translatedRect, Color(0.0f, 1.0f, 0.5f, 0.75f));
 							}
 							String str(0, "0x%04x:   %s:  (%d, %d)%s", info.mRenderQueue, spriteType, info.mPosition.x, info.mPosition.y, info.mPriorityFlag ? " -- prio" : "");

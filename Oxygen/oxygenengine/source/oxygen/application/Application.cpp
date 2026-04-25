@@ -624,7 +624,7 @@ void Application::render()
 		GuiBase::render();
 
 		// TODO: This gets called too late
-		mBackdropView->setGameViewRect(mGameView->getGameViewport());
+		mBackdropView->setGameViewRect(mGameView->getGameViewportRect());
 
 		// Show log display output
 		{
