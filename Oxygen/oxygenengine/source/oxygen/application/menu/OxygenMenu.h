@@ -8,9 +8,9 @@
 
 #pragma once
 
+#include "oxygen/application/menu/sidebar/OxygenSideBar.h"
 #include "oxygen/drawing/DrawerTexture.h"
 #include "oxygen/helper/ScaledScreenRect.h"
-#include "oxygen/menu/loui/LouiVerticalLayout.h"
 #include <rmxmedia.h>
 
 
@@ -22,7 +22,8 @@ public:
 
 	virtual void initialize() override;
 	virtual void deinitialize() override;
-	virtual void update(float timeElapsed) override;
+	virtual void keyboard(const rmx::KeyboardEvent& ev) override;
+	virtual void update(float deltaSeconds) override;
 	virtual void render() override;
 
 private:
@@ -34,7 +35,11 @@ private:
 	int mMenuScale = 1;
 
 	loui::UpdateInfo mUpdateInfo;
-	loui::VerticalLayout mRootWidget;
+	loui::Widget mRootWidget;
+
+	OxygenSideBar mSideBar;
 
 	bool mIsVisible = false;
+	float mVisibility = 0.0f;
+	Recti mCoveredScreenRect;
 };

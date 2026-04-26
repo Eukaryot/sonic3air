@@ -20,7 +20,7 @@ namespace loui
 
 	bool ScrollingController::scrollToTargetPosition(int position, bool animated)
 	{
-		mScrollTargetPosition = clamp(position, 0, mTotalAreaSize - mVisibleAreaSize);
+		mScrollTargetPosition = clamp(position, 0, std::max(0, mTotalAreaSize - mVisibleAreaSize));
 		mCurrentScrollSpeed = 0.0f;
 		mScrollPosFractional = 0.0f;
 

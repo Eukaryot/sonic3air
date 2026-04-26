@@ -121,6 +121,9 @@
     <Filter Include="menu\loui\basics">
       <UniqueIdentifier>{19461d4c-3765-47c3-acb5-c5fd886dc3c7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="application\menu\sidebar">
+      <UniqueIdentifier>{20d99a9b-df52-4237-99be-506c6a8da0fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -624,6 +627,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\helper\ScaledScreenRect.cpp">
       <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\menu\sidebar\OxygenSideBar.cpp">
+      <Filter>application\menu\sidebar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1179,6 +1185,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\helper\ScaledScreenRect.h">
       <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\menu\sidebar\OxygenSideBar.h">
+      <Filter>application\menu\sidebar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

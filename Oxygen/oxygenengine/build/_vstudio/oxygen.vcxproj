@@ -40,6 +40,7 @@
     <ClCompile Include="..\..\source\oxygen\application\input\RumbleEffectQueue.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\GameSetupScreen.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\OxygenMenu.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\menu\sidebar\OxygenSideBar.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\modding\Mod.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\modding\ModManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\overlays\BackdropView.cpp" />
@@ -214,6 +215,7 @@
     <ClInclude Include="..\..\source\oxygen\application\menu\GameSetupScreen.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\OxygenMenu.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\SharedFonts.h" />
+    <ClInclude Include="..\..\source\oxygen\application\menu\sidebar\OxygenSideBar.h" />
     <ClInclude Include="..\..\source\oxygen\application\modding\Mod.h" />
     <ClInclude Include="..\..\source\oxygen\application\modding\ModManager.h" />
     <ClInclude Include="..\..\source\oxygen\application\overlays\BackdropView.h" />
