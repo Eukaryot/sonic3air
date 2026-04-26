@@ -142,7 +142,7 @@ Vec3f Color::getHSL() const
 	else
 		hue = (r - g) / delta * 60.0f + 240.0f;						// Cyan to blue to purple
 
-	return Vec3f(hue * 60.0f, saturation, lightness);
+	return Vec3f(hue, saturation, lightness);
 }
 
 void Color::setFromHSV(const Vec3f& hsv)
