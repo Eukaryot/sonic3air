@@ -13,11 +13,13 @@
 
 namespace loui
 {
-	Label& Label::init(const std::string_view text, FontWrapper& font, Vec2i size)
+	Label& Label::init(const std::string_view text, FontWrapper& font, Vec2i size, int alignment)
 	{
 		mText = text;
 		mFont = &font;
 		mRelativeRect.setSize(size);
+		mAlignment = alignment;
+
 		setInteractable(false);
 		return *this;
 	}
@@ -39,7 +41,7 @@ namespace loui
 		Font* font = (nullptr != mFont) ? mFont->getFont() : nullptr;
 		if (nullptr != font)
 		{
-			renderInfo.mDrawer.printText(*font, mFinalScreenRect + Vec2i(0, 2), mText, 5);
+			renderInfo.mDrawer.printText(*font, mFinalRect + Vec2i(0, 2), mText, mAlignment);
 		}
 	}
 }

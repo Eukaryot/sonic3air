@@ -66,9 +66,7 @@ namespace loui
 	struct RenderInfo
 	{
 		Drawer& mDrawer;
-		bool mIsVisible = true;
-		bool mIsInteractable = true;
-		float mOpacity = 1.0f;
+		bool mShowFocus = false;
 	};
 
 

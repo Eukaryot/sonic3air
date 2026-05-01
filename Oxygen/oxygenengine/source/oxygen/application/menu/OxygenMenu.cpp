@@ -8,21 +8,34 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/application/menu/OxygenMenu.h"
+#include "oxygen/application/menu/sidebar/OxygenSideBar.h"
+#include "oxygen/application/menu/settings/OxygenSettingsMenu.h"
 #include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/InputManager.h"
+#include "oxygen/application/menu/SharedFonts.h"
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
 
 
-void OxygenMenu::setVisible(bool visible)
-{
-	mIsVisible = visible;
-}
-
 void OxygenMenu::initialize()
 {
-	mSideBar.init();
-	mRootWidget.addChildWidget(mSideBar, false);
+	if (nullptr == mSideBar)
+	{
+		mSideBar = &mRootWidget.createChildWidget<OxygenSideBar>();
+		mSideBar->init();
+	}
+
+	if (nullptr == mSettingsMenu)
+	{
+		mSettingsMenu = &mRootWidget.createChildWidget<OxygenSettingsMenu>();
+		mSettingsMenu->init();
+	}
+
+	// All widgets are supposed to be invisible at first
+	for (loui::Widget* widget : mRootWidget.getChildWidgets())
+	{
+		widget->setVisible(false);
+	}
 }
 
 void OxygenMenu::deinitialize()
@@ -37,36 +50,24 @@ void OxygenMenu::keyboard(const rmx::KeyboardEvent& ev)
 #if DEBUG
 	if (ev.key == '<' && ev.state)
 	{
-		// Toggle visibility
-		setVisible(!mIsVisible);
+		// Toggle side bar
+		if (isSideBarOpen())
+		{
+			closeSideBar();
+		}
+		else
+		{
+			openSideBar();
+		}
 	}
 #endif
 }
 
 void OxygenMenu::update(float deltaSeconds)
 {
-	if (mIsVisible)
-	{
-		if (mVisibility < 1.0f)
-		{
-			mVisibility = saturate(mVisibility + deltaSeconds / 0.15f);
-		}
-	}
-	else
-	{
-		if (mVisibility == 0.0f)
-			return;
-
-		mVisibility = saturate(mVisibility - deltaSeconds / 0.15f);
-	}
-
-	const float animPos = 1.0f - (1.0f - mVisibility) * (1.0f - mVisibility);
-	const Vec2i sideBarSize = mSideBar.getRelativeRect().getSize();
-	mSideBar.setRelativeRect(Recti(Vec2i(roundToInt(sideBarSize.x * (animPos - 1.0f)), 0), sideBarSize));
-	mSideBar.setInteractable(mVisibility == 1.0f);
-
-	const Vec2i resolution = (FTX::screenSize() + Vec2i(mMenuScale - 1)) / mMenuScale;	// Round up, to ensure the screen is fully covered
-	mCoveredScreenRect = Recti::getIntersection(mSideBar.getRelativeRect(), Recti(Vec2i(), resolution));
+	// Update resolution
+	refreshMenuResolution();
+	mRootWidget.setRelativeRect(Recti(Vec2i(), mMenuResolution));
 
 	if (!FTX::System->wasEventConsumed())
 	{
@@ -101,15 +102,60 @@ void OxygenMenu::update(float deltaSeconds)
 		// Use a copy of update info
 		loui::UpdateInfo updateInfo = mUpdateInfo;
 		mRootWidget.update(updateInfo);
+
+		switch (mTriggeredAction)
+		{
+			case TriggeredAction::OPEN_SIDE_BAR:
+			{
+				mSideBar->setOpen(true);
+				mSettingsMenu->setOpen(false);
+
+				mSideBar->grantFocus();
+				break;
+			}
+
+			case TriggeredAction::CLOSE_SIDE_BAR:
+			{
+				mSideBar->setOpen(false);
+				mSettingsMenu->setOpen(false);
+				break;
+			}
+
+			case TriggeredAction::OPEN_SETTINGS:
+			{
+				mSideBar->setOpen(false);
+				mSettingsMenu->setOpen(true);
+
+				mSettingsMenu->grantFocus();
+				break;
+			}
+
+			case TriggeredAction::CLOSE_SETTINGS:
+			{
+				mSideBar->setOpen(true);
+				mSettingsMenu->setOpen(false);
+
+				mSideBar->grantFocus();
+				break;
+			}
+		}
+		mTriggeredAction = TriggeredAction::NONE;
 	}
 }
 
 void OxygenMenu::render()
 {
-	if (mVisibility <= 0.0f)
-		return;
-
 	GuiBase::render();
+
+	mCoveredScreenRect = Recti(0, 0, 0, mRootWidget.getRelativeRect().height);
+	for (loui::Widget* widget : mRootWidget.getChildWidgets())
+	{
+		if (widget->isVisible())
+		{
+			mCoveredScreenRect.width = std::max(mCoveredScreenRect.width, widget->getFinalRect().getEndPos().x);
+		}
+	}
+	mCoveredScreenRect = Recti::getIntersection(mCoveredScreenRect, Recti(Vec2i(), mRootWidget.getRelativeRect().getSize()));
 
 	if (mCoveredScreenRect.width <= 0)
 		return;
@@ -118,22 +164,30 @@ void OxygenMenu::render()
 
 	// Render the (pixelated) menu
 	{
-		mMenuScale = getMenuScale();
-		Vec2i resolution = (FTX::screenSize() + Vec2i(mMenuScale - 1)) / mMenuScale;	// Round up, to ensure the screen is fully covered
-
-		resolution.x = mCoveredScreenRect.width;
+		Vec2i resolution = mMenuResolution;
+		Vec2i upscaledResolution = mUpscaledResolution;
+		if (mCoveredScreenRect.width < resolution.x)
+		{
+			upscaledResolution.x = upscaledResolution.x * mCoveredScreenRect.width / resolution.x;
+			resolution.x = mCoveredScreenRect.width;
+		}
 		const Recti menuScreenRect(Vec2i(), resolution);
 
 		mOxygenMenuTexture.setupAsRenderTarget(resolution);
 		mOxygenMenuViewport.setResolution(resolution);
-		mOxygenMenuViewport.setRectOnScreen(Recti(Vec2i(), resolution * mMenuScale));
+		mOxygenMenuViewport.setRectOnScreen(Recti(Vec2i(), upscaledResolution));
 
 		drawer.setRenderTarget(mOxygenMenuTexture, menuScreenRect);
 
 		setRect(menuScreenRect);
 
 		loui::RenderInfo renderInfo { drawer };
+		renderInfo.mShowFocus = !mUpdateInfo.mLastInputWasMouse;
 		mRootWidget.render(renderInfo);
+
+	#if DEBUG
+		//drawer.printText(SharedFonts::oxyFontSmall, Vec2i(8, resolution.y - 6), String(0, "%dx%d", resolution.x, resolution.y), 7);
+	#endif
 
 		drawer.performRendering();
 	}
@@ -145,9 +199,56 @@ void OxygenMenu::render()
 	drawer.performRendering();
 }
 
-int OxygenMenu::getMenuScale() const
+bool OxygenMenu::isSideBarOpen() const
 {
-	const Vec2f desiredSize(640, 360);
-	const Vec2f scales = Vec2f(FTX::screenSize()) / desiredSize;
-	return std::max(1, roundToInt(std::min(scales.x, scales.y)));
+	return mSideBar->shouldBeOpen();
+}
+
+void OxygenMenu::openSideBar()
+{
+	mTriggeredAction = TriggeredAction::OPEN_SIDE_BAR;
+}
+
+void OxygenMenu::closeSideBar()
+{
+	mTriggeredAction = TriggeredAction::CLOSE_SIDE_BAR;
+}
+
+void OxygenMenu::openSettingsMenu()
+{
+	mTriggeredAction = TriggeredAction::OPEN_SETTINGS;
+}
+
+void OxygenMenu::closeSettingsMenu()
+{
+	mTriggeredAction = TriggeredAction::CLOSE_SETTINGS;
+}
+
+void OxygenMenu::refreshMenuResolution()
+{
+	const Vec2i minimumSize(500, 300);
+	const Vec2i desiredSize(560, 360);
+
+	const Vec2i fullSize = FTX::screenSize();
+	const Vec2f scales = Vec2f(fullSize) / Vec2f(desiredSize);
+	int scale = std::max(1, roundToInt(std::min(scales.x, scales.y)));
+
+	while (true)
+	{
+		mMenuResolution = (fullSize + Vec2i(scale - 1)) / scale;	// Round up to ensure the screen is fully covered
+		if (mMenuResolution.x >= minimumSize.x && mMenuResolution.y >= minimumSize.y)
+		{
+			mUpscaledResolution = mMenuResolution * scale;
+			return;
+		}
+
+		--scale;
+		if (scale == 0)
+		{
+			mMenuResolution.x = std::max(mMenuResolution.x, minimumSize.x);
+			mMenuResolution.y = std::max(mMenuResolution.y, minimumSize.y);
+			mUpscaledResolution = fullSize;
+			return;
+		}
+	}
 }

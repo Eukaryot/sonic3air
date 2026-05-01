@@ -9,6 +9,7 @@
 #pragma once
 
 #include "oxygen/menu/loui/LouiVerticalLayout.h"
+#include "oxygen/menu/loui/LouiButton.h"
 #include "oxygen/drawing/DrawerTexture.h"
 
 
@@ -17,10 +18,19 @@ class OxygenSideBar : public loui::Widget
 public:
 	void init();
 
+	inline bool shouldBeOpen() const  { return mShouldBeOpen; }
+	void setOpen(bool open);
+
 	virtual void update(loui::UpdateInfo& updateInfo) override;
 	virtual void render(loui::RenderInfo& renderInfo) override;
 
 private:
 	loui::VerticalLayout mButtonLayout;
 	DrawerTexture mBackground;
+
+	loui::Button mContinueButton;
+	loui::Button mSettingsButton;
+
+	bool mShouldBeOpen = false;
+	float mVisibility = 0.0f;
 };

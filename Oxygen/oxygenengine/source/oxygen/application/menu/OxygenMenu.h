@@ -8,38 +8,55 @@
 
 #pragma once
 
-#include "oxygen/application/menu/sidebar/OxygenSideBar.h"
 #include "oxygen/drawing/DrawerTexture.h"
 #include "oxygen/helper/ScaledScreenRect.h"
+#include "oxygen/menu/loui/LouiWidget.h"
 #include <rmxmedia.h>
 
 
-class OxygenMenu : public GuiBase
+class OxygenMenu : public GuiBase, public SingleInstance<OxygenMenu>
 {
 public:
-	inline bool isVisible() const  { return mIsVisible; }
-	void setVisible(bool visible);
-
 	virtual void initialize() override;
 	virtual void deinitialize() override;
 	virtual void keyboard(const rmx::KeyboardEvent& ev) override;
 	virtual void update(float deltaSeconds) override;
 	virtual void render() override;
 
+	bool isSideBarOpen() const;
+	void openSideBar();
+	void closeSideBar();
+
+	void openSettingsMenu();
+	void closeSettingsMenu();
+
 private:
-	int getMenuScale() const;
+	void refreshMenuResolution();
+
+private:
+	enum class TriggeredAction
+	{
+		NONE,
+		OPEN_SIDE_BAR,
+		CLOSE_SIDE_BAR,
+		OPEN_SETTINGS,
+		CLOSE_SETTINGS,
+	};
 
 private:
 	ScaledScreenRect mOxygenMenuViewport;
 	DrawerTexture mOxygenMenuTexture;
-	int mMenuScale = 1;
+
+	Vec2i mMenuResolution;
+	Vec2i mUpscaledResolution;
 
 	loui::UpdateInfo mUpdateInfo;
 	loui::Widget mRootWidget;
 
-	OxygenSideBar mSideBar;
+	class OxygenSideBar* mSideBar = nullptr;
+	class OxygenSettingsMenu* mSettingsMenu = nullptr;
 
-	bool mIsVisible = false;
-	float mVisibility = 0.0f;
+	TriggeredAction mTriggeredAction = TriggeredAction::NONE;
+
 	Recti mCoveredScreenRect;
 };

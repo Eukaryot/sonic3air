@@ -23,6 +23,8 @@ namespace loui
 		Font* getFont();
 		Font& getFontSafe();
 
+		inline operator Font&()  { return getFontSafe(); }
+
 	private:
 		WeakPtr<Font> mCachedFont;
 		std::string mFontKey;

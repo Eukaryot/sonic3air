@@ -21,21 +21,19 @@ namespace loui
 
 		void scrollToRect(const Recti& localRect, bool animated = true);
 
-		virtual void setSelected(bool selected) override;
-
 		virtual void update(UpdateInfo& updateInfo) override;
 		virtual void render(RenderInfo& renderInfo) override;
 
 	protected:
-		virtual Vec2i getInnerOffset() const  { return Vec2i(0, -mScrollingController.getScrollPosition()); }
-		virtual void applyLayouting();
+		virtual void applyLayouting() override;
+		virtual void refreshChildBaseOffset() override;
 
-		void changeSelectedChildindex(int direction);
+		virtual void onFocusGained() override;
+		virtual void onChangedFocusedChildIndex() override;
+
+		void changeFocusedChildindex(int direction);
 
 	protected:
-		// Selection
-		int mSelectedChildIndex = -1;
-
 		// Scrolling
 		bool mUseScrolling = false;
 		int mWheelScrollSpeed = 20;

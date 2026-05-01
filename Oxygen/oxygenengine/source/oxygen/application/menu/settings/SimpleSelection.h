@@ -18,8 +18,12 @@ namespace loui
 	{
 	public:
 		SimpleSelection& init(const std::string_view text, FontWrapper& font, Vec2i size);
+		SimpleSelection& addOption(std::string_view displayText, int32 value);
 
 		void setValue(int newValue);
+
+		inline bool wasChanged() const  { return mWasChanged; }
+		int32 getCurrentOptionValue() const;
 
 		virtual void update(UpdateInfo& updateInfo) override;
 		virtual void render(RenderInfo& renderInfo) override;
@@ -28,12 +32,22 @@ namespace loui
 		virtual void applyLayouting() override;
 
 	protected:
+		struct Option
+		{
+			std::string mDisplayText;
+			int32 mValue = 0;
+		};
+
+	protected:
 		Label mTitleLabel;
 		Label mValueLabel;
 		Button mButtonLeft;
 		Button mButtonRight;
 
 		bool mIsHovered = false;
-		int mValue = 1;
+		int mOptionIndex = -1;
+		bool mWasChanged = false;
+
+		std::vector<Option> mOptions;
 	};
 }

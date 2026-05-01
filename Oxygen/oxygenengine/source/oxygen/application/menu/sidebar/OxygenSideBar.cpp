@@ -8,52 +8,92 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/application/menu/sidebar/OxygenSideBar.h"
+#include "oxygen/application/menu/OxygenMenu.h"
 #include "oxygen/application/menu/SharedFonts.h"
 #include "oxygen/menu/loui/LouiButton.h"
 #include "oxygen/menu/loui/LouiLabel.h"
-#include "oxygen/menu/loui/basics/SimpleSelection.h"
 
 
 void OxygenSideBar::init()
 {
-	addChildWidget(mButtonLayout, false);
+	addChildWidget(mButtonLayout);
 
 	mButtonLayout.setScrolling(true);
+	mButtonLayout.setInnerPadding(10, 10, 0, 0);
 
 	loui::FontWrapper& font = SharedFonts::oxyFontSmallShadow;
 	const Vec2i buttonSize(120, 16);
 
 	mButtonLayout.createChildWidget<loui::Label>()
-		.init("Title", font, buttonSize)
-		.setOuterMargin(1, 1, 0, 0);
-
-	mButtonLayout.createChildWidget<loui::Button>()
-		.init("Button 1", font, buttonSize)
-		.setOuterMargin(1, 1, 0, 0);
-
-	mButtonLayout.createChildWidget<loui::Button>()
-		.init("Button 2", font, buttonSize)
+		.init("System Menu", font, buttonSize)
 		.setOuterMargin(1, 5, 0, 0);
 
-	for (int k = 0; k < 10; ++k)
-	{
-		mButtonLayout.createChildWidget<loui::SimpleSelection>()
-			.init(String(0, "Value %c", 'A' + k), font, buttonSize)
-			.setOuterMargin(1, 1, 0, 0);
-	}
+	mContinueButton
+		.init("Continue", font, buttonSize)
+		.setOuterMargin(1, 2, 0, 0);
+	mButtonLayout.addChildWidget(mContinueButton);
 
-	mButtonLayout.setSelected(true);
+	mSettingsButton
+		.init("Settings", font, buttonSize)
+		.setOuterMargin(1, 2, 0, 0);
+	mButtonLayout.addChildWidget(mSettingsButton);
+
+	mButtonLayout.makeFocusedChild();
+}
+
+void OxygenSideBar::setOpen(bool open)
+{
+	mShouldBeOpen = open;
 }
 
 void OxygenSideBar::update(loui::UpdateInfo& updateInfo)
 {
-	const Recti rect(getRelativeRect().x, 0, 160, FTX::screenHeight());
+	// Update open/close animation
+	if (mShouldBeOpen)
+	{
+		if (mVisibility < 1.0f)
+		{
+			mVisibility = saturate(mVisibility + updateInfo.mDeltaSeconds / 0.15f);
+		}
+	}
+	else
+	{
+		if (mVisibility == 0.0f)
+		{
+			setVisible(false);
+			return;
+		}
+
+		mVisibility = saturate(mVisibility - updateInfo.mDeltaSeconds / 0.15f);
+	}
+	setVisible(true);
+
+	const float animPos = 1.0f - (1.0f - mVisibility) * (1.0f - mVisibility);
+	const Vec2i sideBarSize = getRelativeRect().getSize();
+	const Recti rect(roundToInt(sideBarSize.x * (animPos - 1.0f)), 0, 160, getParentWidget()->getRelativeRect().height);
 	setRelativeRect(rect);
+	setInteractable(mVisibility == 1.0f);
 
 	mButtonLayout.setRelativeRect(Recti(20, 0, rect.width - 40, rect.height));
 	refreshLayout();
 
 	Widget::update(updateInfo);
+
+	// Check buttons
+	if (mContinueButton.wasPressed())
+	{
+		OxygenMenu::instance().closeSideBar();
+	}
+	if (mSettingsButton.wasPressed())
+	{
+		OxygenMenu::instance().openSettingsMenu();
+	}
+
+	if (hasFocus() && updateInfo.mButtonB.justPressed())
+	{
+		OxygenMenu::instance().closeSideBar();
+		updateInfo.mButtonB.consume();
+	}
 }
 
 void OxygenSideBar::render(loui::RenderInfo& renderInfo)
@@ -77,7 +117,7 @@ void OxygenSideBar::render(loui::RenderInfo& renderInfo)
 		mBackground.bitmapUpdated();
 	}
 
-	renderInfo.mDrawer.drawRect(getFinalScreenRect(), mBackground);
+	renderInfo.mDrawer.drawRect(getFinalRect(), mBackground);
 
 	Widget::render(renderInfo);
 }

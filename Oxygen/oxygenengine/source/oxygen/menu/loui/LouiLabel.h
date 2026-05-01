@@ -16,7 +16,7 @@ namespace loui
 	class Label : public Widget
 	{
 	public:
-		Label& init(const std::string_view text, FontWrapper& font, Vec2i size);
+		Label& init(const std::string_view text, FontWrapper& font, Vec2i size, int alignment = 5);
 
 		void setText(std::string_view text);
 
@@ -26,5 +26,6 @@ namespace loui
 	protected:
 		std::string mText;
 		FontWrapper* mFont = nullptr;
+		int mAlignment = 5;
 	};
 }

@@ -22,7 +22,7 @@ namespace loui
 		virtual ~Widget();
 
 		void clearChildren();
-		void addChildWidget(Widget& widget, bool autoDelete);
+		void addChildWidget(Widget& widget, bool autoDelete = false);
 
 		template<typename T>
 		T& createChildWidget()
@@ -31,6 +31,8 @@ namespace loui
 			addChildWidget(*widget, true);
 			return *widget;
 		}
+
+		void removeChildWidget(Widget& widget);
 
 		inline Widget* getParentWidget() const  { return mParentWidget; }
 		inline const std::vector<Widget*> getChildWidgets() const  { return mChildWidgets; }
@@ -42,10 +44,10 @@ namespace loui
 		void refreshLayout();
 
 		inline const Recti& getRelativeRect() const  { return mRelativeRect; }
-		void setRelativeRect(const Recti& rect);
+		virtual void setRelativeRect(const Recti& rect);
+		void refreshChildPositions();
 
-		inline const Recti& getFinalScreenRect() const  { return mFinalScreenRect; }
-		void setFinalScreenRect(const Recti& rect);
+		inline const Recti& getFinalRect() const  { return mFinalRect; }
 
 		inline const Borders& getInnerPadding() const							{ return mInnerPadding; }
 		inline void setInnerPadding(const Borders& padding)						{ mInnerPadding = padding; }
@@ -55,47 +57,77 @@ namespace loui
 		inline void setOuterMargin(const Borders& margin)						{ mOuterMargin = margin; }
 		inline void setOuterMargin(int top, int bottom, int left, int right)	{ setOuterMargin(Borders { top, bottom, left, right }); }
 
-		virtual Vec2i getInnerOffset() const  { return Vec2i::ZERO; }
+		inline bool isFocusedChild() const	{ return mFocusState >= FocusState::FOCUSED_CHILD; }
+		inline bool hasFocus() const		{ return mFocusState == FocusState::FULL_FOCUS; }
+		void makeFocusedChild(bool focus = true);
+		void grantFocus(bool focus = true);
 
 		inline bool isVisible() const  { return mIsVisible; }
 		virtual void setVisible(bool visible);
 
-		inline bool isInteractable() const  { return mIsInteractable; }
+		inline bool isInteractable() const  { return mIsInteractable && mIsVisible; }
 		virtual void setInteractable(bool interactable);
 
-		inline bool isSelected() const  { return mIsSelected; }
-		virtual void setSelected(bool selected);
+		inline float getOpacity() const  { return mOpacity; }
+		virtual void setOpacity(float opacity);
 
 		virtual void update(UpdateInfo& updateInfo);
 		virtual void render(RenderInfo& renderInfo);
 
 	protected:
-		virtual void applyLayouting() {}
+		enum class FocusState
+		{
+			NONE,			// Widget is not focused at all
+			FOCUSED_CHILD,	// Widget would be focused, if its parent was fully focused
+			FULL_FOCUS,		// Widget has full focus (and so does its parent)
+		};
 
+	protected:
+		virtual void applyLayouting() {}
+		virtual void refreshChildBaseOffset();
+
+		void setFocusStateInternal(FocusState newState);
+		virtual void onFocusGained() {}
+		virtual void onFocusLost() {}
+		virtual void onChangedFocusedChildIndex() {}
+
+		int getIndexOfChild(Widget& childWidget) const;
 		int getNextInteractableChildIndex(int index, int direction) const;
 
 	private:
 		bool removeChildWidgetInternal(Widget& childWidget);
+
+		void beginIteratingChildren();
+		void endIteratingChildren();
 
 	protected:
 		// Layout
 		Borders mInnerPadding;
 		Borders mOuterMargin;
 
-		bool mLayoutDirty = false;
 		Recti mRelativeRect;		// Positioning relative to parent's inner rect
-		Recti mFinalScreenRect;		// Final screen rect
+		Recti mFinalRect;			// Final rect on screen (or whatever coordinate system the root is using)
+		Vec2i mChildBaseOffset;		// Difference between relative rect and final rect for child widgets
+		bool mLayoutDirty = false;
+
+		FocusState mFocusState = FocusState::NONE;
+		int mFocusedChildIndex = -1;
 
 		// Flags
-		bool mIsVisible = true;
+		bool mIsVisible = true;				// Evaluated visiblity value, considering visibility of the parent
+		bool mIsVisibleSelf = true;			// Own local visibility value
 		bool mIsInteractable = true;
-		bool mIsSelected = false;
+		bool mIsInteractableSelf = true;
 		float mOpacity = 1.0f;
+		float mOpacitySelf = 1.0f;
 
 	private:
 		// Widget hierarchy
 		Widget* mParentWidget = nullptr;
 		std::vector<Widget*> mChildWidgets;
+		std::vector<Widget*> mChildrenToRemove;
+		bool mIteratingChildren = false;
+
 		bool mAutoDelete = true;
 	};
 }

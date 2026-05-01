@@ -12,46 +12,12 @@
 
 namespace loui
 {
-	void VerticalLayout::applyLayouting()
-	{
-		// Apply vertical layout
-		Vec2i cursor;
-
-		for (Widget* widget : getChildWidgets())
-		{
-			cursor.y += widget->getOuterMargin().mTop;
-
-			const Recti rect(cursor, widget->getRelativeRect().getSize());
-			widget->setRelativeRect(rect);
-
-			cursor.y += rect.height;
-			cursor.y += widget->getOuterMargin().mBottom;
-
-			widget->refreshLayout();
-		}
-
-		mInnerSize = cursor.y;
-	}
-
 	void VerticalLayout::scrollToRect(const Recti& localRect, bool animated)
 	{
 		const bool scrolling = mScrollingController.scrollToMakeVisible(localRect.y, localRect.height, animated);
 		if (scrolling && !animated)
 		{
-			refreshLayout();
-		}
-	}
-
-	void VerticalLayout::setSelected(bool selected)
-	{
-		if (selected != mIsSelected)
-		{
-			Widget::setSelected(selected);
-
-			if (selected && mSelectedChildIndex < 0 && !getChildWidgets().empty())
-			{
-				changeSelectedChildindex(+1);
-			}
+			refreshChildPositions();
 		}
 	}
 
@@ -66,7 +32,7 @@ namespace loui
 
 				if (mScrollingController.scrollRelative(mLastMouseY - updateInfo.mMousePosition.y))
 				{
-					refreshLayout();
+					refreshChildPositions();
 				}
 			}
 			else
@@ -77,13 +43,13 @@ namespace loui
 
 		Widget::update(updateInfo);
 
-		// Change selection
-		if (isSelected())
+		// Change focused child
+		if (hasFocus())
 		{
 			if (updateInfo.mButtonUp.justPressedOrRepeat() || updateInfo.mButtonDown.justPressedOrRepeat())
 			{
 				const int direction = updateInfo.mButtonUp.justPressedOrRepeat() ? -1 : 1;
-				changeSelectedChildindex(direction);
+				changeFocusedChildindex(direction);
 			}
 		}
 
@@ -93,7 +59,7 @@ namespace loui
 
 			if (mScrollingController.update(updateInfo.mDeltaSeconds))
 			{
-				refreshLayout();
+				refreshChildPositions();
 			}
 
 			// Scroll with mouse wheel
@@ -101,7 +67,7 @@ namespace loui
 			{
 				if (mScrollingController.scrollRelative(-updateInfo.mMouseWheel * mWheelScrollSpeed))
 				{
-					refreshLayout();
+					refreshChildPositions();
 				}
 			}
 
@@ -118,7 +84,7 @@ namespace loui
 	{
 		if (mUseScrolling)
 		{
-			renderInfo.mDrawer.pushScissor(mFinalScreenRect);
+			renderInfo.mDrawer.pushScissor(mFinalRect);
 		}
 
 		Widget::render(renderInfo);
@@ -129,27 +95,63 @@ namespace loui
 		}
 	}
 
-	void VerticalLayout::changeSelectedChildindex(int direction)
+	void VerticalLayout::applyLayouting()
 	{
-		const int newIndex = getNextInteractableChildIndex(mSelectedChildIndex, direction);
-		if (newIndex != mSelectedChildIndex)
+		// Apply vertical layout
+		Vec2i cursor(getInnerPadding().mLeft, getInnerPadding().mTop);
+
+		for (Widget* widget : getChildWidgets())
 		{
-			if (mSelectedChildIndex >= 0)
+			cursor.y += widget->getOuterMargin().mTop;
+
+			const Recti rect(cursor, widget->getRelativeRect().getSize());
+			widget->setRelativeRect(rect);
+
+			cursor.y += rect.height;
+			cursor.y += widget->getOuterMargin().mBottom;
+
+			widget->refreshLayout();
+		}
+
+		cursor.y += getInnerPadding().mBottom;
+		mInnerSize = cursor.y;
+	}
+
+	void VerticalLayout::refreshChildBaseOffset()
+	{
+		mChildBaseOffset = mFinalRect.getPos();
+		mChildBaseOffset.y -= mScrollingController.getScrollPosition();
+	}
+
+	void VerticalLayout::onFocusGained()
+	{
+		if (mFocusedChildIndex < 0 && !getChildWidgets().empty())
+		{
+			changeFocusedChildindex(+1);
+		}
+	}
+
+	void VerticalLayout::onChangedFocusedChildIndex()
+	{
+		Widget* newSelectedChild = getChildWidget(mFocusedChildIndex);
+		if (nullptr != newSelectedChild)
+		{
+			Recti rect = newSelectedChild->getRelativeRect();
+			rect.y -= mSelectionScrollAddSpace;
+			rect.height += mSelectionScrollAddSpace * 2;
+			scrollToRect(rect);
+		}
+	}
+
+	void VerticalLayout::changeFocusedChildindex(int direction)
+	{
+		const int newIndex = getNextInteractableChildIndex(mFocusedChildIndex, direction);
+		if (newIndex != mFocusedChildIndex)
+		{
+			Widget* newSelectedChild = getChildWidget(newIndex);
+			if (nullptr != newSelectedChild)
 			{
-				getChildWidget(mSelectedChildIndex)->setSelected(false);
-			}
-
-			mSelectedChildIndex = newIndex;
-
-			if (mSelectedChildIndex >= 0)
-			{
-				Widget& newSelectedChild = *getChildWidget(mSelectedChildIndex);
-				newSelectedChild.setSelected(true);
-
-				Recti rect = newSelectedChild.getRelativeRect();
-				rect.y -= mSelectionScrollAddSpace;
-				rect.height += mSelectionScrollAddSpace * 2;
-				scrollToRect(rect);
+				newSelectedChild->grantFocus();
 			}
 		}
 	}
