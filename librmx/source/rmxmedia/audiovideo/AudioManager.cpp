@@ -13,7 +13,7 @@ namespace rmx
 {
 
 	AudioManager::AudioManager() :
-		mRootMixer(*new AudioMixer(0))	// Root mixer always uses ID 0
+		mRootMixer(*new AudioMixer("Root", 0))	// Root mixer always uses ID 0
 	{
 		mAudioMixers[0] = &mRootMixer;
 	}

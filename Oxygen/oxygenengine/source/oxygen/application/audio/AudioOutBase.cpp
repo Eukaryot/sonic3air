@@ -26,12 +26,12 @@ AudioOutBase::~AudioOutBase()
 void AudioOutBase::startup()
 {
 	// Create audio mixers
-	FTX::Audio->createAudioMixer<rmx::AudioMixer>((int)AudioMixerId::INGAME_MASTER, (int)AudioMixerId::ROOT);
-	FTX::Audio->createAudioMixer<rmx::AudioMixer>((int)AudioMixerId::INGAME_MUSIC,  (int)AudioMixerId::INGAME_MASTER);
-	FTX::Audio->createAudioMixer<rmx::AudioMixer>((int)AudioMixerId::INGAME_SOUND,  (int)AudioMixerId::INGAME_MASTER);
-	FTX::Audio->createAudioMixer<rmx::AudioMixer>((int)AudioMixerId::MENU_MASTER,   (int)AudioMixerId::ROOT);
-	FTX::Audio->createAudioMixer<rmx::AudioMixer>((int)AudioMixerId::MENU_MUSIC,    (int)AudioMixerId::MENU_MASTER);
-	FTX::Audio->createAudioMixer<rmx::AudioMixer>((int)AudioMixerId::MENU_SOUND,    (int)AudioMixerId::MENU_MASTER);
+	FTX::Audio->createAudioMixer<rmx::AudioMixer>("In-game Master",	(int)AudioMixerId::INGAME_MASTER, (int)AudioMixerId::ROOT);
+	FTX::Audio->createAudioMixer<rmx::AudioMixer>("In-game Music",	(int)AudioMixerId::INGAME_MUSIC,  (int)AudioMixerId::INGAME_MASTER);
+	FTX::Audio->createAudioMixer<rmx::AudioMixer>("In-game Sound",	(int)AudioMixerId::INGAME_SOUND,  (int)AudioMixerId::INGAME_MASTER);
+	FTX::Audio->createAudioMixer<rmx::AudioMixer>("Menu Master",	(int)AudioMixerId::MENU_MASTER,   (int)AudioMixerId::ROOT);
+	FTX::Audio->createAudioMixer<rmx::AudioMixer>("Menu Music",		(int)AudioMixerId::MENU_MUSIC,    (int)AudioMixerId::MENU_MASTER);
+	FTX::Audio->createAudioMixer<rmx::AudioMixer>("Menu Sound",		(int)AudioMixerId::MENU_SOUND,    (int)AudioMixerId::MENU_MASTER);
 
 	// Load audio definitions
 	//  -> No mods yet here, that's coming later in "handleGameLoaded"

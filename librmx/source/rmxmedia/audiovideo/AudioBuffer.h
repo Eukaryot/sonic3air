@@ -51,6 +51,8 @@ public:
 	void lock();
 	void unlock();
 
+	void setName(std::string_view name)  { mName = name; }
+
 private:
 	static const constexpr int MAX_FRAME_LENGTH = 4096;		// Maximum length of an audio frame in samples -- this is the length of all audio frames, except the last
 
@@ -77,6 +79,8 @@ private:
 	int mFrequency = 44100;				// Sampling frequency, e.g. 44100 Hz
 	bool mPersistent = true;			// If false, played audio frames get deleted (e.g. for music streams)
 	bool mCompleted = false;			// Set to true when loading / streaming is completed
+
+	std::string mName;					// Internal name for debugging
 
 	rmx::Mutex mMutex;
 	int mMutexLockCounter = 0;

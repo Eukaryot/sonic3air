@@ -14,7 +14,7 @@
 class CustomAudioMixer final : public rmx::AudioMixer
 {
 public:
-	CustomAudioMixer(int mixerId) : AudioMixer(mixerId) {}
+	CustomAudioMixer(std::string_view name, int mixerId) : AudioMixer(name, mixerId) {}
 
 	void setUnderwaterEffect(int effect, float volumeMultiplier);
 

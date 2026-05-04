@@ -45,7 +45,7 @@ void AudioOut::startup()
 	}
 
 	// Replace the ingame master audio mixer
-	mIngameAudioMixer = &FTX::Audio->createAudioMixer<CustomAudioMixer>((int)AudioMixerId::INGAME_MASTER, (int)AudioMixerId::ROOT);
+	mIngameAudioMixer = &FTX::Audio->createAudioMixer<CustomAudioMixer>("In-game Master (Custom)", (int)AudioMixerId::INGAME_MASTER, (int)AudioMixerId::ROOT);
 }
 
 void AudioOut::shutdown()

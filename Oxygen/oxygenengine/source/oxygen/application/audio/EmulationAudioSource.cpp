@@ -31,6 +31,7 @@ EmulationAudioSource::~EmulationAudioSource()
 bool EmulationAudioSource::initWithSfxId(uint8 soundId)
 {
 	mSoundId = soundId;
+	mAudioBuffer.setName(String(0, "%02x", (int)soundId));
 	return true;
 }
 
@@ -39,6 +40,7 @@ bool EmulationAudioSource::initWithCustomAddress(uint8 soundId, uint32 sourceAdd
 	mSoundId = soundId;
 	mSourceAddress = sourceAddress;
 	mSoundDriver.setSourceAddress(sourceAddress);
+	mAudioBuffer.setName(String(0, "%02x", (int)soundId));
 	return true;
 }
 
@@ -56,6 +58,8 @@ bool EmulationAudioSource::initWithCustomContent(uint8 soundId, const std::wstri
 		}
 		mSoundDriver.setFixedContent(&mCompressedContent[0], (uint32)mCompressedContent.size(), contentOffset);
 	}
+
+	mAudioBuffer.setName(WString(filename).toStdString());
 	return true;
 }
 

@@ -75,10 +75,10 @@ namespace rmx
 		void setGlobalVolume(float volume);
 
 		template<typename T>
-		T& createAudioMixer(int mixerId, int parentMixerId = 0)
+		T& createAudioMixer(std::string_view name, int mixerId, int parentMixerId = 0)
 		{
 			RMX_ASSERT(mixerId != 0, "Root audio mixer (with ID 0) can't be replaced");
-			T* audioMixer = new T(mixerId);
+			T* audioMixer = new T(name, mixerId);
 			registerAudioMixer(*audioMixer, parentMixerId);
 			return *audioMixer;
 		}

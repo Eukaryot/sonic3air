@@ -270,7 +270,7 @@ namespace rmx
 				}
 
 				// Limit by samples available in instance
-				numBlockSamples = (sourceSamplePositionFraction + (numAvailableInputSamples << 16) - 1) / sourceIndexAdvance + 1;
+				numBlockSamples = ((numAvailableInputSamples << 16) - sourceSamplePositionFraction - 1) / sourceIndexAdvance + 1;
 				numBlockSamples = std::min(numBlockSamples, (int)numOutputSamplesNeeded);
 			}
 

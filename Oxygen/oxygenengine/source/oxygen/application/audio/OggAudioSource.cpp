@@ -42,6 +42,8 @@ bool OggAudioSource::load(const std::wstring& filename)
 		RMX_ERROR("Failed to load audio file '" << *WString(filename).toString() << "': File not found", );
 		return false;
 	}
+
+	mAudioBuffer.setName(WString(filename).toStdString());
 	return true;
 }
 

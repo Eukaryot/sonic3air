@@ -31,7 +31,7 @@ namespace rmx
 		};
 
 	public:
-		AudioMixer(int mixerId) : mMixerId(mixerId) {}
+		AudioMixer(std::string_view name, int mixerId) : mName(name), mMixerId(mixerId) {}
 		virtual ~AudioMixer();
 
 		void addChild(AudioMixer& child);
@@ -62,6 +62,7 @@ namespace rmx
 		void removeChildInternal(AudioMixer& child);
 
 	private:
+		std::string mName;
 		int mMixerId = 0;
 		AudioMixer* mParent = nullptr;
 		std::vector<AudioMixer*> mChildren;
