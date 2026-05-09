@@ -276,15 +276,18 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 		pm.getPlaneRects(planeRects, fullscreenRect);
 
 		// Render default planes
-		for (int pass = 0; pass < 2; pass++)
+		for (int pass = 0; pass < 2; ++pass)
 		{
 			const bool priorityFlag = (pass == 1);
-				
+
 			for (const PlaneManager::PlaneRect& planeRect : planeRects)
 			{
-				const int layerIndex = ((planeRect.mPlane == PlaneManager::PLANE_B) ? 0 : 1) + (priorityFlag ? 4 : 0);
-				
-				if (mRenderParts->mLayerRendering[layerIndex] && pm.isDefaultPlaneEnabled(((planeRect.mPlane == PlaneManager::PLANE_B) ? 0 : 1) + (pass << 1)))
+				// Note that layer rendering flags and default plane enabled flags don't properly support differentiation between plane A and W - this needs a rework eventually
+				const bool isPlaneB = (planeRect.mPlane == PlaneManager::PLANE_B);
+				const int layerIndex = (isPlaneB ? 0 : 1) + (priorityFlag ? 4 : 0);
+				const int defaultPlaneIndex = (isPlaneB ? 0 : 1) + (priorityFlag ? 2 : 0);
+
+				if (mRenderParts->mLayerRendering[layerIndex] && pm.isDefaultPlaneEnabled(defaultPlaneIndex))
 				{
 					uint8 scrollOffsets = (uint8)planeRect.mPlane;
 					int renderQueue;
@@ -301,7 +304,7 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 			}
 		}
 
-		// render custom planes
+		// Render custom planes
 		if (!pm.getCustomPlanes().empty())
 		{
 			for (const auto& customPlane : pm.getCustomPlanes())
