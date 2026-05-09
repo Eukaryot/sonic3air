@@ -276,15 +276,15 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 		pm.getPlaneRects(planeRects, fullscreenRect);
 
 		// Render default planes
-		for (int pass = 0; pass < 2; ++pass)
+		for (int pass = 0; pass < 2; pass++)
 		{
 			const bool priorityFlag = (pass == 1);
-
+				
 			for (const PlaneManager::PlaneRect& planeRect : planeRects)
 			{
 				const int layerIndex = ((planeRect.mPlane == PlaneManager::PLANE_B) ? 0 : 1) + (priorityFlag ? 4 : 0);
-
-				if (mRenderParts->mLayerRendering[layerIndex] && pm.isDefaultPlaneEnabled(planeRect.mPlane))
+				
+				if (mRenderParts->mLayerRendering[layerIndex] && pm.isDefaultPlaneEnabled(((planeRect.mPlane == PlaneManager::PLANE_B) ? 0 : 1) + (pass << 1)))
 				{
 					uint8 scrollOffsets = (uint8)planeRect.mPlane;
 					int renderQueue;
