@@ -169,7 +169,6 @@ public:
 	std::wstring mRomPath;					// From configuration
 	std::wstring mLastRomPath;				// From settings
 	std::wstring mScriptsDir;
-	std::wstring mMainScriptName;
 	lemon::PreprocessorDefinitionMap mPreprocessorDefinitions;
 	std::wstring mSaveStatesDir;			// Save states dir in the installation
 	std::wstring mSaveStatesDirLocal;		// Save states dir in app data, specific for the game profile

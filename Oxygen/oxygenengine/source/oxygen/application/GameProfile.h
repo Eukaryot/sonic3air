@@ -68,6 +68,10 @@ public:
 	// Paths
 	std::wstring mGameDataPath;		// As a path relative to the project directory; can stay empty to use the default path
 
+	// Script configuration
+	std::wstring mMainScriptName;
+	bool mErrorOnUnknownAddress = false;
+
 	// Data packages
 	std::vector<DataPackage> mDataPackages;
 

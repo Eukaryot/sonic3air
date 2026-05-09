@@ -352,7 +352,7 @@ bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 	options.mEnforceFullReload = enforceFullReload;
 	options.mModuleSelection = EngineMain::getDelegate().mayLoadScriptMods() ? LemonScriptProgram::LoadOptions::ModuleSelection::ALL_MODS : LemonScriptProgram::LoadOptions::ModuleSelection::BASE_GAME_ONLY;
 	options.mAppVersion = EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber;
-	const std::wstring mainScriptPath = config.mScriptsDir + config.mMainScriptName;
+	const std::wstring mainScriptPath = config.mScriptsDir + GameProfile::instance().mMainScriptName;
 
 	const LemonScriptProgram::LoadScriptsResult result = mLemonScriptProgram.loadScripts(mainScriptPath, options);
 	if (result == LemonScriptProgram::LoadScriptsResult::PROGRAM_CHANGED)
@@ -802,6 +802,7 @@ bool CodeExec::tryCallAddressHookDev(uint32 address)
 		{
 			mUnknownAddressesSet.insert(address);
 			mUnknownAddressesInOrder.push_back(address);
+			RMX_ERROR("Call or jump to unknown address " << rmx::hexString(address, 6), );
 		}
 		return false;
 	}

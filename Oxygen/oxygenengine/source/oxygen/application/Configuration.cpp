@@ -283,7 +283,6 @@ bool Configuration::loadConfiguration(const std::wstring& filename)
 #endif
 
 	// Define fallback values
-	mMainScriptName = L"main.lemon";
 	if (mEngineDataPath.empty())
 		mEngineDataPath = L"data";
 	if (mGameDataPath.empty())
@@ -437,7 +436,6 @@ void Configuration::loadConfigurationProperties(JsonSerializer& serializer)
 	{
 		FTX::FileSystem->normalizePath(mScriptsDir, true);
 	}
-	serializer.serialize("MainScriptName", mMainScriptName);
 
 	if (mDevMode.mEnabled)
 	{

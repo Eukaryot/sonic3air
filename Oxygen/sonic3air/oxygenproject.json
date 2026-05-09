@@ -23,7 +23,10 @@
 	"GameDataPath": "data",
 
 	// Scripts
-	"MainScript": "main.lemon",
+	"Scripts":
+	{
+		"MainScript": "main.lemon"
+	},
 
 	// Data packages
 	"DataPackages":
