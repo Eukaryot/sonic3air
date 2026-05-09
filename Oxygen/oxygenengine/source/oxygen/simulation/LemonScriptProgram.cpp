@@ -314,13 +314,13 @@ LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(const
 			//  -> Note that with a normal game installation, this fails; which is okay, as we can expect loading from scripts.bin to succeed, which is faster anyways
 			if (!scriptsLoaded)
 			{
-				scriptsLoaded = loadBaseScriptFromSource(globalsLookup, baseScriptFilename, coreModuleDependencyHash, loadOptions, loadingResult);
+				scriptsLoaded = loadBaseScriptFromSource(globalsLookup, Configuration::instance().mProjectPath + std::wstring(baseScriptFilename), coreModuleDependencyHash, loadOptions, loadingResult);
 			}
 
 			// If that failed, load from scripts.bin
 			if (!scriptsLoaded)
 			{
-				scriptsLoaded = loadBaseScriptFromBinary(globalsLookup, L"data/scripts.bin", coreModuleDependencyHash, loadOptions);
+				scriptsLoaded = loadBaseScriptFromBinary(globalsLookup, Configuration::instance().mProjectPath + L"data/scripts.bin", coreModuleDependencyHash, loadOptions);
 			}
 		}
 		else
@@ -328,13 +328,13 @@ LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(const
 			// Without dev mode, prefer loading from scripts.bin
 			if (!scriptsLoaded)
 			{
-				scriptsLoaded = loadBaseScriptFromBinary(globalsLookup, L"data/scripts.bin", coreModuleDependencyHash, loadOptions);
+				scriptsLoaded = loadBaseScriptFromBinary(globalsLookup, Configuration::instance().mProjectPath + L"data/scripts.bin", coreModuleDependencyHash, loadOptions);
 			}
 
 			// If that failed, try to load from sources as a fallback
 			if (!scriptsLoaded)
 			{
-				scriptsLoaded = loadBaseScriptFromSource(globalsLookup, baseScriptFilename, coreModuleDependencyHash, loadOptions, loadingResult);
+				scriptsLoaded = loadBaseScriptFromSource(globalsLookup, Configuration::instance().mProjectPath + std::wstring(baseScriptFilename), coreModuleDependencyHash, loadOptions, loadingResult);
 			}
 		}
 
@@ -462,7 +462,7 @@ bool LemonScriptProgram::loadBaseScriptFromCache(lemon::GlobalsLookup& globalsLo
 	Configuration& config = Configuration::instance();
 	if (!FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer))
 		return false;
-	
+
 	VectorBinarySerializer serializer(true, buffer);
 	const bool scriptsLoaded = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
 	RMX_CHECK(scriptsLoaded, "Failed to deserialize scripts, possibly because the compiled script file '" << WString(config.mCompiledScriptSavePath).toStdString() << "' is using an older format", );
