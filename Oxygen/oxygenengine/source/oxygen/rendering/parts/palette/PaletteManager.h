@@ -31,6 +31,7 @@ public:
 	void writePaletteEntryPacked(int paletteIndex, uint16 colorIndex, uint16 packedColor);
 
 	inline Color getBackdropColor() const  { return mMainPalette[0].getColor(mBackdropColorIndex); }
+	inline uint16 getBackdropColorIndex() const  { return mBackdropColorIndex; }
 	inline void setBackdropColorIndex(uint16 paletteIndex)  { mBackdropColorIndex = paletteIndex; }
 
 	void setPaletteSplitPositionY(int py);
