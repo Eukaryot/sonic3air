@@ -185,7 +185,14 @@ void DebugTracking::updateWatches()
 
 void DebugTracking::clearWatches(bool clearPersistent)
 {
-	std::vector<std::pair<uint32, uint16>> reAddWatches;
+	struct SavedWatchData
+	{
+		uint32 mAddress;
+		uint16 mBytes;
+		std::string mName;
+	};
+
+	std::vector<SavedWatchData> reAddWatches;
 	if (!clearPersistent)
 	{
 		// Save persistent watches
@@ -194,7 +201,10 @@ void DebugTracking::clearWatches(bool clearPersistent)
 		{
 			if (watch->mPersistent)
 			{
-				reAddWatches.emplace_back(watch->mAddress, watch->mBytes);
+				SavedWatchData& saved = vectorAdd(reAddWatches);
+				saved.mAddress = watch->mAddress;
+				saved.mBytes = watch->mBytes;
+				saved.mName = watch->mName;
 			}
 		}
 	}
@@ -204,9 +214,9 @@ void DebugTracking::clearWatches(bool clearPersistent)
 	mWatches.clear();
 	mEmulatorInterface.getWatches().clear();
 
-	for (const auto& pair : reAddWatches)
+	for (const SavedWatchData& saved : reAddWatches)
 	{
-		addWatch(pair.first, pair.second, true);
+		addWatch(saved.mAddress, saved.mBytes, true, saved.mName);
 	}
 }
 
@@ -214,7 +224,7 @@ void DebugTracking::addWatch(uint32 address, uint16 bytes, bool persistent, std:
 {
 	address &= 0x00ffffff;
 
-	// Check if already exists
+	// Check if it already exists
 	if (hasWatch(address, bytes))
 		return;
 
