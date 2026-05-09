@@ -37,6 +37,11 @@ ImVec4 ImGuiHelpers::getAccentColorMix(float accent, float saturation, float gra
 }
 
 
+void ImGuiHelpers::InputString::clear()
+{
+	mInternal[0] = 0;
+}
+
 void ImGuiHelpers::InputString::set(std::string_view str)
 {
 	const size_t len = std::min(str.length(), sizeof(mInternal) - 1);
@@ -45,6 +50,12 @@ void ImGuiHelpers::InputString::set(std::string_view str)
 	mInternal[len] = 0;
 }
 
+
+void ImGuiHelpers::WideInputString::clear()
+{
+	mWideString.clear();
+	mInternalUTF8[0] = 0;
+}
 
 void ImGuiHelpers::WideInputString::set(std::wstring_view str)
 {

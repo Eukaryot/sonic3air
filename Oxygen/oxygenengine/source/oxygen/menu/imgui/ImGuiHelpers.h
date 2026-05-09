@@ -79,6 +79,7 @@ struct ImGuiHelpers
 
 		inline bool isEmpty() const  { return (mInternal[0] == 0); }
 		inline std::string_view get() const  { return std::string_view(mInternal); }
+		void clear();
 		void set(std::string_view str);
 	};
 
@@ -90,6 +91,7 @@ struct ImGuiHelpers
 
 		inline bool isEmpty() const  { return mWideString.empty(); }
 		inline const WString& get() const  { return mWideString; }
+		void clear();
 		void set(std::wstring_view str);
 		void refreshFromInternal();
 	};

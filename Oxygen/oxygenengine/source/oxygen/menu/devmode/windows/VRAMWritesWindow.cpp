@@ -45,8 +45,10 @@ void VRAMWritesWindow::buildContent()
 
 	const uint16 startAddressPlaneA = planeManager.getPlaneBaseVRAMAddress(PlaneManager::PLANE_A);
 	const uint16 startAddressPlaneB = planeManager.getPlaneBaseVRAMAddress(PlaneManager::PLANE_B);
+	const uint16 startAddressPlaneW = planeManager.getPlaneBaseVRAMAddress(PlaneManager::PLANE_W);
 	const uint16 endAddressPlaneA = startAddressPlaneA + (uint16)planeManager.getPlaneSizeInVRAM(PlaneManager::PLANE_A);
 	const uint16 endAddressPlaneB = startAddressPlaneB + (uint16)planeManager.getPlaneSizeInVRAM(PlaneManager::PLANE_B);
+	const uint16 endAddressPlaneW = startAddressPlaneW + (uint16)planeManager.getPlaneSizeInVRAM(PlaneManager::PLANE_W);
 	const uint16 startAddressScrollOffsets = scrollOffsetsManager.getHorizontalScrollTableBase();
 	const uint16 endAddressScrollOffsets = startAddressScrollOffsets + 0x400;
 	const uint16 startAddressSAT = spriteManager.getSpriteAttributeTableBase();
@@ -56,23 +58,73 @@ void VRAMWritesWindow::buildContent()
 	std::vector<DebugTracking::VRAMWrite*> writes = debugTracking.getVRAMWrites();
 	std::sort(writes.begin(), writes.end(), [](const DebugTracking::VRAMWrite* a, const DebugTracking::VRAMWrite* b) { return a->mAddress < b->mAddress; } );
 
-	ImGui::Checkbox("Plane A", &mShowPlaneA);
-	ImGui::Checkbox("Plane B", &mShowPlaneB);
-	ImGui::Checkbox("Scroll Offsets", &mShowScroll);
-	ImGui::Checkbox("Sprite Attribute Table", &mShowSAT);
-	ImGui::Checkbox("Patterns and others", &mShowOthers);
+	// Checkboxes
+	{
+		ImGui::Checkbox("Plane A", &mShowPlaneA);
+		if (ImGui::IsItemHovered())
+			ImGui::SetItemTooltip("VRAM range: 0x%04x - 0x%04x", startAddressPlaneA, endAddressPlaneA - 1);
 
+		ImGui::SameLine();
+		ImGui::Text("   ");
+		ImGui::SameLine();
+
+		ImGui::Checkbox("Plane B", &mShowPlaneB);
+		if (ImGui::IsItemHovered())
+			ImGui::SetItemTooltip("VRAM range: 0x%04x - 0x%04x", startAddressPlaneB, endAddressPlaneB - 1);
+
+		ImGui::SameLine();
+		ImGui::Text("   ");
+		ImGui::SameLine();
+
+		ImGui::Checkbox("Plane W", &mShowPlaneW);
+		if (ImGui::IsItemHovered())
+			ImGui::SetItemTooltip("VRAM range: 0x%04x - 0x%04x", startAddressPlaneW, endAddressPlaneW - 1);
+
+		ImGui::Checkbox("Scroll Offsets", &mShowScroll);
+		if (ImGui::IsItemHovered())
+			ImGui::SetItemTooltip("VRAM range: 0x%04x - 0x%04x", startAddressScrollOffsets, endAddressScrollOffsets - 1);
+
+		ImGui::Checkbox("Sprite Attribute Table", &mShowSAT);
+		if (ImGui::IsItemHovered())
+			ImGui::SetItemTooltip("VRAM range: 0x%04x - 0x%04x", startAddressSAT, endAddressSAT - 1);
+
+		ImGui::Checkbox("Patterns and others", &mShowOthers);
+		if (ImGui::IsItemHovered())
+			ImGui::SetItemTooltip("All other VRAM writes");
+	}
+
+	// Filtering
 	static int32 filterAddress = -1;
 	static ImGuiHelpers::InputString filterAddressString;
 	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Filter by address:");
 	ImGui::SameLine();
+	ImGui::PushItemWidth(uiScale * 180);
 	if (ImGuiHelpers::InputText("##FilterByAddress", filterAddressString))
 	{
 		if (filterAddressString.isEmpty())
 			filterAddress = -1;
-		else
+		else if (rmx::startsWith(filterAddressString.mInternal, "0x"))
 			filterAddress = (int32)rmx::parseInteger(filterAddressString.mInternal);
+		else
+			filterAddress = (int32)rmx::parseInteger(std::string("0x") + filterAddressString.mInternal);
+	}
+	ImGui::PopItemWidth();
+
+	ImGui::SameLine();
+	if (ImGui::SmallButton("Clear"))
+	{
+		filterAddressString.clear();
+		filterAddress = -1;
+	}
+	ImGui::SameLine();
+	ImGui::TextDisabled("(?)");
+	if (ImGui::BeginItemTooltip())
+	{
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 25.0f);
+		ImGui::TextUnformatted("To list only writes to a specific VRAM address (and also writes that include that address in its range), enter the address in hexadecimal form here, e.g. 0x1234.");
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
 	}
 
 	ImGui::Spacing();
@@ -113,6 +165,13 @@ void VRAMWritesWindow::buildContent()
 				if (!mShowPlaneB)
 					continue;
 				line = String("Plane B:   ") + line;
+				color = ImVec4(1.0f, 0.75f, 1.0f, 1.0f);
+			}
+			else if (write->mAddress >= startAddressPlaneW && write->mAddress < endAddressPlaneW)
+			{
+				if (!mShowPlaneW)
+					continue;
+				line = String("Plane W:   ") + line;
 				color = ImVec4(1.0f, 0.75f, 1.0f, 1.0f);
 			}
 			else if (write->mAddress >= startAddressScrollOffsets && write->mAddress < endAddressScrollOffsets)
