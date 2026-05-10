@@ -39,6 +39,7 @@ private:
 		FADE_TO_TITLESCREEN,
 		FADE_TO_DATASELECT,
 		FADE_TO_ACTSELECT,
+		FADE_TO_EXTRAS,
 		FADE_TO_SUBMENU,
 		FADE_TO_EXIT
 	};
@@ -46,6 +47,7 @@ private:
 private:
 	void triggerStartNormalGame();
 	void triggerStartActSelect();
+	void triggerStartExtras();
 	void startNormalGame();
 	void openActSelectMenu();
 	void openTimeAttack();
