@@ -601,7 +601,7 @@ AudioPlayer::PlayingSound* AudioPlayer::playAudioInternal(SourceRegistration* so
 	{
 		playingSound->mState = PlayingSound::State::OVERRIDDEN;
 		playingSound->mRelativeVolume = 0.0f;
-		playingSound->mBaseVolume = 1.0f;
+		playingSound->mBaseVolume = sourceReg->mVolume;
 	}
 
 	// Apply audio modifier if needed
