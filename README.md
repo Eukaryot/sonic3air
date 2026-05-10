@@ -70,6 +70,7 @@ Source code contributions by:
 * Rinnegatamante
 * MDashK
 * CodenameGamma
+* LelJader
 
 Remastered soundtrack by:
 * G Spindash
