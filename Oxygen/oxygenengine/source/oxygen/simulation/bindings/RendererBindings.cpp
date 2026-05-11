@@ -505,6 +505,48 @@ namespace
 		return SpriteCollection::instance().hasSprite(key);
 	}
 
+	uint32 Renderer_getWidthOfSprite(uint64 key)
+	{
+		if (!SpriteCollection::instance().hasSprite(key))
+		{
+			return 0;
+		}
+		const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
+		return item->mSprite->getSize().x;
+	}
+	
+	uint32 Renderer_getHeightOfSprite(uint64 key)
+	{
+		if (!SpriteCollection::instance().hasSprite(key))
+		{
+			return 0;
+		}
+		const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
+		return item->mSprite->getSize().y;
+	}
+	
+	uint32 Renderer_getCenterXOfSprite(uint64 key)
+	{
+		if (!SpriteCollection::instance().hasSprite(key))
+		{
+			return 0;
+		}
+		const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
+		int offset = item->mSprite->mOffset.x;
+		return -offset;		// this is negative, so negate
+	}
+	
+	uint32 Renderer_getCenterYOfSprite(uint64 key)
+	{
+		if (!SpriteCollection::instance().hasSprite(key))
+		{
+			return 0;
+		}
+		const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
+		int offset = item->mSprite->mOffset.y;
+		return -offset;		// this is negative, so negate
+	}
+
 	uint64 Renderer_setupCustomUncompressedSprite(uint32 sourceBase, uint16 words, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
 		SpriteCollection::ROMSpriteData romSpriteData;
@@ -1222,6 +1264,18 @@ void RendererBindings::registerBindings(lemon::Module& module)
 			.setParameters("px", "py", "encodedSize", "patternIndex", "renderQueue", "tintColor", "addedColor");
 
 		builder.addNativeFunction("Renderer.hasCustomSprite", lemon::wrap(&Renderer_hasCustomSprite), defaultFlags)
+			.setParameters("key");
+
+		builder.addNativeFunction("Renderer.getWidthOfSprite", lemon::wrap(&Renderer_getWidthOfSprite), defaultFlags)
+			.setParameters("key");
+		
+		builder.addNativeFunction("Renderer.getHeightOfSprite", lemon::wrap(&Renderer_getHeightOfSprite), defaultFlags)
+			.setParameters("key");
+		
+		builder.addNativeFunction("Renderer.getCenterXOfSprite", lemon::wrap(&Renderer_getCenterXOfSprite), defaultFlags)
+			.setParameters("key");
+		
+		builder.addNativeFunction("Renderer.getCenterYOfSprite", lemon::wrap(&Renderer_getCenterYOfSprite), defaultFlags)
 			.setParameters("key");
 
 		builder.addNativeFunction("Renderer.setupCustomUncompressedSprite", lemon::wrap(&Renderer_setupCustomUncompressedSprite), defaultFlags)
