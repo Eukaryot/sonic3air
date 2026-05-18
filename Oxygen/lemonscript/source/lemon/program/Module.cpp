@@ -205,9 +205,19 @@ namespace lemon
 			std::string lastPrefix = ".";		// Start with an invalid prefix so that first function will add a line break
 			for (const Function* function : currentFunctions)
 			{
-				// Separate functions with different prefixes
-				const size_t dot = function->getName().getString().find_first_of('.');
-				std::string_view prefix = (dot == std::string_view::npos) ? std::string_view() : function->getName().getString().substr(0, dot);
+				// Separate functions with different contexts or prefixes
+				std::string_view prefix;
+				if (outputMethods)
+				{
+					prefix = function->getContext().getString();
+				}
+				else
+				{
+					const size_t dot = function->getName().getString().find_first_of('.');
+					if (dot != std::string_view::npos)
+						prefix = function->getName().getString().substr(0, dot);
+				}
+
 				if (prefix != lastPrefix)
 				{
 					lastPrefix = prefix;
