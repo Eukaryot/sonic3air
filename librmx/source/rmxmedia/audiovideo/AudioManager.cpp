@@ -274,7 +274,7 @@ namespace rmx
 
 	void AudioManager::removeSound(AudioReference& ref)
 	{
-		if (ref.valid())
+		if (ref.isValid())
 		{
 			removeInstance(ref.getInstanceID());
 		}

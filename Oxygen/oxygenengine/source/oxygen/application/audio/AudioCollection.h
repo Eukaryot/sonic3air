@@ -55,9 +55,9 @@ public:
 	{
 		enum class Type
 		{
-			MUSIC   = 0,
-			JINGLE  = 1,
-			SOUND   = 2
+			MUSIC   = 0,	// Using channel 0, looping by default
+			JINGLE  = 1,	// Using channel 0, not looping by default
+			SOUND   = 2		// Using other or no channel at all, not looping by default
 		};
 
 		enum class Visibility
@@ -78,6 +78,9 @@ public:
 		SourceRegistration* mActiveSource = nullptr;
 		std::vector<SourceRegistration> mSources;
 	};
+
+public:
+	static int64 checkForNumericKey(std::string_view keyString);	// Returns -1 if not a uint8 key
 
 public:
 	AudioCollection();

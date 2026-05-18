@@ -156,7 +156,7 @@ void AudioPlayer::updatePlayback(float timeElapsed)
 	while (PlayingSound* soundPtr = iterator.getNext())
 	{
 		PlayingSound& sound = *soundPtr;
-		if (!sound.mAudioRef.valid())
+		if (!sound.mAudioRef.isValid())
 		{
 			iterator.removeCurrent();
 			continue;
@@ -174,27 +174,32 @@ void AudioPlayer::updatePlayback(float timeElapsed)
 			}
 
 			// Update fading
-			if (sound.mRelativeVolumeChange != 0.0f)
+			if (sound.mRelativeVolumeChange > 0.0f)
 			{
-				sound.mRelativeVolume += sound.mRelativeVolumeChange * timeElapsed;
-				if (sound.mRelativeVolumeChange < 0.0f)
+				if (sound.mRelativeVolume < sound.mRelativeVolumeTarget)
 				{
-					// Fading out
-					if (sound.mRelativeVolume <= 0.0f)
+					// Fading in
+					sound.mRelativeVolume += sound.mRelativeVolumeChange * timeElapsed;
+					if (sound.mRelativeVolume >= sound.mRelativeVolumeTarget)
 					{
-						// Stop sound now - as usual, using a quick volume change
-						sound.mAudioRef.setVolumeChange(-20.0f);
-						iterator.removeCurrent();
-						continue;
+						sound.mRelativeVolume = sound.mRelativeVolumeTarget;
+						sound.mRelativeVolumeChange = 0.0f;
 					}
 				}
 				else
 				{
-					// Fading in
-					if (sound.mRelativeVolume >= 1.0f)
+					// Fading out
+					sound.mRelativeVolume -= sound.mRelativeVolumeChange * timeElapsed;
+					if (sound.mRelativeVolume <= sound.mRelativeVolumeTarget)
 					{
-						sound.mRelativeVolume = 1.0f;
-						sound.mRelativeVolumeChange = 0.0f;
+						sound.mRelativeVolume = sound.mRelativeVolumeTarget;
+						if (sound.mRelativeVolume == 0.0f && sound.mStopOnFadeOut)
+						{
+							// Stop sound now
+							stopPlayingSoundInternal(sound, false);
+							iterator.removeCurrent();
+							continue;
+						}
 					}
 				}
 
@@ -219,7 +224,7 @@ void AudioPlayer::updatePlayback(float timeElapsed)
 		{
 			// Channel override gets inactive autonmatically when the overriding sound was played
 			PlayingSound* soundPtr = getPlayingSound(channelOverride.mPlayingSoundUniqueId);
-			if (nullptr == soundPtr || !soundPtr->mAudioRef.valid())
+			if (nullptr == soundPtr || !soundPtr->mAudioRef.isValid())
 			{
 				channelOverride.mActive = false;
 			}
@@ -283,7 +288,7 @@ bool AudioPlayer::getAudioRefByChannel(int channelId, AudioReference& outAudioRe
 {
 	for (const PlayingSound& playingSound : mPlayingSounds)
 	{
-		if (playingSound.mContextId == channelId)
+		if (playingSound.mChannelId == channelId)
 		{
 			outAudioRef = playingSound.mAudioRef;
 			return true;
@@ -365,34 +370,15 @@ void AudioPlayer::stopAllSoundsByContext(int contextId)
 	iterator.filterState(PlayingSound::State::PLAYING);
 	while (PlayingSound* soundPtr = iterator.getNext())
 	{
-		if (soundPtr->mAudioRef.isPaused())
-		{
-			// No need for quick fade-out if it's paused anyways
-			soundPtr->mAudioRef.stop();
-		}
-		else
-		{
-			soundPtr->mAudioRef.setVolumeChange(-20.0f);
-		}
+		stopPlayingSoundInternal(*soundPtr, false);
 	}
 }
 
 void AudioPlayer::stopAllSounds(bool immediately)
 {
-	if (immediately)
+	for (PlayingSound& playingSound : mPlayingSounds)
 	{
-		for (PlayingSound& playingSound : mPlayingSounds)
-		{
-			playingSound.mAudioRef.stop();
-		}
-	}
-	else
-	{
-		for (PlayingSound& playingSound : mPlayingSounds)
-		{
-			// We're not actually stopping the sound, but just fading it out very fast
-			playingSound.mAudioRef.setVolumeChange(-20.0f);
-		}
+		stopPlayingSoundInternal(playingSound, immediately);
 	}
 	mPlayingSounds.clear();
 }
@@ -403,8 +389,7 @@ void AudioPlayer::stopAllSoundsByChannel(int channelId)
 	iterator.filterChannel(channelId);
 	while (PlayingSound* soundPtr = iterator.getNext())
 	{
-		// We're not actually stopping the sound, but just fading it out very fast
-		soundPtr->mAudioRef.setVolumeChange(-20.0f);
+		stopPlayingSoundInternal(*soundPtr, false);
 		iterator.removeCurrent();
 	}
 }
@@ -416,8 +401,7 @@ void AudioPlayer::stopAllSoundsByChannelAndContext(int channelId, int contextId)
 	iterator.filterContext(contextId);
 	while (PlayingSound* soundPtr = iterator.getNext())
 	{
-		// We're not actually stopping the sound, but just fading it out very fast
-		soundPtr->mAudioRef.setVolumeChange(-20.0f);
+		stopPlayingSoundInternal(*soundPtr, false);
 		iterator.removeCurrent();
 	}
 }
@@ -429,6 +413,7 @@ void AudioPlayer::fadeInChannel(int channelId, float length)
 	iterator.filterState(PlayingSound::State::PLAYING);
 	while (PlayingSound* soundPtr = iterator.getNext())
 	{
+		soundPtr->mRelativeVolumeTarget = 1.0f;
 		soundPtr->mRelativeVolumeChange = (length > 0.0f) ? (1.0f / length) : 0.1f;
 	}
 }
@@ -440,7 +425,9 @@ void AudioPlayer::fadeOutChannel(int channelId, float length)
 	iterator.filterState(PlayingSound::State::PLAYING);
 	while (PlayingSound* soundPtr = iterator.getNext())
 	{
+		soundPtr->mRelativeVolumeTarget = 0.0f;
 		soundPtr->mRelativeVolumeChange = (length > 0.0f) ? (-1.0f / length) : 0.1f;
+		soundPtr->mStopOnFadeOut = true;
 	}
 }
 
@@ -520,6 +507,98 @@ void AudioPlayer::disableAudioModifier(int channelId, int contextId)
 		applyAudioModifier(channelId, contextId, "", 1.0f, 1.0f / modifier->mRelativeSpeed);
 		mActiveAudioModifiers.erase(mActiveAudioModifiers.begin() + index);
 	}
+}
+
+AudioPlayer::PlayingSoundRef AudioPlayer::getPlayingSoundByUniqueId(uint32 uniqueId)
+{
+	PlayingSound* playingSound = vectorFindByPredicate(mPlayingSounds, [uniqueId](const PlayingSound& playingSound) { return playingSound.mUniqueId == uniqueId; } );
+	return makePlayingSoundRef(playingSound);
+}
+
+AudioPlayer::PlayingSoundRef AudioPlayer::getPlayingSoundBySfxId(uint64 sfxId)
+{
+	PlayingSound* playingSound = vectorFindByPredicate(mPlayingSounds, [sfxId](const PlayingSound& playingSound) { return playingSound.mBaseSourceReg->mAudioDefinition->mKeyId == sfxId; } );
+	return makePlayingSoundRef(playingSound);
+}
+
+AudioPlayer::PlayingSoundRef AudioPlayer::getPlayingSoundByChannel(int channelId)
+{
+	PlayingSound* playingSound = vectorFindByPredicate(mPlayingSounds, [channelId](const PlayingSound& playingSound) { return playingSound.mChannelId == channelId; } );
+	return makePlayingSoundRef(playingSound);
+}
+
+bool AudioPlayer::isValidPlayingSound(PlayingSoundRef ref)
+{
+	return (nullptr != resolvePlayingSoundRef(ref));
+}
+
+void AudioPlayer::pausePlayingSound(PlayingSoundRef ref)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound && playingSound->mState == PlayingSound::State::PLAYING)
+	{
+		playingSound->mAudioRef.setPause(true);
+	}
+}
+
+void AudioPlayer::resumePlayingSound(PlayingSoundRef ref)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound && playingSound->mState == PlayingSound::State::PLAYING)
+	{
+		playingSound->mAudioRef.setPause(false);
+	}
+}
+
+void AudioPlayer::stopPlayingSound(PlayingSoundRef ref, float cutOffTime)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound)
+	{
+		stopPlayingSoundInternal(*playingSound, false, true, cutOffTime);
+	}
+}
+
+float AudioPlayer::getPlayingSoundVolume(PlayingSoundRef ref)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound)
+	{
+		return playingSound->mRelativeVolume;
+	}
+	return 0.0f;
+}
+
+void AudioPlayer::setPlayingSoundVolume(PlayingSoundRef ref, float volume)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound)
+	{
+		playingSound->mRelativeVolume = volume;
+		playingSound->mRelativeVolumeTarget = volume;
+		playingSound->mRelativeVolumeChange = 0.0f;
+	}
+}
+
+void AudioPlayer::fadePlayingSoundVolume(PlayingSoundRef ref, float volume, float length)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound)
+	{
+		playingSound->mRelativeVolumeTarget = volume;
+		playingSound->mRelativeVolumeChange = (volume - playingSound->mRelativeVolume) / std::max(length, 0.001f);
+		playingSound->mStopOnFadeOut = false;
+	}
+}
+
+float AudioPlayer::getPlayingSoundPosition(PlayingSoundRef ref)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound && playingSound->mAudioRef.isValid())
+	{
+		return playingSound->mAudioSource->mapAudioRefPositionToTrackPosition(playingSound->mAudioRef.getPosition());
+	}
+	return 0.0f;
 }
 
 size_t AudioPlayer::getMemoryUsage() const
@@ -752,7 +831,7 @@ AudioPlayer::PlayingSound* AudioPlayer::getPlayingSound(uint32 uniqueId)
 
 AudioPlayer::PlayingSound* AudioPlayer::getPlayingSound(AudioReference& audioRef)
 {
-	if (audioRef.valid())
+	if (audioRef.isValid())
 	{
 		// Just go through the playing sounds
 		//  -> No need for a map or similar, as we usually have only a few of them active at the same time
@@ -773,6 +852,28 @@ const AudioPlayer::PlayingSound* AudioPlayer::getPlayingSound(AudioReference& au
 	return const_cast<AudioPlayer*>(this)->getPlayingSound(audioRef);
 }
 
+void AudioPlayer::stopPlayingSoundInternal(PlayingSound& playingSound, bool immediately, bool removeFromList, float cutOffTime)
+{
+	if (immediately || playingSound.mAudioRef.isPaused())
+	{
+		// No need for quick fade-out if it's paused anyways
+		playingSound.mAudioRef.stop();
+	}
+	else
+	{
+		// We're not actually stopping the sound, but just fading it out very fast
+		playingSound.mAudioRef.setVolumeChange(-1.0f / cutOffTime);
+		playingSound.mAudioRef = AudioReference();		// Invalidate audio reference right away
+	}
+
+	if (removeFromList)
+	{
+		// Remove playing sound from the list
+		//  -> Note that this mus not be done while currently iterating over the list
+		vectorRemoveByPredicate(mPlayingSounds, [&playingSound](const PlayingSound& entry) { return &entry == &playingSound; } );
+	}
+}
+
 void AudioPlayer::applyChannelOverride(int overriddenChannelId, uint8 contextId)
 {
 	SoundIterator iterator(mPlayingSounds);
@@ -782,7 +883,7 @@ void AudioPlayer::applyChannelOverride(int overriddenChannelId, uint8 contextId)
 	while (PlayingSound* soundPtr = iterator.getNext())
 	{
 		PlayingSound& sound = *soundPtr;
-		if (sound.mAudioRef.valid())
+		if (sound.mAudioRef.isValid())
 		{
 			sound.mState = PlayingSound::State::OVERRIDDEN;
 			sound.mAudioRef.setPause(true);
@@ -799,10 +900,11 @@ void AudioPlayer::removeChannelOverride(int overriddenChannelId, uint8 contextId
 	while (PlayingSound* soundPtr = iterator.getNext())
 	{
 		PlayingSound& sound = *soundPtr;
-		if (sound.mAudioRef.valid())
+		if (sound.mAudioRef.isValid())
 		{
 			// Get active again, with a fade-in
 			sound.mRelativeVolume = 0.0f;
+			sound.mRelativeVolumeTarget = 1.0f;
 			sound.mRelativeVolumeChange = 1.0f;
 			sound.mAudioRef.setVolume(0.0f);
 			sound.mAudioRef.setPause(false);
@@ -862,7 +964,7 @@ void AudioPlayer::applyAudioModifier(int channelId, int contextId, std::string_v
 void AudioPlayer::applyAudioModifierSingle(SoundIterator& iterator, std::string_view postfix, float relativeSpeed, float speedChange)
 {
 	PlayingSound& playingSound = *iterator.getCurrent();
-	if (!playingSound.mAudioRef.valid())
+	if (!playingSound.mAudioRef.isValid())
 		return;
 
 	if (playingSound.mAudioSource->getAudioSourceType() == AudioSourceBase::AudioSourceType::EMULATION)
@@ -984,4 +1086,24 @@ void AudioPlayer::stopAutoStreamer(AudioSourceBase& audioSource)
 			return;
 		}
 	}
+}
+
+AudioPlayer::PlayingSoundRef AudioPlayer::makePlayingSoundRef(PlayingSound& playingSound)
+{
+	return PlayingSoundRef { playingSound.mUniqueId, &playingSound };
+}
+
+AudioPlayer::PlayingSoundRef AudioPlayer::makePlayingSoundRef(PlayingSound* playingSound)
+{
+	if (nullptr == playingSound)
+		return PlayingSoundRef();
+	return PlayingSoundRef { playingSound->mUniqueId, playingSound };
+}
+
+AudioPlayer::PlayingSound* AudioPlayer::resolvePlayingSoundRef(PlayingSoundRef& ref)
+{
+	AudioPlayer::PlayingSound* playingSound = reinterpret_cast<AudioPlayer::PlayingSound*>(ref.mPlayingSound);
+	if (nullptr == playingSound || !playingSound->mAudioRef.isValid())
+		return nullptr;
+	return playingSound;
 }

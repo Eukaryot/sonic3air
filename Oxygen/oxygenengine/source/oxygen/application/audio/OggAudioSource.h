@@ -10,6 +10,8 @@
 
 #include "oxygen/application/audio/AudioSourceBase.h"
 
+class OggLoader;
+
 
 class OggAudioSource : public AudioSourceBase
 {

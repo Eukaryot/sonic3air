@@ -20,7 +20,7 @@ public:
 	inline int getInstanceID() const  { return mInstanceID; }
 	void setInstanceID(int ID);
 
-	bool valid();
+	bool isValid();
 
 	float getPosition();
 	float getVolume();

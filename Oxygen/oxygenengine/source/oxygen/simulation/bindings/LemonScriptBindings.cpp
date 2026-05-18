@@ -8,6 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/simulation/bindings/LemonScriptBindings.h"
+#include "oxygen/simulation/bindings/AudioBindings.h"
 #include "oxygen/simulation/bindings/RendererBindings.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
@@ -19,7 +20,6 @@
 #include "oxygen/simulation/analyse/ROMDataAnalyser.h"
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
-#include "oxygen/application/audio/AudioOutBase.h"
 #include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/modding/ModManager.h"
@@ -807,126 +807,6 @@ namespace
 	}
 
 
-	uint8 Audio_getAudioKeyType(uint64 sfxId)
-	{
-		return (uint8)EngineMain::instance().getAudioOut().getAudioKeyType(sfxId);
-	}
-
-	bool Audio_isPlayingAudio(uint64 sfxId)
-	{
-		return EngineMain::instance().getAudioOut().isPlayingSfxId(sfxId);
-	}
-
-	void Audio_playAudio1(uint64 sfxId, uint8 contextId)
-	{
-		const bool success = EngineMain::instance().getAudioOut().playAudioBase(sfxId, contextId);
-		if (!success)
-		{
-			// Audio collections expect lowercase IDs, so we might need to do the conversion here first
-			lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
-			if (nullptr != runtime)
-			{
-				const lemon::FlyweightString* str = runtime->resolveStringByKey(sfxId);
-				if (nullptr != str)
-				{
-					const std::string_view textString = str->getString();
-
-					// Does the string contain any uppercase letters?
-					if (containsByPredicate(textString, [](char ch) { return (ch >= 'A' && ch <= 'Z'); } ))
-					{
-						// Convert to lowercase and try again
-						String tempStr = textString;
-						tempStr.lowerCase();
-						sfxId = rmx::getMurmur2_64(tempStr);
-						EngineMain::instance().getAudioOut().playAudioBase(sfxId, contextId);
-					}
-				}
-			}
-		}
-	}
-
-	void Audio_playAudio2(uint64 sfxId)
-	{
-		Audio_playAudio1(sfxId, 0x01);	// In-game sound effect context
-	}
-
-	void Audio_pauseChannel(uint8 channel)
-	{
-		EngineMain::instance().getAudioOut().getAudioPlayer().pauseAllSoundsByChannel(channel);
-	}
-
-	void Audio_resumeChannel(uint8 channel)
-	{
-		EngineMain::instance().getAudioOut().getAudioPlayer().resumeAllSoundsByChannel(channel);
-	}
-
-	void Audio_stopChannel(uint8 channel)
-	{
-		EngineMain::instance().getAudioOut().getAudioPlayer().stopAllSoundsByChannel(channel);
-	}
-
-	void Audio_pauseContext(uint8 contextId)
-	{
-		EngineMain::instance().getAudioOut().getAudioPlayer().pauseAllSoundsByContext(contextId);
-	}
-
-	void Audio_resumeContext(uint8 contextId)
-	{
-		EngineMain::instance().getAudioOut().getAudioPlayer().resumeAllSoundsByContext(contextId);
-	}
-
-	void Audio_stopContext(uint8 contextId)
-	{
-		EngineMain::instance().getAudioOut().getAudioPlayer().stopAllSoundsByContext(contextId);
-	}
-
-	void Audio_fadeInChannel(uint8 channel, float seconds)
-	{
-		EngineMain::instance().getAudioOut().fadeInChannel(channel, seconds);
-	}
-
-	void Audio_fadeInChannel2(uint8 channel, uint16 length)
-	{
-		EngineMain::instance().getAudioOut().fadeInChannel(channel, (float)length / 256.0f);
-	}
-
-	void Audio_fadeOutChannel(uint8 channel, float seconds)
-	{
-		EngineMain::instance().getAudioOut().fadeOutChannel(channel, seconds);
-	}
-
-	void Audio_fadeOutChannel2(uint8 channel, uint16 length)
-	{
-		EngineMain::instance().getAudioOut().fadeOutChannel(channel, (float)length / 256.0f);
-	}
-
-	void Audio_playOverride(uint64 sfxId, uint8 contextId, uint8 channelId, uint8 overriddenChannelId)
-	{
-		EngineMain::instance().getAudioOut().playOverride(sfxId, contextId, channelId, overriddenChannelId);
-	}
-
-	void Audio_enableAudioModifier(uint8 channel, uint8 contextId, lemon::StringRef postfix, float relativeSpeed)
-	{
-		if (postfix.isValid())
-		{
-			EngineMain::instance().getAudioOut().enableAudioModifier(channel, contextId, postfix.getString(), relativeSpeed);
-		}
-	}
-
-	void Audio_enableAudioModifier2(uint8 channel, uint8 contextId, lemon::StringRef postfix, uint32 relativeSpeed)
-	{
-		if (postfix.isValid())
-		{
-			EngineMain::instance().getAudioOut().enableAudioModifier(channel, contextId, postfix.getString(), (float)relativeSpeed / 65536.0f);
-		}
-	}
-
-	void Audio_disableAudioModifier(uint8 channel, uint8 contextId)
-	{
-		EngineMain::instance().getAudioOut().disableAudioModifier(channel, contextId);
-	}
-
-
 	const Mod* getActiveModByNameHash(lemon::StringRef modName)
 	{
 		if (modName.isValid())
@@ -1366,64 +1246,11 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 	// Renderer bindings
 	RendererBindings::registerBindings(module);
 
+	// Audio
+	AudioBindings::registerBindings(module);
+
+	// Modding
 	{
-		// Audio
-		builder.addNativeFunction("Audio.getAudioKeyType", lemon::wrap(&Audio_getAudioKeyType), defaultFlags)
-			.setParameters("sfxId");
-
-		builder.addNativeFunction("Audio.isPlayingAudio", lemon::wrap(&Audio_isPlayingAudio), defaultFlags)
-			.setParameters("sfxId");
-
-		builder.addNativeFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio1), defaultFlags)
-			.setParameters("sfxId", "contextId");
-
-		builder.addNativeFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio2), defaultFlags)
-			.setParameters("sfxId");
-
-		builder.addNativeFunction("Audio.pauseChannel", lemon::wrap(&Audio_pauseChannel), defaultFlags)
-			.setParameters("channel");
-
-		builder.addNativeFunction("Audio.resumeChannel", lemon::wrap(&Audio_resumeChannel), defaultFlags)
-			.setParameters("channel");
-
-		builder.addNativeFunction("Audio.stopChannel", lemon::wrap(&Audio_stopChannel), defaultFlags)
-			.setParameters("channel");
-
-		builder.addNativeFunction("Audio.pauseContext", lemon::wrap(&Audio_pauseContext), defaultFlags)
-			.setParameters("contextId");
-
-		builder.addNativeFunction("Audio.resumeContext", lemon::wrap(&Audio_resumeContext), defaultFlags)
-			.setParameters("contextId");
-
-		builder.addNativeFunction("Audio.stopContext", lemon::wrap(&Audio_stopContext), defaultFlags)
-			.setParameters("contextId");
-
-		builder.addNativeFunction("Audio.fadeInChannel", lemon::wrap(&Audio_fadeInChannel), defaultFlags)
-			.setParameters("channel", "seconds");
-
-		builder.addNativeFunction("Audio.fadeInChannel", lemon::wrap(&Audio_fadeInChannel2), defaultFlags)
-			.setParameters("channel", "length");
-
-		builder.addNativeFunction("Audio.fadeOutChannel", lemon::wrap(&Audio_fadeOutChannel), defaultFlags)
-			.setParameters("channel", "seconds");
-
-		builder.addNativeFunction("Audio.fadeOutChannel", lemon::wrap(&Audio_fadeOutChannel2), defaultFlags)
-			.setParameters("channel", "length");
-
-		builder.addNativeFunction("Audio.playOverride", lemon::wrap(&Audio_playOverride), defaultFlags)
-			.setParameters("sfxId", "contextId", "channelId", "overriddenChannelId");
-
-		builder.addNativeFunction("Audio.enableAudioModifier", lemon::wrap(&Audio_enableAudioModifier), defaultFlags)
-			.setParameters("channel", "contextId", "postfix", "relativeSpeed");
-
-		builder.addNativeFunction("Audio.enableAudioModifier", lemon::wrap(&Audio_enableAudioModifier2), defaultFlags)
-			.setParameters("channel", "contextId", "postfix", "relativeSpeed");
-
-		builder.addNativeFunction("Audio.disableAudioModifier", lemon::wrap(&Audio_disableAudioModifier), defaultFlags)
-			.setParameters("channel", "context");
-
-
-		// Misc
 		builder.addNativeFunction("Mods.isModActive", lemon::wrap(&Mods_isModActive), defaultFlags)
 			.setParameters("modName");
 

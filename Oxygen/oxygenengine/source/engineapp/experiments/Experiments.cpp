@@ -106,7 +106,7 @@ void Experiments::onPostFrameUpdate()
 		mAudioBuffer.addData(pcmPtr, length);
 	}
 
-	if (!mAudioRef.valid())
+	if (!mAudioRef.isValid())
 	{
 		FTX::Audio->addSound(&mAudioBuffer, mAudioRef, true);
 	}

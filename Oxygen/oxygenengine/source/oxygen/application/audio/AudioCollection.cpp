@@ -62,6 +62,16 @@ namespace
 }
 
 
+int64 AudioCollection::checkForNumericKey(std::string_view keyString)
+{
+	if (keyString.length() == 2 && isHexDigit(keyString[0]) && isHexDigit(keyString[1]))
+	{
+		return rmx::parseInteger(String("0x") + keyString);
+	}
+	return -1;
+}
+
+
 AudioCollection::AudioCollection()
 {
 }
@@ -119,14 +129,8 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 		// Numeric key is either a string hash, or the value in case of keys like "2C"
 		uint64 numericKey = 0;
 		{
-			if (keyString.length() == 2 && isHexDigit(keyString[0]) && isHexDigit(keyString[1]))
-			{
-				numericKey = rmx::parseInteger(String("0x") + keyString);
-			}
-			else
-			{
-				numericKey = rmx::getMurmur2_64(keyString);
-			}
+			const int64 key = checkForNumericKey(keyString);
+			numericKey = (key >= 0) ? key : rmx::getMurmur2_64(keyString);
 		}
 
 		// Read definition from JSON

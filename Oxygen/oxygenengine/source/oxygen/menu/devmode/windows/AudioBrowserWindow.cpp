@@ -87,7 +87,7 @@ void AudioBrowserWindow::buildContent()
 			ImGui::TextColored(textColor, "%s", audioDefinition->mKeyString.c_str());
 
 			ImGui::TableSetColumnIndex(1);
-			if (mPlayingAudio.valid() && mPlayingDefinition == audioDefinition)	// TODO: This does not work yet
+			if (mPlayingAudio.isValid() && mPlayingDefinition == audioDefinition)	// TODO: This does not work yet
 			{
 				if (ImGui::Button("Stop"))
 				{
