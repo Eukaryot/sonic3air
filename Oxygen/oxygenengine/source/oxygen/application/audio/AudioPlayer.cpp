@@ -577,6 +577,7 @@ void AudioPlayer::setPlayingSoundVolume(PlayingSoundRef ref, float volume)
 		playingSound->mRelativeVolume = volume;
 		playingSound->mRelativeVolumeTarget = volume;
 		playingSound->mRelativeVolumeChange = 0.0f;
+		playingSound->mAudioRef.setVolume(playingSound->mBaseVolume * playingSound->mRelativeVolume);
 	}
 }
 
