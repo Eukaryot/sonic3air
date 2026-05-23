@@ -87,6 +87,7 @@
     <ClCompile Include="..\..\source\oxygen\menu\devmode\DevModeMainWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\devmode\DevModeWindowBase.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\AudioBrowserWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\AudioPlaybackWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\CallFramesWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\CustomSidePanelWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\DebugLogWindow.cpp" />
@@ -270,6 +271,7 @@
     <ClInclude Include="..\..\source\oxygen\menu\devmode\DevModeMainWindow.h" />
     <ClInclude Include="..\..\source\oxygen\menu\devmode\DevModeWindowBase.h" />
     <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\AudioBrowserWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\AudioPlaybackWindow.h" />
     <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\CallFramesWindow.h" />
     <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\CustomSidePanelWindow.h" />
     <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\DebugLogWindow.h" />

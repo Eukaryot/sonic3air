@@ -13,6 +13,7 @@
 
 #include "oxygen/menu/imgui/ImGuiHelpers.h"
 #include "oxygen/menu/devmode/windows/AudioBrowserWindow.h"
+#include "oxygen/menu/devmode/windows/AudioPlaybackWindow.h"
 #include "oxygen/menu/devmode/windows/CallFramesWindow.h"
 #include "oxygen/menu/devmode/windows/CustomSidePanelWindow.h"
 #include "oxygen/menu/devmode/windows/DebugLogWindow.h"
@@ -66,6 +67,7 @@ DevModeMainWindow::DevModeMainWindow() :
 		createWindow(mPaletteBrowserWindow);
 
 		createWindow(mAudioBrowserWindow);
+		createWindow(mAudioPlaybackWindow);
 		createWindow(mCustomSidePanelWindow);
 		createWindow(mPersistentDataWindow);
 		createWindow(mFileBrowserWindow);

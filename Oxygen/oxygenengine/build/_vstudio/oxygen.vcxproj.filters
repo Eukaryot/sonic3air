@@ -646,6 +646,9 @@
     <ClCompile Include="..\..\source\oxygen\simulation\bindings\AudioBindings.cpp">
       <Filter>simulation\bindings</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\AudioPlaybackWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -1218,6 +1221,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\simulation\bindings\AudioBindings.h">
       <Filter>simulation\bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\AudioPlaybackWindow.h">
+      <Filter>menu\devmode\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
