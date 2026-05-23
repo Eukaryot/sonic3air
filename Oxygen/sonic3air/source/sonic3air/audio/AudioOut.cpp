@@ -68,24 +68,24 @@ void AudioOut::resetGame()
 	mAudioPlayer.resetAudioModifiers();
 }
 
-void AudioOut::playAudioDirect(uint64 sfxId, SoundRegType type, int contextBase, AudioReference* outAudioReference)
+void AudioOut::playAudioDirect(uint64 audioKey, SoundRegType type, int contextBase, AudioReference* outAudioReference)
 {
 	SfxHandling handling;
-	handling.mSoundReg = mAudioCollection.getSourceRegistration(sfxId);
+	handling.mSoundReg = mAudioCollection.getSourceRegistration(audioKey);
 	handling.mType = type;
 	handling.mClearMusic = false;
 	if (nullptr != handling.mSoundReg)
 	{
-		playAudioInternal(handling, sfxId, contextBase, outAudioReference);
+		playAudioInternal(handling, audioKey, contextBase, outAudioReference);
 	}
 }
 
-void AudioOut::setMenuMusic(uint64 sfxId)
+void AudioOut::setMenuMusic(uint64 audioKey)
 {
-	if (!isPlayingSfxId(sfxId))
+	if (!isPlayingAudioKey(audioKey))
 	{
-		playAudioDirect(sfxId, SoundRegType::MUSIC, CONTEXT_MENU + CONTEXT_MUSIC);
-		mMenuMusicId = sfxId;
+		playAudioDirect(audioKey, SoundRegType::MUSIC, CONTEXT_MENU + CONTEXT_MUSIC);
+		mMenuMusicId = audioKey;
 	}
 }
 
@@ -156,7 +156,7 @@ void AudioOut::determineActiveSourceRegistrations()
 	mAudioCollection.determineActiveSourceRegistrations(preferOriginal);
 }
 
-void AudioOut::playAudioInternal(const SfxHandling& handling, uint64 sfxId, int contextBase, AudioReference* outAudioReference)
+void AudioOut::playAudioInternal(const SfxHandling& handling, uint64 audioKey, int contextBase, AudioReference* outAudioReference)
 {
 	int contextId = contextBase & 0xf0;
 	if (handling.mType == SoundRegType::MUSIC || handling.mType == SoundRegType::JINGLE)
@@ -167,5 +167,5 @@ void AudioOut::playAudioInternal(const SfxHandling& handling, uint64 sfxId, int 
 	{
 		contextId |= CONTEXT_SOUND;
 	}
-	mAudioPlayer.playAudio(sfxId, contextId);
+	mAudioPlayer.playAudio(audioKey, contextId);
 }

@@ -19,10 +19,7 @@ AudioSourceBase::AudioSourceBase(AudioSourceType type, CachingType cachingType) 
 
 AudioSourceBase::~AudioSourceBase()
 {
-	if (isJobRegistered())
-	{
-		FTX::JobManager->removeJob(*this);
-	}
+	RMX_ASSERT(!isJobRegistered(), "Job still registered, even though it should have been removed in 'shutdown'");
 	SDL_DestroyMutex(mMutex);
 
 	mAudioBuffer.lock();
@@ -39,6 +36,14 @@ AudioBuffer* AudioSourceBase::startup()
 		mReadTime = 0.0f;
 	}
 	return &mAudioBuffer;
+}
+
+void AudioSourceBase::shutdown()
+{
+	if (isJobRegistered())
+	{
+		FTX::JobManager->removeJob(*this);
+	}
 }
 
 void AudioSourceBase::progress(float precacheTime)

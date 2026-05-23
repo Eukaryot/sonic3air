@@ -1021,7 +1021,7 @@ void Game::returnToMainMenu()
 	mReturnToMenuTriggered = true;
 
 	// Do not restart data select music
-	if (AudioOut::instance().isPlayingSfxId(0x2f))
+	if (AudioOut::instance().isPlayingAudioKey(0x2f))
 	{
 		AudioOut::instance().moveIngameMusicToMenu();
 	}

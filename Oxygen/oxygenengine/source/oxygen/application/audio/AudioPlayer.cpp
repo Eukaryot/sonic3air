@@ -94,19 +94,19 @@ void AudioPlayer::clearPlayback()
 	mAudioSourceManager.clear();
 }
 
-bool AudioPlayer::playAudio(uint64 sfxId, int contextId)
+bool AudioPlayer::playAudio(uint64 audioKey, int contextId)
 {
-	PlayingSound* playingSound = playAudioInternal(mAudioCollection.getSourceRegistration(sfxId), contextId);
+	PlayingSound* playingSound = playAudioInternal(mAudioCollection.getSourceRegistration(audioKey), contextId);
 	return (nullptr != playingSound);
 }
 
-bool AudioPlayer::playAudio(uint64 sfxId, int contextId, int channelId)
+bool AudioPlayer::playAudio(uint64 audioKey, int contextId, int channelId)
 {
-	PlayingSound* playingSound = playAudioInternal(mAudioCollection.getSourceRegistration(sfxId), channelId, contextId);
+	PlayingSound* playingSound = playAudioInternal(mAudioCollection.getSourceRegistration(audioKey), channelId, contextId);
 	return (nullptr != playingSound);
 }
 
-void AudioPlayer::playOverride(uint64 sfxId, int contextId, int channelId, int overriddenChannelId)
+void AudioPlayer::playOverride(uint64 audioKey, int contextId, int channelId, int overriddenChannelId)
 {
 	// Deactivate duplicates first
 	for (ChannelOverride& channelOverride : mChannelOverrides)
@@ -118,7 +118,7 @@ void AudioPlayer::playOverride(uint64 sfxId, int contextId, int channelId, int o
 	}
 
 	// Start playback of new sound
-	PlayingSound* playingSound = playAudioInternal(mAudioCollection.getSourceRegistration(sfxId), channelId, contextId);
+	PlayingSound* playingSound = playAudioInternal(mAudioCollection.getSourceRegistration(audioKey), channelId, contextId);
 	if (nullptr != playingSound)
 	{
 		// Create new channel override
@@ -270,11 +270,11 @@ void AudioPlayer::updatePlayback(float timeElapsed)
 	FTX::Audio->regularUpdate(timeElapsed);
 }
 
-bool AudioPlayer::isPlayingSfxId(uint64 sfxId, AudioReference* outAudioRef) const
+bool AudioPlayer::isPlayingAudioKey(uint64 audioKey, AudioReference* outAudioRef) const
 {
 	for (const PlayingSound& playingSound : mPlayingSounds)
 	{
-		if (playingSound.mBaseSourceReg->mAudioDefinition->mKeyId == sfxId)
+		if (playingSound.mBaseSourceReg->mAudioDefinition->mKeyId == audioKey)
 		{
 			if (nullptr != outAudioRef)
 				*outAudioRef = playingSound.mAudioRef;
@@ -509,15 +509,20 @@ void AudioPlayer::disableAudioModifier(int channelId, int contextId)
 	}
 }
 
+AudioPlayer::PlayingSoundRef AudioPlayer::getPlayingSoundByIndex(size_t index)
+{
+	return (index < mPlayingSounds.size()) ? makePlayingSoundRef(mPlayingSounds[index]) : PlayingSoundRef();
+}
+
 AudioPlayer::PlayingSoundRef AudioPlayer::getPlayingSoundByUniqueId(uint32 uniqueId)
 {
 	PlayingSound* playingSound = vectorFindByPredicate(mPlayingSounds, [uniqueId](const PlayingSound& playingSound) { return playingSound.mUniqueId == uniqueId; } );
 	return makePlayingSoundRef(playingSound);
 }
 
-AudioPlayer::PlayingSoundRef AudioPlayer::getPlayingSoundBySfxId(uint64 sfxId)
+AudioPlayer::PlayingSoundRef AudioPlayer::getPlayingSoundByAudioKey(uint64 audioKey)
 {
-	PlayingSound* playingSound = vectorFindByPredicate(mPlayingSounds, [sfxId](const PlayingSound& playingSound) { return playingSound.mBaseSourceReg->mAudioDefinition->mKeyId == sfxId; } );
+	PlayingSound* playingSound = vectorFindByPredicate(mPlayingSounds, [audioKey](const PlayingSound& playingSound) { return playingSound.mBaseSourceReg->mAudioDefinition->mKeyId == audioKey; } );
 	return makePlayingSoundRef(playingSound);
 }
 
@@ -530,6 +535,26 @@ AudioPlayer::PlayingSoundRef AudioPlayer::getPlayingSoundByChannel(int channelId
 bool AudioPlayer::isValidPlayingSound(PlayingSoundRef ref)
 {
 	return (nullptr != resolvePlayingSoundRef(ref));
+}
+
+std::string_view AudioPlayer::getPlayingSoundAudioKey(PlayingSoundRef ref)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound && playingSound->mState == PlayingSound::State::PLAYING)
+	{
+		return playingSound->mSourceReg->mAudioDefinition->mKeyString;
+	}
+	return "";
+}
+
+bool AudioPlayer::isPlayingSoundPaused(PlayingSoundRef ref)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound && playingSound->mState == PlayingSound::State::PLAYING)
+	{
+		return playingSound->mAudioRef.isPaused();
+	}
+	return false;
 }
 
 void AudioPlayer::pausePlayingSound(PlayingSoundRef ref)
@@ -597,9 +622,67 @@ float AudioPlayer::getPlayingSoundPosition(PlayingSoundRef ref)
 	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
 	if (nullptr != playingSound && playingSound->mAudioRef.isValid())
 	{
-		return playingSound->mAudioSource->mapAudioRefPositionToTrackPosition(playingSound->mAudioRef.getPosition());
+		return std::max(0.0f, playingSound->mAudioSource->mapAudioRefPositionToTrackPosition(playingSound->mAudioRef.getPosition()));
 	}
 	return 0.0f;
+}
+
+int AudioPlayer::getPlayingSoundChannel(PlayingSoundRef ref)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound && playingSound->mAudioRef.isValid())
+	{
+		return playingSound->mChannelId;
+	}
+	return 0;
+}
+
+int AudioPlayer::getPlayingSoundContext(PlayingSoundRef ref)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound && playingSound->mAudioRef.isValid())
+	{
+		return playingSound->mContextId;
+	}
+	return 0;
+}
+
+float AudioPlayer::getPlayingSoundSpeed(PlayingSoundRef ref)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound && playingSound->mAudioRef.isValid())
+	{
+		return playingSound->mAudioRef.getSpeed();
+	}
+	return 0.0f;
+}
+
+void AudioPlayer::setPlayingSoundSpeed(PlayingSoundRef ref, float speed)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound && playingSound->mAudioRef.isValid())
+	{
+		playingSound->mAudioRef.setSpeed(speed);
+	}
+}
+
+float AudioPlayer::getPlayingSoundPanning(PlayingSoundRef ref)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound && playingSound->mAudioRef.isValid())
+	{
+		return playingSound->mAudioRef.getPanning();
+	}
+	return 0.0f;
+}
+
+void AudioPlayer::setPlayingSoundPanning(PlayingSoundRef ref, float panning)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound && playingSound->mAudioRef.isValid())
+	{
+		playingSound->mAudioRef.setPanning(panning);
+	}
 }
 
 size_t AudioPlayer::getMemoryUsage() const
@@ -613,7 +696,7 @@ void AudioPlayer::loadPlaybackState(const SavedPlaybackState& playbackState)
 
 	for (const SavedAudioState& audioState : playbackState.mAudioStates)
 	{
-		playAudio(audioState.mSfxId, audioState.mChannelId, audioState.mContextId);
+		playAudio(audioState.mAudioKey, audioState.mChannelId, audioState.mContextId);
 	}
 }
 
@@ -630,7 +713,7 @@ void AudioPlayer::savePlaybackState(SavedPlaybackState& outPlaybackState) const
 		}
 
 		SavedAudioState& audioState = vectorAdd(outPlaybackState.mAudioStates);
-		audioState.mSfxId = playingSound.mSourceReg->mAudioDefinition->mKeyId;
+		audioState.mAudioKey = playingSound.mSourceReg->mAudioDefinition->mKeyId;
 		audioState.mChannelId = playingSound.mChannelId;
 		audioState.mContextId = playingSound.mContextId;
 	}

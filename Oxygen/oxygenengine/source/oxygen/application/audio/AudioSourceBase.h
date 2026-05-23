@@ -47,6 +47,7 @@ public:
 	inline void updateReadTime(float readTime)	{ mReadTime = std::max(mReadTime, readTime); }
 
 	AudioBuffer* startup();
+	void shutdown();
 	void progress(float precacheTime);
 
 	void setLastUsedTimestamp(float timestamp)  { mLastUsedTimestamp = timestamp; }

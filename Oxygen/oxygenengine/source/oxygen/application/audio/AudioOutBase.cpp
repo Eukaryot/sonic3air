@@ -103,28 +103,28 @@ void AudioOutBase::setGlobalVolume(float volume)
 	FTX::Audio->setGlobalVolume(mGlobalVolume);
 }
 
-AudioOutBase::AudioKeyType AudioOutBase::getAudioKeyType(uint64 sfxId) const
+AudioOutBase::AudioKeyType AudioOutBase::getAudioKeyType(uint64 audioKey) const
 {
-	AudioCollection::SourceRegistration* sourceReg = mAudioCollection.getSourceRegistration(sfxId);
+	AudioCollection::SourceRegistration* sourceReg = mAudioCollection.getSourceRegistration(audioKey);
 	if (nullptr == sourceReg)
 		return AudioKeyType::INVALID;
 
 	return (AudioKeyType)sourceReg->mPackage;
 }
 
-bool AudioOutBase::isPlayingSfxId(uint64 sfxId) const
+bool AudioOutBase::isPlayingAudioKey(uint64 audioKey) const
 {
-	return mAudioPlayer.isPlayingSfxId(sfxId);
+	return mAudioPlayer.isPlayingAudioKey(audioKey);
 }
 
-bool AudioOutBase::playAudioBase(uint64 sfxId, uint8 contextId)
+bool AudioOutBase::playAudioBase(uint64 audioKey, uint8 contextId)
 {
-	return mAudioPlayer.playAudio(sfxId, contextId);
+	return mAudioPlayer.playAudio(audioKey, contextId);
 }
 
-void AudioOutBase::playOverride(uint64 sfxId, uint8 contextId, uint8 channelId, uint8 overriddenChannelId)
+void AudioOutBase::playOverride(uint64 audioKey, uint8 contextId, uint8 channelId, uint8 overriddenChannelId)
 {
-	mAudioPlayer.playOverride(sfxId, contextId, channelId, overriddenChannelId);
+	mAudioPlayer.playOverride(audioKey, contextId, channelId, overriddenChannelId);
 }
 
 void AudioOutBase::fadeInChannel(uint8 channelId, float length)

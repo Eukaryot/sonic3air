@@ -21,6 +21,7 @@ void AudioSourceManager::clear()
 	// Now it's safe to destroy all the audio sources
 	for (AudioSourceBase* audioSource : mAudioSources)
 	{
+		audioSource->shutdown();
 		delete audioSource;
 	}
 	mAudioSources.clear();

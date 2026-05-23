@@ -37,7 +37,6 @@ namespace rmx
 			float mPanning = 0.0f;					// Left/right panning value in range [-1.0f, +1.0f], usually 0.0f
 			bool mLoop = false;						// Set if sound playback should be looped
 			bool mPaused = false;					// Set when sound playback is paused
-			bool mUsePan = false;					// Set if panning should be used
 			bool mStreaming = false;				// Set if reaching the end of the audio buffer should not stop the playback, just temporily pause it until more data comes in
 			bool mPlaybackDone = false;				// Gets set by audio mixer when playback should stop now
 		};

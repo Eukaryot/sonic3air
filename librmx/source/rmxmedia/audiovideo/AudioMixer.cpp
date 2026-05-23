@@ -281,7 +281,7 @@ namespace rmx
 				const float baseVolume = audioInstance.mVolume * volumeMultiplier;
 				const float baseVolumeChange = audioInstance.mVolumeChange * volumeMultiplier / (float)outputFormat.freq;
 
-				if (audioInstance.mPanning && (outputFormat.channels == 2))
+				if (audioInstance.mPanning != 0.0f && (outputFormat.channels == 2))
 				{
 					volume[0] = roundToInt(baseVolume * (1.0f - audioInstance.mPanning));
 					volume[1] = roundToInt(baseVolume * (1.0f + audioInstance.mPanning));
@@ -318,7 +318,7 @@ namespace rmx
 					mixInSamples(output[0], instanceData[0], numBlockSamples, sourceSamplePositionFraction, sourceIndexAdvance, volume[0], volumeChange[0]);
 					mixInSamples(output[1], instanceData[0], numBlockSamples, sourceSamplePositionFraction, sourceIndexAdvance, volume[1], volumeChange[1]);
 				}
-				else if (audioInstance.mPanning)
+				else if (audioInstance.mPanning != 0.0f)
 				{
 					mixInSampleAverages(output[0], instanceData[0], instanceData[1], numBlockSamples, sourceSamplePositionFraction, sourceIndexAdvance, volume[0], volumeChange[0]);
 					mixInSampleAverages(output[1], instanceData[0], instanceData[1], numBlockSamples, sourceSamplePositionFraction, sourceIndexAdvance, volume[1], volumeChange[1]);

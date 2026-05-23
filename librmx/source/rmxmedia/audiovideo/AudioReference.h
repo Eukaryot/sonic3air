@@ -28,6 +28,7 @@ public:
 	bool isLooped();
 	bool isPaused();
 	bool isStreaming();
+	float getPanning();
 
 	void stop();
 	void setPosition(float position);
@@ -39,7 +40,7 @@ public:
 	void setPause(bool pause);
 	void setStreaming(bool strm);
 	void setTimeout(float timeout);
-	void setPanning(bool enable, float value = 0.0f);
+	void setPanning(float panning);
 
 private:
 	void updateInstance();

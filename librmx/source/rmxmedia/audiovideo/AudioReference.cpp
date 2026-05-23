@@ -64,6 +64,13 @@ bool AudioReference::isStreaming()
 	return false;
 }
 
+float AudioReference::getPanning()
+{
+	if (isValid())
+		return mInstance->mPanning;
+	return false;
+}
+
 void AudioReference::stop()
 {
 	if (isValid())
@@ -124,13 +131,10 @@ void AudioReference::setTimeout(float timeout)
 		mInstance->mTimeout = (int)(timeout * mInstance->mAudioBuffer->getFrequency());
 }
 
-void AudioReference::setPanning(bool enable, float value)
+void AudioReference::setPanning(float panning)
 {
 	if (isValid())
-	{
-		mInstance->mUsePan = enable;
-		mInstance->mPanning = value;
-	}
+		mInstance->mPanning = panning;
 }
 
 void AudioReference::updateInstance()

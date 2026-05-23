@@ -22,7 +22,7 @@ public:
 
 	struct SavedAudioState
 	{
-		uint64 mSfxId = 0;
+		uint64 mAudioKey = 0;
 		int mChannelId = -1;
 		int mContextId = -1;
 	};
@@ -45,13 +45,13 @@ public:
 	void shutdown();
 	void clearPlayback();
 
-	bool playAudio(uint64 sfxId, int contextId);
-	bool playAudio(uint64 sfxId, int contextId, int channelId);
-	void playOverride(uint64 sfxId, int contextId, int channelId, int overriddenChannel);
+	bool playAudio(uint64 audioKey, int contextId);
+	bool playAudio(uint64 audioKey, int contextId, int channelId);
+	void playOverride(uint64 audioKey, int contextId, int channelId, int overriddenChannel);
 
 	void updatePlayback(float timeElapsed);
 
-	bool isPlayingSfxId(uint64 sfxId, AudioReference* outAudioRef = nullptr) const;
+	bool isPlayingAudioKey(uint64 audioKey, AudioReference* outAudioRef = nullptr) const;
 	bool getAudioRefByChannel(int channelId, AudioReference& outAudioRef) const;
 	bool getAudioRefByContext(int contextId, AudioReference& outAudioRef) const;
 	void changeSoundContext(AudioReference& audioRef, int contextId);
@@ -79,11 +79,15 @@ public:
 	void enableAudioModifier(int channelId, int contextId, std::string_view postfix, float relativeSpeed);
 	void disableAudioModifier(int channelId, int contextId);
 
+	PlayingSoundRef getPlayingSoundByIndex(size_t index);
 	PlayingSoundRef getPlayingSoundByUniqueId(uint32 uniqueId);
-	PlayingSoundRef getPlayingSoundBySfxId(uint64 sfxId);
+	PlayingSoundRef getPlayingSoundByAudioKey(uint64 audioKey);
 	PlayingSoundRef getPlayingSoundByChannel(int channelId);
 
 	bool isValidPlayingSound(PlayingSoundRef ref);
+	std::string_view getPlayingSoundAudioKey(PlayingSoundRef ref);
+
+	bool isPlayingSoundPaused(PlayingSoundRef ref);
 	void pausePlayingSound(PlayingSoundRef ref);
 	void resumePlayingSound(PlayingSoundRef ref);
 	void stopPlayingSound(PlayingSoundRef ref, float cutOffTime = 0.02f);
@@ -93,6 +97,14 @@ public:
 	void fadePlayingSoundVolume(PlayingSoundRef ref, float volume, float length);
 
 	float getPlayingSoundPosition(PlayingSoundRef ref);
+
+	int getPlayingSoundChannel(PlayingSoundRef ref);
+	int getPlayingSoundContext(PlayingSoundRef ref);
+
+	float getPlayingSoundSpeed(PlayingSoundRef ref);
+	void setPlayingSoundSpeed(PlayingSoundRef ref, float speed);
+	float getPlayingSoundPanning(PlayingSoundRef ref);
+	void setPlayingSoundPanning(PlayingSoundRef ref, float panning);
 
 	inline size_t getNumPlayingSounds() const  { return mPlayingSounds.size(); }
 	size_t getMemoryUsage() const;

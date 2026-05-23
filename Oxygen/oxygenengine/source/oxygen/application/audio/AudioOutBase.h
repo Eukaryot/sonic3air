@@ -61,11 +61,11 @@ public:
 	inline float getGlobalVolume() const   { return mGlobalVolume; }
 	void setGlobalVolume(float volume);
 
-	AudioKeyType getAudioKeyType(uint64 sfxId) const;
-	bool isPlayingSfxId(uint64 sfxId) const;
+	AudioKeyType getAudioKeyType(uint64 audioKey) const;
+	bool isPlayingAudioKey(uint64 audioKey) const;
 
-	bool playAudioBase(uint64 sfxId, uint8 contextId);
-	void playOverride(uint64 sfxId, uint8 contextId, uint8 channelId, uint8 overriddenChannelId);
+	bool playAudioBase(uint64 audioKey, uint8 contextId);
+	void playOverride(uint64 audioKey, uint8 contextId, uint8 channelId, uint8 overriddenChannelId);
 
 	void fadeInChannel(uint8 channelId, float length);
 	void fadeOutChannel(uint8 channelId, float length);

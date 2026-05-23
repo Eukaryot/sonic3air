@@ -17,26 +17,26 @@
 
 namespace
 {
-	uint8 Audio_getAudioKeyType(uint64 sfxId)
+	uint8 Audio_getAudioKeyType(uint64 audioKey)
 	{
-		return (uint8)EngineMain::instance().getAudioOut().getAudioKeyType(sfxId);
+		return (uint8)EngineMain::instance().getAudioOut().getAudioKeyType(audioKey);
 	}
 
-	bool Audio_isPlayingAudio(uint64 sfxId)
+	bool Audio_isPlayingAudio(uint64 audioKey)
 	{
-		return EngineMain::instance().getAudioOut().isPlayingSfxId(sfxId);
+		return EngineMain::instance().getAudioOut().isPlayingAudioKey(audioKey);
 	}
 
-	void Audio_playAudio1(uint64 sfxId, uint8 contextId)
+	void Audio_playAudio1(uint64 audioKey, uint8 contextId)
 	{
-		const bool success = EngineMain::instance().getAudioOut().playAudioBase(sfxId, contextId);
+		const bool success = EngineMain::instance().getAudioOut().playAudioBase(audioKey, contextId);
 		if (!success)
 		{
 			// Audio collections expect lowercase IDs, so we might need to do the conversion here first
 			lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
 			if (nullptr != runtime)
 			{
-				const lemon::FlyweightString* str = runtime->resolveStringByKey(sfxId);
+				const lemon::FlyweightString* str = runtime->resolveStringByKey(audioKey);
 				if (nullptr != str)
 				{
 					const std::string_view textString = str->getString();
@@ -47,17 +47,17 @@ namespace
 						// Convert to lowercase and try again
 						String tempStr = textString;
 						tempStr.lowerCase();
-						sfxId = rmx::getMurmur2_64(tempStr);
-						EngineMain::instance().getAudioOut().playAudioBase(sfxId, contextId);
+						audioKey = rmx::getMurmur2_64(tempStr);
+						EngineMain::instance().getAudioOut().playAudioBase(audioKey, contextId);
 					}
 				}
 			}
 		}
 	}
 
-	void Audio_playAudio2(uint64 sfxId)
+	void Audio_playAudio2(uint64 audioKey)
 	{
-		Audio_playAudio1(sfxId, 0x01);	// In-game sound effect context
+		Audio_playAudio1(audioKey, 0x01);	// In-game sound effect context
 	}
 
 	void Audio_pauseChannel(uint8 channel)
@@ -110,9 +110,9 @@ namespace
 		EngineMain::instance().getAudioOut().fadeOutChannel(channel, (float)length / 256.0f);
 	}
 
-	void Audio_playOverride(uint64 sfxId, uint8 contextId, uint8 channelId, uint8 overriddenChannelId)
+	void Audio_playOverride(uint64 audioKey, uint8 contextId, uint8 channelId, uint8 overriddenChannelId)
 	{
-		EngineMain::instance().getAudioOut().playOverride(sfxId, contextId, channelId, overriddenChannelId);
+		EngineMain::instance().getAudioOut().playOverride(audioKey, contextId, channelId, overriddenChannelId);
 	}
 
 	void Audio_enableAudioModifier(uint8 channel, uint8 contextId, lemon::StringRef postfix, float relativeSpeed)
@@ -143,21 +143,28 @@ namespace
 		static inline const lemon::CustomDataType* mDataType = nullptr;
 	};
 
-	AudioInstanceWrapper Audio_getAudioInstanceBySfxId_u64(uint64 sfxId)
+	AudioInstanceWrapper Audio_getAudioInstanceByAudioKey_u64(uint64 audioKey)
 	{
 		AudioPlayer& audioPlayer = AudioPlayer::instance();
-		const AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundBySfxId(sfxId);
+		const AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundByAudioKey(audioKey);
 		return AudioInstanceWrapper { ref.mUniqueId };
 	}
 
-	AudioInstanceWrapper Audio_getAudioInstanceBySfxId(lemon::StringRef sfxId)
+	AudioInstanceWrapper Audio_getAudioInstanceByAudioKey(lemon::StringRef audioKey)
 	{
 		// Support keys like "2C", which should result in a "hash" of that uint8 hex number (here 0x2c)
-		const int64 numericKey = AudioCollection::checkForNumericKey(sfxId.getString());
+		const int64 numericKey = AudioCollection::checkForNumericKey(audioKey.getString());
 		if (numericKey >= 0)
-			return Audio_getAudioInstanceBySfxId_u64(numericKey);
+			return Audio_getAudioInstanceByAudioKey_u64(numericKey);
 		else
-			return Audio_getAudioInstanceBySfxId_u64(sfxId.getHash());
+			return Audio_getAudioInstanceByAudioKey_u64(audioKey.getHash());
+	}
+
+	AudioInstanceWrapper Audio_getAudioInstanceByChannel(uint8 channelId)
+	{
+		AudioPlayer& audioPlayer = AudioPlayer::instance();
+		const AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundByChannel(channelId);
+		return AudioInstanceWrapper { ref.mUniqueId };
 	}
 
 	AudioInstanceWrapper Audio_getAudioInstanceByInternalId(uint32 internalId)
@@ -165,6 +172,18 @@ namespace
 		AudioPlayer& audioPlayer = AudioPlayer::instance();
 		const AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundByUniqueId(internalId);
 		return AudioInstanceWrapper { ref.mUniqueId };
+	}
+
+	AudioInstanceWrapper Audio_getAudioInstanceByIndex(uint16 index)
+	{
+		AudioPlayer& audioPlayer = AudioPlayer::instance();
+		const AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundByIndex((size_t)index);
+		return AudioInstanceWrapper { ref.mUniqueId };
+	}
+
+	uint16 Audio_getNumAudioInstances()
+	{
+		return (uint16)AudioPlayer::instance().getNumPlayingSounds();
 	}
 
 	bool AudioInstance_isValid(AudioInstanceWrapper audioInstance)
@@ -179,6 +198,13 @@ namespace
 		AudioPlayer& audioPlayer = AudioPlayer::instance();
 		AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundByUniqueId(audioInstance.mUniqueId);
 		return ref.mUniqueId;
+	}
+
+	lemon::StringRef AudioInstance_getAudioKey(AudioInstanceWrapper audioInstance)
+	{
+		AudioPlayer& audioPlayer = AudioPlayer::instance();
+		AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundByUniqueId(audioInstance.mUniqueId);
+		return lemon::StringRef(audioPlayer.getPlayingSoundAudioKey(ref));
 	}
 
 	void AudioInstance_pause(AudioInstanceWrapper audioInstance)
@@ -236,6 +262,48 @@ namespace
 		AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundByUniqueId(audioInstance.mUniqueId);
 		return audioPlayer.getPlayingSoundPosition(ref);
 	}
+
+	uint8 AudioInstance_getChannel(AudioInstanceWrapper audioInstance)
+	{
+		AudioPlayer& audioPlayer = AudioPlayer::instance();
+		AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundByUniqueId(audioInstance.mUniqueId);
+		return audioPlayer.getPlayingSoundChannel(ref);
+	}
+
+	uint8 AudioInstance_getContext(AudioInstanceWrapper audioInstance)
+	{
+		AudioPlayer& audioPlayer = AudioPlayer::instance();
+		AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundByUniqueId(audioInstance.mUniqueId);
+		return audioPlayer.getPlayingSoundContext(ref);
+	}
+
+	float AudioInstance_getPlaybackSpeed(AudioInstanceWrapper audioInstance)
+	{
+		AudioPlayer& audioPlayer = AudioPlayer::instance();
+		AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundByUniqueId(audioInstance.mUniqueId);
+		return audioPlayer.getPlayingSoundSpeed(ref);
+	}
+
+	void AudioInstance_setPlaybackSpeed(AudioInstanceWrapper audioInstance, float speed)
+	{
+		AudioPlayer& audioPlayer = AudioPlayer::instance();
+		AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundByUniqueId(audioInstance.mUniqueId);
+		audioPlayer.setPlayingSoundSpeed(ref, speed);
+	}
+
+	float AudioInstance_getPanning(AudioInstanceWrapper audioInstance)
+	{
+		AudioPlayer& audioPlayer = AudioPlayer::instance();
+		AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundByUniqueId(audioInstance.mUniqueId);
+		return audioPlayer.getPlayingSoundPanning(ref);
+	}
+
+	void AudioInstance_setPanning(AudioInstanceWrapper audioInstance, float panning)
+	{
+		AudioPlayer& audioPlayer = AudioPlayer::instance();
+		AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundByUniqueId(audioInstance.mUniqueId);
+		audioPlayer.setPlayingSoundPanning(ref, clamp(panning, -1.0f, 1.0f));
+	}
 }
 
 
@@ -279,16 +347,16 @@ void AudioBindings::registerBindings(lemon::Module& module)
 
 		// Global audio functions
 		builder.addNativeFunction("Audio.getAudioKeyType", lemon::wrap(&Audio_getAudioKeyType), defaultFlags)
-			.setParameters("sfxId");
+			.setParameters("audioKey");
 
 		builder.addNativeFunction("Audio.isPlayingAudio", lemon::wrap(&Audio_isPlayingAudio), defaultFlags)
-			.setParameters("sfxId");
+			.setParameters("audioKey");
 
 		builder.addNativeFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio1), defaultFlags)
-			.setParameters("sfxId", "contextId");
+			.setParameters("audioKey", "contextId");
 
 		builder.addNativeFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio2), defaultFlags)
-			.setParameters("sfxId");
+			.setParameters("audioKey");
 
 		builder.addNativeFunction("Audio.pauseChannel", lemon::wrap(&Audio_pauseChannel), defaultFlags)
 			.setParameters("channel");
@@ -321,7 +389,7 @@ void AudioBindings::registerBindings(lemon::Module& module)
 			.setParameters("channel", "length");
 
 		builder.addNativeFunction("Audio.playOverride", lemon::wrap(&Audio_playOverride), defaultFlags)
-			.setParameters("sfxId", "contextId", "channelId", "overriddenChannelId");
+			.setParameters("audioKey", "contextId", "channelId", "overriddenChannelId");
 
 		builder.addNativeFunction("Audio.enableAudioModifier", lemon::wrap(&Audio_enableAudioModifier), defaultFlags)
 			.setParameters("channel", "contextId", "postfix", "relativeSpeed");
@@ -334,14 +402,22 @@ void AudioBindings::registerBindings(lemon::Module& module)
 
 
 		// Audio instance related functions
-		builder.addNativeFunction("Audio.getAudioInstanceBySfxId", lemon::wrap(&Audio_getAudioInstanceBySfxId_u64), defaultFlags)
-			.setParameters("sfxId");
+		builder.addNativeFunction("Audio.getAudioInstanceByAudioKey", lemon::wrap(&Audio_getAudioInstanceByAudioKey_u64), defaultFlags)
+			.setParameters("audioKey");
 
-		builder.addNativeFunction("Audio.getAudioInstanceBySfxId", lemon::wrap(&Audio_getAudioInstanceBySfxId), defaultFlags)
-			.setParameters("sfxId");
+		builder.addNativeFunction("Audio.getAudioInstanceByAudioKey", lemon::wrap(&Audio_getAudioInstanceByAudioKey), defaultFlags)
+			.setParameters("audioKey");
+
+		builder.addNativeFunction("Audio.getAudioInstanceByChannel", lemon::wrap(&Audio_getAudioInstanceByChannel), defaultFlags)
+			.setParameters("channelId");
 
 		builder.addNativeFunction("Audio.getAudioInstanceByInternalId", lemon::wrap(&Audio_getAudioInstanceByInternalId), defaultFlags)
-			.setParameters("sfxId");
+			.setParameters("internalId");
+
+		builder.addNativeFunction("Audio.getAudioInstanceByIndex", lemon::wrap(&Audio_getAudioInstanceByIndex), defaultFlags)
+			.setParameters("index");
+
+		builder.addNativeFunction("Audio.getNumAudioInstances", lemon::wrap(&Audio_getNumAudioInstances), defaultFlags);
 
 
 		// Audio instance methods
@@ -349,6 +425,9 @@ void AudioBindings::registerBindings(lemon::Module& module)
 			.setParameters("this");
 
 		builder.addNativeMethod("AudioInstance", "getInternalId", lemon::wrap(&AudioInstance_getInternalId), defaultFlags)
+			.setParameters("this");
+
+		builder.addNativeMethod("AudioInstance", "getAudioKey", lemon::wrap(&AudioInstance_getAudioKey), defaultFlags)
 			.setParameters("this");
 
 		builder.addNativeMethod("AudioInstance", "pause", lemon::wrap(&AudioInstance_pause), defaultFlags)
@@ -374,5 +453,23 @@ void AudioBindings::registerBindings(lemon::Module& module)
 
 		builder.addNativeMethod("AudioInstance", "getPlaybackPosition", lemon::wrap(&AudioInstance_getPlaybackPosition), defaultFlags)
 			.setParameters("this");
+
+		builder.addNativeMethod("AudioInstance", "getChannel", lemon::wrap(&AudioInstance_getChannel), defaultFlags)
+			.setParameters("this");
+
+		builder.addNativeMethod("AudioInstance", "getContext", lemon::wrap(&AudioInstance_getContext), defaultFlags)
+			.setParameters("this");
+
+		builder.addNativeMethod("AudioInstance", "getPlaybackSpeed", lemon::wrap(&AudioInstance_getPlaybackSpeed), defaultFlags)
+			.setParameters("this");
+
+		builder.addNativeMethod("AudioInstance", "setPlaybackSpeed", lemon::wrap(&AudioInstance_setPlaybackSpeed), defaultFlags)
+			.setParameters("this", "speed");
+
+		builder.addNativeMethod("AudioInstance", "getPanning", lemon::wrap(&AudioInstance_getPanning), defaultFlags)
+			.setParameters("this");
+
+		builder.addNativeMethod("AudioInstance", "setPanning", lemon::wrap(&AudioInstance_setPanning), defaultFlags)
+			.setParameters("this", "panning");
 	}
 }

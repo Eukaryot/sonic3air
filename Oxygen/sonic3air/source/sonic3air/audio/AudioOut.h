@@ -34,9 +34,9 @@ public:
 	void reset() override;
 	void resetGame() override;
 
-	void playAudioDirect(uint64 sfxId, SoundRegType type, int contextBase = CONTEXT_INGAME, AudioReference* outAudioReference = nullptr);
+	void playAudioDirect(uint64 audioKey, SoundRegType type, int contextBase = CONTEXT_INGAME, AudioReference* outAudioReference = nullptr);
 
-	void setMenuMusic(uint64 sfxId);
+	void setMenuMusic(uint64 audioKey);
 	void restartMenuMusic();
 	void moveMenuMusicToIngame();
 	void moveIngameMusicToMenu();
@@ -60,7 +60,7 @@ private:
 	};
 
 private:
-	void playAudioInternal(const SfxHandling& handling, uint64 sfxId, int contextBase, AudioReference* outAudioReference);
+	void playAudioInternal(const SfxHandling& handling, uint64 audioKey, int contextBase, AudioReference* outAudioReference);
 
 private:
 	uint64			  mMenuMusicId = -1;
