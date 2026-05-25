@@ -140,7 +140,7 @@ bool AudioBuffer::load(const String& source, const String& params)
 	for (LoadCallbackList::iterator it = mStaticLoadCallbacks.begin(); it != mStaticLoadCallbacks.end(); ++it)
 	{
 		LoadCallbackType func = *it;
-		if (func(this, source, params))
+		if (func(*this, source, params))
 			return true;
 	}
 	return false;

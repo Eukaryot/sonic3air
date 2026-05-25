@@ -150,7 +150,7 @@ AudioSourceBase::State OggAudioSource::startupInternal()
 		mOggLoader = new OggLoader();
 	}
 	mAudioBuffer.lock();
-	const bool success = mOggLoader->startVorbisStreaming(&mAudioBuffer, mInputStream);
+	const bool success = mOggLoader->startVorbisStreaming(mAudioBuffer, mInputStream);
 	mAudioBuffer.unlock();
 	SDL_UnlockMutex(mMutex);
 

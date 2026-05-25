@@ -627,6 +627,18 @@ float AudioPlayer::getPlayingSoundPosition(PlayingSoundRef ref)
 	return 0.0f;
 }
 
+void AudioPlayer::setPlayingSoundPosition(PlayingSoundRef ref, float seconds)
+{
+	PlayingSound* playingSound = resolvePlayingSoundRef(ref);
+	if (nullptr != playingSound && playingSound->mAudioRef.isValid())
+	{
+		// Seek to that position
+		//  -> TODO: This doesn't work this way at all, no matter if seeking forward or backwards
+		playingSound->mAudioSource->updateReadTime(seconds);
+		playingSound->mAudioRef.setPosition(seconds);
+	}
+}
+
 int AudioPlayer::getPlayingSoundChannel(PlayingSoundRef ref)
 {
 	PlayingSound* playingSound = resolvePlayingSoundRef(ref);

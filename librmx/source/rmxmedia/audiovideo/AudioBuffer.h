@@ -15,7 +15,7 @@
 class API_EXPORT AudioBuffer
 {
 public:
-	typedef bool(*LoadCallbackType)(AudioBuffer*, const String&, const String&);
+	typedef bool(*LoadCallbackType)(AudioBuffer&, const String&, const String&);
 	typedef std::list<LoadCallbackType> LoadCallbackList;
 	static LoadCallbackList mStaticLoadCallbacks;
 

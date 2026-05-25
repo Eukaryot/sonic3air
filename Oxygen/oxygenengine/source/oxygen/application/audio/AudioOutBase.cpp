@@ -108,8 +108,15 @@ AudioOutBase::AudioKeyType AudioOutBase::getAudioKeyType(uint64 audioKey) const
 	AudioCollection::SourceRegistration* sourceReg = mAudioCollection.getSourceRegistration(audioKey);
 	if (nullptr == sourceReg)
 		return AudioKeyType::INVALID;
-
 	return (AudioKeyType)sourceReg->mPackage;
+}
+
+std::string_view AudioOutBase::getAudioKeyDisplayName(uint64 audioKey) const
+{
+	AudioCollection::SourceRegistration* sourceReg = mAudioCollection.getSourceRegistration(audioKey);
+	if (nullptr == sourceReg)
+		return "";
+	return sourceReg->mAudioDefinition->mDisplayName;
 }
 
 bool AudioOutBase::isPlayingAudioKey(uint64 audioKey) const

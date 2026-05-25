@@ -62,6 +62,7 @@ public:
 	void setGlobalVolume(float volume);
 
 	AudioKeyType getAudioKeyType(uint64 audioKey) const;
+	std::string_view getAudioKeyDisplayName(uint64 audioKey) const;
 	bool isPlayingAudioKey(uint64 audioKey) const;
 
 	bool playAudioBase(uint64 audioKey, uint8 contextId);

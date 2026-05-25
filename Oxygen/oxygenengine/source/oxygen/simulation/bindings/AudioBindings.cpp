@@ -22,6 +22,11 @@ namespace
 		return (uint8)EngineMain::instance().getAudioOut().getAudioKeyType(audioKey);
 	}
 
+	lemon::StringRef Audio_getAudioKeyDisplayName(uint64 audioKey)
+	{
+		return lemon::StringRef(EngineMain::instance().getAudioOut().getAudioKeyDisplayName(audioKey));
+	}
+
 	bool Audio_isPlayingAudio(uint64 audioKey)
 	{
 		return EngineMain::instance().getAudioOut().isPlayingAudioKey(audioKey);
@@ -263,6 +268,13 @@ namespace
 		return audioPlayer.getPlayingSoundPosition(ref);
 	}
 
+	void AudioInstance_setPlaybackPosition(AudioInstanceWrapper audioInstance, float seconds)
+	{
+		AudioPlayer& audioPlayer = AudioPlayer::instance();
+		AudioPlayer::PlayingSoundRef ref = audioPlayer.getPlayingSoundByUniqueId(audioInstance.mUniqueId);
+		return audioPlayer.setPlayingSoundPosition(ref, seconds);
+	}
+
 	uint8 AudioInstance_getChannel(AudioInstanceWrapper audioInstance)
 	{
 		AudioPlayer& audioPlayer = AudioPlayer::instance();
@@ -347,6 +359,9 @@ void AudioBindings::registerBindings(lemon::Module& module)
 
 		// Global audio functions
 		builder.addNativeFunction("Audio.getAudioKeyType", lemon::wrap(&Audio_getAudioKeyType), defaultFlags)
+			.setParameters("audioKey");
+
+		builder.addNativeFunction("Audio.getAudioKeyDisplayName", lemon::wrap(&Audio_getAudioKeyDisplayName), defaultFlags)
 			.setParameters("audioKey");
 
 		builder.addNativeFunction("Audio.isPlayingAudio", lemon::wrap(&Audio_isPlayingAudio), defaultFlags)
@@ -453,6 +468,10 @@ void AudioBindings::registerBindings(lemon::Module& module)
 
 		builder.addNativeMethod("AudioInstance", "getPlaybackPosition", lemon::wrap(&AudioInstance_getPlaybackPosition), defaultFlags)
 			.setParameters("this");
+
+		// TODO: This doesn't work, would require some rewrite of ogg playback and possibly frame purging
+	//	builder.addNativeMethod("AudioInstance", "setPlaybackPosition", lemon::wrap(&AudioInstance_setPlaybackPosition), defaultFlags)
+	//		.setParameters("this", "seconds");
 
 		builder.addNativeMethod("AudioInstance", "getChannel", lemon::wrap(&AudioInstance_getChannel), defaultFlags)
 			.setParameters("this");

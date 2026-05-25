@@ -135,7 +135,7 @@ namespace rmx
 	class API_EXPORT WavLoader
 	{
 	public:
-		static bool load(AudioBuffer* buffer, const String& source, const String& params);
+		static bool load(AudioBuffer& outBuffer, const String& source, const String& params);
 	};
 
 }

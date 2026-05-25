@@ -97,6 +97,7 @@ public:
 	void fadePlayingSoundVolume(PlayingSoundRef ref, float volume, float length);
 
 	float getPlayingSoundPosition(PlayingSoundRef ref);
+	void setPlayingSoundPosition(PlayingSoundRef ref, float seconds);
 
 	int getPlayingSoundChannel(PlayingSoundRef ref);
 	int getPlayingSoundContext(PlayingSoundRef ref);

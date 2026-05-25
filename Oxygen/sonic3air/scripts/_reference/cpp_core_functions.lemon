@@ -340,6 +340,7 @@ declare function void setWorldSpaceOffset(s32 px, s32 py)
 declare function SpriteHandle Renderer.addSpriteHandle(u64 spriteKey, s32 px, s32 py, u16 renderQueue)
 
 declare function u8 Audio.getAudioKeyType(u64 audioKey)
+declare function string Audio.getAudioKeyDisplayName(u64 audioKey)
 declare function bool Audio.isPlayingAudio(u64 audioKey)
 declare function void Audio.playAudio(u64 audioKey, u8 contextId)
 declare function void Audio.playAudio(u64 audioKey)

@@ -12,29 +12,27 @@
 #pragma once
 
 
-// OggLoaderError
-enum class OggLoaderError
-{
-	OK = 0,
-	COULD_NOT_OPEN_FILE,
-	UNEXPECTED_EOF,
-	INVALID_VORBIS_HEADER,
-	HEADERS_NOT_FOUND
-};
-
-enum class OggLoaderState
-{
-	INACTIVE = 0,
-	STREAMING,
-	COMPLETE
-};
-
-
-// OggLoader
 class OggLoader
 {
 public:
-	static bool staticLoadVorbis(AudioBuffer* buffer, const String& source, const String& params);
+	enum class LoaderError
+	{
+		OK = 0,
+		COULD_NOT_OPEN_FILE,
+		UNEXPECTED_EOF,
+		INVALID_VORBIS_HEADER,
+		HEADERS_NOT_FOUND
+	};
+
+	enum class LoaderState
+	{
+		INACTIVE = 0,
+		STREAMING,
+		COMPLETE
+	};
+
+public:
+	static bool staticLoadVorbis(AudioBuffer& outBuffer, const String& source, const String& params);
 
 public:
 	OggLoader();
@@ -42,12 +40,12 @@ public:
 
 	void reset();
 
-	bool startVorbisStreaming(AudioBuffer* audiobuffer, InputStream* istream, float precachingTime = 0.0f);
+	bool startVorbisStreaming(AudioBuffer& outBuffer, InputStream* istream, float precachingTime = 0.0f);
 
 	bool updateStreaming();
 	void precache(float time);
 
-	bool loadVorbis(AudioBuffer* buffer, const String& source);
+	bool loadVorbis(AudioBuffer& outBuffer, const String& source);
 
 	void seek(float targetTime);
 
@@ -56,22 +54,23 @@ public:
 
 	inline bool isStreaming() const        { return mIsStreaming; }
 	inline bool isStreamingVorbis() const  { return (nullptr != mAudioBuffer); }
-	inline OggLoaderState getAudioState() const  { return mAudioState; }
+	inline LoaderState getAudioState() const  { return mAudioState; }
 
-	inline OggLoaderError getError() const  { return mError; }
+	inline LoaderError getError() const  { return mError; }
 
 private:
-	int  bufferData();
+	int bufferData();
 	bool openStreams(InputStream* istream);
-	int  seekInternal(float targetTime, std::streamsize& rangeMin, std::streamsize& rangeMax);
+	int seekInternal(float targetTime, std::streamsize& rangeMin, std::streamsize& rangeMax);
 
 private:
+	// Internal state
 	bool mIsStreaming = false;
 	AudioBuffer* mAudioBuffer = nullptr;
 	InputStream* mInputStream = nullptr;
-	OggLoaderError mError = OggLoaderError::OK;
+	LoaderError mError = LoaderError::OK;
 	ogg_int64_t mVorbisGranulePos = 0;
-	OggLoaderState mAudioState = OggLoaderState::INACTIVE;
+	LoaderState mAudioState = LoaderState::INACTIVE;
 	int mSkipAudioSampleOutput = 0;
 
 	// Ogg/Vorbis data structures
