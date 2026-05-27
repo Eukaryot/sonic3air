@@ -540,6 +540,7 @@ struct BlitterHelper
 
 		int lastSourceY = -1;
 		uint32* lastDestData = nullptr;
+		const int bytesToCopyPerLine = std::min(destRect.width, destBitmap.getSize().x - destRect.x) * sizeof(uint32);
 
 		uint32 position = 0;	// This is used as a 16.16 fixed point number
 		const uint32 advance = (sourceRect.width << 16) / destRect.width;
@@ -553,7 +554,7 @@ struct BlitterHelper
 			if (sourceY == lastSourceY && nullptr != lastDestData && !ALPHA_BLENDING)
 			{
 				// Just copy the content from the last line, as it's the same contents again
-				memcpy(destData, lastDestData, destRect.width * sizeof(uint32));
+				memcpy(destData, lastDestData, bytesToCopyPerLine);
 			}
 			else
 			{

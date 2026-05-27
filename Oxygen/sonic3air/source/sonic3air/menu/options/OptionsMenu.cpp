@@ -537,7 +537,7 @@ void OptionsMenu::update(float timeElapsed)
 
 							case option::RENDERER:
 							{
-								EngineMain::instance().switchToRenderMethod((Configuration::RenderMethod)selectedEntry.selected().mValue);
+								Application::instance().setPendingRenderMethod((Configuration::RenderMethod)selectedEntry.selected().mValue);
 								break;
 							}
 

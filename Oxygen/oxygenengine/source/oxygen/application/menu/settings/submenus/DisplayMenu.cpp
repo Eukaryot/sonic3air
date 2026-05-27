@@ -10,6 +10,7 @@
 #include "oxygen/application/menu/settings/submenus/DisplayMenu.h"
 #include "oxygen/application/menu/settings/SimpleSelection.h"
 #include "oxygen/application/menu/SharedFonts.h"
+#include "oxygen/application/Application.h"
 
 
 void DisplayMenu::init()
@@ -47,6 +48,6 @@ void DisplayMenu::update(loui::UpdateInfo& updateInfo)
 	if (mRendererSelection.wasChanged())
 	{
 		const uint32 value = mRendererSelection.getCurrentOptionValue();
-		EngineMain::instance().switchToRenderMethod((Configuration::RenderMethod)value);
+		Application::instance().setPendingRenderMethod((Configuration::RenderMethod)value);
 	}
 }

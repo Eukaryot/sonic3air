@@ -149,6 +149,13 @@ void Application::deinitialize()
 
 void Application::beginFrame()
 {
+	// Change render method if requested
+	if (mPendingRenderMethod.has_value())
+	{
+		EngineMain::instance().switchToRenderMethod(*mPendingRenderMethod);
+		mPendingRenderMethod.reset();
+	}
+
 	// Handle text input
 	{
 		// Start or stop text input from SDL
@@ -300,9 +307,9 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 							updateWindowDisplayIndex();
 							const Configuration::RenderMethod newRenderMethod = (Configuration::instance().mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? Configuration::RenderMethod::OPENGL_SOFT :
 																				(Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? Configuration::RenderMethod::OPENGL_FULL : Configuration::RenderMethod::SOFTWARE;
-							EngineMain::instance().switchToRenderMethod(newRenderMethod);
-							LogDisplay::instance().setLogDisplay((Configuration::instance().mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Switched to pure software renderer" :
-																 (Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Switched to opengl-soft renderer" : "Switched to opengl-full renderer");
+							setPendingRenderMethod(newRenderMethod);
+							LogDisplay::instance().setLogDisplay((newRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Switched to pure software renderer" :
+																 (newRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Switched to opengl-soft renderer" : "Switched to opengl-full renderer");
 						}
 						break;
 					}
@@ -423,8 +430,8 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 						if (Configuration::instance().mRenderMethod != Configuration::RenderMethod::SOFTWARE)
 						{
 							const Configuration::RenderMethod newRenderMethod = (Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? Configuration::RenderMethod::OPENGL_FULL : Configuration::RenderMethod::OPENGL_SOFT;
-							EngineMain::instance().switchToRenderMethod(newRenderMethod);
-							LogDisplay::instance().setLogDisplay((Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Switched to opengl-soft renderer" : "Switched to opengl-full renderer");
+							setPendingRenderMethod(newRenderMethod);
+							LogDisplay::instance().setLogDisplay((newRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Switched to opengl-soft renderer" : "Switched to opengl-full renderer");
 						}
 						break;
 					}
@@ -842,6 +849,12 @@ void Application::toggleFullscreen()
 	{
 		setWindowMode(WindowMode::WINDOWED);
 	}
+}
+
+void Application::setPendingRenderMethod(Configuration::RenderMethod renderMethod)
+{
+	// When this is called, don't immediately change the render method, as doing so during "update" or "render" calls might cause issues down the line
+	mPendingRenderMethod = renderMethod;
 }
 
 void Application::enablePauseOnFocusLoss()

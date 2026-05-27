@@ -59,6 +59,8 @@ public:
 	void setWindowMode(WindowMode windowMode, bool force = false);
 	void toggleFullscreen();
 
+	void setPendingRenderMethod(Configuration::RenderMethod renderMethod);
+
 	void enablePauseOnFocusLoss();
 	void triggerGameRecordingSave();
 
@@ -79,6 +81,8 @@ private:
 	double mNextRefreshTime = 0.0;		// In milliseconds since application start
 	bool mIsVeryFirstFrameForLogging = true;
 	bool mPausedByFocusLoss = false;
+
+	std::optional<Configuration::RenderMethod> mPendingRenderMethod;
 
 	// Simulation
 	Simulation* mSimulation = nullptr;
