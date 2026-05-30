@@ -29,6 +29,20 @@ namespace lemon
 		void readFromStack(ControlFlow& controlFlow);
 	};
 
+	struct ArrayBaseWrapper
+	{
+		uint32 mVariableID = 0;
+	};
+
+	struct ReferenceWrapper
+	{
+		uint32 mVariableID = 0;
+	};
+
+	template<typename T>
+	struct TReferenceWrapper : lemon::ReferenceWrapper {};
+
+
 
 	namespace traits
 	{
@@ -45,58 +59,72 @@ namespace lemon
 		template<> const DataTypeDefinition* getDataType<uint64>();
 		template<> const DataTypeDefinition* getDataType<float>();
 		template<> const DataTypeDefinition* getDataType<double>();
+		template<> const DataTypeDefinition* getDataType<AnyTypeWrapper>();
 		template<> const DataTypeDefinition* getDataType<StringRef>();
 		template<> const DataTypeDefinition* getDataType<ArrayBaseWrapper>();
-		template<> const DataTypeDefinition* getDataType<AnyTypeWrapper>();
+		template<> const DataTypeDefinition* getDataType<ReferenceWrapper>();
 	}
 
 
 	namespace internal
 	{
 
-		// Stack interactions templates for base types - these functions are used as a basis for return type and parameter type handling
-
-		template<typename R>
-		void pushStackGeneric(R value, const NativeFunction::Context context)
-		{
-			context.mControlFlow.pushValueStack<R>(value);
-		};
-
+		// Stack interactions template for base types - this is used as a basis for return type and parameter type handling
 		template<typename T>
-		T popStackGeneric(const NativeFunction::Context context)
+		struct StackHandler
 		{
-			return static_cast<T>(context.mControlFlow.popValueStack<T>());
-		}
+			static void pushStack(T value, const NativeFunction::Context context)
+			{
+				context.mControlFlow.pushValueStack<T>(value);
+			};
 
-
-
-		// Template specializations for StringRef, representing the "string" type in script
-
-		template<>
-		void pushStackGeneric<StringRef>(StringRef value, const NativeFunction::Context context);
-
-		template<>
-		StringRef popStackGeneric(const NativeFunction::Context context);
-
-
-
-		// Template specializations for ArrayBaseWrapper, representing all array types in script
-
-		template<>
-		void pushStackGeneric<ArrayBaseWrapper>(ArrayBaseWrapper value, const NativeFunction::Context context);
-
-		template<>
-		ArrayBaseWrapper popStackGeneric(const NativeFunction::Context context);
-
+			static T popStack(const NativeFunction::Context context)
+			{
+				return static_cast<T>(context.mControlFlow.popValueStack<T>());
+			}
+		};
 
 
 		// Template specializations for AnyTypeWrapper, representing the "any" type in script
-
 		template<>
-		void pushStackGeneric<AnyTypeWrapper>(AnyTypeWrapper value, const NativeFunction::Context context);
+		struct StackHandler<AnyTypeWrapper>
+		{
+			static void pushStack(AnyTypeWrapper value, const NativeFunction::Context context);
+			static AnyTypeWrapper popStack(const NativeFunction::Context context);
+		};
 
+
+		// Template specializations for StringRef, representing the "string" type in script
 		template<>
-		AnyTypeWrapper popStackGeneric(const NativeFunction::Context context);
+		struct StackHandler<StringRef>
+		{
+			static void pushStack(StringRef value, const NativeFunction::Context context);
+			static StringRef popStack(const NativeFunction::Context context);
+		};
+
+
+		// Template specializations for ArrayBaseWrapper, representing all array types in script
+		template<>
+		struct StackHandler<ArrayBaseWrapper>
+		{
+			static void pushStack(ArrayBaseWrapper value, const NativeFunction::Context context);
+			static ArrayBaseWrapper popStack(const NativeFunction::Context context);
+		};
+
+
+		// Template specializations for ReferenceWrapper, representing references in script
+		template<>
+		struct StackHandler<ReferenceWrapper>
+		{
+			static void pushStack(ReferenceWrapper value, const NativeFunction::Context context);
+			static ReferenceWrapper popStack(const NativeFunction::Context context);
+		};
+
+		template<typename T>
+		struct StackHandler<TReferenceWrapper<T>> : public StackHandler<ReferenceWrapper>
+		{
+			static TReferenceWrapper<T> popStack(const NativeFunction::Context context)  { return static_cast<TReferenceWrapper<T>&>(StackHandler<ReferenceWrapper>::popStack(context)); }
+		};
 
 
 
@@ -147,13 +175,13 @@ namespace lemon
 				// Pop from stack
 				constexpr size_t numFixedEntries = (std::is_void_v<CLASS> ? 0 : 1) + (WITH_CONTEXT ? 1 : 0);
 				constexpr size_t index = sizeof...(Tuple) - sizeof...(Args) - 1 + numFixedEntries;
-				std::get<index>(mTuple) = popStackGeneric<T>(mContext);
+				std::get<index>(mTuple) = StackHandler<T>::popStack(mContext);
 			}
 		};
 
 
 
-		// Function wrappers
+		// Function wrapper
 
 		template<bool WITH_CONTEXT, typename R, typename... Args>
 		class FunctionWrapper : public NativeFunction::FunctionWrapper
@@ -180,7 +208,7 @@ namespace lemon
 				}
 				else
 				{
-					pushStackGeneric(std::apply(mPointer, parameters.mTuple), context);
+					StackHandler<R>::pushStack(std::apply(mPointer, parameters.mTuple), context);
 				}
 			}
 
@@ -227,7 +255,7 @@ namespace lemon
 				}
 				else
 				{
-					pushStackGeneric(std::apply(mPointer, parameters.mTuple), context);
+					StackHandler<R>::pushStack(std::apply(mPointer, parameters.mTuple), context);
 				}
 			}
 

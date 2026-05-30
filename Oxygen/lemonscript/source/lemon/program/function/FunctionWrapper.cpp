@@ -55,22 +55,33 @@ namespace lemon
 		template<> const DataTypeDefinition* getDataType<uint64>()			 { return &PredefinedDataTypes::UINT_64; }
 		template<> const DataTypeDefinition* getDataType<float>()			 { return &PredefinedDataTypes::FLOAT; }
 		template<> const DataTypeDefinition* getDataType<double>()			 { return &PredefinedDataTypes::DOUBLE; }
+		template<> const DataTypeDefinition* getDataType<AnyTypeWrapper>()	 { return &PredefinedDataTypes::ANY; }
 		template<> const DataTypeDefinition* getDataType<StringRef>()		 { return &PredefinedDataTypes::STRING; }
 		template<> const DataTypeDefinition* getDataType<ArrayBaseWrapper>() { return &PredefinedDataTypes::ARRAY_BASE; }
-		template<> const DataTypeDefinition* getDataType<AnyTypeWrapper>()	 { return &PredefinedDataTypes::ANY; }
 	}
 
 	namespace internal
 	{
 
-		template<>
-		void pushStackGeneric(StringRef value, const NativeFunction::Context context)
+		void StackHandler<AnyTypeWrapper>::pushStack(AnyTypeWrapper value, const NativeFunction::Context context)
+		{
+			value.pushToStack(context.mControlFlow);
+		};
+
+		AnyTypeWrapper StackHandler<AnyTypeWrapper>::popStack(const NativeFunction::Context context)
+		{
+			AnyTypeWrapper result;
+			result.popFromStack(context.mControlFlow);
+			return result;
+		}
+
+
+		void StackHandler<StringRef>::pushStack(StringRef value, const NativeFunction::Context context)
 		{
 			context.mControlFlow.pushValueStack<uint64>(value.getHash());
 		};
 
-		template<>
-		StringRef popStackGeneric(const NativeFunction::Context context)
+		StringRef StackHandler<StringRef>::popStack(const NativeFunction::Context context)
 		{
 			const uint64 stringHash = context.mControlFlow.popValueStack<uint64>();
 			const FlyweightString* str = context.mControlFlow.getRuntime().resolveStringByKey(stringHash);
@@ -78,14 +89,12 @@ namespace lemon
 		}
 
 
-		template<>
-		void pushStackGeneric(ArrayBaseWrapper value, const NativeFunction::Context context)
+		void StackHandler<ArrayBaseWrapper>::pushStack(ArrayBaseWrapper value, const NativeFunction::Context context)
 		{
 			context.mControlFlow.pushValueStack<uint32>(value.mVariableID);
 		};
 
-		template<>
-		ArrayBaseWrapper popStackGeneric(const NativeFunction::Context context)
+		ArrayBaseWrapper StackHandler<ArrayBaseWrapper>::popStack(const NativeFunction::Context context)
 		{
 			ArrayBaseWrapper result;
 			result.mVariableID = context.mControlFlow.popValueStack<uint32>();
@@ -93,17 +102,15 @@ namespace lemon
 		}
 
 
-		template<>
-		void pushStackGeneric(AnyTypeWrapper value, const NativeFunction::Context context)
+		void StackHandler<ReferenceWrapper>::pushStack(ReferenceWrapper value, const NativeFunction::Context context)
 		{
-			value.pushToStack(context.mControlFlow);
+			context.mControlFlow.pushValueStack<uint32>(value.mVariableID);
 		};
 
-		template<>
-		AnyTypeWrapper popStackGeneric(const NativeFunction::Context context)
+		ReferenceWrapper StackHandler<ReferenceWrapper>::popStack(const NativeFunction::Context context)
 		{
-			AnyTypeWrapper result;
-			result.popFromStack(context.mControlFlow);
+			ReferenceWrapper result;
+			result.mVariableID = context.mControlFlow.popValueStack<uint32>();
 			return result;
 		}
 	}

@@ -19,10 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\main.cpp" />
-    <ClCompile Include="..\..\source\NativizedCode.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\script\mainscript.lemon" />
     <None Include="..\..\script\script01.lemon" />
     <None Include="..\..\script\testcode\arrays.lemon" />
@@ -33,7 +29,15 @@
     <None Include="..\..\script\testcode\objecthandle.lemon" />
     <None Include="..\..\script\testcode\strings.lemon" />
     <None Include="..\..\script\unittests.lemon" />
-    <None Include="..\..\source\NativizedCode.inc" />
+    <None Include="..\..\source\test\NativizedCode.inc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\test\main.cpp" />
+    <ClCompile Include="..\..\source\test\NativizedCode.cpp" />
+    <ClCompile Include="..\..\source\test\TestBindings.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\test\TestBindings.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E93F379A-4D01-444C-AA6E-B100E2D5D161}</ProjectGuid>

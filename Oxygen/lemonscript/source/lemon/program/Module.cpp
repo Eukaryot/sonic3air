@@ -457,12 +457,20 @@ namespace lemon
 		return *arrayDataType;
 	}
 
-	const CustomDataType* Module::addCustomDataType(const char* name, BaseType baseType)
+	ReferenceDataType& Module::addReferenceDataType(const DataTypeDefinition& elementType)
+	{
+		const uint16 id = mFirstDataTypeID + (uint16)mDataTypes.size();
+		ReferenceDataType* referenceDataType = new ReferenceDataType(id, elementType);
+		mDataTypes.push_back(referenceDataType);
+		return *referenceDataType;
+	}
+
+	const CustomDataType& Module::addCustomDataType(const char* name, BaseType baseType)
 	{
 		const uint16 id = mFirstDataTypeID + (uint16)mDataTypes.size();
 		CustomDataType* customDataType = new CustomDataType(name, id, baseType);
 		mDataTypes.push_back(customDataType);
-		return customDataType;
+		return *customDataType;
 	}
 
 	uint32 Module::buildDependencyHash() const

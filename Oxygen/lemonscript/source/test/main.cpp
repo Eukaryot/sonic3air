@@ -8,8 +8,9 @@
 
 #define RMX_LIB
 
+#include "TestBindings.h"
+
 #include "lemon/compiler/Compiler.h"
-#include "lemon/program/function/FunctionWrapper.h"
 #include "lemon/program/GlobalsLookup.h"
 #include "lemon/program/Module.h"
 #include "lemon/program/Program.h"
@@ -62,146 +63,6 @@ void moveOutOfBinDir(const std::string& path)
 }
 
 
-struct ObjectHandleWrapper
-{
-	uint32 mContent;
-
-	static inline const CustomDataType* mObjectHandleDataType = nullptr;
-};
-
-ObjectHandleWrapper makeObjectHandle(uint32 value)
-{
-	return ObjectHandleWrapper { value };
-}
-
-ObjectHandleWrapper increaseObjectHandle(ObjectHandleWrapper value)
-{
-	return ObjectHandleWrapper { value.mContent + 1 };
-}
-
-namespace lemon
-{
-	namespace traits
-	{
-		template<> const DataTypeDefinition* getDataType<ObjectHandleWrapper>()  { return ObjectHandleWrapper::mObjectHandleDataType; }
-	}
-
-	namespace internal
-	{
-		template<>
-		void pushStackGeneric<ObjectHandleWrapper>(ObjectHandleWrapper value, const NativeFunction::Context context)
-		{
-			context.mControlFlow.pushValueStack(value.mContent);
-		};
-
-		template<>
-		ObjectHandleWrapper popStackGeneric(const NativeFunction::Context context)
-		{
-			return ObjectHandleWrapper { context.mControlFlow.popValueStack<uint32>() };
-		}
-	}
-}
-
-
-void logValue(ControlFlow& controlFlow)
-{
-	const int64 value = controlFlow.readValueStack<int64>(-1);		// Read the value, but don't remove it from stack
-	std::cout << rmx::hexString(value, 8) << std::endl;
-}
-
-void logValueStr(ControlFlow& controlFlow)
-{
-	const uint64 key = controlFlow.readValueStack<uint64>(-1);		// Read the value, but don't remove it from stack
-
-	Runtime* runtime = Runtime::getActiveRuntime();
-	RMX_CHECK(nullptr != runtime, "No lemon script runtime active", return);
-
-	const FlyweightString* storedString = runtime->resolveStringByKey(key);
-	RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
-
-	std::cout << storedString->getString() << std::endl;
-}
-
-void debugLog(AnyTypeWrapper param)
-{
-	if (param.mType == &PredefinedDataTypes::UINT_8 || param.mType == &PredefinedDataTypes::INT_8)
-	{
-		std::cout << rmx::hexString(param.mValue.get<uint8>(), 2) << std::endl;
-	}
-	else if (param.mType == &PredefinedDataTypes::UINT_16 || param.mType == &PredefinedDataTypes::INT_16)
-	{
-		std::cout << rmx::hexString(param.mValue.get<uint16>(), 4) << std::endl;
-	}
-	else if (param.mType == &PredefinedDataTypes::UINT_32 || param.mType == &PredefinedDataTypes::INT_32)
-	{
-		std::cout << rmx::hexString(param.mValue.get<uint32>(), 8) << std::endl;
-	}
-	else if (param.mType == &PredefinedDataTypes::UINT_64 || param.mType == &PredefinedDataTypes::INT_64 || param.mType == &PredefinedDataTypes::CONST_INT)
-	{
-		std::cout << rmx::hexString(param.mValue.get<uint64>(), 8) << std::endl;
-	}
-	else if (param.mType == &PredefinedDataTypes::FLOAT)
-	{
-		std::cout << param.mValue.get<float>() << std::endl;
-	}
-	else if (param.mType == &PredefinedDataTypes::DOUBLE)
-	{
-		std::cout << param.mValue.get<double>() << std::endl;
-	}
-	else if (param.mType == &PredefinedDataTypes::STRING)
-	{
-		Runtime* runtime = Runtime::getActiveRuntime();
-		RMX_CHECK(nullptr != runtime, "No lemon script runtime active", return);
-		const FlyweightString* storedString = runtime->resolveStringByKey(param.mValue.get<uint64>());
-		RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
-		std::cout << storedString->getString() << std::endl;
-	}
-	else if (param.mType == ObjectHandleWrapper::mObjectHandleDataType)
-	{
-		std::cout << "[ObjectHandle: " << param.mValue.get<uint32>() << "]" << std::endl;
-	}
-	else
-	{
-		std::cout << "Oops, type support not implemented yet" << std::endl;
-	}
-}
-
-void logFloat(float value)
-{
-	std::cout << value << std::endl;
-}
-
-uint32 valueD0 = 0;
-uint32 valueA0 = 0;
-
-void getterD0(ControlFlow& controlFlow)
-{
-	controlFlow.pushValueStack(valueD0);
-}
-
-void setterD0(ControlFlow& controlFlow)
-{
-	valueD0 = controlFlow.readValueStack<uint32>(-1);	// Read the value, but don't remove it from stack
-}
-
-int64* accessA0()
-{
-	return (int64*)&valueA0;
-}
-
-int8 testFunctionA(int8 a, int8 b)
-{
-	std::cout << "Test function A called" << std::endl;
-	return std::max(a, b);
-}
-
-uint8 testFunctionB(uint8 a, uint8 b)
-{
-	std::cout << "Test function B called" << std::endl;
-	return std::max(a, b);
-}
-
-
 class TestMemAccess : public MemoryAccessHandler
 {
 public:
@@ -251,21 +112,6 @@ public:
 
 private:
 	std::map<uint64, uint8> mMemory;
-};
-
-
-class SomeClass
-{
-public:
-	void sayHello()
-	{
-		std::cout << "Hello World\n";
-	}
-
-	uint8 incTen(uint8 input)
-	{
-		return input + 10;
-	}
 };
 
 
@@ -326,31 +172,8 @@ int main(int argc, char** argv)
 	GlobalsLookup globalsLookup;
 	module.startCompiling(globalsLookup);
 
-	UserDefinedVariable& varD0 = module.addUserDefinedVariable("D0", &PredefinedDataTypes::UINT_32);
-	varD0.mGetter = getterD0;
-	varD0.mSetter = setterD0;
-	lemon::ExternalVariable& varA0 = module.addExternalVariable("A0", &lemon::PredefinedDataTypes::UINT_32, std::bind(accessA0));
-	UserDefinedVariable& var = module.addUserDefinedVariable("Log", &PredefinedDataTypes::INT_64);
-	var.mSetter = logValue;
-	UserDefinedVariable& var2 = module.addUserDefinedVariable("LogStr", &PredefinedDataTypes::INT_64);
-	var2.mSetter = logValueStr;
-
-	module.addNativeFunction("debugLog", lemon::wrap(&debugLog));
-	module.addNativeFunction("logFloat", lemon::wrap(&logFloat));
-	module.addNativeFunction("maximum", wrap(&testFunctionA), Function::Flag::COMPILE_TIME_CONSTANT);
-	module.addNativeFunction("maximum", wrap(&testFunctionB), Function::Flag::COMPILE_TIME_CONSTANT);
-
-	SomeClass instance;
-	module.addNativeFunction("sayHello", wrap(instance, &SomeClass::sayHello));
-	module.addNativeFunction("incTen", wrap(instance, &SomeClass::incTen));
-
-	ObjectHandleWrapper::mObjectHandleDataType = module.addCustomDataType("ObjectHandle", BaseType::UINT_32);
-	module.addNativeFunction("makeObjectHandle", wrap(&makeObjectHandle));
-	module.addNativeFunction("increaseObjectHandle", wrap(&increaseObjectHandle));
-	module.addNativeMethod("ObjectHandle", "increase", wrap(&increaseObjectHandle));
-
 	StandardLibrary::registerBindings(module);
-
+	TestBindings::registerBindings(module);
 	globalsLookup.addDefinitionsFromModule(module);
 
 	{
@@ -400,7 +223,7 @@ int main(int argc, char** argv)
 
 #if 0
 	// Run nativization
-	program.runNativization(module, L"source/NativizedCode.inc", memoryAccess);
+	program.runNativization(module, L"source/test/NativizedCode.inc", memoryAccess);
 #endif
 
 	try

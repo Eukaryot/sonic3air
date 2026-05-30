@@ -1,11 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\source\main.cpp" />
-    <ClCompile Include="..\..\source\NativizedCode.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\source\NativizedCode.inc" />
     <None Include="..\..\script\mainscript.lemon">
       <Filter>script</Filter>
     </None>
@@ -36,6 +31,9 @@
     <None Include="..\..\script\unittests.lemon">
       <Filter>script</Filter>
     </None>
+    <None Include="..\..\source\test\NativizedCode.inc">
+      <Filter>test</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="script">
@@ -44,5 +42,24 @@
     <Filter Include="script\testcode">
       <UniqueIdentifier>{8d46234b-017c-446c-9636-307f84669c5e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="test">
+      <UniqueIdentifier>{b2451600-d40f-4710-8390-2c68e881229d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\test\main.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\test\NativizedCode.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\test\TestBindings.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\test\TestBindings.h">
+      <Filter>test</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

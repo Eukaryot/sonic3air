@@ -399,6 +399,14 @@ namespace lemon
 							break;
 						}
 
+						case DataTypeDefinition::Class::REFERENCE:
+						{
+							const DataTypeDefinition* elementType = nullptr;
+							globalsLookup.serializeDataType(serializer, elementType);
+							module.addReferenceDataType(*elementType);
+							break;
+						}
+
 						case DataTypeDefinition::Class::CUSTOM:
 						{
 							const BaseType baseType = (BaseType)serializer.read<uint8>();
@@ -425,6 +433,13 @@ namespace lemon
 							const DataTypeDefinition* elementType = &dataType->as<ArrayDataType>().mElementType;
 							globalsLookup.serializeDataType(serializer, elementType);
 							serializer.writeAs<uint32>(dataType->as<ArrayDataType>().mArraySize);
+							break;
+						}
+
+						case DataTypeDefinition::Class::REFERENCE:
+						{
+							const DataTypeDefinition* elementType = &dataType->as<ReferenceDataType>().mTargetType;
+							globalsLookup.serializeDataType(serializer, elementType);
 							break;
 						}
 

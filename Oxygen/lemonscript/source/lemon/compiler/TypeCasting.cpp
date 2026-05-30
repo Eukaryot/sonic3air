@@ -171,6 +171,18 @@ namespace lemon
 			}
 		}
 
+		if (target->isA<ReferenceDataType>())
+		{
+			if (original == &target->as<ReferenceDataType>().mTargetType)
+			{
+				return CastHandling(CastHandling::Result::NO_CAST, 0);
+			}
+			else
+			{
+				return CastHandling(CastHandling::Result::INVALID, 0xff);
+			}
+		}
+
 		const bool originalIsBaseType = (original->isA<IntegerDataType>() || original->isA<FloatDataType>());
 		const bool targetIsBaseType = (target->isA<IntegerDataType>() || target->isA<FloatDataType>());
 		if (originalIsBaseType && targetIsBaseType)

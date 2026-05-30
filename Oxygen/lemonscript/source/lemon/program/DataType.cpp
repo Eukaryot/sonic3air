@@ -94,6 +94,18 @@ namespace lemon
 	}
 
 
+	ReferenceDataType::ReferenceDataType(uint16 id, const DataTypeDefinition& targetType) :
+		DataTypeDefinition(buildReferenceDataTypeName(targetType).getString(), id, Class::REFERENCE, 8, BaseType::UINT_64),
+		mTargetType(targetType)
+	{}
+
+	FlyweightString ReferenceDataType::buildReferenceDataTypeName(const DataTypeDefinition& targetType)
+	{
+		const std::string str = "ref<" + std::string(targetType.getName().getString()) + ">";
+		return FlyweightString(str);
+	}
+
+
 	CustomDataType::CustomDataType(const char* name, uint16 id, BaseType baseType) :
 		DataTypeDefinition(name, id, Class::CUSTOM, BaseTypeHelper::getSizeOfBaseType(baseType), baseType)
 	{}

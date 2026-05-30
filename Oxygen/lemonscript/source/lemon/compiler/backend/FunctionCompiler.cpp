@@ -766,8 +766,19 @@ namespace lemon
 				for (size_t i = 0; i < ft.mParameters.size(); ++i)
 				{
 					const TokenPtr<StatementToken>& statementToken = ft.mParameters[i];
-					compileTokenTreeToOpcodes(*statementToken);
-					addCastOpcodeIfNecessary(statementToken->mDataType, ft.mFunction->getParameters()[i].mDataType);
+					const DataTypeDefinition* targetType = ft.mFunction->getParameters()[i].mDataType;
+
+					if (targetType->isA<ReferenceDataType>())
+					{
+						CHECK_ERROR(statementToken->mDataType == &targetType->as<ReferenceDataType>().mTargetType,
+							"Cannot use statement of type " << statementToken->mDataType->getName() << " as a reference of type " << targetType->as<ReferenceDataType>().mTargetType.getName(), mLineNumber);
+						createReferenceFromTokenTree(*statementToken);
+					}
+					else
+					{
+						compileTokenTreeToOpcodes(*statementToken);
+						addCastOpcodeIfNecessary(statementToken->mDataType, targetType);
+					}
 				}
 
 				// Using the data type parameter here to encode whether or not this is a base function call
@@ -1105,6 +1116,24 @@ namespace lemon
 		// Not the token's own data type, that does not work for comparisons
 		//  -> TODO: This is potentially dangerous for u8 * s8 multiplications!
 		addOpcode(opcodeType, leftToken->mDataType);
+	}
+
+	void FunctionCompiler::createReferenceFromTokenTree(const StatementToken& token)
+	{
+		switch (token.getType())
+		{
+			case VariableToken::TYPE:
+			{
+				// Push variable ID
+				const VariableToken& vt = token.as<VariableToken>();
+				addOpcode(Opcode::Type::PUSH_CONSTANT, vt.mVariable->getID());
+				return;
+			}
+
+			// TOOD: Maybe support other types as well, like memory access?
+		}
+
+		CHECK_ERROR(false, "Statement can't be used as a reference, please use a variable instead", mLineNumber);
 	}
 
 	void FunctionCompiler::checkForUndefinedOrderOfOperations(const StatementToken& token1, const StatementToken& token2, bool alsoCheckReverseOrder) const

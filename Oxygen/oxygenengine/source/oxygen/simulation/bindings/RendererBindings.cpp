@@ -981,16 +981,18 @@ namespace lemon
 	namespace internal
 	{
 		template<>
-		void pushStackGeneric<SpriteHandleWrapper>(SpriteHandleWrapper value, const NativeFunction::Context context)
+		struct StackHandler<SpriteHandleWrapper>
 		{
-			context.mControlFlow.pushValueStack(value.mHandle);
-		};
+			static void pushStack(SpriteHandleWrapper value, const NativeFunction::Context context)
+			{
+				context.mControlFlow.pushValueStack(value.mHandle);
+			}
 
-		template<>
-		SpriteHandleWrapper popStackGeneric(const NativeFunction::Context context)
-		{
-			return SpriteHandleWrapper { context.mControlFlow.popValueStack<uint32>() };
-		}
+			static SpriteHandleWrapper popStack(const NativeFunction::Context context)
+			{
+				return SpriteHandleWrapper { context.mControlFlow.popValueStack<uint32>() };
+			}
+		};
 	}
 }
 
@@ -1000,7 +1002,7 @@ void RendererBindings::registerBindings(lemon::Module& module)
 	lemon::ModuleBindingsBuilder builder(module);
 
 	// Data type
-	SpriteHandleWrapper::mDataType = module.addCustomDataType("SpriteHandle", lemon::BaseType::UINT_32);
+	SpriteHandleWrapper::mDataType = &module.addCustomDataType("SpriteHandle", lemon::BaseType::UINT_32);
 
 	// Constants
 	{

@@ -329,16 +329,18 @@ namespace lemon
 	namespace internal
 	{
 		template<>
-		void pushStackGeneric<AudioInstanceWrapper>(AudioInstanceWrapper value, const NativeFunction::Context context)
+		struct StackHandler<AudioInstanceWrapper>
 		{
-			context.mControlFlow.pushValueStack(value.mUniqueId);
-		};
+			static void pushStack(AudioInstanceWrapper value, const NativeFunction::Context context)
+			{
+				context.mControlFlow.pushValueStack(value.mUniqueId);
+			}
 
-		template<>
-		AudioInstanceWrapper popStackGeneric(const NativeFunction::Context context)
-		{
-			return AudioInstanceWrapper { context.mControlFlow.popValueStack<uint32>() };
-		}
+			static AudioInstanceWrapper popStack(const NativeFunction::Context context)
+			{
+				return AudioInstanceWrapper { context.mControlFlow.popValueStack<uint32>() };
+			}
+		};
 	}
 }
 
@@ -348,7 +350,7 @@ void AudioBindings::registerBindings(lemon::Module& module)
 	lemon::ModuleBindingsBuilder builder(module);
 
 	// Data type
-	AudioInstanceWrapper::mDataType = module.addCustomDataType("AudioInstance", lemon::BaseType::UINT_32);
+	AudioInstanceWrapper::mDataType = &module.addCustomDataType("AudioInstance", lemon::BaseType::UINT_32);
 
 	// Functions
 	{

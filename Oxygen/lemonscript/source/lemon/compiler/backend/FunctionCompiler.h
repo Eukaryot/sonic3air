@@ -57,6 +57,7 @@ namespace lemon
 		void compileAssignmentToOpcodes(const BinaryOperationToken& bot);
 		void compileBinaryAssignmentToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType);
 		void compileBinaryOperationToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType);
+		void createReferenceFromTokenTree(const StatementToken& token);
 
 		void checkForUndefinedOrderOfOperations(const StatementToken& token1, const StatementToken& token2, bool alsoCheckReverseOrder = true) const;
 

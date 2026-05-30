@@ -99,7 +99,8 @@ namespace lemon
 		// Data types
 		const std::vector<const DataTypeDefinition*>& getDataTypes() const  { return mDataTypes; }
 		ArrayDataType& addArrayDataType(const DataTypeDefinition& elementType, size_t arraySize);
-		const CustomDataType* addCustomDataType(const char* name, BaseType baseType);
+		ReferenceDataType& addReferenceDataType(const DataTypeDefinition& elementType);
+		const CustomDataType& addCustomDataType(const char* name, BaseType baseType);
 
 		// Serialization
 		uint32 buildDependencyHash() const;

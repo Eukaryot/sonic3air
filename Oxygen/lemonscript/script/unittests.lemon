@@ -7,6 +7,7 @@ function void runTests()
 	runFloatArithmeticTests()
 	runConstantArraysTest()
 	runArraysTest()
+	runReferencesTest()
 
 	debugLog("Done with all tests")
 }
@@ -194,4 +195,35 @@ function bool arraysTestB()
 	//     namely that the left side is executed first
 	arr[index += 1] = index
 	return (arr[2] == 0) && (arr[3] == 3)
+}
+
+
+
+// ----- References -----
+
+function void runReferencesTest()
+{
+	if (!referencesTestA())
+		debugLog("Arrays test A failed")
+}
+
+global u8 refTestGlobal = 0
+
+function bool referencesTestA()
+{
+	u8 value1 = 0
+	u8 value2 = 0
+	increase_u8(value1)
+	increase_u8(value2)
+	increase_u8(value2)
+	for (u8 k = 0; k < 5; ++k)
+		increase_u8(refTestGlobal)
+
+	if (value1 != 1)
+		return false
+	if (value2 != 2)
+		return false
+	if (refTestGlobal != 5)
+		return false
+	return true
 }

@@ -26,6 +26,7 @@ namespace lemon
 			FLOAT,
 			STRING,
 			ARRAY,
+			REFERENCE,
 			CUSTOM
 		};
 
@@ -157,7 +158,19 @@ namespace lemon
 		size_t mArraySize;
 	};
 
-	struct ArrayBaseWrapper { uint32 mVariableID = 0; };	// TODO: Move this somewhere else
+
+	struct ReferenceDataType : public DataTypeDefinition
+	{
+	public:
+		static const Class CLASS = Class::REFERENCE;
+
+	public:
+		ReferenceDataType(uint16 id, const DataTypeDefinition& targetType);
+
+		static FlyweightString buildReferenceDataTypeName(const DataTypeDefinition& targetType);
+
+		const DataTypeDefinition& mTargetType;
+	};
 
 
 	struct CustomDataType : public DataTypeDefinition
