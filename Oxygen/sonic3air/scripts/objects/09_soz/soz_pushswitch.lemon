@@ -50,14 +50,7 @@ function void fn0418e4()
 	D4 = 0
 	fn0419c6()
 
-	D0.u16 = u16[A0 + 0x36]
-#if STANDALONE
-	// Avoid one-pixel-jittering of character when pushing the fully pushed switch
-	//  -> But not for the variant that is meant to be pushed by a rock; it leads to the rock not being held in place
-	if ((objA0.subtype2c & 0x80) == 0)
-		++D0.u16
-#endif
-	D0.u16 >>= 2
+	D0.u16 = u16[A0 + 0x36] >> 2
 	if (objA0.flags2a & 0x01)
 		D0.s16 = -D0.s16
 	D0.u16 += u16[A0 + 0x44]
