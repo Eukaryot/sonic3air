@@ -15,6 +15,9 @@
 #include <lemon/translator/SourceCodeWriter.h>
 
 
+const std::vector<std::string> Configuration::SCREEN_FILTER_NAMES = { "", "pixel", "xbrz", "hqx" };
+
+
 namespace
 {
 	void readInputDevices(const Json::Value& rootJson, std::vector<InputConfig::DeviceDefinition>& inputDeviceDefinitions)
@@ -469,15 +472,13 @@ void Configuration::loadConfigurationProperties(JsonSerializer& serializer)
 		mStartPhase = 3;
 	}
 
-	// Video
+	// Display
 	serializer.serializeVectorAsSizeString("WindowSize", mWindowSize);
 	if (mDevMode.mEnabled)
 	{
 		serializer.serializeVectorAsSizeString("GameScreen", mGameScreen);
 	}
 	serializer.serialize("Upscaling", mUpscaling);
-	serializer.serialize("Filtering", mFiltering);
-	serializer.serialize("Scanlines", mScanlines);
 	serializer.serialize("BackgroundBlur", mBackgroundBlur);
 	serializer.serialize("PerformanceDisplay", mPerformanceDisplay);
 	tryReadRenderMethod(serializer, mFailSafeMode, mRenderMethod, mAutoDetectRenderMethod);
@@ -510,31 +511,12 @@ void Configuration::serializeStandardSettings(JsonSerializer& serializer)
 	if (serializer.isReading() && mFailSafeMode)
 		mAudio.mUseAudioThreading = false;
 
-	// Graphics
-	if (serializer.isReading())
+	// Misc
+	if (!serializer.isReading())
 	{
-		tryReadRenderMethod(serializer, mFailSafeMode, mRenderMethod, mAutoDetectRenderMethod);
-	}
-	else
-	{
-		std::string renderMethod = mAutoDetectRenderMethod ? "auto" :
-									(mRenderMethod == RenderMethod::OPENGL_FULL) ? "opengl-full" :
-									(mRenderMethod == RenderMethod::OPENGL_SOFT) ? "opengl-soft" : "software";
-		serializer.serialize("RenderMethod", renderMethod);
-
 		serializer.serialize("FailSafeMode", mFailSafeMode);
 		serializer.serialize("PlatformFlags", mPlatformFlags);
 	}
-
-	serializer.serializeAs<int>("Fullscreen", mWindowMode);
-	serializer.serialize("DisplayIndex", mDisplayIndex);
-	serializer.serializeAs<int>("FrameSync", mFrameSync);
-	serializer.serialize("Upscaling", mUpscaling);
-	serializer.serialize("Backdrop", mBackdrop);
-	serializer.serialize("Filtering", mFiltering);
-	serializer.serialize("Scanlines", mScanlines);
-	serializer.serialize("BackgroundBlur", mBackgroundBlur);
-	serializer.serialize("PerformanceDisplay", mPerformanceDisplay);
 
 	// Audio
 	if (serializer.beginObject("Audio"))
@@ -547,10 +529,91 @@ void Configuration::serializeStandardSettings(JsonSerializer& serializer)
 	}
 	else if (serializer.isReading())
 	{
-		// Legacy support for old, more flat way of storing settings (before Jan 2026)
+		// Legacy support for old, flat way of storing settings (before Jan 2026)
 		serializer.serialize("Volume", mAudio.mMasterVolume);
 		serializer.serialize("Audio_MusicVolume", mAudio.mMusicVolume);
 		serializer.serialize("Audio_SoundVolume", mAudio.mSoundVolume);
+	}
+
+	// Display
+	if (serializer.beginObject("Display"))
+	{
+		if (serializer.isReading())
+		{
+			tryReadRenderMethod(serializer, mFailSafeMode, mRenderMethod, mAutoDetectRenderMethod);
+		}
+		else
+		{
+			std::string renderMethod = mAutoDetectRenderMethod ? "auto" :
+									   (mRenderMethod == RenderMethod::OPENGL_FULL) ? "opengl-full" :
+									   (mRenderMethod == RenderMethod::OPENGL_SOFT) ? "opengl-soft" : "software";
+			serializer.serialize("RenderMethod", renderMethod);
+		}
+
+		serializer.serializeAs<int>("Fullscreen", mWindowMode);
+		serializer.serialize("DisplayIndex", mDisplayIndex);
+		serializer.serializeAs<int>("FrameSync", mFrameSync);
+		serializer.serialize("Upscaling", mUpscaling);
+		serializer.serialize("Backdrop", mBackdrop);
+		serializer.serialize("PerformanceDisplay", mPerformanceDisplay);
+		serializer.serialize("BackgroundBlur", mBackgroundBlur);	// TODO: This should be made an S3AIR-specific game setting
+		serializer.endObject();
+	}
+	else if (serializer.isReading())
+	{
+		// Legacy support for old, flat way of storing settings (before June 2026)
+		tryReadRenderMethod(serializer, mFailSafeMode, mRenderMethod, mAutoDetectRenderMethod);
+		serializer.serializeAs<int>("Fullscreen", mWindowMode);
+		serializer.serialize("DisplayIndex", mDisplayIndex);
+		serializer.serializeAs<int>("FrameSync", mFrameSync);
+		serializer.serialize("Upscaling", mUpscaling);
+		serializer.serialize("Backdrop", mBackdrop);
+		serializer.serialize("PerformanceDisplay", mPerformanceDisplay);
+		serializer.serialize("BackgroundBlur", mBackgroundBlur);
+	}
+
+	// Screen filter
+	if (serializer.beginObject("ScreenFilter"))
+	{
+		if (serializer.isReading())
+		{
+			mScreenFilter.mFilterIndex = 0;
+			std::string name;
+			serializer.serialize("FilterName", name);
+			for (int index = 0; index < (int)SCREEN_FILTER_NAMES.size(); ++index)
+			{
+				if (name == SCREEN_FILTER_NAMES[index])
+				{
+					mScreenFilter.mFilterIndex = index;
+					break;
+				}
+			}
+		}
+		else
+		{
+			if ((size_t)mScreenFilter.mFilterIndex >= SCREEN_FILTER_NAMES.size())
+				mScreenFilter.mFilterIndex = 0;
+			std::string name = SCREEN_FILTER_NAMES[mScreenFilter.mFilterIndex];
+			serializer.serialize("FilterName", name);
+		}
+
+		serializer.serialize("PixelVariant", mScreenFilter.mPixelVariant);
+		serializer.serialize("HQxVariant", mScreenFilter.mHQxVariant);
+		serializer.serialize("Scanlines", mScreenFilter.mScanlines);
+		serializer.endObject();
+	}
+	else if (serializer.isReading())
+	{
+		// Legacy support for old, flat way of storing settings (before June 2026)
+		static std::vector<int> LEGACY_FILTER_INDEX = { 1, 1, 1, 2, 3, 3, 3 };
+		int filtering = 0;
+		serializer.serialize("Filtering", filtering);
+		if (filtering < 0 || filtering >= (int)LEGACY_FILTER_INDEX.size())
+			filtering = 0;
+		mScreenFilter.mFilterIndex  = LEGACY_FILTER_INDEX[filtering];
+		mScreenFilter.mPixelVariant = (mScreenFilter.mFilterIndex == 1) ? filtering : 0;
+		mScreenFilter.mHQxVariant   = (mScreenFilter.mFilterIndex == 3) ? (filtering - 4) : 0;
+		serializer.serialize("Scanlines", mScreenFilter.mScanlines);
 	}
 
 	// Input
@@ -569,7 +632,7 @@ void Configuration::serializeStandardSettings(JsonSerializer& serializer)
 	}
 	else if (serializer.isReading())
 	{
-		// Legacy support for old, more flat way of storing settings (before Jan 2026)
+		// Legacy support for old, flat way of storing settings (before Jan 2026)
 		serializer.serialize("PreferredGamepadPlayer1", mPreferredGamepad[0]);
 		serializer.serialize("PreferredGamepadPlayer2", mPreferredGamepad[1]);
 		serializer.serialize("PreferredGamepadPlayer3", mPreferredGamepad[2]);

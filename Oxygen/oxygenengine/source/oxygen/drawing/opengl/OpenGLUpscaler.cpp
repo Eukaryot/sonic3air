@@ -76,8 +76,7 @@ void OpenGLUpscaler::shutdown()
 
 void OpenGLUpscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i textureResolution)
 {
-	const int filtering = Configuration::instance().mFiltering;
-	const int scanlines = Configuration::instance().mScanlines;
+	const Configuration::ScreenFilter& config = Configuration::instance().mScreenFilter;
 
 	// Select upscaler
 	Shader* upscaleShader = nullptr;
@@ -94,7 +93,7 @@ void OpenGLUpscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i 
 
 		case Type::SOFT:
 		{
-			upscaleShader = &mShaders[(scanlines > 0) ? 1 : 0];
+			upscaleShader = &mShaders[(config.mScanlines > 0) ? 1 : 0];
 			break;
 		}
 
@@ -107,19 +106,7 @@ void OpenGLUpscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i 
 
 		case Type::HQX:
 		{
-			switch (filtering)
-			{
-				default:
-				case 4:
-					lookupTextureIndex = 0;
-					break;
-				case 5:
-					lookupTextureIndex = 1;
-					break;
-				case 6:
-					lookupTextureIndex = 2;
-					break;
-			}
+			lookupTextureIndex = (config.mHQxVariant >= 0 && config.mHQxVariant < 3) ? config.mHQxVariant : 0;
 			upscaleShader = &mShaders[lookupTextureIndex];
 			break;
 		}
@@ -169,12 +156,12 @@ void OpenGLUpscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i 
 		{
 			// PixelFactor is at least 1.0f, which is basically bilinear sampling, infinity would be point sampling
 			float pixelFactor = rect.height / (float)textureResolution.y;
-			pixelFactor *= (filtering == 1) ? 2.0f : 1.0f;
+			pixelFactor *= (config.mPixelVariant == 0) ? 1000.0f : (config.mPixelVariant == 1) ? 2.0f : 1.0f;
 			firstShader->setParam("PixelFactor", clamp(pixelFactor, 1.0f, 1000.0f));
 
 			if (firstShader == &mShaders[1])
 			{
-				firstShader->setParam("ScanlinesIntensity", (float)scanlines * 0.25f);
+				firstShader->setParam("ScanlinesIntensity", (float)config.mScanlines * 0.25f);
 			}
 		}
 

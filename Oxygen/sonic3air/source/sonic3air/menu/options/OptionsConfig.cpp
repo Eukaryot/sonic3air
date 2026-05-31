@@ -168,31 +168,38 @@ void OptionsConfig::buildDisplay()
 			.addOption("Classic Box 2", 2)
 			.addOption("Classic Box 3", 3);
 
-	#if !defined(PLATFORM_VITA)
-		configBuilder.addSetting("Screen Filter:", option::FILTERING)
-			.addOption("Sharp", 0)
-			.addOption("Soft 1", 1)
-			.addOption("Soft 2", 2)
-			.addOption("xBRZ", 3)
-			.addOption("HQ2x", 4)
-			.addOption("HQ3x", 5)
-			.addOption("HQ4x", 6);
-	#else
-		// High quality filters on the PSVITA is playing in slowmotion...
-		configBuilder.addSetting("Screen Filter:", option::FILTERING)
-			.addOption("Sharp", 0)
-			.addOption("Soft 1", 1)
-			.addOption("Soft 2", 2);
-	#endif
-
-		configBuilder.addSetting("Scanlines:", option::SCANLINES)
+		configBuilder.addSetting("Background Blur:", option::BG_BLUR)
 			.addOption("Off", 0)
 			.addOption("25%", 1)
 			.addOption("50%", 2)
 			.addOption("75%", 3)
 			.addOption("100%", 4);
+	}
 
-		configBuilder.addSetting("Background Blur:", option::BG_BLUR)
+	CATEGORY("Screen Filter")
+	{
+	#if !defined(PLATFORM_VITA)
+		configBuilder.addSetting("Screen Filter:", option::SCREEN_FILTER_INDEX)
+			.addOption("Pixel", 1)
+			.addOption("xBRZ", 2)
+			.addOption("HQx", 3);
+	#else
+		// High quality filters on the PSVITA is playing in slowmotion...
+		configBuilder.addSetting("Screen Filter:", option::SCREEN_FILTER_INDEX)
+			.addOption("Pixel", 1);
+	#endif
+
+		configBuilder.addSetting("Variant:", option::SCREEN_FILTER_PIXEL_VARIANT)
+			.addOption("Sharp", 0)
+			.addOption("Soft 1", 1)
+			.addOption("Soft 2", 2);
+
+		configBuilder.addSetting("Variant:", option::SCREEN_FILTER_HQX_VARIANT)
+			.addOption("HQ2x", 0)
+			.addOption("HQ3x", 1)
+			.addOption("HQ4x", 2);
+
+		configBuilder.addSetting("Scanlines:", option::SCREEN_FILTER_SCANLINES)
 			.addOption("Off", 0)
 			.addOption("25%", 1)
 			.addOption("50%", 2)

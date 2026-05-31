@@ -86,6 +86,14 @@ public:
 		bool  mUseAudioThreading = true;		// Disabled in constructor for platforms that don't support it
 	};
 
+	struct ScreenFilter
+	{
+		int mFilterIndex = 0;
+		int mPixelVariant = 0;		// Only used by "pixel" filter
+		int mHQxVariant = 0;		// Only used by "hqx" filter
+		int mScanlines = 0;			// Only used by "pixel" filter
+	};
+
 	struct GameRecorder
 	{
 		int mRecordingMode = -1;		// -1 = Auto, 0 = Recording disabled, 1 = Recording enabled
@@ -126,6 +134,8 @@ public:
 	};
 
 	static const int NUM_PLAYERS = 4;
+
+	static const std::vector<std::string> SCREEN_FILTER_NAMES;
 
 public:
 	inline static bool hasInstance()		 { return (nullptr != mSingleInstance); }
@@ -191,7 +201,7 @@ public:
 	// Dev mode
 	DevModeSettings mDevMode;
 
-	// Video
+	// Display
 	WindowMode mWindowMode = WindowMode::WINDOWED;
 #if defined(PLATFORM_VITA)
 	Vec2i mWindowSize = Vec2i(960, 544);
@@ -205,10 +215,11 @@ public:
 	FrameSyncType mFrameSync = FrameSyncType::VSYNC_ON;
 	int   mUpscaling = 0;
 	int   mBackdrop = 0;
-	int   mFiltering = 0;
-	int   mScanlines = 0;
 	int   mBackgroundBlur = 0;
 	int   mPerformanceDisplay = 0;
+
+	// Screen filter
+	ScreenFilter mScreenFilter;
 
 	// Audio
 	AudioSettings mAudio;

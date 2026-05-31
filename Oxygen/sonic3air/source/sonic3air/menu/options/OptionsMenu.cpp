@@ -115,9 +115,11 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntryInt(option::GAME_RECORDING_MODE,		&config.mGameRecorder.mRecordingMode);
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
 		setupOptionEntryInt(option::BACKDROP,					&config.mBackdrop);
-		setupOptionEntryInt(option::FILTERING,					&config.mFiltering);
-		setupOptionEntryInt(option::SCANLINES,					&config.mScanlines);
 		setupOptionEntryInt(option::BG_BLUR,					&config.mBackgroundBlur);
+		setupOptionEntryInt(option::SCREEN_FILTER_INDEX,		&config.mScreenFilter.mFilterIndex);
+		setupOptionEntryInt(option::SCREEN_FILTER_PIXEL_VARIANT,&config.mScreenFilter.mPixelVariant);
+		setupOptionEntryInt(option::SCREEN_FILTER_HQX_VARIANT,	&config.mScreenFilter.mHQxVariant);
+		setupOptionEntryInt(option::SCREEN_FILTER_SCANLINES,	&config.mScreenFilter.mScanlines);
 		setupOptionEntryInt(option::PERFORMANCE_DISPLAY,		&config.mPerformanceDisplay);
 		setupOptionEntryInt(option::SOUNDTRACK,					&config.mActiveSoundtrack);
 		setupOptionEntryInt(option::CONTROLLER_AUTOASSIGN,		&config.mAutoAssignGamepadPlayerIndex);
@@ -431,8 +433,10 @@ void OptionsMenu::update(float timeElapsed)
 
 		mOptionEntries[option::WINDOW_MODE].mGameMenuEntry->setSelectedIndexByValue((int)Application::instance().getWindowMode());
 		mOptionEntries[option::FRAME_SYNC].loadValue();
-		mOptionEntries[option::FILTERING].loadValue();
 		mOptionEntries[option::BG_BLUR].loadValue();
+		mOptionEntries[option::SCREEN_FILTER_INDEX].loadValue();
+		mOptionEntries[option::SCREEN_FILTER_PIXEL_VARIANT].loadValue();
+		mOptionEntries[option::SCREEN_FILTER_HQX_VARIANT].loadValue();
 		mOptionEntries[option::MASTER_VOLUME].loadValue();
 		mOptionEntries[option::RENDERER].mGameMenuEntry->setSelectedIndexByValue((int)config.mRenderMethod);
 
@@ -743,8 +747,10 @@ void OptionsMenu::update(float timeElapsed)
 	// Enable / disable options
 	//  -> Done here as the conditions can change at any time (incl. hotkeys)
 	const bool isSoftware = (Configuration::instance().mRenderMethod == Configuration::RenderMethod::SOFTWARE);
-	mOptionEntries[option::SCANLINES].mGameMenuEntry->setInteractable(!isSoftware && Configuration::instance().mFiltering < 3);
-	mOptionEntries[option::FILTERING].mGameMenuEntry->setInteractable(!isSoftware);
+	mOptionEntries[option::SCREEN_FILTER_INDEX].mGameMenuEntry->setInteractable(!isSoftware);
+	mOptionEntries[option::SCREEN_FILTER_PIXEL_VARIANT].mGameMenuEntry->setVisible(!isSoftware && Configuration::instance().mScreenFilter.mFilterIndex == 1);
+	mOptionEntries[option::SCREEN_FILTER_HQX_VARIANT].mGameMenuEntry->setVisible(!isSoftware && Configuration::instance().mScreenFilter.mFilterIndex == 3);
+	mOptionEntries[option::SCREEN_FILTER_SCANLINES].mGameMenuEntry->setInteractable(!isSoftware && Configuration::instance().mScreenFilter.mFilterIndex == 1);
 
 	// Scrolling
 	mScrolling.update(timeElapsed);

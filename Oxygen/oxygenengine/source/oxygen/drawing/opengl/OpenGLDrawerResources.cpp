@@ -273,43 +273,22 @@ const Vec2i& OpenGLDrawerResources::getPaletteTextureSize() const
 
 OpenGLUpscaler& OpenGLDrawerResources::getUpscaler()
 {
-	OpenGLUpscaler::Type upscalerType = OpenGLUpscaler::Type::DEFAULT;
+	const Configuration::ScreenFilter& config = Configuration::instance().mScreenFilter;
 
-	const int filtering = Configuration::instance().mFiltering;
-	const int scanlines = Configuration::instance().mScanlines;
-	if (scanlines > 0 && filtering < 3)
+#if defined(PLATFORM_VITA)
+	config.mFilterIndex = clamp(config.mFilterIndex, 0, 1);
+#endif
+
+	if (config.mFilterIndex == 1 && config.mPixelVariant == 0 && config.mScanlines == 0)
 	{
-		upscalerType = OpenGLUpscaler::Type::SOFT;
+		// Use the default point filter upscaling
+		return *mInternal.mUpscalers[0];
 	}
 	else
 	{
-		switch (filtering)
-		{
-			default:
-			case 0:
-				upscalerType = OpenGLUpscaler::Type::DEFAULT;
-				break;
-
-			case 1:
-			case 2:
-				upscalerType = OpenGLUpscaler::Type::SOFT;
-				break;
-
-		#if !defined(PLATFORM_VITA)
-			case 3:
-				upscalerType = OpenGLUpscaler::Type::XBRZ;
-				break;
-
-			case 4:
-			case 5:
-			case 6:
-				upscalerType = OpenGLUpscaler::Type::HQX;
-				break;
-		#endif
-		}
+		// Choose the right upscaling filter
+		return *mInternal.mUpscalers[config.mFilterIndex];
 	}
-
-	return *mInternal.mUpscalers[(int)upscalerType];
 }
 
 bool OpenGLDrawerResources::updatePaletteBitmap(const PaletteBase& palette, Bitmap& bitmap, int offsetY, uint16& changeCounter)
