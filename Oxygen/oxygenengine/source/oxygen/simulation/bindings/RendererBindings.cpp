@@ -505,46 +505,40 @@ namespace
 		return SpriteCollection::instance().hasSprite(key);
 	}
 
-	uint32 Renderer_getWidthOfSprite(uint64 key)
+	uint32 Renderer_getSpriteWidth(uint64 key)
 	{
-		if (!SpriteCollection::instance().hasSprite(key))
-		{
-			return 0;
-		}
 		const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
-		return item->mSprite->getSize().x;
+		if (nullptr == item)
+			return 0;
+
+		return (uint32)item->mSprite->getSize().x;
 	}
-	
-	uint32 Renderer_getHeightOfSprite(uint64 key)
+
+	uint32 Renderer_getSpriteHeight(uint64 key)
 	{
-		if (!SpriteCollection::instance().hasSprite(key))
-		{
-			return 0;
-		}
 		const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
-		return item->mSprite->getSize().y;
+		if (nullptr == item)
+			return 0;
+
+		return (uint32)item->mSprite->getSize().y;
 	}
-	
-	uint32 Renderer_getCenterXOfSprite(uint64 key)
+
+	int32 Renderer_getSpriteCenterX(uint64 key)
 	{
-		if (!SpriteCollection::instance().hasSprite(key))
-		{
-			return 0;
-		}
 		const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
-		int offset = item->mSprite->mOffset.x;
-		return -offset;		// this is negative, so negate
+		if (nullptr == item)
+			return 0;
+
+		return -item->mSprite->mOffset.x;	// Offset is usually negative, however you'd expect the center position to be positive
 	}
-	
-	uint32 Renderer_getCenterYOfSprite(uint64 key)
+
+	int32 Renderer_getSpriteCenterY(uint64 key)
 	{
-		if (!SpriteCollection::instance().hasSprite(key))
-		{
-			return 0;
-		}
 		const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
-		int offset = item->mSprite->mOffset.y;
-		return -offset;		// this is negative, so negate
+		if (nullptr == item)
+			return 0;
+
+		return -item->mSprite->mOffset.y;	// Offset is usually negative, however you'd expect the center position to be positive
 	}
 
 	uint64 Renderer_setupCustomUncompressedSprite(uint32 sourceBase, uint16 words, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
@@ -1268,16 +1262,16 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		builder.addNativeFunction("Renderer.hasCustomSprite", lemon::wrap(&Renderer_hasCustomSprite), defaultFlags)
 			.setParameters("key");
 
-		builder.addNativeFunction("Renderer.getWidthOfSprite", lemon::wrap(&Renderer_getWidthOfSprite), defaultFlags)
+		builder.addNativeFunction("Renderer.getSpriteWidth", lemon::wrap(&Renderer_getSpriteWidth), defaultFlags)
 			.setParameters("key");
-		
-		builder.addNativeFunction("Renderer.getHeightOfSprite", lemon::wrap(&Renderer_getHeightOfSprite), defaultFlags)
+
+		builder.addNativeFunction("Renderer.getSpriteHeight", lemon::wrap(&Renderer_getSpriteHeight), defaultFlags)
 			.setParameters("key");
-		
-		builder.addNativeFunction("Renderer.getCenterXOfSprite", lemon::wrap(&Renderer_getCenterXOfSprite), defaultFlags)
+
+		builder.addNativeFunction("Renderer.getSpriteCenterX", lemon::wrap(&Renderer_getSpriteCenterX), defaultFlags)
 			.setParameters("key");
-		
-		builder.addNativeFunction("Renderer.getCenterYOfSprite", lemon::wrap(&Renderer_getCenterYOfSprite), defaultFlags)
+
+		builder.addNativeFunction("Renderer.getSpriteCenterY", lemon::wrap(&Renderer_getSpriteCenterY), defaultFlags)
 			.setParameters("key");
 
 		builder.addNativeFunction("Renderer.setupCustomUncompressedSprite", lemon::wrap(&Renderer_setupCustomUncompressedSprite), defaultFlags)
