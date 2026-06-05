@@ -22,6 +22,7 @@
 #include "oxygen/menu/devmode/DevModeMainWindow.h"
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/software/SoftwareDrawer.h"
+#include "oxygen/drawing/upscaler/UpscalerCollection.h"
 #include "oxygen/file/PackedFileProvider.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/JsonHelper.h"
@@ -53,6 +54,7 @@ struct EngineMain::Internal
 	ModManager		   mModManager;
 	ResourcesCache	   mResourcesCache;
 	FontCollection	   mFontCollection;
+	UpscalerCollection mUpscalerCollection;
 	PersistentData	   mPersistentData;
 	VideoOut		   mVideoOut;
 	ControlsIn		   mControlsIn;
@@ -290,6 +292,9 @@ bool EngineMain::startupEngine()
 	}
 
 	// Video
+	RMX_LOG_INFO("Loading upscaler definitions...");
+	mInternal.mUpscalerCollection.loadUpscalers();
+
 	RMX_LOG_INFO("Video initialization...");
 	if (!createWindow())
 	{
@@ -297,7 +302,7 @@ bool EngineMain::startupEngine()
 		return false;
 	}
 
-	RMX_LOG_INFO("Startup of VideoOut");
+	RMX_LOG_INFO("Startup of VideoOut...");
 	mInternal.mVideoOut.startup();
 
 	// Input manager startup after config is loaded

@@ -88,7 +88,8 @@ public:
 
 	struct ScreenFilter
 	{
-		int mFilterIndex = 0;
+		std::string mUpscalerName;
+		uint64 mUpscalerNameHash = 0;
 		int mPixelVariant = 0;		// Only used by "pixel" filter
 		int mHQxVariant = 0;		// Only used by "hqx" filter
 		int mScanlines = 0;			// Only used by "pixel" filter
@@ -134,8 +135,6 @@ public:
 	};
 
 	static const int NUM_PLAYERS = 4;
-
-	static const std::vector<std::string> SCREEN_FILTER_NAMES;
 
 public:
 	inline static bool hasInstance()		 { return (nullptr != mSingleInstance); }

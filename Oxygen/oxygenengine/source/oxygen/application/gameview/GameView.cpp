@@ -15,6 +15,7 @@
 #include "oxygen/application/menu/SharedFonts.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/drawing/DrawerTexture.h"
+#include "oxygen/drawing/upscaler/UpscalerCollection.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/HighResolutionTimer.h"
 #include "oxygen/helper/Logging.h"
@@ -200,53 +201,8 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 					case 'f':
 					case 'g':
 					{
-						int& filterIndex = Configuration::instance().mScreenFilter.mFilterIndex;
-						int& pixelVariant = Configuration::instance().mScreenFilter.mPixelVariant;
-						int& hqxVariant = Configuration::instance().mScreenFilter.mHQxVariant;
-
-						if (ev.key == 'f')
-						{
-							if (filterIndex == 1 && pixelVariant > 0)
-							{
-								--pixelVariant;
-							}
-							else if (filterIndex == 3 && hqxVariant > 0)
-							{
-								--hqxVariant;
-							}
-							else
-							{
-								filterIndex = (filterIndex + (int)Configuration::SCREEN_FILTER_NAMES.size() - 1) % (int)Configuration::SCREEN_FILTER_NAMES.size();
-								pixelVariant = (filterIndex == 1) ? 2 : 0;
-								hqxVariant = (filterIndex == 3) ? 2 : 0;
-							}
-						}
-						else
-						{
-							if (filterIndex == 1 && pixelVariant < 2)
-							{
-								++pixelVariant;
-							}
-							else if (filterIndex == 3 && hqxVariant < 2)
-							{
-								++hqxVariant;
-							}
-							else
-							{
-								filterIndex = (filterIndex + 1) % (int)Configuration::SCREEN_FILTER_NAMES.size();
-								pixelVariant = 0;
-								hqxVariant = 0;
-							}
-						}
-
-						static const std::string FILTER_METHOD_NAME[] = { "Sharp", "Soft 1", "Soft 2", "xBRZ", "HQ2x", "HQ3x", "HQ4x" };
-						switch (filterIndex)
-						{
-							case 0:  setLogDisplay("Filtering method: " + FILTER_METHOD_NAME[0]);  break;
-							case 1:  setLogDisplay("Filtering method: " + FILTER_METHOD_NAME[pixelVariant]);  break;
-							case 2:  setLogDisplay("Filtering method: " + FILTER_METHOD_NAME[3]);  break;
-							case 3:  setLogDisplay("Filtering method: " + FILTER_METHOD_NAME[4 + hqxVariant]);  break;
-						}
+						UpscalerCollection::instance().changeCurrentConfigVariant((ev.key == 'f') ? -1 : 1);
+						setLogDisplay("Filtering method: " + UpscalerCollection::instance().getCurrentConfigVariant().mDisplayName);
 						break;
 					}
 

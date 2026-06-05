@@ -15,9 +15,6 @@
 #include <lemon/translator/SourceCodeWriter.h>
 
 
-const std::vector<std::string> Configuration::SCREEN_FILTER_NAMES = { "", "pixel", "xbrz", "hqx" };
-
-
 namespace
 {
 	void readInputDevices(const Json::Value& rootJson, std::vector<InputConfig::DeviceDefinition>& inputDeviceDefinitions)
@@ -575,28 +572,11 @@ void Configuration::serializeStandardSettings(JsonSerializer& serializer)
 	// Screen filter
 	if (serializer.beginObject("ScreenFilter"))
 	{
+		serializer.serialize("FilterName", mScreenFilter.mUpscalerName);
 		if (serializer.isReading())
 		{
-			mScreenFilter.mFilterIndex = 0;
-			std::string name;
-			serializer.serialize("FilterName", name);
-			for (int index = 0; index < (int)SCREEN_FILTER_NAMES.size(); ++index)
-			{
-				if (name == SCREEN_FILTER_NAMES[index])
-				{
-					mScreenFilter.mFilterIndex = index;
-					break;
-				}
-			}
+			mScreenFilter.mUpscalerNameHash = rmx::getMurmur2_64(mScreenFilter.mUpscalerName);
 		}
-		else
-		{
-			if ((size_t)mScreenFilter.mFilterIndex >= SCREEN_FILTER_NAMES.size())
-				mScreenFilter.mFilterIndex = 0;
-			std::string name = SCREEN_FILTER_NAMES[mScreenFilter.mFilterIndex];
-			serializer.serialize("FilterName", name);
-		}
-
 		serializer.serialize("PixelVariant", mScreenFilter.mPixelVariant);
 		serializer.serialize("HQxVariant", mScreenFilter.mHQxVariant);
 		serializer.serialize("Scanlines", mScreenFilter.mScanlines);
@@ -605,14 +585,16 @@ void Configuration::serializeStandardSettings(JsonSerializer& serializer)
 	else if (serializer.isReading())
 	{
 		// Legacy support for old, flat way of storing settings (before June 2026)
-		static std::vector<int> LEGACY_FILTER_INDEX = { 1, 1, 1, 2, 3, 3, 3 };
+		const std::vector<int> LEGACY_UPSCALER_INDEX = { 1, 1, 1, 2, 3, 3, 3 };
+		const std::vector<std::string> LEGACY_UPSCALER_NAME = { "", "pixel", "xbrz", "hqx" };
 		int filtering = 0;
 		serializer.serialize("Filtering", filtering);
-		if (filtering < 0 || filtering >= (int)LEGACY_FILTER_INDEX.size())
+		if (filtering < 0 || filtering >= (int)LEGACY_UPSCALER_INDEX.size())
 			filtering = 0;
-		mScreenFilter.mFilterIndex  = LEGACY_FILTER_INDEX[filtering];
-		mScreenFilter.mPixelVariant = (mScreenFilter.mFilterIndex == 1) ? filtering : 0;
-		mScreenFilter.mHQxVariant   = (mScreenFilter.mFilterIndex == 3) ? (filtering - 4) : 0;
+		const int upscalerIndex = LEGACY_UPSCALER_INDEX[filtering];
+		mScreenFilter.mUpscalerName = LEGACY_UPSCALER_NAME[upscalerIndex];
+		mScreenFilter.mPixelVariant = (upscalerIndex == 1) ? filtering : 0;
+		mScreenFilter.mHQxVariant   = (upscalerIndex == 3) ? (filtering - 4) : 0;
 		serializer.serialize("Scanlines", mScreenFilter.mScanlines);
 	}
 

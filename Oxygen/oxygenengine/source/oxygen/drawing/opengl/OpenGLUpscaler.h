@@ -13,6 +13,7 @@
 #include "oxygen/drawing/opengl/OpenGLTexture.h"
 
 class OpenGLDrawerResources;
+class UpscalerDefinition;
 
 
 class OpenGLUpscaler
@@ -21,13 +22,13 @@ public:
 	enum class Type
 	{
 		DEFAULT,
-		SOFT,
+		PIXEL,
 		XBRZ,
 		HQX
 	};
 
 public:
-	OpenGLUpscaler(Type type, OpenGLDrawerResources& resources) : mType(type), mResources(resources) {}
+	OpenGLUpscaler(Type type, const UpscalerDefinition& definition, OpenGLDrawerResources& resources);
 
 	void startup();
 	void shutdown();
@@ -44,14 +45,13 @@ private:
 
 private:
 	const Type mType = Type::DEFAULT;
+	const UpscalerDefinition& mDefinition;
 	OpenGLDrawerResources& mResources;
 
 	std::vector<Shader> mShaders;
 	Framebuffer mPass0Buffer;
 	OpenGLTexture mPass0Texture;
 	std::vector<LookupTexture> mLookupTextures;
-
-	bool mFilterLinear = false;
 };
 
 #endif

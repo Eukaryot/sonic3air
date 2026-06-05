@@ -73,6 +73,8 @@
     <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareDrawer.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareDrawerTexture.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\upscaler\UpscalerCollection.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\upscaler\UpscalerDefinition.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\FilePackage.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\FileStructureTree.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\PackedFileProvider.cpp" />
@@ -256,6 +258,8 @@
     <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareDrawer.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareDrawerTexture.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\upscaler\UpscalerCollection.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\upscaler\UpscalerDefinition.h" />
     <ClInclude Include="..\..\source\oxygen\file\FilePackage.h" />
     <ClInclude Include="..\..\source\oxygen\file\FileStructureTree.h" />
     <ClInclude Include="..\..\source\oxygen\file\PackedFileProvider.h" />

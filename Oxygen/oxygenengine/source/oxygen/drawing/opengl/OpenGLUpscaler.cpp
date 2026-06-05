@@ -12,54 +12,39 @@
 
 #include "oxygen/drawing/opengl/OpenGLUpscaler.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
+#include "oxygen/drawing/upscaler/UpscalerDefinition.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/rendering/opengl/shaders/SimpleRectTexturedShader.h"
 
 
+OpenGLUpscaler::OpenGLUpscaler(Type type, const UpscalerDefinition& definition, OpenGLDrawerResources& resources) :
+	mType(type),
+	mDefinition(definition),
+	mResources(resources)
+{
+}
+
 void OpenGLUpscaler::startup()
 {
-	mFilterLinear = false;
-
-	switch (mType)
+	// Load shaders
+	if (!mDefinition.mOpenGLShaders.empty())
 	{
-		default:
-		case Type::DEFAULT:
-			break;
-
-		case Type::SOFT:
+		mShaders.resize(mDefinition.mOpenGLShaders.size());
+		for (size_t k = 0; k < mDefinition.mOpenGLShaders.size(); ++k)
 		{
-			mFilterLinear = true;
-
-			mShaders.resize(2);
-			FileHelper::loadShader(mShaders[0], L"data/shader/upscaler_soft.shader", "Standard");
-			FileHelper::loadShader(mShaders[1], L"data/shader/upscaler_soft.shader", "Scanlines");
-			break;
+			FileHelper::loadShader(mShaders[k], mDefinition.mOpenGLShaders[k].mPath, mDefinition.mOpenGLShaders[k].mTechnique);
 		}
+	}
 
-	#if !defined(PLATFORM_VITA)
-		case Type::XBRZ:
+	// Setup textures
+	if (!mDefinition.mLookupTextures.empty())
+	{
+		mLookupTextures.resize(mDefinition.mLookupTextures.size());
+		for (size_t k = 0; k < mDefinition.mLookupTextures.size(); ++k)
 		{
-			mShaders.resize(2);
-			FileHelper::loadShader(mShaders[0], L"data/shader/upscaler_xbrz-freescale-pass0.shader", "Standard");
-			FileHelper::loadShader(mShaders[1], L"data/shader/upscaler_xbrz-freescale-pass1.shader", "Standard");
-			break;
+			mLookupTextures[k].mImagePath = mDefinition.mLookupTextures[k];
 		}
-
-		case Type::HQX:
-		{
-			mShaders.resize(3);
-			FileHelper::loadShader(mShaders[0], L"data/shader/upscaler_hqx.shader", "Standard_2x");
-			FileHelper::loadShader(mShaders[1], L"data/shader/upscaler_hqx.shader", "Standard_3x");
-			FileHelper::loadShader(mShaders[2], L"data/shader/upscaler_hqx.shader", "Standard_4x");
-
-			mLookupTextures.resize(3);
-			mLookupTextures[0].mImagePath = L"data/shader/hq2x.png";
-			mLookupTextures[1].mImagePath = L"data/shader/hq3x.png";
-			mLookupTextures[2].mImagePath = L"data/shader/hq4x.png";
-			break;
-		}
-	#endif
 	}
 
 	mPass0Texture.setup(Configuration::instance().mGameScreen, rmx::OpenGLHelper::FORMAT_RGBA);
@@ -79,6 +64,7 @@ void OpenGLUpscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i 
 	const Configuration::ScreenFilter& config = Configuration::instance().mScreenFilter;
 
 	// Select upscaler
+	const UpscalerDefinition::Variant* variant = nullptr;
 	Shader* upscaleShader = nullptr;
 	Shader* pass0Shader = nullptr;
 	int lookupTextureIndex = -1;
@@ -91,8 +77,13 @@ void OpenGLUpscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i 
 		case Type::DEFAULT:
 			break;
 
-		case Type::SOFT:
+		case Type::PIXEL:
 		{
+			if (!mDefinition.mVariants.empty())
+			{
+				const int variantIndex = (config.mPixelVariant >= 0 && config.mPixelVariant < (int)mDefinition.mVariants.size()) ? config.mPixelVariant : 0;
+				variant = &mDefinition.mVariants[variantIndex];
+			}
 			upscaleShader = &mShaders[(config.mScanlines > 0) ? 1 : 0];
 			break;
 		}
@@ -106,14 +97,20 @@ void OpenGLUpscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i 
 
 		case Type::HQX:
 		{
-			lookupTextureIndex = (config.mHQxVariant >= 0 && config.mHQxVariant < 3) ? config.mHQxVariant : 0;
-			upscaleShader = &mShaders[lookupTextureIndex];
+			if (!mDefinition.mVariants.empty())
+			{
+				const int variantIndex = (config.mHQxVariant >= 0 && config.mHQxVariant < (int)mDefinition.mVariants.size()) ? config.mHQxVariant : 0;
+				variant = &mDefinition.mVariants[variantIndex];
+				lookupTextureIndex = variantIndex;
+				upscaleShader = &mShaders[lookupTextureIndex];
+			}
 			break;
 		}
 	}
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mFilterLinear ? GL_LINEAR : GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mFilterLinear ? GL_LINEAR : GL_NEAREST);
+	const bool filterLinear = (nullptr != variant) && variant->mFilterLinear;
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterLinear ? GL_LINEAR : GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterLinear ? GL_LINEAR : GL_NEAREST);
 
 	// Multipass rendering?
 	const bool isMultiPass = (nullptr != pass0Shader);
@@ -152,7 +149,7 @@ void OpenGLUpscaler::renderImage(const Recti& rect, GLuint textureHandle, Vec2i 
 		firstShader->setParam("GameResolution", Vec2f(textureResolution));
 
 		// Configuration for soft shader
-		if (mType == Type::SOFT)
+		if (mType == Type::PIXEL)
 		{
 			// PixelFactor is at least 1.0f, which is basically bilinear sampling, infinity would be point sampling
 			float pixelFactor = rect.height / (float)textureResolution.y;

@@ -25,6 +25,7 @@
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/video/VideoOut.h"
+#include "oxygen/drawing/upscaler/UpscalerCollection.h"
 #include "oxygen/helper/Utils.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/GameRecorder.h"
@@ -116,7 +117,6 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
 		setupOptionEntryInt(option::BACKDROP,					&config.mBackdrop);
 		setupOptionEntryInt(option::BG_BLUR,					&config.mBackgroundBlur);
-		setupOptionEntryInt(option::SCREEN_FILTER_INDEX,		&config.mScreenFilter.mFilterIndex);
 		setupOptionEntryInt(option::SCREEN_FILTER_PIXEL_VARIANT,&config.mScreenFilter.mPixelVariant);
 		setupOptionEntryInt(option::SCREEN_FILTER_HQX_VARIANT,	&config.mScreenFilter.mHQxVariant);
 		setupOptionEntryInt(option::SCREEN_FILTER_SCANLINES,	&config.mScreenFilter.mScanlines);
@@ -434,7 +434,7 @@ void OptionsMenu::update(float timeElapsed)
 		mOptionEntries[option::WINDOW_MODE].mGameMenuEntry->setSelectedIndexByValue((int)Application::instance().getWindowMode());
 		mOptionEntries[option::FRAME_SYNC].loadValue();
 		mOptionEntries[option::BG_BLUR].loadValue();
-		mOptionEntries[option::SCREEN_FILTER_INDEX].loadValue();
+		mOptionEntries[option::SCREEN_FILTER_INDEX].mGameMenuEntry->setSelectedIndexByValue(UpscalerCollection::instance().getUpscalerIndexByNameHash(config.mScreenFilter.mUpscalerNameHash));
 		mOptionEntries[option::SCREEN_FILTER_PIXEL_VARIANT].loadValue();
 		mOptionEntries[option::SCREEN_FILTER_HQX_VARIANT].loadValue();
 		mOptionEntries[option::MASTER_VOLUME].loadValue();
@@ -542,6 +542,12 @@ void OptionsMenu::update(float timeElapsed)
 							case option::RENDERER:
 							{
 								Application::instance().setPendingRenderMethod((Configuration::RenderMethod)selectedEntry.selected().mValue);
+								break;
+							}
+
+							case option::SCREEN_FILTER_INDEX:
+							{
+								UpscalerCollection::instance().setCurrentConfigUpscalerByIndex(selectedEntry.selected().mValue);
 								break;
 							}
 
@@ -748,9 +754,11 @@ void OptionsMenu::update(float timeElapsed)
 	//  -> Done here as the conditions can change at any time (incl. hotkeys)
 	const bool isSoftware = (Configuration::instance().mRenderMethod == Configuration::RenderMethod::SOFTWARE);
 	mOptionEntries[option::SCREEN_FILTER_INDEX].mGameMenuEntry->setInteractable(!isSoftware);
-	mOptionEntries[option::SCREEN_FILTER_PIXEL_VARIANT].mGameMenuEntry->setVisible(!isSoftware && Configuration::instance().mScreenFilter.mFilterIndex == 1);
-	mOptionEntries[option::SCREEN_FILTER_HQX_VARIANT].mGameMenuEntry->setVisible(!isSoftware && Configuration::instance().mScreenFilter.mFilterIndex == 3);
-	mOptionEntries[option::SCREEN_FILTER_SCANLINES].mGameMenuEntry->setInteractable(!isSoftware && Configuration::instance().mScreenFilter.mFilterIndex == 1);
+	constexpr uint64 UPSCALER_HASH_PIXEL = rmx::constMurmur2_64("pixel");
+	constexpr uint64 UPSCALER_HASH_HQX   = rmx::constMurmur2_64("hqx");
+	mOptionEntries[option::SCREEN_FILTER_PIXEL_VARIANT].mGameMenuEntry->setVisible(!isSoftware && Configuration::instance().mScreenFilter.mUpscalerNameHash == UPSCALER_HASH_PIXEL);
+	mOptionEntries[option::SCREEN_FILTER_HQX_VARIANT].mGameMenuEntry->setVisible(!isSoftware && Configuration::instance().mScreenFilter.mUpscalerNameHash == UPSCALER_HASH_HQX);
+	mOptionEntries[option::SCREEN_FILTER_SCANLINES].mGameMenuEntry->setVisible(!isSoftware && Configuration::instance().mScreenFilter.mUpscalerNameHash == UPSCALER_HASH_PIXEL);
 
 	// Scrolling
 	mScrolling.update(timeElapsed);
@@ -860,7 +868,7 @@ void OptionsMenu::render()
 								const GameMenuEntry& nextEntry = tab.mMenuEntries[nextLine];
 								if (nextEntry.getMenuEntryType() == TitleMenuEntry::MENU_ENTRY_TYPE || nextEntry.mData == option::_BACK)
 									break;
-								if (nextEntry.isFullyInteractable())
+								if (nextEntry.isVisible())
 								{
 									valid = true;
 									break;
