@@ -10,6 +10,7 @@
 #include "lemon/compiler/frontend/CompilerFrontend.h"
 #include "lemon/compiler/frontend/BlockNodeStack.h"
 #include "lemon/compiler/frontend/NodesIterator.h"
+#include "lemon/compiler/Compiler.h"
 #include "lemon/compiler/LineNumberTranslation.h"
 #include "lemon/compiler/TokenHelper.h"
 #include "lemon/compiler/TokenTypes.h"
@@ -523,6 +524,9 @@ namespace lemon
 
 		// Processing
 		processUndefinedNodesInBlock(content, function, scopeContext);
+
+		// If needed, add a return node at the end
+		checkForMissingReturn(functionNode);
 	}
 
 	void CompilerFrontend::processUndefinedNodesInBlock(BlockNode& blockNode, ScriptFunction& function, ScopeContext& scopeContext)
@@ -1213,6 +1217,72 @@ namespace lemon
 		CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << constantDataType->getName().getString() << " to type " << dataType->getName().getString(), lineNumber);
 
 		return finalValue;
+	}
+
+	void CompilerFrontend::checkForMissingReturn(FunctionNode& functionNode)
+	{
+		ScriptFunction& function = *functionNode.mFunction;
+		if (function.getReturnType() != &PredefinedDataTypes::VOID)
+		{
+			BlockNode& content = *functionNode.mContent;
+			if (canReachEndOfBlock(content))
+			{
+				const uint32 lineNumber = content.mNodes.empty() ? functionNode.getLineNumber() : content.mNodes.back().getLineNumber();
+				ADD_WARNING(CompilerWarning::Code::MISSING_RETURN, "Function '" << function.getName() << "' with return type " << function.getReturnType()->getName() << " is missing a return statement at the end", lineNumber);
+
+				ReturnNode& returnNode = content.mNodes.createBack<ReturnNode>();
+				returnNode.setLineNumber(lineNumber);
+
+				ConstantToken& constantToken = returnNode.mStatementToken.create<ConstantToken>();
+				constantToken.mValue.set<uint64>(0);		// TODO: Get default value for the data type (though 0 is certainly fine for all base type)
+				constantToken.mDataType = function.getReturnType();
+			}
+		}
+	}
+
+	bool CompilerFrontend::canReachNodeAfter(const Node& node) const
+	{
+		switch ((uint32)node.getType())
+		{
+			case BlockNode::TYPE:
+				return canReachEndOfBlock(node.as<BlockNode>());
+
+			case LabelNode::TYPE:
+				return true;
+
+			case JumpNode::TYPE:
+			case JumpIndirectNode::TYPE:
+			case BreakNode::TYPE:
+			case ContinueNode::TYPE:
+			case ReturnNode::TYPE:
+				return false;
+
+			case ExternalNode::TYPE:
+				return (node.as<ExternalNode>().mSubType == ExternalNode::SubType::EXTERNAL_CALL);
+
+			case StatementNode::TYPE:
+				return true;
+
+			case IfStatementNode::TYPE:
+			{
+				if (canReachNodeAfter(*node.as<IfStatementNode>().mContentIf))
+					return true;
+				if (!node.as<IfStatementNode>().mContentElse.valid() || canReachNodeAfter(*node.as<IfStatementNode>().mContentElse))
+					return true;
+				return false;
+			}
+
+			case ForStatementNode::TYPE:
+			case WhileStatementNode::TYPE:
+				return true;		// TODO: We could check if the condition is always false, and that there's no break inside... but that seems overly complicated
+		}
+
+		return true;
+	}
+
+	bool CompilerFrontend::canReachEndOfBlock(const BlockNode& blockNode) const
+	{
+		return (blockNode.mNodes.empty() || canReachNodeAfter(blockNode.mNodes.back()));
 	}
 
 }

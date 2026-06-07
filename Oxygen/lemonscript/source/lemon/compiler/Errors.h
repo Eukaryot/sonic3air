@@ -37,6 +37,7 @@ namespace lemon
 			DEPRECATED_FUNCTION				= 0x0100,
 			DEPRECATED_FUNCTION_ALIAS		= 0x0101,
 			UNDEFINED_ORDER_OF_OPERATIONS	= 0x0200,	// When the order of operations is undefined, but matters as one of the operations influences the result of the other
+			MISSING_RETURN					= 0x0300,	// A non-void function is missing a return at the end
 		};
 
 		struct Occurrence
