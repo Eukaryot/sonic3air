@@ -35,7 +35,7 @@ public:
 		std::wstring mIconFile;
 		int			 mWindowsIconResource = 0;
 		std::string	 mBuildVersionString;
-		uint32		 mBuildVersionNumber;
+		uint32		 mBuildVersionNumber = 0;
 		std::wstring mAppDataFolder;
 	};
 

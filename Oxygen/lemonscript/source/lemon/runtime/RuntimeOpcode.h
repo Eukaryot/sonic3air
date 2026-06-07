@@ -41,7 +41,7 @@ namespace lemon
 		};
 
 		ExecFunc mExecFunc;
-		RuntimeOpcode* mNext = nullptr;
+		int32 mOffsetToNext = 0;
 		Opcode::Type mOpcodeType = Opcode::Type::NOP;
 		uint8 mSize = 0;
 		BitFlagSet<Flag> mFlags;
@@ -72,6 +72,8 @@ namespace lemon
 		{
 			*reinterpret_cast<T*>((uint8*)this + PARAMETER_OFFSET + offset) = value;
 		}
+
+		FORCE_INLINE const RuntimeOpcode* getNextOpcode() const  { return (const RuntimeOpcode*)((uint8*)this + mOffsetToNext); }
 	};
 
 }

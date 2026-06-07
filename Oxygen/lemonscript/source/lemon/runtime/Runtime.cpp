@@ -491,23 +491,23 @@ namespace lemon
 					if (context.mOpcode->mSuccessiveHandledOpcodes >= 4)
 					{
 						(*context.mOpcode->mExecFunc)(context);
-						context.mOpcode = context.mOpcode->mNext;
+						context.mOpcode = context.mOpcode->getNextOpcode();
 
 						(*context.mOpcode->mExecFunc)(context);
-						context.mOpcode = context.mOpcode->mNext;
+						context.mOpcode = context.mOpcode->getNextOpcode();
 
 						(*context.mOpcode->mExecFunc)(context);
-						context.mOpcode = context.mOpcode->mNext;
+						context.mOpcode = context.mOpcode->getNextOpcode();
 
 						(*context.mOpcode->mExecFunc)(context);
-						context.mOpcode = context.mOpcode->mNext;
+						context.mOpcode = context.mOpcode->getNextOpcode();
 
 						result.mStepsExecuted += 4;
 					}
 					else
 					{
 						(*context.mOpcode->mExecFunc)(context);
-						context.mOpcode = context.mOpcode->mNext;
+						context.mOpcode = context.mOpcode->getNextOpcode();
 
 						++result.mStepsExecuted;
 					}
@@ -520,7 +520,7 @@ namespace lemon
 						--mSelectedControlFlow->mValueStackPtr;
 						if (*mSelectedControlFlow->mValueStackPtr != 0)
 						{
-							context.mOpcode = context.mOpcode->mNext;
+							context.mOpcode = context.mOpcode->getNextOpcode();
 							++result.mStepsExecuted;
 							break;
 						}
@@ -557,7 +557,7 @@ namespace lemon
 						{
 							// Otherwise decrease it and go on with the next opcode
 							--mSelectedControlFlow->mValueStackPtr[-1];
-							context.mOpcode = context.mOpcode->mNext;
+							context.mOpcode = context.mOpcode->getNextOpcode();
 							++result.mStepsExecuted;
 						}
 						break;
@@ -565,7 +565,7 @@ namespace lemon
 
 					case Opcode::Type::CALL:
 					{
-						state.mProgramCounter = (uint8*)context.mOpcode->mNext;
+						state.mProgramCounter = (uint8*)context.mOpcode + context.mOpcode->mOffsetToNext;
 						const uint64 callTarget = context.mOpcode->getParameter<uint64>();
 						++result.mStepsExecuted;
 

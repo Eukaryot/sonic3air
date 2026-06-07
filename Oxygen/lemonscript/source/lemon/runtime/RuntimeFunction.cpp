@@ -181,24 +181,26 @@ namespace lemon
 			for (size_t i = 0; i < runtimeOpcodePointers.size() - 1; ++i)
 			{
 				RuntimeOpcode& runtimeOpcode = *runtimeOpcodePointers[i];
-				runtimeOpcode.mNext = (RuntimeOpcode*)((uint8*)&runtimeOpcode + (size_t)runtimeOpcode.mSize);
+				RuntimeOpcode* next = (RuntimeOpcode*)((uint8*)&runtimeOpcode + (size_t)runtimeOpcode.mSize);
 
 				for (int runs = 0; runs < 5; ++runs)
 				{
-					if (runtimeOpcode.mNext->mOpcodeType != Opcode::Type::JUMP)
+					if (next->mOpcodeType != Opcode::Type::JUMP)
 						break;
 
 					// Take a shortcut by skipping the jump opcode and directly pointing to its target as next opcode
 					//  -> But only do that for jumps forward, otherwise it's possible that script execution can get stuck in an infinite loop
 					//  -> That's because counted steps are only checked in actually executed jumps, but not in those that we optimize away here
-					RuntimeOpcode* targetPointer = reinterpret_cast<RuntimeOpcode*>(runtimeOpcode.mNext->getParameter<uint64>());
+					RuntimeOpcode* targetPointer = reinterpret_cast<RuntimeOpcode*>(next->getParameter<uint64>());
 					RuntimeOpcode* ownPointer = &runtimeOpcode;
 					if (targetPointer <= ownPointer)
 						break;
 
-					runtimeOpcode.mNext = targetPointer;
+					next = targetPointer;
 					// Continue the for-loop, in case mNext is yet another jump that can be resolved by a shortcut
 				}
+
+				runtimeOpcode.mOffsetToNext = (int32)((uint8*)next - (uint8*)&runtimeOpcode);
 			}
 		}
 
