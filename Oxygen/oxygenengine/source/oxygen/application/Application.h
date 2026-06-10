@@ -69,6 +69,9 @@ public:
 
 	void requestActiveTextInput();
 
+	void processForwardedCommand(std::string_view command);
+	void processUrl(std::string_view url);
+
 private:
 	int updateWindowDisplayIndex();
 	void setUnscaledWindow();

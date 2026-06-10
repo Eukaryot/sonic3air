@@ -14,11 +14,16 @@
 class ArgumentsReader
 {
 public:
+	// Read parameters
 	std::wstring mExecutableCallPath;
 	std::wstring mProjectPath;
+	std::string mUrl;
+	std::string mForwardedCommand;
+	bool mStop = false;
 	int mDisplayIndex = -1;
 
 public:
+	explicit ArgumentsReader(const char* urlSchemePrefix) : mUrlSchemePrefix(urlSchemePrefix) {}
 	virtual ~ArgumentsReader()  {}
 
 	void read(int argc, char** argv)
@@ -33,13 +38,13 @@ public:
 		for (int i = 1; i < argc; ++i)
 		{
 			const std::string parameter(argv[i]);
-			if (rmx::startsWith(parameter, "-display="))
+			if (rmx::startsWith(parameter, mUrlSchemePrefix))
 			{
-				mDisplayIndex = (int)rmx::parseInteger(parameter.substr(9));;
+				mUrl = parameter;
 			}
 			else if (parameter[0] == '-')
 			{
-				readParameter(parameter);
+				readParameterBase(parameter);
 			}
 			else
 			{
@@ -51,5 +56,31 @@ public:
 	}
 
 protected:
-	virtual bool readParameter(const std::string& parameter)  { return false; }
+	void readParameterBase(const std::string& parameter)
+	{
+		if (rmx::startsWith(parameter, "-display="))
+		{
+			mDisplayIndex = (int)rmx::parseInteger(parameter.substr(9));
+		}
+		else if (rmx::startsWith(parameter, "-forward="))
+		{
+			mForwardedCommand = parameter.substr(9);
+		}
+		else if (parameter == "-stop")
+		{
+			// The stop parameter is meant to be used in conjunction with "-forward" or an URL, to ensure that the new
+			// instance will close in any case - especially when there was no already running instance to forward to
+			mStop = true;
+		}
+		else
+		{
+			// Pass it on to sub-class implementation
+			readParameter(parameter);
+		}
+	}
+
+	virtual bool readParameter(const std::string& parameter) { return false; }
+
+protected:
+	std::string mUrlSchemePrefix;	// Something like "oxygen://"
 };

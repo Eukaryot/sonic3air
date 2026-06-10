@@ -6,8 +6,9 @@
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
-#include "sonic3air/pch.h"
-#include "sonic3air/helper/CommandForwarder.h"
+#include "oxygen/pch.h"
+#include "oxygen/platform/CommandForwarder.h"
+#include "oxygen/application/Application.h"
 
 #ifdef PLATFORM_WINDOWS
 	#include <windows.h>
@@ -21,8 +22,13 @@
 struct CommandForwarder::Internal
 {
 #ifdef PLATFORM_WINDOWS
-	static inline const char* COMMAND_FORWARDER_PIPE_NAME = "\\\\.\\Pipe\\Sonic3AIR_CommandForwarder";
 	static inline const size_t MAX_BUFFER_SIZE = 1024;
+	static inline std::string mPipeName;
+
+	static void setApplicationName(std::string_view name)
+	{
+		mPipeName = "\\\\.\\Pipe\\" + std::string(name) + "_CommandForwarder";
+	}
 
 	static bool send(std::string_view command)
 	{
@@ -30,7 +36,7 @@ struct CommandForwarder::Internal
 
 		RMX_CHECK(command.length() + 1 < MAX_BUFFER_SIZE, "Buffer size of " << MAX_BUFFER_SIZE << " is too small for a command of length " << command.length(), return false);
 
-		const HANDLE pipeHandle = CreateFile(COMMAND_FORWARDER_PIPE_NAME, GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+		const HANDLE pipeHandle = CreateFile(mPipeName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 		if (pipeHandle == INVALID_HANDLE_VALUE)
 		{
 			// Pipe does not exist yet, so there's no other instance running
@@ -51,7 +57,7 @@ struct CommandForwarder::Internal
 
 	void startup()
 	{
-		mPipeHandle = CreateNamedPipe(COMMAND_FORWARDER_PIPE_NAME, PIPE_ACCESS_DUPLEX, PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_NOWAIT, PIPE_UNLIMITED_INSTANCES, MAX_BUFFER_SIZE, MAX_BUFFER_SIZE, NMPWAIT_USE_DEFAULT_WAIT, nullptr);
+		mPipeHandle = CreateNamedPipe(mPipeName.c_str(), PIPE_ACCESS_DUPLEX, PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_NOWAIT, PIPE_UNLIMITED_INSTANCES, MAX_BUFFER_SIZE, MAX_BUFFER_SIZE, NMPWAIT_USE_DEFAULT_WAIT, nullptr);
 		RMX_CHECK(mPipeHandle != INVALID_HANDLE_VALUE, "Error creating named pipe: " << GetLastError(), );
 	}
 
@@ -76,6 +82,7 @@ struct CommandForwarder::Internal
 
 #else
 	// Fallback implementation (does nothing at all)
+	static void setApplicationName(std::string_view name) {}
 	static bool send(std::string_view command) { return false; }
 	void startup() {}
 	void shutdown() {}
@@ -84,6 +91,11 @@ struct CommandForwarder::Internal
 #endif
 };
 
+
+void CommandForwarder::setApplicationName(std::string_view name)
+{
+	Internal::setApplicationName(name);
+}
 
 bool CommandForwarder::trySendCommand(std::string_view command)
 {
@@ -123,8 +135,12 @@ void CommandForwarder::handleReceivedCommand(std::string_view command)
 		if (rmx::startsWith(withoutPrefix, "Url:"))
 		{
 			const std::string_view url = withoutPrefix.substr(4);
-			// TODO...
-			RMX_ERROR("Received URL: " << url << "\n(But it's not yet processed in any way", );
+			Application::instance().processUrl(url);
+		}
+		else
+		{
+			const std::string_view command = withoutPrefix;
+			Application::instance().processForwardedCommand(command);
 		}
 	}
 }

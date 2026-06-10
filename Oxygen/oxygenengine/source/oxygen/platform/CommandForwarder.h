@@ -11,9 +11,10 @@
 #include <rmxbase.h>
 
 
-class CommandForwarder
+class CommandForwarder : public SingleInstance<CommandForwarder>
 {
 public:
+	static void setApplicationName(std::string_view name);
 	static bool trySendCommand(std::string_view command);
 
 public:

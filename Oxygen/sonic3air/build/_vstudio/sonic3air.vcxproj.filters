@@ -176,9 +176,6 @@
     <ClCompile Include="..\..\source\sonic3air\helper\BlueSpheresRendering.cpp">
       <Filter>helper</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\sonic3air\helper\CommandForwarder.cpp">
-      <Filter>helper</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\helper\DiscordIntegration.cpp">
       <Filter>helper</Filter>
     </ClCompile>
@@ -321,9 +318,6 @@
       <Filter>menu\helper</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\helper\BlueSpheresRendering.h">
-      <Filter>helper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\sonic3air\helper\CommandForwarder.h">
       <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\helper\DiscordIntegration.h">

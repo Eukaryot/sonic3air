@@ -28,6 +28,7 @@
 #include "oxygen/helper/JsonHelper.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/network/EngineServerClient.h"
+#include "oxygen/platform/CommandForwarder.h"
 #include "oxygen/platform/CrashHandler.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/resources/FontCollection.h"
@@ -60,6 +61,7 @@ struct EngineMain::Internal
 	ControlsIn		   mControlsIn;
 	DownloadManager	   mDownloadManager;
 	EngineServerClient mEngineServerClient;
+	CommandForwarder   mCommandForwarder;
 
 #if defined(PLATFORM_ANDROID)
 	AndroidJavaInterface mAndroidJavaInterface;
@@ -322,6 +324,9 @@ bool EngineMain::startupEngine()
 	const bool useIPv6 = false;
 	mInternal.mEngineServerClient.setupClient(useIPv6);
 
+	// Command forwarder
+	mInternal.mCommandForwarder.startup();
+
 	// Done
 	RMX_LOG_INFO("Engine startup successful");
 	return true;
@@ -340,6 +345,8 @@ void EngineMain::run()
 
 void EngineMain::shutdown()
 {
+	mInternal.mCommandForwarder.shutdown();
+
 	destroyWindow();
 
 	// Shutdown subsystems

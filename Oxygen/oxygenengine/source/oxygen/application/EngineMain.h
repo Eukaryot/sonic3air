@@ -32,6 +32,7 @@ public:
 	struct AppMetaData
 	{
 		std::string  mTitle;
+		std::string  mInternalName;
 		std::wstring mIconFile;
 		int			 mWindowsIconResource = 0;
 		std::string	 mBuildVersionString;

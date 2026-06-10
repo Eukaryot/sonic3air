@@ -658,6 +658,9 @@
     <ClCompile Include="..\..\source\oxygen\drawing\upscaler\UpscalerDefinition.cpp">
       <Filter>drawing\upscaler</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\platform\CommandForwarder.cpp">
+      <Filter>platform</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -1239,6 +1242,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\drawing\upscaler\UpscalerDefinition.h">
       <Filter>drawing\upscaler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\platform\CommandForwarder.h">
+      <Filter>platform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

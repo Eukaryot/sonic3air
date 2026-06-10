@@ -20,6 +20,8 @@ const EngineDelegateInterface::AppMetaData& EngineDelegate::getAppMetaData()
 		mAppMetaData.mBuildVersionString = "0.1.0";		// Oxygen Engine currently doesn't use a version number to take serious in any way...
 		mAppMetaData.mBuildVersionNumber = 0x00010000;
 	}
+
+	mAppMetaData.mInternalName = "OxygenEngine";
 	mAppMetaData.mAppDataFolder = L"OxygenEngine";
 	return mAppMetaData;
 }

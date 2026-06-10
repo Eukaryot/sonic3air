@@ -10,7 +10,6 @@
 
 #include "sonic3air/ConfigurationImpl.h"
 #include "sonic3air/Game.h"
-#include "sonic3air/helper/CommandForwarder.h"
 
 #include "oxygen/application/EngineMain.h"
 
@@ -56,7 +55,6 @@ public:
 
 private:
 	AppMetaData mAppMetaData;
-	CommandForwarder mCommandForwarder;
 	ConfigurationImpl mConfiguration;
 	Game mGame;
 };

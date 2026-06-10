@@ -46,6 +46,8 @@ const EngineDelegateInterface::AppMetaData& EngineDelegate::getAppMetaData()
 		mAppMetaData.mBuildVersionNumber = BUILD_NUMBER;
 		mAppMetaData.mAppDataFolder = L"Sonic3AIR";
 	}
+
+	mAppMetaData.mInternalName = "S3AIR";
 	return mAppMetaData;
 }
 
@@ -123,19 +125,16 @@ bool EngineDelegate::setupCustomGameProfile()
 void EngineDelegate::startupGame(EmulatorInterface& emulatorInterface)
 {
 	mGame.startup(emulatorInterface);
-	mCommandForwarder.startup();
 }
 
 void EngineDelegate::shutdownGame()
 {
 	mGame.shutdown();
-	mCommandForwarder.shutdown();
 }
 
 void EngineDelegate::updateGame(float timeElapsed)
 {
 	mGame.update(timeElapsed);
-	mCommandForwarder.update(timeElapsed);
 }
 
 void EngineDelegate::registerScriptBindings(lemon::Module& module)

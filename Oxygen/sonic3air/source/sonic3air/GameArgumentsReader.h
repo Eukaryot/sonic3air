@@ -14,20 +14,17 @@
 class GameArgumentsReader : public ArgumentsReader
 {
 public:
-	std::string mUrl;
 	bool mPack = false;
 	bool mNativize = false;
 	bool mDumpCppDefinitions = false;
 
+public:
+	GameArgumentsReader() : ArgumentsReader("sonic3air://") {}
+
 protected:
 	virtual bool readParameter(const std::string& parameter) override
 	{
-		if (rmx::startsWith(parameter, "sonic3air://"))
-		{
-			mUrl = parameter;
-			return true;
-		}
-		else if (parameter == "-pack")
+		if (parameter == "-pack")
 		{
 			mPack = true;
 			return true;

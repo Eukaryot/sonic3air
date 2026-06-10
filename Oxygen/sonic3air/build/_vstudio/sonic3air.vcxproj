@@ -35,7 +35,6 @@
     <ClCompile Include="..\..\source\sonic3air\Game.cpp" />
     <ClCompile Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.cpp" />
     <ClCompile Include="..\..\source\sonic3air\helper\BlueSpheresRendering.cpp" />
-    <ClCompile Include="..\..\source\sonic3air\helper\CommandForwarder.cpp" />
     <ClCompile Include="..\..\source\sonic3air\helper\DiscordIntegration.cpp" />
     <ClCompile Include="..\..\source\sonic3air\helper\DrawingUtils.cpp" />
     <ClCompile Include="..\..\source\sonic3air\helper\GameUtils.cpp" />
@@ -92,7 +91,6 @@
     <ClInclude Include="..\..\source\sonic3air\GameArgumentsReader.h" />
     <ClInclude Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\BlueSpheresRendering.h" />
-    <ClInclude Include="..\..\source\sonic3air\helper\CommandForwarder.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\DiscordIntegration.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\DrawingUtils.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\GameUtils.h" />

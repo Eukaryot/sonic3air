@@ -31,6 +31,7 @@
 #include "oxygen/helper/Logging.h"
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/network/EngineServerClient.h"
+#include "oxygen/platform/CommandForwarder.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/GameRecorder.h"
 #include "oxygen/simulation/LogDisplay.h"
@@ -533,6 +534,9 @@ void Application::update(float timeElapsed)
 	// Update engine server client and netplay
 	EngineServerClient::instance().updateClient(timeElapsed);
 
+	// Update command forwarder
+	CommandForwarder::instance().update(timeElapsed);
+
 	// Update drawer
 	EngineMain::instance().getDrawer().updateDrawer(timeElapsed);
 
@@ -891,6 +895,33 @@ bool Application::hasVirtualGamepad() const
 void Application::requestActiveTextInput()
 {
 	mRequestActiveTextInput = true;
+}
+
+void Application::processForwardedCommand(std::string_view command)
+{
+	if (command == "reload-scripts")
+	{
+		// Reload scripts (just like pressing F11)
+		if (EngineMain::getDelegate().useDeveloperFeatures())
+		{
+			HighResolutionTimer timer;
+			timer.start();
+			if (mSimulation->triggerFullScriptsReload())
+			{
+				LogDisplay::instance().setLogDisplay(String(0, "Reloaded scripts in %0.2f sec", timer.getSecondsSinceStart()));
+			}
+		}
+	}
+	else
+	{
+		RMX_ASSERT(false, "Unhandled forwarded command: " << command);
+	}
+}
+
+void Application::processUrl(std::string_view url)
+{
+	// TODO...
+	RMX_ASSERT(false, "Unhandled received URL: " << url);
 }
 
 int Application::updateWindowDisplayIndex()
