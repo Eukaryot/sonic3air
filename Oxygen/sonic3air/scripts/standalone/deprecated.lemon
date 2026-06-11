@@ -61,6 +61,13 @@ function void Debug.drawRect(s32 px, s32 py, s32 width, s32 height, u32 color)
 	Renderer.drawRect(px, py, width, height, color, 0xffff, true)
 }
 
+//# deprecated
+function void VDP.Config.setBackdropColor(u8 paletteIndex)
+{
+	VDP.Config.setBackdropColorIndex(paletteIndex)
+}
+
+//# deprecated
 function void VDP.Config.setupWindowPlane(bool useWindowPlane, u16 splitY)
 {
 	VDP.Config.setWindowPlaneSplitY(useWindowPlane, splitY)

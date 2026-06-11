@@ -164,7 +164,7 @@ function void fn05c2e0()
 
 	VDP.Config.setActiveDisplay(false)
 	VDP.Config.enableHInt(false)
-	VDP.Config.setBackdropColor(0)
+	VDP.Config.setBackdropColorIndex(0)
 	kosinski.queue_size = 0
 
 	zeroMemory(0xffffff10, 0x6c)

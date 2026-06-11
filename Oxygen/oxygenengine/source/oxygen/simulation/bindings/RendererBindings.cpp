@@ -1160,9 +1160,6 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		builder.addNativeFunction("VDP.Config.setBackdropColorIndex", lemon::wrap(&VDP_Config_setBackdropColorIndex), defaultFlags)
 			.setParameters("paletteIndex");
 
-		builder.addNativeFunction("VDP.Config.setBackdropColor", lemon::wrap(&VDP_Config_setBackdropColorIndex), deprecatedFlags)
-			.setParameters("paletteIndex");
-
 		builder.addNativeFunction("VDP.Config.setVerticalScrolling", lemon::wrap(&VDP_Config_setVerticalScrolling), defaultFlags)
 			.setParameters("verticalScrolling", "horizontalScrollMask");
 

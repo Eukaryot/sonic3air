@@ -92,7 +92,7 @@ function void fn04c8e4()
 	VDP.Config.setPlayfieldSizeInPixels(512, 256)
 	VDP.Config.setWindowPlaneSplitY(false, 0)
 	VDP.Config.setVerticalScrolling(false, 0xff)
-	VDP.Config.setBackdropColor(0x20)
+	VDP.Config.setBackdropColorIndex(0x20)
 	VDP.Config.setRenderingModeConfiguration(false)
 	water.fullscreen = 0
 	level.water_present = 0

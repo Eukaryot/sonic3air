@@ -49,7 +49,7 @@ function void SpecialStage()
 	VDP.Config.setPlayfieldSizeInPixels(512, 256)
 	VDP.Config.setWindowPlaneSplitY(false, 0)	// Disable window plane
 	VDP.Config.setVerticalScrolling(false, 0)
-	VDP.Config.setBackdropColor(0x20)
+	VDP.Config.setBackdropColorIndex(0x20)
 	VDP.Config.setRenderingModeConfiguration(false)
 	water.fullscreen = 0
 

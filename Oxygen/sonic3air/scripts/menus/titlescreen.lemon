@@ -163,7 +163,7 @@ function void TitleScreen()
 	VDP.Config.setPlayfieldSizeInPixels(512, 256)
 	VDP.Config.setWindowPlaneSplitY(false, 0)			// Disable window plane
 	VDP.Config.setVerticalScrolling(false, 0xff)	// Good old horizontal scrolling mode
-	VDP.Config.setBackdropColor(0)
+	VDP.Config.setBackdropColorIndex(0)
 	VDP.Config.setRenderingModeConfiguration(false)
 
 	water.fullscreen = 0

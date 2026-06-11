@@ -599,7 +599,7 @@ function void VDP.Config.setSpriteAttributeTableBase(u16 satBase)
 	u16[0xc00004] = 0x8500 + data
 }
 
-function void VDP.Config.setBackdropColor(u8 paletteIndex)
+function void VDP.Config.setBackdropColorIndex(u8 paletteIndex)
 {
 	u16[0xc00004] = 0x8700 + paletteIndex
 }

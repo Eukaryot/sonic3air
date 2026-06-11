@@ -269,7 +269,7 @@ function void DataSelect.setup()
 	VDP.Config.setNameTableBasePlaneA(0xe000)
 	VDP.Config.setNameTableBasePlaneB(0xc000)
 	VDP.Config.setNameTableBasePlaneW(0xe000)
-	VDP.Config.setBackdropColor(0)
+	VDP.Config.setBackdropColorIndex(0)
 	VDP.Config.setVerticalScrolling(false, 0)	// Horizontal scrolling mode without scroll mask
 	VDP.Config.setRenderingModeConfiguration(false)
 	VDP.Config.setPlayfieldSizeInPixels(1024, 256)

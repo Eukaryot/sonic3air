@@ -430,7 +430,7 @@ function void initializeMainGame()
 	VDP.Config.setPlayfieldSizeInPixels(512, 256)
 	VDP.Config.enableHInt(false)
 	VDP.Config.setWindowPlaneSplitY(false, 0)	// Disable window plane
-	VDP.Config.setBackdropColor(0x20)
+	VDP.Config.setBackdropColorIndex(0x20)
 	VDP.Config.setRenderingModeConfiguration(false)
 
 	if (debug_mode.unlocked && control.pad1.state & CONTROL_A)
