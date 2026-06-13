@@ -52,6 +52,7 @@ public:
 	void setSetting(uint32 settingId, uint32 value);
 
 	void checkForUnlockedSecrets(bool saveIfAnyUnlocked);
+	void unlockSecret(uint32 secretId);
 
 	void startIntoTitleScreen();
 	void startIntoDataSelect();

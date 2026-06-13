@@ -331,6 +331,11 @@ void Game::checkForUnlockedSecrets(bool saveIfAnyUnlocked)
 	}
 }
 
+void Game::unlockSecret(uint32 secretId)
+{
+	setSecretUnlocked(secretId);
+}
+
 void Game::startIntoTitleScreen()
 {
 	mMode = Mode::TITLE_SCREEN;
@@ -943,7 +948,7 @@ void Game::setSecretUnlocked(uint32 secretId)
 	if (!mPlayerProgress.mUnlocks.isSecretUnlocked(secretId))
 	{
 		mPlayerProgress.mUnlocks.setSecretUnlocked(secretId);
-		const char* text = (secret->mType == SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE) ? "Unlocked in Act Select" : "Found hidden secret!";
+		const char* text = (secret->mType == SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE) ? "Unlocked in Act Select" : secret->mHiddenUntilUnlocked ? "Found hidden secret!" : "Secret unlocked!";
 		GameApp::instance().showUnlockedWindow(SecretUnlockedWindow::EntryType::SECRET, text, secret->mName);
 		mPlayerProgress.save();
 	}

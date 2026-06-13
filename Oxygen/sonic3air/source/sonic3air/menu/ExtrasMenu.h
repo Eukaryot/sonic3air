@@ -73,4 +73,5 @@ private:
 	std::map<uint32, std::vector<std::string_view>> mDescriptionLinesCache;
 
 	int mAchievementsCompleted = 0;
+	int mRightPressCounter = 0;
 };
