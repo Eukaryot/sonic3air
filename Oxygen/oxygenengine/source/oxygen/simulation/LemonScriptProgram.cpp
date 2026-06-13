@@ -271,12 +271,12 @@ void LemonScriptProgram::resolveLocation(ResolvedLocation& outResolvedLocation, 
 		}
 		else
 		{
-			outResolvedLocation.mScriptFilename = *String(0, "<invalid program counter %d in function '%.*s'>", programCounter, function.getName().getString().length(), function.getName().getString().data());
+			outResolvedLocation.mScriptFilename = *String(0, "<invalid program counter %d in function '%.*s'>", programCounter, (int)function.getName().getString().length(), function.getName().getString().data());
 		}
 	}
 	else
 	{
-		outResolvedLocation.mScriptFilename = *String(0, "<native function '%.*s'>", function.getName().getString().length(), function.getName().getString().data());
+		outResolvedLocation.mScriptFilename = *String(0, "<native function '%.*s'>", (int)function.getName().getString().length(), function.getName().getString().data());
 	}
 }
 

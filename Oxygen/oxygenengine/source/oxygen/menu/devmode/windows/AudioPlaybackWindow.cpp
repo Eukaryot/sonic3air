@@ -79,7 +79,7 @@ void AudioPlaybackWindow::buildContent()
 
 			ImGui::TableSetColumnIndex(1);
 			const std::string_view audioKey = audioPlayer.getPlayingSoundAudioKey(ref);
-			ImGui::Text("%.*s", audioKey.length(), audioKey.data());
+			ImGui::Text("%.*s", (int)audioKey.length(), audioKey.data());
 
 			if (mShowPosition)
 			{
