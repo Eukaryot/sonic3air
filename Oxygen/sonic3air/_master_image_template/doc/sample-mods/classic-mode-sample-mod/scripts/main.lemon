@@ -21,10 +21,10 @@ function void EntryFunctions.dataSelect()
 }
 
 
-function void EntryFunctions.actSelect()
+function void EntryFunctions.actSelectMenu()
 {
 	Renderer.setScreenSize(ClassicModeSampleMode.screenWidth, 224)
-	base.EntryFunctions.actSelect()
+	base.EntryFunctions.actSelectMenu()
 }
 
 

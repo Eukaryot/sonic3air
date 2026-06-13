@@ -7,6 +7,6 @@
 		"Description": "An example how a font mod basically looks like. It adds a shaded version of the normal oxygen_regular font that you can use in scripts (it won't show up otherwise)",
 		"URL": "https://sonic3air.org",
 		"ModVersion": "1.0.0.0",
-		"GameVersion": "22.07.03.0"
+		"GameVersion": "26.03.28.0"
 	}
 }
