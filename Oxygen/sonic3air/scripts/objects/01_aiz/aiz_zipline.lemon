@@ -577,7 +577,7 @@ function void fn02219e()
 			return
 
 	#if STANDALONE
-		u8[0x02219e] = 0x14
+		Game.setSecretUnlocked(SECRET_LEVELSELECT)
 	#else
 		levelselect.unlocked = 1
 		pausecheats.unlocked = 1

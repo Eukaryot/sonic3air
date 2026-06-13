@@ -21,6 +21,7 @@
 //  -> In Blue Spheres for data exchange with C++ code
 //  -> In Slot Machine stage rendering
 //  -> For credits data generation
+//  -> For tracking the Sonic 3 pre title screen cheat
 
 
 // Random number for the current game, for monitor and special stages randomization

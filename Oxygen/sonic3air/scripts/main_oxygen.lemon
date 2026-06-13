@@ -32,15 +32,15 @@ function bool Game.isSecretUnlocked(u32 secretId)
 	return false
 }
 
+function void Game.setSecretUnlocked(u32 secretId)
+{
+	// Ignore this function call
+}
+
 function bool Game.isEnduserBuild()
 {
 	// There's no differentiation between end-user and development builds any more, so this exists only for mod compatibility
 	return false
-}
-
-function void Game.setSecretUnlocked(u32 secretId)
-{
-	// Ignore this function call
 }
 
 function void Game.triggerRestart()

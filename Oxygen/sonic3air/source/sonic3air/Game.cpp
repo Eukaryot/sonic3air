@@ -530,23 +530,6 @@ void Game::onPostUpdateFrame()
 	// Update ghost sync
 	GameClient::instance().getGhostSync().onPostUpdateFrame();
 
-	// Check for unlocked hidden secrets
-	//  - SECRET_LEVELSELECT	unlocked when u8[0x02219e] changes from 0xb2 to 0x14
-	//  - SECRET_TITLE_SK		unlocked when u8[0x065fde] changes from 0x08 to 0x93
-	//  - SECRET_GAME_SPEED		unlocked when u64[0x003e32] changes from 0xd522427870e16100 to 0x0101020201010101 (= up, up, down, down, up, up, up, up)
-	if (emulatorInterface.readMemory8(0x02219e) == 0x14)
-	{
-		setSecretUnlocked(SharedDatabase::Secret::SECRET_LEVELSELECT);
-	}
-	if (emulatorInterface.readMemory8(0x065fde) == 0x93)
-	{
-		setSecretUnlocked(SharedDatabase::Secret::SECRET_TITLE_SK);
-	}
-	if (emulatorInterface.readMemory64(0x003e32) == 0x0101020201010101ull)
-	{
-		setSecretUnlocked(SharedDatabase::Secret::SECRET_GAME_SPEED);
-	}
-
 	if (mReceivedTimeAttackFinished)
 	{
 		int hundreds = 0;

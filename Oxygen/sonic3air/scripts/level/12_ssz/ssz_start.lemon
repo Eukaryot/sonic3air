@@ -779,7 +779,7 @@ function void fn065fde()
 	if (u32[A0 + 0x30] != 0x06671f)
 		return
 
-	u8[0x065fde] = 0x93
+	Game.setSecretUnlocked(SECRET_TITLE_SK)
 #endif
 
 	Object.ResetAnimationProgress(0x06672a)		// Cutscene Knuckles tired shooing animation data
