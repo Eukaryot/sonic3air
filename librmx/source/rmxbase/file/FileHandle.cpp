@@ -8,6 +8,10 @@
 
 #include "rmxbase.h"
 
+#if defined(PLATFORM_WINDOWS)
+	#include <share.h>		// For _SH_DENYNO and _SH_DENYWR
+#endif
+
 
 namespace
 {

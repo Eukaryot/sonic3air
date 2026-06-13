@@ -157,6 +157,15 @@ endif()
 
 
 
+# curl
+if (WIN32)
+	set(BUILD_CURL_EXE OFF)
+	add_subdirectory(${WORKSPACE_DIR}/framework/external/curl/curl curl)
+	include_directories(${WORKSPACE_DIR}/framework/external/curl/curl/include)
+endif()
+
+
+
 # imgui
 if (USE_IMGUI)
 	file(GLOB IMGUI_SOURCES ${WORKSPACE_DIR}/framework/external/imgui/imgui/*.cpp
@@ -258,6 +267,9 @@ if (NOT CMAKE_VERSION VERSION_LESS "3.16.0")
 endif()
 
 target_link_libraries(oxygen_netcore rmxbase)
+if (WIN32)
+	target_link_libraries(oxygen_netcore ws2_32)
+endif()
 
 
 
@@ -288,6 +300,8 @@ endif()
 
 if (UNIX)
 	find_package(CURL REQUIRED)
+	target_link_libraries(oxygen CURL::libcurl)
+elseif (WIN32)
 	target_link_libraries(oxygen CURL::libcurl)
 endif()
 
