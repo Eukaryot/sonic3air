@@ -51,7 +51,7 @@ public:
 	uint32 getSetting(uint32 settingId, bool ignoreGameMode) const;
 	void setSetting(uint32 settingId, uint32 value);
 
-	void checkForUnlockedSecrets();
+	void checkForUnlockedSecrets(bool saveIfAnyUnlocked);
 
 	void startIntoTitleScreen();
 	void startIntoDataSelect();

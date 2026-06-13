@@ -108,7 +108,7 @@ void MainMenu::onFadeIn()
 	}
 
 	// Check for unlocked secrets (needed when new game versions added secrets or reduced requirements)
-	Game::instance().checkForUnlockedSecrets();
+	Game::instance().checkForUnlockedSecrets(true);
 }
 
 bool MainMenu::canBeRemoved()

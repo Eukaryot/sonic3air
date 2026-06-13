@@ -301,7 +301,7 @@ void Game::setSetting(uint32 settingId, uint32 value)
 	ConfigurationImpl::instance().mActiveGameSettings->setValue(settingId, value);
 }
 
-void Game::checkForUnlockedSecrets()
+void Game::checkForUnlockedSecrets(bool saveIfAnyUnlocked)
 {
 	// Check for unlocked secrets
 	uint32 achievementsCompleted = 0;
@@ -313,6 +313,7 @@ void Game::checkForUnlockedSecrets()
 		}
 	}
 
+	bool anyUnlocked = false;
 	for (const SharedDatabase::Secret& secret : SharedDatabase::getSecrets())
 	{
 		if (secret.mUnlockedByAchievements && !mPlayerProgress.mUnlocks.isSecretUnlocked(secret.mType) && achievementsCompleted >= secret.mRequiredAchievements)
@@ -320,7 +321,13 @@ void Game::checkForUnlockedSecrets()
 			// Unlock secret now
 			mPlayerProgress.mUnlocks.setSecretUnlocked(secret.mType);
 			GameApp::instance().showUnlockedWindow(SecretUnlockedWindow::EntryType::SECRET, "Secret unlocked!", secret.mName);
+			anyUnlocked = true;
 		}
+	}
+
+	if (anyUnlocked && saveIfAnyUnlocked)
+	{
+		mPlayerProgress.save();
 	}
 }
 
@@ -918,7 +925,7 @@ void Game::setAchievementComplete(uint32 achievementId)
 			RMX_ERROR("Achievement not found", );
 		}
 
-		checkForUnlockedSecrets();
+		checkForUnlockedSecrets(false);
 		mPlayerProgress.save();
 	}
 }
