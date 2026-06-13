@@ -40,7 +40,7 @@ public:
 	inline const Recti& getGameViewportRect() const  { return mGameViewport.getRectOnScreen(); }
 	void updateGameViewport();
 
-	bool translatePositionIntoGameViewport(Vec2f& outInnerPosition, const Vec2f& screenPosition) const;
+	bool translatePositionIntoGameViewport(Vec2i& outInnerPosition, const Vec2f& screenPosition) const;
 
 	virtual void initialize() override;
 	virtual void deinitialize() override;

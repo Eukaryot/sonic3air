@@ -150,10 +150,10 @@ void GameView::updateGameViewport()
 	}
 }
 
-bool GameView::translatePositionIntoGameViewport(Vec2f& outPosition, const Vec2f& inPosition) const
+bool GameView::translatePositionIntoGameViewport(Vec2i& outPosition, const Vec2f& inPosition) const
 {
-	const Vec2i innerPos = Vec2i(mGameViewport.getInnerPositionFromScreen(inPosition));
-	return mGameViewport.isValidInnerPosition(innerPos);
+	outPosition = Vec2i(mGameViewport.getInnerPositionFromScreen(inPosition));
+	return mGameViewport.isValidInnerPosition(outPosition);
 }
 
 void GameView::initialize()
@@ -420,14 +420,14 @@ void GameView::mouse(const rmx::MouseEvent& ev)
 
 		if (nullptr != functionName)
 		{
-			Vec2f relativePosition;
+			Vec2i relativePosition;
 			if (translatePositionIntoGameViewport(relativePosition, Vec2f(ev.position)))
 			{
 				const uint8 flags = (FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_RSHIFT)) ? 0x01 : 0x00;
 
 				CodeExec::FunctionExecData execData;
-				execData.addParam(lemon::PredefinedDataTypes::INT_16, roundToInt(relativePosition.x));
-				execData.addParam(lemon::PredefinedDataTypes::INT_16, roundToInt(relativePosition.y));
+				execData.addParam(lemon::PredefinedDataTypes::INT_16, relativePosition.x);
+				execData.addParam(lemon::PredefinedDataTypes::INT_16, relativePosition.y);
 				execData.addParam(lemon::PredefinedDataTypes::UINT_8, flags);
 				mSimulation.getCodeExec().executeScriptFunction(functionName, false, &execData);
 			}
