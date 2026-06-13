@@ -98,11 +98,11 @@ void SharedDatabase::initialize()
 		};
 
 		addSecret(Secret::SECRET_COMPETITION_MODE,	false, true,  false,  0, "Competition Mode", "As known from original Sonic 3 (& Knuckles).", "competitionmode");
-		addSecret(Secret::SECRET_DROPDASH,			false, true,  true,   3, "Sonic Drop Dash", "In the Options menu (in Controls), you can now activate Sonic's Drop Dash move for Normal Game and Act Select.", "dropdash");
+		addSecret(Secret::SECRET_DROPDASH,			false, true,  true,   2, "Sonic Drop Dash", "In the Options menu (in Controls), you can now activate Sonic's Drop Dash move for Normal Game and Act Select.", "dropdash");
+		addSecret(Secret::SECRET_SUPER_PEELOUT,		false, true,  true,   3, "Sonic Super Peel-Out", "The Super Peel-Out move is available in the Options menu. This also unlocks \"Max Control\" Time Attack.", "superpeelout");
 		addSecret(Secret::SECRET_KNUX_AND_TAILS,	false, true,  true,   5, "Knuckles & Tails Mode", "Play as Knuckles & Tails character combination in Normal Game and Act Select.", "knuckles_tails");
-		addSecret(Secret::SECRET_SUPER_PEELOUT,		false, true,  true,   7, "Sonic Super Peel-Out", "The Super Peel-Out move is available in the Options menu. This also unlocks \"Max Control\" Time Attack.", "superpeelout");
-		addSecret(Secret::SECRET_DEBUGMODE,			false, true,  true,  10, "Debug Mode", "Debug Mode can be activated in the Options menu (in Tweaks), and is available in Normal Game and Act Select.", "debugmode");
-		addSecret(Secret::SECRET_BLUE_SPHERE,		false, true,  true,  12, "Blue Sphere", "Adds the Blue Sphere game to Extras that is known from Sonic 1 locked on to Sonic & Knuckles.", "bluesphere");
+		addSecret(Secret::SECRET_BLUE_SPHERE,		false, true,  true,   7, "Blue Sphere", "Adds the Blue Sphere game to Extras that is known from Sonic 1 locked on to Sonic & Knuckles.", "bluesphere");
+		addSecret(Secret::SECRET_DEBUGMODE,			false, true,  true,   9, "Debug Mode", "Debug Mode can be activated in the Options menu (in Tweaks), and is available in Normal Game and Act Select.", "debugmode");
 		addSecret(Secret::SECRET_LEVELSELECT,		true,  true,  true,   0, "Level Select", "Adds the original Sonic 3 & Knuckles Level Select menu to Extras.", "levelselect");
 		addSecret(Secret::SECRET_TITLE_SK,			true,  true,  true,   0, "Sonic & Knuckles Title", "You can now select the Sonic & Knuckles title screen in the Options menu.", "title_sk");
 		addSecret(Secret::SECRET_GAME_SPEED,		true,  true,  true,   0, "Game Speed Setting", "Ready for a new challenge? Make the game faster (or slower) in the Options menu.", "gamespeed");
