@@ -584,6 +584,12 @@ void Application::update(float timeElapsed)
 	mGameView->earlyUpdate(timeElapsed);
 	GuiBase::update(timeElapsed);
 
+	// Any GUI element blocked input, inject that as an ignore for in-game controls
+	if (FTX::System->wasEventConsumed())
+	{
+		ControlsIn::instance().setAllIgnores();
+	}
+
 	if (nullptr != mRemoveChild)
 	{
 		removeChild(*mRemoveChild);

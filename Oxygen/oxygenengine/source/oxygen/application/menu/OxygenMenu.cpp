@@ -99,6 +99,7 @@ void OxygenMenu::update(float deltaSeconds)
 		mUpdateInfo.mButtonDown.updateState(controller.Down.isPressed(), deltaSeconds);
 		mUpdateInfo.mButtonLeft.updateState(controller.Left.isPressed(), deltaSeconds);
 		mUpdateInfo.mButtonRight.updateState(controller.Right.isPressed(), deltaSeconds);
+		mUpdateInfo.mButtonStart.updateState(controller.Start.isPressed(), deltaSeconds);
 		mUpdateInfo.mButtonA.updateState(controller.A.isPressed(), deltaSeconds);
 		mUpdateInfo.mButtonB.updateState(controller.B.isPressed(), deltaSeconds);
 		mUpdateInfo.mButtonX.updateState(controller.X.isPressed(), deltaSeconds);
@@ -154,7 +155,7 @@ void OxygenMenu::update(float deltaSeconds)
 		mTriggeredAction = TriggeredAction::NONE;
 	}
 
-	// Block input for the rest of teh app
+	// Block input for the rest of the app
 	const bool anyMenuOpen = (mSideBar->shouldBeOpen() || mSettingsMenu->shouldBeOpen());
 	if (anyMenuOpen)
 	{

@@ -91,7 +91,8 @@ namespace loui
 			// Evaluate keyboard / controller button press
 			if (hasFocus())
 			{
-				const bool pressedByButton = mRepeatable ? updateInfo.mButtonA.justPressedOrRepeat() : updateInfo.mButtonA.justPressed();
+				const bool pressedByButton = mRepeatable ? (updateInfo.mButtonStart.justPressedOrRepeat() || updateInfo.mButtonA.justPressedOrRepeat())
+														 : (updateInfo.mButtonStart.justPressed() || updateInfo.mButtonA.justPressed());
 				if (pressedByButton)
 				{
 					mWasPressed = true;

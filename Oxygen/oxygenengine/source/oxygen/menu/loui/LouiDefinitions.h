@@ -56,6 +56,7 @@ namespace loui
 		BinaryInput mButtonDown;
 		BinaryInput mButtonLeft;
 		BinaryInput mButtonRight;
+		BinaryInput mButtonStart;
 		BinaryInput mButtonA;
 		BinaryInput mButtonB;
 		BinaryInput mButtonX;

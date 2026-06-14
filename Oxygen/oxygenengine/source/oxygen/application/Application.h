@@ -113,4 +113,5 @@ private:
 	// Input
 	float mMouseHideTimer = 0.0f;
 	bool mRequestActiveTextInput = false;
+	bool mInputBlockedByAnyChild = false;
 };
