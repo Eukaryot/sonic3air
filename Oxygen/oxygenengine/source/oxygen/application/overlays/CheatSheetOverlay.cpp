@@ -12,7 +12,8 @@
 #include "oxygen/application/menu/SharedFonts.h"
 
 
-CheatSheetOverlay::CheatSheetOverlay()
+CheatSheetOverlay::CheatSheetOverlay() :
+	GuiBase("CheatSheetOverlay")
 {
 }
 

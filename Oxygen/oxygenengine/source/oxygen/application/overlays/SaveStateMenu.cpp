@@ -18,7 +18,8 @@
 #include "oxygen/simulation/Simulation.h"
 
 
-SaveStateMenu::SaveStateMenu()
+SaveStateMenu::SaveStateMenu() :
+	GuiBase("SaveStateMenu")
 {
 	mFont.setSize(18.0f);
 	mFont.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2i(2, 2), 0.5f));

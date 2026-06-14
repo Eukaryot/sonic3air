@@ -12,7 +12,8 @@
 #include "oxygen/application/EngineMain.h"
 
 
-GameSetupScreen::GameSetupScreen()
+GameSetupScreen::GameSetupScreen() :
+	GuiBase("GameSetupScreen")
 {
 }
 

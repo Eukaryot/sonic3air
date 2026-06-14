@@ -19,7 +19,7 @@
 
 
 NetworkingWindow::NetworkingWindow() :
-	DevModeWindowBase("Networking", Category::MISC, ImGuiWindowFlags_AlwaysAutoResize)
+	DevModeWindowBase("Networking", Category::DEBUGGING, ImGuiWindowFlags_AlwaysAutoResize)
 {
 }
 

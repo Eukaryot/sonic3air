@@ -66,6 +66,11 @@ namespace
 }
 
 
+BackdropView::BackdropView() :
+	GuiBase("BackdropView")
+{
+}
+
 void BackdropView::setGameViewRect(const Recti& rect)
 {
 	// Add a black border

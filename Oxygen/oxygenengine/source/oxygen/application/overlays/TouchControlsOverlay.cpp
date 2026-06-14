@@ -43,7 +43,8 @@ float TouchControlsOverlay::TouchArea::getWeight(const Vec2f& position) const
 }
 
 
-TouchControlsOverlay::TouchControlsOverlay()
+TouchControlsOverlay::TouchControlsOverlay() :
+	GuiBase("TouchControlsOverlay")
 {
 }
 

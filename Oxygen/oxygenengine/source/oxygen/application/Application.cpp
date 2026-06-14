@@ -46,6 +46,7 @@ static const float MOUSE_HIDE_TIME = 1.0f;	// Seconds until mouse cursor gets hi
 
 
 Application::Application() :
+	GuiBase("Application"),
 	mGameLoader(new GameLoader()),
 	mSimulation(new Simulation()),
 	mSaveStateMenu(new SaveStateMenu())
@@ -109,9 +110,10 @@ void Application::initialize()
 	#endif
 	}
 
-	mOxygenMenu = &createChild<OxygenMenu>();
 	mProfilingView = &createChild<ProfilingView>();
 	mCheatSheetOverlay = &createChild<CheatSheetOverlay>();
+
+	mOxygenMenu = &createChild<OxygenMenu>();
 
 	if (nullptr != mTouchControlsOverlay && nullptr == mTouchControlsOverlay->getParent())
 	{

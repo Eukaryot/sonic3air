@@ -13,7 +13,8 @@
 #include "oxygen/simulation/EmulatorInterface.h"
 
 
-MemoryHexView::MemoryHexView()
+MemoryHexView::MemoryHexView() :
+	GuiBase("MemoryHexView")
 {
 }
 

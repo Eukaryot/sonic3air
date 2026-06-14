@@ -83,6 +83,7 @@ namespace
 
 
 GameView::GameView(Simulation& simulation) :
+	GuiBase("GameView"),
 	mSimulation(simulation)
 {
 }

@@ -14,26 +14,6 @@
 
 #include "oxygen/menu/devmode/DevModeWindowBase.h"
 
-class AudioBrowserWindow;
-class AudioPlaybackWindow;
-class CallFramesWindow;
-class CustomSidePanelWindow;
-class DebugLogWindow;
-class FileBrowserWindow;
-class GameSimWindow;
-class GameVisualizationsWindow;
-class MemoryHexViewWindow;
-class NetworkingWindow;
-class PaletteBrowserWindow;
-class PaletteViewWindow;
-class PersistentDataWindow;
-class RenderedGeometryWindow;
-class ScriptBuildWindow;
-class SettingsWindow;
-class SpriteBrowserWindow;
-class VRAMWritesWindow;
-class WatchesWindow;
-
 
 class DevModeMainWindow : public DevModeWindowBase
 {
@@ -64,27 +44,27 @@ private:
 private:
 	std::vector<DevModeWindowBase*> mAllWindows;
 
-	AudioBrowserWindow* mAudioBrowserWindow = nullptr;
-	AudioPlaybackWindow* mAudioPlaybackWindow = nullptr;
-	CallFramesWindow* mCallFramesWindow = nullptr;
-	CustomSidePanelWindow* mCustomSidePanelWindow = nullptr;
-	DebugLogWindow* mDebugLogWindow = nullptr;
-	FileBrowserWindow* mFileBrowserWindow = nullptr;
-	GameSimWindow* mGameSimWindow = nullptr;
-	GameVisualizationsWindow* mGameVisualizationsWindow = nullptr;
-	MemoryHexViewWindow* mMemoryHexViewWindow = nullptr;
-	NetworkingWindow* mNetworkingWindow = nullptr;
-	PaletteBrowserWindow* mPaletteBrowserWindow = nullptr;
-	PaletteViewWindow* mPaletteViewWindow = nullptr;
-	PersistentDataWindow* mPersistentDataWindow = nullptr;
-	RenderedGeometryWindow* mRenderedGeometryWindow = nullptr;
-	ScriptBuildWindow* mScriptBuildWindow = nullptr;
-	SettingsWindow* mSettingsWindow = nullptr;
-	SpriteBrowserWindow* mSpriteBrowserWindow = nullptr;
-	VRAMWritesWindow* mVRAMWritesWindow = nullptr;
-	WatchesWindow* mWatchesWindow = nullptr;
+	class AppDebugWindow* mAppDebugWindow = nullptr;
+	class AudioBrowserWindow* mAudioBrowserWindow = nullptr;
+	class AudioPlaybackWindow* mAudioPlaybackWindow = nullptr;
+	class CallFramesWindow* mCallFramesWindow = nullptr;
+	class CustomSidePanelWindow* mCustomSidePanelWindow = nullptr;
+	class DebugLogWindow* mDebugLogWindow = nullptr;
+	class FileBrowserWindow* mFileBrowserWindow = nullptr;
+	class GameSimWindow* mGameSimWindow = nullptr;
+	class GameVisualizationsWindow* mGameVisualizationsWindow = nullptr;
+	class MemoryHexViewWindow* mMemoryHexViewWindow = nullptr;
+	class NetworkingWindow* mNetworkingWindow = nullptr;
+	class PaletteBrowserWindow* mPaletteBrowserWindow = nullptr;
+	class PaletteViewWindow* mPaletteViewWindow = nullptr;
+	class PersistentDataWindow* mPersistentDataWindow = nullptr;
+	class RenderedGeometryWindow* mRenderedGeometryWindow = nullptr;
+	class ScriptBuildWindow* mScriptBuildWindow = nullptr;
+	class SettingsWindow* mSettingsWindow = nullptr;
+	class SpriteBrowserWindow* mSpriteBrowserWindow = nullptr;
+	class VRAMWritesWindow* mVRAMWritesWindow = nullptr;
+	class WatchesWindow* mWatchesWindow = nullptr;
 
-	bool mShowImGuiDemo = false;
 	int mActiveTab = -1;
 };
 

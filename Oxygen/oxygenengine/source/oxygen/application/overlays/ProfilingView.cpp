@@ -40,7 +40,8 @@ namespace
 }
 
 
-ProfilingView::ProfilingView()
+ProfilingView::ProfilingView() :
+	GuiBase("ProfilingView")
 {
 }
 

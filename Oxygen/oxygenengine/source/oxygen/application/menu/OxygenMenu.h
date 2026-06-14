@@ -17,6 +17,8 @@
 class OxygenMenu : public GuiBase, public SingleInstance<OxygenMenu>
 {
 public:
+	OxygenMenu();
+
 	virtual void initialize() override;
 	virtual void deinitialize() override;
 	virtual void keyboard(const rmx::KeyboardEvent& ev) override;

@@ -26,7 +26,8 @@ public:
 	{
 		SIMULATION,
 		GRAPHICS,
-		MISC
+		MISC,
+		DEBUGGING
 	};
 
 public:

@@ -14,7 +14,8 @@
 #include "oxygen/simulation/Simulation.h"
 
 
-DebugLogView::DebugLogView()
+DebugLogView::DebugLogView() :
+	GuiBase("DebugLogView")
 {
 }
 

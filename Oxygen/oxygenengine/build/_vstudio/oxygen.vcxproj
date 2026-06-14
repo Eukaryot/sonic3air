@@ -88,6 +88,7 @@
     <ClCompile Include="..\..\source\oxygen\helper\Transform2D.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\devmode\DevModeMainWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\devmode\DevModeWindowBase.cpp" />
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\AppDebugWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\AudioBrowserWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\AudioPlaybackWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\CallFramesWindow.cpp" />
@@ -275,6 +276,7 @@
     <ClInclude Include="..\..\source\oxygen\helper\Transform2D.h" />
     <ClInclude Include="..\..\source\oxygen\menu\devmode\DevModeMainWindow.h" />
     <ClInclude Include="..\..\source\oxygen\menu\devmode\DevModeWindowBase.h" />
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\AppDebugWindow.h" />
     <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\AudioBrowserWindow.h" />
     <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\AudioPlaybackWindow.h" />
     <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\CallFramesWindow.h" />

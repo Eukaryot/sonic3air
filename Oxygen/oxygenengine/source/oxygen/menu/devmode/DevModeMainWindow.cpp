@@ -12,6 +12,7 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/menu/imgui/ImGuiHelpers.h"
+#include "oxygen/menu/devmode/windows/AppDebugWindow.h"
 #include "oxygen/menu/devmode/windows/AudioBrowserWindow.h"
 #include "oxygen/menu/devmode/windows/AudioPlaybackWindow.h"
 #include "oxygen/menu/devmode/windows/CallFramesWindow.h"
@@ -72,7 +73,9 @@ DevModeMainWindow::DevModeMainWindow() :
 		createWindow(mPersistentDataWindow);
 		createWindow(mFileBrowserWindow);
 		createWindow(mSettingsWindow);
+
 	#ifdef DEBUG
+		createWindow(mAppDebugWindow);
 		createWindow(mNetworkingWindow);
 	#endif
 	}
@@ -117,11 +120,6 @@ bool DevModeMainWindow::buildWindow()
 	{
 		window->buildWindow();
 	}
-
-	// ImGui demo window for testing
-	if (mShowImGuiDemo)
-		ImGui::ShowDemoWindow();
-
 	return result;
 }
 
@@ -140,20 +138,21 @@ void DevModeMainWindow::buildContent()
 	int& configActiveTab = Configuration::instance().mDevMode.mActiveMainWindowTab;
 	const bool firstRun = (mActiveTab == -1);
 
-	const char* TEXT_BY_CATEGORY[] =
+	static const std::vector<const char*> TEXT_BY_CATEGORY =
 	{
 		"Simulation",
 		"Graphics",
-		"Misc"
+		"Misc",
+	#if DEBUG
+		"Debug"
+	#endif
 	};
-	constexpr int NUM_CATEGORIES = (int)DevModeWindowBase::Category::MISC + 1;
-	static_assert(sizeof(TEXT_BY_CATEGORY) / sizeof(const char*) == NUM_CATEGORIES);
 
 	if (!useTabs || ImGui::BeginTabBar("Tab Bar", 0))
 	{
 		std::vector<DevModeWindowBase*> windows;
 
-		for (int categoryIndex = 0; categoryIndex < NUM_CATEGORIES; ++categoryIndex)
+		for (int categoryIndex = 0; categoryIndex < (int)TEXT_BY_CATEGORY.size(); ++categoryIndex)
 		{
 			windows.clear();
 			for (DevModeWindowBase* window : mAllWindows)
@@ -163,14 +162,6 @@ void DevModeMainWindow::buildContent()
 					windows.push_back(window);
 				}
 			}
-
-		#ifdef DEBUG
-			if (categoryIndex == NUM_CATEGORIES - 1)
-			{
-				// For ImGui demo
-				windows.push_back(nullptr);
-			}
-		#endif
 
 			if (!windows.empty())
 			{
@@ -206,12 +197,6 @@ void DevModeMainWindow::buildContent()
 									window->setIsWindowOpen(isOpen);
 								}
 							}
-						#ifdef DEBUG
-							else
-							{
-								ImGui::Checkbox("ImGui Demo", &mShowImGuiDemo);
-							}
-						#endif
 						}
 
 						ImGui::EndTable();

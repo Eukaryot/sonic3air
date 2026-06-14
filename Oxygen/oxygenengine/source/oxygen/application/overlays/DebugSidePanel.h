@@ -12,11 +12,11 @@
 #include <functional>
 #include <optional>
 
-
 class CustomDebugSidePanelCategory;
 class DebugSidePanelCategory;
 class DebugTracking;
 class Drawer;
+
 
 class DebugSidePanel : public GuiBase
 {

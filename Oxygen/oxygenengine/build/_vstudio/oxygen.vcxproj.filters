@@ -661,6 +661,9 @@
     <ClCompile Include="..\..\source\oxygen\platform\CommandForwarder.cpp">
       <Filter>platform</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\AppDebugWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -1245,6 +1248,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\platform\CommandForwarder.h">
       <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\AppDebugWindow.h">
+      <Filter>menu\devmode\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

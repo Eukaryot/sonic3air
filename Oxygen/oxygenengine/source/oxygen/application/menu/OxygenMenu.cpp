@@ -17,6 +17,11 @@
 #include "oxygen/application/EngineMain.h"
 
 
+OxygenMenu::OxygenMenu() :
+	GuiBase("OxygenMenu")
+{
+}
+
 void OxygenMenu::initialize()
 {
 	if (nullptr == mSideBar)
@@ -69,40 +74,46 @@ void OxygenMenu::update(float deltaSeconds)
 	refreshMenuResolution();
 	mRootWidget.setRelativeRect(Recti(Vec2i(), mMenuResolution));
 
-	if (!FTX::System->wasEventConsumed())
+	if (FTX::System->wasEventConsumed())
+		return;
+
+	GuiBase::update(deltaSeconds);
+
+	// Update input
 	{
-		GuiBase::update(deltaSeconds);
+		InputManager& inputManager = InputManager::instance();
+		const Vec2i mousePos = Vec2i(mOxygenMenuViewport.getInnerPositionFromScreen(Vec2f(FTX::mousePos())));
+		const bool hasMousePos = mOxygenMenuViewport.isValidInnerPosition(mousePos);
+		const InputManager::ControllerScheme& controller = inputManager.getController(0);
 
-		// Update input
-		{
-			InputManager& inputManager = InputManager::instance();
-			const Vec2i mousePos = Vec2i(mOxygenMenuViewport.getInnerPositionFromScreen(Vec2f(FTX::mousePos())));
-			const bool hasMousePos = mOxygenMenuViewport.isValidInnerPosition(mousePos);
-			const InputManager::ControllerScheme& controller = inputManager.getController(0);
+		mUpdateInfo.mDeltaSeconds = deltaSeconds;
+		mUpdateInfo.mLastInputWasMouse = (inputManager.getLastInputType() == InputManager::InputType::TOUCH);
 
-			mUpdateInfo.mDeltaSeconds = deltaSeconds;
-			mUpdateInfo.mLastInputWasMouse = (inputManager.getLastInputType() == InputManager::InputType::TOUCH);
+		mUpdateInfo.mMousePosition = mousePos;
+		mUpdateInfo.mMouseWheel = FTX::mouseWheel();
+		mUpdateInfo.mMousePosConsumed = !hasMousePos;
+		mUpdateInfo.mMouseWheelConsumed = !hasMousePos;
+		mUpdateInfo.mLeftMouseButton.updateState(FTX::mouseState(rmx::MouseButton::Left), deltaSeconds);
 
-			mUpdateInfo.mMousePosition = mousePos;
-			mUpdateInfo.mMouseWheel = FTX::mouseWheel();
-			mUpdateInfo.mMousePosConsumed = !hasMousePos;
-			mUpdateInfo.mMouseWheelConsumed = !hasMousePos;
-			mUpdateInfo.mLeftMouseButton.updateState(FTX::mouseState(rmx::MouseButton::Left), deltaSeconds);
+		mUpdateInfo.mButtonUp.updateState(controller.Up.isPressed(), deltaSeconds);
+		mUpdateInfo.mButtonDown.updateState(controller.Down.isPressed(), deltaSeconds);
+		mUpdateInfo.mButtonLeft.updateState(controller.Left.isPressed(), deltaSeconds);
+		mUpdateInfo.mButtonRight.updateState(controller.Right.isPressed(), deltaSeconds);
+		mUpdateInfo.mButtonA.updateState(controller.A.isPressed(), deltaSeconds);
+		mUpdateInfo.mButtonB.updateState(controller.B.isPressed(), deltaSeconds);
+		mUpdateInfo.mButtonX.updateState(controller.X.isPressed(), deltaSeconds);
+		mUpdateInfo.mButtonY.updateState(controller.Y.isPressed(), deltaSeconds);
+	}
 
-			mUpdateInfo.mButtonUp.updateState(controller.Up.isPressed(), deltaSeconds);
-			mUpdateInfo.mButtonDown.updateState(controller.Down.isPressed(), deltaSeconds);
-			mUpdateInfo.mButtonLeft.updateState(controller.Left.isPressed(), deltaSeconds);
-			mUpdateInfo.mButtonRight.updateState(controller.Right.isPressed(), deltaSeconds);
-			mUpdateInfo.mButtonA.updateState(controller.A.isPressed(), deltaSeconds);
-			mUpdateInfo.mButtonB.updateState(controller.B.isPressed(), deltaSeconds);
-			mUpdateInfo.mButtonX.updateState(controller.X.isPressed(), deltaSeconds);
-			mUpdateInfo.mButtonY.updateState(controller.Y.isPressed(), deltaSeconds);
-		}
-
-		// Use a copy of update info
-		loui::UpdateInfo updateInfo = mUpdateInfo;
+	// Update widgets
+	{
+		loui::UpdateInfo updateInfo = mUpdateInfo;	// Using a copy of update info for that
 		mRootWidget.update(updateInfo);
+	}
 
+	// Execute triggered action
+	if (mTriggeredAction != TriggeredAction::NONE)
+	{
 		switch (mTriggeredAction)
 		{
 			case TriggeredAction::OPEN_SIDE_BAR:
@@ -139,7 +150,15 @@ void OxygenMenu::update(float deltaSeconds)
 				break;
 			}
 		}
+
 		mTriggeredAction = TriggeredAction::NONE;
+	}
+
+	// Block input for the rest of teh app
+	const bool anyMenuOpen = (mSideBar->shouldBeOpen() || mSettingsMenu->shouldBeOpen());
+	if (anyMenuOpen)
+	{
+		FTX::System->consumeCurrentEvent();
 	}
 }
 
@@ -185,9 +204,8 @@ void OxygenMenu::render()
 		renderInfo.mShowFocus = !mUpdateInfo.mLastInputWasMouse;
 		mRootWidget.render(renderInfo);
 
-	#if DEBUG
+		// Debug output
 		//drawer.printText(SharedFonts::oxyFontSmall, Vec2i(8, resolution.y - 6), String(0, "%dx%d", resolution.x, resolution.y), 7);
-	#endif
 
 		drawer.performRendering();
 	}

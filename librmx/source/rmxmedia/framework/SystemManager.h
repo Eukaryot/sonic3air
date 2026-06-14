@@ -35,6 +35,8 @@ namespace rmx
 
 		void quit();
 
+		GuiBase& getRoot()  { return mRoot; }
+
 		// Time measurement
 		float getTime() const			{ return mTotalTime; }
 		float getTimeDifference() const	{ return mTimeDifference; }

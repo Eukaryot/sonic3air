@@ -15,6 +15,8 @@
 class BackdropView : public GuiBase
 {
 public:
+	BackdropView();
+
 	void setGameViewRect(const Recti& rect);
 
 	virtual void initialize() override;

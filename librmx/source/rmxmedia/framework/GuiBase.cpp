@@ -13,6 +13,11 @@ GuiBase::GuiBase()
 {
 }
 
+GuiBase::GuiBase(std::string_view internalName) :
+	mInternalName(internalName)
+{
+}
+
 GuiBase::~GuiBase()
 {
 	deleteAllChildren();

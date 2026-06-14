@@ -89,7 +89,8 @@ void DebugSidePanel::Builder::addCallStack(DebugTracking& debugTracking, int cal
 }
 
 
-DebugSidePanel::DebugSidePanel()
+DebugSidePanel::DebugSidePanel() :
+	GuiBase("DebugSidePanel")
 {
 	addCategory(CATEGORY_NONE, "");		// We need a dummy for this
 	addCategory(CATEGORY_CALL_FRAMES, "CALL FRAMES");

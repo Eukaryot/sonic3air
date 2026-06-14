@@ -13,7 +13,8 @@
 #include "oxygen/simulation/Simulation.h"
 
 
-GameApp::GameApp()
+GameApp::GameApp() :
+	GuiBase("GameApp")
 {
 }
 
