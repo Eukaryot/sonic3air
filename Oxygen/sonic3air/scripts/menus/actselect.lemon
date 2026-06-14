@@ -103,13 +103,22 @@ function u16 ActSelect.TranslateZoneAct(u8 zoneNumber, u8 act)
 }
 
 
-constant array<string> ActSelect.CHARACTER_COMBINATION_NAME =
+constant array<string> ActSelect.CHARACTER_COMBINATION_NAME_WESTERN =
 {
 	"Sonic & Tails",
 	"Sonic",
 	"Tails",
 	"Knuckles",
 	"Knuckles & Tails"		// This is left out in "ActSelect.GetNumCharacterCombinations" if the respective secret is not unlocked
+}
+
+constant array<string> ActSelect.CHARACTER_COMBINATION_NAME_JAPAN =
+{
+	"Sonic & Miles",
+	"Sonic",
+	"Miles",
+	"Knuckles",
+	"Knuckles & Miles"		// This is left out in "ActSelect.GetNumCharacterCombinations" if the respective secret is not unlocked
 }
 
 constant array<string> ActSelect.CHARACTER_COMBINATION_SPRITE =
@@ -123,7 +132,7 @@ constant array<string> ActSelect.CHARACTER_COMBINATION_SPRITE =
 
 function u8 ActSelect.GetNumCharacterCombinations()
 {
-	u8 numCharacterCombinations = ActSelect.CHARACTER_COMBINATION_NAME.length()
+	u8 numCharacterCombinations = ActSelect.CHARACTER_COMBINATION_NAME_WESTERN.length()
 	if (!Game.isSecretUnlocked(SECRET_KNUX_AND_TAILS))
 		--numCharacterCombinations
 	return numCharacterCombinations
@@ -131,7 +140,7 @@ function u8 ActSelect.GetNumCharacterCombinations()
 
 function string ActSelect.GetCharacterCombinationName(u8 index)
 {
-	return ActSelect.CHARACTER_COMBINATION_NAME[index]
+	return Game.getSetting(SETTING_REGION_CODE) ? ActSelect.CHARACTER_COMBINATION_NAME_WESTERN[index] : ActSelect.CHARACTER_COMBINATION_NAME_JAPAN[index]
 }
 
 function string ActSelect.GetCharacterCombinationSprite(u8 index)

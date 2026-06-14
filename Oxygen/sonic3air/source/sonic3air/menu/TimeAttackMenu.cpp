@@ -67,10 +67,10 @@ TimeAttackMenu::TimeAttackMenu(MenuBackground& menuBackground) :
 		}
 
 		mCharacterEntry = &mMenuEntries.addEntry();
-		mCharacterEntry->addOption("Sonic",    (uint32)CharacterOption::SONIC_CLASSIC);
+		mCharacterEntry->addOption("Sonic",				  (uint32)CharacterOption::SONIC_CLASSIC);
 		mCharacterEntry->addOption("Sonic - Max Control", (uint32)CharacterOption::SONIC_MAXCONTROL);
-		mCharacterEntry->addOption("Tails",    (uint32)CharacterOption::TAILS);
-		mCharacterEntry->addOption("Knuckles", (uint32)CharacterOption::KNUCKLES);
+		mCharacterEntry->addOption("Tails",				  (uint32)CharacterOption::TAILS);
+		mCharacterEntry->addOption("Knuckles",			  (uint32)CharacterOption::KNUCKLES);
 
 		mMenuEntries.addEntry("Back", 0x10);
 	}
@@ -134,10 +134,19 @@ void TimeAttackMenu::initialize()
 {
 	// Update Max Control unlocking
 	GameMenuEntry::Option* option = mCharacterEntry->getOptionByValue((uint32)CharacterOption::SONIC_MAXCONTROL);
-	RMX_CHECK(nullptr != option, "Option for Max Control not found", );
+	RMX_ASSERT(nullptr != option, "Option for Max Control not found");
 	if (nullptr != option)
 	{
 		option->mVisible = PlayerProgress::instance().mUnlocks.isSecretUnlocked(SharedDatabase::Secret::SECRET_SUPER_PEELOUT);
+	}
+
+	// Set region-dependent name for Tails
+	option = mCharacterEntry->getOptionByValue((uint32)CharacterOption::TAILS);
+	RMX_ASSERT(nullptr != option, "Option for Tails not found");
+	if (nullptr != option)
+	{
+		const bool useJapaneseName = (Game::instance().getSetting(SharedDatabase::Setting::SETTING_REGION_CODE, true) == 0);
+		option->mText = useJapaneseName ? "Miles" : "Tails";
 	}
 }
 
