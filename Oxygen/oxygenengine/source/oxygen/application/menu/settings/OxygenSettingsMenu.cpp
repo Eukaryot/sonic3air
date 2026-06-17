@@ -142,7 +142,7 @@ void OxygenSettingsMenu::applyLayouting()
 
 	for (SubMenu& subMenu : mSubMenus)
 	{
-		subMenu.mSubMenu->setRelativeRect(Recti(frameRect.x + frameRect.width / 2 - 80, frameRect.y, 200, frameRect.height));
+		subMenu.mSubMenu->setRelativeRect(Recti(frameRect.x + frameRect.width / 2 - 80, frameRect.y, 300, frameRect.height));
 	}
 }
 

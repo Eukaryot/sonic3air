@@ -9,6 +9,7 @@
 #pragma once
 
 #include "oxygen/application/menu/settings/submenus/SettingsSubMenu.h"
+#include "oxygen/application/menu/settings/SimpleSelection.h"
 
 
 class AudioMenu : public SettingsSubMenu
@@ -17,4 +18,9 @@ public:
 	virtual void init() override;
 
 	virtual void update(loui::UpdateInfo& updateInfo) override;
+
+protected:
+	loui::SimpleSelection mMasterVolumeSelection;
+	loui::SimpleSelection mMusicVolumeSelection;
+	loui::SimpleSelection mSoundVolumeSelection;
 };

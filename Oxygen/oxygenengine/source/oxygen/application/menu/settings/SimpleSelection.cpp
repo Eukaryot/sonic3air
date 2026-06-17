@@ -30,7 +30,7 @@ namespace loui
 		mButtonRight.init(">", font, Vec2i(), true);
 		addChildWidget(mButtonRight);
 
-		setValue(1);
+		setCurrentOptionByIndex(0);
 
 		return *this;
 	}
@@ -44,19 +44,19 @@ namespace loui
 		return *this;
 	}
 
-	void SimpleSelection::setValue(int newValue)
+	void SimpleSelection::setCurrentOptionByIndex(int index)
 	{
-		if (mOptionIndex == newValue)
+		if (mOptionIndex == index)
 			return;
 
-		mOptionIndex = newValue;
-		if (mOptionIndex >= 0 && mOptionIndex < (int)mOptions.size())
+		if (index >= 0 && index < (int)mOptions.size())
 		{
+			mOptionIndex = index;
 			mValueLabel.setText(mOptions[mOptionIndex].mDisplayText);
 		}
 		else
 		{
-			mValueLabel.setText(String(0, "%d", mOptionIndex));
+			mValueLabel.setText("?");
 		}
 	}
 
@@ -72,6 +72,46 @@ namespace loui
 		}
 	}
 
+	void SimpleSelection::setCurrentOptionByValue(int value)
+	{
+		if (mOptions.empty())
+			return;
+
+		if (mOptionIndex < 0 || mOptionIndex >= (int)mOptions.size())
+			mOptionIndex = 0;
+
+		// Any change?
+		if (mOptions[mOptionIndex].mValue == value)
+			return;
+
+		// Check for closest match
+		int index = mOptionIndex;
+		int difference = 0x7fffffff;
+		for (size_t i = 0; i < mOptions.size(); ++i)
+		{
+			const int diff = std::abs(mOptions[i].mValue - value);
+			if (diff < difference)
+			{
+				index = i;
+				if (diff == 0)
+					break;		// This is an exact match already, no need to check any other option
+				difference = diff;
+			}
+		}
+
+		setCurrentOptionByIndex(index);
+	}
+
+	bool SimpleSelection::canGoLeft() const
+	{
+		return (mOptionIndex > 0);
+	}
+
+	bool SimpleSelection::canGoRight() const
+	{
+		return (mOptionIndex < (int)mOptions.size() - 1);
+	}
+
 	void SimpleSelection::update(UpdateInfo& updateInfo)
 	{
 		Widget::update(updateInfo);
@@ -79,16 +119,19 @@ namespace loui
 		mIsHovered = (isInteractable() && !updateInfo.mMousePosConsumed && mFinalRect.contains(updateInfo.mMousePosition));
 		mWasChanged = false;
 
-		if (mButtonLeft.wasPressed() || (hasFocus() && updateInfo.mButtonLeft.justPressedOrRepeat()))
+		if (canGoLeft() && (mButtonLeft.wasPressed() || (hasFocus() && updateInfo.mButtonLeft.justPressedOrRepeat())))
 		{
-			setValue(mOptionIndex - 1);
+			setCurrentOptionByIndex(mOptionIndex - 1);
 			mWasChanged = true;
 		}
-		if (mButtonRight.wasPressed() || (hasFocus() && updateInfo.mButtonRight.justPressedOrRepeat()))
+		if (canGoRight() && (mButtonRight.wasPressed() || (hasFocus() && updateInfo.mButtonRight.justPressedOrRepeat())))
 		{
-			setValue(mOptionIndex + 1);
+			setCurrentOptionByIndex(mOptionIndex + 1);
 			mWasChanged = true;
 		}
+
+		mButtonLeft.setVisible(canGoLeft());
+		mButtonRight.setVisible(canGoRight());
 	}
 
 	void SimpleSelection::render(RenderInfo& renderInfo)
@@ -109,10 +152,10 @@ namespace loui
 	void SimpleSelection::applyLayouting()
 	{
 		const int x0 = 5;
-		const int x1 = 100;
-		const int x2 = 125;
-		const int x3 = 175;
-		const int x4 = 200;
+		const int x1 = mRelativeRect.width * 4/8;
+		const int x2 = mRelativeRect.width * 5/8;
+		const int x3 = mRelativeRect.width * 7/8;
+		const int x4 = mRelativeRect.width;
 
 		mTitleLabel.setRelativeRect (Recti(x0, 0, x1 - x0, mRelativeRect.height));
 		mValueLabel.setRelativeRect (Recti(x2, 0, x3 - x2, mRelativeRect.height));

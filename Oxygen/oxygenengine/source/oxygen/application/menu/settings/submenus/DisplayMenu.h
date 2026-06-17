@@ -21,4 +21,5 @@ public:
 
 private:
 	loui::SimpleSelection mRendererSelection;
+	loui::SimpleSelection mFrameSyncSelection;
 };

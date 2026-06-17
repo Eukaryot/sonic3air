@@ -19,11 +19,21 @@ namespace loui
 	public:
 		SimpleSelection& init(const std::string_view text, FontWrapper& font, Vec2i size);
 		SimpleSelection& addOption(std::string_view displayText, int32 value);
-
-		void setValue(int newValue);
+		template<typename T> SimpleSelection& addOption(std::string_view displayText, T value)  { return addOption(displayText, static_cast<int>(value)); }
 
 		inline bool wasChanged() const  { return mWasChanged; }
+
+		inline int getCurrentOptionIndex() const  { return mOptionIndex; }
+		void setCurrentOptionByIndex(int index);
+
 		int32 getCurrentOptionValue() const;
+		template<typename T> T getCurrentOptionValueTyped() const  { return static_cast<T>(getCurrentOptionValue()); }
+
+		void setCurrentOptionByValue(int value);
+		template<typename T> void setCurrentOptionByValue(T value)  { setCurrentOptionByValue(static_cast<int>(value)); }
+
+		bool canGoLeft() const;
+		bool canGoRight() const;
 
 		virtual void update(UpdateInfo& updateInfo) override;
 		virtual void render(RenderInfo& renderInfo) override;

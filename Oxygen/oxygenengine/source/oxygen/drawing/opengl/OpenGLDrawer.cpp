@@ -340,6 +340,8 @@ namespace opengldrawer
 					return;
 			}
 
+			mResources.setBlendMode(BlendMode::ALPHA);
+
 			static OpenGLFontOutput::VertexGroups vertexGroups;
 			fontOutput.buildVertexGroups(vertexGroups, typeInfos);
 

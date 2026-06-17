@@ -15,19 +15,24 @@
 
 void DisplayMenu::init()
 {
-	const Vec2i buttonSize(200, 16);
+	const Vec2i buttonSize(300, 16);
 	loui::FontWrapper& font = SharedFonts::oxyFontSmallShadow;
 
 	mRendererSelection
-		.addOption("Fail-Safe / Pure Software",	(int)Configuration::RenderMethod::SOFTWARE)
-		.addOption("OpenGL Software",			(int)Configuration::RenderMethod::OPENGL_SOFT)
-		.addOption("OpenGL Hardware",			(int)Configuration::RenderMethod::OPENGL_FULL)
+		.addOption("Fail-Safe / Pure Software",	Configuration::RenderMethod::SOFTWARE)
+		.addOption("OpenGL Software",			Configuration::RenderMethod::OPENGL_SOFT)
+		.addOption("OpenGL Hardware",			Configuration::RenderMethod::OPENGL_FULL)
 		.init("Renderer", font, buttonSize);
 	addChildWidget(mRendererSelection);
 
-	createChildWidget<loui::SimpleSelection>()
+	mFrameSyncSelection
+		.addOption("V-Sync Off",		Configuration::FrameSyncType::VSYNC_OFF)
+		.addOption("V-Sync On",			Configuration::FrameSyncType::VSYNC_ON)
+		.addOption("V-Sync + FPS Cap",	Configuration::FrameSyncType::VSYNC_FRAMECAP)
 		.init("Frame Sync", font, buttonSize);
+	addChildWidget(mFrameSyncSelection);
 
+/*
 	createChildWidget<loui::SimpleSelection>()
 		.init("Upscaling", font, buttonSize);
 
@@ -39,15 +44,27 @@ void DisplayMenu::init()
 
 	createChildWidget<loui::SimpleSelection>()
 		.init("Scanlines", font, buttonSize);
+*/
+
+	const Configuration& config = Configuration::instance();
+
+	mRendererSelection.setCurrentOptionByValue(config.mRenderMethod);
+	mFrameSyncSelection.setCurrentOptionByValue(config.mFrameSync);
 }
 
 void DisplayMenu::update(loui::UpdateInfo& updateInfo)
 {
 	loui::VerticalLayout::update(updateInfo);
 
+	Configuration& config = Configuration::instance();
+
 	if (mRendererSelection.wasChanged())
 	{
-		const uint32 value = mRendererSelection.getCurrentOptionValue();
-		Application::instance().setPendingRenderMethod((Configuration::RenderMethod)value);
+		Application::instance().setPendingRenderMethod(mRendererSelection.getCurrentOptionValueTyped<Configuration::RenderMethod>());
+	}
+
+	if (mFrameSyncSelection.wasChanged())
+	{
+		config.mFrameSync = (Configuration::FrameSyncType)mFrameSyncSelection.getCurrentOptionValue();
 	}
 }

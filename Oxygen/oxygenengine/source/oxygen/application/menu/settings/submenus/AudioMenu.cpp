@@ -14,23 +14,48 @@
 
 void AudioMenu::init()
 {
-	const Vec2i buttonSize(200, 16);
+	const Vec2i buttonSize(300, 16);
 	loui::FontWrapper& font = SharedFonts::oxyFontSmallShadow;
 
-	createChildWidget<loui::SimpleSelection>()
-		.init("Main Volume", font, buttonSize)
-		.setOuterMargin(1, 1, 0, 0);
+	const auto setupVolumeSelection = [&](loui::SimpleSelection& selection, const char* text)
+	{
+		for (int percent = 0; percent <= 100; percent += 5)
+		{
+			selection.addOption(String(0, "%d %%", percent), percent);
+		}
+		selection.init(text, font, buttonSize);
+		addChildWidget(selection);
+	};
 
-	createChildWidget<loui::SimpleSelection>()
-		.init("Music", font, buttonSize)
-		.setOuterMargin(5, 1, 0, 0);
+	setupVolumeSelection(mMasterVolumeSelection, "Main Volume");
+	setupVolumeSelection(mMusicVolumeSelection, "Music");
+	setupVolumeSelection(mSoundVolumeSelection, "Sound Effects");
 
-	createChildWidget<loui::SimpleSelection>()
-		.init("Sound Effects", font, buttonSize)
-		.setOuterMargin(1, 1, 0, 0);
+	const Configuration& config = Configuration::instance();
+
+	mMasterVolumeSelection.setCurrentOptionByValue(roundToInt(config.mAudio.mMasterVolume * 100.0f));
+	mMusicVolumeSelection.setCurrentOptionByValue(roundToInt(config.mAudio.mMusicVolume * 100.0f));
+	mSoundVolumeSelection.setCurrentOptionByValue(roundToInt(config.mAudio.mSoundVolume * 100.0f));
 }
 
 void AudioMenu::update(loui::UpdateInfo& updateInfo)
 {
 	loui::VerticalLayout::update(updateInfo);
+
+	Configuration& config = Configuration::instance();
+
+	if (mMasterVolumeSelection.wasChanged())
+	{
+		config.mAudio.mMasterVolume = (float)mMasterVolumeSelection.getCurrentOptionValue() / 100.0f;
+	}
+
+	if (mMusicVolumeSelection.wasChanged())
+	{
+		config.mAudio.mMusicVolume = (float)mMusicVolumeSelection.getCurrentOptionValue() / 100.0f;
+	}
+
+	if (mSoundVolumeSelection.wasChanged())
+	{
+		config.mAudio.mSoundVolume = (float)mSoundVolumeSelection.getCurrentOptionValue() / 100.0f;
+	}
 }
