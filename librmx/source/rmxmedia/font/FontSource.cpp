@@ -131,6 +131,9 @@ FontSourceBitmap::FontSourceBitmap(const std::wstring& jsonFilename, bool showEr
 	Json::Value charactersJson = root["characters"];
 	for (auto iterator = charactersJson.begin(); iterator != charactersJson.end(); ++iterator)
 	{
+		if (!iterator->isString())
+			continue;
+
 		wchar_t character;
 		{
 			WString key;
