@@ -69,6 +69,8 @@ public:
 
 	void requestActiveTextInput();
 
+	void onActiveModsChanged();
+
 	void processForwardedCommand(std::string_view command);
 	void processUrl(std::string_view url);
 
@@ -77,6 +79,8 @@ private:
 	void setUnscaledWindow();
 	bool updateLoading();
 	void setPausedByFocusLoss(bool enable);
+
+	void checkActiveModsUsedFeatures();
 
 private:
 	WindowMode mWindowMode = WindowMode::WINDOWED;

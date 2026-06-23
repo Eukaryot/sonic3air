@@ -28,6 +28,7 @@
 #include "oxygen/helper/JsonHelper.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/network/EngineServerClient.h"
+#include "oxygen/network/crowdcontrol/CrowdControlClient.h"
 #include "oxygen/platform/CommandForwarder.h"
 #include "oxygen/platform/CrashHandler.h"
 #include "oxygen/platform/PlatformFunctions.h"
@@ -59,9 +60,11 @@ struct EngineMain::Internal
 	PersistentData	   mPersistentData;
 	VideoOut		   mVideoOut;
 	ControlsIn		   mControlsIn;
+
+	CommandForwarder   mCommandForwarder;
 	DownloadManager	   mDownloadManager;
 	EngineServerClient mEngineServerClient;
-	CommandForwarder   mCommandForwarder;
+	CrowdControlClient mCrowdControlClient;
 
 #if defined(PLATFORM_ANDROID)
 	AndroidJavaInterface mAndroidJavaInterface;
@@ -135,6 +138,9 @@ void EngineMain::onActiveModsChanged()
 
 	// Scripts need to be reloaded
 	Application::instance().getSimulation().reloadScriptsAfterModsChange();
+
+	// Inform the application
+	Application::instance().onActiveModsChanged();
 
 	// Inform the delegate as well
 	mDelegate.onActiveModsChanged();

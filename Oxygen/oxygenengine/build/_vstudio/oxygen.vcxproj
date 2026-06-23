@@ -121,6 +121,7 @@
     <ClCompile Include="..\..\source\oxygen\menu\loui\LouiScrollingController.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\loui\LouiVerticalLayout.cpp" />
     <ClCompile Include="..\..\source\oxygen\menu\loui\LouiWidget.cpp" />
+    <ClCompile Include="..\..\source\oxygen\network\crowdcontrol\CrowdControlClient.cpp" />
     <ClCompile Include="..\..\source\oxygen\network\EngineServerClient.cpp" />
     <ClCompile Include="..\..\source\oxygen\network\netplay\ExternalAddressQuery.cpp" />
     <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayClient.cpp" />
@@ -311,6 +312,7 @@
     <ClInclude Include="..\..\source\oxygen\menu\loui\LouiScrollingController.h" />
     <ClInclude Include="..\..\source\oxygen\menu\loui\LouiVerticalLayout.h" />
     <ClInclude Include="..\..\source\oxygen\menu\loui\LouiWidget.h" />
+    <ClInclude Include="..\..\source\oxygen\network\crowdcontrol\CrowdControlClient.h" />
     <ClInclude Include="..\..\source\oxygen\network\EngineServerClient.h" />
     <ClInclude Include="..\..\source\oxygen\network\netplay\ExternalAddressQuery.h" />
     <ClInclude Include="..\..\source\oxygen\network\netplay\NetplayClient.h" />

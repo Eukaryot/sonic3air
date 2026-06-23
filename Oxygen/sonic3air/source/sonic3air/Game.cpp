@@ -100,7 +100,6 @@ void Game::update(float timeElapsed)
 {
 	// Update game client
 	mGameClient.updateClient(timeElapsed);
-	mCrowdControlClient.updateConnection(timeElapsed);
 
 	// Update sprite redirects (like input icons)
 	mDynamicSprites.updateSpriteRedirects();
@@ -231,12 +230,6 @@ void Game::registerScriptBindings(lemon::Module& module)
 
 		builder.addNativeFunction("Game.setDiscordSmallImage", lemon::wrap(&setDiscordSmallImage), defaultFlags)
 			.setParameters("imageName");
-	}
-
-	// CrowdControl
-	{
-		builder.addNativeFunction("CrowdControl.sendResponse", lemon::wrap(mCrowdControlClient, &CrowdControlClient::sendResponse), defaultFlags)
-			.setParameters("id", "status", "message");
 	}
 
 	// Audio
@@ -841,13 +834,6 @@ void Game::checkActiveModsUsedFeatures()
 	const bool usesThreePlayers = ModManager::instance().anyActiveModUsesFeature(rmx::constMurmur2_64("ThreePlayers"));
 	const bool usesFourPlayers = ModManager::instance().anyActiveModUsesFeature(rmx::constMurmur2_64("FourPlayers"));
 	Configuration::instance().mNumPlayers = usesFourPlayers ? 4 : usesThreePlayers ? 3 : 2;
-
-	// Check mods for usage of Crowd Control
-	const bool usesCrowdControl = ModManager::instance().anyActiveModUsesFeature(rmx::constMurmur2_64("CrowdControl"));
-	if (usesCrowdControl)
-		mCrowdControlClient.startConnection();
-	else
-		mCrowdControlClient.stopConnection();
 }
 
 void Game::startIntoGameInternal()

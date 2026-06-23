@@ -130,6 +130,9 @@
     <Filter Include="drawing\upscaler">
       <UniqueIdentifier>{49c5f31d-69e2-4003-a28e-63d384644f64}</UniqueIdentifier>
     </Filter>
+    <Filter Include="network\crowdcontrol">
+      <UniqueIdentifier>{f8ee760c-f271-4644-8491-37009fb50cb1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -663,6 +666,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\AppDebugWindow.cpp">
       <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\network\crowdcontrol\CrowdControlClient.cpp">
+      <Filter>network\crowdcontrol</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1251,6 +1257,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\AppDebugWindow.h">
       <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\network\crowdcontrol\CrowdControlClient.h">
+      <Filter>network\crowdcontrol</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

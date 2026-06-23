@@ -6,9 +6,8 @@
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
-#include "sonic3air/pch.h"
-#include "sonic3air/client/crowdcontrol/CrowdControlClient.h"
-
+#include "oxygen/pch.h"
+#include "oxygen/network/crowdcontrol/CrowdControlClient.h"
 #include "oxygen/application/Application.h"
 #include "oxygen/helper/JsonHelper.h"
 #include "oxygen/simulation/CodeExec.h"
@@ -34,19 +33,19 @@ public:
 			{
 				ch = *str++;
 			}
-			else if ((*str & 0xE0) == 0xC0)
+			else if ((*str & 0xe0) == 0xc0)
 			{
-				ch = ((*str & 0x1F) << 6) | (str[1] & 0x3F);
+				ch = ((*str & 0x1f) << 6) | (str[1] & 0x3f);
 				str += 2;
 			}
-			else if ((*str & 0xF0) == 0xE0)
+			else if ((*str & 0xf0) == 0xe0)
 			{
-				ch = ((*str & 0x0F) << 12) | ((str[1] & 0x3F) << 6) | (str[2] & 0x3F);
+				ch = ((*str & 0x0f) << 12) | ((str[1] & 0x3f) << 6) | (str[2] & 0x3f);
 				str += 3;
 			}
-			else if ((*str & 0xF8) == 0xF0)
+			else if ((*str & 0xf8) == 0xf0)
 			{
-				ch = ((*str & 0x07) << 18) | ((str[1] & 0x3F) << 12) | ((str[2] & 0x3F) << 6) | (str[3] & 0x3F);
+				ch = ((*str & 0x07) << 18) | ((str[1] & 0x3f) << 12) | ((str[2] & 0x3f) << 6) | (str[3] & 0x3f);
 				str += 4;
 			}
 			else

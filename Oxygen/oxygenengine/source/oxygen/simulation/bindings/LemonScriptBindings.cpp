@@ -27,6 +27,7 @@
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/menu/imgui/ImGuiIntegration.h"
 #include "oxygen/helper/RandomNumberGenerator.h"
+#include "oxygen/network/crowdcontrol/CrowdControlClient.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/resources/PaletteCollection.h"
 #include "oxygen/resources/RawDataCollection.h"
@@ -1343,6 +1344,12 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		// This is not really debugging-related, as it's meant to be written in non-developer environment as well
 		builder.addNativeFunction("System.writeDisplayLine", lemon::wrap(&System_writeDisplayLine), defaultFlags)
 			.setParameters("text");
+	}
+
+	// CrowdControl
+	{
+		builder.addNativeFunction("CrowdControl.sendResponse", lemon::wrap(CrowdControlClient::instance(), &CrowdControlClient::sendResponse), defaultFlags)
+			.setParameters("id", "status", "message");
 	}
 
 	// Register game-specific script bindings

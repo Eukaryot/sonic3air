@@ -18,6 +18,7 @@
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/menu/GameSetupScreen.h"
 #include "oxygen/application/menu/OxygenMenu.h"
+#include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/overlays/BackdropView.h"
 #include "oxygen/application/overlays/CheatSheetOverlay.h"
 #include "oxygen/application/overlays/DebugLogView.h"
@@ -31,6 +32,7 @@
 #include "oxygen/helper/Logging.h"
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/network/EngineServerClient.h"
+#include "oxygen/network/crowdcontrol/CrowdControlClient.h"
 #include "oxygen/platform/CommandForwarder.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/GameRecorder.h"
@@ -561,6 +563,9 @@ void Application::update(float timeElapsed)
 	mSimulation->update(timeElapsed);
 	Profiling::popRegion(ProfilingRegion::SIMULATION);
 
+	// Update systems
+	CrowdControlClient::instance().updateConnection(timeElapsed);
+
 	// Update game
 	EngineMain::getDelegate().updateGame(timeElapsed);
 
@@ -905,6 +910,11 @@ void Application::requestActiveTextInput()
 	mRequestActiveTextInput = true;
 }
 
+void Application::onActiveModsChanged()
+{
+	checkActiveModsUsedFeatures();
+}
+
 void Application::processForwardedCommand(std::string_view command)
 {
 	if (command == "reload-scripts")
@@ -1019,6 +1029,8 @@ bool Application::updateLoading()
 				RMX_LOG_INFO("Adding game app instance");
 				mGameApp = &EngineMain::getDelegate().createGameApp();
 				addChild(*mGameApp);
+
+				checkActiveModsUsedFeatures();
 				break;
 			}
 
@@ -1047,4 +1059,14 @@ void Application::setPausedByFocusLoss(bool enable)
 		mPausedByFocusLoss = enable;
 		mSimulation->setRunning(!enable);
 	}
+}
+
+void Application::checkActiveModsUsedFeatures()
+{
+	// Check mods for usage of Crowd Control
+	const bool usesCrowdControl = ModManager::instance().anyActiveModUsesFeature(rmx::constMurmur2_64("CrowdControl"));
+	if (usesCrowdControl)
+		CrowdControlClient::instance().startConnection();
+	else
+		CrowdControlClient::instance().stopConnection();
 }

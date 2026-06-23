@@ -15,7 +15,7 @@
 
 // Crowd Control documentation: https://developer.crowdcontrol.live/sdk/simpletcp/structure.html
 
-class CrowdControlClient
+class CrowdControlClient : public SingleInstance<CrowdControlClient>
 {
 public:
 	bool startConnection();

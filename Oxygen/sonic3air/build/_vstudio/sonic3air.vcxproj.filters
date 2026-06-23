@@ -43,9 +43,6 @@
     <Filter Include="menu\mods">
       <UniqueIdentifier>{2d24639b-9a65-4177-a4e0-6783a69f3842}</UniqueIdentifier>
     </Filter>
-    <Filter Include="client\crowdcontrol">
-      <UniqueIdentifier>{58c44b68-4d4f-4f2e-9fa9-6c314f319434}</UniqueIdentifier>
-    </Filter>
     <Filter Include="menu\helper">
       <UniqueIdentifier>{b8db9620-a4d0-4dd3-9f39-584f4dec4c60}</UniqueIdentifier>
     </Filter>
@@ -163,9 +160,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\menu\mods\ModsMenuEntries.cpp">
       <Filter>menu\mods</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\sonic3air\client\crowdcontrol\CrowdControlClient.cpp">
-      <Filter>client\crowdcontrol</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\menu\helper\GameMenuControlsDisplay.cpp">
       <Filter>menu\helper</Filter>
@@ -307,9 +301,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\menu\mods\ModResources.h">
       <Filter>menu\mods</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\sonic3air\client\crowdcontrol\CrowdControlClient.h">
-      <Filter>client\crowdcontrol</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\menu\helper\GameMenuControlsDisplay.h">
       <Filter>menu\helper</Filter>
