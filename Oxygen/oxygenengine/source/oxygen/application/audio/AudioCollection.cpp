@@ -122,7 +122,8 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 	try
 	{
 		const Json::Value jsonRoot = JsonHelper::loadFile(fullpath);
-		RMX_CHECK(!jsonRoot.isNull(), "Could not read JSON file \"" << WString(fullpath).toStdString() << "\"", return false);
+		if (jsonRoot.isNull())
+			return false;
 		RMX_CHECK(jsonRoot.isObject(), "Expecting a JSON object in \"" << WString(fullpath).toStdString() << "\"", return false);
 
 		for (auto iterator = jsonRoot.begin(); iterator != jsonRoot.end(); ++iterator)
