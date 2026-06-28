@@ -359,7 +359,7 @@ function void fn0492b2()
 function void fn0492d4()
 {
 #if STANDALONE
-	// Early out in debug mode, #contributed by TheMushrunt
+	// Early out in debug mode, #contributed by nabbup / Ramona
 	if (debug_mode.state)
 	{
 		u8[A2] = 0

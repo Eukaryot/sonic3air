@@ -25,7 +25,7 @@ function void Batbot.Init()
 function void Batbot.BaseUpdate()
 {
 #if STANDALONE
-	// Put Batbot in front of the stage, #contributed by TheMushrunt
+	// Put Batbot in front of the stage, #contributed by nabbup / Ramona
 	objA0.sprite_priority = 0x200
 #endif
 	// Targets:

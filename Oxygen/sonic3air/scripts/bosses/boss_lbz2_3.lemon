@@ -1435,7 +1435,7 @@ function void fn074fd2()
 		}
 
 	#if !STANDALONE
-		// This resets the character state, but is unnecessary, #contributed by TheMushrunt
+		// This resets the character state, but is unnecessary, #contributed by nabbup / Ramona
 		if (u8[A0 + 0x30] == 0)
 		{
 			stopCharacterWinPose(0xffffb000)
