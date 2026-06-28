@@ -162,7 +162,7 @@ function void fn075356()
 	objA0.countdown_value = 0x4f
 
 #if STANDALONE
-	// Fix for jump in boss movement, #contributed by HazelSpooder
+	// Fix for jump in boss movement, #contributed by AmberChromatic
 	if (objA0.value3b == 0)
 	{
 		// Ignore first movements, the original countdown time is correct in that case

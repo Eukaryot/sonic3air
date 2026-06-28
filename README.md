@@ -81,7 +81,7 @@ Game scripts & other contributions by:
 * Legobouwer
 * GFX32
 * Dynamic Lemons
-* HazelSpooder
+* AmberChromatic
 * iCloudius
 * D.A. Garden
 * Alieneer

@@ -31,7 +31,7 @@ function void fn06fd16()
 	call tableLookupAddress(0x06fd2e, objA0.base_state)
 
 #if STANDALONE
-	// Destructible laser logic here and in other functions below was #contributed by HazelSpooder
+	// Destructible laser logic here and in other functions below was #contributed by AmberChromatic
 	if (objA0.base_state < 0x06)
 	{
 		// Prevent boss from being damaged too early

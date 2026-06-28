@@ -146,7 +146,7 @@ function void fn08867e()
 	D1.u16 = u16[0x0886da + D0.u16]
 
 #if STANDALONE
-	// Factor in screen extend as well, #contributed by HazelSpooder
+	// Factor in screen extend as well, #contributed by AmberChromatic
 	D1.u16 += ((getScreenExtend() * 2) % (D1.u16 / 2))
 #endif
 
