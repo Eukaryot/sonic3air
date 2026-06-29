@@ -148,7 +148,7 @@ function void TitleScreen_SK()
 				fn005972()
 
 				u32[0xffffb04a] = 0x005802
-				u16[0xffffb04a + 0x2e] = 0x0140 + getScreenExtend()		// Fix for the Death Egg not in the right position when skipping intro, #contributed by TheMushrunt
+				u16[0xffffb04a + 0x2e] = 0x0140 + getScreenExtend()		// Fix for the Death Egg not in the right position when skipping intro, #contributed by nabbup / Ramona
 				u16[0xffffb04a + 0x32] = 0x70
 				u16[0xffffeec0] = 0x03
 
@@ -375,7 +375,7 @@ function void fn005628()
 function void fn00565a()
 {
 #if STANDALONE
-	// Fix for Sonic's position in widescreen, #contributed by TheMushrunt
+	// Fix for Sonic's position in widescreen, #contributed by nabbup / Ramona
 	objA0.position.x.u16 = 0xe8 + getScreenExtend()
 #endif
 	if (objA0.position.y.u16 != 0xf0)
