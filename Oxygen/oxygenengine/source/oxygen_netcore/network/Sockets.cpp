@@ -744,7 +744,17 @@ bool UDPSocket::sendData(const uint8* data, size_t length, const SocketAddress& 
 	if (!isValid())
 		return false;
 
-	const int result = ::sendto(mInternal->mSocket, (const char*)data, (int)length, 0, (sockaddr*)destinationAddress.getSockAddr(), (int)sizeof(sockaddr_storage));
+	int addrlen = 0;
+	const sockaddr* addr = (const sockaddr*)destinationAddress.getSockAddr();
+	int family = addr->sa_family;
+	if (family == AF_INET) {
+		addrlen = sizeof(sockaddr_in);
+	} else if (family == AF_INET6) {
+		addrlen = sizeof(sockaddr_in6);
+	} else {
+		addrlen = sizeof(sockaddr_storage); //Unknown address family
+	}
+	const int result = ::sendto(mInternal->mSocket, (const char*)data, (int)length, 0, addr, addrlen);
 	if (result >= 0)
 		return true;
 
