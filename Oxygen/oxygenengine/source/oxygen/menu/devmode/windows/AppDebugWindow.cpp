@@ -50,7 +50,7 @@ void AppDebugWindow::buildContent()
 			if (level > 0)	// Ignore root
 			{
 				ImGuiHelpers::ScopedIndent si(level * 20.0f - 18.0f);
-				ImGui::BulletText(element.getInternalName().c_str());
+				ImGui::BulletText("%s", element.getInternalName().c_str());
 			}
 
 			for (int k = (int)element.getChildren().size() - 1; k >= 0; --k)
