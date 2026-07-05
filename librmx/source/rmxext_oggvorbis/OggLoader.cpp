@@ -22,11 +22,6 @@ bool OggLoader::staticLoadVorbis(AudioBuffer& outBuffer, const String& source, c
 OggLoader::OggLoader()
 {
 	ogg_sync_init(&mSyncState);
-	ogg_stream_clear(&mVorbisStreamState);
-	vorbis_block_clear(&mVorbisBlock);
-	vorbis_dsp_clear(&mVorbisDspState);
-	vorbis_comment_clear(&mVorbisComment);
-	vorbis_info_clear(&mVorbisInfo);
 }
 
 OggLoader::~OggLoader()
