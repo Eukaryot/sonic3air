@@ -92,7 +92,7 @@ namespace loui
 			const int diff = std::abs(mOptions[i].mValue - value);
 			if (diff < difference)
 			{
-				index = i;
+				index = (int)i;
 				if (diff == 0)
 					break;		// This is an exact match already, no need to check any other option
 				difference = diff;
