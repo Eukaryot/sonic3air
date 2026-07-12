@@ -392,6 +392,8 @@ declare function void System.SidePanel.addLine(string text, s8 indent)
 declare function bool System.SidePanel.isEntryHovered(u64 key)
 declare function void System.writeDisplayLine(string text)
 
+declare function void CrowdControl.sendResponse(u32 id, u8 status, string message)
+
 declare function u32 Game.getSetting(u32 settingId)
 declare function bool Game.isSecretUnlocked(u32 secretId)
 declare function void Game.setSecretUnlocked(u32 secretId)
@@ -422,9 +424,6 @@ declare function void Game.setDiscordDetails(string text)
 declare function void Game.setDiscordState(string text)
 declare function void Game.setDiscordLargeImage(string imageName)
 declare function void Game.setDiscordSmallImage(string imageName)
-
-declare function void CrowdControl.sendResponse(u32 id, u8 status, string message)
-
 declare function void Game.setUnderwaterAudioEffect(u8 value)
 
 declare function void Kosinski.Decompress()
