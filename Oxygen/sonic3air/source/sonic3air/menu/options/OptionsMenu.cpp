@@ -1302,7 +1302,7 @@ void OptionsMenu::playSoundtest(const AudioCollection::AudioDefinition& audioDef
 	else
 	{
 		AudioOut::instance().disableAudioModifier(0, AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
-		AudioOut::instance().playAudioDirect(audioDefinition.mKeyId, (AudioOut::SoundRegType)audioDefinition.mType, AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
+		AudioOut::instance().playAudioDirect(audioDefinition.mPrimaryKeyId, (AudioOut::SoundRegType)audioDefinition.mType, AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
 	}
 }
 
@@ -1432,7 +1432,7 @@ void OptionsMenu::updateModExpandState(ModTitleMenuEntry& modTitleMenuEntry)
 void OptionsMenu::goBack()
 {
 	playMenuSound(0xad);
-	if (nullptr != mPlayingSoundTest && mPlayingSoundTest->mKeyId != 0x2f)
+	if (nullptr != mPlayingSoundTest && mPlayingSoundTest->mNumericKey != 0x2f)
 	{
 		AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
 	}

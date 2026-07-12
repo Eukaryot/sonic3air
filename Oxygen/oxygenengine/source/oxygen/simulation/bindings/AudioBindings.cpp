@@ -34,6 +34,11 @@ namespace
 
 	void Audio_playAudio1(uint64 audioKey, uint8 contextId)
 	{
+	#if 1
+		EngineMain::instance().getAudioOut().playAudioBase(audioKey, contextId);
+
+		// Since audio definitions now register under multiple audio key IDs, this shouldn't be needed any more -> code to be deleted sooner or later
+	#else
 		const bool success = EngineMain::instance().getAudioOut().playAudioBase(audioKey, contextId);
 		if (!success)
 		{
@@ -58,6 +63,7 @@ namespace
 				}
 			}
 		}
+	#endif
 	}
 
 	void Audio_playAudio2(uint64 audioKey)

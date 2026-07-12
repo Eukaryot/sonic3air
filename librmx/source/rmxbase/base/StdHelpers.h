@@ -79,6 +79,13 @@ bool vectorContains(const std::vector<T>& vec, T element)
 	return containsElement(vec, element);
 }
 
+// Check if an std::vector contains an element matching the predicate
+template<typename T, class PRED>
+bool vectorContainsByPredicate(const std::vector<T>& vec, PRED predicate)
+{
+	return containsByPredicate(vec, predicate);
+}
+
 // Get the index of a certain element in an std::vector, or -1 if not found
 template<typename T>
 int vectorIndexOf(const std::vector<T>& vec, T element)

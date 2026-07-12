@@ -274,7 +274,7 @@ bool AudioPlayer::isPlayingAudioKey(uint64 audioKey, AudioReference* outAudioRef
 {
 	for (const PlayingSound& playingSound : mPlayingSounds)
 	{
-		if (playingSound.mBaseSourceReg->mAudioDefinition->mKeyId == audioKey)
+		if (playingSound.mBaseSourceReg->mAudioDefinition->hasKeyId(audioKey))
 		{
 			if (nullptr != outAudioRef)
 				*outAudioRef = playingSound.mAudioRef;
@@ -522,7 +522,7 @@ AudioPlayer::PlayingSoundRef AudioPlayer::getPlayingSoundByUniqueId(uint32 uniqu
 
 AudioPlayer::PlayingSoundRef AudioPlayer::getPlayingSoundByAudioKey(uint64 audioKey)
 {
-	PlayingSound* playingSound = vectorFindByPredicate(mPlayingSounds, [audioKey](const PlayingSound& playingSound) { return playingSound.mBaseSourceReg->mAudioDefinition->mKeyId == audioKey; } );
+	PlayingSound* playingSound = vectorFindByPredicate(mPlayingSounds, [audioKey](const PlayingSound& playingSound) { return playingSound.mBaseSourceReg->mAudioDefinition->hasKeyId(audioKey); } );
 	return makePlayingSoundRef(playingSound);
 }
 
@@ -724,8 +724,10 @@ void AudioPlayer::savePlaybackState(SavedPlaybackState& outPlaybackState) const
 			continue;
 		}
 
+		const AudioCollection::AudioDefinition& audioDefinition = *playingSound.mSourceReg->mAudioDefinition;
+
 		SavedAudioState& audioState = vectorAdd(outPlaybackState.mAudioStates);
-		audioState.mAudioKey = playingSound.mSourceReg->mAudioDefinition->mKeyId;
+		audioState.mAudioKey = audioDefinition.mPrimaryKeyId;
 		audioState.mChannelId = playingSound.mChannelId;
 		audioState.mContextId = playingSound.mContextId;
 	}

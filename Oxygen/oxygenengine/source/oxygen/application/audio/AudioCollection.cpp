@@ -62,11 +62,11 @@ namespace
 }
 
 
-int64 AudioCollection::checkForNumericKey(std::string_view keyString)
+int16 AudioCollection::checkForNumericKey(std::string_view keyString)
 {
 	if (keyString.length() == 2 && isHexDigit(keyString[0]) && isHexDigit(keyString[1]))
 	{
-		return rmx::parseInteger(String("0x") + keyString);
+		return (int16)rmx::parseInteger(String("0x") + keyString);
 	}
 	return -1;
 }
@@ -82,7 +82,8 @@ AudioCollection::~AudioCollection()
 
 void AudioCollection::clear()
 {
-	mAudioDefinitions.clear();
+	mUniqueAudioDefinitions.clear();
+	mAudioDefinitionsByKeyId.clear();
 	for (size_t i = 0; i < (size_t)Package::_NUM; ++i)
 		mNumSourcesByPackageType[i] = 0;
 	++mChangeCounter;
@@ -90,9 +91,11 @@ void AudioCollection::clear()
 
 void AudioCollection::clearPackage(Package package)
 {
-	for (auto it = mAudioDefinitions.begin(); it != mAudioDefinitions.end(); )
+	for (auto it = mUniqueAudioDefinitions.begin(); it != mUniqueAudioDefinitions.end(); )
 	{
-		auto& sources = it->second.mSources;
+		AudioDefinition& audioDefinition = it->second;
+		std::vector<SourceRegistration>& sources = audioDefinition.mSources;
+
 		for (size_t k = 0; k < sources.size(); ++k)
 		{
 			if (sources[k].mPackage == package)
@@ -104,7 +107,8 @@ void AudioCollection::clearPackage(Package package)
 
 		if (sources.empty())
 		{
-			it = mAudioDefinitions.erase(it);
+			unregisterAudioDefinitionKeyIds(audioDefinition);
+			it = mUniqueAudioDefinitions.erase(it);
 		}
 		else
 		{
@@ -128,15 +132,13 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 
 		for (auto iterator = jsonRoot.begin(); iterator != jsonRoot.end(); ++iterator)
 		{
-			String keyString = iterator.key().asString();
-			keyString.lowerCase();
+			const std::string keyString = iterator.key().asString();
+			const uint64 primaryKeyId = rmx::getMurmur2_64(keyString);
 
-			// Numeric key is either a string hash, or the value in case of keys like "2C"
-			uint64 numericKey = 0;
-			{
-				const int64 key = checkForNumericKey(keyString);
-				numericKey = (key >= 0) ? key : rmx::getMurmur2_64(keyString);
-			}
+			// Numeric key is the uint8 value in case of keys like "2C"
+			const int16 numKeyCheck = checkForNumericKey(keyString);
+			const uint8 numericKey = (uint8)numKeyCheck;
+			const bool hasNumericKey = (numKeyCheck >= 0);
 
 			// Read definition from JSON
 			AudioDefinition::Type type = AudioDefinition::Type::SOUND;
@@ -144,11 +146,11 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 			WString audioFilename;
 			uint32 sourceAddress = 0;
 			uint32 contentOffset = 0;
-			uint8 emulationSfxId = (numericKey <= 0xff) ? (uint8)numericKey : 0;
+			uint8 emulationSfxId = hasNumericKey ? numericKey : 0;
 			SourceRegistration::Type sourceType = SourceRegistration::Type::FILE;
 			int loopStart = 0;
 			float volume = 1.0f;
-			uint8 channel = (numericKey < 0xff) ? (uint8)numericKey : 0xff;
+			uint8 channel = hasNumericKey ? numericKey : 0xff;
 			AudioDefinition::Visibility soundTestVisibility = AudioDefinition::Visibility::AUTO;
 
 			for (auto it = iterator->begin(); it != iterator->end(); ++it)
@@ -231,22 +233,45 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 				}
 			}
 
-			AudioDefinition* audioDefinition = mapFind(mAudioDefinitions, numericKey);
-			if (nullptr == audioDefinition)
+			AudioDefinition& audioDefinition = mUniqueAudioDefinitions[primaryKeyId];
+			if (audioDefinition.mAllKeyIds.empty())
 			{
-				audioDefinition = &mAudioDefinitions[numericKey];
-				audioDefinition->mKeyId = numericKey;
-				audioDefinition->mKeyString = *keyString;
-				audioDefinition->mType = type;
+				// Definition did not exist yet, so fill it accordingly
+				audioDefinition.mPrimaryKeyId = primaryKeyId;
+				audioDefinition.mNumericKey = numericKey;
+				audioDefinition.mKeyString = keyString;
+				audioDefinition.mType = type;
+
+				// Determine the audio key IDs under which to register this definition
+				{
+					audioDefinition.mAllKeyIds.push_back(primaryKeyId);
+
+					// Use the lowercase key string as well, for legacy compatibility
+					String lowerCaseKeyString = keyString;
+					lowerCaseKeyString.lowerCase();
+					const uint64 lowerCaseKeyId = rmx::getMurmur2_64(lowerCaseKeyString);
+					if (lowerCaseKeyId != primaryKeyId)
+					{
+						audioDefinition.mAllKeyIds.push_back(lowerCaseKeyId);
+					}
+
+					if (hasNumericKey)
+					{
+						audioDefinition.mAllKeyIds.push_back(numericKey);
+					}
+				}
+
+				// Properly register under all these key IDs
+				registerAudioDefinitionKeyIds(audioDefinition);
 
 				// Music and jingles always use channel 0 -- no matter what is edited
 				if (type == AudioDefinition::Type::MUSIC || type == AudioDefinition::Type::JINGLE)
 				{
-					audioDefinition->mChannel = 0;
+					audioDefinition.mChannel = 0;
 				}
 				else
 				{
-					audioDefinition->mChannel = channel;
+					audioDefinition.mChannel = channel;
 				}
 			}
 			else
@@ -256,13 +281,13 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 
 			// Set or overwrite values in audio definition
 			if (!displayName.empty())
-				audioDefinition->mDisplayName = displayName;
+				audioDefinition.mDisplayName = displayName;
 			if (soundTestVisibility != AudioDefinition::Visibility::AUTO)
-				audioDefinition->mSoundTestVisibility = soundTestVisibility;
+				audioDefinition.mSoundTestVisibility = soundTestVisibility;
 
 			// Add audio source
-			SourceRegistration& sourceRegistration = vectorAdd(audioDefinition->mSources);
-			sourceRegistration.mAudioDefinition = audioDefinition;
+			SourceRegistration& sourceRegistration = vectorAdd(audioDefinition.mSources);
+			sourceRegistration.mAudioDefinition = &audioDefinition;
 			sourceRegistration.mPackage = package;
 			sourceRegistration.mType = sourceType;
 			sourceRegistration.mIsLooping = (type == AudioDefinition::Type::MUSIC);
@@ -272,9 +297,9 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 
 			if (sourceType == SourceRegistration::Type::FILE)
 			{
-				RMX_CHECK(!audioFilename.empty(), "No audio file name set for audio key " << *keyString, );
-				RMX_CHECK(sourceAddress == 0, "Source address can only be used with emulated sound, for audio key " << *keyString, );
-				RMX_CHECK(contentOffset == 0, "Content offset can only be used with emulated sound, for audio key " << *keyString, );
+				RMX_CHECK(!audioFilename.empty(), "No audio file name set for audio key " << keyString, );
+				RMX_CHECK(sourceAddress == 0, "Source address can only be used with emulated sound, for audio key " << keyString, );
+				RMX_CHECK(contentOffset == 0, "Content offset can only be used with emulated sound, for audio key " << keyString, );
 				sourceRegistration.mSourceFile = *audioFilename;
 			}
 			else
@@ -296,9 +321,30 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 	return true;
 }
 
+void AudioCollection::registerAudioDefinitionKeyIds(AudioDefinition& audioDefinition)
+{
+	for (uint64 keyId : audioDefinition.mAllKeyIds)
+	{
+		// If for some reason, two defintions would use the same key ID, one does simply overwrite the other
+		mAudioDefinitionsByKeyId[keyId] = &audioDefinition;
+	}
+}
+
+void AudioCollection::unregisterAudioDefinitionKeyIds(const AudioDefinition& audioDefinition)
+{
+	for (uint64 keyId : audioDefinition.mAllKeyIds)
+	{
+		const auto it = mAudioDefinitionsByKeyId.find(keyId);
+		if (it != mAudioDefinitionsByKeyId.end() && it->second == &audioDefinition)
+		{
+			mAudioDefinitionsByKeyId.erase(it);
+		}
+	}
+}
+
 void AudioCollection::determineActiveSourceRegistrations(bool preferOriginalSoundtrack)
 {
-	for (auto& [key, audioDefinition] : mAudioDefinitions)
+	for (auto& [key, audioDefinition] : mUniqueAudioDefinitions)
 	{
 		// Search for the right one considering settings
 		SourceRegistration* bestSourceReg = nullptr;
@@ -316,7 +362,7 @@ void AudioCollection::determineActiveSourceRegistrations(bool preferOriginalSoun
 
 const AudioCollection::AudioDefinition* AudioCollection::getAudioDefinition(uint64 keyId) const
 {
-	const AudioDefinition* audioDefinition = mapFind(mAudioDefinitions, keyId);
+	const AudioDefinition* audioDefinition = mapFindOrDefault(mAudioDefinitionsByKeyId, keyId, nullptr);
 	if (nullptr != audioDefinition)
 	{
 		// Found directly
@@ -331,7 +377,7 @@ const AudioCollection::AudioDefinition* AudioCollection::getAudioDefinition(uint
 	}
 
 	// Try again, it might get found now
-	return mapFind(mAudioDefinitions, keyId);
+	return mapFindOrDefault(mAudioDefinitionsByKeyId, keyId, nullptr);
 }
 
 AudioCollection::SourceRegistration* AudioCollection::getSourceRegistration(uint64 keyId) const

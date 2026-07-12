@@ -107,7 +107,7 @@ void AudioBrowserWindow::buildContent()
 					}
 
 					//mPlayingAudio = ...
-					audioOut.playAudioBase(audioDefinition->mKeyId, AudioOutBase::CONTEXT_MENU + (isSound? 0 : AudioOutBase::CONTEXT_MUSIC));
+					audioOut.playAudioBase(audioDefinition->mPrimaryKeyId, AudioOutBase::CONTEXT_MENU + (isSound? 0 : AudioOutBase::CONTEXT_MUSIC));
 					mPlayingDefinition = audioDefinition;
 				}
 			}

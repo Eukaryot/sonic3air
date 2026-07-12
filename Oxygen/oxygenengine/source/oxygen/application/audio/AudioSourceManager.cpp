@@ -52,7 +52,7 @@ AudioSourceBase* AudioSourceManager::getAudioSourceForPlayback(SourceRegistratio
 	}
 	else
 	{
-		hash = rmx::getMurmur2_64(String(0, "EmulatedKey:%016llx", sourceRegistration.mAudioDefinition->mKeyId));
+		hash = rmx::getMurmur2_64(String(0, "EmulatedKey:%016llx", sourceRegistration.mAudioDefinition->mAllKeyIds.back()));	// Usually the numeric key, at least if there is one
 	}
 
 	AudioSourceBase* audioSource = nullptr;
