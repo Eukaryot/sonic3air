@@ -426,7 +426,7 @@ void AudioPlayer::fadeOutChannel(int channelId, float length)
 	while (PlayingSound* soundPtr = iterator.getNext())
 	{
 		soundPtr->mRelativeVolumeTarget = 0.0f;
-		soundPtr->mRelativeVolumeChange = (length > 0.0f) ? (-1.0f / length) : 0.1f;
+		soundPtr->mRelativeVolumeChange = (length > 0.0f) ? (1.0f / length) : 0.1f;
 		soundPtr->mStopOnFadeOut = true;
 	}
 }
@@ -612,7 +612,7 @@ void AudioPlayer::fadePlayingSoundVolume(PlayingSoundRef ref, float volume, floa
 	if (nullptr != playingSound)
 	{
 		playingSound->mRelativeVolumeTarget = volume;
-		playingSound->mRelativeVolumeChange = (volume - playingSound->mRelativeVolume) / std::max(length, 0.001f);
+		playingSound->mRelativeVolumeChange = std::abs(volume - playingSound->mRelativeVolume) / std::max(length, 0.001f);
 		playingSound->mStopOnFadeOut = false;
 	}
 }
