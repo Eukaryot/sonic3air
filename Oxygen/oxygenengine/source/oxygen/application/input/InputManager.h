@@ -165,6 +165,12 @@ public:
 	inline bool hasKeyboard() const						{ return mHasKeyboard; }
 	inline bool anythingPressed() const					{ return mAnythingPressed; }
 
+	Vec2i getMousePos() { return mMousePos; }
+	bool isMouseDown(int button) const { return mMouseState[button]; }
+	bool isMousePressed(int button) const { return mMouseState[button] && mMouseChange[button]; }
+	bool isMouseReleased(int button) const { return !mMouseState[button] && mMouseChange[button]; }
+	int getMouseWheel() const { return mMouseScroll; }
+
 	void setControlState(Control& control, bool pressed);
 	void setTouchInputMode(TouchInputMode mode);
 
@@ -238,4 +244,9 @@ private:
 	WaitInputState mWaitingForSingleInput = WaitInputState::NONE;
 
 	bool mUsingControlsLR = false;
+
+	Vec2i mMousePos;
+	bool mMouseState[5] = { false };
+	bool mMouseChange[5] = { false };
+	int mMouseScroll;
 };
