@@ -353,17 +353,20 @@ void InputManager::updateInput(float timeElapsed)
 				}
 			}
 		}
-
-		// Also consider left mouse click
-		if (FTX::mouseState(rmx::MouseButton::Left))
-		{
-			vectorAdd(mActiveTouches).mPosition = Vec2f(FTX::mousePos()) / Vec2f(FTX::screenSize());
-		}
-
+		
 		if (!mActiveTouches.empty())
 		{
 			mLastInputType = InputType::TOUCH;
 			mAnythingPressed = true;
+		}
+		
+		// Update mouse controls
+		mMousePos = FTX::mousePos();
+		mMouseScroll = FTX::mouseWheel();
+		for (int k = 0; k < 5; ++k)
+		{
+			mMouseState[k] = FTX::System->getMouseState(k);
+			mMouseChange[k] = FTX::System->getMouseChange(k);
 		}
 	}
 
