@@ -121,7 +121,8 @@ void RuntimeMemory::clear()
 	// Reset ROM to unmodified version
 	{
 		const std::vector<uint8>& unmodifiedROM = ResourcesCache::instance().getUnmodifiedRom();
-		memcpy(mRom, &unmodifiedROM[0], unmodifiedROM.size());
+		if (!unmodifiedROM.empty())
+			memcpy(mRom, &unmodifiedROM[0], unmodifiedROM.size());
 		if (sizeof(mRom) > unmodifiedROM.size())
 			memset(&mRom[unmodifiedROM.size()], 0, sizeof(mRom) - unmodifiedROM.size());
 	}

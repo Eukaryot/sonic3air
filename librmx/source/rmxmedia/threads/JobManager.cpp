@@ -320,7 +320,10 @@ namespace rmx
 				{
 					// Job is done
 					job->mJobState = JobBase::JobState::DONE;
-					job->mRegisteredAtManager->removeJob(*job);
+					if (nullptr != job->mRegisteredAtManager)
+					{
+						job->mRegisteredAtManager->removeJob(*job);
+					}
 				}
 				else
 				{

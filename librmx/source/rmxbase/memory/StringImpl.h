@@ -517,7 +517,7 @@ TEMPLATE int STRING::parseData(void* dst) const
 		}
 		((uint8*)dst)[i] = value;
 	}
-	return mLength/2;
+	return (int)mLength/2;
 }
 
 TEMPLATE bool STRING::equal(const STRING& str) const
