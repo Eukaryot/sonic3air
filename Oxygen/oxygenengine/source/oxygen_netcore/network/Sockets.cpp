@@ -169,21 +169,15 @@ std::string SocketAddress::toLoggedString() const
 	}
 }
 
-uint64 SocketAddress::getHash() const
-{
-	assureSockAddr();
-	return rmx::getMurmur2_64(mSockAddr, 16);
-}
-
 void SocketAddress::assureSockAddr() const
 {
 	if (!mHasSockAddr)
 	{
-		memset(&mSockAddr, 0, sizeof(mSockAddr));
 		bool success = false;
 	#if !defined(PLATFORM_SWITCH)	// The IPv6 part won't compile on Switch, but isn't really needed there anyways
 		{
 			// IPv6
+			memset(&mSockAddr, 0, sizeof(mSockAddr));
 			sockaddr_in6& addr = *reinterpret_cast<sockaddr_in6*>(&mSockAddr);
 			addr.sin6_family = AF_INET6;
 			addr.sin6_port = htons(mPort);
@@ -193,6 +187,7 @@ void SocketAddress::assureSockAddr() const
 		if (!success)
 		{
 			// IPv4
+			memset(&mSockAddr, 0, sizeof(mSockAddr));
 			sockaddr_in& addr = *reinterpret_cast<sockaddr_in*>(&mSockAddr);
 			addr.sin_family = AF_INET;
 			addr.sin_port = htons(mPort);
@@ -232,6 +227,16 @@ void SocketAddress::assureIpPort() const
 			mPort = 0;
 		}
 		mHasIpPort = true;
+	}
+}
+
+void SocketAddress::assureAddrHash() const
+{
+	if (!mHasAddrHash)
+	{
+		assureSockAddr();
+		mAddrHash = rmx::getMurmur2_64(mSockAddr, 16);
+		mHasAddrHash = true;
 	}
 }
 

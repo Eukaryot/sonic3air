@@ -316,6 +316,13 @@ void NetConnection::sendAcceptConnectionPacket()
 
 void NetConnection::handleLowLevelPacket(const ReceivedPacket& receivedPacket)
 {
+	// For security reasons, ignore senders that don't fit the stored sender address for this connection
+	if (receivedPacket.mSenderAddress.getHash() != getRemoteAddress().getHash())
+	{
+		RMX_ASSERT(false, "Packet dropped due to mismatch in sender address hash");
+		return;
+	}
+
 	// Reset timeout whenever any packet got received
 	mTimeoutStart = mCurrentTimestamp;
 	mLastMessageReceivedTimestamp = mCurrentTimestamp;	// TODO: It would be nice to use the actual timestamp of receiving the packet here, which happened previously already

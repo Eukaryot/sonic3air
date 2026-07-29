@@ -62,18 +62,22 @@ public:
 	inline std::string toString() const		 { assureIpPort();  return mIP + ':' + std::to_string(mPort); }
 	std::string toLoggedString() const;
 
+	inline uint64 getHash() const			 { assureAddrHash();  return mAddrHash; }
+
 	inline bool isValid() const  { return (mHasSockAddr || mHasIpPort); }
 
 	inline void clear()
 	{
 		mHasSockAddr = false;
 		mHasIpPort = false;
+		mHasAddrHash = false;
 	}
 
 	inline void set(std::string_view ip, uint16 port)
 	{
 		mHasSockAddr = false;
 		mHasIpPort = true;
+		mHasAddrHash = false;
 		mIP = ip;
 	#ifdef _MSC_VER
 		mIP = ip;	// Two assignments because there seems to be a weird compiler error that makes the first assignment not work
@@ -86,12 +90,14 @@ public:
 		memcpy(mSockAddr, sockAddr, 128);
 		mHasSockAddr = true;
 		mHasIpPort = false;
+		mHasAddrHash = false;
 	}
 
 	inline void onSockAddrSet()
 	{
 		mHasSockAddr = true;
 		mHasIpPort = false;
+		mHasAddrHash = false;
 	}
 
 	inline void writeTo(std::string& outIP, uint16& outPort) const
@@ -101,10 +107,9 @@ public:
 		outPort = mPort;
 	}
 
-	uint64 getHash() const;
-
 	void assureSockAddr() const;
 	void assureIpPort() const;
+	void assureAddrHash() const;
 
 	bool operator==(const SocketAddress& other) const;
 	inline bool operator!=(const SocketAddress& other) const { return !operator==(other); }
@@ -113,9 +118,11 @@ private:
 	// Yes, everything is mutable here indeed...
 	mutable bool mHasSockAddr = false;
 	mutable bool mHasIpPort = false;
+	mutable bool mHasAddrHash = false;
 	mutable uint8 mSockAddr[128];	// Size of sockaddr_storage (pretty large, huh?)
 	mutable std::string mIP;		// Usually an IPv4 as string, e.g. "123.45.67.89"
 	mutable uint16 mPort = 0;
+	mutable uint64 mAddrHash = 0;
 };
 
 
