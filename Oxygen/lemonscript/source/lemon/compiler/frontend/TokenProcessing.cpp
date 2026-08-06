@@ -645,7 +645,11 @@ namespace lemon
 				const Variable* thisPointerVariable = nullptr;
 
 				const std::vector<FunctionReference>* candidateFunctions = &mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
-				if (!candidateFunctions->empty())
+				if (identifierToken.mName.getHash() == rmx::constMurmur2_64("base"))
+				{
+					isBaseCall = true;
+				}
+				else if (!candidateFunctions->empty())
 				{
 					// Is it a global function
 				}
@@ -655,22 +659,6 @@ namespace lemon
 					RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
 					CHECK_ERROR(functionName.substr(5) == mContext.mFunction->getName().getString(), "Base call '" << functionName << "' goes to a different function, expected 'base." << mContext.mFunction->getName() << "' instead", mLineNumber);
 					isBaseCall = true;
-
-					const std::string_view baseName = identifierToken.mName.getString().substr(5);
-					const std::vector<FunctionReference>& candidates = mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(baseName));
-					for (const FunctionReference& candidate : candidates)
-					{
-						// Base function signature must be the same as current function's
-						if (candidate.mFunction->getSignatureHash() == mContext.mFunction->getSignatureHash() && candidate.mFunction != mContext.mFunction)
-						{
-							baseFunctionExists = true;
-							break;
-						}
-					}
-
-					// TODO: The following check would be no good idea, as some mods overwrite functions (and call their base) from other mods that may or may not be loaded before
-					//  -> The solution is to allow this, and make the base calls simply do nothing at all
-					//CHECK_ERROR(baseFunctionExists, "There's no base function for call '" << functionName << "' with the same signature, i.e. exact same types for parameters and return value", mLineNumber);
 				}
 				else
 				{
@@ -718,6 +706,24 @@ namespace lemon
 					}
 
 					CHECK_ERROR(isValidFunctionCall, "Unknown function name '" << functionName << "'", mLineNumber);
+				}
+
+				if (isBaseCall)
+				{
+					const std::vector<FunctionReference>& candidates = mGlobalsLookup.getFunctionsByName(mContext.mFunction->getName().getHash());
+					for (const FunctionReference& candidate : candidates)
+					{
+						// Base function signature must be the same as current function's
+						if (candidate.mFunction->getSignatureHash() == mContext.mFunction->getSignatureHash() && candidate.mFunction != mContext.mFunction)
+						{
+							baseFunctionExists = true;
+							break;
+						}
+					}
+
+					// TODO: The following check would be no good idea, as some mods overwrite functions (and call their base) from other mods that may or may not be loaded before
+					//  -> The solution is to allow this, and make the base calls simply do nothing at all
+					//CHECK_ERROR(baseFunctionExists, "There's no base function for call '" << functionName << "' with the same signature, i.e. exact same types for parameters and return value", mLineNumber);
 				}
 
 				// Create function token

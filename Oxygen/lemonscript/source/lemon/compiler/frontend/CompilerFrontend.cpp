@@ -448,6 +448,7 @@ namespace lemon
 		++offset;
 		CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier in function definition", lineNumber);
 		const FlyweightString functionName = tokens[offset].as<IdentifierToken>().mName;
+		CHECK_ERROR(functionName.getHash() != rmx::constMurmur2_64("base"), "Function can't be named 'base'", lineNumber);
 
 		++offset;
 		CHECK_ERROR(offset < tokens.size() && isOperator(tokens[offset], Operator::PARENTHESIS_LEFT), "Expected opening parentheses in function definition", lineNumber);

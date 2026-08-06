@@ -125,10 +125,37 @@ namespace lemon
 		const uint64 nameHash = function.getName().getHash();
 		if (function.getContext().isEmpty())
 		{
-			FunctionReference& ref = vectorAdd(mFunctionsByName[nameHash]);
-			ref.mFunction = &function;
-			ref.mIsDeprecated = function.getFlags().isSet(Function::Flag::DEPRECATED);
+			std::vector<FunctionReference>& functions = mFunctionsByName[nameHash];
+			const bool isDeprecated = function.getFlags().isSet(Function::Flag::DEPRECATED);
 
+			// Check if there's a base function
+			const Function* baseFunction = nullptr;
+			for (const FunctionReference& ref : functions)
+			{
+				if (ref.mFunction->getSignatureHash() == function.getSignatureHash())
+				{
+					baseFunction = ref.mFunction;
+					// No break here, to ensure we get the latest fitting function overload as the actual direct base
+				}
+			}
+
+			if (nullptr != baseFunction)
+			{
+				// Add all of the base functions's aliases to the new function as well
+				//  -> This is required to allow function overloads to use an alias of their base as their name
+				function.addAliasName(baseFunction->getName(), isDeprecated);
+				for (const Function::AliasName& aliasName : baseFunction->getAliasNames())
+				{
+					function.addAliasName(aliasName.mName, aliasName.mIsDeprecated);
+				}
+			}
+
+			// Register function under its actual name
+			FunctionReference& ref = vectorAdd(functions);
+			ref.mFunction = &function;
+			ref.mIsDeprecated = isDeprecated;
+
+			// Register function under all of its aliases
 			for (const Function::AliasName& aliasName : function.getAliasNames())
 			{
 				FunctionReference& ref = vectorAdd(mFunctionsByName[aliasName.mName.getHash()]);

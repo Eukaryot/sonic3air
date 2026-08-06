@@ -77,7 +77,9 @@ namespace lemon
 		inline FlyweightString getContext() const { return mContext; }
 		inline FlyweightString getName() const    { return mName; }
 		inline uint64 getNameAndSignatureHash() const { return mNameAndSignatureHash; }
+
 		inline const std::vector<AliasName>& getAliasNames() const { return mAliasNames; }
+		void addAliasName(const FlyweightString& name, bool isDeprecated);
 
 		const DataTypeDefinition* getReturnType() const  { return mReturnType; }
 		const ParameterList& getParameters() const  { return mParameters; }

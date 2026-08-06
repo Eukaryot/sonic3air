@@ -144,10 +144,19 @@ namespace lemon
 				ScriptFunction& scriptFunc = *scriptFunctions[i];
 				runtimeFunc.mFunction = &scriptFunc;
 
-				// Register in lookups
+				// Register in lookup mapping script functions to runtime functions
 				mRuntimeFunctionsMapped[&scriptFunc] = &runtimeFunc;
+
+				// Register function under its actual name
 				std::vector<RuntimeFunction*>& funcs = mRuntimeFunctionsBySignature[scriptFunc.getNameAndSignatureHash()];
 				funcs.insert(funcs.begin(), &runtimeFunc);		// Insert as first
+
+				// Register function under all of its aliases
+				for (const Function::AliasName& aliasName : scriptFunc.getAliasNames())
+				{
+					std::vector<RuntimeFunction*>& funcs = mRuntimeFunctionsBySignature[aliasName.mName.getHash() + scriptFunc.getSignatureHash()];
+					funcs.insert(funcs.begin(), &runtimeFunc);		// Insert as first
+				}
 			}
 
 			// Load all string literals

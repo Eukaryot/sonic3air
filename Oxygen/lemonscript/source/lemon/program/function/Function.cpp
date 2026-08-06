@@ -62,6 +62,19 @@ namespace lemon
 		return signatureHash;
 	}
 
+	void Function::addAliasName(const FlyweightString& name, bool isDeprecated)
+	{
+		if (mName != name)
+		{
+			if (!vectorContainsByPredicate(mAliasNames, [&name](const AliasName& alias) { return name == alias.mName; } ))
+			{
+				AliasName& newAliasName = vectorAdd(mAliasNames);
+				newAliasName.mName = name;
+				newAliasName.mIsDeprecated = isDeprecated;
+			}
+		}
+	}
+
 	uint32 Function::getSignatureHash() const
 	{
 		if (mSignatureHash == 0)
