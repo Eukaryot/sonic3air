@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -22,11 +22,14 @@
 #include "oxygen/menu/devmode/DevModeMainWindow.h"
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/software/SoftwareDrawer.h"
+#include "oxygen/drawing/upscaler/UpscalerCollection.h"
 #include "oxygen/file/PackedFileProvider.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/JsonHelper.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/network/EngineServerClient.h"
+#include "oxygen/network/crowdcontrol/CrowdControlClient.h"
+#include "oxygen/platform/CommandForwarder.h"
 #include "oxygen/platform/CrashHandler.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/resources/FontCollection.h"
@@ -53,11 +56,15 @@ struct EngineMain::Internal
 	ModManager		   mModManager;
 	ResourcesCache	   mResourcesCache;
 	FontCollection	   mFontCollection;
+	UpscalerCollection mUpscalerCollection;
 	PersistentData	   mPersistentData;
 	VideoOut		   mVideoOut;
 	ControlsIn		   mControlsIn;
+
+	CommandForwarder   mCommandForwarder;
 	DownloadManager	   mDownloadManager;
 	EngineServerClient mEngineServerClient;
+	CrowdControlClient mCrowdControlClient;
 
 #if defined(PLATFORM_ANDROID)
 	AndroidJavaInterface mAndroidJavaInterface;
@@ -131,6 +138,9 @@ void EngineMain::onActiveModsChanged()
 
 	// Scripts need to be reloaded
 	Application::instance().getSimulation().reloadScriptsAfterModsChange();
+
+	// Inform the application
+	Application::instance().onActiveModsChanged();
 
 	// Inform the delegate as well
 	mDelegate.onActiveModsChanged();
@@ -213,6 +223,26 @@ void EngineMain::setVSyncMode(Configuration::FrameSyncType frameSyncMode)
 	}
 }
 
+Vec2i EngineMain::getDisplaySize(int displayIndex) const
+{
+	SDL_Rect rect;
+	if (SDL_GetDisplayBounds(displayIndex, &rect) == 0)
+	{
+		return Vec2i(rect.w, rect.h);
+	}
+	else
+	{
+		SDL_DisplayMode dm;
+		if (SDL_GetDesktopDisplayMode(displayIndex, &dm) == 0)
+		{
+			return Vec2i(dm.w, dm.h);
+		}
+	}
+
+	// Return some fallback size in case everything failed... how about Full HD?
+	return Vec2i(1920, 1080);
+}
+
 bool EngineMain::startupEngine()
 {
 #if defined(PLATFORM_ANDROID)
@@ -239,7 +269,7 @@ bool EngineMain::startupEngine()
 	//  -> It should be disabled by default according to the SDL2 docs, but that does not seem to be always the case
 	SDL_DisableScreenSaver();
 
-	// Determine verious directory and file paths in config
+	// Determine various directory and file paths in config
 	initDirectories();
 
 	// Startup logging
@@ -270,6 +300,9 @@ bool EngineMain::startupEngine()
 	}
 
 	// Video
+	RMX_LOG_INFO("Loading upscaler definitions...");
+	mInternal.mUpscalerCollection.loadUpscalers();
+
 	RMX_LOG_INFO("Video initialization...");
 	if (!createWindow())
 	{
@@ -277,7 +310,7 @@ bool EngineMain::startupEngine()
 		return false;
 	}
 
-	RMX_LOG_INFO("Startup of VideoOut");
+	RMX_LOG_INFO("Startup of VideoOut...");
 	mInternal.mVideoOut.startup();
 
 	// Input manager startup after config is loaded
@@ -297,6 +330,9 @@ bool EngineMain::startupEngine()
 	const bool useIPv6 = false;
 	mInternal.mEngineServerClient.setupClient(useIPv6);
 
+	// Command forwarder
+	mInternal.mCommandForwarder.startup();
+
 	// Done
 	RMX_LOG_INFO("Engine startup successful");
 	return true;
@@ -315,6 +351,8 @@ void EngineMain::run()
 
 void EngineMain::shutdown()
 {
+	mInternal.mCommandForwarder.shutdown();
+
 	destroyWindow();
 
 	// Shutdown subsystems
@@ -543,23 +581,37 @@ bool EngineMain::initFileSystem()
 			FTX::FileSystem->addMountPoint(*provider, L"data/", engineBasePath + L"data/", 0x10);
 		}
 	}
-	else
+
+	// In case the game data path isn't located in local "data" directory, add a real file system provider for it
+	//  -> This is relevant for Oxygen Engine using an external game data path
+	//  -> Also, the Mac build of S3AIR requires this logic, as game data is in a different subdirectory inside the app container than the binary
+	//  -> In other cases (such as S3AIR on other platforms), no additional real file provider is needed, so this part is skipped
+	if (config.mGameDataPath != L"data" && config.mGameDataPath != L"./data")
 	{
-		// Add real file system provider for the game data path, if it isn't located in local "data" directory
-		//  -> This is relevant for Oxygen Engine using an external game data path
-		if (config.mGameDataPath != L"data" && config.mGameDataPath != L"./data")
-		{
-			rmx::RealFileProvider* provider = new rmx::RealFileProvider();
-			FTX::FileSystem->addManagedFileProvider(*provider);
-			FTX::FileSystem->addMountPoint(*provider, L"data/", config.mGameDataPath + L'/', 0x10);
-		}
+		rmx::RealFileProvider* provider = new rmx::RealFileProvider();
+		FTX::FileSystem->addManagedFileProvider(*provider);
+		FTX::FileSystem->addMountPoint(*provider, L"data/", config.mGameDataPath + L'/', 0x10);
 	}
 
 	// Create mod data folder (the default mod directory)
 	FTX::FileSystem->createDirectory(config.mGameAppDataPath + L"mods");
 
 	// Add package providers
-	return loadFilePackages(false);
+	if (!loadFilePackages(false))
+		return false;
+
+	// Sanity check if engine data exists
+	//  -> The Oxygen icon is a file that is always part of the engine data, so we just check for that
+	if (!FTX::FileSystem->exists(config.mEngineDataPath + L"/oxygen_icon.png"))
+	{
+		if (mDelegate.isDedicatedApplication())
+			RMX_ERROR("Could not find engine data.\nThis can mean your game installation is broken and needs to be downloaded and installed again.\n\nIn case you manually replaced your data folder with the source data files, please make sure to also copy over the files from 'oxygenengine/data' as well.", )
+		else
+			RMX_ERROR("Could not find engine data.\nThis can mean your game installation is broken and needs to be downloaded and installed again.", );
+		return false;
+	}
+
+	return true;
 }
 
 bool EngineMain::loadFilePackages(bool forceReload)
@@ -715,21 +767,7 @@ bool EngineMain::createWindow()
 			case Configuration::WindowMode::FULLSCREEN_BORDERLESS:
 			{
 				// Borderless maximized window
-				SDL_Rect rect;
-				if (SDL_GetDisplayBounds(displayIndex, &rect) == 0)
-				{
-					videoConfig.mWindowRect.width = rect.w;
-					videoConfig.mWindowRect.height = rect.h;
-				}
-				else
-				{
-					SDL_DisplayMode dm;
-					if (SDL_GetDesktopDisplayMode(displayIndex, &dm) == 0)
-					{
-						videoConfig.mWindowRect.width = dm.w;
-						videoConfig.mWindowRect.height = dm.h;
-					}
-				}
+				videoConfig.mWindowRect.setSize(getDisplaySize(displayIndex));
 				flags |= SDL_WINDOW_BORDERLESS;
 				break;
 			}
@@ -738,13 +776,15 @@ bool EngineMain::createWindow()
 			{
 				// Fullscreen window at desktop resolution
 				//  -> According to https://wiki.libsdl.org/SDL_SetWindowFullscreen, this is not really an exclusive fullscreen mode, but that's fine
+				videoConfig.mWindowRect.setSize(getDisplaySize(displayIndex));
 				flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 				break;
 			}
 
 			case Configuration::WindowMode::FULLSCREEN_EXCLUSIVE:
 			{
-				// Real exclusive fullscreen with custom resolution
+				// Real exclusive fullscreen with desktop resolution (though also allowing for a custom resolution)
+				videoConfig.mWindowRect.setSize(getDisplaySize(displayIndex));
 				flags |= SDL_WINDOW_FULLSCREEN;
 				break;
 			}

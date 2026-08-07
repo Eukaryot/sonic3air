@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -31,6 +31,7 @@ public:
 	void writePaletteEntryPacked(int paletteIndex, uint16 colorIndex, uint16 packedColor);
 
 	inline Color getBackdropColor() const  { return mMainPalette[0].getColor(mBackdropColorIndex); }
+	inline uint16 getBackdropColorIndex() const  { return mBackdropColorIndex; }
 	inline void setBackdropColorIndex(uint16 paletteIndex)  { mBackdropColorIndex = paletteIndex; }
 
 	void setPaletteSplitPositionY(int py);

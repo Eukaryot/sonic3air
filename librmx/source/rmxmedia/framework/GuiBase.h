@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -23,7 +23,10 @@ class API_EXPORT GuiBase
 {
 public:
 	GuiBase();
+	explicit GuiBase(std::string_view internalName);
 	virtual ~GuiBase();
+
+	inline const std::string& getInternalName() const  { return mInternalName; }
 
 	inline bool hasParent() const		{ return nullptr != mParent; }
 	inline GuiBase* getParent() const	{ return mParent; }
@@ -72,6 +75,7 @@ private:
 
 protected:
 	Recti mRect;
+	std::string mInternalName;	// For debugging and internal use, empty by default
 
 private:
 	std::vector<GuiBase*> mChildren;	// Front children get rendered first, but updated last

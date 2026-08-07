@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -21,7 +21,7 @@
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/Simulation.h"
 
-#include <lemon/program/Function.h>
+#include <lemon/program/function/Function.h>
 
 
 namespace
@@ -89,7 +89,8 @@ void DebugSidePanel::Builder::addCallStack(DebugTracking& debugTracking, int cal
 }
 
 
-DebugSidePanel::DebugSidePanel()
+DebugSidePanel::DebugSidePanel() :
+	GuiBase("DebugSidePanel")
 {
 	addCategory(CATEGORY_NONE, "");		// We need a dummy for this
 	addCategory(CATEGORY_CALL_FRAMES, "CALL FRAMES");
@@ -488,8 +489,8 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					{
 						if (visualizationSorting)
 						{
-							const std::wstring& filenameA = (a.second->getType() == lemon::Function::Type::SCRIPT) ? static_cast<const lemon::ScriptFunction*>(a.second)->mSourceFileInfo->mFilename : L"";
-							const std::wstring& filenameB = (b.second->getType() == lemon::Function::Type::SCRIPT) ? static_cast<const lemon::ScriptFunction*>(b.second)->mSourceFileInfo->mFilename : L"";
+							const std::wstring& filenameA = (a.second->isA<lemon::ScriptFunction>()) ? a.second->as<lemon::ScriptFunction>().mSourceFileInfo->mFilename : L"";
+							const std::wstring& filenameB = (b.second->isA<lemon::ScriptFunction>()) ? b.second->as<lemon::ScriptFunction>().mSourceFileInfo->mFilename : L"";
 							if (filenameA != filenameB)
 							{
 								return (filenameA < filenameB);
@@ -508,7 +509,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 				for (const auto& pair : sortedFunctions)
 				{
-					const String filename = (pair.second->getType() == lemon::Function::Type::SCRIPT) ? WString(static_cast<const lemon::ScriptFunction*>(pair.second)->mSourceFileInfo->mFilename).toString() : "";
+					const String filename = (pair.second->isA<lemon::ScriptFunction>()) ? WString(pair.second->as<lemon::ScriptFunction>().mSourceFileInfo->mFilename).toString() : "";
 					String line;
 					if (visualizationSorting && !filename.empty())
 						line << filename << " | ";
@@ -677,21 +678,21 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					case 1:
 					{
 						const uint8 value = emulatorInterface.readMemory8(globalDefine.mAddress);
-						builder.addLine(*String(0, "%.*s   = 0x%02x", name.length(), name.data(), value), color, indent, key);
+						builder.addLine(*String(0, "%.*s   = 0x%02x", (int)name.length(), name.data(), value), color, indent, key);
 						break;
 					}
 
 					case 2:
 					{
 						const uint16 value = emulatorInterface.readMemory16(globalDefine.mAddress);
-						builder.addLine(*String(0, "%.*s   = 0x%04x", name.length(), name.data(), value), color, indent, key);
+						builder.addLine(*String(0, "%.*s   = 0x%04x", (int)name.length(), name.data(), value), color, indent, key);
 						break;
 					}
 
 					case 4:
 					{
 						const uint32 value = emulatorInterface.readMemory32(globalDefine.mAddress);
-						builder.addLine(*String(0, "%.*s   = 0x%08x", name.length(), name.data(), value), color, indent, key);
+						builder.addLine(*String(0, "%.*s   = 0x%08x", (int)name.length(), name.data(), value), color, indent, key);
 						break;
 					}
 				}
@@ -803,8 +804,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 						{
 							if (mMouseOverKey == key)
 							{
-								Rectf translatedRect;
-								Application::instance().getGameView().translateRectIntoScreenCoords(translatedRect, objectRect);
+								const Rectf translatedRect = Application::instance().getGameView().getGameViewport().getScreenRectFromInner(objectRect);
 								drawer.drawRect(translatedRect, Color(0.0f, 1.0f, 0.5f, 0.75f));
 							}
 							String str(0, "0x%04x:   %s:  (%d, %d)%s", info.mRenderQueue, spriteType, info.mPosition.x, info.mPosition.y, info.mPriorityFlag ? " -- prio" : "");

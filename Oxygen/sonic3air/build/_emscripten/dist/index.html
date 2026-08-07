@@ -9,11 +9,12 @@
 <link rel="manifest" href="manifest.json">
 </head>
 <body>
-	<h1>Sonic 3 AIR for iOS and Web (Public Beta 2021.04.04)</h1>
-	<div>This is a beta release. <span style="color:red">The port is not finished yet.</span> You will encounter problems. Here are just a few notes before you start:</div>
+	<h1>Sonic 3 AIR for iOS and Web (Public Beta 2026.03.28)</h1>
+	<div>This is a beta release. <span style="color:red">The port lacks functionality that a native app would have and some limitations may not be fixed.</span> You will encounter problems. Here are just a few notes before you start:</div>
 	<ul>
-		<li>Once the game has been installed to your home screen, there is a one time data download of around 150MB when you launch the game for the first time. If your device goes to sleep during this, the download will fail and you will need to kill the app and relaunch it for the download to try again. When a new version of the game comes out, you will need to download the entire thing again just like you would with the PC versions.</li>
-		<li>There is a basic file manager accessible when you select "Exit" from the main menu in game. This will allow you to upload or files from the save data folder. Currently you need to upload files one at a time, but mods inside .zip files are now supported to make uploading mods easier. The primary use for the file manager right now is if you want to backup your save data or upload your save data from the PC version.</li>
+		<li>Once the game has been installed to your home screen, there is a one time data download of around 7MB when you launch the game for the first time. If your device goes to sleep during this, the download will fail and you will need to kill the app and relaunch it for the download to try again. When a new version of the game comes out, you will need to download the entire thing again just like you would with the PC versions. You can install multiple versions at the same time.</li>
+		<li>There is a basic file manager accessible accessible in-game from the Options menu. This will allow you to upload or download files from the game data folders. You need to upload and download files one at a time, but mods inside .zip files are supported to make uploading mods easier. The file manager can be used to backup your save data or upload your save data from the PC version.</li>
+		<li>The remastered soundtrack is not included by default in the iOS / Web release. Due to limitations of running the game as a web application, all content must fit into memory. Not including the remastered soundtrack saves over 100MB against the size of the game, making it run more stable on many devices. The option to download the remastered soundtrack is in the options window. You can also manually upload audioremaster.bin from the PC release into the file manager if you have issues downloading it from the server. If the game is unstable after doing this, you can delete autoremaster.bin via the file manager to improve game performance.</li>
 		<li>A To Do list for the iOS port with more details on known issues and changes that are planned for later can be found <a href="https://projects.sappharad.com/s3air_ios/todoList.html">here</a>.</li>
 	</ul>
 	<h3>iOS Requirements</h3>

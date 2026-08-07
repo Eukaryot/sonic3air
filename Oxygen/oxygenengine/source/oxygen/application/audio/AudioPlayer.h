@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -15,14 +15,14 @@
 #include <optional>
 
 
-class AudioPlayer
+class AudioPlayer : public SingleInstance<AudioPlayer>
 {
 public:
 	using SourceRegistration = AudioCollection::SourceRegistration;
 
 	struct SavedAudioState
 	{
-		uint64 mSfxId = 0;
+		uint64 mAudioKey = 0;
 		int mChannelId = -1;
 		int mContextId = -1;
 	};
@@ -32,6 +32,12 @@ public:
 		std::vector<SavedAudioState> mAudioStates;
 	};
 
+	struct PlayingSoundRef
+	{
+		uint32 mUniqueId = 0;
+		void* mPlayingSound = nullptr;	// Needs to be casted to "PlayingSound" when used
+	};
+
 public:
 	inline AudioPlayer(AudioCollection& audioCollection) : mAudioCollection(audioCollection) {}
 
@@ -39,13 +45,13 @@ public:
 	void shutdown();
 	void clearPlayback();
 
-	bool playAudio(uint64 sfxId, int contextId);
-	bool playAudio(uint64 sfxId, int contextId, int channelId);
-	void playOverride(uint64 sfxId, int contextId, int channelId, int overriddenChannel);
+	bool playAudio(uint64 audioKey, int contextId);
+	bool playAudio(uint64 audioKey, int contextId, int channelId);
+	void playOverride(uint64 audioKey, int contextId, int channelId, int overriddenChannel);
 
 	void updatePlayback(float timeElapsed);
 
-	bool isPlayingSfxId(uint64 sfxId, AudioReference* outAudioRef = nullptr) const;
+	bool isPlayingAudioKey(uint64 audioKey, AudioReference* outAudioRef = nullptr) const;
 	bool getAudioRefByChannel(int channelId, AudioReference& outAudioRef) const;
 	bool getAudioRefByContext(int contextId, AudioReference& outAudioRef) const;
 	void changeSoundContext(AudioReference& audioRef, int contextId);
@@ -73,6 +79,34 @@ public:
 	void enableAudioModifier(int channelId, int contextId, std::string_view postfix, float relativeSpeed);
 	void disableAudioModifier(int channelId, int contextId);
 
+	PlayingSoundRef getPlayingSoundByIndex(size_t index);
+	PlayingSoundRef getPlayingSoundByUniqueId(uint32 uniqueId);
+	PlayingSoundRef getPlayingSoundByAudioKey(uint64 audioKey);
+	PlayingSoundRef getPlayingSoundByChannel(int channelId);
+
+	bool isValidPlayingSound(PlayingSoundRef ref);
+	std::string_view getPlayingSoundAudioKey(PlayingSoundRef ref);
+
+	bool isPlayingSoundPaused(PlayingSoundRef ref);
+	void pausePlayingSound(PlayingSoundRef ref);
+	void resumePlayingSound(PlayingSoundRef ref);
+	void stopPlayingSound(PlayingSoundRef ref, float cutOffTime = 0.02f);
+
+	float getPlayingSoundVolume(PlayingSoundRef ref);
+	void setPlayingSoundVolume(PlayingSoundRef ref, float volume);
+	void fadePlayingSoundVolume(PlayingSoundRef ref, float volume, float length);
+
+	float getPlayingSoundPosition(PlayingSoundRef ref);
+	void setPlayingSoundPosition(PlayingSoundRef ref, float seconds);
+
+	int getPlayingSoundChannel(PlayingSoundRef ref);
+	int getPlayingSoundContext(PlayingSoundRef ref);
+
+	float getPlayingSoundSpeed(PlayingSoundRef ref);
+	void setPlayingSoundSpeed(PlayingSoundRef ref, float speed);
+	float getPlayingSoundPanning(PlayingSoundRef ref);
+	void setPlayingSoundPanning(PlayingSoundRef ref, float panning);
+
 	inline size_t getNumPlayingSounds() const  { return mPlayingSounds.size(); }
 	size_t getMemoryUsage() const;
 
@@ -91,14 +125,15 @@ private:
 
 		uint32 mUniqueId = 0;
 		AudioReference mAudioRef;
-		uint64 mSfxId = 0;
 		SourceRegistration* mSourceReg = nullptr;
 		SourceRegistration* mBaseSourceReg = nullptr;	// Original non-modified source registration
 		AudioSourceBase* mAudioSource = nullptr;
 
 		float mBaseVolume = 1.0f;
 		float mRelativeVolume = 1.0f;
-		float mRelativeVolumeChange = 0.0f;
+		float mRelativeVolumeTarget = 1.0f;
+		float mRelativeVolumeChange = 0.0f;		// 0.0f if not fading, positive if fading
+		bool mStopOnFadeOut = false;
 		int mContextId = -1;
 		int mChannelId = -1;
 		State mState = State::PLAYING;
@@ -158,6 +193,8 @@ private:
 	PlayingSound* getPlayingSound(AudioReference& audioRef);
 	const PlayingSound* getPlayingSound(AudioReference& audioRef) const;
 
+	void stopPlayingSoundInternal(PlayingSound& playingSound, bool immediately, bool removeFromList = false, float cutOffTime = 0.02f);
+
 	void applyChannelOverride(int overriddenChannelId, uint8 contextId);
 	void removeChannelOverride(int overriddenChannelId, uint8 contextId);
 	bool isChannelOverridden(int channelId, uint8 contextId) const;
@@ -169,6 +206,10 @@ private:
 
 	void startAutoStreamer(AudioSourceBase& audioSource, float currentTime, float speed = 1.0f);
 	void stopAutoStreamer(AudioSourceBase& audioSource);
+
+	PlayingSoundRef makePlayingSoundRef(PlayingSound& playingSound);
+	PlayingSoundRef makePlayingSoundRef(PlayingSound* playingSound);
+	PlayingSound* resolvePlayingSoundRef(PlayingSoundRef& ref);
 
 private:
 	AudioCollection& mAudioCollection;

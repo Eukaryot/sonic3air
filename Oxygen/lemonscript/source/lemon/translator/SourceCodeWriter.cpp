@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,7 +8,7 @@
 
 #include "lemon/pch.h"
 #include "lemon/translator/SourceCodeWriter.h"
-#include "lemon/program/Function.h"
+#include "lemon/program/function/Function.h"
 
 
 namespace lemon
@@ -61,11 +61,11 @@ namespace lemon
 
 	void CppWriter::addDataType(String& line, const DataTypeDefinition* dataType)
 	{
-		if (dataType->getClass() == DataTypeDefinition::Class::VOID)
+		if (dataType->isA<VoidDataType>())
 		{
 			line << "void";
 		}
-		else if (dataType->getClass() == DataTypeDefinition::Class::INTEGER)
+		else if (dataType->isA<IntegerDataType>())
 		{
 			const IntegerDataType& integerType = dataType->as<IntegerDataType>();
 			if (integerType.mSemantics == IntegerDataType::Semantics::BOOLEAN)

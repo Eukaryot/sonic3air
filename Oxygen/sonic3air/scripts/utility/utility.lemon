@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2025 by Eukaryot
+	Copyright (C) 2017-2026 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -599,7 +599,7 @@ function void VDP.Config.setSpriteAttributeTableBase(u16 satBase)
 	u16[0xc00004] = 0x8500 + data
 }
 
-function void VDP.Config.setBackdropColor(u8 paletteIndex)
+function void VDP.Config.setBackdropColorIndex(u8 paletteIndex)
 {
 	u16[0xc00004] = 0x8700 + paletteIndex
 }

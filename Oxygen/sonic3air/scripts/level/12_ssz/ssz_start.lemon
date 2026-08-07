@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2025 by Eukaryot
+	Copyright (C) 2017-2026 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -779,7 +779,7 @@ function void fn065fde()
 	if (u32[A0 + 0x30] != 0x06671f)
 		return
 
-	u8[0x065fde] = 0x93
+	Game.setSecretUnlocked(SECRET_TITLE_SK)
 #endif
 
 	Object.ResetAnimationProgress(0x06672a)		// Cutscene Knuckles tired shooing animation data

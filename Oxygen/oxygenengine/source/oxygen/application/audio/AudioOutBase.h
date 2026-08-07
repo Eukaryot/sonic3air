@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -61,11 +61,12 @@ public:
 	inline float getGlobalVolume() const   { return mGlobalVolume; }
 	void setGlobalVolume(float volume);
 
-	AudioKeyType getAudioKeyType(uint64 sfxId) const;
-	bool isPlayingSfxId(uint64 sfxId) const;
+	AudioKeyType getAudioKeyType(uint64 audioKey) const;
+	std::string_view getAudioKeyDisplayName(uint64 audioKey) const;
+	bool isPlayingAudioKey(uint64 audioKey) const;
 
-	bool playAudioBase(uint64 sfxId, uint8 contextId);
-	void playOverride(uint64 sfxId, uint8 contextId, uint8 channelId, uint8 overriddenChannelId);
+	bool playAudioBase(uint64 audioKey, uint8 contextId);
+	void playOverride(uint64 audioKey, uint8 contextId, uint8 channelId, uint8 overriddenChannelId);
 
 	void fadeInChannel(uint8 channelId, float length);
 	void fadeOutChannel(uint8 channelId, float length);

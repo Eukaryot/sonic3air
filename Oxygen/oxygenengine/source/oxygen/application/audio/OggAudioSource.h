@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,8 +10,10 @@
 
 #include "oxygen/application/audio/AudioSourceBase.h"
 
+class OggLoader;
 
-class OggAudioSource : public AudioSourceBase, public rmx::JobBase
+
+class OggAudioSource : public AudioSourceBase
 {
 public:
 	OggAudioSource(bool useCaching, bool isLooping, int loopStart);
@@ -20,11 +22,11 @@ public:
 	bool load(const std::wstring& filename);
 
 	virtual void onPlaybackStart(AudioReference& audioRef, float time) override;
-	virtual bool checkForUnload(float timestamp) override;
 
 	virtual float mapAudioRefPositionToTrackPosition(float audioRefPosition) const override;
 
 protected:
+	virtual void resetInternal() override;
 	virtual State startupInternal() override;
 	virtual void progressInternal(float targetTime) override;
 
@@ -45,6 +47,5 @@ private:
 	int mTrackLength = -1;		// In samples - but it's only set if looped back at least once
 	int mInitialSeekPos = 0;	// In samples, start position of initial seek (zero if playback started at the beginning)
 
-	SDL_mutex* mMutex = nullptr;
 	float mPrecacheTime = 0.0f;
 };

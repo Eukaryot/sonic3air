@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -92,6 +92,10 @@ namespace lemon
 		// Misc
 		bool processGlobalPragma(const std::string& content);
 		AnyBaseValue readConstantExpression(TokenList& tokens, size_t& pos, size_t endPos, const DataTypeDefinition* dataType, uint32 lineNumber);
+
+		void checkForMissingReturn(FunctionNode& functionNode);
+		bool canReachNodeAfter(const Node& node) const;
+		bool canReachEndOfBlock(const BlockNode& blockNode) const;
 
 	private:
 		Module& mModule;

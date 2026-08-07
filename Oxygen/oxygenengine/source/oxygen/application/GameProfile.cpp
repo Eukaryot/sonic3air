@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -68,10 +68,10 @@ bool GameProfile::loadOxygenProjectFromJson(const Json::Value& jsonRoot)
 	// Update configuration
 	{
 		std::string romFile;
-		config.mMainScriptName = L"main.lemon";
+		mMainScriptName = L"main.lemon";	// Default
 
 		rootHelper.tryReadString("Rom", romFile);
-		rootHelper.tryReadString("MainScriptName", config.mMainScriptName);
+		rootHelper.tryReadString("MainScriptName", mMainScriptName);		// Deprecated JSON entry, prefer to use the one in "Scripts" instead
 		rootHelper.tryReadBool("CompileScripts", config.mForceCompileScripts);
 
 	#ifndef PLATFORM_MAC
@@ -179,6 +179,17 @@ bool GameProfile::loadOxygenProjectFromJson(const Json::Value& jsonRoot)
 		if (!mGameDataPath.empty())
 		{
 			config.mGameDataPath = config.mProjectPath + mGameDataPath;
+		}
+	}
+
+	// Load script configuration
+	{
+		const Json::Value scriptsJson = jsonRoot["Scripts"];
+		if (!scriptsJson.isNull())
+		{
+			JsonHelper jsonHelper(scriptsJson);
+			jsonHelper.tryReadString("MainScriptName", mMainScriptName);
+			jsonHelper.tryReadBool("ErrorOnUnknownAddress", mErrorOnUnknownAddress);
 		}
 	}
 

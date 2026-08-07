@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -11,6 +11,10 @@
 #include <rmxbase.h>
 #include <atomic>
 #include <thread>
+
+#ifdef PLATFORM_WEB
+struct emscripten_fetch_t;
+#endif
 
 
 class Downloader
@@ -53,4 +57,8 @@ private:
 	FileHandle mOutputFile;
 	std::atomic<uint64> mBytesDownloaded = 0;
 	std::atomic<bool> mThreadRunning = false;
+
+#ifdef PLATFORM_WEB
+	emscripten_fetch_t* mFetch = nullptr;
+#endif
 };

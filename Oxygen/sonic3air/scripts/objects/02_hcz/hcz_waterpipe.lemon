@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2025 by Eukaryot
+	Copyright (C) 2017-2026 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -325,7 +325,7 @@ function void fn0302e6()
 	u16[A0 + 0x30] = 0x60
 
 	// Removed unnecessary hiding while moving through the transparent tube
-	// Thank to Fred Bronze for pointing out that this is not needed at all! (https://s3unlocked.blogspot.de/2017/12/sonic-eraser.html)
+	// Thanks to Liliam Bronze for pointing out that this is not needed at all! (https://s3unlocked.blogspot.de/2017/12/sonic-eraser.html)
 	if (!Game.getSetting(SETTING_HCZ_WATERPIPE))
 	{
 		u8[0xffffb000 + 0x20] = char.state.DISAPPEARED

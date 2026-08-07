@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -169,21 +169,15 @@ std::string SocketAddress::toLoggedString() const
 	}
 }
 
-uint64 SocketAddress::getHash() const
-{
-	assureSockAddr();
-	return rmx::getMurmur2_64(mSockAddr, 16);
-}
-
 void SocketAddress::assureSockAddr() const
 {
 	if (!mHasSockAddr)
 	{
-		memset(&mSockAddr, 0, sizeof(mSockAddr));
 		bool success = false;
 	#if !defined(PLATFORM_SWITCH)	// The IPv6 part won't compile on Switch, but isn't really needed there anyways
 		{
 			// IPv6
+			memset(&mSockAddr, 0, sizeof(mSockAddr));
 			sockaddr_in6& addr = *reinterpret_cast<sockaddr_in6*>(&mSockAddr);
 			addr.sin6_family = AF_INET6;
 			addr.sin6_port = htons(mPort);
@@ -193,6 +187,7 @@ void SocketAddress::assureSockAddr() const
 		if (!success)
 		{
 			// IPv4
+			memset(&mSockAddr, 0, sizeof(mSockAddr));
 			sockaddr_in& addr = *reinterpret_cast<sockaddr_in*>(&mSockAddr);
 			addr.sin_family = AF_INET;
 			addr.sin_port = htons(mPort);
@@ -232,6 +227,16 @@ void SocketAddress::assureIpPort() const
 			mPort = 0;
 		}
 		mHasIpPort = true;
+	}
+}
+
+void SocketAddress::assureAddrHash() const
+{
+	if (!mHasAddrHash)
+	{
+		assureSockAddr();
+		mAddrHash = rmx::getMurmur2_64(mSockAddr, 16);
+		mHasAddrHash = true;
 	}
 }
 
@@ -744,7 +749,17 @@ bool UDPSocket::sendData(const uint8* data, size_t length, const SocketAddress& 
 	if (!isValid())
 		return false;
 
-	const int result = ::sendto(mInternal->mSocket, (const char*)data, (int)length, 0, (sockaddr*)destinationAddress.getSockAddr(), (int)sizeof(sockaddr_storage));
+	int addrlen = 0;
+	const sockaddr* addr = (const sockaddr*)destinationAddress.getSockAddr();
+	int family = addr->sa_family;
+	if (family == AF_INET) {
+		addrlen = sizeof(sockaddr_in);
+	} else if (family == AF_INET6) {
+		addrlen = sizeof(sockaddr_in6);
+	} else {
+		addrlen = sizeof(sockaddr_storage); //Unknown address family
+	}
+	const int result = ::sendto(mInternal->mSocket, (const char*)data, (int)length, 0, addr, addrlen);
 	if (result >= 0)
 		return true;
 

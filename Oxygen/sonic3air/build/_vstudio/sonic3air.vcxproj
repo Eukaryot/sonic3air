@@ -22,7 +22,6 @@
     <ClCompile Include="..\..\source\sonic3air\audio\AudioOut.cpp" />
     <ClCompile Include="..\..\source\sonic3air\audio\CustomAudioMixer.cpp" />
     <ClCompile Include="..\..\source\sonic3air\audio\RemasteredMusicDownload.cpp" />
-    <ClCompile Include="..\..\source\sonic3air\client\crowdcontrol\CrowdControlClient.cpp" />
     <ClCompile Include="..\..\source\sonic3air\client\GameClient.cpp" />
     <ClCompile Include="..\..\source\sonic3air\client\GhostSync.cpp" />
     <ClCompile Include="..\..\source\sonic3air\client\UpdateCheck.cpp" />
@@ -35,7 +34,6 @@
     <ClCompile Include="..\..\source\sonic3air\Game.cpp" />
     <ClCompile Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.cpp" />
     <ClCompile Include="..\..\source\sonic3air\helper\BlueSpheresRendering.cpp" />
-    <ClCompile Include="..\..\source\sonic3air\helper\CommandForwarder.cpp" />
     <ClCompile Include="..\..\source\sonic3air\helper\DiscordIntegration.cpp" />
     <ClCompile Include="..\..\source\sonic3air\helper\DrawingUtils.cpp" />
     <ClCompile Include="..\..\source\sonic3air\helper\GameUtils.cpp" />
@@ -77,7 +75,6 @@
     <ClInclude Include="..\..\source\sonic3air\audio\AudioOut.h" />
     <ClInclude Include="..\..\source\sonic3air\audio\CustomAudioMixer.h" />
     <ClInclude Include="..\..\source\sonic3air\audio\RemasteredMusicDownload.h" />
-    <ClInclude Include="..\..\source\sonic3air\client\crowdcontrol\CrowdControlClient.h" />
     <ClInclude Include="..\..\source\sonic3air\client\GameClient.h" />
     <ClInclude Include="..\..\source\sonic3air\client\GhostSync.h" />
     <ClInclude Include="..\..\source\sonic3air\client\UpdateCheck.h" />
@@ -92,7 +89,6 @@
     <ClInclude Include="..\..\source\sonic3air\GameArgumentsReader.h" />
     <ClInclude Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\BlueSpheresRendering.h" />
-    <ClInclude Include="..\..\source\sonic3air\helper\CommandForwarder.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\DiscordIntegration.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\DrawingUtils.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\GameUtils.h" />

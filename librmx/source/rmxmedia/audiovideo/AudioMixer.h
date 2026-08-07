@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -31,7 +31,7 @@ namespace rmx
 		};
 
 	public:
-		AudioMixer(int mixerId) : mMixerId(mixerId) {}
+		AudioMixer(std::string_view name, int mixerId) : mName(name), mMixerId(mixerId) {}
 		virtual ~AudioMixer();
 
 		void addChild(AudioMixer& child);
@@ -62,6 +62,7 @@ namespace rmx
 		void removeChildInternal(AudioMixer& child);
 
 	private:
+		std::string mName;
 		int mMixerId = 0;
 		AudioMixer* mParent = nullptr;
 		std::vector<AudioMixer*> mChildren;

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,7 +10,6 @@
 
 #include "sonic3air/audio/RemasteredMusicDownload.h"
 #include "sonic3air/client/GameClient.h"
-#include "sonic3air/client/crowdcontrol/CrowdControlClient.h"
 #include "sonic3air/data/PlayerProgress.h"
 #include "sonic3air/data/PlayerRecorder.h"
 #include "sonic3air/helper/BlueSpheresRendering.h"
@@ -51,7 +50,8 @@ public:
 	uint32 getSetting(uint32 settingId, bool ignoreGameMode) const;
 	void setSetting(uint32 settingId, uint32 value);
 
-	void checkForUnlockedSecrets();
+	void checkForUnlockedSecrets(bool saveIfAnyUnlocked);
+	void unlockSecret(uint32 secretId);
 
 	void startIntoTitleScreen();
 	void startIntoDataSelect();
@@ -139,7 +139,6 @@ private:
 	PlayerProgress mPlayerProgress;
 	PlayerRecorder mPlayerRecorder;
 	GameClient mGameClient;
-	CrowdControlClient mCrowdControlClient;
 	DynamicSprites mDynamicSprites;
 	RemasteredMusicDownload mRemasteredMusicDownload;
 

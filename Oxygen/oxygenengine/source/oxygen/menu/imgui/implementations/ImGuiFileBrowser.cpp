@@ -1,6 +1,6 @@
 ﻿/*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -21,6 +21,8 @@
 
 #if defined(PLATFORM_ANDROID)
 	#include "oxygen/platform/android/AndroidJavaInterface.h"
+#elif defined(PLATFORM_WEB)
+	#include <emscripten.h>
 #endif
 
 #if defined(PLATFORM_WINDOWS)
@@ -36,6 +38,9 @@ namespace
 {
 	static const ImVec4 FILE_COLOR(0.6f, 0.8f, 1.0f, 1.0f);		// Only used if file name is meant to be highlighted
 	static const ImVec4 FOLDER_COLOR(1.0f, 1.0f, 0.6f, 1.0f);
+#if defined(PLATFORM_WEB)
+	ImGuiFileBrowser* sActiveFileBrowser = nullptr;
+#endif
 
 	void drawFileSize(uint64 fileSize)
 	{
@@ -92,9 +97,10 @@ namespace
 
 	int filterFileNameInput(ImGuiInputTextCallbackData* data)
 	{
-		static const char FORBIDDEN_CHARACTERS[] = "/\\*?:|<>\"";
+		static const char FORBIDDEN_FILENAME_CHARACTERS[] = "/\\*?:|<>\"";
 
-		for (char character : FORBIDDEN_CHARACTERS)
+		// Check for forbidden characters
+		for (char character : FORBIDDEN_FILENAME_CHARACTERS)
 		{
 			if (data->EventChar == character)
 				return 1;
@@ -102,7 +108,6 @@ namespace
 		return 0;
 	}
 }
-
 
 ImGuiFileBrowser::ImGuiFileBrowser()
 {
@@ -113,6 +118,9 @@ ImGuiFileBrowser::ImGuiFileBrowser()
 
 void ImGuiFileBrowser::buildImGuiContent()
 {
+#if defined(PLATFORM_WEB)
+	sActiveFileBrowser = this;
+#endif
 	if (ImGui::Begin("Fullscreen File Browser", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
 	{
 		ImGui::SetWindowPos(ImVec2((float)FTX::screenWidth() * 0.05f, (float)FTX::screenHeight() * 0.01f), ImGuiCond_Always);
@@ -271,8 +279,23 @@ void ImGuiFileBrowser::refreshFileEntries()
 	mRefreshFileEntries = false;
 }
 
+#if defined(PLATFORM_WEB)
+	extern "C" EMSCRIPTEN_KEEPALIVE void ImGuiFileBrowser_OnWebImportDone()
+	{
+		if (sActiveFileBrowser != nullptr)
+		{
+			sActiveFileBrowser->refreshFileEntries();
+		}
+	}
+#endif
+
 void ImGuiFileBrowser::drawFileBrowser()
 {
+	const std::wstring* clickedDirectory = nullptr;
+	const std::wstring* openActionsForDirectory = nullptr;
+	const rmx::FileIO::FileEntry* openActionsForFile = nullptr;
+	bool openCreateDirectoryDialog = false;
+
 	ImGui::Text("  ");
 	ImGui::SameLine();
 
@@ -282,22 +305,39 @@ void ImGuiFileBrowser::drawFileBrowser()
 		mRefreshFileEntries = true;
 	}
 
-#if defined(PLATFORM_ANDROID) || defined(DEBUG)
-	// "Import file" button
 	ImGui::SameLine();
 	ImGui::Text("  |  ");
 	ImGui::SameLine();
 
 	ImGui::BeginDisabled(mIsReadOnlyLocation);
+
+	ImVec2 cursorScreenPos = ImGui::GetCursorScreenPos();
+	if (ImGui::Button("New " PLATFORM_DIRECTORY_STRING))
+	{
+		openCreateDirectoryDialog = true;
+		mActionsMenuPosition = cursorScreenPos;
+		mActionsMenuPosition.y += mUIScale * 23.0f;
+	}
+
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(DEBUG)
+	// "Import file" button
+	ImGui::SameLine();
 	if (ImGui::Button("Import file..."))
 	{
 	#if defined(PLATFORM_ANDROID)
 		AndroidJavaInterface& javaInterface = AndroidJavaInterface::instance();
 		javaInterface.openFileSelectionDialog();
+	#elif defined(PLATFORM_WEB)
+		const std::string uploadPath = rmx::convertToUTF8(mFullPath);
+		EM_ASM({
+			window.__s3airFileUploadPath = UTF8ToString($0);
+			triggerFileSelect();
+		}, uploadPath.c_str());
 	#endif
 	}
-	ImGui::EndDisabled();
 #endif
+
+	ImGui::EndDisabled();
 
 	ImGui::Separator();
 	ImGui::Spacing();
@@ -312,10 +352,6 @@ void ImGuiFileBrowser::drawFileBrowser()
 	{
 		refreshFileEntries();
 	}
-
-	const std::wstring* clickedDirectory = nullptr;
-	const std::wstring* openActionsForDirectory = nullptr;
-	const rmx::FileIO::FileEntry* openActionsForFile = nullptr;
 
 	ImGui::PushStyleVarY(ImGuiStyleVar_CellPadding, 5.0f * mUIScale);
 	ImGui::PushStyleColor(ImGuiCol_TableRowBg, ImGuiHelpers::getAccentColorMix(1.0f, 0.1f, 0.05f));
@@ -421,6 +457,7 @@ void ImGuiFileBrowser::drawFileBrowser()
 	}
 
 	drawActionsMenu(openActionsMenu);
+	drawCreateDirectoryPopup(openCreateDirectoryDialog);
 }
 
 void ImGuiFileBrowser::drawAddressLine()
@@ -602,17 +639,25 @@ void ImGuiFileBrowser::drawActionsMenu(bool openMenuNow)
 			}
 			ImGui::EndDisabled();
 
-		#if defined(PLATFORM_ANDROID)
+		#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
 			ImGui::Separator();
 
 			if (ImGui::Button("Export file...", BUTTON_SIZE))
 			{
+				#if defined(PLATFORM_ANDROID)
 				std::vector<uint8> contents;
 				if (FTX::FileSystem->readFile(mOpenActionsForFile->mPath + mOpenActionsForFile->mFilename, contents))
 				{
 					AndroidJavaInterface& javaInterface = AndroidJavaInterface::instance();
 					javaInterface.openFileExportDialog(mOpenActionsForFile->mFilename, contents);
 				}
+				#elif defined(PLATFORM_WEB)
+				const std::wstring filePath = mOpenActionsForFile->mPath + mOpenActionsForFile->mFilename;
+				const std::string filePathUtf8 = rmx::convertToUTF8(filePath);
+				EM_ASM({
+					window.fileManagerExportFile(UTF8ToString($0));
+				}, filePathUtf8.c_str());
+				#endif
 				ImGui::CloseCurrentPopup();
 			}
 		#endif
@@ -705,6 +750,25 @@ void ImGuiFileBrowser::drawRenamingPopup(bool openPopupNow)
 	static ImGuiHelpers::WideInputString newNameInput;
 	bool performRenaming = false;
 
+#if defined(PLATFORM_WEB)
+	if (openPopupNow)
+	{
+		if (nullptr == mOpenActionsForFile && nullptr == mOpenActionsForDirectory)
+		{
+			return;
+		}
+
+		const bool isFile = (nullptr != mOpenActionsForFile);
+		const std::wstring oldName = isFile ? mOpenActionsForFile->mFilename : *mOpenActionsForDirectory;
+		const std::string oldNameUtf8 = rmx::convertToUTF8(oldName);
+		const std::string currentPathUtf8 = rmx::convertToUTF8(mFullPath);
+		EM_ASM({
+			window.fileManagerPromptRename(UTF8ToString($0), UTF8ToString($1), $2);
+		}, oldNameUtf8.c_str(), currentPathUtf8.c_str(), isFile ? 1 : 0);
+		return;
+	}
+#endif
+
 	if (openPopupNow)
 	{
 		ImGui::OpenPopup("FileBrowser_Renaming");
@@ -748,11 +812,13 @@ void ImGuiFileBrowser::drawRenamingPopup(bool openPopupNow)
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max<float>(ImGui::GetContentRegionAvail().x - 208 * mUIScale, 0) / 2);
 
 			// Buttons
+			ImGui::BeginDisabled(!rmx::FileIO::isValidFileName(newNameInput.mWideString));
 			if (ImGui::Button("Rename", ImVec2(100 * mUIScale, 0)))
 			{
 				performRenaming = true;
 				ImGui::CloseCurrentPopup();
 			}
+			ImGui::EndDisabled();
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(100 * mUIScale, 0)))
 			{
@@ -795,6 +861,71 @@ void ImGuiFileBrowser::drawRenamingPopup(bool openPopupNow)
 		}
 
 		RMX_CHECK(success, "Renaming failed", );
+		mRefreshFileEntries = true;
+	}
+}
+
+void ImGuiFileBrowser::drawCreateDirectoryPopup(bool openPopupNow)
+{
+	bool performCreation = false;
+	static ImGuiHelpers::WideInputString directoryNameInput;
+
+#if defined(PLATFORM_WEB)
+	if (openPopupNow)
+	{
+		const std::string parentPath = rmx::convertToUTF8(mFullPath);
+		EM_ASM({
+			window.fileManagerPromptRename("", UTF8ToString($0), 0, 1);
+		}, parentPath.c_str());
+		return;
+	}
+#endif
+
+	if (openPopupNow)
+	{
+		ImGui::OpenPopup("FileBrowser_CreateDirectory");
+	}
+
+	ImGui::SetNextWindowPos(mActionsMenuPosition);
+	if (ImGui::BeginPopup("FileBrowser_CreateDirectory"))
+	{
+		ImGui::Text("Name of new " PLATFORM_DIRECTORY_STRING ":");
+
+		if (openPopupNow)
+		{
+			ImGui::SetKeyboardFocusHere();
+		}
+		ImGuiHelpers::InputText("##NewName", directoryNameInput, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_CallbackCharFilter, &filterFileNameInput);
+
+		ImGui::Separator();
+
+		// Center the buttons
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max<float>(ImGui::GetContentRegionAvail().x - 208 * mUIScale, 0) / 2);
+
+		// Buttons
+		ImGui::BeginDisabled(!rmx::FileIO::isValidFileName(directoryNameInput.mWideString));
+		if (ImGui::Button("Create", ImVec2(100 * mUIScale, 0)))
+		{
+			performCreation = true;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndDisabled();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(100 * mUIScale, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		moveWindowToFitOnScreen(mActionsMenuPosition, mUIScale);
+		ImGui::EndPopup();
+	}
+
+	if (performCreation)
+	{
+		const std::wstring fullPath = mFullPath + directoryNameInput.get().toStdWString();
+		bool success = FTX::FileSystem->createDirectory(fullPath);
+
+		RMX_CHECK(success, "Failed to create new " << PLATFORM_DIRECTORY_STRING, );
 		mRefreshFileEntries = true;
 	}
 }

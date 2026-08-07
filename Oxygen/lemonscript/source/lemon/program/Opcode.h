@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -55,6 +55,7 @@ namespace lemon
 			RETURN,
 			EXTERNAL_CALL,
 			EXTERNAL_JUMP,
+			DUPLICATE,
 
 			_NUM_TYPES
 		};
@@ -77,7 +78,7 @@ namespace lemon
 		int64 mParameter = 0;	// For constants, or ID in case of variables and calls
 
 	public:
-		static const char* GetTypeString(Type type);
+		static const char* getTypeString(Type type);
 	};
 
 }

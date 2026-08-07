@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -20,7 +20,7 @@ public:
 	inline int getInstanceID() const  { return mInstanceID; }
 	void setInstanceID(int ID);
 
-	bool valid();
+	bool isValid();
 
 	float getPosition();
 	float getVolume();
@@ -28,6 +28,7 @@ public:
 	bool isLooped();
 	bool isPaused();
 	bool isStreaming();
+	float getPanning();
 
 	void stop();
 	void setPosition(float position);
@@ -39,7 +40,7 @@ public:
 	void setPause(bool pause);
 	void setStreaming(bool strm);
 	void setTimeout(float timeout);
-	void setPanning(bool enable, float value = 0.0f);
+	void setPanning(float panning);
 
 private:
 	void updateInstance();

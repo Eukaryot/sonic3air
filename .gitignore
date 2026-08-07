@@ -38,8 +38,13 @@ bin/
 # Visual Studio built files
 *.aps
 *.pdb
+*.ipdb
 *.idb
+*.ilk
+*.iobj
 *.tlog
+*.recipe
+*.res
 .vs
 
 # SDL2 Visual Studio generated files
@@ -88,6 +93,7 @@ mac_dist
 !/Oxygen/sonic3air/source/external/discord_game_sdk/lib/*/*.dylib
 !/Oxygen/sonic3air/source/external/discord_game_sdk/lib/*/*.so
 
+framework/include/
 framework/external/ogg-vorbis/libogg/build
 framework/external/ogg-vorbis/libogg/xcode/libogg.xcodeproj/project.xcworkspace/xcuserdata
 framework/external/ogg-vorbis/libogg/xcode/libogg.xcodeproj/xcuserdata

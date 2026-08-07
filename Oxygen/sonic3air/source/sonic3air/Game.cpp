@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -32,7 +32,7 @@
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/Simulation.h"
 
-#include <lemon/program/FunctionWrapper.h>
+#include <lemon/program/function/FunctionWrapper.h>
 #include <lemon/program/Module.h>
 #include <lemon/program/ModuleBindingsBuilder.h>
 
@@ -100,7 +100,6 @@ void Game::update(float timeElapsed)
 {
 	// Update game client
 	mGameClient.updateClient(timeElapsed);
-	mCrowdControlClient.updateConnection(timeElapsed);
 
 	// Update sprite redirects (like input icons)
 	mDynamicSprites.updateSpriteRedirects();
@@ -233,12 +232,6 @@ void Game::registerScriptBindings(lemon::Module& module)
 			.setParameters("imageName");
 	}
 
-	// CrowdControl
-	{
-		builder.addNativeFunction("CrowdControl.sendResponse", lemon::wrap(mCrowdControlClient, &CrowdControlClient::sendResponse), defaultFlags)
-			.setParameters("id", "status", "message");
-	}
-
 	// Audio
 	{
 		builder.addNativeFunction("Game.setUnderwaterAudioEffect", lemon::wrap(&setUnderwaterAudioEffect), defaultFlags)
@@ -301,7 +294,7 @@ void Game::setSetting(uint32 settingId, uint32 value)
 	ConfigurationImpl::instance().mActiveGameSettings->setValue(settingId, value);
 }
 
-void Game::checkForUnlockedSecrets()
+void Game::checkForUnlockedSecrets(bool saveIfAnyUnlocked)
 {
 	// Check for unlocked secrets
 	uint32 achievementsCompleted = 0;
@@ -313,6 +306,7 @@ void Game::checkForUnlockedSecrets()
 		}
 	}
 
+	bool anyUnlocked = false;
 	for (const SharedDatabase::Secret& secret : SharedDatabase::getSecrets())
 	{
 		if (secret.mUnlockedByAchievements && !mPlayerProgress.mUnlocks.isSecretUnlocked(secret.mType) && achievementsCompleted >= secret.mRequiredAchievements)
@@ -320,8 +314,19 @@ void Game::checkForUnlockedSecrets()
 			// Unlock secret now
 			mPlayerProgress.mUnlocks.setSecretUnlocked(secret.mType);
 			GameApp::instance().showUnlockedWindow(SecretUnlockedWindow::EntryType::SECRET, "Secret unlocked!", secret.mName);
+			anyUnlocked = true;
 		}
 	}
+
+	if (anyUnlocked && saveIfAnyUnlocked)
+	{
+		mPlayerProgress.save();
+	}
+}
+
+void Game::unlockSecret(uint32 secretId)
+{
+	setSecretUnlocked(secretId);
 }
 
 void Game::startIntoTitleScreen()
@@ -529,23 +534,6 @@ void Game::onPostUpdateFrame()
 
 	// Update ghost sync
 	GameClient::instance().getGhostSync().onPostUpdateFrame();
-
-	// Check for unlocked hidden secrets
-	//  - SECRET_LEVELSELECT	unlocked when u8[0x02219e] changes from 0xb2 to 0x14
-	//  - SECRET_TITLE_SK		unlocked when u8[0x065fde] changes from 0x08 to 0x93
-	//  - SECRET_GAME_SPEED		unlocked when u64[0x003e32] changes from 0xd522427870e16100 to 0x0101020201010101 (= up, up, down, down, up, up, up, up)
-	if (emulatorInterface.readMemory8(0x02219e) == 0x14)
-	{
-		setSecretUnlocked(SharedDatabase::Secret::SECRET_LEVELSELECT);
-	}
-	if (emulatorInterface.readMemory8(0x065fde) == 0x93)
-	{
-		setSecretUnlocked(SharedDatabase::Secret::SECRET_TITLE_SK);
-	}
-	if (emulatorInterface.readMemory64(0x003e32) == 0x0101020201010101ull)
-	{
-		setSecretUnlocked(SharedDatabase::Secret::SECRET_GAME_SPEED);
-	}
 
 	if (mReceivedTimeAttackFinished)
 	{
@@ -846,13 +834,6 @@ void Game::checkActiveModsUsedFeatures()
 	const bool usesThreePlayers = ModManager::instance().anyActiveModUsesFeature(rmx::constMurmur2_64("ThreePlayers"));
 	const bool usesFourPlayers = ModManager::instance().anyActiveModUsesFeature(rmx::constMurmur2_64("FourPlayers"));
 	Configuration::instance().mNumPlayers = usesFourPlayers ? 4 : usesThreePlayers ? 3 : 2;
-
-	// Check mods for usage of Crowd Control
-	const bool usesCrowdControl = ModManager::instance().anyActiveModUsesFeature(rmx::constMurmur2_64("CrowdControl"));
-	if (usesCrowdControl)
-		mCrowdControlClient.startConnection();
-	else
-		mCrowdControlClient.stopConnection();
 }
 
 void Game::startIntoGameInternal()
@@ -935,7 +916,7 @@ void Game::setAchievementComplete(uint32 achievementId)
 			RMX_ERROR("Achievement not found", );
 		}
 
-		checkForUnlockedSecrets();
+		checkForUnlockedSecrets(false);
 		mPlayerProgress.save();
 	}
 }
@@ -953,7 +934,7 @@ void Game::setSecretUnlocked(uint32 secretId)
 	if (!mPlayerProgress.mUnlocks.isSecretUnlocked(secretId))
 	{
 		mPlayerProgress.mUnlocks.setSecretUnlocked(secretId);
-		const char* text = (secret->mType == SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE) ? "Unlocked in Act Select" : "Found hidden secret!";
+		const char* text = (secret->mType == SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE) ? "Unlocked in Act Select" : secret->mHiddenUntilUnlocked ? "Found hidden secret!" : "Secret unlocked!";
 		GameApp::instance().showUnlockedWindow(SecretUnlockedWindow::EntryType::SECRET, text, secret->mName);
 		mPlayerProgress.save();
 	}
@@ -1021,7 +1002,7 @@ void Game::returnToMainMenu()
 	mReturnToMenuTriggered = true;
 
 	// Do not restart data select music
-	if (AudioOut::instance().isPlayingSfxId(0x2f))
+	if (AudioOut::instance().isPlayingAudioKey(0x2f))
 	{
 		AudioOut::instance().moveIngameMusicToMenu();
 	}

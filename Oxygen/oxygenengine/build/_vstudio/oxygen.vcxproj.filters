@@ -115,6 +115,24 @@
     <Filter Include="menu\devmode\windows">
       <UniqueIdentifier>{89c3dd34-ae44-4bd5-9227-c171ac17b9c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="menu\loui">
+      <UniqueIdentifier>{3b47f5e9-3779-49dd-974a-4564e129c41d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\menu\sidebar">
+      <UniqueIdentifier>{20d99a9b-df52-4237-99be-506c6a8da0fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\menu\settings">
+      <UniqueIdentifier>{99e99ca8-eb57-496a-841c-24f175b5aab1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\menu\settings\submenus">
+      <UniqueIdentifier>{6f5dd9e9-86e1-4ccb-a0c4-dcb38ee245a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="drawing\upscaler">
+      <UniqueIdentifier>{49c5f31d-69e2-4003-a28e-63d384644f64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="network\crowdcontrol">
+      <UniqueIdentifier>{f8ee760c-f271-4644-8491-37009fb50cb1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -344,9 +362,6 @@
       <Filter>application\menu</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\menu\OxygenMenu.cpp">
-      <Filter>application\menu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\application\menu\MenuItems.cpp">
       <Filter>application\menu</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\overlays\CheatSheetOverlay.cpp">
@@ -592,6 +607,69 @@
     <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\WatchesWindow.cpp">
       <Filter>menu\devmode\windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\audio\ChipWritesAudioSource.cpp">
+      <Filter>application\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiWidget.cpp">
+      <Filter>menu\loui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiFontWrapper.cpp">
+      <Filter>menu\loui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiVerticalLayout.cpp">
+      <Filter>menu\loui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiScrollingController.cpp">
+      <Filter>menu\loui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiDefinitions.cpp">
+      <Filter>menu\loui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiButton.cpp">
+      <Filter>menu\loui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\loui\LouiLabel.cpp">
+      <Filter>menu\loui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\ScaledScreenRect.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\menu\sidebar\OxygenSideBar.cpp">
+      <Filter>application\menu\sidebar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\menu\settings\OxygenSettingsMenu.cpp">
+      <Filter>application\menu\settings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\menu\settings\SimpleSelection.cpp">
+      <Filter>application\menu\settings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\menu\settings\submenus\DisplayMenu.cpp">
+      <Filter>application\menu\settings\submenus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\menu\settings\submenus\AudioMenu.cpp">
+      <Filter>application\menu\settings\submenus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\bindings\AudioBindings.cpp">
+      <Filter>simulation\bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\AudioPlaybackWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\upscaler\UpscalerCollection.cpp">
+      <Filter>drawing\upscaler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\upscaler\UpscalerDefinition.cpp">
+      <Filter>drawing\upscaler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\platform\CommandForwarder.cpp">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\menu\devmode\windows\AppDebugWindow.cpp">
+      <Filter>menu\devmode\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\network\crowdcontrol\CrowdControlClient.cpp">
+      <Filter>network\crowdcontrol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -833,9 +911,6 @@
       <Filter>application\menu</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\menu\OxygenMenu.h">
-      <Filter>application\menu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\application\menu\MenuItems.h">
       <Filter>application\menu</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\overlays\CheatSheetOverlay.h">
@@ -1116,6 +1191,75 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\platform\PlatformFlags.h">
       <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\audio\ChipWritesAudioSource.h">
+      <Filter>application\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiWidget.h">
+      <Filter>menu\loui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiDefinitions.h">
+      <Filter>menu\loui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiFontWrapper.h">
+      <Filter>menu\loui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\menu\SharedFonts.h">
+      <Filter>application\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiVerticalLayout.h">
+      <Filter>menu\loui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiScrollingController.h">
+      <Filter>menu\loui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiButton.h">
+      <Filter>menu\loui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\loui\LouiLabel.h">
+      <Filter>menu\loui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\ScaledScreenRect.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\menu\sidebar\OxygenSideBar.h">
+      <Filter>application\menu\sidebar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\menu\settings\OxygenSettingsMenu.h">
+      <Filter>application\menu\settings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\menu\settings\SimpleSelection.h">
+      <Filter>application\menu\settings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\menu\settings\submenus\SettingsSubMenu.h">
+      <Filter>application\menu\settings\submenus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\menu\settings\submenus\DisplayMenu.h">
+      <Filter>application\menu\settings\submenus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\menu\settings\submenus\AudioMenu.h">
+      <Filter>application\menu\settings\submenus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\bindings\AudioBindings.h">
+      <Filter>simulation\bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\AudioPlaybackWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\upscaler\UpscalerCollection.h">
+      <Filter>drawing\upscaler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\upscaler\UpscalerDefinition.h">
+      <Filter>drawing\upscaler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\platform\CommandForwarder.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\menu\devmode\windows\AppDebugWindow.h">
+      <Filter>menu\devmode\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\network\crowdcontrol\CrowdControlClient.h">
+      <Filter>network\crowdcontrol</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

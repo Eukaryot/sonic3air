@@ -1,12 +1,16 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
 #include "rmxbase.h"
+
+#if defined(PLATFORM_WINDOWS)
+	#include <share.h>		// For _SH_DENYNO and _SH_DENYWR
+#endif
 
 
 namespace

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -34,9 +34,11 @@ namespace option
 		FRAME_SYNC,
 		UPSCALING,
 		BACKDROP,
-		FILTERING,
-		SCANLINES,
 		BG_BLUR,
+		SCREEN_FILTER_INDEX,
+		SCREEN_FILTER_PIXEL_VARIANT,
+		SCREEN_FILTER_HQX_VARIANT,
+		SCREEN_FILTER_SCANLINES,
 		PERFORMANCE_DISPLAY,
 
 		// Audio

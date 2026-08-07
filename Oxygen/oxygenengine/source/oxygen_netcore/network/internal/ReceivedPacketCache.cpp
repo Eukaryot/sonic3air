@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -61,8 +61,13 @@ bool ReceivedPacketCache::enqueuePacket(const ReceivedPacket& receivedPacket, co
 		uint32 indexAfterQueue = uniquePacketID - (lastEnqueuedPacketID + 1);
 		if (indexAfterQueue != 0)
 		{
-			// Create a gap...
-			// TODO: Check if that would create a very large gap
+			// Create a gap, but check for potentially very large gaps
+			if (indexAfterQueue > 100)
+			{
+				RMX_ASSERT(false, "Encountered too large gap in unique packet IDs (size: " << indexAfterQueue << ")");
+				return false;
+			}
+
 			for (size_t k = 0; k < indexAfterQueue; ++k)
 			{
 				mQueue.emplace_back();

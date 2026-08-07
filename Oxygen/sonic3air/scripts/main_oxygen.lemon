@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2025 by Eukaryot
+	Copyright (C) 2017-2026 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -32,15 +32,15 @@ function bool Game.isSecretUnlocked(u32 secretId)
 	return false
 }
 
+function void Game.setSecretUnlocked(u32 secretId)
+{
+	// Ignore this function call
+}
+
 function bool Game.isEnduserBuild()
 {
 	// There's no differentiation between end-user and development builds any more, so this exists only for mod compatibility
 	return false
-}
-
-function void Game.setSecretUnlocked(u32 secretId)
-{
-	// Ignore this function call
 }
 
 function void Game.triggerRestart()

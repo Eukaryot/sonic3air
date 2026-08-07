@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -15,7 +15,7 @@
 class API_EXPORT AudioBuffer
 {
 public:
-	typedef bool(*LoadCallbackType)(AudioBuffer*, const String&, const String&);
+	typedef bool(*LoadCallbackType)(AudioBuffer&, const String&, const String&);
 	typedef std::list<LoadCallbackType> LoadCallbackList;
 	static LoadCallbackList mStaticLoadCallbacks;
 
@@ -51,6 +51,8 @@ public:
 	void lock();
 	void unlock();
 
+	void setName(std::string_view name)  { mName = name; }
+
 private:
 	static const constexpr int MAX_FRAME_LENGTH = 4096;		// Maximum length of an audio frame in samples -- this is the length of all audio frames, except the last
 
@@ -77,6 +79,8 @@ private:
 	int mFrequency = 44100;				// Sampling frequency, e.g. 44100 Hz
 	bool mPersistent = true;			// If false, played audio frames get deleted (e.g. for music streams)
 	bool mCompleted = false;			// Set to true when loading / streaming is completed
+
+	std::string mName;					// Internal name for debugging
 
 	rmx::Mutex mMutex;
 	int mMutexLockCounter = 0;

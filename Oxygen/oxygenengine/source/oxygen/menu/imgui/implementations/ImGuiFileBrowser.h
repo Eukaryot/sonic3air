@@ -1,6 +1,6 @@
 ﻿/*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -32,10 +32,10 @@ public:
 	virtual bool shouldBlockOtherProviders() const override  { return true; }
 
 	void buildWindowContent();
+	void refreshFileEntries();
 
 private:
 	void updateFullPath();
-	void refreshFileEntries();
 
 	void drawFileBrowser();
 
@@ -43,6 +43,7 @@ private:
 	void drawActionsMenu(bool openMenuNow);
 	void drawConfirmDeletionPopup(bool openPopupNow);
 	void drawRenamingPopup(bool openPopupNow);
+	void drawCreateDirectoryPopup(bool openPopupNow);
 
 	DrawerTexture& getFileIcon(const std::wstring& filename);
 

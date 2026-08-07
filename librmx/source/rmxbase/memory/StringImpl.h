@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -517,7 +517,7 @@ TEMPLATE int STRING::parseData(void* dst) const
 		}
 		((uint8*)dst)[i] = value;
 	}
-	return mLength/2;
+	return (int)mLength/2;
 }
 
 TEMPLATE bool STRING::equal(const STRING& str) const

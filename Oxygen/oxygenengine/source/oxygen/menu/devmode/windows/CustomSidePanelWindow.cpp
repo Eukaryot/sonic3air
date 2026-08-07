@@ -1,6 +1,6 @@
 ﻿/*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -15,6 +15,7 @@
 #include "oxygen/application/Application.h"
 #include "oxygen/application/overlays/DebugSidePanel.h"
 #include "oxygen/application/overlays/DebugSidePanelCategory.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 
 CustomSidePanelWindow::CustomSidePanelWindow() :
@@ -134,6 +135,30 @@ void CustomSidePanelWindow::buildContent()
 						ImGui::PopStyleVar();
 
 						ImGui::EndTable();
+					}
+
+					if (PlatformFunctions::hasClipboardSupport() && !category->mEntries.empty())
+					{
+						if (ImGui::SmallButton("Copy"))
+						{
+							String str;
+							for (CustomDebugSidePanelCategory::Entry& entry : category->mEntries)
+							{
+								if (!entry.mUpdated || entry.mLines.empty())
+									continue;
+
+								if (!str.empty())
+									str << "\n";
+
+								for (CustomDebugSidePanelCategory::Line& line : entry.mLines)
+								{
+									str.add(' ', line.mIndent);
+									str << line.mText.c_str() << "\n";
+								}
+							}
+
+							PlatformFunctions::copyToClipboard(*str);
+						}
 					}
 
 					allowDragScrolling();

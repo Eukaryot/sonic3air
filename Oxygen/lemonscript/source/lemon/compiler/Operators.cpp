@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -211,6 +211,52 @@ namespace lemon
 			{
 				return OperatorType::UNKNOWN;
 			}
+		}
+	}
+
+	bool OperatorHelper::isAssignment(Operator op)
+	{
+		switch (op)
+		{
+			case Operator::ASSIGN:
+			case Operator::ASSIGN_PLUS:
+			case Operator::ASSIGN_MINUS:
+			case Operator::ASSIGN_MULTIPLY:
+			case Operator::ASSIGN_DIVIDE:
+			case Operator::ASSIGN_MODULO:
+			case Operator::ASSIGN_SHIFT_LEFT:
+			case Operator::ASSIGN_SHIFT_RIGHT:
+			case Operator::ASSIGN_AND:
+			case Operator::ASSIGN_OR:
+			case Operator::ASSIGN_XOR:
+				return true;
+
+			default:
+				return false;
+		}
+	}
+
+	bool OperatorHelper::isSymmetric(Operator op)
+	{
+		switch (op)
+		{
+			case Operator::BINARY_PLUS:
+			case Operator::BINARY_MINUS:
+			case Operator::BINARY_MULTIPLY:
+			case Operator::BINARY_DIVIDE:
+			case Operator::BINARY_MODULO:
+			case Operator::LOGICAL_AND:
+			case Operator::LOGICAL_OR:
+			case Operator::COLON:
+			case Operator::BINARY_SHIFT_LEFT:
+			case Operator::BINARY_SHIFT_RIGHT:
+			case Operator::BINARY_AND:
+			case Operator::BINARY_OR:
+			case Operator::BINARY_XOR:
+				return true;
+
+			default:
+				return false;
 		}
 	}
 

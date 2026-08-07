@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -226,7 +226,7 @@ void OptionsMenuEntry::renderInternal(RenderContext& renderContext_, const Color
 			if (mData == option::SOUND_TEST)
 			{
 				audioDefinition = renderContext.mOptionsMenu->getSoundTestAudioDefinition(selected().mValue);
-				if (nullptr != audioDefinition && AudioOut::instance().getAudioKeyType(audioDefinition->mKeyId) == AudioOutBase::AudioKeyType::MODDED)
+				if (nullptr != audioDefinition && AudioOut::instance().getAudioKeyType(audioDefinition->mPrimaryKeyId) == AudioOutBase::AudioKeyType::MODDED)
 				{
 					static std::string combinedText;
 					combinedText = *text + " (modded)";

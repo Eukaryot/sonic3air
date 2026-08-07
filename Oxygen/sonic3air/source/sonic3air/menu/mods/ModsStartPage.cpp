@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -29,10 +29,8 @@ void ModsStartPage::initialize()
 	if (!mMenuEntries.empty())
 		return;
 
-#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MAC)
-	mMenuEntries.addEntry("Open mods folder", (uint32)Option::OPEN_MODS_FOLDER);
-#elif defined(PLATFORM_LINUX)
-	mMenuEntries.addEntry("Open mods directory", (uint32)Option::OPEN_MODS_FOLDER);
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MAC) || defined(PLATFORM_LINUX)
+	mMenuEntries.addEntry("Open mods " PLATFORM_DIRECTORY_STRING, (uint32)Option::OPEN_MODS_FOLDER);
 #endif
 
 	mMenuEntries.addEntry("Open Manual in web browser", (uint32)Option::OPEN_MANUAL);

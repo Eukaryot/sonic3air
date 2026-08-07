@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,9 +9,11 @@
 #include "oxygen/pch.h"
 #include "oxygen/application/overlays/CheatSheetOverlay.h"
 #include "oxygen/application/EngineMain.h"
+#include "oxygen/application/menu/SharedFonts.h"
 
 
-CheatSheetOverlay::CheatSheetOverlay()
+CheatSheetOverlay::CheatSheetOverlay() :
+	GuiBase("CheatSheetOverlay")
 {
 }
 
@@ -49,7 +51,7 @@ void CheatSheetOverlay::render()
 	const Color alphaWhite(1.0f, 1.0f, 1.0f, alpha);
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
-	Font& font = EngineMain::getDelegate().getDebugFont(10);
+	Font& font = SharedFonts::oxyFontRegularShaded.getFontSafe();
 
 	static const std::vector<const char*> texts =
 	{

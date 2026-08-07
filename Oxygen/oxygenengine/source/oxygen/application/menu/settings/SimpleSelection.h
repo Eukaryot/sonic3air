@@ -1,0 +1,63 @@
+﻿/*
+*	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
+*	Copyright (C) 2017-2026 by Eukaryot
+*
+*	Published under the GNU GPLv3 open source software license, see license.txt
+*	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+#pragma once
+
+#include "oxygen/menu/loui/LouiButton.h"
+#include "oxygen/menu/loui/LouiLabel.h"
+
+
+namespace loui
+{
+	class SimpleSelection : public Widget
+	{
+	public:
+		SimpleSelection& init(const std::string_view text, FontWrapper& font, Vec2i size);
+		SimpleSelection& addOption(std::string_view displayText, int32 value);
+		template<typename T> SimpleSelection& addOption(std::string_view displayText, T value)  { return addOption(displayText, static_cast<int>(value)); }
+
+		inline bool wasChanged() const  { return mWasChanged; }
+
+		inline int getCurrentOptionIndex() const  { return mOptionIndex; }
+		void setCurrentOptionByIndex(int index);
+
+		int32 getCurrentOptionValue() const;
+		template<typename T> T getCurrentOptionValueTyped() const  { return static_cast<T>(getCurrentOptionValue()); }
+
+		void setCurrentOptionByValue(int value);
+		template<typename T> void setCurrentOptionByValue(T value)  { setCurrentOptionByValue(static_cast<int>(value)); }
+
+		bool canGoLeft() const;
+		bool canGoRight() const;
+
+		virtual void update(UpdateInfo& updateInfo) override;
+		virtual void render(RenderInfo& renderInfo) override;
+
+	protected:
+		virtual void applyLayouting() override;
+
+	protected:
+		struct Option
+		{
+			std::string mDisplayText;
+			int32 mValue = 0;
+		};
+
+	protected:
+		Label mTitleLabel;
+		Label mValueLabel;
+		Button mButtonLeft;
+		Button mButtonRight;
+
+		bool mIsHovered = false;
+		int mOptionIndex = -1;
+		bool mWasChanged = false;
+
+		std::vector<Option> mOptions;
+	};
+}

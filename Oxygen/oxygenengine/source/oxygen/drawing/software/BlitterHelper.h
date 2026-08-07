@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -535,11 +535,12 @@ struct BlitterHelper
 	template<bool ALPHA_BLENDING, bool USE_TINT_COLOR>
 	static inline void blitBitmapWithScaling(BitmapViewMutable<uint32>& destBitmap, Recti destRect, const BitmapViewMutable<uint32>& sourceBitmap, Recti sourceRect, uint32 tintColor)
 	{
-		if (destBitmap.isEmpty() || sourceRect.isEmpty())
+		if (destBitmap.isEmpty() || destRect.isEmpty() || sourceRect.isEmpty())
 			return;
 
 		int lastSourceY = -1;
 		uint32* lastDestData = nullptr;
+		const int bytesToCopyPerLine = std::min(destRect.width, destBitmap.getSize().x - destRect.x) * sizeof(uint32);
 
 		uint32 position = 0;	// This is used as a 16.16 fixed point number
 		const uint32 advance = (sourceRect.width << 16) / destRect.width;
@@ -553,7 +554,7 @@ struct BlitterHelper
 			if (sourceY == lastSourceY && nullptr != lastDestData && !ALPHA_BLENDING)
 			{
 				// Just copy the content from the last line, as it's the same contents again
-				memcpy(destData, lastDestData, destRect.width * sizeof(uint32));
+				memcpy(destData, lastDestData, bytesToCopyPerLine);
 			}
 			else
 			{

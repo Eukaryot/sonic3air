@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -16,7 +16,7 @@
 #include "oxygen/application/Application.h"
 #include "oxygen/rendering/parts/palette/PaletteManager.h"
 
-#include <lemon/program/Function.h>
+#include <lemon/program/function/Function.h>
 #include <lemon/runtime/RuntimeFunction.h>
 
 
@@ -185,7 +185,14 @@ void DebugTracking::updateWatches()
 
 void DebugTracking::clearWatches(bool clearPersistent)
 {
-	std::vector<std::pair<uint32, uint16>> reAddWatches;
+	struct SavedWatchData
+	{
+		uint32 mAddress;
+		uint16 mBytes;
+		std::string mName;
+	};
+
+	std::vector<SavedWatchData> reAddWatches;
 	if (!clearPersistent)
 	{
 		// Save persistent watches
@@ -194,7 +201,10 @@ void DebugTracking::clearWatches(bool clearPersistent)
 		{
 			if (watch->mPersistent)
 			{
-				reAddWatches.emplace_back(watch->mAddress, watch->mBytes);
+				SavedWatchData& saved = vectorAdd(reAddWatches);
+				saved.mAddress = watch->mAddress;
+				saved.mBytes = watch->mBytes;
+				saved.mName = watch->mName;
 			}
 		}
 	}
@@ -204,9 +214,9 @@ void DebugTracking::clearWatches(bool clearPersistent)
 	mWatches.clear();
 	mEmulatorInterface.getWatches().clear();
 
-	for (const auto& pair : reAddWatches)
+	for (const SavedWatchData& saved : reAddWatches)
 	{
-		addWatch(pair.first, pair.second, true);
+		addWatch(saved.mAddress, saved.mBytes, true, saved.mName);
 	}
 }
 
@@ -214,7 +224,7 @@ void DebugTracking::addWatch(uint32 address, uint16 bytes, bool persistent, std:
 {
 	address &= 0x00ffffff;
 
-	// Check if already exists
+	// Check if it already exists
 	if (hasWatch(address, bytes))
 		return;
 
@@ -260,10 +270,10 @@ void DebugTracking::getCallStackFromCallFrameIndex(std::vector<Location>& outCal
 	while (callFrameIndex >= 0 && callFrameIndex < (int)callFrames.size())
 	{
 		const CodeExec::CallFrame& callFrame = callFrames[callFrameIndex];
-		if (nullptr != callFrame.mFunction && callFrame.mFunction->getType() == lemon::Function::Type::SCRIPT)
+		if (nullptr != callFrame.mFunction && callFrame.mFunction->isA<lemon::ScriptFunction>())
 		{
 			Location& location = vectorAdd(outCallStack);
-			location.mFunction = static_cast<const lemon::ScriptFunction*>(callFrame.mFunction);
+			location.mFunction = &callFrame.mFunction->as<lemon::ScriptFunction>();
 
 			// TODO: Move this inside of a helper function, maybe inside LemonScriptRuntime?
 			lemon::RuntimeFunction* runtimeFunction = mCodeExec.getLemonScriptRuntime().getInternalLemonRuntime().getRuntimeFunction(*location.mFunction);
@@ -363,7 +373,7 @@ void DebugTracking::onWatchTriggered(size_t watchIndex, uint32 address, uint16 b
 	Application::instance().getSimulation().sendBreakSignal(Simulation::BreakCondition::WATCH_HIT);
 }
 
-void DebugTracking::onVRAMWrite(uint16 address, uint16 bytes)
+void DebugTracking::onVRAMWrite(uint16 address, uint16 bytes, uint16 value)
 {
 	// Not more than the limit
 	if (mVRAMWrites.size() >= mVRAMWrites.capacity())
@@ -389,6 +399,7 @@ void DebugTracking::onVRAMWrite(uint16 address, uint16 bytes)
 	VRAMWrite& write = mVRAMWritePool.rentObject();
 	write.mAddress = address;
 	write.mSize = bytes;
+	write.mValue = value;
 	write.mLocation = location;
 	write.mCallFrameIndex = getCurrentCallFrameIndex();
 	mVRAMWrites.push_back(&write);

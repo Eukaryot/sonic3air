@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -37,7 +37,6 @@ namespace rmx
 			float mPanning = 0.0f;					// Left/right panning value in range [-1.0f, +1.0f], usually 0.0f
 			bool mLoop = false;						// Set if sound playback should be looped
 			bool mPaused = false;					// Set when sound playback is paused
-			bool mUsePan = false;					// Set if panning should be used
 			bool mStreaming = false;				// Set if reaching the end of the audio buffer should not stop the playback, just temporily pause it until more data comes in
 			bool mPlaybackDone = false;				// Gets set by audio mixer when playback should stop now
 		};
@@ -75,10 +74,10 @@ namespace rmx
 		void setGlobalVolume(float volume);
 
 		template<typename T>
-		T& createAudioMixer(int mixerId, int parentMixerId = 0)
+		T& createAudioMixer(std::string_view name, int mixerId, int parentMixerId = 0)
 		{
 			RMX_ASSERT(mixerId != 0, "Root audio mixer (with ID 0) can't be replaced");
-			T* audioMixer = new T(mixerId);
+			T* audioMixer = new T(name, mixerId);
 			registerAudioMixer(*audioMixer, parentMixerId);
 			return *audioMixer;
 		}
@@ -136,7 +135,7 @@ namespace rmx
 	class API_EXPORT WavLoader
 	{
 	public:
-		static bool load(AudioBuffer* buffer, const String& source, const String& params);
+		static bool load(AudioBuffer& outBuffer, const String& source, const String& params);
 	};
 
 }

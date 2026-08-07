@@ -1,6 +1,6 @@
 ﻿/*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -20,7 +20,7 @@
 #include "oxygen/simulation/LemonScriptProgram.h"
 #include "oxygen/simulation/Simulation.h"
 
-#include <lemon/program/Function.h>
+#include <lemon/program/function/Function.h>
 
 
 VRAMWritesWindow::VRAMWritesWindow() :
@@ -45,8 +45,10 @@ void VRAMWritesWindow::buildContent()
 
 	const uint16 startAddressPlaneA = planeManager.getPlaneBaseVRAMAddress(PlaneManager::PLANE_A);
 	const uint16 startAddressPlaneB = planeManager.getPlaneBaseVRAMAddress(PlaneManager::PLANE_B);
+	const uint16 startAddressPlaneW = planeManager.getPlaneBaseVRAMAddress(PlaneManager::PLANE_W);
 	const uint16 endAddressPlaneA = startAddressPlaneA + (uint16)planeManager.getPlaneSizeInVRAM(PlaneManager::PLANE_A);
 	const uint16 endAddressPlaneB = startAddressPlaneB + (uint16)planeManager.getPlaneSizeInVRAM(PlaneManager::PLANE_B);
+	const uint16 endAddressPlaneW = startAddressPlaneW + (uint16)planeManager.getPlaneSizeInVRAM(PlaneManager::PLANE_W);
 	const uint16 startAddressScrollOffsets = scrollOffsetsManager.getHorizontalScrollTableBase();
 	const uint16 endAddressScrollOffsets = startAddressScrollOffsets + 0x400;
 	const uint16 startAddressSAT = spriteManager.getSpriteAttributeTableBase();
@@ -56,23 +58,73 @@ void VRAMWritesWindow::buildContent()
 	std::vector<DebugTracking::VRAMWrite*> writes = debugTracking.getVRAMWrites();
 	std::sort(writes.begin(), writes.end(), [](const DebugTracking::VRAMWrite* a, const DebugTracking::VRAMWrite* b) { return a->mAddress < b->mAddress; } );
 
-	ImGui::Checkbox("Plane A", &mShowPlaneA);
-	ImGui::Checkbox("Plane B", &mShowPlaneB);
-	ImGui::Checkbox("Scroll Offsets", &mShowScroll);
-	ImGui::Checkbox("Sprite Attribute Table", &mShowSAT);
-	ImGui::Checkbox("Patterns and others", &mShowOthers);
+	// Checkboxes
+	{
+		ImGui::Checkbox("Plane A", &mShowPlaneA);
+		if (ImGui::IsItemHovered())
+			ImGui::SetItemTooltip("VRAM range: 0x%04x - 0x%04x", startAddressPlaneA, endAddressPlaneA - 1);
 
+		ImGui::SameLine();
+		ImGui::Text("   ");
+		ImGui::SameLine();
+
+		ImGui::Checkbox("Plane B", &mShowPlaneB);
+		if (ImGui::IsItemHovered())
+			ImGui::SetItemTooltip("VRAM range: 0x%04x - 0x%04x", startAddressPlaneB, endAddressPlaneB - 1);
+
+		ImGui::SameLine();
+		ImGui::Text("   ");
+		ImGui::SameLine();
+
+		ImGui::Checkbox("Plane W", &mShowPlaneW);
+		if (ImGui::IsItemHovered())
+			ImGui::SetItemTooltip("VRAM range: 0x%04x - 0x%04x", startAddressPlaneW, endAddressPlaneW - 1);
+
+		ImGui::Checkbox("Scroll Offsets", &mShowScroll);
+		if (ImGui::IsItemHovered())
+			ImGui::SetItemTooltip("VRAM range: 0x%04x - 0x%04x", startAddressScrollOffsets, endAddressScrollOffsets - 1);
+
+		ImGui::Checkbox("Sprite Attribute Table", &mShowSAT);
+		if (ImGui::IsItemHovered())
+			ImGui::SetItemTooltip("VRAM range: 0x%04x - 0x%04x", startAddressSAT, endAddressSAT - 1);
+
+		ImGui::Checkbox("Patterns and others", &mShowOthers);
+		if (ImGui::IsItemHovered())
+			ImGui::SetItemTooltip("All other VRAM writes");
+	}
+
+	// Filtering
 	static int32 filterAddress = -1;
 	static ImGuiHelpers::InputString filterAddressString;
 	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Filter by address:");
 	ImGui::SameLine();
+	ImGui::PushItemWidth(uiScale * 180);
 	if (ImGuiHelpers::InputText("##FilterByAddress", filterAddressString))
 	{
 		if (filterAddressString.isEmpty())
 			filterAddress = -1;
-		else
+		else if (rmx::startsWith(filterAddressString.mInternal, "0x"))
 			filterAddress = (int32)rmx::parseInteger(filterAddressString.mInternal);
+		else
+			filterAddress = (int32)rmx::parseInteger(std::string("0x") + filterAddressString.mInternal);
+	}
+	ImGui::PopItemWidth();
+
+	ImGui::SameLine();
+	if (ImGui::SmallButton("Clear"))
+	{
+		filterAddressString.clear();
+		filterAddress = -1;
+	}
+	ImGui::SameLine();
+	ImGui::TextDisabled("(?)");
+	if (ImGui::BeginItemTooltip())
+	{
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 25.0f);
+		ImGui::TextUnformatted("To list only writes to a specific VRAM address (and also writes that include that address in its range), enter the address in hexadecimal form here, e.g. 0x1234.");
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
 	}
 
 	ImGui::Spacing();
@@ -90,34 +142,50 @@ void VRAMWritesWindow::buildContent()
 			}
 
 			const uint64 key = ((uint64)write->mAddress << 32) + write->mSize;
-			String line(0, "0x%04x (0x%02x bytes) at %s", write->mAddress, write->mSize, write->mLocation.toString(codeExec).c_str());
+			String line;
+			if (write->mSize == 2)
+			{
+				line.formatString("[0x%04x] = 0x%02x (2 bytes) at %s", write->mAddress, write->mValue, write->mLocation.toString(codeExec).c_str());
+			}
+			else
+			{
+				line.formatString("[0x%04x] (0x%02x bytes) at %s", write->mAddress, write->mSize, write->mLocation.toString(codeExec).c_str());
+			}
+
 			ImVec4 color(1.0f, 1.0f, 1.0f, 1.0f);
 			if (write->mAddress >= startAddressPlaneA && write->mAddress < endAddressPlaneA)
 			{
 				if (!mShowPlaneA)
 					continue;
-				line = String("[Plane A] ") + line;
+				line = String("Plane A:   ") + line;
 				color = ImVec4(1.0f, 1.0f, 0.75f, 1.0f);
 			}
 			else if (write->mAddress >= startAddressPlaneB && write->mAddress < endAddressPlaneB)
 			{
 				if (!mShowPlaneB)
 					continue;
-				line = String("[Plane B] ") + line;
+				line = String("Plane B:   ") + line;
+				color = ImVec4(1.0f, 0.75f, 1.0f, 1.0f);
+			}
+			else if (write->mAddress >= startAddressPlaneW && write->mAddress < endAddressPlaneW)
+			{
+				if (!mShowPlaneW)
+					continue;
+				line = String("Plane W:   ") + line;
 				color = ImVec4(1.0f, 0.75f, 1.0f, 1.0f);
 			}
 			else if (write->mAddress >= startAddressScrollOffsets && write->mAddress < endAddressScrollOffsets)
 			{
 				if (!mShowScroll)
 					continue;
-				line = String("[Scroll Offsets] ") + line;
+				line = String("Scroll Offsets:   ") + line;
 				color = ImVec4(0.75f, 1.0f, 1.0f, 1.0f);
 			}
 			else if (write->mAddress >= startAddressSAT && write->mAddress < endAddressSAT)
 			{
 				if (!mShowSAT)
 					continue;
-				line = String("[Sprites] ") + line;
+				line = String("Sprites:   ") + line;
 				color = ImVec4(0.75f, 0.75f, 1.0f, 1.0f);
 			}
 			else

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,6 +10,7 @@
 #include "lemon/compiler/frontend/CompilerFrontend.h"
 #include "lemon/compiler/frontend/BlockNodeStack.h"
 #include "lemon/compiler/frontend/NodesIterator.h"
+#include "lemon/compiler/Compiler.h"
 #include "lemon/compiler/LineNumberTranslation.h"
 #include "lemon/compiler/TokenHelper.h"
 #include "lemon/compiler/TokenTypes.h"
@@ -160,8 +161,8 @@ namespace lemon
 							const ConstantParserToken& input = parserToken.as<ConstantParserToken>();
 							ConstantToken& constantToken = node.mTokenList.createBack<ConstantToken>();
 							constantToken.mValue = input.mValue;
-							constantToken.mDataType = (input.mBaseType == BaseType::FLOAT)  ? static_cast<const DataTypeDefinition*>(&PredefinedDataTypes::FLOAT) :
-													  (input.mBaseType == BaseType::DOUBLE) ? static_cast<const DataTypeDefinition*>(&PredefinedDataTypes::DOUBLE) : static_cast<const DataTypeDefinition*>(&PredefinedDataTypes::CONST_INT);
+							constantToken.mDataType = (input.mBaseType == BaseType::FLOAT)  ? &PredefinedDataTypes::FLOAT.as<DataTypeDefinition>() :
+													  (input.mBaseType == BaseType::DOUBLE) ? &PredefinedDataTypes::DOUBLE.as<DataTypeDefinition>() : &PredefinedDataTypes::CONST_INT.as<DataTypeDefinition>();
 							break;
 						}
 
@@ -262,14 +263,34 @@ namespace lemon
 							const FlyweightString identifier = tokens[offset].as<IdentifierToken>().mName;
 							++offset;
 
-							// Create global variable
-							GlobalVariable& variable = mModule.addGlobalVariable(identifier, dataType);
-							mGlobalsLookup.registerGlobalVariable(variable);
-
-							if (offset+2 <= tokens.size() && isOperator(tokens[offset], Operator::ASSIGN))
+							// Check for array definition
+							if (offset+3 <= tokens.size() && isOperator(tokens[offset], Operator::BRACKET_LEFT) &&
+								tokens[offset+1].isA<ConstantToken>() && isOperator(tokens[offset+2], Operator::BRACKET_RIGHT))
 							{
-								++offset;
-								variable.mInitialValue = readConstantExpression(tokens, offset, tokens.size(), dataType, lineNumber);
+								CHECK_ERROR(tokens[offset+1].as<ConstantToken>().mDataType == &PredefinedDataTypes::CONST_INT, "Expected an integer as array size", lineNumber);
+								const int arraySize = tokens[offset+1].as<ConstantToken>().mValue.get<int32>();
+								CHECK_ERROR(arraySize >= 1, "Invalid array size of " << arraySize, lineNumber);
+								CHECK_ERROR(arraySize <= 0x10000, "Too large array size of " << arraySize, lineNumber);
+								CHECK_ERROR(offset+3 == tokens.size(), "Syntax error after array definition", lineNumber);
+
+								// Get or create array data type
+								const DataTypeDefinition& arrayDataType = mTokenProcessing.getArrayDataType(*dataType, arraySize);
+
+								// Create global variable
+								GlobalVariable& variable = mModule.addGlobalVariable(identifier, &arrayDataType);
+								mGlobalsLookup.registerGlobalVariable(variable);
+							}
+							else
+							{
+								// Create global variable
+								GlobalVariable& variable = mModule.addGlobalVariable(identifier, dataType);
+								mGlobalsLookup.registerGlobalVariable(variable);
+
+								if (offset+2 <= tokens.size() && isOperator(tokens[offset], Operator::ASSIGN))
+								{
+									++offset;
+									variable.mInitialValue = readConstantExpression(tokens, offset, tokens.size(), dataType, lineNumber);
+								}
 							}
 							break;
 						}
@@ -427,6 +448,7 @@ namespace lemon
 		++offset;
 		CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier in function definition", lineNumber);
 		const FlyweightString functionName = tokens[offset].as<IdentifierToken>().mName;
+		CHECK_ERROR(functionName.getHash() != rmx::constMurmur2_64("base"), "Function can't be named 'base'", lineNumber);
 
 		++offset;
 		CHECK_ERROR(offset < tokens.size() && isOperator(tokens[offset], Operator::PARENTHESIS_LEFT), "Expected opening parentheses in function definition", lineNumber);
@@ -503,6 +525,9 @@ namespace lemon
 
 		// Processing
 		processUndefinedNodesInBlock(content, function, scopeContext);
+
+		// If needed, add a return node at the end
+		checkForMissingReturn(functionNode);
 	}
 
 	void CompilerFrontend::processUndefinedNodesInBlock(BlockNode& blockNode, ScriptFunction& function, ScopeContext& scopeContext)
@@ -1180,7 +1205,7 @@ namespace lemon
 		}
 
 		// For integers, check if data gets lost by the cast
-		if (constantDataType->getClass() == DataTypeDefinition::Class::INTEGER && dataType->getClass() == DataTypeDefinition::Class::INTEGER)
+		if (constantDataType->isA<IntegerDataType>() && dataType->isA<IntegerDataType>())
 		{
 			if (!DataTypeHelper::isInsideIntegerRange(constantValue.get<int64>(), dataType->as<IntegerDataType>()))
 				CHECK_ERROR(false, "Constant " << constantValue.get<int64>() << " (" << rmx::hexString(constantValue.get<int64>()) << ") can't fit into data type " << dataType->getName().getString() << ", data would get lost", lineNumber);
@@ -1193,6 +1218,72 @@ namespace lemon
 		CHECK_ERROR(castSuccessful, "Unable to cast constant from type " << constantDataType->getName().getString() << " to type " << dataType->getName().getString(), lineNumber);
 
 		return finalValue;
+	}
+
+	void CompilerFrontend::checkForMissingReturn(FunctionNode& functionNode)
+	{
+		ScriptFunction& function = *functionNode.mFunction;
+		if (function.getReturnType() != &PredefinedDataTypes::VOID)
+		{
+			BlockNode& content = *functionNode.mContent;
+			if (canReachEndOfBlock(content))
+			{
+				const uint32 lineNumber = content.mNodes.empty() ? functionNode.getLineNumber() : content.mNodes.back().getLineNumber();
+				ADD_WARNING(CompilerWarning::Code::MISSING_RETURN, "Function '" << function.getName() << "' with return type " << function.getReturnType()->getName() << " is missing a return statement at the end", lineNumber);
+
+				ReturnNode& returnNode = content.mNodes.createBack<ReturnNode>();
+				returnNode.setLineNumber(lineNumber);
+
+				ConstantToken& constantToken = returnNode.mStatementToken.create<ConstantToken>();
+				constantToken.mValue.set<uint64>(0);		// TODO: Get default value for the data type (though 0 is certainly fine for all base type)
+				constantToken.mDataType = function.getReturnType();
+			}
+		}
+	}
+
+	bool CompilerFrontend::canReachNodeAfter(const Node& node) const
+	{
+		switch ((uint32)node.getType())
+		{
+			case BlockNode::TYPE:
+				return canReachEndOfBlock(node.as<BlockNode>());
+
+			case LabelNode::TYPE:
+				return true;
+
+			case JumpNode::TYPE:
+			case JumpIndirectNode::TYPE:
+			case BreakNode::TYPE:
+			case ContinueNode::TYPE:
+			case ReturnNode::TYPE:
+				return false;
+
+			case ExternalNode::TYPE:
+				return (node.as<ExternalNode>().mSubType == ExternalNode::SubType::EXTERNAL_CALL);
+
+			case StatementNode::TYPE:
+				return true;
+
+			case IfStatementNode::TYPE:
+			{
+				if (canReachNodeAfter(*node.as<IfStatementNode>().mContentIf))
+					return true;
+				if (!node.as<IfStatementNode>().mContentElse.valid() || canReachNodeAfter(*node.as<IfStatementNode>().mContentElse))
+					return true;
+				return false;
+			}
+
+			case ForStatementNode::TYPE:
+			case WhileStatementNode::TYPE:
+				return true;		// TODO: We could check if the condition is always false, and that there's no break inside... but that seems overly complicated
+		}
+
+		return true;
+	}
+
+	bool CompilerFrontend::canReachEndOfBlock(const BlockNode& blockNode) const
+	{
+		return (blockNode.mNodes.empty() || canReachNodeAfter(blockNode.mNodes.back()));
 	}
 
 }

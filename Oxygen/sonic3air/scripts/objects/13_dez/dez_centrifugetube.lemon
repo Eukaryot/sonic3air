@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2025 by Eukaryot
+	Copyright (C) 2017-2026 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -359,7 +359,7 @@ function void fn0492b2()
 function void fn0492d4()
 {
 #if STANDALONE
-	// Early out in debug mode, #contributed by TheMushrunt
+	// Early out in debug mode, #contributed by nabbup / Ramona
 	if (debug_mode.state)
 	{
 		u8[A2] = 0

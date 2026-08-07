@@ -8,6 +8,7 @@
 #include "sonic3air/data/SharedDatabase.h"
 #include "sonic3air/pch.h"
 #include "sonic3air/EngineDelegate.h"
+#include "sonic3air/GameArgumentsReader.h"
 #include "sonic3air/version.inc"
 #include "oxygen/platform/CrashHandler.h"
 #include "oxygen/platform/PlatformFunctions.h"
@@ -26,7 +27,14 @@ EngineMain* _myMain;
 	_wndSetup.delegate = self;
 	INIT_RMX;
 	INIT_RMXEXT_OGGVORBIS;
-	_myMain = new EngineMain(_myDelegate);
+	GameArgumentsReader arguments;
+	NSString* appPath = NSBundle.mainBundle.bundlePath;
+	int argc = 1;
+	char** argv = new char*[argc];
+	argv[0] =(char*)[appPath UTF8String];
+	arguments.read(argc, argv);
+	
+	_myMain = new EngineMain(_myDelegate, arguments);
 	
 	Configuration& config = Configuration::instance();
 	//Files for this app will go into ~/Library/Application Support/sonic3air/
@@ -52,7 +60,6 @@ EngineMain* _myMain;
 	SharedDatabase::initialize();
 	bool loadedSettings = config.loadSettings(config.mAppDataPath + L"settings.json", Configuration::SettingsType::STANDARD);
 	config.loadSettings(config.mAppDataPath + L"settings_input.json", Configuration::SettingsType::INPUT);
-	config.loadSettings(config.mAppDataPath + L"settings_global.json", Configuration::SettingsType::GLOBAL);
 	if (loadedSettings)
 	{
 		NSString* romPath = [NSString stringWithCString:((char*)config.mLastRomPath.c_str()) encoding:NSUTF8StringEncoding];
@@ -109,6 +116,8 @@ EngineMain* _myMain;
 -(void)startGame:(NSString*)romPath{
 	try
 	{
+		randomize();
+		
 		Configuration& config = Configuration::instance();
 #ifdef ENDUSER
 		config.mWindowSize = Vec2i(1200, 740); //Why is the default 960x720?
@@ -116,7 +125,6 @@ EngineMain* _myMain;
 		if(romPath){
 			config.loadSettings(config.mAppDataPath + L"settings.json", Configuration::SettingsType::STANDARD);
 			config.loadSettings(config.mAppDataPath + L"settings_input.json", Configuration::SettingsType::INPUT);
-			config.loadSettings(config.mAppDataPath + L"settings_global.json", Configuration::SettingsType::GLOBAL);
 			
 			std::wstring userRom = *String(romPath.UTF8String).toWString();
 			config.mRomPath = userRom;
@@ -135,11 +143,8 @@ EngineMain* _myMain;
 		config.mGameDataPath = resourcePath;
 #endif
 		
-		NSString* appPath = NSBundle.mainBundle.bundlePath;
-		int argc = 1;
-		char** argv = new char*[argc];
-		argv[0] =(char*)[appPath UTF8String];
-		_myMain->execute(argc, (char**)argv);
+		
+		_myMain->execute();
 	}
 	catch (const std::exception& e)
 	{

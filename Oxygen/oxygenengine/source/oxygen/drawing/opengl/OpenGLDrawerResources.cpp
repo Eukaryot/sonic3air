@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -12,6 +12,7 @@
 
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/drawing/opengl/OpenGLUpscaler.h"
+#include "oxygen/drawing/upscaler/UpscalerCollection.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/rendering/opengl/shaders/SimpleRectColoredShader.h"
 #include "oxygen/rendering/opengl/shaders/SimpleRectIndexedShader.h"
@@ -24,6 +25,11 @@
 namespace
 {
 	static const Vec2i PALETTE_TEXTURE_SIZE = Vec2i(256, PaletteManager::MAIN_PALETTE_SIZE / 256 * 2);
+
+	constexpr uint64 UPSCALER_HASH_EMPTY = rmx::constMurmur2_64("");
+	constexpr uint64 UPSCALER_HASH_PIXEL = rmx::constMurmur2_64("pixel");
+	constexpr uint64 UPSCALER_HASH_XBRZ  = rmx::constMurmur2_64("xbrz");
+	constexpr uint64 UPSCALER_HASH_HQX   = rmx::constMurmur2_64("hqx");
 }
 
 
@@ -37,7 +43,7 @@ struct OpenGLDrawerResources::Internal
 	SimpleRectIndexedShader		mSimpleRectIndexedShader[4];		// Enumerated using enum Variant
 
 	// Upscalers
-	std::vector<OpenGLUpscaler*> mUpscalers;
+	std::unordered_map<uint64, OpenGLUpscaler*> mUpscalers;
 
 	// Vertex array objects
 	opengl::VertexArrayObject mSimpleQuadVAO;
@@ -73,11 +79,23 @@ void OpenGLDrawerResources::startup()
 	}
 
 	// Load upscalers
-	for (int k = 0; k < 4; ++k)
+	for (const UpscalerDefinition& definition : UpscalerCollection::instance().getUpscalers())
 	{
-		OpenGLUpscaler* upscaler = new OpenGLUpscaler((OpenGLUpscaler::Type)k, *this);
-		upscaler->startup();
-		mInternal.mUpscalers.push_back(upscaler);
+		// Map to internal (still hard-coded) type
+		OpenGLUpscaler::Type type;
+		switch (definition.mNameHash)
+		{
+			case UPSCALER_HASH_EMPTY: type = OpenGLUpscaler::Type::DEFAULT;	break;
+			case UPSCALER_HASH_PIXEL: type = OpenGLUpscaler::Type::PIXEL;	break;
+			case UPSCALER_HASH_XBRZ:  type = OpenGLUpscaler::Type::XBRZ;	break;
+			case UPSCALER_HASH_HQX:	  type = OpenGLUpscaler::Type::HQX;		break;
+			default:
+				continue;
+		}
+
+		OpenGLUpscaler* openGLUpscaler = new OpenGLUpscaler(type, definition, *this);
+		openGLUpscaler->startup();
+		mInternal.mUpscalers.emplace(definition.mNameHash, openGLUpscaler);
 	}
 
 	// Setup simple quad VAO, consisting of two triangles
@@ -99,9 +117,9 @@ void OpenGLDrawerResources::startup()
 
 void OpenGLDrawerResources::shutdown()
 {
-	for (OpenGLUpscaler* upscaler : mInternal.mUpscalers)
+	for (auto& pair : mInternal.mUpscalers)
 	{
-		upscaler->shutdown();
+		pair.second->shutdown();
 	}
 	mInternal.mUpscalers.clear();
 }
@@ -273,43 +291,35 @@ const Vec2i& OpenGLDrawerResources::getPaletteTextureSize() const
 
 OpenGLUpscaler& OpenGLDrawerResources::getUpscaler()
 {
-	OpenGLUpscaler::Type upscalerType = OpenGLUpscaler::Type::DEFAULT;
+	const Configuration::ScreenFilter& config = Configuration::instance().mScreenFilter;
 
-	const int filtering = Configuration::instance().mFiltering;
-	const int scanlines = Configuration::instance().mScanlines;
-	if (scanlines > 0 && filtering < 3)
+#if defined(PLATFORM_VITA)
+	config.mUpscalerNameHash = UPSCALER_HASH_PIXEL;
+#endif
+
+	OpenGLUpscaler* upscaler = nullptr;
+	if (config.mUpscalerNameHash == UPSCALER_HASH_PIXEL && config.mPixelVariant == 0 && config.mScanlines == 0)
 	{
-		upscalerType = OpenGLUpscaler::Type::SOFT;
+		// Use simple upscaler in this case
+		upscaler = mapFindOrDefault(mInternal.mUpscalers, UPSCALER_HASH_EMPTY, nullptr);
 	}
 	else
 	{
-		switch (filtering)
+		// Find the right upscaler
+		OpenGLUpscaler** found = mapFind(mInternal.mUpscalers, config.mUpscalerNameHash);
+		if (nullptr != found)
 		{
-			default:
-			case 0:
-				upscalerType = OpenGLUpscaler::Type::DEFAULT;
-				break;
-
-			case 1:
-			case 2:
-				upscalerType = OpenGLUpscaler::Type::SOFT;
-				break;
-
-		#if !defined(PLATFORM_VITA)
-			case 3:
-				upscalerType = OpenGLUpscaler::Type::XBRZ;
-				break;
-
-			case 4:
-			case 5:
-			case 6:
-				upscalerType = OpenGLUpscaler::Type::HQX;
-				break;
-		#endif
+			upscaler = *found;
+		}
+		else
+		{
+			// Fallback to simple upscaler
+			upscaler = mapFindOrDefault(mInternal.mUpscalers, UPSCALER_HASH_EMPTY, nullptr);
 		}
 	}
 
-	return *mInternal.mUpscalers[(int)upscalerType];
+	RMX_ASSERT(nullptr != upscaler, "Upscaler not found, not even the fallback");
+	return *upscaler;
 }
 
 bool OpenGLDrawerResources::updatePaletteBitmap(const PaletteBase& palette, Bitmap& bitmap, int offsetY, uint16& changeCounter)

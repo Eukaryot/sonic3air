@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -44,7 +44,11 @@ uint64 RemasteredMusicDownload::getBytesDownloaded() const
 
 void RemasteredMusicDownload::startDownload()
 {
+	#if defined(PLATFORM_WEB)
+	DownloadManager::instance().startDownload(mDownloadID, "audioremaster.bin", L"data/audioremaster.bin");
+	#else
 	DownloadManager::instance().startDownload(mDownloadID, "https://sonic3air.org/download/audioremaster.bin", L"data/audioremaster.bin");
+	#endif
 }
 
 void RemasteredMusicDownload::removeDownload()

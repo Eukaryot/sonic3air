@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,7 +9,7 @@
 #include "lemon/pch.h"
 #include "lemon/utility/StringFormatterLegacy.h"
 #include "lemon/utility/FastStringStream.h"
-#include "lemon/program/FunctionWrapper.h"
+#include "lemon/program/function/FunctionWrapper.h"
 
 
 namespace lemon
@@ -116,7 +116,7 @@ namespace lemon
 				{
 					// String argument
 					const FlyweightString* argStoredString = nullptr;
-					if (args[0].mType->getClass() == DataTypeDefinition::Class::STRING || args[0].mType->getClass() == DataTypeDefinition::Class::INTEGER)
+					if (args[0].mType->isA<StringDataType>() || args[0].mType->isA<IntegerDataType>())
 					{
 						lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
 						argStoredString = runtime->resolveStringByKey(args[0].mValue.get<uint64>());

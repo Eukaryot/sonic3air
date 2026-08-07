@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -14,7 +14,7 @@
 class CustomAudioMixer final : public rmx::AudioMixer
 {
 public:
-	CustomAudioMixer(int mixerId) : AudioMixer(mixerId) {}
+	CustomAudioMixer(std::string_view name, int mixerId) : AudioMixer(name, mixerId) {}
 
 	void setUnderwaterEffect(int effect, float volumeMultiplier);
 

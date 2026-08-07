@@ -1,6 +1,6 @@
 ﻿/*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -79,6 +79,7 @@ struct ImGuiHelpers
 
 		inline bool isEmpty() const  { return (mInternal[0] == 0); }
 		inline std::string_view get() const  { return std::string_view(mInternal); }
+		void clear();
 		void set(std::string_view str);
 	};
 
@@ -90,6 +91,7 @@ struct ImGuiHelpers
 
 		inline bool isEmpty() const  { return mWideString.empty(); }
 		inline const WString& get() const  { return mWideString; }
+		void clear();
 		void set(std::wstring_view str);
 		void refreshFromInternal();
 	};

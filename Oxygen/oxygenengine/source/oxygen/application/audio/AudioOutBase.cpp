@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -26,17 +26,32 @@ AudioOutBase::~AudioOutBase()
 void AudioOutBase::startup()
 {
 	// Create audio mixers
-	FTX::Audio->createAudioMixer<rmx::AudioMixer>((int)AudioMixerId::INGAME_MASTER, (int)AudioMixerId::ROOT);
-	FTX::Audio->createAudioMixer<rmx::AudioMixer>((int)AudioMixerId::INGAME_MUSIC,  (int)AudioMixerId::INGAME_MASTER);
-	FTX::Audio->createAudioMixer<rmx::AudioMixer>((int)AudioMixerId::INGAME_SOUND,  (int)AudioMixerId::INGAME_MASTER);
-	FTX::Audio->createAudioMixer<rmx::AudioMixer>((int)AudioMixerId::MENU_MASTER,   (int)AudioMixerId::ROOT);
-	FTX::Audio->createAudioMixer<rmx::AudioMixer>((int)AudioMixerId::MENU_MUSIC,    (int)AudioMixerId::MENU_MASTER);
-	FTX::Audio->createAudioMixer<rmx::AudioMixer>((int)AudioMixerId::MENU_SOUND,    (int)AudioMixerId::MENU_MASTER);
+	FTX::Audio->createAudioMixer<rmx::AudioMixer>("In-game Master",	(int)AudioMixerId::INGAME_MASTER, (int)AudioMixerId::ROOT);
+	FTX::Audio->createAudioMixer<rmx::AudioMixer>("In-game Music",	(int)AudioMixerId::INGAME_MUSIC,  (int)AudioMixerId::INGAME_MASTER);
+	FTX::Audio->createAudioMixer<rmx::AudioMixer>("In-game Sound",	(int)AudioMixerId::INGAME_SOUND,  (int)AudioMixerId::INGAME_MASTER);
+	FTX::Audio->createAudioMixer<rmx::AudioMixer>("Menu Master",	(int)AudioMixerId::MENU_MASTER,   (int)AudioMixerId::ROOT);
+	FTX::Audio->createAudioMixer<rmx::AudioMixer>("Menu Music",		(int)AudioMixerId::MENU_MUSIC,    (int)AudioMixerId::MENU_MASTER);
+	FTX::Audio->createAudioMixer<rmx::AudioMixer>("Menu Sound",		(int)AudioMixerId::MENU_SOUND,    (int)AudioMixerId::MENU_MASTER);
 
 	// Load audio definitions
 	//  -> No mods yet here, that's coming later in "handleGameLoaded"
-	mAudioCollection.loadFromJson(L"data/audio/original", L"audio_default.json", AudioCollection::Package::ORIGINAL);
-	reloadRemasteredSoundtrack();
+	if (FTX::FileSystem->exists(L"data/audio/original"))
+	{
+		// Game is used differentiation between original and remastered soundtrack (namely S3AIR)
+		mAudioCollection.loadFromJson(L"data/audio/original", L"audio_default.json", AudioCollection::Package::ORIGINAL);
+		reloadRemasteredSoundtrack();
+	}
+	else
+	{
+		// Simply load any JSON from "data/audio"
+		std::vector<rmx::FileIO::FileEntry> fileEntries;
+		fileEntries.reserve(8);
+		FTX::FileSystem->listFilesByMask(L"data/audio/*.json", true, fileEntries);
+		for (const rmx::FileIO::FileEntry& fileEntry : fileEntries)
+		{
+			mAudioCollection.loadFromJson(fileEntry.mPath, fileEntry.mFilename, AudioCollection::Package::ORIGINAL);
+		}
+	}
 
 	// Startup
 	mAudioPlayer.startup();
@@ -88,28 +103,35 @@ void AudioOutBase::setGlobalVolume(float volume)
 	FTX::Audio->setGlobalVolume(mGlobalVolume);
 }
 
-AudioOutBase::AudioKeyType AudioOutBase::getAudioKeyType(uint64 sfxId) const
+AudioOutBase::AudioKeyType AudioOutBase::getAudioKeyType(uint64 audioKey) const
 {
-	AudioCollection::SourceRegistration* sourceReg = mAudioCollection.getSourceRegistration(sfxId);
+	AudioCollection::SourceRegistration* sourceReg = mAudioCollection.getSourceRegistration(audioKey);
 	if (nullptr == sourceReg)
 		return AudioKeyType::INVALID;
-
 	return (AudioKeyType)sourceReg->mPackage;
 }
 
-bool AudioOutBase::isPlayingSfxId(uint64 sfxId) const
+std::string_view AudioOutBase::getAudioKeyDisplayName(uint64 audioKey) const
 {
-	return mAudioPlayer.isPlayingSfxId(sfxId);
+	AudioCollection::SourceRegistration* sourceReg = mAudioCollection.getSourceRegistration(audioKey);
+	if (nullptr == sourceReg)
+		return "";
+	return sourceReg->mAudioDefinition->mDisplayName;
 }
 
-bool AudioOutBase::playAudioBase(uint64 sfxId, uint8 contextId)
+bool AudioOutBase::isPlayingAudioKey(uint64 audioKey) const
 {
-	return mAudioPlayer.playAudio(sfxId, contextId);
+	return mAudioPlayer.isPlayingAudioKey(audioKey);
 }
 
-void AudioOutBase::playOverride(uint64 sfxId, uint8 contextId, uint8 channelId, uint8 overriddenChannelId)
+bool AudioOutBase::playAudioBase(uint64 audioKey, uint8 contextId)
 {
-	mAudioPlayer.playOverride(sfxId, contextId, channelId, overriddenChannelId);
+	return mAudioPlayer.playAudio(audioKey, contextId);
+}
+
+void AudioOutBase::playOverride(uint64 audioKey, uint8 contextId, uint8 channelId, uint8 overriddenChannelId)
+{
+	mAudioPlayer.playOverride(audioKey, contextId, channelId, overriddenChannelId);
 }
 
 void AudioOutBase::fadeInChannel(uint8 channelId, float length)

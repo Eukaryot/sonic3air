@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -34,9 +34,9 @@ public:
 	void reset() override;
 	void resetGame() override;
 
-	void playAudioDirect(uint64 sfxId, SoundRegType type, int contextBase = CONTEXT_INGAME, AudioReference* outAudioReference = nullptr);
+	void playAudioDirect(uint64 audioKey, SoundRegType type, int contextBase = CONTEXT_INGAME, AudioReference* outAudioReference = nullptr);
 
-	void setMenuMusic(uint64 sfxId);
+	void setMenuMusic(uint64 audioKey);
 	void restartMenuMusic();
 	void moveMenuMusicToIngame();
 	void moveIngameMusicToMenu();
@@ -60,7 +60,7 @@ private:
 	};
 
 private:
-	void playAudioInternal(const SfxHandling& handling, uint64 sfxId, int contextBase, AudioReference* outAudioReference);
+	void playAudioInternal(const SfxHandling& handling, uint64 audioKey, int contextBase, AudioReference* outAudioReference);
 
 private:
 	uint64			  mMenuMusicId = -1;

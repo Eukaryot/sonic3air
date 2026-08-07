@@ -100,6 +100,7 @@ List of Renderer Backends:
 List of high-level Frameworks Backends (combining Platform + Renderer):
 
     imgui_impl_allegro5.cpp
+    imgui_impl_null.cpp
 
 Emscripten is also supported!
 The SDL2+GL, SDL3+GL, GLFW+GL and GLFW+WebGPU examples are all ready to build and run with Emscripten.
@@ -336,7 +337,7 @@ void MyImGuiBackend_UpdateTexture(ImTextureData* tex)
     {
         // Create texture based on tex->Width, tex->Height.
         // - Most backends only support tex->Format == ImTextureFormat_RGBA32.
-        // - Backends for particularly memory constrainted platforms may support tex->Format == ImTextureFormat_Alpha8.
+        // - Backends for particularly memory constrained platforms may support tex->Format == ImTextureFormat_Alpha8.
 
         // Upload all texture pixels
         // - Read from our CPU-side copy of the texture and copy to your graphics API.

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -46,6 +46,8 @@ const EngineDelegateInterface::AppMetaData& EngineDelegate::getAppMetaData()
 		mAppMetaData.mBuildVersionNumber = BUILD_NUMBER;
 		mAppMetaData.mAppDataFolder = L"Sonic3AIR";
 	}
+
+	mAppMetaData.mInternalName = "S3AIR";
 	return mAppMetaData;
 }
 
@@ -71,7 +73,7 @@ bool EngineDelegate::onEnginePreStartup()
 		Configuration& config = Configuration::instance();
 		const bool check = FTX::FileSystem->exists(config.mGameDataPath + L"/gamedata.bin");
 	#else
-		const bool check = (FTX::FileSystem->exists(L"data/content.json") || FTX::FileSystem->exists(L"data/gamedata.bin"));
+		const bool check = (FTX::FileSystem->exists(L"data/metadata.json") || FTX::FileSystem->exists(L"data/gamedata.bin"));
 	#endif
 		if (!check)
 		{
@@ -123,19 +125,16 @@ bool EngineDelegate::setupCustomGameProfile()
 void EngineDelegate::startupGame(EmulatorInterface& emulatorInterface)
 {
 	mGame.startup(emulatorInterface);
-	mCommandForwarder.startup();
 }
 
 void EngineDelegate::shutdownGame()
 {
 	mGame.shutdown();
-	mCommandForwarder.shutdown();
 }
 
 void EngineDelegate::updateGame(float timeElapsed)
 {
 	mGame.update(timeElapsed);
-	mCommandForwarder.update(timeElapsed);
 }
 
 void EngineDelegate::registerScriptBindings(lemon::Module& module)
@@ -249,11 +248,6 @@ void EngineDelegate::onGameRecordingHeaderLoaded(const std::string& buildString,
 void EngineDelegate::onGameRecordingHeaderSave(std::vector<uint8>& buffer)
 {
 	mGame.onGameRecordingHeaderSave(buffer);
-}
-
-Font& EngineDelegate::getDebugFont(int size)
-{
-	return (size >= 10) ? global::mOxyfontRegular : global::mSmallfontSemiOutlined;
 }
 
 void EngineDelegate::fillDebugVisualization(Bitmap& bitmap, int& mode)

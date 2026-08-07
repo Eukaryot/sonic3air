@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -25,7 +25,8 @@ namespace
 	//  - 4: Added more rendering data (scroll offsets, sprites, etc.)
 	//  - 5: Added data for ROM based sprites
 	//  - 6: Added spaces manager serialization
-	static const constexpr uint8 OXYGEN_SAVESTATE_FORMATVERSION = 6;
+	//  - 7: Added "mRenderPlaneABehindW" flag for plane manager
+	static const constexpr uint8 OXYGEN_SAVESTATE_FORMATVERSION = 7;
 }
 
 

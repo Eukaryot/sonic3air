@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -62,6 +62,16 @@ namespace
 }
 
 
+int16 AudioCollection::checkForNumericKey(std::string_view keyString)
+{
+	if (keyString.length() == 2 && isHexDigit(keyString[0]) && isHexDigit(keyString[1]))
+	{
+		return (int16)rmx::parseInteger(String("0x") + keyString);
+	}
+	return -1;
+}
+
+
 AudioCollection::AudioCollection()
 {
 }
@@ -72,7 +82,8 @@ AudioCollection::~AudioCollection()
 
 void AudioCollection::clear()
 {
-	mAudioDefinitions.clear();
+	mUniqueAudioDefinitions.clear();
+	mAudioDefinitionsByKeyId.clear();
 	for (size_t i = 0; i < (size_t)Package::_NUM; ++i)
 		mNumSourcesByPackageType[i] = 0;
 	++mChangeCounter;
@@ -80,9 +91,11 @@ void AudioCollection::clear()
 
 void AudioCollection::clearPackage(Package package)
 {
-	for (auto it = mAudioDefinitions.begin(); it != mAudioDefinitions.end(); )
+	for (auto it = mUniqueAudioDefinitions.begin(); it != mUniqueAudioDefinitions.end(); )
 	{
-		auto& sources = it->second.mSources;
+		AudioDefinition& audioDefinition = it->second;
+		std::vector<SourceRegistration>& sources = audioDefinition.mSources;
+
 		for (size_t k = 0; k < sources.size(); ++k)
 		{
 			if (sources[k].mPackage == package)
@@ -94,7 +107,8 @@ void AudioCollection::clearPackage(Package package)
 
 		if (sources.empty())
 		{
-			it = mAudioDefinitions.erase(it);
+			unregisterAudioDefinitionKeyIds(audioDefinition);
+			it = mUniqueAudioDefinitions.erase(it);
 		}
 		else
 		{
@@ -107,180 +121,230 @@ void AudioCollection::clearPackage(Package package)
 
 bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstring& filename, Package package)
 {
-	const Json::Value jsonRoot = JsonHelper::loadFile(basepath + L'/' + filename);
-	if (jsonRoot.empty())
-		return false;
+	const std::wstring fullpath = basepath + L'/' + filename;
 
-	for (auto iterator = jsonRoot.begin(); iterator != jsonRoot.end(); ++iterator)
+	try
 	{
-		String keyString = iterator.key().asString();
-		keyString.lowerCase();
+		const Json::Value jsonRoot = JsonHelper::loadFile(fullpath);
+		if (jsonRoot.isNull())
+			return false;
+		RMX_CHECK(jsonRoot.isObject(), "Expecting a JSON object in \"" << WString(fullpath).toStdString() << "\"", return false);
 
-		// Numeric key is either a string hash, or the value in case of keys like "2C"
-		uint64 numericKey = 0;
+		for (auto iterator = jsonRoot.begin(); iterator != jsonRoot.end(); ++iterator)
 		{
-			if (keyString.length() == 2 && isHexDigit(keyString[0]) && isHexDigit(keyString[1]))
-			{
-				numericKey = rmx::parseInteger(String("0x") + keyString);
-			}
-			else
-			{
-				numericKey = rmx::getMurmur2_64(keyString);
-			}
-		}
+			const std::string keyString = iterator.key().asString();
+			const uint64 primaryKeyId = rmx::getMurmur2_64(keyString);
 
-		// Read definition from JSON
-		AudioDefinition::Type type = AudioDefinition::Type::SOUND;
-		std::string displayName;
-		WString audioFilename;
-		uint32 sourceAddress = 0;
-		uint32 contentOffset = 0;
-		uint8 emulationSfxId = (numericKey <= 0xff) ? (uint8)numericKey : 0;
-		SourceRegistration::Type sourceType = SourceRegistration::Type::FILE;
-		int loopStart = 0;
-		float volume = 1.0f;
-		uint8 channel = (numericKey < 0xff) ? (uint8)numericKey : 0xff;
-		AudioDefinition::Visibility soundTestVisibility = AudioDefinition::Visibility::AUTO;
+			// Numeric key is the uint8 value in case of keys like "2C"
+			const int16 numKeyCheck = checkForNumericKey(keyString);
+			const uint8 numericKey = (uint8)numKeyCheck;
+			const bool hasNumericKey = (numKeyCheck >= 0);
 
-		for (auto it = iterator->begin(); it != iterator->end(); ++it)
-		{
-			const std::string key = it.key().asString();
-			const std::string value = it->asString();
+			// Read definition from JSON
+			AudioDefinition::Type type = AudioDefinition::Type::SOUND;
+			std::string displayName;
+			WString audioFilename;
+			uint32 sourceAddress = 0;
+			uint32 contentOffset = 0;
+			uint8 emulationSfxId = hasNumericKey ? numericKey : 0;
+			SourceRegistration::Type sourceType = SourceRegistration::Type::FILE;
+			int loopStart = 0;
+			float volume = 1.0f;
+			uint8 channel = hasNumericKey ? numericKey : 0xff;
+			AudioDefinition::Visibility soundTestVisibility = AudioDefinition::Visibility::AUTO;
 
-			if (key == "Name")
+			for (auto it = iterator->begin(); it != iterator->end(); ++it)
 			{
-				displayName = value;
-			}
-			else if (key == "Type")
-			{
-				if (value == "Music")
+				if (it->isArray() || it->isObject())
+					continue;
+
+				const std::string key = it.key().asString();
+				const std::string value = it->asString();
+
+				if (key == "Name")
 				{
-					type = AudioDefinition::Type::MUSIC;
+					displayName = value;
 				}
-				else if (value == "Jingle")
+				else if (key == "Type")
 				{
-					type = AudioDefinition::Type::JINGLE;
+					if (value == "Music")
+					{
+						type = AudioDefinition::Type::MUSIC;
+					}
+					else if (value == "Jingle")
+					{
+						type = AudioDefinition::Type::JINGLE;
+					}
+					else if (value == "Sound")
+					{
+						type = AudioDefinition::Type::SOUND;
+					}
+					else
+					{
+						RMX_ERROR("Invalid audio definition type: " << value, continue);
+					}
 				}
-				else if (value == "Sound")
+				else if (key == "File" && !value.empty())
 				{
-					type = AudioDefinition::Type::SOUND;
+				#if 0
+					// TEST: Enforce emulation
+					sourceType = SourceRegistration::Type::EMULATION_DIRECT;
+				#else
+					audioFilename = WString(basepath) + L'/' + String(value).toWString();
+				#endif
+				}
+				else if (key == "Source" && !value.empty())
+				{
+					sourceType = (value == "EmulationContinuous") ? SourceRegistration::Type::EMULATION_CONTINUOUS :
+								 (value == "EmulationDirect") ? SourceRegistration::Type::EMULATION_DIRECT : SourceRegistration::Type::EMULATION_BUFFERED;
+				}
+				else if (key == "Address" && !value.empty())
+				{
+					sourceAddress = (uint32)rmx::parseInteger(value);
+				}
+				else if (key == "ContentOffset" && !value.empty())
+				{
+					contentOffset = (uint32)rmx::parseInteger(value);
+				}
+				else if (key == "EmulatedID" && !value.empty())
+				{
+					emulationSfxId = (uint8)rmx::parseInteger(value);
+				}
+				else if (key == "Channel" && !value.empty())
+				{
+					if (value == "multiple")
+						channel = 0xff;
+					else
+						channel = (uint8)rmx::parseInteger("0x" + value);
+				}
+				else if (key == "LoopStart" && !value.empty())
+				{
+					loopStart = (uint32)rmx::parseInteger(value);
+				}
+				else if (key == "Volume" && !value.empty())
+				{
+					volume = String(value).parseFloat();
+				}
+				else if (key == "SoundTestVisibility" && !value.empty())
+				{
+					soundTestVisibility = (value == "visible") ? AudioDefinition::Visibility::ALWAYS_VISIBLE
+										: (value == "hidden")  ? AudioDefinition::Visibility::ALWAYS_HIDDEN
+										: (value == "devmode") ? AudioDefinition::Visibility::DEV_MODE_ONLY : AudioDefinition::Visibility::AUTO;
+				}
+			}
+
+			AudioDefinition& audioDefinition = mUniqueAudioDefinitions[primaryKeyId];
+			if (audioDefinition.mAllKeyIds.empty())
+			{
+				// Definition did not exist yet, so fill it accordingly
+				audioDefinition.mPrimaryKeyId = primaryKeyId;
+				audioDefinition.mNumericKey = numericKey;
+				audioDefinition.mKeyString = keyString;
+				audioDefinition.mType = type;
+
+				// Determine the audio key IDs under which to register this definition
+				{
+					audioDefinition.mAllKeyIds.push_back(primaryKeyId);
+
+					// Use the lowercase key string as well, for legacy compatibility
+					String lowerCaseKeyString = keyString;
+					lowerCaseKeyString.lowerCase();
+					const uint64 lowerCaseKeyId = rmx::getMurmur2_64(lowerCaseKeyString);
+					if (lowerCaseKeyId != primaryKeyId)
+					{
+						audioDefinition.mAllKeyIds.push_back(lowerCaseKeyId);
+					}
+
+					if (hasNumericKey)
+					{
+						audioDefinition.mAllKeyIds.push_back(numericKey);
+					}
+				}
+
+				// Properly register under all these key IDs
+				registerAudioDefinitionKeyIds(audioDefinition);
+
+				// Music and jingles always use channel 0 -- no matter what is edited
+				if (type == AudioDefinition::Type::MUSIC || type == AudioDefinition::Type::JINGLE)
+				{
+					audioDefinition.mChannel = 0;
 				}
 				else
 				{
-					RMX_ERROR("Invalid audio definition type: " << value, continue);
+					audioDefinition.mChannel = channel;
 				}
-			}
-			else if (key == "File" && !value.empty())
-			{
-			#if 0
-				// TEST: Enforce emulation
-				sourceType = SourceRegistration::Type::EMULATION_DIRECT;
-			#else
-				audioFilename = WString(basepath) + L'/' + String(value).toWString();
-			#endif
-			}
-			else if (key == "Source" && !value.empty())
-			{
-				sourceType = (value == "EmulationContinuous") ? SourceRegistration::Type::EMULATION_CONTINUOUS :
-							 (value == "EmulationDirect") ? SourceRegistration::Type::EMULATION_DIRECT : SourceRegistration::Type::EMULATION_BUFFERED;
-			}
-			else if (key == "Address" && !value.empty())
-			{
-				sourceAddress = (uint32)rmx::parseInteger(value);
-			}
-			else if (key == "ContentOffset" && !value.empty())
-			{
-				contentOffset = (uint32)rmx::parseInteger(value);
-			}
-			else if (key == "EmulatedID" && !value.empty())
-			{
-				emulationSfxId = (uint8)rmx::parseInteger(value);
-			}
-			else if (key == "Channel" && !value.empty())
-			{
-				if (value == "multiple")
-					channel = 0xff;
-				else
-					channel = (uint8)rmx::parseInteger("0x" + value);
-			}
-			else if (key == "LoopStart" && !value.empty())
-			{
-				loopStart = (uint32)rmx::parseInteger(value);
-			}
-			else if (key == "Volume" && !value.empty())
-			{
-				volume = String(value).parseFloat();
-			}
-			else if (key == "SoundTestVisibility" && !value.empty())
-			{
-				soundTestVisibility = (value == "visible") ? AudioDefinition::Visibility::ALWAYS_VISIBLE
-									: (value == "hidden")  ? AudioDefinition::Visibility::ALWAYS_HIDDEN
-									: (value == "devmode") ? AudioDefinition::Visibility::DEV_MODE_ONLY : AudioDefinition::Visibility::AUTO;
-			}
-		}
-
-		AudioDefinition* audioDefinition = mapFind(mAudioDefinitions, numericKey);
-		if (nullptr == audioDefinition)
-		{
-			audioDefinition = &mAudioDefinitions[numericKey];
-			audioDefinition->mKeyId = numericKey;
-			audioDefinition->mKeyString = *keyString;
-			audioDefinition->mType = type;
-
-			// Music and jingles always use channel 0 -- no matter what is edited
-			if (type == AudioDefinition::Type::MUSIC || type == AudioDefinition::Type::JINGLE)
-			{
-				audioDefinition->mChannel = 0;
 			}
 			else
 			{
-				audioDefinition->mChannel = channel;
+				// Definition already exists, ignore the properties that are not specifying the source
+			}
+
+			// Set or overwrite values in audio definition
+			if (!displayName.empty())
+				audioDefinition.mDisplayName = displayName;
+			if (soundTestVisibility != AudioDefinition::Visibility::AUTO)
+				audioDefinition.mSoundTestVisibility = soundTestVisibility;
+
+			// Add audio source
+			SourceRegistration& sourceRegistration = vectorAdd(audioDefinition.mSources);
+			sourceRegistration.mAudioDefinition = &audioDefinition;
+			sourceRegistration.mPackage = package;
+			sourceRegistration.mType = sourceType;
+			sourceRegistration.mIsLooping = (type == AudioDefinition::Type::MUSIC);
+			sourceRegistration.mLoopStart = loopStart;
+			sourceRegistration.mVolume = volume;
+			++mNumSourcesByPackageType[(size_t)package];
+
+			if (sourceType == SourceRegistration::Type::FILE)
+			{
+				RMX_CHECK(!audioFilename.empty(), "No audio file name set for audio key " << keyString, );
+				RMX_CHECK(sourceAddress == 0, "Source address can only be used with emulated sound, for audio key " << keyString, );
+				RMX_CHECK(contentOffset == 0, "Content offset can only be used with emulated sound, for audio key " << keyString, );
+				sourceRegistration.mSourceFile = *audioFilename;
+			}
+			else
+			{
+				sourceRegistration.mEmulationSfxId = emulationSfxId;
+				sourceRegistration.mSourceFile = *audioFilename;	// Can be empty to use ROM's original SMPS data, or the name of a file containing that data
+				sourceRegistration.mSourceAddress = sourceAddress;	// Can be zero to use original address in ROM, or the address where the SMPS data is located
+				sourceRegistration.mContentOffset = contentOffset;
 			}
 		}
-		else
-		{
-			// Definition already exists, ignore the properties that are not specifying the source
-		}
-
-		// Set or overwrite values in audio definition
-		if (!displayName.empty())
-			audioDefinition->mDisplayName = displayName;
-		if (soundTestVisibility != AudioDefinition::Visibility::AUTO)
-			audioDefinition->mSoundTestVisibility = soundTestVisibility;
-
-		// Add audio source
-		SourceRegistration& sourceRegistration = vectorAdd(audioDefinition->mSources);
-		sourceRegistration.mAudioDefinition = audioDefinition;
-		sourceRegistration.mPackage = package;
-		sourceRegistration.mType = sourceType;
-		sourceRegistration.mIsLooping = (type == AudioDefinition::Type::MUSIC);
-		sourceRegistration.mLoopStart = loopStart;
-		sourceRegistration.mVolume = volume;
-		++mNumSourcesByPackageType[(size_t)package];
-
-		if (sourceType == SourceRegistration::Type::FILE)
-		{
-			RMX_CHECK(!audioFilename.empty(), "No audio file name set for audio key " << *keyString, );
-			RMX_CHECK(sourceAddress == 0, "Source address can only be used with emulated sound, for audio key " << *keyString, );
-			RMX_CHECK(contentOffset == 0, "Content offset can only be used with emulated sound, for audio key " << *keyString, );
-			sourceRegistration.mSourceFile = *audioFilename;
-		}
-		else
-		{
-			sourceRegistration.mEmulationSfxId = emulationSfxId;
-			sourceRegistration.mSourceFile = *audioFilename;	// Can be empty to use ROM's original SMPS data, or the name of a file containing that data
-			sourceRegistration.mSourceAddress = sourceAddress;	// Can be zero to use original address in ROM, or the address where the SMPS data is located
-			sourceRegistration.mContentOffset = contentOffset;
-		}
+	}
+	catch (const std::exception& e)
+	{
+		RMX_ERROR("Error reading file \"" << WString(fullpath).toStdString() << "\": " << e.what(), );
+		return false;
 	}
 
 	++mChangeCounter;
 	return true;
 }
 
+void AudioCollection::registerAudioDefinitionKeyIds(AudioDefinition& audioDefinition)
+{
+	for (uint64 keyId : audioDefinition.mAllKeyIds)
+	{
+		// If for some reason, two defintions would use the same key ID, one does simply overwrite the other
+		mAudioDefinitionsByKeyId[keyId] = &audioDefinition;
+	}
+}
+
+void AudioCollection::unregisterAudioDefinitionKeyIds(const AudioDefinition& audioDefinition)
+{
+	for (uint64 keyId : audioDefinition.mAllKeyIds)
+	{
+		const auto it = mAudioDefinitionsByKeyId.find(keyId);
+		if (it != mAudioDefinitionsByKeyId.end() && it->second == &audioDefinition)
+		{
+			mAudioDefinitionsByKeyId.erase(it);
+		}
+	}
+}
+
 void AudioCollection::determineActiveSourceRegistrations(bool preferOriginalSoundtrack)
 {
-	for (auto& [key, audioDefinition] : mAudioDefinitions)
+	for (auto& [key, audioDefinition] : mUniqueAudioDefinitions)
 	{
 		// Search for the right one considering settings
 		SourceRegistration* bestSourceReg = nullptr;
@@ -298,7 +362,7 @@ void AudioCollection::determineActiveSourceRegistrations(bool preferOriginalSoun
 
 const AudioCollection::AudioDefinition* AudioCollection::getAudioDefinition(uint64 keyId) const
 {
-	const AudioDefinition* audioDefinition = mapFind(mAudioDefinitions, keyId);
+	const AudioDefinition* audioDefinition = mapFindOrDefault(mAudioDefinitionsByKeyId, keyId, nullptr);
 	if (nullptr != audioDefinition)
 	{
 		// Found directly
@@ -313,7 +377,7 @@ const AudioCollection::AudioDefinition* AudioCollection::getAudioDefinition(uint
 	}
 
 	// Try again, it might get found now
-	return mapFind(mAudioDefinitions, keyId);
+	return mapFindOrDefault(mAudioDefinitionsByKeyId, keyId, nullptr);
 }
 
 AudioCollection::SourceRegistration* AudioCollection::getSourceRegistration(uint64 keyId) const

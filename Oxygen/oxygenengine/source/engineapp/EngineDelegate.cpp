@@ -1,3 +1,11 @@
+/*
+*	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
+*	Copyright (C) 2017-2026 by Eukaryot
+*
+*	Published under the GNU GPLv3 open source software license, see license.txt
+*	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
 #include "engineapp/pch.h"
 #include "engineapp/EngineDelegate.h"
 #include "engineapp/GameApp.h"
@@ -12,6 +20,8 @@ const EngineDelegateInterface::AppMetaData& EngineDelegate::getAppMetaData()
 		mAppMetaData.mBuildVersionString = "0.1.0";		// Oxygen Engine currently doesn't use a version number to take serious in any way...
 		mAppMetaData.mBuildVersionNumber = 0x00010000;
 	}
+
+	mAppMetaData.mInternalName = "OxygenEngine";
 	mAppMetaData.mAppDataFolder = L"OxygenEngine";
 	return mAppMetaData;
 }
@@ -123,38 +133,6 @@ void EngineDelegate::onGameRecordingHeaderLoaded(const std::string& buildString,
 
 void EngineDelegate::onGameRecordingHeaderSave(std::vector<uint8>& buffer)
 {
-}
-
-Font& EngineDelegate::getDebugFont(int size)
-{
-	if (size >= 10)
-	{
-		static Font font10;
-		if (font10.getLineHeight() == 0)
-		{
-			font10.loadFromFile("data/font/oxyfont_regular.json", 0.0f);
-			if (font10.getLineHeight() != 0)
-			{
-				font10.addFontProcessor(std::make_shared<OutlineFontProcessor>());
-				font10.addFontProcessor(std::make_shared<GradientFontProcessor>());
-				font10.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2i(1, 1), 0.5f, 0.8f));
-			}
-		}
-		return font10;
-	}
-	else
-	{
-		static Font font3;
-		if (font3.getLineHeight() == 0)
-		{
-			font3.loadFromFile("data/font/smallfont.json", 0.0f);
-			if (font3.getLineHeight() != 0)
-			{
-				font3.addFontProcessor(std::make_shared<OutlineFontProcessor>(Color(0.0f, 0.0f, 0.0f, 0.5f)));
-			}
-		}
-		return font3;
-	}
 }
 
 void EngineDelegate::fillDebugVisualization(Bitmap& bitmap, int& mode)

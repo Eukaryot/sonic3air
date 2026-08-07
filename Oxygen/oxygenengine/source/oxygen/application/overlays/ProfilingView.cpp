@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,6 +10,7 @@
 #include "oxygen/application/overlays/ProfilingView.h"
 #include "oxygen/application/audio/AudioOutBase.h"
 #include "oxygen/application/audio/AudioPlayer.h"
+#include "oxygen/application/menu/SharedFonts.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/helper/Profiling.h"
@@ -39,7 +40,8 @@ namespace
 }
 
 
-ProfilingView::ProfilingView()
+ProfilingView::ProfilingView() :
+	GuiBase("ProfilingView")
 {
 }
 
@@ -69,7 +71,7 @@ void ProfilingView::render()
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
 	Profiling::Region& rootRegion = Profiling::getRootRegion();
-	Font& font = EngineMain::getDelegate().getDebugFont(10);
+	Font& font = SharedFonts::oxyFontRegularShaded.getFontSafe();
 
 	static std::vector<std::pair<Profiling::Region*, int>> regions;
 	Profiling::listRegionsRecursive(regions);

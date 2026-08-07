@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -76,7 +76,7 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 					}
 
 				#elif defined(PLATFORM_ANDROID)
-					javaInterface.openRomFileSelectionDialog(gameProfile.mFullName);
+					javaInterface.openRomFileSelectionDialog(gameProfile.mRomInfos[0].mSteamGameName);
 					mState = State::WAITING_FOR_ROM;
 					return UpdateResult::CONTINUE;
 

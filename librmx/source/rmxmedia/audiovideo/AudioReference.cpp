@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -16,16 +16,7 @@ void AudioReference::setInstanceID(int ID)
 	mChangeCounter = -1;
 }
 
-void AudioReference::updateInstance()
-{
-	if (mChangeCounter != FTX::Audio->getChangeCounter())
-	{
-		mInstance = FTX::Audio->findInstance(mInstanceID);
-		mChangeCounter = FTX::Audio->getChangeCounter();
-	}
-}
-
-bool AudioReference::valid()
+bool AudioReference::isValid()
 {
 	updateInstance();
 	return (nullptr != mInstance);
@@ -33,111 +24,124 @@ bool AudioReference::valid()
 
 float AudioReference::getPosition()
 {
-	if (valid())
+	if (isValid())
 		return (float)mInstance->mPosition / (float)mInstance->mAudioBuffer->getFrequency();
 	return 0.0f;
 }
 
 float AudioReference::getVolume()
 {
-	if (valid())
+	if (isValid())
 		return mInstance->mVolume;
 	return 0.0f;
 }
 
 float AudioReference::getSpeed()
 {
-	if (valid())
+	if (isValid())
 		return mInstance->mSpeed;
 	return 0.0f;
 }
 
 bool AudioReference::isLooped()
 {
-	if (valid())
+	if (isValid())
 		return mInstance->mLoop;
 	return false;
 }
 
 bool AudioReference::isPaused()
 {
-	if (valid())
+	if (isValid())
 		return mInstance->mPaused;
 	return false;
 }
 
 bool AudioReference::isStreaming()
 {
-	if (valid())
+	if (isValid())
 		return mInstance->mStreaming;
+	return false;
+}
+
+float AudioReference::getPanning()
+{
+	if (isValid())
+		return mInstance->mPanning;
 	return false;
 }
 
 void AudioReference::stop()
 {
-	if (valid())
+	if (isValid())
 		FTX::Audio->removeSound(*this);
 }
 
 void AudioReference::setPosition(float position)
 {
-	if (valid())
+	if (isValid())
 		mInstance->mPosition = (int)(position * mInstance->mAudioBuffer->getFrequency());
 }
 
 void AudioReference::setLoopStartInSamples(int loopStart)
 {
-	if (valid())
+	if (isValid())
 		mInstance->mLoopStart = loopStart;
 }
 
 void AudioReference::setVolume(float volume)
 {
-	if (valid())
+	if (isValid())
 		mInstance->mVolume = volume;
 }
 
 void AudioReference::setVolumeChange(float volumeChange)
 {
-	if (valid())
+	if (isValid())
 		mInstance->mVolumeChange = volumeChange;
 }
 
 void AudioReference::setSpeed(float speed)
 {
-	if (valid())
+	if (isValid())
 		mInstance->mSpeed = speed;
 }
 
 void AudioReference::setLoop(bool loop)
 {
-	if (valid())
+	if (isValid())
 		mInstance->mLoop = loop;
 }
 
 void AudioReference::setPause(bool pause)
 {
-	if (valid())
+	if (isValid())
 		mInstance->mPaused = pause;
 }
 
 void AudioReference::setStreaming(bool strm)
 {
-	if (valid())
+	if (isValid())
 		mInstance->mStreaming = strm;
 }
 
 void AudioReference::setTimeout(float timeout)
 {
-	if (valid())
+	if (isValid())
 		mInstance->mTimeout = (int)(timeout * mInstance->mAudioBuffer->getFrequency());
 }
 
-void AudioReference::setPanning(bool enable, float value)
+void AudioReference::setPanning(float panning)
 {
-	if (valid())
+	if (isValid())
+		mInstance->mPanning = panning;
+}
+
+void AudioReference::updateInstance()
+{
+	if (mChangeCounter != FTX::Audio->getChangeCounter())
 	{
-		mInstance->mUsePan = enable;
-		mInstance->mPanning = value;
+		mInstance = FTX::Audio->findInstance(mInstanceID);
+		mChangeCounter = FTX::Audio->getChangeCounter();
 	}
 }

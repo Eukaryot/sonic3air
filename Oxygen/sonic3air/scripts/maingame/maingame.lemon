@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2025 by Eukaryot
+	Copyright (C) 2017-2026 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -430,7 +430,7 @@ function void initializeMainGame()
 	VDP.Config.setPlayfieldSizeInPixels(512, 256)
 	VDP.Config.enableHInt(false)
 	VDP.Config.setWindowPlaneSplitY(false, 0)	// Disable window plane
-	VDP.Config.setBackdropColor(0x20)
+	VDP.Config.setBackdropColorIndex(0x20)
 	VDP.Config.setRenderingModeConfiguration(false)
 
 	if (debug_mode.unlocked && control.pad1.state & CONTROL_A)

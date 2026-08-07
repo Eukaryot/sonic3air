@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -20,7 +20,7 @@
 #include "oxygen/simulation/GameRecorder.h"
 #include "oxygen/simulation/SaveStateSerializer.h"
 
-#include <lemon/program/Function.h>
+#include <lemon/program/function/Function.h>
 #include <lemon/runtime/Runtime.h>
 #include <lemon/runtime/RuntimeFunction.h>
 
@@ -145,7 +145,7 @@ protected:
 			mCodeExec.showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(callTarget, 16) + ").");
 			return false;
 		}
-		if (func->getType() == lemon::Function::Type::SCRIPT)
+		if (func->isA<lemon::ScriptFunction>())
 		{
 			CodeExec::CallFrame& callFrame = mCodeExec.mActiveCallFrameTracking->pushCallFrame(CodeExec::CallFrame::Type::SCRIPT_DIRECT);
 			callFrame.mFunction = func;
@@ -326,6 +326,8 @@ void CodeExec::cleanScriptDebug()
 
 bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 {
+	const Configuration& config = Configuration::instance();
+
 	if (retainRuntimeState)
 	{
 		// If the runtime is already active, save its current state
@@ -345,14 +347,14 @@ bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 	}
 	mExecutionState = ExecutionState::INACTIVE;
 
-	const Configuration& config = Configuration::instance();
+	// Load scripts
 	LemonScriptProgram::LoadOptions options;
 	options.mEnforceFullReload = enforceFullReload;
 	options.mModuleSelection = EngineMain::getDelegate().mayLoadScriptMods() ? LemonScriptProgram::LoadOptions::ModuleSelection::ALL_MODS : LemonScriptProgram::LoadOptions::ModuleSelection::BASE_GAME_ONLY;
 	options.mAppVersion = EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber;
-	const WString mainScriptPath = config.mScriptsDir + config.mMainScriptName;
+	const std::wstring mainScriptPath = config.mScriptsDir + GameProfile::instance().mMainScriptName;
 
-	const LemonScriptProgram::LoadScriptsResult result = mLemonScriptProgram.loadScripts(mainScriptPath.toStdString(), options);
+	const LemonScriptProgram::LoadScriptsResult result = mLemonScriptProgram.loadScripts(mainScriptPath, options);
 	if (result == LemonScriptProgram::LoadScriptsResult::PROGRAM_CHANGED)
 	{
 		lemon::Runtime::setActiveEnvironment(&mRuntimeEnvironment);
@@ -439,8 +441,23 @@ void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enfo
 			{
 				std::string str;
 				for (uint32 i : callstack)
-					str += " " + rmx::hexString(i, 8, "");
-				RMX_ERROR("Save state stack could not be represented in lemon script:\n" + str, );
+				{
+					if (!str.empty())
+						str += ", ";
+					str += "\"" + rmx::hexString(i, 6) + "\"";
+				}
+
+			#if defined(PLATFORM_IS_DESKTOP)
+				if (EngineMain::getDelegate().useDeveloperFeatures())
+				{
+					SDL_SetClipboardText(str.c_str());
+					RMX_ERROR("Save state stack could not be represented in lemon script:\n" << str << "\n\nSave state stack was copied to the clipboard.", );
+				}
+				else
+			#endif
+				{
+					RMX_ERROR("Save state stack could not be represented in lemon script:\n" << str, );
+				}
 			}
 		}
 
@@ -448,12 +465,12 @@ void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enfo
 		if (!success || mLemonScriptRuntime.getCallStackSize() == 0)
 		{
 			// Start from scratch
-			mLemonScriptRuntime.callFunctionByName("scriptMainEntryPoint", true);
+			mLemonScriptRuntime.callFunctionByName("Engine.scriptMainEntryPoint", true);
 		}
 	}
 
 	// Execute init once
-	mLemonScriptRuntime.callFunctionByName("Init", false);
+	mLemonScriptRuntime.callFunctionByName("Engine.onScriptInitialization", false);
 
 	EngineMain::getDelegate().onRuntimeInit(*this);
 
@@ -785,6 +802,7 @@ bool CodeExec::tryCallAddressHookDev(uint32 address)
 		{
 			mUnknownAddressesSet.insert(address);
 			mUnknownAddressesInOrder.push_back(address);
+			RMX_ERROR("Call or jump to unknown address " << rmx::hexString(address, 6), );
 		}
 		return false;
 	}

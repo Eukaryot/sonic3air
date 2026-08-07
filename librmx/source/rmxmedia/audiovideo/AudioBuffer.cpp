@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -140,7 +140,7 @@ bool AudioBuffer::load(const String& source, const String& params)
 	for (LoadCallbackList::iterator it = mStaticLoadCallbacks.begin(); it != mStaticLoadCallbacks.end(); ++it)
 	{
 		LoadCallbackType func = *it;
-		if (func(this, source, params))
+		if (func(*this, source, params))
 			return true;
 	}
 	return false;

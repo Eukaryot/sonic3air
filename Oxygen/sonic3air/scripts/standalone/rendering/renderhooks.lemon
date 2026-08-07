@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2025 by Eukaryot
+	Copyright (C) 2017-2026 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -785,12 +785,12 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		return true
 	}
 
-	// Character sprites in best ending final scene
+	// Character sprites in best ending final scene (with a fix for Tails #contributed by Crappy Productions)
 	if (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f39e || objA0.update_address == 0x05f3da || objA0.update_address == 0x05f400)
 	{
 		u8 character = (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f39e) ? CHARACTER_SONIC : CHARACTER_TAILS
 		u8 atex = 0x40 + character * 0x20
-		u8 animationSprite = (character == CHARACTER_SONIC) ? (objA0.animation.sprite-1) : (character == CHARACTER_TAILS) ? (objA0.animation.sprite-5) : (objA0.animation.sprite-10)
+		u8 animationSprite = (character == CHARACTER_SONIC) ? (objA0.animation.sprite-1) : (objA0.update_address == 0x05f400) ? (objA0.animation.sprite-5) : (objA0.animation.sprite-10)
 		u64 key = stringformat((objA0.update_address == 0x05f400) ? "%s_tails_ending_0x%02x" : "%s_ending_0x%02x", getCharacterSpriteKey(character, false), animationSprite)
 		if (Renderer.hasCustomSprite(key))
 		{

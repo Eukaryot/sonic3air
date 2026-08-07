@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,6 +10,7 @@
 #include "lemon/runtime/ControlFlow.h"
 #include "lemon/runtime/Runtime.h"
 #include "lemon/runtime/RuntimeFunction.h"
+#include "lemon/program/Program.h"
 
 
 namespace lemon
@@ -103,6 +104,110 @@ namespace lemon
 	{
 		const ScriptFunction* function = getCurrentFunction();
 		return (nullptr != function) ? &function->getModule() : nullptr;
+	}
+
+	int64 ControlFlow::readVariableGeneric(uint32 variableId)
+	{
+		const Variable::Type type = (Variable::Type)(variableId >> 28);
+		switch (type)
+		{
+			default:
+			case Variable::Type::LOCAL:
+			{
+				const LocalVariable& variable = getCurrentFunction()->getLocalVariableByID(variableId);
+				return readLocalVariable<int64>(variable.getLocalMemoryOffset());
+			}
+
+			case Variable::Type::GLOBAL:
+			{
+				const GlobalVariable& variable = mProgram->getGlobalVariableByID(variableId).as<GlobalVariable>();
+				const int64* valuePtr = getRuntime().accessGlobalVariableValue(variable);
+				return (nullptr != valuePtr) ? *valuePtr : 0;
+			}
+
+			case Variable::Type::USER:
+			{
+				const UserDefinedVariable& variable = mProgram->getGlobalVariableByID(variableId).as<UserDefinedVariable>();
+				variable.mGetter(*this);		// This is supposed to write a value to the value stack
+				return popValueStack<int64>();
+			}
+
+			case Variable::Type::EXTERNAL:
+			{
+				const ExternalVariable& variable = mProgram->getGlobalVariableByID(variableId).as<ExternalVariable>();
+				const int64* valuePtr = variable.mAccessor();
+				return (nullptr != valuePtr) ? *valuePtr : 0;
+			}
+		}
+	}
+
+	void ControlFlow::writeVariableGeneric(uint32 variableId, int64 value)
+	{
+		const Variable::Type type = (Variable::Type)(variableId >> 28);
+		switch (type)
+		{
+			default:
+			case Variable::Type::LOCAL:
+			{
+				const LocalVariable& variable = getCurrentFunction()->getLocalVariableByID(variableId);
+				writeLocalVariable(variable.getLocalMemoryOffset(), value);
+				break;
+			}
+
+			case Variable::Type::GLOBAL:
+			{
+				const GlobalVariable& variable = mProgram->getGlobalVariableByID(variableId).as<GlobalVariable>();
+				int64* valuePtr = getRuntime().accessGlobalVariableValue(variable);
+				if (nullptr != valuePtr)
+					*valuePtr = value;
+				break;
+			}
+
+			case Variable::Type::USER:
+			{
+				const UserDefinedVariable& variable = mProgram->getGlobalVariableByID(variableId).as<UserDefinedVariable>();
+				pushValueStack(value);
+				variable.mSetter(*this);		// This is supposed to read a value from the value stack
+				break;
+			}
+
+			case Variable::Type::EXTERNAL:
+			{
+				const ExternalVariable& variable = mProgram->getGlobalVariableByID(variableId).as<ExternalVariable>();
+				int64* valuePtr = variable.mAccessor();
+				if (nullptr != valuePtr)
+					*valuePtr = value;
+				break;
+			}
+		}
+	}
+
+	uint8* ControlFlow::accessVariableGeneric(uint32 variableId)
+	{
+		const Variable::Type type = (Variable::Type)(variableId >> 28);
+		switch (type)
+		{
+			case Variable::Type::LOCAL:
+			{
+				// This requires local variables with different sizes, currently they're all just one uint64 each
+				//return reinterpret_cast<uint8*>(mCurrentLocalVariables[variableId]);
+
+				RMX_ASSERT(false, "Unhandled variable type for 'accessVariableGeneric'");
+				return nullptr;
+			}
+
+			case Variable::Type::GLOBAL:
+			{
+				const GlobalVariable& variable = mProgram->getGlobalVariableByID(variableId).as<GlobalVariable>();
+				return reinterpret_cast<uint8*>(getRuntime().accessGlobalVariableValue(variable));
+			}
+
+			default:
+			{
+				RMX_ASSERT(false, "Unhandled variable type for 'accessVariableGeneric'");
+				return nullptr;
+			}
+		}
 	}
 
 }

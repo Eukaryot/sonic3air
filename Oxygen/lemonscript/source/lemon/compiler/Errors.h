@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -33,9 +33,11 @@ namespace lemon
 	{
 		enum class Code
 		{
-			UNDEFINED					= 0,		// Should not be used at all
-			DEPRECATED_FUNCTION			= 0x0100,
-			DEPRECATED_FUNCTION_ALIAS	= 0x0101,
+			UNDEFINED						= 0,		// Should not be used at all
+			DEPRECATED_FUNCTION				= 0x0100,
+			DEPRECATED_FUNCTION_ALIAS		= 0x0101,
+			UNDEFINED_ORDER_OF_OPERATIONS	= 0x0200,	// When the order of operations is undefined, but matters as one of the operations influences the result of the other
+			MISSING_RETURN					= 0x0300,	// A non-void function is missing a return at the end
 		};
 
 		struct Occurrence

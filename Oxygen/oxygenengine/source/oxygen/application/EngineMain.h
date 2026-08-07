@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -32,10 +32,11 @@ public:
 	struct AppMetaData
 	{
 		std::string  mTitle;
+		std::string  mInternalName;
 		std::wstring mIconFile;
 		int			 mWindowsIconResource = 0;
 		std::string	 mBuildVersionString;
-		uint32		 mBuildVersionNumber;
+		uint32		 mBuildVersionNumber = 0;
 		std::wstring mAppDataFolder;
 	};
 
@@ -75,7 +76,6 @@ public:
 	virtual void onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer) = 0;
 	virtual void onGameRecordingHeaderSave(std::vector<uint8>& buffer) = 0;
 
-	virtual Font& getDebugFont(int size) = 0;
 	virtual void fillDebugVisualization(Bitmap& bitmap, int& mode) = 0;
 };
 
@@ -103,6 +103,7 @@ public:
 	uint32 getPlatformFlags() const;
 	void switchToRenderMethod(Configuration::RenderMethod newRenderMethod);
 	void setVSyncMode(Configuration::FrameSyncType frameSyncMode);
+	Vec2i getDisplaySize(int displayIndex) const;
 
 private:
 	bool startupEngine();

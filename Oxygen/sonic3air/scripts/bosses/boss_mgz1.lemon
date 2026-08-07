@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2025 by Eukaryot
+	Copyright (C) 2017-2026 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -146,7 +146,7 @@ function void fn08867e()
 	D1.u16 = u16[0x0886da + D0.u16]
 
 #if STANDALONE
-	// Factor in screen extend as well, #contributed by HazelSpooder
+	// Factor in screen extend as well, #contributed by AmberChromatic
 	D1.u16 += ((getScreenExtend() * 2) % (D1.u16 / 2))
 #endif
 

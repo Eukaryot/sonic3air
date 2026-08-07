@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,6 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/application/audio/AudioSourceManager.h"
+#include "oxygen/application/audio/ChipWritesAudioSource.h"
 #include "oxygen/application/audio/EmulationAudioSource.h"
 #include "oxygen/application/audio/OggAudioSource.h"
 
@@ -20,6 +21,7 @@ void AudioSourceManager::clear()
 	// Now it's safe to destroy all the audio sources
 	for (AudioSourceBase* audioSource : mAudioSources)
 	{
+		audioSource->shutdown();
 		delete audioSource;
 	}
 	mAudioSources.clear();
@@ -50,7 +52,7 @@ AudioSourceBase* AudioSourceManager::getAudioSourceForPlayback(SourceRegistratio
 	}
 	else
 	{
-		hash = rmx::getMurmur2_64(String(0, "EmulatedKey:%016llx", sourceRegistration.mAudioDefinition->mKeyId));
+		hash = rmx::getMurmur2_64(String(0, "EmulatedKey:%016llx", sourceRegistration.mAudioDefinition->mAllKeyIds.back()));	// Usually the numeric key, at least if there is one
 	}
 
 	AudioSourceBase* audioSource = nullptr;
@@ -68,8 +70,15 @@ AudioSourceBase* AudioSourceManager::getAudioSourceForPlayback(SourceRegistratio
 		// Create a new audio source
 		if (sourceRegistration.mType == SourceRegistration::Type::FILE)
 		{
-			const bool useCaching = !String(sourceRegistration.mAudioDefinition->mKeyString).endsWith("_fast");
-			audioSource = addOggAudioSource(sourceRegistration.mSourceFile, useCaching, sourceRegistration.mIsLooping, sourceRegistration.mLoopStart);
+			if (rmx::endsWith(sourceRegistration.mSourceFile, L".chipw"))
+			{
+				audioSource = addChipWritesAudioSource(sourceRegistration.mSourceFile, false);
+			}
+			else
+			{
+				const bool useCaching = !String(sourceRegistration.mAudioDefinition->mKeyString).endsWith("_fast");
+				audioSource = addOggAudioSource(sourceRegistration.mSourceFile, useCaching, sourceRegistration.mIsLooping, sourceRegistration.mLoopStart);
+			}
 		}
 		else
 		{
@@ -110,6 +119,17 @@ size_t AudioSourceManager::getMemoryUsage() const
 		memoryUsage += audioSource->getMemoryUsage();
 	}
 	return memoryUsage;
+}
+
+AudioSourceBase* AudioSourceManager::addChipWritesAudioSource(std::wstring_view filename, bool useCaching)
+{
+	// Register audio source
+	ChipWritesAudioSource* audioSource = new ChipWritesAudioSource(useCaching);
+	mAudioSources.push_back(audioSource);
+
+	// Load content
+	audioSource->load(filename);
+	return audioSource;
 }
 
 AudioSourceBase* AudioSourceManager::addEmulationAudioSource(uint8 soundId, AudioSourceBase::CachingType cachingType, const std::wstring& filename, uint32 sourceAddress, uint32 contentOffset)

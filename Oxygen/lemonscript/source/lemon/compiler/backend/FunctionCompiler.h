@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -46,6 +46,7 @@ namespace lemon
 		Opcode& addOpcode(Opcode::Type type, BaseType dataType, int64 parameter = 0);
 		Opcode& addOpcode(Opcode::Type type, const DataTypeDefinition* dataType, int64 parameter = 0);
 		void addCastOpcodeIfNecessary(const DataTypeDefinition* sourceType, const DataTypeDefinition* targetType);
+		void addMoveStackOpcode(int stackChange);
 		Opcode& addJumpToLabel(Opcode::Type type, const LabelToken& labelToken);
 
 		void buildOpcodesFromNodes(const BlockNode& blockNode, NodeContext& context);
@@ -53,14 +54,16 @@ namespace lemon
 
 		void compileTokenTreeToOpcodes(const StatementToken& token, bool consumeResult = false, bool isLValue = false);
 		void compileUnaryDecIncToOpcodes(const UnaryOperationToken& uot);
+		void compileAssignmentToOpcodes(const BinaryOperationToken& bot);
 		void compileBinaryAssignmentToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType);
 		void compileBinaryOperationToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType);
+		void createReferenceFromTokenTree(const StatementToken& token);
+
+		void checkForUndefinedOrderOfOperations(const StatementToken& token1, const StatementToken& token2, bool alsoCheckReverseOrder = true) const;
 
 		void scopeBegin(int numVariables);
 		void scopeEnd(int numVariables);
 
-		void optimizeOpcodes();
-		void cleanupNOPs();
 		void assignOpcodeFlags();
 
 	private:

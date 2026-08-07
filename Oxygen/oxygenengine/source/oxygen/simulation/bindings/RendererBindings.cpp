@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -155,7 +155,7 @@ namespace
 			case WriteTarget::VRAM:
 			{
 				if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
-					LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress, 2);
+					LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress, 2, value);
 
 				getEmulatorInterface().writeVRam16(mWriteAddress, value);
 				break;
@@ -194,7 +194,14 @@ namespace
 			// Optimized version of the code below
 			if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
 			{
-				LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress, bytes);
+				uint32 value = 0;
+				if (bytes == 2)
+				{
+					const uint8* ptr = emulatorInterface.getMemoryPointer(address, false, bytes);
+					if (nullptr != ptr)
+						value = *(uint16*)ptr;
+				}
+				LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress, bytes, value);
 			}
 
 			emulatorInterface.copyFromMemoryToVRam(mWriteAddress, address, bytes);
@@ -205,7 +212,10 @@ namespace
 			if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
 			{
 				for (uint16 i = 0; i < bytes; i += 2)
-					LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress + mWriteIncrement * i/2, 2);
+				{
+					const uint16 value = emulatorInterface.readMemory16(address + i);
+					LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress + mWriteIncrement * i/2, 2, value);
+				}
 			}
 
 			for (uint16 i = 0; i < bytes; i += 2)
@@ -223,7 +233,9 @@ namespace
 		RMX_CHECK(uint32(vramAddress) + bytes <= 0x10000, "Invalid VRAM access from " << rmx::hexString(vramAddress, 8) << " to " << rmx::hexString(uint32(vramAddress)+bytes-1, 8) << " in VDP_fillVRAMbyDMA", return);
 
 		if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
-			LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(vramAddress, bytes);
+		{
+			LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(vramAddress, bytes, fillValue);
+		}
 
 		getEmulatorInterface().fillVRam(vramAddress, fillValue, bytes);
 		mWriteAddress = vramAddress + bytes;
@@ -232,7 +244,9 @@ namespace
 	void VDP_zeroVRAM(uint16 bytes)
 	{
 		if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
-			LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress, bytes);
+		{
+			LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(mWriteAddress, bytes, 0);
+		}
 
 		VDP_fillVRAMbyDMA(0, mWriteAddress, bytes);
 	}
@@ -265,9 +279,19 @@ namespace
 		VDP_copyToCRAM(sourceAddress, bytes);
 	}
 
+	bool VDP_Config_getActiveDisplay()
+	{
+		return RenderParts::instance().getActiveDisplay();
+	}
+
 	void VDP_Config_setActiveDisplay(uint8 enable)
 	{
 		RenderParts::instance().setActiveDisplay(enable != 0);
+	}
+
+	uint16 VDP_Config_getNameTableBasePlaneB()
+	{
+		return RenderParts::instance().getPlaneManager().getNameTableBaseB();
 	}
 
 	void VDP_Config_setNameTableBasePlaneB(uint16 vramAddress)
@@ -275,9 +299,19 @@ namespace
 		RenderParts::instance().getPlaneManager().setNameTableBaseB(vramAddress);
 	}
 
+	uint16 VDP_Config_getNameTableBasePlaneA()
+	{
+		return RenderParts::instance().getPlaneManager().getNameTableBaseA();
+	}
+
 	void VDP_Config_setNameTableBasePlaneA(uint16 vramAddress)
 	{
 		RenderParts::instance().getPlaneManager().setNameTableBaseA(vramAddress);
+	}
+
+	uint16 VDP_Config_getNameTableBasePlaneW()
+	{
+		return RenderParts::instance().getPlaneManager().getNameTableBaseW();
 	}
 
 	void VDP_Config_setNameTableBasePlaneW(uint16 vramAddress)
@@ -291,7 +325,12 @@ namespace
 		RenderParts::instance().getScrollOffsetsManager().setHorizontalScrollMask(horizontalScrollMask);
 	}
 
-	void VDP_Config_setBackdropColor(uint8 paletteIndex)
+	uint8 VDP_Config_getBackdropColorIndex()
+	{
+		return (uint8)RenderParts::instance().getPaletteManager().getBackdropColorIndex();
+	}
+
+	void VDP_Config_setBackdropColorIndex(uint8 paletteIndex)
 	{
 		RenderParts::instance().getPaletteManager().setBackdropColorIndex(paletteIndex);
 	}
@@ -299,6 +338,11 @@ namespace
 	void VDP_Config_setRenderingModeConfiguration(uint8 shadowHighlightPalette)
 	{
 		// TODO: Implement this
+	}
+
+	uint16 VDP_Config_getHorizontalScrollTableBase()
+	{
+		return RenderParts::instance().getScrollOffsetsManager().getHorizontalScrollTableBase();
 	}
 
 	void VDP_Config_setHorizontalScrollTableBase(uint16 vramAddress)
@@ -319,18 +363,26 @@ namespace
 	void VDP_Config_setWindowPlaneSplitX(uint8 rightSideWindow, uint16 splitX)
 	{
 		RenderParts::instance().getPlaneManager().setWindowPlaneSplitX(rightSideWindow != 0, splitX);
-		RenderParts::instance().getScrollOffsetsManager().setPlaneWScrollOffset(Vec2i(0, 0));	// Reset scroll offset to default
 	}
 
 	void VDP_Config_setWindowPlaneSplitY(uint8 bottomWindow, uint16 splitY)
 	{
 		RenderParts::instance().getPlaneManager().setWindowPlaneSplitY(bottomWindow != 0, splitY);
-		RenderParts::instance().getScrollOffsetsManager().setPlaneWScrollOffset(Vec2i(0, 0));	// Reset scroll offset to default
+	}
+
+	void VDP_Config_setRenderPlaneABehindW(bool renderPlaneABehindW)
+	{
+		RenderParts::instance().getPlaneManager().setRenderPlaneABehindW(renderPlaneABehindW);
 	}
 
 	void VDP_Config_setPlaneWScrollOffset(uint16 x, uint8 y)
 	{
 		RenderParts::instance().getScrollOffsetsManager().setPlaneWScrollOffset(Vec2i(x, y));
+	}
+
+	uint16 VDP_Config_getSpriteAttributeTableBase()
+	{
+		return RenderParts::instance().getSpriteManager().getSpriteAttributeTableBase();
 	}
 
 	void VDP_Config_setSpriteAttributeTableBase(uint16 vramAddress)
@@ -347,7 +399,9 @@ namespace
 	void setVRAM(uint16 vramAddress, uint16 value)
 	{
 		if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
-			LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(vramAddress, 2);
+		{
+			LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(vramAddress, 2, value);
+		}
 
 		getEmulatorInterface().writeVRam16(vramAddress, value);
 	}
@@ -449,6 +503,42 @@ namespace
 	bool Renderer_hasCustomSprite(uint64 key)
 	{
 		return SpriteCollection::instance().hasSprite(key);
+	}
+
+	uint32 Renderer_getSpriteWidth(uint64 key)
+	{
+		const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
+		if (nullptr == item)
+			return 0;
+
+		return (uint32)item->mSprite->getSize().x;
+	}
+
+	uint32 Renderer_getSpriteHeight(uint64 key)
+	{
+		const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
+		if (nullptr == item)
+			return 0;
+
+		return (uint32)item->mSprite->getSize().y;
+	}
+
+	int32 Renderer_getSpriteCenterX(uint64 key)
+	{
+		const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
+		if (nullptr == item)
+			return 0;
+
+		return -item->mSprite->mOffset.x;	// Offset is usually negative, however you'd expect the center position to be positive
+	}
+
+	int32 Renderer_getSpriteCenterY(uint64 key)
+	{
+		const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(key);
+		if (nullptr == item)
+			return 0;
+
+		return -item->mSprite->mOffset.y;	// Offset is usually negative, however you'd expect the center position to be positive
 	}
 
 	uint64 Renderer_setupCustomUncompressedSprite(uint32 sourceBase, uint16 words, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
@@ -927,16 +1017,18 @@ namespace lemon
 	namespace internal
 	{
 		template<>
-		void pushStackGeneric<SpriteHandleWrapper>(SpriteHandleWrapper value, const NativeFunction::Context context)
+		struct StackHandler<SpriteHandleWrapper>
 		{
-			context.mControlFlow.pushValueStack(value.mHandle);
-		};
+			static void pushStack(SpriteHandleWrapper value, const NativeFunction::Context context)
+			{
+				context.mControlFlow.pushValueStack(value.mHandle);
+			}
 
-		template<>
-		SpriteHandleWrapper popStackGeneric(const NativeFunction::Context context)
-		{
-			return SpriteHandleWrapper { context.mControlFlow.popValueStack<uint32>() };
-		}
+			static SpriteHandleWrapper popStack(const NativeFunction::Context context)
+			{
+				return SpriteHandleWrapper { context.mControlFlow.popValueStack<uint32>() };
+			}
+		};
 	}
 }
 
@@ -946,7 +1038,7 @@ void RendererBindings::registerBindings(lemon::Module& module)
 	lemon::ModuleBindingsBuilder builder(module);
 
 	// Data type
-	SpriteHandleWrapper::mDataType = module.addDataType("SpriteHandle", lemon::BaseType::UINT_32);
+	SpriteHandleWrapper::mDataType = &module.addCustomDataType("SpriteHandle", lemon::BaseType::UINT_32);
 
 	// Constants
 	{
@@ -963,6 +1055,7 @@ void RendererBindings::registerBindings(lemon::Module& module)
 	{
 		const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
 		const BitFlagSet<lemon::Function::Flag> compileTimeConstant(lemon::Function::Flag::ALLOW_INLINE_EXECUTION, lemon::Function::Flag::COMPILE_TIME_CONSTANT);
+		const BitFlagSet<lemon::Function::Flag> deprecatedFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION, lemon::Function::Flag::DEPRECATED);
 
 
 		// Screen size query
@@ -1042,19 +1135,29 @@ void RendererBindings::registerBindings(lemon::Module& module)
 
 
 		// VDP config
+		builder.addNativeFunction("VDP.Config.getActiveDisplay", lemon::wrap(&VDP_Config_getActiveDisplay), defaultFlags);
+
 		builder.addNativeFunction("VDP.Config.setActiveDisplay", lemon::wrap(&VDP_Config_setActiveDisplay), defaultFlags)
 			.setParameters("enable");
+
+		builder.addNativeFunction("VDP.Config.getNameTableBasePlaneB", lemon::wrap(&VDP_Config_getNameTableBasePlaneB), defaultFlags);
 
 		builder.addNativeFunction("VDP.Config.setNameTableBasePlaneB", lemon::wrap(&VDP_Config_setNameTableBasePlaneB), defaultFlags)
 			.setParameters("vramAddress");
 
+		builder.addNativeFunction("VDP.Config.getNameTableBasePlaneA", lemon::wrap(&VDP_Config_getNameTableBasePlaneA), defaultFlags);
+
 		builder.addNativeFunction("VDP.Config.setNameTableBasePlaneA", lemon::wrap(&VDP_Config_setNameTableBasePlaneA), defaultFlags)
 			.setParameters("vramAddress");
+
+		builder.addNativeFunction("VDP.Config.getNameTableBasePlaneW", lemon::wrap(&VDP_Config_getNameTableBasePlaneW), defaultFlags);
 
 		builder.addNativeFunction("VDP.Config.setNameTableBasePlaneW", lemon::wrap(&VDP_Config_setNameTableBasePlaneW), defaultFlags)
 			.setParameters("vramAddress");
 
-		builder.addNativeFunction("VDP.Config.setBackdropColor", lemon::wrap(&VDP_Config_setBackdropColor), defaultFlags)
+		builder.addNativeFunction("VDP.Config.getBackdropColorIndex", lemon::wrap(&VDP_Config_getBackdropColorIndex), defaultFlags);
+
+		builder.addNativeFunction("VDP.Config.setBackdropColorIndex", lemon::wrap(&VDP_Config_setBackdropColorIndex), defaultFlags)
 			.setParameters("paletteIndex");
 
 		builder.addNativeFunction("VDP.Config.setVerticalScrolling", lemon::wrap(&VDP_Config_setVerticalScrolling), defaultFlags)
@@ -1062,6 +1165,8 @@ void RendererBindings::registerBindings(lemon::Module& module)
 
 		builder.addNativeFunction("VDP.Config.setRenderingModeConfiguration", lemon::wrap(&VDP_Config_setRenderingModeConfiguration), defaultFlags)
 			.setParameters("shadowHighlightPalette");
+
+		builder.addNativeFunction("VDP.Config.getHorizontalScrollTableBase", lemon::wrap(&VDP_Config_getHorizontalScrollTableBase), defaultFlags);
 
 		builder.addNativeFunction("VDP.Config.setHorizontalScrollTableBase", lemon::wrap(&VDP_Config_setHorizontalScrollTableBase), defaultFlags)
 			.setParameters("vramAddress");
@@ -1080,6 +1185,11 @@ void RendererBindings::registerBindings(lemon::Module& module)
 
 		builder.addNativeFunction("VDP.Config.setPlaneWScrollOffset", lemon::wrap(&VDP_Config_setPlaneWScrollOffset), defaultFlags)
 			.setParameters("x", "y");
+
+		builder.addNativeFunction("VDP.Config.setRenderPlaneABehindW", lemon::wrap(&VDP_Config_setRenderPlaneABehindW), defaultFlags)
+			.setParameters("renderPlaneABehindW");
+
+		builder.addNativeFunction("VDP.Config.getSpriteAttributeTableBase", lemon::wrap(&VDP_Config_getSpriteAttributeTableBase), defaultFlags);
 
 		builder.addNativeFunction("VDP.Config.setSpriteAttributeTableBase", lemon::wrap(&VDP_Config_setSpriteAttributeTableBase), defaultFlags)
 			.setParameters("vramAddress");
@@ -1147,6 +1257,18 @@ void RendererBindings::registerBindings(lemon::Module& module)
 			.setParameters("px", "py", "encodedSize", "patternIndex", "renderQueue", "tintColor", "addedColor");
 
 		builder.addNativeFunction("Renderer.hasCustomSprite", lemon::wrap(&Renderer_hasCustomSprite), defaultFlags)
+			.setParameters("key");
+
+		builder.addNativeFunction("Renderer.getSpriteWidth", lemon::wrap(&Renderer_getSpriteWidth), defaultFlags)
+			.setParameters("key");
+
+		builder.addNativeFunction("Renderer.getSpriteHeight", lemon::wrap(&Renderer_getSpriteHeight), defaultFlags)
+			.setParameters("key");
+
+		builder.addNativeFunction("Renderer.getSpriteCenterX", lemon::wrap(&Renderer_getSpriteCenterX), defaultFlags)
+			.setParameters("key");
+
+		builder.addNativeFunction("Renderer.getSpriteCenterY", lemon::wrap(&Renderer_getSpriteCenterY), defaultFlags)
 			.setParameters("key");
 
 		builder.addNativeFunction("Renderer.setupCustomUncompressedSprite", lemon::wrap(&Renderer_setupCustomUncompressedSprite), defaultFlags)

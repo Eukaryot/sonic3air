@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -142,7 +142,7 @@ Vec3f Color::getHSL() const
 	else
 		hue = (r - g) / delta * 60.0f + 240.0f;						// Cyan to blue to purple
 
-	return Vec3f(hue * 60.0f, saturation, lightness);
+	return Vec3f(hue, saturation, lightness);
 }
 
 void Color::setFromHSV(const Vec3f& hsv)

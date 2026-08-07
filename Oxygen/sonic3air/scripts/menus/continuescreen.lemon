@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2025 by Eukaryot
+	Copyright (C) 2017-2026 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -164,7 +164,7 @@ function void fn05c2e0()
 
 	VDP.Config.setActiveDisplay(false)
 	VDP.Config.enableHInt(false)
-	VDP.Config.setBackdropColor(0)
+	VDP.Config.setBackdropColorIndex(0)
 	kosinski.queue_size = 0
 
 	zeroMemory(0xffffff10, 0x6c)

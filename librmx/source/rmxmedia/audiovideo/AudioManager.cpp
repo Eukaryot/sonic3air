@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -13,7 +13,7 @@ namespace rmx
 {
 
 	AudioManager::AudioManager() :
-		mRootMixer(*new AudioMixer(0))	// Root mixer always uses ID 0
+		mRootMixer(*new AudioMixer("Root", 0))	// Root mixer always uses ID 0
 	{
 		mAudioMixers[0] = &mRootMixer;
 	}
@@ -274,7 +274,7 @@ namespace rmx
 
 	void AudioManager::removeSound(AudioReference& ref)
 	{
-		if (ref.valid())
+		if (ref.isValid())
 		{
 			removeInstance(ref.getInstanceID());
 		}
@@ -452,10 +452,10 @@ namespace rmx
 
 
 
-	bool WavLoader::load(AudioBuffer* buffer, const String& source, const String& params)
+	bool WavLoader::load(AudioBuffer& outBuffer, const String& source, const String& params)
 	{
 		// Load WAV file
-		if (nullptr == buffer || source.empty())
+		if (source.empty())
 			return false;
 		if (!source.endsWith(".wav"))
 			return false;
@@ -470,7 +470,7 @@ namespace rmx
 		// Rebuild audio buffer
 		int frequency = 44100;
 		int channels = 2;
-		buffer->clear(frequency, channels);
+		outBuffer.clear(frequency, channels);
 
 		// Convert format
 		SDL_AudioCVT cvt;
@@ -487,14 +487,20 @@ namespace rmx
 		short buf0[2048];
 		short buf1[2048];
 		short* buf[2] = { buf0, buf1 };
+
 		const int pages = length/2048+1;
 		for (int page = 0; page < pages; ++page)
 		{
 			int pagesize = (page < pages-1) ? 2048 : (length % 2048);
 			for (int i = 0; i < pagesize; ++i)
+			{
 				for (int j = 0; j < 2; ++j)
+				{
 					buf[j][i] = data[(page*2048+i)*2+j];
-			buffer->addData(buf, pagesize);
+				}
+			}
+
+			outBuffer.addData(buf, pagesize);
 		}
 		return true;
 	}

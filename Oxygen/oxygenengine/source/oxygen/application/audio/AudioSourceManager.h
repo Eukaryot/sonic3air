@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -27,6 +27,7 @@ public:
 	size_t getMemoryUsage() const;
 
 private:
+	AudioSourceBase* addChipWritesAudioSource(std::wstring_view filename, bool useCaching = true);
 	AudioSourceBase* addEmulationAudioSource(uint8 soundId, AudioSourceBase::CachingType cachingType, const std::wstring& filename = L"", uint32 sourceAddress = 0, uint32 contentOffset = 0);
 	AudioSourceBase* addOggAudioSource(const std::wstring& filename, bool useCaching = true, bool isLooping = false, int loopStart = -1);
 

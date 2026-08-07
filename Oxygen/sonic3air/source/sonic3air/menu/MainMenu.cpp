@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -53,7 +53,7 @@ MainMenu::MainMenu(MenuBackground& menuBackground) :
 		mMenuEntries.addEntry("EXTRAS",		 mainmenu::EXTRAS);
 		mMenuEntries.addEntry("MODS",		 mainmenu::MODS);
 
-	#if !defined(PLATFORM_ANDROID) && !defined(PLATFORM_IOS)
+	#if !defined(PLATFORM_ANDROID) && !defined(PLATFORM_IOS) && !defined(PLATFORM_WEB)
 		mMenuEntries.addEntry("EXIT",		 mainmenu::EXIT);
 	#endif
 	}
@@ -108,7 +108,7 @@ void MainMenu::onFadeIn()
 	}
 
 	// Check for unlocked secrets (needed when new game versions added secrets or reduced requirements)
-	Game::instance().checkForUnlockedSecrets();
+	Game::instance().checkForUnlockedSecrets(true);
 }
 
 bool MainMenu::canBeRemoved()

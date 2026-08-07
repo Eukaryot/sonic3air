@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2025 by Eukaryot
+	Copyright (C) 2017-2026 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -776,7 +776,7 @@ function void fn01e732()
 function void fn08598a()
 {
 #if STANDALONE
-	// Fix for CNZ 1 miniboss altering ring palette, #contributed by TheMushrunt
+	// Fix for CNZ 1 miniboss altering ring palette, #contributed by nabbup / Ramona
 	if ((objA0.update_address == 0x06da24 && objA0.base_state < 0x06) && global.zone_act == 0x0300)
 		return
 #endif

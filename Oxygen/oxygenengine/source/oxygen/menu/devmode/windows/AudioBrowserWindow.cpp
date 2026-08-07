@@ -1,6 +1,6 @@
 ﻿/*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -87,7 +87,7 @@ void AudioBrowserWindow::buildContent()
 			ImGui::TextColored(textColor, "%s", audioDefinition->mKeyString.c_str());
 
 			ImGui::TableSetColumnIndex(1);
-			if (mPlayingAudio.valid() && mPlayingDefinition == audioDefinition)	// TODO: This does not work yet
+			if (mPlayingAudio.isValid() && mPlayingDefinition == audioDefinition)	// TODO: This does not work yet
 			{
 				if (ImGui::Button("Stop"))
 				{
@@ -107,7 +107,7 @@ void AudioBrowserWindow::buildContent()
 					}
 
 					//mPlayingAudio = ...
-					audioOut.playAudioBase(audioDefinition->mKeyId, AudioOutBase::CONTEXT_MENU + (isSound? 0 : AudioOutBase::CONTEXT_MUSIC));
+					audioOut.playAudioBase(audioDefinition->mPrimaryKeyId, AudioOutBase::CONTEXT_MENU + (isSound? 0 : AudioOutBase::CONTEXT_MUSIC));
 					mPlayingDefinition = audioDefinition;
 				}
 			}

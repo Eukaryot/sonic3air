@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -220,6 +220,7 @@ void ExtrasMenu::update(float timeElapsed)
 		const GameMenuEntries::UpdateResult result = mActiveMenu->update();
 		if (result != GameMenuEntries::UpdateResult::NONE)
 		{
+			mRightPressCounter = 0;
 			if (result == GameMenuEntries::UpdateResult::OPTION_CHANGED && mActiveMenu == &mTabMenuEntries)
 			{
 				mActiveTab = mTabMenuEntries[0].mSelectedIndex;
@@ -241,14 +242,31 @@ void ExtrasMenu::update(float timeElapsed)
 		{
 			NONE,
 			ACCEPT,
-			BACK
+			BACK,
+			RIGHT
 		};
 		const ButtonEffect buttonEffect = (keys.Start.justPressed() || keys.A.justPressed() || keys.X.justPressed()) ? ButtonEffect::ACCEPT :
-										  (keys.Back.justPressed() || keys.B.justPressed()) ? ButtonEffect::BACK : ButtonEffect::NONE;
+										  (keys.Back.justPressed() || keys.B.justPressed()) ? ButtonEffect::BACK : 
+										   keys.Right.justPressed() ? ButtonEffect::RIGHT : ButtonEffect::NONE;
 
 		if (buttonEffect != ButtonEffect::NONE)
 		{
-			if (buttonEffect == ButtonEffect::BACK || mActiveMenu == &mTabMenuEntries)
+			if (buttonEffect == ButtonEffect::RIGHT)
+			{
+				if (mActiveTab == 1)
+				{
+					++mRightPressCounter;
+					if (mRightPressCounter == 5)
+					{
+						const GameMenuEntry& selectedEntry = mTabs[mActiveTab].mMenuEntries.selected();
+						if (!PlayerProgress::instance().mUnlocks.isSecretUnlocked(selectedEntry.mData))
+						{
+							Game::instance().unlockSecret(selectedEntry.mData);
+						}
+					}
+				}
+			}
+			else if (buttonEffect == ButtonEffect::BACK || mActiveMenu == &mTabMenuEntries)
 			{
 				goBack();
 			}

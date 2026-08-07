@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -77,6 +77,13 @@ template<typename T>
 bool vectorContains(const std::vector<T>& vec, T element)
 {
 	return containsElement(vec, element);
+}
+
+// Check if an std::vector contains an element matching the predicate
+template<typename T, class PRED>
+bool vectorContainsByPredicate(const std::vector<T>& vec, PRED predicate)
+{
+	return containsByPredicate(vec, predicate);
 }
 
 // Get the index of a certain element in an std::vector, or -1 if not found

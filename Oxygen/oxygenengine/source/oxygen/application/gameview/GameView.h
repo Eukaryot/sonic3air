@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,6 +9,7 @@
 #pragma once
 
 #include "oxygen/drawing/DrawerTexture.h"
+#include "oxygen/helper/ScaledScreenRect.h"
 
 class Simulation;
 
@@ -35,13 +36,11 @@ public:
 	GameView(Simulation& simulation);
 	~GameView();
 
-	inline const Recti& getGameViewport() const  { return mGameViewport; }
+	inline const ScaledScreenRect& getGameViewport() const  { return mGameViewport; }
+	inline const Recti& getGameViewportRect() const  { return mGameViewport.getRectOnScreen(); }
 	void updateGameViewport();
 
-	bool translatePositionIntoGameViewport(Vec2f& outPosition, const Vec2f& inPosition) const;
-	void translateRectIntoGameViewport(Rectf& outRect, const Rectf& inRect) const;
-	void translatePositionIntoScreenCoords(Vec2f& outPosition, const Vec2f& inPosition) const;
-	void translateRectIntoScreenCoords(Rectf& outRect, const Rectf& inRect) const;
+	bool translatePositionIntoGameViewport(Vec2i& outInnerPosition, const Vec2f& screenPosition) const;
 
 	virtual void initialize() override;
 	virtual void deinitialize() override;
@@ -81,15 +80,14 @@ private:
 private:
 	Simulation& mSimulation;
 
-	Recti mGameViewport;
+	ScaledScreenRect mGameViewport;
+	DrawerTexture mFinalGameTexture;
 
 	float mFadeValue = 1.0f;
 	float mFadeChange = 0.0f;
 	float mWhiteOverlayAlpha = 0.0f;
 
 	StillImage mStillImage;
-
-	DrawerTexture mFinalGameTexture;
 
 	float mRewindTimer = 0.0f;
 	int mRewindCounter = 0;

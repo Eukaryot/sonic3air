@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,7 +8,10 @@
 
 #include "lemon/pch.h"
 #include "lemon/compiler/backend/FunctionCompiler.h"
+#include "lemon/compiler/backend/OpcodeOptimization.h"
+#include "lemon/compiler/Compiler.h"
 #include "lemon/compiler/Node.h"
+#include "lemon/compiler/TokenHelper.h"
 #include "lemon/compiler/TokenTypes.h"
 #include "lemon/compiler/TypeCasting.h"
 #include "lemon/compiler/Utility.h"
@@ -99,7 +102,8 @@ namespace lemon
 		mLineNumber = mFunction.mStartLineNumber;
 
 		// Create scope
-		addOpcode(Opcode::Type::MOVE_VAR_STACK, mFunction.mLocalVariablesByID.size());
+		RMX_ASSERT((mFunction.mLocalVariablesMemorySize % 8) == 0, "Expected local variables total size to be a multiple of 8 bytes");
+		addOpcode(Opcode::Type::MOVE_VAR_STACK, mFunction.mLocalVariablesMemorySize / 8);
 
 		// Go through parameters in reverse order
 		for (int index = (int)mFunction.getParameters().size() - 1; index >= 0; --index)
@@ -115,7 +119,7 @@ namespace lemon
 			// Pop value from stack (as SET_VARIABLE_VALUE opcode does not consume it)
 			const int sizeOnStack = (int)variable->getDataType()->getSizeOnStack();
 			RMX_ASSERT(sizeOnStack != 0, "Invalid stack size of type " << variable->getDataType()->getName().getString());
-			addOpcode(Opcode::Type::MOVE_STACK, -sizeOnStack);
+			addMoveStackOpcode(-sizeOnStack);
 		}
 	}
 
@@ -144,7 +148,7 @@ namespace lemon
 		// Make sure it ends with a return in any case
 		if (mOpcodes.empty() || mOpcodes.back().mType != Opcode::Type::RETURN)
 		{
-			CHECK_ERROR(mFunction.getReturnType()->getClass() == DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->getName() << " value", blockNode.getLineNumber());
+			CHECK_ERROR(mFunction.getReturnType()->isA<VoidDataType>(), "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->getName() << " value", blockNode.getLineNumber());
 			addOpcode(Opcode::Type::RETURN);
 		}
 		else
@@ -164,7 +168,8 @@ namespace lemon
 		}
 
 		// Optimize the whole thing
-		optimizeOpcodes();
+		OpcodeOptimization opcodeOptimization(mFunction, mOpcodes);
+		opcodeOptimization.optimizeOpcodes();
 
 		// Determine opcode flags
 		assignOpcodeFlags();
@@ -199,7 +204,7 @@ namespace lemon
 	Opcode& FunctionCompiler::addOpcode(Opcode::Type type, const DataTypeDefinition* dataType, int64 parameter)
 	{
 		BaseType baseType = dataType->getBaseType();
-		if (dataType->getClass() == DataTypeDefinition::Class::INTEGER && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::BOOLEAN)
+		if (dataType->isA<IntegerDataType>() && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::BOOLEAN)
 		{
 			baseType = BaseType::BOOL;
 		}
@@ -237,6 +242,21 @@ namespace lemon
 			default:
 				CHECK_ERROR(false, "Cannot cast from " << sourceType->getName() << " to " << targetType->getName(), mLineNumber);
 				break;
+		}
+	}
+
+	void FunctionCompiler::addMoveStackOpcode(int stackChange)
+	{
+		// If there was a move stack opcode added last, then modify or remove it
+		if (!mOpcodes.empty() && mOpcodes.back().mType == Opcode::Type::MOVE_STACK)
+		{
+			mOpcodes.back().mParameter += stackChange;
+			if (mOpcodes.back().mParameter == 0)
+				mOpcodes.pop_back();
+		}
+		else
+		{
+			addOpcode(Opcode::Type::MOVE_STACK, stackChange);
 		}
 	}
 
@@ -280,11 +300,11 @@ namespace lemon
 			case Node::Type::BLOCK:
 			{
 				const BlockNode& blockNode = node.as<BlockNode>();
-				// TODO: Get correct number of local variables in this scope
-				const int numVariables = 0;
-				scopeBegin(numVariables);
+				// TODO: Get correct size of local variables in this scope
+				const int memorySize = 0;
+				scopeBegin(memorySize);
 				buildOpcodesFromNodes(blockNode, context);
-				scopeEnd(numVariables);
+				scopeEnd(memorySize);
 				break;
 			}
 
@@ -322,7 +342,7 @@ namespace lemon
 				{
 					addJumpToLabel(Opcode::Type::JUMP_SWITCH, *labelToken);
 				}
-				addOpcode(Opcode::Type::MOVE_VAR_STACK, -1);	// Consume top of stack if none of the jumps did
+				addOpcode(Opcode::Type::MOVE_VAR_STACK, -1);	// Consume top of stack if none of the jumps did -- TODO: Isn't this meant to be MOVE_STACK (via "addMoveStackOpcode") instead?
 				break;
 			}
 
@@ -349,13 +369,13 @@ namespace lemon
 				const ReturnNode& returnNode = node.as<ReturnNode>();
 				if (returnNode.mStatementToken.valid())
 				{
-					CHECK_ERROR(mFunction.getReturnType()->getClass() != DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' with 'void' return type cannot return a value", node.getLineNumber());
+					CHECK_ERROR(!mFunction.getReturnType()->isA<VoidDataType>(), "Function '" << mFunction.getName() << "' with 'void' return type cannot return a value", node.getLineNumber());
 					compileTokenTreeToOpcodes(*returnNode.mStatementToken);
 					addCastOpcodeIfNecessary(returnNode.mStatementToken->mDataType, mFunction.getReturnType());
 				}
 				else
 				{
-					CHECK_ERROR(mFunction.getReturnType()->getClass() == DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->getName() << " value", node.getLineNumber());
+					CHECK_ERROR(mFunction.getReturnType()->isA<VoidDataType>(), "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->getName() << " value", node.getLineNumber());
 				}
 				addOpcode(Opcode::Type::RETURN);
 				break;
@@ -583,14 +603,7 @@ namespace lemon
 
 				switch (bot.mOperator)
 				{
-					case Operator::ASSIGN:
-					{
-						// Assignment to variable
-						compileTokenTreeToOpcodes(*bot.mRight);
-						addCastOpcodeIfNecessary(bot.mRight->mDataType, bot.mLeft->mDataType);
-						compileTokenTreeToOpcodes(*bot.mLeft, false, true);
-						break;
-					}
+					case Operator::ASSIGN:					 compileAssignmentToOpcodes(bot);  break;
 
 					case Operator::ASSIGN_PLUS:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_ADD);	break;
 					case Operator::ASSIGN_MINUS:			 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_SUB);	break;
@@ -732,8 +745,16 @@ namespace lemon
 			case VariableToken::TYPE:
 			{
 				const VariableToken& vt = token.as<VariableToken>();
-				const Opcode::Type opcodeType = isLValue ? Opcode::Type::SET_VARIABLE_VALUE : Opcode::Type::GET_VARIABLE_VALUE;
-				addOpcode(opcodeType, vt.mDataType, vt.mVariable->getID());
+				if (vt.mDataType->isA<ArrayDataType>())
+				{
+					// Push variable ID
+					addOpcode(Opcode::Type::PUSH_CONSTANT, vt.mVariable->getID());
+				}
+				else
+				{
+					const Opcode::Type opcodeType = isLValue ? Opcode::Type::SET_VARIABLE_VALUE : Opcode::Type::GET_VARIABLE_VALUE;
+					addOpcode(opcodeType, vt.mDataType, vt.mVariable->getID());
+				}
 				break;
 			}
 
@@ -745,8 +766,19 @@ namespace lemon
 				for (size_t i = 0; i < ft.mParameters.size(); ++i)
 				{
 					const TokenPtr<StatementToken>& statementToken = ft.mParameters[i];
-					compileTokenTreeToOpcodes(*statementToken);
-					addCastOpcodeIfNecessary(statementToken->mDataType, ft.mFunction->getParameters()[i].mDataType);
+					const DataTypeDefinition* targetType = ft.mFunction->getParameters()[i].mDataType;
+
+					if (targetType->isA<ReferenceDataType>())
+					{
+						CHECK_ERROR(statementToken->mDataType == &targetType->as<ReferenceDataType>().mTargetType,
+							"Cannot use statement of type " << statementToken->mDataType->getName() << " as a reference of type " << targetType->as<ReferenceDataType>().mTargetType.getName(), mLineNumber);
+						createReferenceFromTokenTree(*statementToken);
+					}
+					else
+					{
+						compileTokenTreeToOpcodes(*statementToken);
+						addCastOpcodeIfNecessary(statementToken->mDataType, targetType);
+					}
 				}
 
 				// Using the data type parameter here to encode whether or not this is a base function call
@@ -756,11 +788,15 @@ namespace lemon
 
 			case MemoryAccessToken::TYPE:
 			{
+				// For writing to a memory access, this implementation should not be reached any more, instead "compileAssignmentToOpcodes" or a similar method is used
+				CHECK_ERROR(!isLValue, "Internal error: Memory write should have been resolved differently", mLineNumber);
 				const MemoryAccessToken& mat = token.as<MemoryAccessToken>();
+
+				// Compile memory address calculation
 				compileTokenTreeToOpcodes(*mat.mAddress);
 
-				const Opcode::Type opcodeType = isLValue ? Opcode::Type::WRITE_MEMORY : Opcode::Type::READ_MEMORY;
-				addOpcode(opcodeType, mat.mDataType);
+				// Opcode to read from memory address
+				addOpcode(Opcode::Type::READ_MEMORY, mat.mDataType);
 				break;
 			}
 
@@ -769,27 +805,46 @@ namespace lemon
 				const BracketAccessToken& bat = token.as<BracketAccessToken>();
 				const DataTypeDefinition::BracketOperator& bracket = bat.mVariable->getDataType()->getBracketOperator();
 
-				// First parameter is the parameter inside the brackets
-				compileTokenTreeToOpcodes(*bat.mParameter);
-				addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
-
-				// Second parameter is the variable ID
-				addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
-
 				// Choose the right function depending on isLValue
 				if (isLValue)
 				{
-					addOpcode(Opcode::Type::CALL, 0, bracket.mSetterNameAndSignatureHash);
+					// Note that this is partially moved to "compileAssignmentToOpcodes"
+					//  -> TODO: Also implement support in "compileUnaryDecIncToOpcodes" and "compileBinaryAssignmentToOpcodes"
+					//  -> Afterwards, this block can be removed and turned into a "CHECK_ERROR(!isLValue, ...)" - similar to MemoryAccessToken, see case above
 
-					// TODO: We actually need the value to assign to as third parameter here already
-					//  -> It's not sufficient to just add it afterwards as for memory access
-					//  -> See "case Operator::ASSIGN:" above for the place where to add that
+					CHECK_ERROR(nullptr != bracket.mSetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
+					// TODO: Also check the setter signature
 
-					// TODO: Also this probably requires a special case inside "compileBinaryAssignmentToOpcodes" as well
+					// Note that the value to assign was already pushed, so that will be the first parameter for the setter
+
+					// Second parameter is the variable ID
+					addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
+
+					// Third parameter is the parameter inside the brackets
+					compileTokenTreeToOpcodes(*bat.mParameter);
+					addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+					addOpcode(Opcode::Type::CALL, bracket.mSetter->getNameAndSignatureHash());
+
+					// Differentiate on whether the setter returns a value or void
+					if (bracket.mSetter->getReturnType()->isVoid())
+					{
+						addMoveStackOpcode(1);	// Push a dummy value onto stack
+					}
 				}
 				else
 				{
-					addOpcode(Opcode::Type::CALL, 0, bracket.mGetterNameAndSignatureHash);
+					CHECK_ERROR(nullptr != bracket.mGetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
+					// TODO: Also check the getter signature
+
+					// First parameter is the variable ID
+					addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
+
+					// Second parameter is the parameter inside the brackets
+					compileTokenTreeToOpcodes(*bat.mParameter);
+					addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+					addOpcode(Opcode::Type::CALL, bracket.mGetter->getNameAndSignatureHash());
 				}
 				break;
 			}
@@ -808,11 +863,11 @@ namespace lemon
 				CHECK_ERROR(false, "Token type should be eliminated by now", mLineNumber);
 		}
 
-		if (consumeResult && token.mDataType->getClass() != DataTypeDefinition::Class::VOID)
+		if (consumeResult && !token.mDataType->isA<VoidDataType>())
 		{
 			const int sizeOnStack = (int)token.mDataType->getSizeOnStack();
 			RMX_ASSERT(sizeOnStack != 0, "Invalid stack size of type " << token.mDataType->getName().getString());
-			addOpcode(Opcode::Type::MOVE_STACK, -sizeOnStack);	// Pop result of statement
+			addMoveStackOpcode(-sizeOnStack);	// Pop result of statement
 		}
 	}
 
@@ -824,8 +879,9 @@ namespace lemon
 		//  -> Memory address calculation must only be done once, especially if it has side effects (e.g. "u8[A0++] += 8")
 		if (uot.mArgument->isA<MemoryAccessToken>())
 		{
-			// Compile memory read
 			const MemoryAccessToken& mat = uot.mArgument->as<MemoryAccessToken>();
+
+			// Compile memory address calculation
 			compileTokenTreeToOpcodes(*mat.mAddress);
 
 			// Output READ_MEMORY opcode with parameter that tells it to *not* consume its input
@@ -836,9 +892,42 @@ namespace lemon
 			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, (uot.mOperator == Operator::UNARY_DECREMENT) ? -1 : 1);
 			addOpcode(Opcode::Type::ARITHM_ADD, uot.mDataType);
 
-			// Output WRITE_MEMORY opcode with parameter that tells it to exchange its inputs
-			//  -> Top of stack is value, next is address - but in other cases it's the other way round
-			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType, 1);
+			// Output WRITE_MEMORY opcode
+			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType);
+		}
+		else if (uot.mArgument->isA<BracketAccessToken>())
+		{
+			const BracketAccessToken& bat = uot.mArgument->as<BracketAccessToken>();
+			const DataTypeDefinition::BracketOperator& bracket = bat.mVariable->getDataType()->getBracketOperator();
+
+			CHECK_ERROR(nullptr != bracket.mSetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
+			// TODO: Also check the setter signature
+
+			// First parameter is the variable ID
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
+
+			// Second parameter is the parameter inside the brackets
+			compileTokenTreeToOpcodes(*bat.mParameter);
+			addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+			// Both parameters so far will be needed by the setter again, are but consumed by the getter - so we need to copy them
+			addOpcode(Opcode::Type::DUPLICATE, 2);
+
+			// Call the getter
+			addOpcode(Opcode::Type::CALL, bracket.mGetter->getNameAndSignatureHash());
+
+			// Add arithmetic add opcode with constant -1 or +1
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, (uot.mOperator == Operator::UNARY_DECREMENT) ? -1 : 1);
+			addOpcode(Opcode::Type::ARITHM_ADD, uot.mDataType);
+
+			// Call the setter
+			addOpcode(Opcode::Type::CALL, bracket.mSetter->getNameAndSignatureHash());
+
+			// Differentiate on whether the setter returns a value or void
+			if (bracket.mSetter->getReturnType()->isVoid())
+			{
+				addMoveStackOpcode(1);	// Push a dummy value onto stack
+			}
 		}
 		else
 		{
@@ -854,18 +943,84 @@ namespace lemon
 		}
 	}
 
+	void FunctionCompiler::compileAssignmentToOpcodes(const BinaryOperationToken& bot)
+	{
+		// Special handling for memory access on left side
+		//  -> Just to ensure the memory address gets pushed first, before the right side
+		if (bot.mLeft->isA<MemoryAccessToken>())
+		{
+			const MemoryAccessToken& mat = bot.mLeft->as<MemoryAccessToken>();
+
+			checkForUndefinedOrderOfOperations(*mat.mAddress, *bot.mRight);
+
+			// Compile memory address calculation
+			compileTokenTreeToOpcodes(*mat.mAddress);
+
+			// Compile right, and cast if necessary
+			compileTokenTreeToOpcodes(*bot.mRight);
+			addCastOpcodeIfNecessary(bot.mRight->mDataType, bot.mLeft->mDataType);
+
+			// Output WRITE_MEMORY opcode
+			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType);
+		}
+		else if (bot.mLeft->isA<BracketAccessToken>())
+		{
+			const BracketAccessToken& bat = bot.mLeft->as<BracketAccessToken>();
+			const DataTypeDefinition::BracketOperator& bracket = bat.mVariable->getDataType()->getBracketOperator();
+
+			CHECK_ERROR(nullptr != bracket.mSetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
+			// TODO: Also check the setter signature
+
+			checkForUndefinedOrderOfOperations(*bat.mParameter, *bot.mRight);
+
+			// First parameter is the variable ID
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
+
+			// Second parameter is the parameter inside the brackets
+			compileTokenTreeToOpcodes(*bat.mParameter);
+			addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+			// Third parameter is the value to assign, i.e. the right side of the assignment
+			compileTokenTreeToOpcodes(*bot.mRight);
+			addCastOpcodeIfNecessary(bot.mRight->mDataType, bot.mLeft->mDataType);
+
+			addOpcode(Opcode::Type::CALL, bracket.mSetter->getNameAndSignatureHash());
+
+			// TODO: For operators like +=, this likely requires a special case inside "compileBinaryAssignmentToOpcodes" just like with memory access
+			//  -> Otherwise the parameter inside the brackets is evaluated twice, which might have unintended side-effects
+
+			// Differentiate on whether the setter returns a value or void
+			if (bracket.mSetter->getReturnType()->isVoid())
+			{
+				addMoveStackOpcode(1);	// Push a dummy value onto stack
+			}
+		}
+		else
+		{
+			// Compile right, and cast if necessary
+			compileTokenTreeToOpcodes(*bot.mRight);
+			addCastOpcodeIfNecessary(bot.mRight->mDataType, bot.mLeft->mDataType);
+
+			// Compile left for assignment
+			compileTokenTreeToOpcodes(*bot.mLeft, false, true);
+		}
+	}
+
 	void FunctionCompiler::compileBinaryAssignmentToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType)
 	{
 		// Special handling for memory access on left side
 		//  -> Memory address calculation must only be done once, especially if it has side effects (e.g. "u8[A0++] += 8")
 		if (bot.mLeft->isA<MemoryAccessToken>())
 		{
-			// Compile memory read
 			const MemoryAccessToken& mat = bot.mLeft->as<MemoryAccessToken>();
+
+			checkForUndefinedOrderOfOperations(*mat.mAddress, *bot.mRight);
+
+			// Compile memory address calculation
 			compileTokenTreeToOpcodes(*mat.mAddress);
 
-			// Output READ_MEMORY opcode with parameter that tells it to *not* consume its input
-			//  -> It would usually do, but in our case here the value is needed again as input for the WRITE_MEMORY below
+			// Output READ_MEMORY opcode with parameter that tells it to *not* consume its input, i.e. the memory address
+			//  -> It would usually do, but in our case here the address is needed again as input for the WRITE_MEMORY below
 			addOpcode(Opcode::Type::READ_MEMORY, mat.mDataType, 1);
 
 			// Compile right
@@ -874,9 +1029,46 @@ namespace lemon
 			// Add arithmetic opcode
 			addOpcode(opcodeType, bot.mDataType);
 
-			// Output WRITE_MEMORY opcode with parameter that tells it to exchange its inputs
-			//  -> Top of stack is value, next is address - but in other cases it's the other way round
-			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType, 1);
+			// Output WRITE_MEMORY opcode
+			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType);
+		}
+		else if (bot.mLeft->isA<BracketAccessToken>())
+		{
+			const BracketAccessToken& bat = bot.mLeft->as<BracketAccessToken>();
+			const DataTypeDefinition::BracketOperator& bracket = bat.mVariable->getDataType()->getBracketOperator();
+
+			CHECK_ERROR(nullptr != bracket.mSetter, "Write access is not possible for bracket operator [] for type " << bat.mVariable->getDataType()->getName(), mLineNumber);
+			// TODO: Also check the setter signature
+
+			checkForUndefinedOrderOfOperations(*bat.mParameter, *bot.mRight);
+
+			// First parameter is the variable ID
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
+
+			// Second parameter is the parameter inside the brackets
+			compileTokenTreeToOpcodes(*bat.mParameter);
+			addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+			// Both parameters so far will be needed by the setter again, are but consumed by the getter - so we need to copy them
+			addOpcode(Opcode::Type::DUPLICATE, 2);
+
+			// Call the getter
+			addOpcode(Opcode::Type::CALL, bracket.mGetter->getNameAndSignatureHash());
+
+			// Compile right
+			compileTokenTreeToOpcodes(*bot.mRight);
+
+			// Add arithmetic opcode
+			addOpcode(opcodeType, bot.mDataType);
+
+			// Call the setter
+			addOpcode(Opcode::Type::CALL, bracket.mSetter->getNameAndSignatureHash());
+
+			// Differentiate on whether the setter returns a value or void
+			if (bracket.mSetter->getReturnType()->isVoid())
+			{
+				addMoveStackOpcode(1);	// Push a dummy value onto stack
+			}
 		}
 		else
 		{
@@ -926,360 +1118,72 @@ namespace lemon
 		addOpcode(opcodeType, leftToken->mDataType);
 	}
 
-	void FunctionCompiler::scopeBegin(int numVariables)
+	void FunctionCompiler::createReferenceFromTokenTree(const StatementToken& token)
 	{
-		if (numVariables > 0)
+		switch (token.getType())
 		{
-			addOpcode(Opcode::Type::MOVE_VAR_STACK, numVariables);
+			case VariableToken::TYPE:
+			{
+				// Push variable ID
+				const VariableToken& vt = token.as<VariableToken>();
+				addOpcode(Opcode::Type::PUSH_CONSTANT, vt.mVariable->getID());
+				return;
+			}
+
+			// TOOD: Maybe support other types as well, like memory access?
+		}
+
+		CHECK_ERROR(false, "Statement can't be used as a reference, please use a variable instead", mLineNumber);
+	}
+
+	void FunctionCompiler::checkForUndefinedOrderOfOperations(const StatementToken& token1, const StatementToken& token2, bool alsoCheckReverseOrder) const
+	{
+		if (isAssignment(token1))
+		{
+			const VariableToken* var1 = token1.as<BinaryOperationToken>().mLeft->cast<VariableToken>();
+			if (nullptr == var1)
+				return;
+
+			const Token* foundToken = findInTokenTree(token2,
+				[&var1](const Token& token)
+			{
+				const VariableToken* var2 = token.cast<VariableToken>();
+				return (nullptr != var2 && var1->mVariable == var2->mVariable);
+			});
+
+			if (nullptr != foundToken)
+			{
+				ADD_WARNING(CompilerWarning::Code::UNDEFINED_ORDER_OF_OPERATIONS, "Variable '" << var1->mVariable->getName() << "' is both changed and used in the same statement, but the order of these operations is not defined", mLineNumber);
+				return;
+			}
+		}
+
+		if (alsoCheckReverseOrder)
+		{
+			if (token2.isA<ValueCastToken>())
+			{
+				checkForUndefinedOrderOfOperations(*token2.as<ValueCastToken>().mArgument, token1, false);
+			}
+			else
+			{
+				checkForUndefinedOrderOfOperations(token2, token1, false);
+			}
 		}
 	}
 
-	void FunctionCompiler::scopeEnd(int numVariables)
+	void FunctionCompiler::scopeBegin(int memoryToReserve)
 	{
-		if (numVariables > 0)
+		if (memoryToReserve > 0)
 		{
-			addOpcode(Opcode::Type::MOVE_VAR_STACK, -numVariables);
+			addOpcode(Opcode::Type::MOVE_VAR_STACK, memoryToReserve);
 		}
 	}
 
-	void FunctionCompiler::optimizeOpcodes()
+	void FunctionCompiler::scopeEnd(int memoryToFree)
 	{
-		if (mOpcodes.empty())
-			return;
-
-		bool anotherRun = true;
-		while (anotherRun)
+		if (memoryToFree > 0)
 		{
-			anotherRun = false;
-
-			// Build up a list of jump targets
-			static std::vector<bool> isOpcodeJumpTarget;
-			{
-				isOpcodeJumpTarget.clear();
-				isOpcodeJumpTarget.resize(mOpcodes.size(), false);
-
-				// Collect jump targets
-				for (const Opcode& opcode : mOpcodes)
-				{
-					if (opcode.mType == Opcode::Type::JUMP || opcode.mType == Opcode::Type::JUMP_CONDITIONAL)
-					{
-						if ((size_t)opcode.mParameter < isOpcodeJumpTarget.size())
-						{
-							isOpcodeJumpTarget[(size_t)opcode.mParameter] = true;
-						}
-					}
-				}
-
-				// Collect labels
-				for (ScriptFunction::Label& label : mFunction.mLabels)
-				{
-					if ((size_t)label.mOffset < isOpcodeJumpTarget.size())
-					{
-						isOpcodeJumpTarget[(size_t)label.mOffset] = true;
-					}
-				}
-			}
-
-			// Look through all pairs of opcodes
-			for (size_t i = 0; i < mOpcodes.size() - 1; ++i)
-			{
-				Opcode& opcode1 = mOpcodes[i];
-				Opcode& opcode2 = mOpcodes[i+1];
-
-				// They must be part of the same line
-				if (opcode1.mLineNumber != opcode2.mLineNumber)
-					continue;
-
-				// Second opcode must not be a jump target
-				if (isOpcodeJumpTarget[i+1])
-					continue;
-
-				// Cleanup: No need to make a comparison result boolean, it is already
-				// TODO: This should not happen any more
-				if (opcode1.mType >= Opcode::Type::COMPARE_EQ && opcode1.mType <= Opcode::Type::COMPARE_GE)
-				{
-					if (opcode2.mType == Opcode::Type::MAKE_BOOL)
-					{
-						opcode2.mType = Opcode::Type::NOP;
-						anotherRun = true;
-						continue;
-					}
-				}
-
-				// Merge: No cast needed after constant
-				if (opcode1.mType == Opcode::Type::PUSH_CONSTANT)
-				{
-					if (opcode2.mType == Opcode::Type::CAST_VALUE)
-					{
-						// TODO: Support conversions between integer, float, double constants
-						//  -> Unless this is done in the compiler frontend already, which actually makes more sense...
-						if (BaseTypeHelper::isPureIntegerBaseCast((BaseCastType)opcode2.mParameter))
-						{
-							switch (opcode2.mParameter & 0x13)
-							{
-								case 0x00:  opcode1.mParameter =  (uint8)opcode1.mParameter;  break;
-								case 0x01:  opcode1.mParameter = (uint16)opcode1.mParameter;  break;
-								case 0x02:  opcode1.mParameter = (uint32)opcode1.mParameter;  break;
-								case 0x10:  opcode1.mParameter =   (int8)opcode1.mParameter;  break;
-								case 0x11:  opcode1.mParameter =  (int16)opcode1.mParameter;  break;
-								case 0x12:  opcode1.mParameter =  (int32)opcode1.mParameter;  break;
-							}
-							opcode2.mType = Opcode::Type::NOP;
-							anotherRun = true;
-							continue;
-						}
-					}
-				}
-			}
-
-			cleanupNOPs();
-		}
-
-		// Collapse all chains of jumps
-		for (size_t i = 0; i < mOpcodes.size(); ++i)
-		{
-			Opcode& startOpcode = mOpcodes[i];
-			if (startOpcode.mType == Opcode::Type::JUMP || startOpcode.mType == Opcode::Type::JUMP_CONDITIONAL)
-			{
-				// Check if this (conditional or unconditional) jump leads to another unconditional jump
-				size_t nextPosition = (size_t)startOpcode.mParameter;
-				if (mOpcodes[nextPosition].mType == Opcode::Type::JUMP)
-				{
-					// Maybe the chain is longer, get the final target opcode of the chain
-					do
-					{
-						nextPosition = (size_t)mOpcodes[nextPosition].mParameter;
-					}
-					while (mOpcodes[nextPosition].mType == Opcode::Type::JUMP);
-
-					// Now the opcode at nextPosition is not a jump any more, this is our final target
-					const size_t targetPosition = nextPosition;
-
-					// Go through the chain again and let everyone point to the final target
-					size_t currentPosition = i;
-					do
-					{
-						nextPosition = (size_t)mOpcodes[currentPosition].mParameter;
-						mOpcodes[currentPosition].mParameter = targetPosition;
-						currentPosition = nextPosition;
-					}
-					while (currentPosition != targetPosition);
-				}
-			}
-		}
-
-		// Resolve conditional jumps that have a fixed condition at compile time already
-		for (size_t i = 0; i < mOpcodes.size() - 1; ++i)
-		{
-			Opcode& firstOpcode = mOpcodes[i];
-			if (firstOpcode.mType == Opcode::Type::PUSH_CONSTANT)
-			{
-				bool replace = false;
-				size_t condJumpPosition = 0;
-
-				const Opcode& secondOpcode = mOpcodes[i+1];
-				if (secondOpcode.mType == Opcode::Type::JUMP_CONDITIONAL)
-				{
-					replace = true;
-					condJumpPosition = i + 1;
-				}
-				else if (secondOpcode.mType == Opcode::Type::JUMP)
-				{
-					// Check the jump target, whether it's an unconditional jump
-					const size_t jumpTarget = (size_t)secondOpcode.mParameter;
-					const Opcode& thirdOpcode = mOpcodes[jumpTarget];
-					if (thirdOpcode.mType == Opcode::Type::JUMP_CONDITIONAL)
-					{
-						replace = true;
-						condJumpPosition = jumpTarget;
-					}
-				}
-
-				if (replace)
-				{
-					const bool conditionMet = (firstOpcode.mParameter != 0);
-					const Opcode& condJumpOpcode = mOpcodes[condJumpPosition];
-					uint64 jumpTarget = conditionMet ? ((uint64)condJumpPosition + 1) : condJumpOpcode.mParameter;
-
-					// Check for a shortcut (as this is not ruled out at that point)
-					if (mOpcodes[(size_t)jumpTarget].mType == Opcode::Type::JUMP)
-					{
-						jumpTarget = mOpcodes[(size_t)jumpTarget].mParameter;
-					}
-
-					// Replace the first opcode with a jump directly to where the (now not really) conditional jump would lead to
-					firstOpcode.mType = Opcode::Type::JUMP;
-					firstOpcode.mDataType = BaseType::VOID;
-					firstOpcode.mFlags.set(makeBitFlagSet(Opcode::Flag::CTRLFLOW, Opcode::Flag::JUMP, Opcode::Flag::SEQ_BREAK));
-					firstOpcode.mParameter = jumpTarget;
-					firstOpcode.mLineNumber = condJumpOpcode.mLineNumber;
-				}
-			}
-		}
-
-		// Replace jumps that only lead to a returning opcode
-		for (size_t i = 0; i < mOpcodes.size(); ++i)
-		{
-			Opcode& opcode = mOpcodes[i];
-			if (opcode.mType == Opcode::Type::JUMP)
-			{
-				Opcode& nextOpcode = mOpcodes[(size_t)opcode.mParameter];
-				if (nextOpcode.mType == Opcode::Type::RETURN || nextOpcode.mType == Opcode::Type::EXTERNAL_JUMP)
-				{
-					// Copy the return (or external jump) over the jump
-					opcode = nextOpcode;
-				}
-			}
-		}
-
-		// With the optimizations above, there might be opcodes now that are unreachable
-		//  -> Replace them with NOPs
-		//  -> Check for unnecessary jumps, that would just to skip the NOPs, and NOP them as well
-		//  -> And finally, clean up all NOPs once again
-		{
-			// Mark all opcodes as not visited yet, using the temp flag -- except for the very last return, which must never get removed
-			for (size_t i = 0; i < mOpcodes.size() - 1; ++i)
-			{
-				mOpcodes[i].mFlags.set(Opcode::Flag::TEMP_FLAG);
-			}
-
-			static std::vector<size_t> openSeeds;
-			openSeeds.clear();
-			openSeeds.push_back(0);
-			for (const ScriptFunction::Label& label : mFunction.mLabels)
-			{
-				openSeeds.push_back((size_t)label.mOffset);
-			}
-
-			// Trace all reachable opcodes from our seeds
-			while (!openSeeds.empty())
-			{
-				size_t position = openSeeds.back();
-				openSeeds.pop_back();
-
-				while (mOpcodes[position].mFlags.isSet(Opcode::Flag::TEMP_FLAG))
-				{
-					mOpcodes[position].mFlags.clear(Opcode::Flag::TEMP_FLAG);
-					switch (mOpcodes[position].mType)
-					{
-						case Opcode::Type::JUMP:
-							position = (size_t)mOpcodes[position].mParameter;
-							break;
-
-						case Opcode::Type::JUMP_CONDITIONAL:
-							openSeeds.push_back((size_t)mOpcodes[position].mParameter);
-							++position;
-							break;
-
-						case Opcode::Type::EXTERNAL_JUMP:
-						case Opcode::Type::RETURN:
-							// Just do nothing, this will exit the while loop automatically
-							break;
-
-						default:
-							++position;
-							break;
-					}
-				}
-			}
-
-			// Remove opcodes that are unreachable
-			for (Opcode& opcode : mOpcodes)
-			{
-				if (opcode.mFlags.isSet(Opcode::Flag::TEMP_FLAG))
-				{
-					opcode.mType = Opcode::Type::NOP;
-				}
-			}
-
-			// Remove unnecessary jumps, namely those that only skip a bunch of NOPs (or just lead to the very next opcode)
-			if (mOpcodes.size() >= 3)
-			{
-				for (size_t i = 0; i < mOpcodes.size() - 1; ++i)
-				{
-					if (mOpcodes[i].mType == Opcode::Type::JUMP || mOpcodes[i].mType == Opcode::Type::JUMP_CONDITIONAL)
-					{
-						const size_t jumpTarget = (size_t)mOpcodes[i].mParameter;
-						size_t position = i + 1;
-						if (jumpTarget >= position)
-						{
-							while (mOpcodes[position].mType == Opcode::Type::NOP)
-								++position;
-
-							// Check if the jump target is at the position after the NOPs, or right into one of the NOPs
-							if (jumpTarget <= position)
-							{
-								if (mOpcodes[i].mType == Opcode::Type::JUMP_CONDITIONAL)
-								{
-									// The conditional jump at the start is not needed any more, but we need to consume one item from the stack (namely the condition)
-									mOpcodes[i].mType = Opcode::Type::MOVE_STACK;
-									mOpcodes[i].mDataType = BaseType::VOID;			// Because that's what we generally use for MOVE_STACK
-									mOpcodes[i].mParameter = -1;
-									mOpcodes[i].mFlags.setOnly(Opcode::Flag::NEW_LINE);	// Clear all other flags
-								}
-								else
-								{
-									// The jump at the start is not needed any more, NOP it so it gets removed
-									mOpcodes[i].mType = Opcode::Type::NOP;
-								}
-								i = position - 1;
-							}
-						}
-					}
-				}
-			}
-
-			cleanupNOPs();
-		}
-	}
-
-	void FunctionCompiler::cleanupNOPs()
-	{
-		// Remove all NOPs and update all jump targets etc. appropriately
-		static std::vector<int> indexRemap;
-		indexRemap.clear();
-		indexRemap.resize(mOpcodes.size());
-		size_t newSize = 0;
-		for (size_t i = 0; i < mOpcodes.size(); ++i)
-		{
-			indexRemap[i] = (int)newSize;
-			if (mOpcodes[i].mType != Opcode::Type::NOP)
-			{
-				++newSize;
-			}
-		}
-
-		if (newSize < mOpcodes.size())
-		{
-			const int lastOpcode = (int)newSize - 1;	// Point to last opcode, which is a return in any case
-
-			// Move opcodes
-			for (size_t i = 0; i < mOpcodes.size(); ++i)
-			{
-				if ((int)i != indexRemap[i] && mOpcodes[i].mType != Opcode::Type::NOP)
-				{
-					mOpcodes[indexRemap[i]] = mOpcodes[i];
-				}
-			}
-
-			// Update jump targets
-			for (size_t i = 0; i < newSize; ++i)
-			{
-				Opcode& opcode = mOpcodes[i];
-				if (opcode.mType == Opcode::Type::JUMP || opcode.mType == Opcode::Type::JUMP_CONDITIONAL)
-				{
-					opcode.mParameter = ((size_t)opcode.mParameter < indexRemap.size()) ? indexRemap[(size_t)opcode.mParameter] : lastOpcode;
-					RMX_ASSERT(opcode.mParameter != -1, "Invalid opcode parameter");
-				}
-			}
-
-			// Update labels
-			for (ScriptFunction::Label& label : mFunction.mLabels)
-			{
-				label.mOffset = ((size_t)label.mOffset < indexRemap.size()) ? (uint32)indexRemap[(size_t)label.mOffset] : (uint32)lastOpcode;
-			}
-
-			mOpcodes.resize(newSize);
+			addOpcode(Opcode::Type::MOVE_VAR_STACK, -memoryToFree);
 		}
 	}
 

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -316,6 +316,13 @@ void NetConnection::sendAcceptConnectionPacket()
 
 void NetConnection::handleLowLevelPacket(const ReceivedPacket& receivedPacket)
 {
+	// For security reasons, ignore senders that don't fit the stored sender address for this connection
+	if (receivedPacket.mSenderAddress.getHash() != getRemoteAddress().getHash())
+	{
+		RMX_ASSERT(false, "Packet dropped due to mismatch in sender address hash");
+		return;
+	}
+
 	// Reset timeout whenever any packet got received
 	mTimeoutStart = mCurrentTimestamp;
 	mLastMessageReceivedTimestamp = mCurrentTimestamp;	// TODO: It would be nice to use the actual timestamp of receiving the packet here, which happened previously already

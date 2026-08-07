@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -86,6 +86,15 @@ public:
 		bool  mUseAudioThreading = true;		// Disabled in constructor for platforms that don't support it
 	};
 
+	struct ScreenFilter
+	{
+		std::string mUpscalerName;
+		uint64 mUpscalerNameHash = 0;
+		int mPixelVariant = 0;		// Only used by "pixel" filter
+		int mHQxVariant = 0;		// Only used by "hqx" filter
+		int mScanlines = 0;			// Only used by "pixel" filter
+	};
+
 	struct GameRecorder
 	{
 		int mRecordingMode = -1;		// -1 = Auto, 0 = Recording disabled, 1 = Recording enabled
@@ -169,7 +178,6 @@ public:
 	std::wstring mRomPath;					// From configuration
 	std::wstring mLastRomPath;				// From settings
 	std::wstring mScriptsDir;
-	std::wstring mMainScriptName;
 	lemon::PreprocessorDefinitionMap mPreprocessorDefinitions;
 	std::wstring mSaveStatesDir;			// Save states dir in the installation
 	std::wstring mSaveStatesDirLocal;		// Save states dir in app data, specific for the game profile
@@ -192,7 +200,7 @@ public:
 	// Dev mode
 	DevModeSettings mDevMode;
 
-	// Video
+	// Display
 	WindowMode mWindowMode = WindowMode::WINDOWED;
 #if defined(PLATFORM_VITA)
 	Vec2i mWindowSize = Vec2i(960, 544);
@@ -206,10 +214,11 @@ public:
 	FrameSyncType mFrameSync = FrameSyncType::VSYNC_ON;
 	int   mUpscaling = 0;
 	int   mBackdrop = 0;
-	int   mFiltering = 0;
-	int   mScanlines = 0;
 	int   mBackgroundBlur = 0;
 	int   mPerformanceDisplay = 0;
+
+	// Screen filter
+	ScreenFilter mScreenFilter;
 
 	// Audio
 	AudioSettings mAudio;

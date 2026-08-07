@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -76,6 +76,19 @@ bool JsonSerializer::serialize(const char* key, std::wstring& value)
 	}
 }
 
+bool JsonSerializer::serializeHexValue(const char* key, int& value, int numHexDigits)
+{
+	if (mReading)
+	{
+		return JsonHelper(*mCurrentJson).tryReadInt(key, value);
+	}
+	else
+	{
+		(*mCurrentJson)[key] = rmx::hexString(value, numHexDigits);
+		return true;
+	}
+}
+
 bool JsonSerializer::serializeComponents(const char* key, Vec2i& value)
 {
 	bool result = true;
@@ -102,6 +115,30 @@ bool JsonSerializer::serializeVectorAsSizeString(const char* key, Vec2i& value)
 	else
 	{
 		std::string str = *String(0, "%d x %d", value.x, value.y);
+		return serialize(key, str);
+	}
+}
+
+bool JsonSerializer::serializeVectorAsString(const char* key, Vec2f& value)
+{
+	if (mReading)
+	{
+		std::string str;
+		serialize(key, str);
+		std::vector<String> components;
+		String(str).split(components, ',');
+		if (components.size() < 2)
+			return false;
+
+		components[0].trimWhitespace();
+		components[1].trimWhitespace();
+		value.x = (float)atof(*components[0]);
+		value.y = (float)atof(*components[1]);
+		return true;
+	}
+	else
+	{
+		std::string str = *String(0, "%f, %f", value.x, value.y);
 		return serialize(key, str);
 	}
 }

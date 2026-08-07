@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -14,7 +14,8 @@
 #include "oxygen/simulation/Simulation.h"
 
 
-DebugLogView::DebugLogView()
+DebugLogView::DebugLogView() :
+	GuiBase("DebugLogView")
 {
 }
 
@@ -90,9 +91,12 @@ void DebugLogView::render()
 				const Color color(brightness, brightness, brightness);
 
 				rect.x = logRect.x + 10;
-				drawer.printText(mFont, rect, (pair.first + ":"), 1, color);
+				if (pair.first[0] != '$')
+				{
+					drawer.printText(mFont, rect, (pair.first + ":"), 1, color);
+					rect.x += maxKeyWidth;
+				}
 
-				rect.x += maxKeyWidth;
 				if (hasCurrent)
 				{
 					for (const DebugTracking::ScriptLogSingleEntry& singleEntry : entry.mEntries)

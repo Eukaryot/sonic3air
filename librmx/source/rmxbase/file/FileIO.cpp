@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -17,24 +17,9 @@
 	#include <direct.h>
 	#include <io.h>
 
-#elif defined(PLATFORM_LINUX) || defined(PLATFORM_WEB)
+#elif defined(PLATFORM_LINUX) || defined(PLATFORM_MAC) || defined(PLATFORM_WEB)
 	#include <filesystem>
 	namespace std_filesystem = std::filesystem;
-	#define USE_STD_FILESYSTEM
-
-	#include <dirent.h>
-	#include <sys/stat.h>
-
-#elif defined(PLATFORM_MAC)
-#if TARGET_CPU_X86_64
-	//Older Intel macOS < 10.15 lacks std::filesystem, so we substitute with boost::filesystem
-	#include <boost/filesystem.hpp>
-	namespace std_filesystem = boost::filesystem;
-#else
-	//Newer Macs, specifically arm64, are running macOS 11 or newer which has std::filesystem
-	#include <filesystem>
-	namespace std_filesystem = std::filesystem;
-#endif
 	#define USE_STD_FILESYSTEM
 
 	#include <dirent.h>
@@ -48,6 +33,9 @@
 
 	#include <dirent.h>
 	#include <sys/stat.h>
+#endif
+#if defined(PLATFORM_WEB)
+	#include <emscripten.h>
 #endif
 
 
@@ -221,21 +209,41 @@ namespace rmx
 
 		struct FileNameCharacterValidityLookup
 		{
-			FileNameCharacterValidityLookup()
+			explicit FileNameCharacterValidityLookup(bool allowSlash)
 			{
 				for (int k = 32; k < 128; ++k)		// Exclude non-printable ASCII characters
+				{
 					mIsCharacterValid.setBit(k);
+				}
 				const std::wstring invalidCharacters = L"\"<>:|?*";		// Technically not all of these characters are problematic on all platforms, but we treat them all as illegal to avoid cross-platform issues
 				for (wchar_t ch : invalidCharacters)
+				{
 					mIsCharacterValid.clearBit(ch);
+				}
+				if (!allowSlash)
+				{
+					mIsCharacterValid.clearBit(L'/');
+					mIsCharacterValid.clearBit(L'\\');
+				}
 			}
 
 			bool isValid(wchar_t ch) const  { return ch >= 128 || mIsCharacterValid.isBitSet(ch); }
 
+			bool allValid(std::wstring_view str) const
+			{
+				for (wchar_t ch : str)
+				{
+					if (!isValid(ch))
+						return false;
+				}
+				return true;
+			}
+
 			BitArray<128> mIsCharacterValid;
 		};
 
-		static FileNameCharacterValidityLookup mFileNameCharacterValidityLookup;
+		static FileNameCharacterValidityLookup mFileNameCharacterValidityLookup(false);
+		static FileNameCharacterValidityLookup mFilePathCharacterValidityLookup(true);
 
 	}
 
@@ -297,7 +305,7 @@ namespace rmx
 	{
 		mLastErrorCode.clear();
 
-	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+	#if defined(USE_STD_FILESYSTEM)
 		const std_filesystem::path fspath(filename.data());
 		const std_filesystem::file_time_type time = std_filesystem::last_write_time(fspath, mLastErrorCode);
 		if (mLastErrorCode)
@@ -358,6 +366,15 @@ namespace rmx
 			stream.write((char*)data, size);
 		}
 		stream.close();
+
+		#if defined(PLATFORM_WEB)
+			EM_ASM({
+				FS.syncfs(false, function(err)
+				{
+					if (err) console.error('FS.syncfs failed:', err);
+				});
+			});
+		#endif
 		return true;
 	}
 
@@ -376,7 +393,7 @@ namespace rmx
 	{
 		mLastErrorCode.clear();
 
-	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+	#if defined(USE_STD_FILESYSTEM)
 		const std_filesystem::path fspathOld(oldFilename.data());
 		const std_filesystem::path fspathNew(newFilename.data());
 		std_filesystem::rename(fspathOld, fspathNew, mLastErrorCode);
@@ -391,7 +408,7 @@ namespace rmx
 	{
 		mLastErrorCode.clear();
 
-	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+	#if defined(USE_STD_FILESYSTEM)
 		const std_filesystem::path fspathOld(oldFilename.data());
 		const std_filesystem::path fspathNew(newFilename.data());
 		std_filesystem::rename(fspathOld, fspathNew, mLastErrorCode);
@@ -406,7 +423,7 @@ namespace rmx
 	{
 		mLastErrorCode.clear();
 
-	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+	#if defined(USE_STD_FILESYSTEM)
 		const std_filesystem::path fspath(path);
 		std_filesystem::remove(fspath, mLastErrorCode);
 		return !mLastErrorCode;
@@ -420,7 +437,7 @@ namespace rmx
 	{
 		mLastErrorCode.clear();
 
-	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+	#if defined(USE_STD_FILESYSTEM)
 		const std_filesystem::path fspath(path);
 		std_filesystem::remove_all(fspath, mLastErrorCode);
 		return !mLastErrorCode;
@@ -430,9 +447,9 @@ namespace rmx
 	#endif
 	}
 
-	void FileIO::createDirectory(std::wstring_view path)
+	bool FileIO::createDirectory(std::wstring_view path)
 	{
-		createDir(path, true);
+		return createDir(path, true);
 	}
 
 	void FileIO::listFiles(std::wstring_view path, bool recursive, std::vector<FileEntry>& outFileEntries)
@@ -608,19 +625,40 @@ namespace rmx
 
 	bool FileIO::isValidFileName(std::wstring_view filename)
 	{
-		for (wchar_t ch : filename)
-		{
-			if (!mFileNameCharacterValidityLookup.isValid(ch))
-				return false;
-		}
+		if (filename.empty())
+			return false;
+		if (!mFileNameCharacterValidityLookup.allValid(filename))
+			return false;
+		if (filename == L"." || rmx::startsWith(filename, L".."))
+			return false;
+		return true;
+	}
+
+	bool FileIO::isValidPathName(std::wstring_view pathname)
+	{
+		if (pathname.empty())
+			return false;
+		if (!mFilePathCharacterValidityLookup.allValid(pathname))
+			return false;
 		return true;
 	}
 
 	void FileIO::sanitizeFileName(std::wstring& filename)
 	{
 		// Replace all characters that are not valid in a file name
-		//  -> Note that this does not replace slashes (though it converts backslashes to forward slashes)
+		//  -> Note that this does replace slashes with underscores
 		for (wchar_t& ch : filename)
+		{
+			if (!mFileNameCharacterValidityLookup.isValid(ch))
+				ch = L'_';
+		}
+	}
+
+	void FileIO::sanitizePathName(std::wstring& pathname)
+	{
+		// Replace all characters that are not valid in a path name
+		//  -> Note that this does not replace slashes (though it converts backslashes to forward slashes)
+		for (wchar_t& ch : pathname)
 		{
 			if (!mFileNameCharacterValidityLookup.isValid(ch))
 				ch = L'_';

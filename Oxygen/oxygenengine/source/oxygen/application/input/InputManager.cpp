@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -334,19 +334,22 @@ void InputManager::updateInput(float timeElapsed)
 
 	// Update touches
 	mActiveTouches.clear();
-	if (mTouchInputEnabled && !FTX::System->wasEventConsumed())
+	if (!FTX::System->wasEventConsumed())
 	{
-		const int touchDevices = SDL_GetNumTouchDevices();
-		for (int k = 0; k < touchDevices; ++k)
+		if (mTouchInputEnabled)
 		{
-			const SDL_TouchID touchId = SDL_GetTouchDevice(k);
-			const int numFingers = SDL_GetNumTouchFingers(touchId);
-			for (int i = 0; i < numFingers; ++i)
+			const int touchDevices = SDL_GetNumTouchDevices();
+			for (int k = 0; k < touchDevices; ++k)
 			{
-				const SDL_Finger* finger = SDL_GetTouchFinger(touchId, i);
-				if (nullptr != finger)
+				const SDL_TouchID touchId = SDL_GetTouchDevice(k);
+				const int numFingers = SDL_GetNumTouchFingers(touchId);
+				for (int i = 0; i < numFingers; ++i)
 				{
-					vectorAdd(mActiveTouches).mPosition.set(finger->x, finger->y);
+					const SDL_Finger* finger = SDL_GetTouchFinger(touchId, i);
+					if (nullptr != finger)
+					{
+						vectorAdd(mActiveTouches).mPosition.set(finger->x, finger->y);
+					}
 				}
 			}
 		}

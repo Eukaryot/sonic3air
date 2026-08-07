@@ -1,6 +1,6 @@
 ﻿/*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -37,6 +37,11 @@ ImVec4 ImGuiHelpers::getAccentColorMix(float accent, float saturation, float gra
 }
 
 
+void ImGuiHelpers::InputString::clear()
+{
+	mInternal[0] = 0;
+}
+
 void ImGuiHelpers::InputString::set(std::string_view str)
 {
 	const size_t len = std::min(str.length(), sizeof(mInternal) - 1);
@@ -45,6 +50,12 @@ void ImGuiHelpers::InputString::set(std::string_view str)
 	mInternal[len] = 0;
 }
 
+
+void ImGuiHelpers::WideInputString::clear()
+{
+	mWideString.clear();
+	mInternalUTF8[0] = 0;
+}
 
 void ImGuiHelpers::WideInputString::set(std::wstring_view str)
 {

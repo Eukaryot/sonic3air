@@ -1,0 +1,27 @@
+/*
+*	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
+*	Copyright (C) 2017-2026 by Eukaryot
+*
+*	Published under the GNU GPLv3 open source software license, see license.txt
+*	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+#include "oxygen/pch.h"
+#include "oxygen/drawing/upscaler/UpscalerDefinition.h"
+
+
+UpscalerDefinition::Variant& UpscalerDefinition::addVariant(int id, std::string_view name)
+{
+	Variant& variant = vectorAdd(mVariants);
+	variant.mVariantID = id;
+	variant.mDisplayName = name;
+	return variant;
+}
+
+UpscalerDefinition::ShaderInfo& UpscalerDefinition::addOpenGLShader(std::wstring_view path, std::string_view technique)
+{
+	ShaderInfo& shaderInfo = vectorAdd(mOpenGLShaders);
+	shaderInfo.mPath = path;
+	shaderInfo.mTechnique = technique;
+	return shaderInfo;
+}

@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2025 by Eukaryot
+*	Copyright (C) 2008-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -103,8 +103,8 @@ namespace rmx
 
 
 	// Parse integer, with support for hexidecimal string (starting with "0x") and 64-bit values
-	uint64 parseInteger(const String& input, size_t& pos);
-	uint64 parseInteger(const String& input);
+	int64 parseInteger(const String& input, size_t& pos);
+	int64 parseInteger(const String& input);
 
 	// Create hexadecimal String
 	std::string hexString(uint64 value, const char* prefix = "0x");

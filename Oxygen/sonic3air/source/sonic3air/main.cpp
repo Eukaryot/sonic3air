@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -12,6 +12,7 @@
 #include "sonic3air/helper/PackageBuilder.h"
 #include "sonic3air/platform/PlatformSpecifics.h"
 
+#include "oxygen/platform/CommandForwarder.h"
 #include "oxygen/platform/PlatformFunctions.h"
 
 
@@ -48,6 +49,7 @@ int main(int argc, char** argv)
 {
 	EngineMain::earlySetup();
 	PlatformSpecifics::platformStartup();
+	CommandForwarder::setApplicationName("S3AIR");
 
 	GameArgumentsReader arguments;
 
@@ -58,11 +60,18 @@ int main(int argc, char** argv)
 	arguments.read(argc, argv);
 
 	// For certain arguments, just try to forward them to an already running instance of S3AIR
+	if (!arguments.mForwardedCommand.empty())
+	{
+		if (CommandForwarder::trySendCommand("ForwardedCommand:" + arguments.mForwardedCommand))
+			return 0;
+	}
 	if (!arguments.mUrl.empty())
 	{
 		if (CommandForwarder::trySendCommand("ForwardedCommand:Url:" + arguments.mUrl))
 			return 0;
 	}
+	if (arguments.mStop)
+		return 0;
 
 	// Make sure we're in the correct working directory
 	PlatformFunctions::changeWorkingDirectory(arguments.mExecutableCallPath);

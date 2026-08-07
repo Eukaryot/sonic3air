@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -67,6 +67,10 @@ public:
 
 	// Paths
 	std::wstring mGameDataPath;		// As a path relative to the project directory; can stay empty to use the default path
+
+	// Script configuration
+	std::wstring mMainScriptName;
+	bool mErrorOnUnknownAddress = false;
 
 	// Data packages
 	std::vector<DataPackage> mDataPackages;

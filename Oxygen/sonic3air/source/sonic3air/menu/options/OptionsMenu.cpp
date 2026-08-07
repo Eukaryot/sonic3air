@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -25,6 +25,7 @@
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/video/VideoOut.h"
+#include "oxygen/drawing/upscaler/UpscalerCollection.h"
 #include "oxygen/helper/Utils.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/GameRecorder.h"
@@ -115,9 +116,10 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntryInt(option::GAME_RECORDING_MODE,		&config.mGameRecorder.mRecordingMode);
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
 		setupOptionEntryInt(option::BACKDROP,					&config.mBackdrop);
-		setupOptionEntryInt(option::FILTERING,					&config.mFiltering);
-		setupOptionEntryInt(option::SCANLINES,					&config.mScanlines);
 		setupOptionEntryInt(option::BG_BLUR,					&config.mBackgroundBlur);
+		setupOptionEntryInt(option::SCREEN_FILTER_PIXEL_VARIANT,&config.mScreenFilter.mPixelVariant);
+		setupOptionEntryInt(option::SCREEN_FILTER_HQX_VARIANT,	&config.mScreenFilter.mHQxVariant);
+		setupOptionEntryInt(option::SCREEN_FILTER_SCANLINES,	&config.mScreenFilter.mScanlines);
 		setupOptionEntryInt(option::PERFORMANCE_DISPLAY,		&config.mPerformanceDisplay);
 		setupOptionEntryInt(option::SOUNDTRACK,					&config.mActiveSoundtrack);
 		setupOptionEntryInt(option::CONTROLLER_AUTOASSIGN,		&config.mAutoAssignGamepadPlayerIndex);
@@ -431,8 +433,10 @@ void OptionsMenu::update(float timeElapsed)
 
 		mOptionEntries[option::WINDOW_MODE].mGameMenuEntry->setSelectedIndexByValue((int)Application::instance().getWindowMode());
 		mOptionEntries[option::FRAME_SYNC].loadValue();
-		mOptionEntries[option::FILTERING].loadValue();
 		mOptionEntries[option::BG_BLUR].loadValue();
+		mOptionEntries[option::SCREEN_FILTER_INDEX].mGameMenuEntry->setSelectedIndexByValue(UpscalerCollection::instance().getUpscalerIndexByNameHash(config.mScreenFilter.mUpscalerNameHash));
+		mOptionEntries[option::SCREEN_FILTER_PIXEL_VARIANT].loadValue();
+		mOptionEntries[option::SCREEN_FILTER_HQX_VARIANT].loadValue();
 		mOptionEntries[option::MASTER_VOLUME].loadValue();
 		mOptionEntries[option::RENDERER].mGameMenuEntry->setSelectedIndexByValue((int)config.mRenderMethod);
 
@@ -537,7 +541,13 @@ void OptionsMenu::update(float timeElapsed)
 
 							case option::RENDERER:
 							{
-								EngineMain::instance().switchToRenderMethod((Configuration::RenderMethod)selectedEntry.selected().mValue);
+								Application::instance().setPendingRenderMethod((Configuration::RenderMethod)selectedEntry.selected().mValue);
+								break;
+							}
+
+							case option::SCREEN_FILTER_INDEX:
+							{
+								UpscalerCollection::instance().setCurrentConfigUpscalerByIndex(selectedEntry.selected().mValue);
 								break;
 							}
 
@@ -743,8 +753,12 @@ void OptionsMenu::update(float timeElapsed)
 	// Enable / disable options
 	//  -> Done here as the conditions can change at any time (incl. hotkeys)
 	const bool isSoftware = (Configuration::instance().mRenderMethod == Configuration::RenderMethod::SOFTWARE);
-	mOptionEntries[option::SCANLINES].mGameMenuEntry->setInteractable(!isSoftware && Configuration::instance().mFiltering < 3);
-	mOptionEntries[option::FILTERING].mGameMenuEntry->setInteractable(!isSoftware);
+	mOptionEntries[option::SCREEN_FILTER_INDEX].mGameMenuEntry->setInteractable(!isSoftware);
+	constexpr uint64 UPSCALER_HASH_PIXEL = rmx::constMurmur2_64("pixel");
+	constexpr uint64 UPSCALER_HASH_HQX   = rmx::constMurmur2_64("hqx");
+	mOptionEntries[option::SCREEN_FILTER_PIXEL_VARIANT].mGameMenuEntry->setVisible(!isSoftware && Configuration::instance().mScreenFilter.mUpscalerNameHash == UPSCALER_HASH_PIXEL);
+	mOptionEntries[option::SCREEN_FILTER_HQX_VARIANT].mGameMenuEntry->setVisible(!isSoftware && Configuration::instance().mScreenFilter.mUpscalerNameHash == UPSCALER_HASH_HQX);
+	mOptionEntries[option::SCREEN_FILTER_SCANLINES].mGameMenuEntry->setVisible(!isSoftware && Configuration::instance().mScreenFilter.mUpscalerNameHash == UPSCALER_HASH_PIXEL);
 
 	// Scrolling
 	mScrolling.update(timeElapsed);
@@ -854,7 +868,7 @@ void OptionsMenu::render()
 								const GameMenuEntry& nextEntry = tab.mMenuEntries[nextLine];
 								if (nextEntry.getMenuEntryType() == TitleMenuEntry::MENU_ENTRY_TYPE || nextEntry.mData == option::_BACK)
 									break;
-								if (nextEntry.isFullyInteractable())
+								if (nextEntry.isVisible())
 								{
 									valid = true;
 									break;
@@ -1288,7 +1302,7 @@ void OptionsMenu::playSoundtest(const AudioCollection::AudioDefinition& audioDef
 	else
 	{
 		AudioOut::instance().disableAudioModifier(0, AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
-		AudioOut::instance().playAudioDirect(audioDefinition.mKeyId, (AudioOut::SoundRegType)audioDefinition.mType, AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
+		AudioOut::instance().playAudioDirect(audioDefinition.mPrimaryKeyId, (AudioOut::SoundRegType)audioDefinition.mType, AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
 	}
 }
 
@@ -1418,7 +1432,7 @@ void OptionsMenu::updateModExpandState(ModTitleMenuEntry& modTitleMenuEntry)
 void OptionsMenu::goBack()
 {
 	playMenuSound(0xad);
-	if (nullptr != mPlayingSoundTest && mPlayingSoundTest->mKeyId != 0x2f)
+	if (nullptr != mPlayingSoundTest && mPlayingSoundTest->mNumericKey != 0x2f)
 	{
 		AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
 	}

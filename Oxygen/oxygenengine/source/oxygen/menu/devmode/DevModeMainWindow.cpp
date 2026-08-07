@@ -1,6 +1,6 @@
 ﻿/*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -12,7 +12,9 @@
 #if defined(SUPPORT_IMGUI)
 
 #include "oxygen/menu/imgui/ImGuiHelpers.h"
+#include "oxygen/menu/devmode/windows/AppDebugWindow.h"
 #include "oxygen/menu/devmode/windows/AudioBrowserWindow.h"
+#include "oxygen/menu/devmode/windows/AudioPlaybackWindow.h"
 #include "oxygen/menu/devmode/windows/CallFramesWindow.h"
 #include "oxygen/menu/devmode/windows/CustomSidePanelWindow.h"
 #include "oxygen/menu/devmode/windows/DebugLogWindow.h"
@@ -66,11 +68,14 @@ DevModeMainWindow::DevModeMainWindow() :
 		createWindow(mPaletteBrowserWindow);
 
 		createWindow(mAudioBrowserWindow);
+		createWindow(mAudioPlaybackWindow);
 		createWindow(mCustomSidePanelWindow);
 		createWindow(mPersistentDataWindow);
 		createWindow(mFileBrowserWindow);
 		createWindow(mSettingsWindow);
+
 	#ifdef DEBUG
+		createWindow(mAppDebugWindow);
 		createWindow(mNetworkingWindow);
 	#endif
 	}
@@ -115,11 +120,6 @@ bool DevModeMainWindow::buildWindow()
 	{
 		window->buildWindow();
 	}
-
-	// ImGui demo window for testing
-	if (mShowImGuiDemo)
-		ImGui::ShowDemoWindow();
-
 	return result;
 }
 
@@ -138,20 +138,21 @@ void DevModeMainWindow::buildContent()
 	int& configActiveTab = Configuration::instance().mDevMode.mActiveMainWindowTab;
 	const bool firstRun = (mActiveTab == -1);
 
-	const char* TEXT_BY_CATEGORY[] =
+	static const std::vector<const char*> TEXT_BY_CATEGORY =
 	{
 		"Simulation",
 		"Graphics",
-		"Misc"
+		"Misc",
+	#if DEBUG
+		"Debug"
+	#endif
 	};
-	constexpr int NUM_CATEGORIES = (int)DevModeWindowBase::Category::MISC + 1;
-	static_assert(sizeof(TEXT_BY_CATEGORY) / sizeof(const char*) == NUM_CATEGORIES);
 
 	if (!useTabs || ImGui::BeginTabBar("Tab Bar", 0))
 	{
 		std::vector<DevModeWindowBase*> windows;
 
-		for (int categoryIndex = 0; categoryIndex < NUM_CATEGORIES; ++categoryIndex)
+		for (int categoryIndex = 0; categoryIndex < (int)TEXT_BY_CATEGORY.size(); ++categoryIndex)
 		{
 			windows.clear();
 			for (DevModeWindowBase* window : mAllWindows)
@@ -161,14 +162,6 @@ void DevModeMainWindow::buildContent()
 					windows.push_back(window);
 				}
 			}
-
-		#ifdef DEBUG
-			if (categoryIndex == NUM_CATEGORIES - 1)
-			{
-				// For ImGui demo
-				windows.push_back(nullptr);
-			}
-		#endif
 
 			if (!windows.empty())
 			{
@@ -204,12 +197,6 @@ void DevModeMainWindow::buildContent()
 									window->setIsWindowOpen(isOpen);
 								}
 							}
-						#ifdef DEBUG
-							else
-							{
-								ImGui::Checkbox("ImGui Demo", &mShowImGuiDemo);
-							}
-						#endif
 						}
 
 						ImGui::EndTable();

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -14,20 +14,17 @@
 class GameArgumentsReader : public ArgumentsReader
 {
 public:
-	std::string mUrl;
 	bool mPack = false;
 	bool mNativize = false;
 	bool mDumpCppDefinitions = false;
 
+public:
+	GameArgumentsReader() : ArgumentsReader("sonic3air://") {}
+
 protected:
 	virtual bool readParameter(const std::string& parameter) override
 	{
-		if (rmx::startsWith(parameter, "sonic3air://"))
-		{
-			mUrl = parameter;
-			return true;
-		}
-		else if (parameter == "-pack")
+		if (parameter == "-pack")
 		{
 			mPack = true;
 			return true;

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -18,6 +18,7 @@
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/menu/GameSetupScreen.h"
 #include "oxygen/application/menu/OxygenMenu.h"
+#include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/overlays/BackdropView.h"
 #include "oxygen/application/overlays/CheatSheetOverlay.h"
 #include "oxygen/application/overlays/DebugLogView.h"
@@ -31,6 +32,8 @@
 #include "oxygen/helper/Logging.h"
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/network/EngineServerClient.h"
+#include "oxygen/network/crowdcontrol/CrowdControlClient.h"
+#include "oxygen/platform/CommandForwarder.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/GameRecorder.h"
 #include "oxygen/simulation/LogDisplay.h"
@@ -45,6 +48,7 @@ static const float MOUSE_HIDE_TIME = 1.0f;	// Seconds until mouse cursor gets hi
 
 
 Application::Application() :
+	GuiBase("Application"),
 	mGameLoader(new GameLoader()),
 	mSimulation(new Simulation()),
 	mSaveStateMenu(new SaveStateMenu())
@@ -108,9 +112,10 @@ void Application::initialize()
 	#endif
 	}
 
-	//mOxygenMenu = &mGameView->createChild<OxygenMenu>();
 	mProfilingView = &createChild<ProfilingView>();
 	mCheatSheetOverlay = &createChild<CheatSheetOverlay>();
+
+	mOxygenMenu = &createChild<OxygenMenu>();
 
 	if (nullptr != mTouchControlsOverlay && nullptr == mTouchControlsOverlay->getParent())
 	{
@@ -149,6 +154,13 @@ void Application::deinitialize()
 
 void Application::beginFrame()
 {
+	// Change render method if requested
+	if (mPendingRenderMethod.has_value())
+	{
+		EngineMain::instance().switchToRenderMethod(*mPendingRenderMethod);
+		mPendingRenderMethod.reset();
+	}
+
 	// Handle text input
 	{
 		// Start or stop text input from SDL
@@ -300,9 +312,9 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 							updateWindowDisplayIndex();
 							const Configuration::RenderMethod newRenderMethod = (Configuration::instance().mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? Configuration::RenderMethod::OPENGL_SOFT :
 																				(Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? Configuration::RenderMethod::OPENGL_FULL : Configuration::RenderMethod::SOFTWARE;
-							EngineMain::instance().switchToRenderMethod(newRenderMethod);
-							LogDisplay::instance().setLogDisplay((Configuration::instance().mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Switched to pure software renderer" :
-																 (Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Switched to opengl-soft renderer" : "Switched to opengl-full renderer");
+							setPendingRenderMethod(newRenderMethod);
+							LogDisplay::instance().setLogDisplay((newRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Switched to pure software renderer" :
+																 (newRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Switched to opengl-soft renderer" : "Switched to opengl-full renderer");
 						}
 						break;
 					}
@@ -423,8 +435,8 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 						if (Configuration::instance().mRenderMethod != Configuration::RenderMethod::SOFTWARE)
 						{
 							const Configuration::RenderMethod newRenderMethod = (Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? Configuration::RenderMethod::OPENGL_FULL : Configuration::RenderMethod::OPENGL_SOFT;
-							EngineMain::instance().switchToRenderMethod(newRenderMethod);
-							LogDisplay::instance().setLogDisplay((Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Switched to opengl-soft renderer" : "Switched to opengl-full renderer");
+							setPendingRenderMethod(newRenderMethod);
+							LogDisplay::instance().setLogDisplay((newRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Switched to opengl-soft renderer" : "Switched to opengl-full renderer");
 						}
 						break;
 					}
@@ -489,7 +501,7 @@ void Application::update(float timeElapsed)
 	// ImGui frame start must be done here (instead of at the start of "render"), to ensure that the mouse capturing flag is set correctly
 	//  -> This is particularly relevant for touch input, where we would miss the first touch into an ImGui window and falsely pass it to the touch overlay
 	mImGuiIntegration.startFrame();
-	if (mImGuiIntegration.isCapturingMouse() || mImGuiIntegration.isCapturingKeyboard())
+	if (mImGuiIntegration.isCapturingMouse() || mImGuiIntegration.isCapturingKeyboard() || mImGuiIntegration.hasBlockingImGuiWindow())
 	{
 		FTX::System->consumeCurrentEvent();
 	}
@@ -526,6 +538,9 @@ void Application::update(float timeElapsed)
 	// Update engine server client and netplay
 	EngineServerClient::instance().updateClient(timeElapsed);
 
+	// Update command forwarder
+	CommandForwarder::instance().update(timeElapsed);
+
 	// Update drawer
 	EngineMain::instance().getDrawer().updateDrawer(timeElapsed);
 
@@ -547,6 +562,9 @@ void Application::update(float timeElapsed)
 	Profiling::pushRegion(ProfilingRegion::SIMULATION);
 	mSimulation->update(timeElapsed);
 	Profiling::popRegion(ProfilingRegion::SIMULATION);
+
+	// Update systems
+	CrowdControlClient::instance().updateConnection(timeElapsed);
 
 	// Update game
 	EngineMain::getDelegate().updateGame(timeElapsed);
@@ -570,6 +588,12 @@ void Application::update(float timeElapsed)
 
 	mGameView->earlyUpdate(timeElapsed);
 	GuiBase::update(timeElapsed);
+
+	// Any GUI element blocked input, inject that as an ignore for in-game controls
+	if (FTX::System->wasEventConsumed())
+	{
+		ControlsIn::instance().setAllIgnores();
+	}
 
 	if (nullptr != mRemoveChild)
 	{
@@ -624,7 +648,7 @@ void Application::render()
 		GuiBase::render();
 
 		// TODO: This gets called too late
-		mBackdropView->setGameViewRect(mGameView->getGameViewport());
+		mBackdropView->setGameViewRect(mGameView->getGameViewportRect());
 
 		// Show log display output
 		{
@@ -764,8 +788,10 @@ void Application::setWindowMode(WindowMode windowMode, bool force)
 		{
 			if (mWindowMode >= WindowMode::FULLSCREEN_DESKTOP)
 			{
+				// Exit fullscreen first
 				SDL_SetWindowFullscreen(window, 0);
 			}
+
 			SDL_SetWindowSize(window, Configuration::instance().mWindowSize.x, Configuration::instance().mWindowSize.y);
 			SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex));
 			SDL_SetWindowResizable(window, SDL_TRUE);
@@ -842,6 +868,12 @@ void Application::toggleFullscreen()
 	}
 }
 
+void Application::setPendingRenderMethod(Configuration::RenderMethod renderMethod)
+{
+	// When this is called, don't immediately change the render method, as doing so during "update" or "render" calls might cause issues down the line
+	mPendingRenderMethod = renderMethod;
+}
+
 void Application::enablePauseOnFocusLoss()
 {
 	setPausedByFocusLoss(true);
@@ -876,6 +908,38 @@ bool Application::hasVirtualGamepad() const
 void Application::requestActiveTextInput()
 {
 	mRequestActiveTextInput = true;
+}
+
+void Application::onActiveModsChanged()
+{
+	checkActiveModsUsedFeatures();
+}
+
+void Application::processForwardedCommand(std::string_view command)
+{
+	if (command == "reload-scripts")
+	{
+		// Reload scripts (just like pressing F11)
+		if (EngineMain::getDelegate().useDeveloperFeatures())
+		{
+			HighResolutionTimer timer;
+			timer.start();
+			if (mSimulation->triggerFullScriptsReload())
+			{
+				LogDisplay::instance().setLogDisplay(String(0, "Reloaded scripts in %0.2f sec", timer.getSecondsSinceStart()));
+			}
+		}
+	}
+	else
+	{
+		RMX_ASSERT(false, "Unhandled forwarded command: " << command);
+	}
+}
+
+void Application::processUrl(std::string_view url)
+{
+	// TODO...
+	RMX_ASSERT(false, "Unhandled received URL: " << url);
 }
 
 int Application::updateWindowDisplayIndex()
@@ -965,6 +1029,8 @@ bool Application::updateLoading()
 				RMX_LOG_INFO("Adding game app instance");
 				mGameApp = &EngineMain::getDelegate().createGameApp();
 				addChild(*mGameApp);
+
+				checkActiveModsUsedFeatures();
 				break;
 			}
 
@@ -993,4 +1059,14 @@ void Application::setPausedByFocusLoss(bool enable)
 		mPausedByFocusLoss = enable;
 		mSimulation->setRunning(!enable);
 	}
+}
+
+void Application::checkActiveModsUsedFeatures()
+{
+	// Check mods for usage of Crowd Control
+	const bool usesCrowdControl = ModManager::instance().anyActiveModUsesFeature(rmx::constMurmur2_64("CrowdControl"));
+	if (usesCrowdControl)
+		CrowdControlClient::instance().startConnection();
+	else
+		CrowdControlClient::instance().stopConnection();
 }

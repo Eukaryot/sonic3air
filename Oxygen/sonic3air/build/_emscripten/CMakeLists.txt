@@ -45,7 +45,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 set (CMAKE_CXX_FLAGS "-s USE_VORBIS=1 -s USE_SDL=2 -s USE_ZLIB=1")
-set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lidbfs.js -lwebsocket.js")
+set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s FETCH=1 -lidbfs.js -lwebsocket.js")
 
 include_directories(${WORKSPACE_DIR}/framework/external/sdl/SDL2/include)
 include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizip)

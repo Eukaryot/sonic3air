@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2025 by Eukaryot
+	Copyright (C) 2017-2026 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -21,6 +21,7 @@
 //  -> In Blue Spheres for data exchange with C++ code
 //  -> In Slot Machine stage rendering
 //  -> For credits data generation
+//  -> For tracking the Sonic 3 pre title screen cheat
 
 
 // Random number for the current game, for monitor and special stages randomization

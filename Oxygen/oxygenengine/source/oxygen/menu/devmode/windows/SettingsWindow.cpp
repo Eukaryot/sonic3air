@@ -1,6 +1,6 @@
 ﻿/*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2025 by Eukaryot
+*	Copyright (C) 2017-2026 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -125,7 +125,10 @@ void SettingsWindow::buildContent()
 	{
 		ImGuiHelpers::ScopedIndent si;
 
-		ImGui::SliderFloat("Size", &config.mDevMode.mGameViewScale, 0.2f, 1.0f, "%.2f");
+		ImGui::SliderFloat("Size", &config.mDevMode.mGameViewScale, 0.2f, 2.0f, "%.2f");
+		ImGui::SameLine();
+		if (ImGui::Button("Reset"))
+			config.mDevMode.mGameViewScale = 1.0f;
 
 		ImGui::SliderFloat("Alignment X", &config.mDevMode.mGameViewAlignment.x, -1.0f, 1.0f, "%.3f");
 		ImGui::SameLine();

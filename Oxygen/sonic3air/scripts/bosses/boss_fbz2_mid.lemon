@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2025 by Eukaryot
+	Copyright (C) 2017-2026 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -31,7 +31,7 @@ function void fn06fd16()
 	call tableLookupAddress(0x06fd2e, objA0.base_state)
 
 #if STANDALONE
-	// Destructible laser logic here and in other functions below was #contributed by HazelSpooder
+	// Destructible laser logic here and in other functions below was #contributed by AmberChromatic
 	if (objA0.base_state < 0x06)
 	{
 		// Prevent boss from being damaged too early

@@ -1,0 +1,55 @@
+
+constant array<u8> fibonacci =
+{
+	1, 1, 2, 3,
+	5, 8, 13, 21,	// Some numbers, in multiple lines
+	34, 55,
+}
+
+
+function void testStrings()
+{
+	debugLog("\n== Strings ==")
+
+#if 1
+	// Test for string bracket operator
+	string qs = "?"
+	u8 qc = qs[0]
+	string TestString = "Hello World"
+	for (u8 k = 0; k < TestString.length(); ++k)
+	{
+		debugLog(getStringFromCharacter(TestString[k]))
+		if (k % 2)
+		{
+			--k
+			TestString[++k] -= 32		// Converts lowercase to uppercase
+		}
+		else
+		{
+			--k
+			++TestString[++k]
+		}
+	}
+	debugLog(TestString)	// Result should be "IEmLpXOsLe"
+#endif
+
+	// Test for constant arrays & strings
+	{
+		for (u8 i = 0; i < 11; ++i)
+		{
+			debugLog(stringformat("[%d] = %d", i, fibonacci[i]))
+		}
+
+		constant array<string> strings = { "ABC", "DEF", "GHIJKL", "MNOP", "QRSTUV" }
+
+		for (u8 i = 0; i < strings.length(); ++i)
+		{
+			debugLog(stringformat("[%d] = \"%s\"", i, strings[i]))
+		}
+
+		string hello = "Hello " + "World"
+		hello += "!"
+		debugLog(hello)
+		Log = hello.length()
+	}
+}
