@@ -1347,7 +1347,6 @@ namespace lemon
 					constantToken.mValue.set(address);
 					constantToken.mDataType = &PredefinedDataTypes::UINT_32;
 					tokens.erase(i+1);
-					break;
 				}
 			}
 		}
