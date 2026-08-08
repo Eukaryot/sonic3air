@@ -143,11 +143,13 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(std::wstri
 		}
 	}
 
+	lemon::GlobalsLookup globalsLookup;
+
 	// Loop to immediately retry script loading after compilation failed
 	LoadingResult loadingResult = LoadingResult::FAILED_RETRY;
 	while (loadingResult == LoadingResult::FAILED_RETRY)
 	{
-		loadingResult = loadAllScriptModules(loadOptions, mainScriptReloadNeeded ? baseScriptFilename : L"", modsToLoad);
+		loadingResult = loadAllScriptModules(globalsLookup, loadOptions, mainScriptReloadNeeded ? baseScriptFilename : L"", modsToLoad);
 	}
 
 	if (loadingResult != LoadingResult::SUCCESS)
@@ -189,7 +191,7 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(std::wstri
 	}
 
 	// Scan for function pragmas defining hooks
-	collectHooksFromFunctions();
+	collectHooksFromFunctions(globalsLookup);
 
 	if (EngineMain::getDelegate().useDeveloperFeatures())
 	{
@@ -280,10 +282,10 @@ void LemonScriptProgram::resolveLocation(ResolvedLocation& outResolvedLocation, 
 	}
 }
 
-LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(const LoadOptions& loadOptions, std::wstring_view baseScriptFilename, const std::vector<const Mod*>& modsToLoad)
+LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(lemon::GlobalsLookup& globalsLookup, const LoadOptions& loadOptions, std::wstring_view baseScriptFilename, const std::vector<const Mod*>& modsToLoad)
 {
 	Configuration& config = Configuration::instance();
-	lemon::GlobalsLookup globalsLookup = mInternal.mGlobalsLookupCoreOnly;	// Copy the definitions from the two core modules
+	globalsLookup = mInternal.mGlobalsLookupCoreOnly;	// Copy the definitions from the two core modules
 
 	// Clear program here already - in case compilation fails, it would be broken otherwise
 	mInternal.mProgram.clear();
@@ -299,6 +301,10 @@ LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(const
 		// Load scripts
 		bool scriptsLoaded = false;
 
+		#define RESET_GLOBALS_LOOKUP_ON_FAILURE \
+			if (!scriptsLoaded) \
+				globalsLookup = mInternal.mGlobalsLookupCoreOnly;
+
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
 		#ifdef DEBUG
@@ -306,6 +312,7 @@ LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(const
 			if (!config.mForceCompileScripts && !config.mCompiledScriptSavePath.empty())
 			{
 				scriptsLoaded = loadBaseScriptFromCache(globalsLookup, coreModuleDependencyHash, loadOptions);
+				RESET_GLOBALS_LOOKUP_ON_FAILURE;
 			}
 		#endif
 
@@ -315,12 +322,14 @@ LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(const
 			if (!scriptsLoaded)
 			{
 				scriptsLoaded = loadBaseScriptFromSource(globalsLookup, Configuration::instance().mProjectPath + std::wstring(baseScriptFilename), coreModuleDependencyHash, loadOptions, loadingResult);
+				RESET_GLOBALS_LOOKUP_ON_FAILURE;
 			}
 
 			// If that failed, load from scripts.bin
 			if (!scriptsLoaded)
 			{
 				scriptsLoaded = loadBaseScriptFromBinary(globalsLookup, Configuration::instance().mProjectPath + L"data/scripts.bin", coreModuleDependencyHash, loadOptions);
+				RESET_GLOBALS_LOOKUP_ON_FAILURE;
 			}
 		}
 		else
@@ -329,12 +338,14 @@ LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(const
 			if (!scriptsLoaded)
 			{
 				scriptsLoaded = loadBaseScriptFromBinary(globalsLookup, Configuration::instance().mProjectPath + L"data/scripts.bin", coreModuleDependencyHash, loadOptions);
+				RESET_GLOBALS_LOOKUP_ON_FAILURE;
 			}
 
 			// If that failed, try to load from sources as a fallback
 			if (!scriptsLoaded)
 			{
 				scriptsLoaded = loadBaseScriptFromSource(globalsLookup, Configuration::instance().mProjectPath + std::wstring(baseScriptFilename), coreModuleDependencyHash, loadOptions, loadingResult);
+				RESET_GLOBALS_LOOKUP_ON_FAILURE;
 			}
 		}
 
@@ -562,9 +573,22 @@ LemonScriptProgram::LoadingResult LemonScriptProgram::loadScriptModule(lemon::Mo
 	return LoadingResult::FAILED_CONTINUE;
 }
 
-void LemonScriptProgram::collectHooksFromFunctions()
+void LemonScriptProgram::collectHooksFromFunctions(const lemon::GlobalsLookup& globalsLookup)
 {
 	mInternal.mAddressHooks.clear();
+
+	const auto getDeepestFunctionOverload = [](const lemon::GlobalsLookup& globalsLookup, const lemon::ScriptFunction& function) -> const lemon::ScriptFunction&
+	{
+		// Check if there are function overloads for the given function, and return the deepest one or the function itself
+		const lemon::FunctionReference* ref = globalsLookup.getFunctionOverloadByNameAndSignature(function.getName().getHash(), function.getSignatureHash());
+		if (nullptr != ref && nullptr != ref->mFunction && ref->mFunction->isA<lemon::ScriptFunction>())
+		{
+			lemon::ScriptFunction& func = ref->mFunction->as<lemon::ScriptFunction>();
+			if (&func != &function)
+				return func;
+		}
+		return function;
+	};
 
 	// Go through all functions
 	for (const lemon::ScriptFunction* function : mInternal.mProgram.getScriptFunctions())
@@ -581,7 +605,7 @@ void LemonScriptProgram::collectHooksFromFunctions()
 
 					// Create update hook
 					Hook& hook = addHook(Hook::Type::PRE_UPDATE, 0);
-					hook.mFunction = function;
+					hook.mFunction = &getDeepestFunctionOverload(globalsLookup, *function);
 				}
 				else if (entry.mArgument == "post-update-hook")
 				{
@@ -589,7 +613,7 @@ void LemonScriptProgram::collectHooksFromFunctions()
 
 					// Create update hook
 					Hook& hook = addHook(Hook::Type::POST_UPDATE, 0);
-					hook.mFunction = function;
+					hook.mFunction = &getDeepestFunctionOverload(globalsLookup, *function);
 				}
 			}
 		}
@@ -598,7 +622,7 @@ void LemonScriptProgram::collectHooksFromFunctions()
 		for (const lemon::ScriptFunction::AddressHook& addressHook : function->mAddressHooks)
 		{
 			Hook& hook = addHook(Hook::Type::ADDRESS, addressHook.mAddress);
-			hook.mFunction = function;
+			hook.mFunction = &getDeepestFunctionOverload(globalsLookup, *function);
 			// Note that "addressHook.mDisabled" is only meant for emulation, and intentionally ignored in Oxygen
 		}
 
@@ -608,7 +632,7 @@ void LemonScriptProgram::collectHooksFromFunctions()
 			for (const lemon::ScriptFunction::AddressHook& addressHook : label.mLabelAddressHooks)
 			{
 				Hook& hook = addHook(Hook::Type::ADDRESS, addressHook.mAddress);
-				hook.mFunction = function;
+				hook.mFunction = &getDeepestFunctionOverload(globalsLookup, *function);
 				hook.mLabel = &label;
 			}
 		}

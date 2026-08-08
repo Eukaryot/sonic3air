@@ -70,6 +70,7 @@ namespace lemon
 		// Functions
 		const std::vector<FunctionReference>& getFunctionsByName(uint64 nameHash) const;
 		const FunctionReference* getFunctionByNameAndSignature(uint64 nameHash, uint32 signatureHash, bool* outAnyFound = nullptr) const;
+		const FunctionReference* getFunctionOverloadByNameAndSignature(uint64 nameHash, uint32 signatureHash) const;
 		const std::vector<FunctionReference>& getMethodsByName(uint64 contextNameHash) const;
 		void registerFunction(Function& function);
 

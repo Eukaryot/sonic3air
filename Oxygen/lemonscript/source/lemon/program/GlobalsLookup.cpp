@@ -93,6 +93,7 @@ namespace lemon
 
 	const FunctionReference* GlobalsLookup::getFunctionByNameAndSignature(uint64 nameHash, uint32 signatureHash, bool* outAnyFound) const
 	{
+		// This will return the first occurring function with the given name and signature, but not the deepest overload
 		const std::vector<FunctionReference>& candidateFunctions = getFunctionsByName(nameHash);
 		if (candidateFunctions.empty())
 		{
@@ -109,6 +110,18 @@ namespace lemon
 				if (func.mFunction->getSignatureHash() == signatureHash)
 					return &func;
 			}
+		}
+		return nullptr;
+	}
+
+	const FunctionReference* GlobalsLookup::getFunctionOverloadByNameAndSignature(uint64 nameHash, uint32 signatureHash) const
+	{
+		// This will return the last occurring function with the given name and signature, which is the deepest overload
+		const std::vector<FunctionReference>& candidateFunctions = getFunctionsByName(nameHash);
+		for (auto it = candidateFunctions.rbegin(); it != candidateFunctions.rend(); ++it)
+		{
+			if (it->mFunction->getSignatureHash() == signatureHash)
+				return &*it;
 		}
 		return nullptr;
 	}

@@ -64,13 +64,13 @@ public:
 		mTable.resize(TABLESIZE >> SHIFT, nullptr);
 	}
 
-	inline size_t size() const  { return mNumEntries; }
+	inline size_t size() const  { return mAllEntries.size(); }
 
 	inline void clear()
 	{
+		mAllEntries.clear();
 		mEntriesPool.clear();
 		memset(&mTable[0], 0, mTable.size() * sizeof(Entry*));
-		mNumEntries = 0;
 	}
 
 	inline VALUE* add(uint32 key)
@@ -83,8 +83,8 @@ public:
 		newEntry.mKey = key;
 		newEntry.mNext = mTable[index];
 
+		mAllEntries.push_back(&newEntry);
 		mTable[index] = &newEntry;
-		++mNumEntries;
 		return &newEntry.mValue;
 	}
 
@@ -113,6 +113,15 @@ public:
 		return nullptr;
 	}
 
+	template<class PRED>
+	void forEach(PRED predicate)
+	{
+		for (Entry* entry : mAllEntries)
+		{
+			predicate(entry->mValue);
+		}
+	}
+
 private:
 	inline uint32 getIndex(uint32 key) const
 	{
@@ -127,6 +136,6 @@ private:
 		Entry* mNext = nullptr;
 	};
 	ObjectPool<Entry, RMX_PAGESIZE> mEntriesPool;
+	std::vector<Entry*> mAllEntries;
 	std::vector<Entry*> mTable;
-	size_t mNumEntries = 0;
 };
