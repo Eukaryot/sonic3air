@@ -114,6 +114,35 @@ namespace lemon
 			}
 			return nullptr;
 		}
+
+		const Function* findBaseFunction(const GlobalsLookup& globalsLookup, const Function& function)
+		{
+			const std::vector<FunctionReference>& candidates = globalsLookup.getFunctionsByName(function.getName().getHash());
+			for (const FunctionReference& candidate : candidates)
+			{
+				// Base function signature must be the same as current function's
+				if (candidate.mFunction->getSignatureHash() == function.getSignatureHash() && candidate.mFunction != &function)
+				{
+					return candidate.mFunction;
+				}
+			}
+
+			// Also check all alias names of that function
+			for (const Function::AliasName& aliasName : function.getAliasNames())
+			{
+				const std::vector<FunctionReference>& candidates = globalsLookup.getFunctionsByName(aliasName.mName.getHash());
+				for (const FunctionReference& candidate : candidates)
+				{
+					// Base function signature must be the same as current function's
+					if (candidate.mFunction->getSignatureHash() == function.getSignatureHash() && candidate.mFunction != &function)
+					{
+						return candidate.mFunction;
+					}
+				}
+			}
+
+			return nullptr;
+		};
 	}
 
 
@@ -640,18 +669,19 @@ namespace lemon
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
 				const std::string_view functionName = identifierToken.mName.getString();
 				bool isBaseCall = false;
-				bool baseFunctionExists = false;
+				const Function* baseFunction = nullptr;
 				const Function* function = nullptr;
 				const Variable* thisPointerVariable = nullptr;
 
 				const std::vector<FunctionReference>* candidateFunctions = &mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
-				if (identifierToken.mName.getHash() == rmx::constMurmur2_64("base"))
+				if (!candidateFunctions->empty())
 				{
-					isBaseCall = true;
+					// It's a global function
 				}
-				else if (!candidateFunctions->empty())
+				else if (identifierToken.mName.getHash() == rmx::constMurmur2_64("base"))
 				{
-					// Is it a global function
+					// It's a base call
+					isBaseCall = true;
 				}
 				else if (rmx::startsWith(functionName, "base."))
 				{
@@ -710,20 +740,11 @@ namespace lemon
 
 				if (isBaseCall)
 				{
-					const std::vector<FunctionReference>& candidates = mGlobalsLookup.getFunctionsByName(mContext.mFunction->getName().getHash());
-					for (const FunctionReference& candidate : candidates)
-					{
-						// Base function signature must be the same as current function's
-						if (candidate.mFunction->getSignatureHash() == mContext.mFunction->getSignatureHash() && candidate.mFunction != mContext.mFunction)
-						{
-							baseFunctionExists = true;
-							break;
-						}
-					}
+					baseFunction = findBaseFunction(mGlobalsLookup, *mContext.mFunction);
 
 					// TODO: The following check would be no good idea, as some mods overwrite functions (and call their base) from other mods that may or may not be loaded before
 					//  -> The solution is to allow this, and make the base calls simply do nothing at all
-					//CHECK_ERROR(baseFunctionExists, "There's no base function for call '" << functionName << "' with the same signature, i.e. exact same types for parameters and return value", mLineNumber);
+					//CHECK_ERROR(nullptr != baseFunction, "There's no base function for call '" << functionName << "' with the same signature, i.e. exact same types for parameters and return value", mLineNumber);
 				}
 
 				// Create function token
@@ -781,10 +802,10 @@ namespace lemon
 						const bool canMatch = mTypeCasting.canMatchSignature(parameterTypes, mContext.mFunction->getParameters(), &failedIndex);
 						CHECK_ERROR(canMatch, "Can't cast parameters of '" << functionName << "' function call to match base function, parameter '" << mContext.mFunction->getParameters()[failedIndex].mName << "' has the wrong type", mLineNumber);
 
-						if (baseFunctionExists)
+						if (nullptr != baseFunction)
 						{
-							// Use the very same function again, as a base call
-							function = mContext.mFunction;
+							// Use the base function, as a base call
+							function = baseFunction;
 							functionToken.mIsBaseCall = true;
 						}
 						else
