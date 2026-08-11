@@ -35,7 +35,7 @@ void AudioOutBase::startup()
 
 	// Load audio definitions
 	//  -> No mods yet here, that's coming later in "handleGameLoaded"
-	if (FTX::FileSystem->exists(L"data/audio/original"))
+	if (FTX::FileSystem->exists(L"data/audio/original/"))
 	{
 		// Game is used differentiation between original and remastered soundtrack (namely S3AIR)
 		mAudioCollection.loadFromJson(L"data/audio/original", L"audio_default.json", AudioCollection::Package::ORIGINAL);
