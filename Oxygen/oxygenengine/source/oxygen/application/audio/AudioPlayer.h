@@ -90,7 +90,7 @@ public:
 	bool isPlayingSoundPaused(PlayingSoundRef ref);
 	void pausePlayingSound(PlayingSoundRef ref);
 	void resumePlayingSound(PlayingSoundRef ref);
-	void stopPlayingSound(PlayingSoundRef ref, float cutOffTime = 0.02f);
+	void stopPlayingSound(PlayingSoundRef ref, float cutOffTime = 0.05f);
 
 	float getPlayingSoundVolume(PlayingSoundRef ref);
 	void setPlayingSoundVolume(PlayingSoundRef ref, float volume);
@@ -193,7 +193,7 @@ private:
 	PlayingSound* getPlayingSound(AudioReference& audioRef);
 	const PlayingSound* getPlayingSound(AudioReference& audioRef) const;
 
-	void stopPlayingSoundInternal(PlayingSound& playingSound, bool immediately, bool removeFromList = false, float cutOffTime = 0.02f);
+	void stopPlayingSoundInternal(PlayingSound& playingSound, bool immediately, bool removeFromList = false, float cutOffTime = 0.05f);
 
 	void applyChannelOverride(int overriddenChannelId, uint8 contextId);
 	void removeChannelOverride(int overriddenChannelId, uint8 contextId);
