@@ -776,7 +776,7 @@ namespace lemon
 			if (serializer.isReading())
 			{
 				controlFlow.mCallStack.resize(controlFlow.mCallStack.count);
-				for (uint16 i = 0; i < controlFlow.mCallStack.count; ++i)
+				for (int i = 0; i < (int)controlFlow.mCallStack.count; ++i)
 				{
 					const std::string_view functionName = serializer.readStringView();
 					const uint64 nameHash = rmx::getMurmur2_64(functionName);
@@ -815,7 +815,7 @@ namespace lemon
 				}
 
 				// Make corrections to the program counters for the case that the call points changed
-				for (uint16 i = 0; i < controlFlow.mCallStack.count - 1; ++i)
+				for (int i = 0; i < (int)controlFlow.mCallStack.count - 1; ++i)
 				{
 					const size_t opcodeIndex = (size_t)matchCallerProgramCounter(*mProgram, controlFlow.mCallStack[i], controlFlow.mCallStack[i + 1]);
 					controlFlow.mCallStack[i].mProgramCounter = controlFlow.mCallStack[i].mRuntimeFunction->translateToRuntimeProgramCounter(opcodeIndex);
@@ -823,7 +823,7 @@ namespace lemon
 			}
 			else
 			{
-				for (uint16 i = 0; i < controlFlow.mCallStack.count; ++i)
+				for (int i = 0; i < (int)controlFlow.mCallStack.count; ++i)
 				{
 					serializer.write(controlFlow.mCallStack[i].mRuntimeFunction->mFunction->getName().getString());
 					serializer.write(controlFlow.mCallStack[i].mRuntimeFunction->mFunction->getSignatureHash());

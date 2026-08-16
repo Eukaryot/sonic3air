@@ -463,7 +463,7 @@ void Configuration::loadConfigurationProperties(JsonSerializer& serializer)
 		serializer.endObject();
 	}
 
-	if (mLoadLevel != -1 || mGameRecorder.mEnablePlayback)
+	if ((mLoadLevel >= 0 && mLoadLevel <= 0xffff) || mGameRecorder.mEnablePlayback)
 	{
 		// Enforce start phase 3 (in-game) when a level to load directly is defined, and in game recording playback mode
 		mStartPhase = 3;

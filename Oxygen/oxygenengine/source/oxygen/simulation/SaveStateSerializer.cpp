@@ -127,6 +127,15 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 	{
 		const uint8 formatVersion = signature[15];
 
+		if (serializer.isReading())
+		{
+			if (formatVersion > OXYGEN_SAVESTATE_FORMATVERSION)
+			{
+				RMX_ERROR("Save state could not be read due to unsupported version " << (int)formatVersion << " (supported range is 1 to " << (int)OXYGEN_SAVESTATE_FORMATVERSION << ")", );
+				return false;
+			}
+		}
+
 		// Registers
 		for (size_t i = 0; i < 16; ++i)
 		{
