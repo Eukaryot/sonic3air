@@ -73,7 +73,7 @@ Source code contributions by:
 * LelJader
 
 Remastered soundtrack by:
-* G Spindash
+* SpinnRG
 
 Game scripts & other contributions by:
 * Vinegar
