@@ -158,6 +158,7 @@ void DiscordIntegration::updateInfo(Game::Mode gameMode, uint32 subMode, Emulato
 	{
 		case Game::Mode::NORMAL_GAME:	break;		// Not showing the game mode in this case (to save space)
 		case Game::Mode::ACT_SELECT:	break;		// Not showing the game mode in this case (to save space)
+		case Game::Mode::EXTRAS:		break;		// Not showing the game mode in this case (to save space)
 		case Game::Mode::TIME_ATTACK:	details = "Time Attack";		break;
 		case Game::Mode::COMPETITION:	details = "Competition Mode";	largeImage = "gamemode_competition";	break;
 		case Game::Mode::BLUE_SPHERE:	details = "Blue Sphere Game";	largeImage = "gamemode_bluesphere";		break;
