@@ -25,6 +25,7 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/overlays/DebugSidePanel.h"
 #include "oxygen/application/video/VideoOut.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/menu/imgui/ImGuiIntegration.h"
 #include "oxygen/helper/RandomNumberGenerator.h"
 #include "oxygen/network/crowdcontrol/CrowdControlClient.h"
@@ -829,6 +830,41 @@ namespace
 		return (nullptr != mod) ? (int32)mod->mActivePriority : -1;
 	}
 
+	
+	int32 Input_getMouseX()
+	{
+		const Vec2i mPos = InputManager::instance().getMousePos();
+		const Vec2f relativeMPos = Application::instance().getGameView().getGameViewport().getInnerPositionFromScreen(Vec2f(mPos));
+		return roundToInt(relativeMPos.x);
+	}
+	
+	int32 Input_getMouseY()
+	{
+		const Vec2i mPos = InputManager::instance().getMousePos();
+		const Vec2f relativeMPos = Application::instance().getGameView().getGameViewport().getInnerPositionFromScreen(Vec2f(mPos));
+		return roundToInt(relativeMPos.y);
+	}
+	
+	bool Input_mouseButtonPressed(uint8 index)
+	{
+		return InputManager::instance().isMousePressed(index);
+	}
+	
+	bool Input_mouseButtonDown(uint8 index)
+	{
+		return InputManager::instance().isMouseDown(index);
+	}
+	
+	bool Input_mouseButtonReleased(uint8 index)
+	{
+		return InputManager::instance().isMouseReleased(index);
+	}
+	
+	int8 Input_getScrollWheel()
+	{
+		return InputManager::instance().getMouseWheel();
+	}
+
 
 	void debugKeyGetter(lemon::ControlFlow& controlFlow, int index)
 	{
@@ -1230,6 +1266,21 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 		builder.addNativeFunction("Input.setTouchInputMode", lemon::wrap(&Input_setTouchInputMode), defaultFlags)
 			.setParameters("mode");
+
+		builder.addNativeFunction("Input.getMouseX", lemon::wrap(&Input_getMouseX), defaultFlags);
+		
+		builder.addNativeFunction("Input.getMouseY", lemon::wrap(&Input_getMouseY), defaultFlags);
+		
+		builder.addNativeFunction("Input.mouseButtonPressed", lemon::wrap(&Input_mouseButtonPressed), defaultFlags)
+			.setParameters("index");
+		
+		builder.addNativeFunction("Input.mouseButtonDown", lemon::wrap(&Input_mouseButtonDown), defaultFlags)
+			.setParameters("index");
+		
+		builder.addNativeFunction("Input.mouseButtonReleased", lemon::wrap(&Input_mouseButtonReleased), defaultFlags)
+			.setParameters("index");
+		
+		builder.addNativeFunction("Input.getScrollWheel", lemon::wrap(&Input_getScrollWheel), defaultFlags);
 
 		builder.addNativeFunction("Input.resetControllerRumble", lemon::wrap(&Input_resetControllerRumble), defaultFlags)
 			.setParameters("playerIndex");
