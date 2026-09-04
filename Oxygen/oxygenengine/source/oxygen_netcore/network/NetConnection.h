@@ -57,6 +57,7 @@ public:
 
 	enum class SocketType
 	{
+		UNDEFINED,
 		UDP_SOCKET,		// UDP usage -- this is the default
 		TCP_SOCKET,		// TCP usage -- fallback if UDP is not available
 		WEB_SOCKET		// Emscripten web socket usage, used only on client side
@@ -128,7 +129,7 @@ private:
 	DisconnectReason mDisconnectReason = DisconnectReason::UNKNOWN;
 	ConnectionManager* mConnectionManager = nullptr;
 
-	SocketType mSocketType = SocketType::UDP_SOCKET;
+	SocketType mSocketType = SocketType::UNDEFINED;
 	TCPSocket mTCPSocket;				// Used only for SocketType::TCP_SOCKET
 	WebSocketClient mWebSocketClient;	// Used only for SocketType::WEB_SOCKET
 	bool mIsWebSocketServer = false;	// Set on server side if is a WebSocket connection; used only for SocketType::TCP_SOCKET

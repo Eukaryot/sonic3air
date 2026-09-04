@@ -113,7 +113,10 @@ bool NetConnection::startConnectTo(ConnectionManager& connectionManager, const S
 	else if (mWebSocketClient.isAvailable())
 	{
 		if (!mWebSocketClient.connectTo(remoteAddress))
+		{
+			mConnectionManager = nullptr;
 			return false;
+		}
 
 		mSocketType = NetConnection::SocketType::WEB_SOCKET;
 
@@ -127,7 +130,10 @@ bool NetConnection::startConnectTo(ConnectionManager& connectionManager, const S
 		//  -> Note that this is a blocking call!
 		const bool success = mTCPSocket.connectTo(remoteAddress.getIP(), remoteAddress.getPort());
 		if (!success)
+		{
+			mConnectionManager = nullptr;
 			return false;
+		}
 
 		mSocketType = NetConnection::SocketType::TCP_SOCKET;
 	}
@@ -145,6 +151,9 @@ bool NetConnection::isConnectedTo(uint16 localConnectionID, uint16 remoteConnect
 
 void NetConnection::disconnect(DisconnectReason disconnectReason)
 {
+	if (mState == State::EMPTY || mState == State::DISCONNECTED)
+		return;
+
 	if (disconnectReason == DisconnectReason::MANUAL_LOCAL && nullptr != mConnectionManager)
 	{
 		// Send a termination packet
@@ -274,6 +283,7 @@ void NetConnection::acceptIncomingConnectionUDP(ConnectionManager& connectionMan
 {
 	clear();
 
+	mSocketType = SocketType::UDP_SOCKET;
 	mState = State::ACCEPTED;
 	mConnectionManager = &connectionManager;
 	mLocalConnectionID = 0;			// Not yet set, see "addConnection" below
