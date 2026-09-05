@@ -24,9 +24,6 @@ public:
 	JsonReader& getSecondJsonReader()	{ return mSecondJsonReader; }
 
 private:
-	Json::Value mMainJson;
-	Json::Value mSecondJson;
-
 	JsonReader mMainJsonReader;
 	JsonReader mSecondJsonReader;
 };

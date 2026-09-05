@@ -9,7 +9,6 @@
 #include "oxygen/pch.h"
 #include "oxygen/extensions/test/TestExtension.h"
 #include "oxygen/extensions/test/JsonReaderWrapper.h"
-#include "oxygen/helper/JsonHelper.h"
 
 #include <lemon/program/ModuleBindingsBuilder.h>
 
@@ -58,18 +57,26 @@ void TestExtension::initialize()
 		]
 	})";
 
-	mMainJson = JsonHelper::loadFromString(jsonContent);
-	mMainJsonReader = JsonReader(mMainJson);		// Note: It's important to reset a JsonReader whenever its source JSON changes!
-
-	mSecondJson = JsonHelper::loadFromString("{}");		// Just an empty JSON object
-	mSecondJsonReader = JsonReader(mSecondJson);
+	mMainJsonReader.loadFromString(jsonContent);
+	mSecondJsonReader.loadFromString("{}");		// Just an empty JSON object
 
 	/*
-		Example usage in scripts:
+		Example usage in scripts (requires "//# script-feature-level(2)"):
 
 		JsonReader json = TestExtension.getMainJsonReader()
 		json.enterRoot()
 		if (json.enterObject("Object1"))
-			debugLog("Value read: " + json.getStringValue("Key1"))
+		{
+			debugLog("Object1 -> Key1 = " + json.getString("Key1"))
+			debugLog("Object1 -> Key2 = " + json.getInteger("Key2"))
+			debugLog("Object1 -> Key3 = " + json.getDouble("Key3"))
+			json.leave()
+		}
+		if (json.enterArray("Array1"))
+		{
+			for (u32 k = 0; k < json.getNumChildren(); ++k)
+				debugLog(stringformat("Array1 index [%d] = %d", k, json.getInteger(k)))
+			json.leave()
+		}
 	*/
 }
