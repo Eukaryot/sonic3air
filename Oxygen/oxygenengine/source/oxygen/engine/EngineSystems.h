@@ -22,6 +22,9 @@
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/PersistentData.h"
+#if defined(PLATFORM_ANDROID)
+	#include "oxygen/platform/android/AndroidJavaInterface.h"
+#endif
 
 
 namespace oxygen
