@@ -134,6 +134,8 @@ namespace lemon
 		CachedBuiltinFunction mBuiltinStringOperatorPlus;
 		CachedBuiltinFunction mBuiltinStringOperatorPlusInt64;
 		CachedBuiltinFunction mBuiltinStringOperatorPlusInt64Inv;
+		CachedBuiltinFunction mBuiltinStringOperatorPlusDouble;
+		CachedBuiltinFunction mBuiltinStringOperatorPlusDoubleInv;
 		CachedBuiltinFunction mBuiltinStringOperatorLess;
 		CachedBuiltinFunction mBuiltinStringOperatorLessOrEqual;
 		CachedBuiltinFunction mBuiltinStringOperatorGreater;

@@ -37,6 +37,8 @@ namespace lemon
 		static FunctionName STRING_OPERATOR_PLUS;
 		static FunctionName STRING_OPERATOR_PLUS_INT64;
 		static FunctionName STRING_OPERATOR_PLUS_INT64_INV;
+		static FunctionName STRING_OPERATOR_PLUS_DOUBLE;
+		static FunctionName STRING_OPERATOR_PLUS_DOUBLE_INV;
 		static FunctionName STRING_OPERATOR_LESS;
 		static FunctionName STRING_OPERATOR_LESS_OR_EQUAL;
 		static FunctionName STRING_OPERATOR_GREATER;

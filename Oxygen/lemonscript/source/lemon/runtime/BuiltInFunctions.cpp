@@ -227,6 +227,32 @@ namespace lemon
 			return StringRef(runtime->addString(std::string_view(result.mBuffer, result.mLength)));
 		}
 
+		StringRef string_operator_plus_double(StringRef str, double value)
+		{
+			Runtime* runtime = Runtime::getActiveRuntime();
+			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			RMX_CHECK(str.isValid(), "Unable to resolve string", return StringRef());
+
+			static detail::FastStringStream result;
+			result.clear();
+			result.addString(str.getStringRef());
+			result.addDouble(value);
+			return StringRef(runtime->addString(std::string_view(result.mBuffer, result.mLength)));
+		}
+
+		StringRef string_operator_plus_double_inv(double value, StringRef str)
+		{
+			Runtime* runtime = Runtime::getActiveRuntime();
+			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			RMX_CHECK(str.isValid(), "Unable to resolve string", return StringRef());
+
+			static detail::FastStringStream result;
+			result.clear();
+			result.addDouble(value);
+			result.addString(str.getStringRef());
+			return StringRef(runtime->addString(std::string_view(result.mBuffer, result.mLength)));
+		}
+
 		bool string_operator_less(StringRef str1, StringRef str2)
 		{
 			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
@@ -302,6 +328,8 @@ namespace lemon
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_PLUS("#builtin_string_operator_plus");
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_PLUS_INT64("#builtin_string_operator_plus_int64");
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_PLUS_INT64_INV("#builtin_string_operator_plus_int64_inv");
+	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_PLUS_DOUBLE("#builtin_string_operator_plus_double");
+	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_PLUS_DOUBLE_INV("#builtin_string_operator_plus_double_inv");
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_LESS("#builtin_string_operator_less");
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_LESS_OR_EQUAL("#builtin_string_operator_less_equal");
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_GREATER("#builtin_string_operator_greater");
@@ -356,6 +384,8 @@ namespace lemon
 		module.addNativeFunction(STRING_OPERATOR_PLUS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus), defaultFlags);
 		module.addNativeFunction(STRING_OPERATOR_PLUS_INT64.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus_int64), defaultFlags);
 		module.addNativeFunction(STRING_OPERATOR_PLUS_INT64_INV.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus_int64_inv), defaultFlags);
+		module.addNativeFunction(STRING_OPERATOR_PLUS_DOUBLE.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus_double), defaultFlags);
+		module.addNativeFunction(STRING_OPERATOR_PLUS_DOUBLE_INV.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus_double_inv), defaultFlags);
 		module.addNativeFunction(STRING_OPERATOR_LESS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_less), defaultFlags);
 		module.addNativeFunction(STRING_OPERATOR_LESS_OR_EQUAL.makeFlyweightString(), lemon::wrap(&builtins::string_operator_less_or_equal), defaultFlags);
 		module.addNativeFunction(STRING_OPERATOR_GREATER.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater), defaultFlags);

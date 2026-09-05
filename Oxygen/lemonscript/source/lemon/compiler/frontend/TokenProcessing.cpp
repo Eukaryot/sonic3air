@@ -160,6 +160,8 @@ namespace lemon
 		fillCachedBuiltInFunction(mBuiltinStringOperatorPlus,			false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS);
 		fillCachedBuiltInFunction(mBuiltinStringOperatorPlusInt64,		false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64);
 		fillCachedBuiltInFunction(mBuiltinStringOperatorPlusInt64Inv,	false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64_INV);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorPlusDouble,		false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_DOUBLE);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorPlusDoubleInv,	false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_DOUBLE_INV);
 		fillCachedBuiltInFunction(mBuiltinStringOperatorLess,			false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS);
 		fillCachedBuiltInFunction(mBuiltinStringOperatorLessOrEqual,	false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS_OR_EQUAL);
 		fillCachedBuiltInFunction(mBuiltinStringOperatorGreater,		false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER);
@@ -170,8 +172,11 @@ namespace lemon
 		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlus,           &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING);
 		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusInt64,      &PredefinedDataTypes::STRING, &PredefinedDataTypes::INT_64, &PredefinedDataTypes::STRING);
 		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusInt64Inv,   &PredefinedDataTypes::INT_64, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING);
+		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusDouble,	   &PredefinedDataTypes::STRING, &PredefinedDataTypes::DOUBLE, &PredefinedDataTypes::STRING);
+		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusDoubleInv,  &PredefinedDataTypes::DOUBLE, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING);
 		mBinaryOperationLookup[(size_t)Operator::ASSIGN_PLUS]             .emplace_back(&mBuiltinStringOperatorPlus,           &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, Operator::BINARY_PLUS);
 		mBinaryOperationLookup[(size_t)Operator::ASSIGN_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusInt64,      &PredefinedDataTypes::STRING, &PredefinedDataTypes::INT_64, &PredefinedDataTypes::STRING, Operator::BINARY_PLUS);
+		mBinaryOperationLookup[(size_t)Operator::ASSIGN_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusDouble,     &PredefinedDataTypes::STRING, &PredefinedDataTypes::DOUBLE, &PredefinedDataTypes::STRING, Operator::BINARY_PLUS);
 		mBinaryOperationLookup[(size_t)Operator::COMPARE_LESS]            .emplace_back(&mBuiltinStringOperatorLess,           &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::BOOL);
 		mBinaryOperationLookup[(size_t)Operator::COMPARE_LESS_OR_EQUAL]   .emplace_back(&mBuiltinStringOperatorLessOrEqual,    &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::BOOL);
 		mBinaryOperationLookup[(size_t)Operator::COMPARE_GREATER]         .emplace_back(&mBuiltinStringOperatorGreater,        &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::BOOL);
