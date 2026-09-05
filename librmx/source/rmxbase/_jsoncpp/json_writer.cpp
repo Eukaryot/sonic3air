@@ -10,73 +10,14 @@
 #include <algorithm>
 #include <cassert>
 #include <cctype>
+#include <cmath>
+#include <cstdio>
 #include <cstring>
 #include <iomanip>
 #include <memory>
 #include <set>
 #include <sstream>
 #include <utility>
-
-#if __cplusplus >= 201103L
-#include <cmath>
-#include <cstdio>
-
-#if !defined(isnan)
-#define isnan std::isnan
-#endif
-
-#if !defined(isfinite)
-#define isfinite std::isfinite
-#endif
-
-#else
-#include <cmath>
-#include <cstdio>
-
-#if defined(_MSC_VER)
-#if !defined(isnan)
-#include <float.h>
-#define isnan _isnan
-#endif
-
-#if !defined(isfinite)
-#include <float.h>
-#define isfinite _finite
-#endif
-
-#if !defined(_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES)
-#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
-#endif //_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
-
-#endif //_MSC_VER
-
-#if defined(__sun) && defined(__SVR4) // Solaris
-#if !defined(isfinite)
-#include <ieeefp.h>
-#define isfinite finite
-#endif
-#endif
-
-#if defined(__hpux)
-#if !defined(isfinite)
-#if defined(__ia64) && !defined(finite)
-#define isfinite(x)                                                            \
-  ((sizeof(x) == sizeof(float) ? _Isfinitef(x) : _IsFinite(x)))
-#endif
-#endif
-#endif
-
-#if !defined(isnan)
-// IEEE standard states that NaN values will not compare to themselves
-#define isnan(x) ((x) != (x))
-#endif
-
-#if !defined(__APPLE__)
-#if !defined(isfinite)
-#define isfinite finite
-#endif
-#endif
-#endif
 
 #if defined(_MSC_VER)
 // Disable warning about strdup being deprecated.
@@ -85,11 +26,7 @@
 
 namespace Json {
 
-#if __cplusplus >= 201103L || (defined(_CPPLIB_VER) && _CPPLIB_VER >= 520)
 using StreamWriterPtr = std::unique_ptr<StreamWriter>;
-#else
-using StreamWriterPtr = std::auto_ptr<StreamWriter>;
-#endif
 
 String valueToString(LargestInt value) {
   UIntToStringBuffer buffer;
@@ -129,11 +66,12 @@ String valueToString(double value, bool useSpecialFloats,
   // Print into the buffer. We need not request the alternative representation
   // that always has a decimal point because JSON doesn't distinguish the
   // concepts of reals and integers.
-  if (!isfinite(value)) {
-    static const char* const reps[2][3] = {{"NaN", "-Infinity", "Infinity"},
-                                           {"null", "-1e+9999", "1e+9999"}};
-    return reps[useSpecialFloats ? 0 : 1]
-               [isnan(value) ? 0 : (value < 0) ? 1 : 2];
+  if (!std::isfinite(value)) {
+    if (std::isnan(value))
+      return useSpecialFloats ? "NaN" : "null";
+    if (value < 0)
+      return useSpecialFloats ? "-Infinity" : "-1e+9999";
+    return useSpecialFloats ? "Infinity" : "1e+9999";
   }
 
   String buffer(size_t(36), '\0');
@@ -278,7 +216,7 @@ static String valueToQuotedStringN(const char* value, size_t length,
     return "";
 
   if (!doesAnyCharRequireEscaping(value, length))
-    return String("\"") + value + "\"";
+    return String("\"") + String(value, length) + "\"";
   // We have to walk value and escape any special characters.
   // Appending to String is not efficient, but this should be rare.
   // (Note: forward slashes are *not* rare, but I am not escaping them.)
@@ -351,6 +289,10 @@ static String valueToQuotedStringN(const char* value, size_t length,
 
 String valueToQuotedString(const char* value) {
   return valueToQuotedStringN(value, strlen(value));
+}
+
+String valueToQuotedString(const char* value, size_t length) {
+  return valueToQuotedStringN(value, length);
 }
 
 // Class Writer
@@ -490,7 +432,7 @@ void StyledWriter::writeValue(const Value& value) {
         const String& name = *it;
         const Value& childValue = value[name];
         writeCommentBeforeValue(childValue);
-        writeWithIndent(valueToQuotedString(name.c_str()));
+        writeWithIndent(valueToQuotedString(name.c_str(), name.size()));
         document_ += " : ";
         writeValue(childValue);
         if (++it == members.end()) {
@@ -708,7 +650,7 @@ void StyledStreamWriter::writeValue(const Value& value) {
         const String& name = *it;
         const Value& childValue = value[name];
         writeCommentBeforeValue(childValue);
-        writeWithIndent(valueToQuotedString(name.c_str()));
+        writeWithIndent(valueToQuotedString(name.c_str(), name.size()));
         *document_ << " : ";
         writeValue(childValue);
         if (++it == members.end()) {
@@ -1246,7 +1188,7 @@ String writeString(StreamWriter::Factory const& factory, Value const& root) {
   OStringStream sout;
   StreamWriterPtr const writer(factory.newStreamWriter());
   writer->write(root, &sout);
-  return sout.str();
+  return std::move(sout).str();
 }
 
 OStream& operator<<(OStream& sout, Value const& root) {
