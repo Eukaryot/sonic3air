@@ -31,16 +31,22 @@ public:
 
 	size_t getNumChildren() const;
 
+	bool hasKey(std::string_view key) const;
 	bool isString(std::string_view key) const;
 	bool isInteger(std::string_view key) const;
 	bool isDouble(std::string_view key) const;
+	bool isObject(std::string_view key) const;
+	bool isArray(std::string_view key) const;
 	std::string getString(std::string_view key) const;
 	int64 getInteger(std::string_view key) const;
 	double getDouble(std::string_view key) const;
 
+	bool hasIndex(int index) const;
 	bool isString(int index) const;
 	bool isInteger(int index) const;
 	bool isDouble(int index) const;
+	bool isObject(int index) const;
+	bool isArray(int index) const;
 	std::string getString(int index) const;
 	int64 getInteger(int index) const;
 	double getDouble(int index) const;

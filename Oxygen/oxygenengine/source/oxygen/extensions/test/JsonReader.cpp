@@ -55,6 +55,12 @@ namespace functions
 		return false;
 	}
 
+	bool jsonReader_hasKey(JsonReaderWrapper jsonReaderWrapper, lemon::StringRef key)
+	{
+		JsonReader* jsonReader = jsonReaderWrapper.getJsonReader();
+		return (nullptr != jsonReader && jsonReader->hasKey(key.getString()));
+	}
+
 	bool jsonReader_isStringByKey(JsonReaderWrapper jsonReaderWrapper, lemon::StringRef key)
 	{
 		JsonReader* jsonReader = jsonReaderWrapper.getJsonReader();
@@ -71,6 +77,18 @@ namespace functions
 	{
 		JsonReader* jsonReader = jsonReaderWrapper.getJsonReader();
 		return (nullptr != jsonReader && jsonReader->isDouble(key.getString()));
+	}
+
+	bool jsonReader_isObjectByKey(JsonReaderWrapper jsonReaderWrapper, lemon::StringRef key)
+	{
+		JsonReader* jsonReader = jsonReaderWrapper.getJsonReader();
+		return (nullptr != jsonReader && jsonReader->isObject(key.getString()));
+	}
+
+	bool jsonReader_isArrayByKey(JsonReaderWrapper jsonReaderWrapper, lemon::StringRef key)
+	{
+		JsonReader* jsonReader = jsonReaderWrapper.getJsonReader();
+		return (nullptr != jsonReader && jsonReader->isArray(key.getString()));
 	}
 
 	lemon::StringRef jsonReader_getStringByKey(JsonReaderWrapper jsonReaderWrapper, lemon::StringRef key)
@@ -99,28 +117,40 @@ namespace functions
 		return (nullptr != jsonReader) ? jsonReader->getDouble(key.getString()) : 0.0;
 	}
 
-	uint32 jsonReader_getNumChildren(JsonReaderWrapper jsonReaderWrapper)
+	bool jsonReader_hasIndex(JsonReaderWrapper jsonReaderWrapper, uint32 index)
 	{
 		JsonReader* jsonReader = jsonReaderWrapper.getJsonReader();
-		return (nullptr != jsonReader) ? (uint32)jsonReader->getNumChildren() : 0;
+		return (nullptr != jsonReader && jsonReader->hasIndex((int)index));
 	}
 
 	bool jsonReader_isStringByIndex(JsonReaderWrapper jsonReaderWrapper, uint32 index)
 	{
 		JsonReader* jsonReader = jsonReaderWrapper.getJsonReader();
-		return (nullptr != jsonReader && jsonReader->isString(index));
+		return (nullptr != jsonReader && jsonReader->isString((int)index));
 	}
 
 	bool jsonReader_isIntegerByIndex(JsonReaderWrapper jsonReaderWrapper, uint32 index)
 	{
 		JsonReader* jsonReader = jsonReaderWrapper.getJsonReader();
-		return (nullptr != jsonReader && jsonReader->isInteger(index));
+		return (nullptr != jsonReader && jsonReader->isInteger((int)index));
 	}
 
 	bool jsonReader_isDoubleByIndex(JsonReaderWrapper jsonReaderWrapper, uint32 index)
 	{
 		JsonReader* jsonReader = jsonReaderWrapper.getJsonReader();
-		return (nullptr != jsonReader && jsonReader->isDouble(index));
+		return (nullptr != jsonReader && jsonReader->isDouble((int)index));
+	}
+
+	bool jsonReader_isObjectByIndex(JsonReaderWrapper jsonReaderWrapper, uint32 index)
+	{
+		JsonReader* jsonReader = jsonReaderWrapper.getJsonReader();
+		return (nullptr != jsonReader && jsonReader->isObject((int)index));
+	}
+
+	bool jsonReader_isArrayByIndex(JsonReaderWrapper jsonReaderWrapper, uint32 index)
+	{
+		JsonReader* jsonReader = jsonReaderWrapper.getJsonReader();
+		return (nullptr != jsonReader && jsonReader->isArray((int)index));
 	}
 
 	lemon::StringRef jsonReader_getStringByIndex(JsonReaderWrapper jsonReaderWrapper, uint32 index)
@@ -148,6 +178,12 @@ namespace functions
 		JsonReader* jsonReader = jsonReaderWrapper.getJsonReader();
 		return (nullptr != jsonReader) ? jsonReader->getDouble((int)index) : 0.0;
 	}
+
+	uint32 jsonReader_getNumChildren(JsonReaderWrapper jsonReaderWrapper)
+	{
+		JsonReader* jsonReader = jsonReaderWrapper.getJsonReader();
+		return (nullptr != jsonReader) ? (uint32)jsonReader->getNumChildren() : 0;
+	}
 }
 
 
@@ -168,17 +204,23 @@ void JsonReader::registerScriptBindings(lemon::ModuleBindingsBuilder& builder)
 		builder.addNativeMethod("JsonReader", "leave", lemon::wrap(functions::jsonReader_leave), defaultFlags);
 
 		// For a JSON object
+		builder.addNativeMethod("JsonReader", "hasKey", lemon::wrap(functions::jsonReader_hasKey), defaultFlags);
 		builder.addNativeMethod("JsonReader", "isString",  lemon::wrap(functions::jsonReader_isStringByKey), defaultFlags);
 		builder.addNativeMethod("JsonReader", "isInteger", lemon::wrap(functions::jsonReader_isIntegerByKey), defaultFlags);
 		builder.addNativeMethod("JsonReader", "isDouble",  lemon::wrap(functions::jsonReader_isDoubleByKey), defaultFlags);
+		builder.addNativeMethod("JsonReader", "isObject",  lemon::wrap(functions::jsonReader_isObjectByKey), defaultFlags);
+		builder.addNativeMethod("JsonReader", "isArray",   lemon::wrap(functions::jsonReader_isArrayByKey), defaultFlags);
 		builder.addNativeMethod("JsonReader", "getString",  lemon::wrap(functions::jsonReader_getStringByKey), defaultFlags);
 		builder.addNativeMethod("JsonReader", "getInteger", lemon::wrap(functions::jsonReader_getIntegerByKey), defaultFlags);
 		builder.addNativeMethod("JsonReader", "getDouble",  lemon::wrap(functions::jsonReader_getDoubleByKey), defaultFlags);
 
 		// For a JSON array
+		builder.addNativeMethod("JsonReader", "hasIndex", lemon::wrap(functions::jsonReader_hasIndex), defaultFlags);
 		builder.addNativeMethod("JsonReader", "isString",  lemon::wrap(functions::jsonReader_isStringByIndex), defaultFlags);
 		builder.addNativeMethod("JsonReader", "isInteger", lemon::wrap(functions::jsonReader_isIntegerByIndex), defaultFlags);
 		builder.addNativeMethod("JsonReader", "isDouble",  lemon::wrap(functions::jsonReader_isDoubleByIndex), defaultFlags);
+		builder.addNativeMethod("JsonReader", "isObject",  lemon::wrap(functions::jsonReader_isObjectByIndex), defaultFlags);
+		builder.addNativeMethod("JsonReader", "isArray",   lemon::wrap(functions::jsonReader_isArrayByIndex), defaultFlags);
 		builder.addNativeMethod("JsonReader", "getString",  lemon::wrap(functions::jsonReader_getStringByIndex), defaultFlags);
 		builder.addNativeMethod("JsonReader", "getInteger", lemon::wrap(functions::jsonReader_getIntegerByIndex), defaultFlags);
 		builder.addNativeMethod("JsonReader", "getDouble",  lemon::wrap(functions::jsonReader_getDoubleByIndex), defaultFlags);
@@ -246,6 +288,12 @@ size_t JsonReader::getNumChildren() const
 	return (size_t)mCurrentJson->size();
 }
 
+bool JsonReader::hasKey(std::string_view key) const
+{
+	const Json::Value* value = getValueByKey(key);
+	return (nullptr != value);
+}
+
 bool JsonReader::isString(std::string_view key) const
 {
 	const Json::Value* value = getValueByKey(key);
@@ -262,6 +310,18 @@ bool JsonReader::isDouble(std::string_view key) const
 {
 	const Json::Value* value = getValueByKey(key);
 	return (nullptr != value && value->isDouble());
+}
+
+bool JsonReader::isObject(std::string_view key) const
+{
+	const Json::Value* value = getValueByKey(key);
+	return (nullptr != value && value->isObject());
+}
+
+bool JsonReader::isArray(std::string_view key) const
+{
+	const Json::Value* value = getValueByKey(key);
+	return (nullptr != value && value->isArray());
 }
 
 std::string JsonReader::getString(std::string_view key) const
@@ -282,6 +342,12 @@ double JsonReader::getDouble(std::string_view key) const
 	return (nullptr != value) ? value->asDouble() : 0.0;
 }
 
+bool JsonReader::hasIndex(int index) const
+{
+	const Json::Value* value = getValueByIndex(index);
+	return (nullptr != value);
+}
+
 bool JsonReader::isString(int index) const
 {
 	const Json::Value* value = getValueByIndex(index);
@@ -299,6 +365,7 @@ bool JsonReader::isDouble(int index) const
 	const Json::Value* value = getValueByIndex(index);
 	return (nullptr != value && value->isDouble());
 }
+
 std::string JsonReader::getString(int index) const
 {
 	const Json::Value* value = getValueByIndex(index);
@@ -315,6 +382,18 @@ double JsonReader::getDouble(int index) const
 {
 	const Json::Value* value = getValueByIndex(index);
 	return (nullptr != value) ? value->asDouble() : 0.0;
+}
+
+bool JsonReader::isObject(int index) const
+{
+	const Json::Value* value = getValueByIndex(index);
+	return (nullptr != value && value->isObject());
+}
+
+bool JsonReader::isArray(int index) const
+{
+	const Json::Value* value = getValueByIndex(index);
+	return (nullptr != value && value->isArray());
 }
 
 const Json::Value* JsonReader::getValueByKey(std::string_view key) const
