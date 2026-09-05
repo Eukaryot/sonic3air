@@ -25,6 +25,11 @@ namespace lemon
 	class Program;
 }
 
+namespace oxygen
+{
+	class EngineSystems;
+}
+
 
 class EngineDelegateInterface
 {
@@ -126,8 +131,7 @@ private:
 	EngineDelegateInterface& mDelegate;
 	ArgumentsReader& mArguments;
 
-	struct Internal;
-	Internal& mInternal;
+	oxygen::EngineSystems& mSystems;
 
 	AudioOutBase* mAudioOut = nullptr;
 	SDL_Window*	  mSDLWindow = nullptr;

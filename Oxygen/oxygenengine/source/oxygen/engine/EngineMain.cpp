@@ -8,68 +8,27 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/engine/EngineMain.h"
+#include "oxygen/engine/EngineSystems.h"
 #include "oxygen/application/Application.h"
 #include "oxygen/application/ArgumentsReader.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/GameProfile.h"
 #include "oxygen/application/audio/AudioOutBase.h"
-#include "oxygen/application/input/ControlsIn.h"
-#include "oxygen/application/input/InputManager.h"
-#include "oxygen/application/video/VideoOut.h"
-#include "oxygen/download/DownloadManager.h"
-#include "oxygen/engine/modding/ModManager.h"
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/software/SoftwareDrawer.h"
-#include "oxygen/drawing/upscaler/UpscalerCollection.h"
 #include "oxygen/file/PackedFileProvider.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/JsonHelper.h"
-#include "oxygen/helper/Logging.h"
 #include "oxygen/menu/imgui/ImGuiIntegration.h"
-#include "oxygen/menu/devmode/DevModeMainWindow.h"
-#include "oxygen/network/EngineServerClient.h"
-#include "oxygen/network/crowdcontrol/CrowdControlClient.h"
-#include "oxygen/platform/CommandForwarder.h"
 #include "oxygen/platform/CrashHandler.h"
 #include "oxygen/platform/PlatformFunctions.h"
-#include "oxygen/resources/FontCollection.h"
-#include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/rendering/RenderResources.h"
-#include "oxygen/simulation/LogDisplay.h"
-#include "oxygen/simulation/PersistentData.h"
 #include "oxygen/simulation/Simulation.h"
-#if defined(PLATFORM_ANDROID)
-	#include "oxygen/platform/android/AndroidJavaInterface.h"
-#endif
 
 
 #if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
 	#define LOAD_APP_ICON_PNG
 #endif
-
-
-struct EngineMain::Internal
-{
-	GameProfile		   mGameProfile;
-	InputManager	   mInputManager;
-	LogDisplay		   mLogDisplay;
-	ModManager		   mModManager;
-	ResourcesCache	   mResourcesCache;
-	FontCollection	   mFontCollection;
-	UpscalerCollection mUpscalerCollection;
-	PersistentData	   mPersistentData;
-	VideoOut		   mVideoOut;
-	ControlsIn		   mControlsIn;
-
-	CommandForwarder   mCommandForwarder;
-	DownloadManager	   mDownloadManager;
-	EngineServerClient mEngineServerClient;
-	CrowdControlClient mCrowdControlClient;
-
-#if defined(PLATFORM_ANDROID)
-	AndroidJavaInterface mAndroidJavaInterface;
-#endif
-};
 
 
 void EngineMain::earlySetup()
@@ -94,13 +53,13 @@ void EngineMain::earlySetup()
 EngineMain::EngineMain(EngineDelegateInterface& delegate_, ArgumentsReader& arguments) :
 	mDelegate(delegate_),
 	mArguments(arguments),
-	mInternal(*new Internal())
+	mSystems(*new oxygen::EngineSystems())
 {
 }
 
 EngineMain::~EngineMain()
 {
-	delete &mInternal;
+	delete &mSystems;
 }
 
 void EngineMain::execute()
@@ -125,16 +84,16 @@ void EngineMain::onActiveModsChanged()
 	ResourcesCache::instance().loadAllResources();
 
 	// Update fonts
-	mInternal.mFontCollection.collectFromMods();
+	mSystems.mFontCollection.collectFromMods();
 
 	// Update video
-	mInternal.mVideoOut.handleActiveModsChanged();
+	mSystems.mVideoOut.handleActiveModsChanged();
 
 	// Update audio
 	mAudioOut->handleActiveModsChanged();
 
 	// Update input
-	mInternal.mInputManager.handleActiveModsChanged();
+	mSystems.mInputManager.handleActiveModsChanged();
 
 	// Scripts need to be reloaded
 	Application::instance().getSimulation().reloadScriptsAfterModsChange();
@@ -301,7 +260,7 @@ bool EngineMain::startupEngine()
 
 	// Video
 	RMX_LOG_INFO("Loading upscaler definitions...");
-	mInternal.mUpscalerCollection.loadUpscalers();
+	mSystems.mUpscalerCollection.loadUpscalers();
 
 	RMX_LOG_INFO("Video initialization...");
 	if (!createWindow())
@@ -311,7 +270,7 @@ bool EngineMain::startupEngine()
 	}
 
 	RMX_LOG_INFO("Startup of VideoOut...");
-	mInternal.mVideoOut.startup();
+	mSystems.mVideoOut.startup();
 
 	// Input manager startup after config is loaded
 	RMX_LOG_INFO("Input initialization...");
@@ -328,10 +287,10 @@ bool EngineMain::startupEngine()
 	// Networking
 	RMX_LOG_INFO("Networking initialization...");
 	const bool useIPv6 = false;
-	mInternal.mEngineServerClient.setupClient(useIPv6);
+	mSystems.mEngineServerClient.setupClient(useIPv6);
 
 	// Command forwarder
-	mInternal.mCommandForwarder.startup();
+	mSystems.mCommandForwarder.startup();
 
 	// Done
 	RMX_LOG_INFO("Engine startup successful");
@@ -351,12 +310,12 @@ void EngineMain::run()
 
 void EngineMain::shutdown()
 {
-	mInternal.mCommandForwarder.shutdown();
+	mSystems.mCommandForwarder.shutdown();
 
 	destroyWindow();
 
 	// Shutdown subsystems
-	mInternal.mVideoOut.shutdown();
+	mSystems.mVideoOut.shutdown();
 	if (nullptr != mAudioOut)
 	{
 		mAudioOut->shutdown();
@@ -372,7 +331,7 @@ void EngineMain::shutdown()
 	FTX::System->exit();
 	FTX::JobManager->~JobManager();
 
-	mInternal.mModManager.copyModSettingsToConfig();
+	mSystems.mModManager.copyModSettingsToConfig();
 	Configuration::instance().saveSettings();
 	oxygen::Logging::shutdown();
 }
@@ -460,7 +419,7 @@ bool EngineMain::initConfigAndSettings()
 		}
 
 		RMX_LOG_INFO("Loading game profile");
-		const bool loadedProject = mInternal.mGameProfile.loadOxygenProjectFromFile(config.mProjectPath + L"oxygenproject.json");
+		const bool loadedProject = mSystems.mGameProfile.loadOxygenProjectFromFile(config.mProjectPath + L"oxygenproject.json");
 		RMX_CHECK(loadedProject, "Failed to load game profile from '" << *WString(config.mProjectPath).toString() << "oxygenproject.json'", );
 	}
 
@@ -551,13 +510,13 @@ void EngineMain::updateGameProfilePaths()
 	Configuration& config = Configuration::instance();
 
 	// Use an project-specific app data sub-folder path, unless the application defined its own app data folder (like the S3AIR executable does)
-	if ((mDelegate.getAppMetaData().mAppDataFolder != L"OxygenEngine") || mInternal.mGameProfile.mIdentifier.empty())
+	if ((mDelegate.getAppMetaData().mAppDataFolder != L"OxygenEngine") || mSystems.mGameProfile.mIdentifier.empty())
 	{
 		config.mGameAppDataPath = config.mAppDataPath;
 	}
 	else
 	{
-		config.mGameAppDataPath = config.mAppDataPath + L"_" + String(mInternal.mGameProfile.mIdentifier).toStdWString() + L"/";
+		config.mGameAppDataPath = config.mAppDataPath + L"_" + String(mSystems.mGameProfile.mIdentifier).toStdWString() + L"/";
 	}
 
 	// Update dependent paths
@@ -880,7 +839,7 @@ bool EngineMain::createWindow()
 
 void EngineMain::destroyWindow()
 {
-	mInternal.mVideoOut.destroyRenderer();
+	mSystems.mVideoOut.destroyRenderer();
 	mDrawer.destroyDrawer();
 	SDL_DestroyWindow(mSDLWindow);
 	mSDLWindow = nullptr;

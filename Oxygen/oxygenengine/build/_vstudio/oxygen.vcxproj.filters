@@ -1264,6 +1264,9 @@
     <ClInclude Include="..\..\source\oxygen\engine\modding\ModManager.h">
       <Filter>engine\modding</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\engine\EngineSystems.h">
+      <Filter>engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Oxygen.natvis" />
