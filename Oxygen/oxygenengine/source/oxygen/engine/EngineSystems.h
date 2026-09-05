@@ -34,8 +34,8 @@ namespace oxygen
 	public:
 		// Main systems
 		GameProfile		   mGameProfile;
-		ControlsIn		   mControlsIn;
 		InputManager	   mInputManager;
+		ControlsIn		   mControlsIn;
 		VideoOut		   mVideoOut;
 		ModManager		   mModManager;
 
