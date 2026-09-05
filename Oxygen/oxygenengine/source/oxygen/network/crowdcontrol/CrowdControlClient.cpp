@@ -14,6 +14,8 @@
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/Simulation.h"
 
+#include <lemon/program/ModuleBindingsBuilder.h>
+
 
 // Functionality kindly provided by CodenameGamma, thanks!
 class ProfanityChecker
@@ -201,6 +203,14 @@ void CrowdControlClient::sendResponse(uint32 id, uint8 status, lemon::StringRef 
 	response += "}";
 
 	mSocket.sendData((const uint8*)response.c_str(), response.length() + 1);
+}
+
+void CrowdControlClient::registerScriptBindings(lemon::ModuleBindingsBuilder& builder)
+{
+	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
+
+	builder.addNativeFunction("CrowdControl.sendResponse", lemon::wrap(CrowdControlClient::instance(), &CrowdControlClient::sendResponse), defaultFlags)
+		.setParameters("id", "status", "message");
 }
 
 void CrowdControlClient::evaluateRequestJson(const Json::Value& requestJson)

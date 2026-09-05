@@ -75,6 +75,9 @@
     <ClCompile Include="..\..\source\oxygen\engine\EngineMain.cpp" />
     <ClCompile Include="..\..\source\oxygen\engine\modding\Mod.cpp" />
     <ClCompile Include="..\..\source\oxygen\engine\modding\ModManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen\extensions\test\JsonReader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\extensions\test\JsonReaderWrapper.cpp" />
+    <ClCompile Include="..\..\source\oxygen\extensions\test\TestExtension.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\FilePackage.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\FileStructureTree.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\PackedFileProvider.cpp" />
@@ -265,6 +268,9 @@
     <ClInclude Include="..\..\source\oxygen\engine\EngineSystems.h" />
     <ClInclude Include="..\..\source\oxygen\engine\modding\Mod.h" />
     <ClInclude Include="..\..\source\oxygen\engine\modding\ModManager.h" />
+    <ClInclude Include="..\..\source\oxygen\extensions\test\JsonReader.h" />
+    <ClInclude Include="..\..\source\oxygen\extensions\test\JsonReaderWrapper.h" />
+    <ClInclude Include="..\..\source\oxygen\extensions\test\TestExtension.h" />
     <ClInclude Include="..\..\source\oxygen\file\FilePackage.h" />
     <ClInclude Include="..\..\source\oxygen\file\FileStructureTree.h" />
     <ClInclude Include="..\..\source\oxygen\file\PackedFileProvider.h" />

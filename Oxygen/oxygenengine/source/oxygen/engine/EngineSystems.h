@@ -15,6 +15,7 @@
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/download/DownloadManager.h"
 #include "oxygen/drawing/upscaler/UpscalerCollection.h"
+#include "oxygen/extensions/test/TestExtension.h"
 #include "oxygen/network/EngineServerClient.h"
 #include "oxygen/network/crowdcontrol/CrowdControlClient.h"
 #include "oxygen/platform/CommandForwarder.h"
@@ -58,5 +59,6 @@ namespace oxygen
 		DownloadManager	   mDownloadManager;
 		EngineServerClient mEngineServerClient;
 		CrowdControlClient mCrowdControlClient;
+		TestExtension	   mTestExtension;		// Test only
 	};
 }

@@ -292,6 +292,9 @@ bool EngineMain::startupEngine()
 	// Command forwarder
 	mSystems.mCommandForwarder.startup();
 
+	// Test extension
+	mSystems.mTestExtension.initialize();
+
 	// Done
 	RMX_LOG_INFO("Engine startup successful");
 	return true;

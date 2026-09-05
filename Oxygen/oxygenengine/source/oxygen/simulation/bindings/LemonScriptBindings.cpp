@@ -25,6 +25,8 @@
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/engine/EngineMain.h"
 #include "oxygen/engine/modding/ModManager.h"
+#include "oxygen/extensions/test/JsonReader.h"
+#include "oxygen/extensions/test/TestExtension.h"
 #include "oxygen/helper/RandomNumberGenerator.h"
 #include "oxygen/menu/imgui/ImGuiIntegration.h"
 #include "oxygen/network/crowdcontrol/CrowdControlClient.h"
@@ -1347,10 +1349,13 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 	}
 
 	// CrowdControl
-	{
-		builder.addNativeFunction("CrowdControl.sendResponse", lemon::wrap(CrowdControlClient::instance(), &CrowdControlClient::sendResponse), defaultFlags)
-			.setParameters("id", "status", "message");
-	}
+	CrowdControlClient::instance().registerScriptBindings(builder);
+
+	// JsonReader
+	JsonReader::registerScriptBindings(builder);
+
+	// TestExtension
+	TestExtension::instance().registerScriptBindings(builder);
 
 	// Register game-specific script bindings
 	EngineMain::getDelegate().registerScriptBindings(module);

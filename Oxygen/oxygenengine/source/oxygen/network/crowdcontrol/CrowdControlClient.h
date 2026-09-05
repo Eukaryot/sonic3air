@@ -12,6 +12,11 @@
 
 #include <lemon/program/StringRef.h>
 
+namespace lemon
+{
+	class ModuleBindingsBuilder;
+}
+
 
 // Crowd Control documentation: https://developer.crowdcontrol.live/sdk/simpletcp/structure.html
 
@@ -23,6 +28,8 @@ public:
 	void updateConnection(float timeElapsed);
 
 	void sendResponse(uint32 id, uint8 status, lemon::StringRef message);
+
+	void registerScriptBindings(lemon::ModuleBindingsBuilder& builder);
 
 private:
 	enum class StatusCode : uint8

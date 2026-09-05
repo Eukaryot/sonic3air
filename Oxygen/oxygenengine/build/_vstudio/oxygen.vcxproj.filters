@@ -136,6 +136,12 @@
     <Filter Include="engine\modding">
       <UniqueIdentifier>{e9bf568d-17dd-45d5-bf97-8ea49867a253}</UniqueIdentifier>
     </Filter>
+    <Filter Include="extensions">
+      <UniqueIdentifier>{0a0821f3-fa4f-45ca-9306-4141ae3b0058}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="extensions\test">
+      <UniqueIdentifier>{ca3c2263-72d1-44fb-bbd4-c8994837c774}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -672,6 +678,15 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\engine\modding\ModManager.cpp">
       <Filter>engine\modding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\extensions\test\TestExtension.cpp">
+      <Filter>extensions\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\extensions\test\JsonReader.cpp">
+      <Filter>extensions\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\extensions\test\JsonReaderWrapper.cpp">
+      <Filter>extensions\test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1269,6 +1284,15 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\engine\EngineDelegateInterface.h">
       <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\extensions\test\TestExtension.h">
+      <Filter>extensions\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\extensions\test\JsonReader.h">
+      <Filter>extensions\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\extensions\test\JsonReaderWrapper.h">
+      <Filter>extensions\test</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
