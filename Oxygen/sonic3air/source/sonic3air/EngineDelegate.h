@@ -11,7 +11,7 @@
 #include "sonic3air/ConfigurationImpl.h"
 #include "sonic3air/Game.h"
 
-#include "oxygen/engine/EngineMain.h"
+#include "oxygen/engine/EngineDelegateInterface.h"
 
 
 class EngineDelegate : public EngineDelegateInterface

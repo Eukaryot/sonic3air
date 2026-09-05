@@ -12,7 +12,7 @@
 #include "engineapp/experiments/Experiments.h"
 #include "engineapp/version.inc"
 
-#include "oxygen/engine/EngineMain.h"
+#include "oxygen/engine/EngineDelegateInterface.h"
 
 
 class EngineDelegate : public EngineDelegateInterface

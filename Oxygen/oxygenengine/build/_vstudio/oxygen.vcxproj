@@ -260,6 +260,7 @@
     <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareDrawerTexture.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\upscaler\UpscalerCollection.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\upscaler\UpscalerDefinition.h" />
+    <ClInclude Include="..\..\source\oxygen\engine\EngineDelegateInterface.h" />
     <ClInclude Include="..\..\source\oxygen\engine\EngineMain.h" />
     <ClInclude Include="..\..\source\oxygen\engine\EngineSystems.h" />
     <ClInclude Include="..\..\source\oxygen\engine\modding\Mod.h" />
