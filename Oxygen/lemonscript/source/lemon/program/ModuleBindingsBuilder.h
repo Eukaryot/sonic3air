@@ -154,6 +154,8 @@ namespace lemon
 	public:
 		explicit inline ModuleBindingsBuilder(Module& module) : mModule(module) {}
 
+		Module& getModule() const  { return mModule; }
+
 		template<typename T, typename S>
 		inline void addConstant(FlyweightString name, S value)
 		{
