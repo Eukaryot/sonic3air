@@ -25,7 +25,7 @@
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/engine/EngineMain.h"
 #include "oxygen/engine/modding/ModManager.h"
-#include "oxygen/extensions/test/JsonReader.h"
+#include "oxygen/extensions/jsonreader/JsonReader.h"
 #include "oxygen/extensions/test/TestExtension.h"
 #include "oxygen/helper/RandomNumberGenerator.h"
 #include "oxygen/menu/imgui/ImGuiIntegration.h"

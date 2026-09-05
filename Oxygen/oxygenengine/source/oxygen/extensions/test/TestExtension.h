@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "oxygen/extensions/test/JsonReader.h"
+#include "oxygen/extensions/jsonreader/JsonReader.h"
 
 
 // Just for testing stuff

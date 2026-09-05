@@ -8,7 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/extensions/test/TestExtension.h"
-#include "oxygen/extensions/test/JsonReaderWrapper.h"
+#include "oxygen/extensions/jsonreader/JsonReaderWrapper.h"
 
 #include <lemon/program/ModuleBindingsBuilder.h>
 

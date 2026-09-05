@@ -142,6 +142,9 @@
     <Filter Include="extensions\test">
       <UniqueIdentifier>{ca3c2263-72d1-44fb-bbd4-c8994837c774}</UniqueIdentifier>
     </Filter>
+    <Filter Include="extensions\jsonreader">
+      <UniqueIdentifier>{2b4630e4-df28-4b66-a803-4968a82ded91}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -682,11 +685,11 @@
     <ClCompile Include="..\..\source\oxygen\extensions\test\TestExtension.cpp">
       <Filter>extensions\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\extensions\test\JsonReader.cpp">
-      <Filter>extensions\test</Filter>
+    <ClCompile Include="..\..\source\oxygen\extensions\jsonreader\JsonReader.cpp">
+      <Filter>extensions\jsonreader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\extensions\test\JsonReaderWrapper.cpp">
-      <Filter>extensions\test</Filter>
+    <ClCompile Include="..\..\source\oxygen\extensions\jsonreader\JsonReaderWrapper.cpp">
+      <Filter>extensions\jsonreader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1288,11 +1291,11 @@
     <ClInclude Include="..\..\source\oxygen\extensions\test\TestExtension.h">
       <Filter>extensions\test</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\extensions\test\JsonReader.h">
-      <Filter>extensions\test</Filter>
+    <ClInclude Include="..\..\source\oxygen\extensions\jsonreader\JsonReader.h">
+      <Filter>extensions\jsonreader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\extensions\test\JsonReaderWrapper.h">
-      <Filter>extensions\test</Filter>
+    <ClInclude Include="..\..\source\oxygen\extensions\jsonreader\JsonReaderWrapper.h">
+      <Filter>extensions\jsonreader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
