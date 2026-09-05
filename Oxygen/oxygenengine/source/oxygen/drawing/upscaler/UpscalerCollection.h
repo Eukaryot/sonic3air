@@ -20,7 +20,7 @@ public:
 
 	int getUpscalerIndexByName(std::string_view name) const;
 	int getUpscalerIndexByNameHash(uint64 hash) const;
-	
+
 	void setCurrentConfigUpscalerByIndex(int index);
 
 	const UpscalerDefinition::Variant& getCurrentConfigVariant() const;

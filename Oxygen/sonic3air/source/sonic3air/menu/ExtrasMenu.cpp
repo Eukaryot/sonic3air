@@ -246,7 +246,7 @@ void ExtrasMenu::update(float timeElapsed)
 			RIGHT
 		};
 		const ButtonEffect buttonEffect = (keys.Start.justPressed() || keys.A.justPressed() || keys.X.justPressed()) ? ButtonEffect::ACCEPT :
-										  (keys.Back.justPressed() || keys.B.justPressed()) ? ButtonEffect::BACK : 
+										  (keys.Back.justPressed() || keys.B.justPressed()) ? ButtonEffect::BACK :
 										   keys.Right.justPressed() ? ButtonEffect::RIGHT : ButtonEffect::NONE;
 
 		if (buttonEffect != ButtonEffect::NONE)

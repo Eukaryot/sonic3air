@@ -85,7 +85,7 @@ namespace
 			flags &= ~O_NONBLOCK;
 		else
 			flags |= O_NONBLOCK;
-		
+
 		if (fcntl(socket, F_SETFL, flags) < 0)
 		{
 			RMX_ERROR("fcntl failed with error: " << errno, );

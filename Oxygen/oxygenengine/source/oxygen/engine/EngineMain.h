@@ -13,9 +13,6 @@
 #include "oxygen/engine/EngineDelegateInterface.h"
 
 class ArgumentsReader;
-class Configuration;
-class EmulatorInterface;
-class LogDisplay;
 class PackedFileProvider;
 
 namespace oxygen
@@ -39,7 +36,7 @@ public:
 	void onActiveModsChanged();
 	bool reloadFilePackage(std::wstring_view packageName, bool forceReload);
 
-	inline AudioOutBase& getAudioOut() { return *mAudioOut; }
+	inline AudioOutBase& getAudioOut()  { return *mAudioOut; }
 
 	inline SDL_Window& getSDLWindow() const	{ return *mSDLWindow; }
 	inline Drawer& getDrawer()				{ return mDrawer; }
