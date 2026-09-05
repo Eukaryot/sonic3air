@@ -9,9 +9,9 @@
 #include "oxygen/pch.h"
 #include "oxygen/application/audio/AudioOutBase.h"
 #include "oxygen/application/audio/AudioPlayer.h"
-#include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/Application.h"
 #include "oxygen/application/Configuration.h"
+#include "oxygen/engine/modding/ModManager.h"
 
 
 AudioOutBase::AudioOutBase() :

@@ -11,7 +11,7 @@
 
 #if defined(SUPPORT_IMGUI)
 
-#include "oxygen/application/modding/ModManager.h"
+#include "oxygen/engine/modding/ModManager.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/menu/imgui/ImGuiIntegration.h"
 #include "oxygen/menu/imgui/ImGuiHelpers.h"

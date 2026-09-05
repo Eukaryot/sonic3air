@@ -9,7 +9,7 @@
 #include "oxygen/pch.h"
 #include "oxygen/application/menu/GameSetupScreen.h"
 #include "oxygen/application/menu/SharedFonts.h"
-#include "oxygen/application/EngineMain.h"
+#include "oxygen/engine/EngineMain.h"
 
 
 GameSetupScreen::GameSetupScreen() :

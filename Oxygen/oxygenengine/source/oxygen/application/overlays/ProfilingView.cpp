@@ -12,7 +12,7 @@
 #include "oxygen/application/audio/AudioPlayer.h"
 #include "oxygen/application/menu/SharedFonts.h"
 #include "oxygen/application/Configuration.h"
-#include "oxygen/application/EngineMain.h"
+#include "oxygen/engine/EngineMain.h"
 #include "oxygen/helper/Profiling.h"
 
 

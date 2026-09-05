@@ -11,7 +11,7 @@
 #include "sonic3air/menu/SharedResources.h"
 
 #include "oxygen/application/Configuration.h"
-#include "oxygen/application/EngineMain.h"
+#include "oxygen/engine/EngineMain.h"
 #include "oxygen/platform/PlatformFunctions.h"
 
 

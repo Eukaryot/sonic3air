@@ -18,10 +18,10 @@
 #include "sonic3air/version.inc"
 
 #include "oxygen/application/Application.h"
-#include "oxygen/application/EngineMain.h"
 #include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/InputManager.h"
-#include "oxygen/application/modding/ModManager.h"
+#include "oxygen/engine/EngineMain.h"
+#include "oxygen/engine/modding/ModManager.h"
 #include "oxygen/helper/Utils.h"
 
 

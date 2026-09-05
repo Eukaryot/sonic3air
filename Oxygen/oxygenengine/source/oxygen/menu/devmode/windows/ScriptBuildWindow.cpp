@@ -13,7 +13,7 @@
 
 #include "oxygen/menu/imgui/ImGuiHelpers.h"
 #include "oxygen/application/Application.h"
-#include "oxygen/application/modding/Mod.h"
+#include "oxygen/engine/modding/Mod.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/LemonScriptProgram.h"

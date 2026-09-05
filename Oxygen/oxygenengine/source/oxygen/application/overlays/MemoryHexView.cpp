@@ -9,7 +9,7 @@
 #include "oxygen/pch.h"
 #include "oxygen/application/overlays/MemoryHexView.h"
 #include "oxygen/application/video/VideoOut.h"
-#include "oxygen/application/EngineMain.h"
+#include "oxygen/engine/EngineMain.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 
 

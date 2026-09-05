@@ -17,9 +17,9 @@
 #include "sonic3air/data/TimeAttackData.h"
 
 #include "oxygen/application/Application.h"
-#include "oxygen/application/EngineMain.h"
 #include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/InputManager.h"
+#include "oxygen/engine/EngineMain.h"
 #include "oxygen/simulation/Simulation.h"
 
 

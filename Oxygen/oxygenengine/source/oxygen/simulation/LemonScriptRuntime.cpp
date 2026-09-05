@@ -13,8 +13,8 @@
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/application/Configuration.h"
-#include "oxygen/application/EngineMain.h"
-#include "oxygen/application/modding/ModManager.h"
+#include "oxygen/engine/EngineMain.h"
+#include "oxygen/engine/modding/ModManager.h"
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/helper/Utils.h"
 

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "oxygen/application/EngineMain.h"
+#include "oxygen/engine/EngineMain.h"
 #include "engineapp/version.inc"
 
 #ifdef USE_EXPERIMENTS

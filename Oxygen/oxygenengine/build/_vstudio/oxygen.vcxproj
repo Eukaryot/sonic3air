@@ -29,7 +29,6 @@
     <ClCompile Include="..\..\source\oxygen\application\audio\EmulationAudioSource.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\audio\OggAudioSource.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\Configuration.cpp" />
-    <ClCompile Include="..\..\source\oxygen\application\EngineMain.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\GameLoader.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\GameProfile.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\gameview\GameView.cpp" />
@@ -45,8 +44,6 @@
     <ClCompile Include="..\..\source\oxygen\application\menu\settings\submenus\AudioMenu.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\settings\submenus\DisplayMenu.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\sidebar\OxygenSideBar.cpp" />
-    <ClCompile Include="..\..\source\oxygen\application\modding\Mod.cpp" />
-    <ClCompile Include="..\..\source\oxygen\application\modding\ModManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\overlays\BackdropView.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\overlays\CheatSheetOverlay.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\overlays\DebugLogView.cpp" />
@@ -75,6 +72,9 @@
     <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\upscaler\UpscalerCollection.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\upscaler\UpscalerDefinition.cpp" />
+    <ClCompile Include="..\..\source\oxygen\engine\EngineMain.cpp" />
+    <ClCompile Include="..\..\source\oxygen\engine\modding\Mod.cpp" />
+    <ClCompile Include="..\..\source\oxygen\engine\modding\ModManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\FilePackage.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\FileStructureTree.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\PackedFileProvider.cpp" />
@@ -213,7 +213,6 @@
     <ClInclude Include="..\..\source\oxygen\application\audio\EmulationAudioSource.h" />
     <ClInclude Include="..\..\source\oxygen\application\audio\OggAudioSource.h" />
     <ClInclude Include="..\..\source\oxygen\application\Configuration.h" />
-    <ClInclude Include="..\..\source\oxygen\application\EngineMain.h" />
     <ClInclude Include="..\..\source\oxygen\application\GameLoader.h" />
     <ClInclude Include="..\..\source\oxygen\application\GameProfile.h" />
     <ClInclude Include="..\..\source\oxygen\application\gameview\GameView.h" />
@@ -231,8 +230,6 @@
     <ClInclude Include="..\..\source\oxygen\application\menu\settings\submenus\SettingsSubMenu.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\SharedFonts.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\sidebar\OxygenSideBar.h" />
-    <ClInclude Include="..\..\source\oxygen\application\modding\Mod.h" />
-    <ClInclude Include="..\..\source\oxygen\application\modding\ModManager.h" />
     <ClInclude Include="..\..\source\oxygen\application\overlays\BackdropView.h" />
     <ClInclude Include="..\..\source\oxygen\application\overlays\CheatSheetOverlay.h" />
     <ClInclude Include="..\..\source\oxygen\application\overlays\DebugLogView.h" />
@@ -263,6 +260,9 @@
     <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareDrawerTexture.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\upscaler\UpscalerCollection.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\upscaler\UpscalerDefinition.h" />
+    <ClInclude Include="..\..\source\oxygen\engine\EngineMain.h" />
+    <ClInclude Include="..\..\source\oxygen\engine\modding\Mod.h" />
+    <ClInclude Include="..\..\source\oxygen\engine\modding\ModManager.h" />
     <ClInclude Include="..\..\source\oxygen\file\FilePackage.h" />
     <ClInclude Include="..\..\source\oxygen\file\FileStructureTree.h" />
     <ClInclude Include="..\..\source\oxygen\file\PackedFileProvider.h" />

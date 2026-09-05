@@ -19,7 +19,7 @@
 #include "sonic3air/version.inc"
 
 #include "oxygen/application/Application.h"
-#include "oxygen/application/modding/Mod.h"
+#include "oxygen/engine/modding/Mod.h"
 #include "oxygen/download/Downloader.h"
 
 

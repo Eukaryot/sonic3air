@@ -10,7 +10,7 @@
 #include "sonic3air/menu/overlays/SkippableCutsceneWindow.h"
 #include "sonic3air/menu/SharedResources.h"
 
-#include "oxygen/application/EngineMain.h"
+#include "oxygen/engine/EngineMain.h"
 
 
 void SkippableCutsceneWindow::initialize()

@@ -11,7 +11,7 @@
 #include "sonic3air/menu/mods/ModResources.h"
 #include "sonic3air/menu/SharedResources.h"
 
-#include "oxygen/application/modding/Mod.h"
+#include "oxygen/engine/modding/Mod.h"
 
 
 ModMenuEntry::ModMenuEntry()

@@ -14,7 +14,7 @@
 #if defined(PLATFORM_VITA) // For the emergency unloads
 	#include "oxygen/application/audio/AudioOutBase.h"
 	#include "oxygen/application/audio/AudioPlayer.h"
-	#include "oxygen/application/EngineMain.h"
+	#include "oxygen/engine/EngineMain.h"
 #endif
 
 

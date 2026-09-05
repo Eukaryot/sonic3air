@@ -8,7 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/resources/FontCollection.h"
-#include "oxygen/application/modding/ModManager.h"
+#include "oxygen/engine/modding/ModManager.h"
 #include "oxygen/rendering/RenderResources.h"
 
 #include "lemon/compiler/parser/Parser.h"

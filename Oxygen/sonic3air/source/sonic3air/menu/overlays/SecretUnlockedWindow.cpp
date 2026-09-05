@@ -11,7 +11,7 @@
 #include "sonic3air/menu/overlays/SecretUnlockedWindow.h"
 #include "sonic3air/audio/AudioOut.h"
 
-#include "oxygen/application/EngineMain.h"
+#include "oxygen/engine/EngineMain.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/Utils.h"
 

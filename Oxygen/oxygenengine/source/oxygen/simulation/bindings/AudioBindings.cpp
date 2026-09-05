@@ -9,8 +9,8 @@
 #include "oxygen/pch.h"
 #include "oxygen/simulation/bindings/AudioBindings.h"
 #include "oxygen/simulation/bindings/LemonScriptBindings.h"
-#include "oxygen/application/EngineMain.h"
 #include "oxygen/application/audio/AudioOutBase.h"
+#include "oxygen/engine/EngineMain.h"
 
 #include <lemon/program/ModuleBindingsBuilder.h>
 

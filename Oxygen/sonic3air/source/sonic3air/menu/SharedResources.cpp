@@ -10,8 +10,8 @@
 #include "sonic3air/menu/SharedResources.h"
 #include "sonic3air/data/SharedDatabase.h"
 
-#include "oxygen/application/EngineMain.h"
-#include "oxygen/application/modding/ModManager.h"
+#include "oxygen/engine/EngineMain.h"
+#include "oxygen/engine/modding/ModManager.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/JsonHelper.h"
 #include "oxygen/resources/FontCollection.h"

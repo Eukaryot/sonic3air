@@ -7,9 +7,9 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/application/modding/ModManager.h"
+#include "oxygen/engine/modding/ModManager.h"
+#include "oxygen/engine/EngineMain.h"
 #include "oxygen/application/Configuration.h"
-#include "oxygen/application/EngineMain.h"
 #include "oxygen/file/ZipFileProvider.h"
 #include "oxygen/helper/JsonHelper.h"
 #include "oxygen/helper/Logging.h"

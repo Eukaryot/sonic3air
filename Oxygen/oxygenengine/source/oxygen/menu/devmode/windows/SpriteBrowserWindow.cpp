@@ -11,8 +11,8 @@
 
 #if defined(SUPPORT_IMGUI)
 
+#include "oxygen/engine/modding/Mod.h"
 #include "oxygen/menu/imgui/ImGuiHelpers.h"
-#include "oxygen/application/modding/Mod.h"
 #include "oxygen/resources/PaletteCollection.h"
 
 

@@ -55,9 +55,6 @@
     <Filter Include="drawing\software">
       <UniqueIdentifier>{4f74a5ca-d4eb-4c32-9534-db0a341b1e99}</UniqueIdentifier>
     </Filter>
-    <Filter Include="application\modding">
-      <UniqueIdentifier>{e9bf568d-17dd-45d5-bf97-8ea49867a253}</UniqueIdentifier>
-    </Filter>
     <Filter Include="file">
       <UniqueIdentifier>{7114b4f1-cc30-4e6e-8ce0-01e658297cd1}</UniqueIdentifier>
     </Filter>
@@ -132,6 +129,12 @@
     </Filter>
     <Filter Include="network\crowdcontrol">
       <UniqueIdentifier>{f8ee760c-f271-4644-8491-37009fb50cb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine">
+      <UniqueIdentifier>{a8dfc540-69f3-4be9-b664-6c5683202b06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine\modding">
+      <UniqueIdentifier>{e9bf568d-17dd-45d5-bf97-8ea49867a253}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -243,9 +246,6 @@
     <ClCompile Include="..\..\source\oxygen\simulation\sound\ym2612.cpp">
       <Filter>simulation\sound</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\application\EngineMain.cpp">
-      <Filter>application</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\simulation\GameRecorder.cpp">
       <Filter>simulation</Filter>
     </ClCompile>
@@ -312,12 +312,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\helper\HighResolutionTimer.cpp">
       <Filter>helper</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\application\modding\Mod.cpp">
-      <Filter>application\modding</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\application\modding\ModManager.cpp">
-      <Filter>application\modding</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\audio\AudioSourceManager.cpp">
       <Filter>application\audio</Filter>
@@ -670,6 +664,15 @@
     <ClCompile Include="..\..\source\oxygen\network\crowdcontrol\CrowdControlClient.cpp">
       <Filter>network\crowdcontrol</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\engine\EngineMain.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\engine\modding\Mod.cpp">
+      <Filter>engine\modding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\engine\modding\ModManager.cpp">
+      <Filter>engine\modding</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -786,9 +789,6 @@
     <ClInclude Include="..\..\source\oxygen\simulation\sound\ym2612.h">
       <Filter>simulation\sound</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\application\EngineMain.h">
-      <Filter>application</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\simulation\DebuggingInterfaces.h">
       <Filter>simulation</Filter>
     </ClInclude>
@@ -861,12 +861,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\helper\HighResolutionTimer.h">
       <Filter>helper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\application\modding\Mod.h">
-      <Filter>application\modding</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\application\modding\ModManager.h">
-      <Filter>application\modding</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\audio\AudioSourceManager.h">
       <Filter>application\audio</Filter>
@@ -1260,6 +1254,15 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\network\crowdcontrol\CrowdControlClient.h">
       <Filter>network\crowdcontrol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\engine\EngineMain.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\engine\modding\Mod.h">
+      <Filter>engine\modding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\engine\modding\ModManager.h">
+      <Filter>engine\modding</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

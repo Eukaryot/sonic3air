@@ -16,9 +16,9 @@
 #include "sonic3air/data/SharedDatabase.h"
 
 #include "oxygen/application/Configuration.h"
-#include "oxygen/application/EngineMain.h"
 #include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/InputManager.h"
+#include "oxygen/engine/EngineMain.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/Utils.h"
 

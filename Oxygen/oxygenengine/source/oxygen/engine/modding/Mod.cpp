@@ -7,7 +7,7 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/application/modding/Mod.h"
+#include "oxygen/engine/modding/Mod.h"
 #include "oxygen/helper/JsonHelper.h"
 
 

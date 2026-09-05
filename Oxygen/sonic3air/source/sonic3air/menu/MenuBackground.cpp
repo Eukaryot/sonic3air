@@ -19,9 +19,9 @@
 #include "sonic3air/Game.h"
 
 #include "oxygen/application/Application.h"
-#include "oxygen/application/EngineMain.h"
 #include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/video/VideoOut.h"
+#include "oxygen/engine/EngineMain.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/Simulation.h"
 

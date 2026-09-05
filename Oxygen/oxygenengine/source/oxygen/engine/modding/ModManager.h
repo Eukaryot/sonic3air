@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "oxygen/application/modding/Mod.h"
+#include "oxygen/engine/modding/Mod.h"
 #include <functional>
 
 class ZipFileProvider;

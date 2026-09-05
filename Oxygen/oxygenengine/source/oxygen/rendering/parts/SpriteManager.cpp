@@ -7,9 +7,9 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/application/EngineMain.h"
 #include "oxygen/rendering/parts/SpriteManager.h"
 #include "oxygen/rendering/parts/PatternManager.h"
+#include "oxygen/engine/EngineMain.h"
 #include "oxygen/resources/PaletteCollection.h"
 #include "oxygen/resources/SpriteCollection.h"
 #include "oxygen/simulation/EmulatorInterface.h"

@@ -22,11 +22,11 @@
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/Configuration.h"
-#include "oxygen/application/EngineMain.h"
 #include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/video/VideoOut.h"
+#include "oxygen/engine/EngineMain.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/menu/imgui/ImGuiManager.h"
 #include "oxygen/menu/imgui/implementations/ImGuiFileBrowser.h"

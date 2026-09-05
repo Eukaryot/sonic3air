@@ -12,8 +12,8 @@
 #include "sonic3air/menu/SharedResources.h"
 
 #include "oxygen/application/Application.h"
-#include "oxygen/application/EngineMain.h"
 #include "oxygen/application/input/InputManager.h"
+#include "oxygen/engine/EngineMain.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/simulation/Simulation.h"
 

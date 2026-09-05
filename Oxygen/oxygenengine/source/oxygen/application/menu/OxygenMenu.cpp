@@ -14,7 +14,7 @@
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/menu/SharedFonts.h"
 #include "oxygen/application/Application.h"
-#include "oxygen/application/EngineMain.h"
+#include "oxygen/engine/EngineMain.h"
 
 
 OxygenMenu::OxygenMenu() :

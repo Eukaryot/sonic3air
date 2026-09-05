@@ -9,7 +9,7 @@
 #include "oxygen/pch.h"
 #include "oxygen/resources/PaletteCollection.h"
 #include "oxygen/resources/SpriteCollection.h"
-#include "oxygen/application/modding/ModManager.h"
+#include "oxygen/engine/modding/ModManager.h"
 
 
 void PaletteCollection::clear()

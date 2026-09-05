@@ -8,7 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/resources/RawDataCollection.h"
-#include "oxygen/application/modding/ModManager.h"
+#include "oxygen/engine/modding/ModManager.h"
 #include "oxygen/helper/JsonHelper.h"
 
 
