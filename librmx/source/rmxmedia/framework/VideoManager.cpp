@@ -11,10 +11,12 @@
 #if defined(PLATFORM_WINDOWS)
 	#pragma warning(disable: 4005)	// Macro redefinition of APIENTRY
 
-	#if defined(__GNUC__)
-		#include <SDL2/SDL_syswm.h>
-	#else
-		#include <SDL/SDL_syswm.h>
+	#ifndef RMX_USE_SDL3
+		#if defined(__GNUC__)
+			#include <SDL2/SDL_syswm.h>
+		#else
+			#include <SDL/SDL_syswm.h>
+		#endif
 	#endif
 
 	#define WIN32_LEAN_AND_MEAN
@@ -70,7 +72,21 @@ namespace rmx
 			startY = videoconfig.mStartPos.y;
 		}
 
+	#ifdef RMX_USE_SDL3
+		{
+			SDL_PropertiesID props = SDL_CreateProperties();
+			SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, *videoconfig.mCaption);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, startX);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, startY);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, videoconfig.mWindowRect.width);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, videoconfig.mWindowRect.height);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, flags);
+			mMainWindow = SDL_CreateWindowWithProperties(props);
+			SDL_DestroyProperties(props);
+		}
+	#else
 		mMainWindow = SDL_CreateWindow(*videoconfig.mCaption, startX, startY, videoconfig.mWindowRect.width, videoconfig.mWindowRect.height, flags);
+	#endif
 
 		// Success so far?
 		if (nullptr == mMainWindow)
@@ -176,7 +192,11 @@ namespace rmx
 			if (nullptr != bitmap)
 			{
 				bitmap->rescale(32, 32);
+			#ifdef RMX_USE_SDL3
+				SDL_Surface* icon = SDL_CreateSurfaceFrom(32, 32, SDL_PIXELFORMAT_ABGR8888, bitmap->getData(), bitmap->getWidth() * sizeof(uint32));
+			#else
 				SDL_Surface* icon = SDL_CreateRGBSurfaceFrom(bitmap->getData(), 32, 32, 32, bitmap->getWidth() * sizeof(uint32), 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+			#endif
 				SDL_SetWindowIcon(mMainWindow, icon);
 				SDL_FreeSurface(icon);
 			}
@@ -292,11 +312,18 @@ namespace rmx
 	uint64 VideoManager::getNativeWindowHandle() const
 	{
 	#ifdef PLATFORM_WINDOWS
-		SDL_SysWMinfo info;
-		SDL_VERSION(&info.version);
-		if (!SDL_GetWindowWMInfo(mMainWindow, &info))
-			return 0;
-		return (uint64)info.info.win.window;
+
+		#ifdef RMX_USE_SDL3
+			HWND hwnd = (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(mMainWindow), SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+			return (uint64)hwnd;
+		#else
+			SDL_SysWMinfo info;
+			SDL_VERSION(&info.version);
+			if (!SDL_GetWindowWMInfo(mMainWindow, &info))
+				return 0;
+			return (uint64)info.info.win.window;
+		#endif
+
 	#else
 		// TODO: Implement this
 		return 0;

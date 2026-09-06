@@ -200,6 +200,7 @@
     <ClInclude Include="..\..\source\rmxmedia\framework\VideoManager.h">
       <Filter>framework</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia_sdl3_compat.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\source\rmxmedia\font\StdFontData.inc">

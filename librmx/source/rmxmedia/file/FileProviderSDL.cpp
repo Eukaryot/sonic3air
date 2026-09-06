@@ -95,7 +95,11 @@ namespace rmx
 		char data[BUFFER_SIZE];
 		while (true)
 		{
+		#ifdef RMX_USE_SDL3
+			const size_t bytesRead = SDL_ReadIO(context, data, BUFFER_SIZE);
+		#else
 			const size_t bytesRead = SDL_RWread(context, data, 1, BUFFER_SIZE);
+		#endif
 			if (bytesRead == 0)
 				break;
 

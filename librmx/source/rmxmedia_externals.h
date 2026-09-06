@@ -9,10 +9,20 @@
 #pragma once
 
 
+// Use SDL3 instead of SDL2
+//  -> This is work in progress and probably won't compile yet!
+//  -> Also note that you will need to adjust the "framework/build/externals.props" file accordingly
+//#define RMX_USE_SDL3
+
+
 // Library linking via pragma
 #if defined(PLATFORM_WINDOWS) && defined(RMX_LIB)
-	#pragma comment(lib, "sdl2main.lib")
-	#pragma comment(lib, "sdl2.lib")
+	#ifdef RMX_USE_SDL3
+		#pragma comment(lib, "sdl3.lib")
+	#else
+		#pragma comment(lib, "sdl2main.lib")
+		#pragma comment(lib, "sdl2.lib")
+	#endif
 	#pragma comment(lib, "winmm.lib")
 	#pragma comment(lib, "imm32.lib")
 	#pragma comment(lib, "version.lib")
@@ -27,19 +37,32 @@
 
 
 // SDL
-#ifdef PLATFORM_WINDOWS
-	// Needed for MSYS2
-	#if defined(__GNUC__)
-		#include <SDL2/SDL.h>
+#ifdef RMX_USE_SDL3
+
+	// SDL3
+	#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
+		#include <SDL3/SDL.h>
 	#else
 		#include <SDL/SDL.h>
 	#endif
-
-#elif defined(PLATFORM_LINUX)
-	#include <SDL2/SDL.h>
+	#include "rmxmedia_sdl3_compat.h"
 
 #else
-	#include <SDL.h>
+
+	// SDL2
+	#if defined(PLATFORM_WINDOWS)
+		// Needed for MSYS2
+		#if defined(__GNUC__)
+			#include <SDL2/SDL.h>
+		#else
+			#include <SDL/SDL.h>
+		#endif
+	#elif defined(PLATFORM_LINUX)
+		#include <SDL2/SDL.h>
+	#else
+		#include <SDL.h>
+	#endif
+
 #endif
 
 

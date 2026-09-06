@@ -8,22 +8,9 @@
 
 #include "rmxmedia.h"
 
-#if defined(PLATFORM_WINDOWS)
-	#pragma warning(disable: 4005)	// Macro redefinition of APIENTRY
-
-	#if defined(__GNUC__)
-		#include <SDL2/SDL_syswm.h>
-	#else
-		#include <SDL/SDL_syswm.h>
-	#endif
-
-	#define WIN32_LEAN_AND_MEAN
-	#include "CleanWindowsInclude.h"
-
-#elif defined(PLATFORM_WEB)
+#if defined(PLATFORM_WEB)
 	#include <emscripten.h>
 	#include <emscripten/html5.h>
-
 #endif
 
 
@@ -75,10 +62,17 @@ namespace rmx
 					quit();
 					break;
 
+			#ifdef RMX_USE_SDL3
+				case SDL_EVENT_WINDOW_RESIZED:
+				case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+					reshape(evnt.window.data1, evnt.window.data2);
+					break;
+			#else
 				case SDL_WINDOWEVENT:
 					if (evnt.window.event == SDL_WINDOWEVENT_RESIZED || evnt.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 						reshape(evnt.window.data1, evnt.window.data2);
 					break;
+			#endif
 
 				case SDL_KEYDOWN:
 				case SDL_KEYUP:
@@ -119,9 +113,15 @@ namespace rmx
 	void SystemManager::keyboard(const SDL_KeyboardEvent& evnt)
 	{
 		KeyboardEvent ev;
+	#ifdef RMX_USE_SDL3
+		ev.key = evnt.key;
+		ev.scancode = evnt.scancode;
+		ev.modifiers = evnt.mod;
+	#else
 		ev.key = evnt.keysym.sym;
 		ev.scancode = evnt.keysym.scancode;
 		ev.modifiers = evnt.keysym.mod;
+	#endif
 		ev.state = (evnt.type == SDL_KEYDOWN);
 		ev.repeat = (evnt.repeat != 0);
 		mInputContext.applyEvent(ev);

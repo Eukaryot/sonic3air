@@ -263,6 +263,7 @@
     <ClInclude Include="..\..\source\rmxmedia\_glew\GL\glxew.h" />
     <ClInclude Include="..\..\source\rmxmedia\_glew\GL\wglew.h" />
     <ClInclude Include="..\..\source\rmxmedia_externals.h" />
+    <ClInclude Include="..\..\source\rmxmedia_sdl3_compat.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="rmxbase.vcxproj">

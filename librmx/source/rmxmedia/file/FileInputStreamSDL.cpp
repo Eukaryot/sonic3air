@@ -77,7 +77,11 @@ namespace rmx
 		if (nullptr == mContext)
 			return 0;
 
+	#ifdef RMX_USE_SDL3
+		const size_t readBytes = SDL_ReadIO(mContext, dst, len);
+	#else
 		const size_t readBytes = SDL_RWread(mContext, dst, 1, len);
+	#endif
 		mLastStreamingState = (readBytes == 0) ? StreamingState::COMPLETED : StreamingState::STREAMING;
 		return readBytes;
 	}
