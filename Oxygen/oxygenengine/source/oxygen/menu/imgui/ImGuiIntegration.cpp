@@ -124,7 +124,11 @@ void ImGuiIntegration::shutdown()
 
 	saveIniSettings();
 
+#ifdef RMX_USE_SDL3
+	SDL_StopTextInput(&EngineMain::instance().getSDLWindow());
+#else
 	SDL_StopTextInput();
+#endif
 
 	if (mUsingOpenGL)
 	{

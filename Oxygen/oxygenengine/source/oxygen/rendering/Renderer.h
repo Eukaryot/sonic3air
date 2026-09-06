@@ -46,7 +46,7 @@ private:
 	uint8 mRendererType = 0;
 
 	// Limit for render time
-	uint32 mRenderingStartTicks = 0;
+	SDL_TicksType mRenderingStartTicks = 0;
 	uint32 mRenderingRunningCount = 0;
 	bool mLoggedLimitWarning = false;
 };

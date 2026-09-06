@@ -659,7 +659,7 @@ void CodeExec::runScript(bool executeSingleFunction, CallFrameTracking* callFram
 
 	size_t stepsCounter = 0;
 	size_t nextCheckSteps = 0x40000;
-	const uint32 ticksStart = SDL_GetTicks();
+	const SDL_TicksType ticksStart = SDL_GetTicks();
 
 	while (true)
 	{

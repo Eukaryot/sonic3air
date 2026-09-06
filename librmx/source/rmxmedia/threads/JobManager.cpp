@@ -147,12 +147,12 @@ namespace rmx
 			// Using a time-out for two reasons:
 			//  - to have a chance to check if "mShouldBeRunning" changed outside
 			//  - to react to a delayed job, if there's no other jobs at the moment
-			uint32 timeoutMilliseconds = 100;
-			if (mNextDelayedJobTicks != 0xffffffff)
+			int32 timeoutMilliseconds = 100;
+			if (mNextDelayedJobTicks != ~(SDL_TicksType)0)
 			{
-				const uint32 currentTicks = SDL_GetTicks();
+				const uint64 currentTicks = SDL_GetTicks();
 				if (mNextDelayedJobTicks > currentTicks)
-					timeoutMilliseconds = mNextDelayedJobTicks - currentTicks;
+					timeoutMilliseconds = (int32)(mNextDelayedJobTicks - currentTicks);
 			}
 			SDL_CondWaitTimeout(mConditionVariable, mConditionLock, timeoutMilliseconds);
 			job = getNextJobInternal();
@@ -178,9 +178,9 @@ namespace rmx
 	JobBase* JobManager::getNextJobInternal()
 	{
 		// Select waiting job with highest priority
-		mNextDelayedJobTicks = 0xffffffff;	// This will get updated as well
+		mNextDelayedJobTicks = ~(SDL_TicksType)0;
 		JobBase* bestJob = nullptr;
-		const uint32 currentTicks = SDL_GetTicks();
+		const SDL_TicksType currentTicks = SDL_GetTicks();
 		for (JobBase* job : mJobs)
 		{
 			if (job->mJobState == JobBase::JobState::WAITING)
@@ -250,7 +250,7 @@ namespace rmx
 		}
 	}
 
-	void JobBase::setJobDelayUntilTicks(uint32 sdlTicks)
+	void JobBase::setJobDelayUntilTicks(SDL_TicksType sdlTicks)
 	{
 		// If the job delay gets reduced (possibly to zero, i.e. deactivating the delay), a thread possibly needs to be woken up
 		const bool wakeUpThread = (sdlTicks < mJobDelayUntilTicks);

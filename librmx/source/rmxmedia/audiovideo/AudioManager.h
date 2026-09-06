@@ -58,7 +58,7 @@ namespace rmx
 		AudioManager();
 		~AudioManager();
 
-		void initialize(int sample_freq = 44100, int channels = 2, int audioBufferSamples = 1024);
+		void initialize(int sampleFrequency = 44100, int numChannels = 2, int audioBufferSamples = 1024);
 		void exit();
 
 		void clear();
@@ -99,10 +99,13 @@ namespace rmx
 
 		inline int getChangeCounter() const  { return mChangeCounter; }
 
+	#ifndef RMX_USE_SDL3
 		inline int getOutputBufferSize() const		  { return mFormat.samples; }
+	#endif
 		inline int getOutputFrequency() const		  { return mFormat.freq; }
+		inline int getOutputChannels() const		  { return mFormat.channels; }
 		inline uint32 getGlobalPlayedSamples() const  { return mPlayedSamples; }
-		inline double getGlobalPlaybackTime() const   { return (double)mPlayedSamples / (double)mFormat.freq; }
+		inline double getGlobalPlaybackTime() const   { return (double)mPlayedSamples / (double)getOutputFrequency(); }
 
 	private:
 		void registerAudioMixer(AudioMixer& audioMixer, int parentMixerId);
@@ -110,13 +113,22 @@ namespace rmx
 		void removeInstance(int ID);
 		void processRemoveIDs();
 
+	#ifdef RMX_USE_SDL3
+		static void mixAudioStatic(void* userdata, SDL_AudioStream* audioStream, int additionalAmount, int totalAmount);
+	#else
 		static void mixAudioStatic(void* _userdata, uint8* outputStream, int outputBytes);
+	#endif
 		void mixAudio(uint8* outputStream, int outputBytes);
 
 	private:
+	#ifdef RMX_USE_SDL3
+		SDL_AudioStream* mAudioStream = nullptr;
+	#else
 		SDL_AudioDeviceID mAudioDeviceID = 0;		// Audio device opened by SDL
-		SDL_AudioSpec mFormat;						// Audio format
 		uint32 mAudioLocks = 0;						// Set if audio device is locked right now (needed to allow for nested audio locking)
+	#endif
+		SDL_AudioSpec mFormat;						// Audio format
+
 		std::map<int, AudioInstance> mInstances;	// Map of all active audio instances by their ID
 		std::vector<int> mRemoveIDs;				// Audio instance IDs that got invalid during audio mixing
 		int mNextFreeID = 1;						// ID to use for next audio instance created

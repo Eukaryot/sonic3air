@@ -447,7 +447,7 @@ void InputManager::updateInput(float timeElapsed)
 	}
 
 	// Update controller rumble
-	const uint32 currentTicks = SDL_GetTicks();
+	const SDL_TicksType currentTicks = SDL_GetTicks();
 	for (int playerIndex = 0; playerIndex < (int)NUM_PLAYERS; ++playerIndex)
 	{
 		// Check if rumble intensity has changed - or if the player switched to a different input device
@@ -471,6 +471,15 @@ void InputManager::injectSDLInputEvent(const SDL_Event& ev)
 	{
 		case SDL_KEYDOWN:
 		{
+		#ifdef RMX_USE_SDL3
+			if (ev.key.down)	// This check may be unnecessary
+			{
+				// Add as one-frame input
+				//  -> This is done so that very short key pressed get registered for one frame even if there is no "updateInput" call between key down and key up
+				mOneFrameKeyboardInputs.insert(ev.key.key);
+				mHasKeyboard = true;
+			}
+		#else
 			if (ev.key.state == SDL_PRESSED)	// This check may be unnecessary
 			{
 				// Add as one-frame input
@@ -478,6 +487,7 @@ void InputManager::injectSDLInputEvent(const SDL_Event& ev)
 				mOneFrameKeyboardInputs.insert(ev.key.keysym.sym);
 				mHasKeyboard = true;
 			}
+		#endif
 			break;
 		}
 	}
@@ -923,7 +933,7 @@ void InputManager::setControllerRumbleForPlayer(int playerIndex, float lowFreque
 {
 	if (playerIndex >= 0 && playerIndex < NUM_PLAYERS)
 	{
-		const uint32 endTicks = SDL_GetTicks() + milliseconds;
+		const uint64 endTicks = (uint64)SDL_GetTicks() + milliseconds;
 		if (mPlayers[playerIndex].mRumbleEffectQueue.addEffect(lowFrequencyRumble, highFrequencyRumble, endTicks))
 		{
 			reapplyControllerRumble(playerIndex);
@@ -1049,7 +1059,11 @@ bool InputManager::isPressed(SDL_Joystick* joystick, const ControlInput& input)
 
 			case InputConfig::Assignment::Type::BUTTON:
 			{
+			#ifdef RMX_USE_SDL3
+				return SDL_GetJoystickButton(joystick, input.mIndex);
+			#else
 				return (SDL_JoystickGetButton(joystick, input.mIndex) > 0);
+			#endif
 			}
 
 			case InputConfig::Assignment::Type::POV:

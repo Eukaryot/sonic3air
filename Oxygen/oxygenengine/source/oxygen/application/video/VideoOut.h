@@ -105,7 +105,7 @@ private:
 
 	Vec2i mGameResolution;
 	FrameState mFrameState = FrameState::OUTSIDE_FRAME;
-	uint32 mLastFrameTicks = 0;
+	SDL_TicksType mLastFrameTicks = 0;
 
 	FrameInterpolation mFrameInterpolation;
 	Vec2i mLastWorldSpaceOffset;

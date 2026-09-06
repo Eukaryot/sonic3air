@@ -13,10 +13,15 @@
 
 
 class InputManager;
-struct _SDL_Joystick;
-struct _SDL_GameController;
-typedef struct _SDL_Joystick SDL_Joystick;
-typedef struct _SDL_GameController SDL_GameController;
+#ifdef RMX_USE_SDL3
+	struct SDL_Joystick;
+	struct SDL_GameController;
+#else
+	struct _SDL_Joystick;
+	struct _SDL_GameController;
+	typedef struct _SDL_Joystick SDL_Joystick;
+	typedef struct _SDL_GameController SDL_GameController;
+#endif
 
 
 class InputFeeder

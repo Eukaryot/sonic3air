@@ -35,8 +35,8 @@ bool Renderer::progressRendering()
 	++mRenderingRunningCount;
 	if ((mRenderingRunningCount % 100) == 0)
 	{
-		constexpr uint32 LIMIT_MILLISECONDS = 100;
-		const uint32 numTicks = SDL_GetTicks() - mRenderingStartTicks;
+		constexpr SDL_TicksType LIMIT_MILLISECONDS = 100;
+		const SDL_TicksType numTicks = SDL_GetTicks() - mRenderingStartTicks;
 		if (numTicks >= LIMIT_MILLISECONDS)
 		{
 			if (!mLoggedLimitWarning)

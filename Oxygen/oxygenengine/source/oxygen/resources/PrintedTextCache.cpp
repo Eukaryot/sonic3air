@@ -48,8 +48,8 @@ PrintedTextCache::CacheItem& PrintedTextCache::addCacheItem(const Key& key, Font
 
 void PrintedTextCache::regularCleanup()
 {
-	const uint32 currentTicks = SDL_GetTicks();
-	if ((int32)(currentTicks - mNextCheckTicks) < 0)
+	const SDL_TicksType currentTicks = SDL_GetTicks();
+	if ((signed)(currentTicks - mNextCheckTicks) < 0)
 		return;
 
 	// Remove all cached items that were not used since last cleanup

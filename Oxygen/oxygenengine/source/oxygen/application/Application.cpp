@@ -166,17 +166,24 @@ void Application::beginFrame()
 		// Start or stop text input from SDL
 		//  -> The start call is required to even get any "textinput" callbacks
 		//  -> On devices that support it (like Android), active text input will also bring up the virtual keyboard
+	#ifdef RMX_USE_SDL3
+		SDL_Window* window = &EngineMain::instance().getSDLWindow();
+		if (mRequestActiveTextInput != SDL_TextInputActive(window))
+		{
+			if (mRequestActiveTextInput)
+				SDL_StartTextInput(window);
+			else
+				SDL_StopTextInput(window);
+		}
+	#else
 		if (mRequestActiveTextInput != (bool)SDL_IsTextInputActive())
 		{
 			if (mRequestActiveTextInput)
-			{
 				SDL_StartTextInput();
-			}
 			else
-			{
 				SDL_StopTextInput();
-			}
 		}
+	#endif
 
 		// Reset for next frame, so text input gets deactivated if nobody requests it again
 		mRequestActiveTextInput = false;
@@ -207,6 +214,16 @@ void Application::sdlEvent(const SDL_Event& ev)
 	// Handle events that FTX doesn't
 	switch (ev.type)
 	{
+	#ifdef RMX_USE_SDL3
+		case SDL_EVENT_WINDOW_FOCUS_LOST:
+		{
+			if (ev.window.windowID == SDL_GetWindowID(&EngineMain::instance().getSDLWindow()))
+			{
+				EngineMain::getDelegate().onApplicationLostFocus();
+			}
+			break;
+		}
+	#else
 		case SDL_WINDOWEVENT:
 		{
 			if (ev.window.windowID == SDL_GetWindowID(&EngineMain::instance().getSDLWindow()))
@@ -222,6 +239,7 @@ void Application::sdlEvent(const SDL_Event& ev)
 			}
 			break;
 		}
+	#endif
 
 		case SDL_APP_WILLENTERBACKGROUND:
 		{
@@ -780,7 +798,7 @@ void Application::setWindowMode(WindowMode windowMode, bool force)
 
 	SDL_Window* window = FTX::Video->getMainWindow();
 	const int displayIndex = updateWindowDisplayIndex();
-
+	
 	switch (windowMode)
 	{
 		default:
@@ -817,6 +835,16 @@ void Application::setWindowMode(WindowMode windowMode, bool force)
 			}
 			else
 			{
+			#ifdef RMX_USE_SDL3
+				const SDL_DisplayMode* dm = SDL_GetDesktopDisplayMode(displayIndex);
+				if (nullptr != dm)
+				{
+					SDL_SetWindowSize(window, dm->w, dm->h);
+					SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+					SDL_SetWindowResizable(window, false);
+					SDL_SetWindowBordered(window, false);
+				}
+			#else
 				SDL_DisplayMode dm;
 				if (SDL_GetDesktopDisplayMode(displayIndex, &dm) == 0)
 				{
@@ -825,6 +853,7 @@ void Application::setWindowMode(WindowMode windowMode, bool force)
 					SDL_SetWindowResizable(window, SDL_FALSE);
 					SDL_SetWindowBordered(window, SDL_FALSE);
 				}
+			#endif
 			}
 			break;
 		}
@@ -966,11 +995,19 @@ void Application::setUnscaledWindow()
 		}
 		else
 		{
+		#ifdef RMX_USE_SDL3
+			const SDL_DisplayMode* dm = SDL_GetDesktopDisplayMode(displayIndex);
+			if (nullptr != dm)
+			{
+				desktopSize.set(dm->w, dm->h);
+			}
+		#else
 			SDL_DisplayMode dm;
 			if (SDL_GetDesktopDisplayMode(displayIndex, &dm) == 0)
 			{
 				desktopSize.set(dm.w, dm.h);
 			}
+		#endif
 		}
 	}
 

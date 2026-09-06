@@ -57,7 +57,11 @@ namespace rmx
 		//  -> Not using a data structure optimized for getting the next job (using priority);
 		//     but that's probably overkill anyways if the number of active jobs is not more than a few dozens
 		std::vector<JobBase*> mJobs;
+	#ifdef RMX_USE_SDL3
+		uint64 mNextDelayedJobTicks = 0;
+	#else
 		uint32 mNextDelayedJobTicks = 0;
+	#endif
 		bool mSearchforJobs = true;
 	};
 
@@ -77,8 +81,8 @@ namespace rmx
 		inline float getJobPriority() const			{ return mJobPriority; }
 		void setJobPriority(float priority);
 
-		inline uint32 getJobDelayUntilTicks() const	{ return mJobDelayUntilTicks; }
-		void setJobDelayUntilTicks(uint32 sdlTicks);
+		inline SDL_TicksType getJobDelayUntilTicks() const	{ return mJobDelayUntilTicks; }
+		void setJobDelayUntilTicks(SDL_TicksType sdlTicks);
 
 		inline bool isJobRegistered() const	{ return (nullptr != mRegisteredAtManager); }
 		inline bool isJobWaiting() const	{ return (mJobState == JobState::WAITING); }
@@ -96,7 +100,7 @@ namespace rmx
 		inline bool shouldJobBeRunning() const	{ return mJobShouldBeRunning; }
 
 	protected:
-		String mJobType;							// Type string for the job
+		String mJobType;		// Type string for the job
 
 	private:
 		enum class JobState
@@ -112,7 +116,7 @@ namespace rmx
 		JobState mJobState = JobState::INACTIVE;	// Current state
 		bool mJobShouldBeRunning = false;			// Can be set to false while running to signal the jobFunc that it should abort
 		float mJobPriority = 0.0f;					// Priority, higher values will be preferred; jobs with negative priorities won't get processed at all
-		uint32 mJobDelayUntilTicks = 0;				// SDL ticks value until when the job should get delayed; 0 if no delay active (which is the default)
+		SDL_TicksType mJobDelayUntilTicks = 0;		// SDL ticks value until when the job should get delayed; 0 if no delay active (which is the default)
 	};
 
 

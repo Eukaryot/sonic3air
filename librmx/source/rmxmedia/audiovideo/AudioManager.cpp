@@ -20,7 +20,9 @@ namespace rmx
 
 	AudioManager::~AudioManager()
 	{
+	#ifndef RMX_USE_SDL3
 		RMX_ASSERT(mAudioLocks == 0, "Pending audio locks");
+	#endif
 
 		// Delete all audio mixers (including the root mixer)
 		for (const auto& [key, audioMixer] : mAudioMixers)
@@ -29,36 +31,55 @@ namespace rmx
 		}
 	}
 
-	void AudioManager::initialize(int sample_freq, int channels, int audioBufferSamples)
+	void AudioManager::initialize(int sampleFrequency, int numChannels, int audioBufferSamples)
 	{
 		if (!FTX::System->initialize())
 			return;
+
+		// Initialize SDL2 audio subsystem
+		SDL_InitSubSystem(SDL_INIT_AUDIO);
 
 		// Reset instances
 		mInstances.clear();
 		mRootMixer.clearAudioInstances();
 
-		// Initialize SDL2 audio subsystem
-		SDL_InitSubSystem(SDL_INIT_AUDIO);
+	#ifdef RMX_USE_SDL3
+		// Destroy old audio stream, if there was one already
+		if (nullptr != mAudioStream)
+		{
+			SDL_DestroyAudioStream(mAudioStream);
+			mAudioStream = nullptr;
+		}
+	#endif
 
 		// Check input, we don't support everything
-		if ((sample_freq % 11025) != 0)
+		if ((sampleFrequency % 11025) != 0)
 		{
-			if (sample_freq != 48000)
+			if (sampleFrequency != 48000)
 			{
 				// It might be supported anyway, you'd have to try
-				RMX_ASSERT(false, "Unsupported sample frequency: " << sample_freq << " Hz");
-				int sf = sample_freq / 11025;
+				RMX_ASSERT(false, "Unsupported sample frequency: " << sampleFrequency << " Hz");
+				int sf = sampleFrequency / 11025;
 				sf = (sf == 3) ? 2 : clamp(sf, 1, 4);	// Result is 1, 2 or 4
-				sample_freq = sf * 11025;
+				sampleFrequency = sf * 11025;
 			}
 		}
-		channels = clamp(channels, 1, 2);
+		numChannels = clamp(numChannels, 1, 2);
 
 		// Define format
-		mFormat.freq = sample_freq;
+		mFormat.channels = numChannels;
+		mFormat.freq = sampleFrequency;
+
+	#ifdef RMX_USE_SDL3
+		mFormat.format = SDL_AUDIO_S16;
+		mAudioStream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &mFormat, AudioManager::mixAudioStatic, nullptr);
+		if (nullptr == mAudioStream)
+		{
+			RMX_ERROR("SDL_OpenAudioDeviceStream failed with error: '" << SDL_GetError() << "'", );
+			return;
+		}
+	#else
 		mFormat.format = AUDIO_S16LSB;
-		mFormat.channels = channels;
 		mFormat.samples = audioBufferSamples;
 		mFormat.callback = AudioManager::mixAudioStatic;
 		mFormat.userdata = 0;
@@ -82,6 +103,7 @@ namespace rmx
 			RMX_ERROR("SDL_OpenAudioDevice failed with error: '" << SDL_GetError() << "' (found " << numAudioDevices << " audio devices: " << text << ")", );
 			return;
 		}
+	#endif
 
 		// Everything alright so far
 		mPlayedSamples = 0;
@@ -90,7 +112,16 @@ namespace rmx
 
 	void AudioManager::exit()
 	{
+	#ifdef RMX_USE_SDL3
+		// Destroy audio stream
+		if (nullptr != mAudioStream)
+		{
+			SDL_DestroyAudioStream(mAudioStream);
+			mAudioStream = nullptr;
+		}
+	#else
 		SDL_CloseAudioDevice(mAudioDeviceID);
+	#endif
 	}
 
 	void AudioManager::clear()
@@ -111,31 +142,63 @@ namespace rmx
 
 	void AudioManager::playAudio(bool onoff)
 	{
+	#ifdef RMX_USE_SDL3
+		if (nullptr != mAudioStream)
+		{
+			const SDL_AudioDeviceID audioDeviceId = SDL_GetAudioStreamDevice(mAudioStream);
+			if (audioDeviceId != 0)
+			{
+				if (onoff)
+					SDL_ResumeAudioDevice(audioDeviceId);
+				else
+					SDL_PauseAudioDevice(audioDeviceId);
+			}
+		}
+	#else
 		SDL_PauseAudioDevice(mAudioDeviceID, onoff ? 0 : 1);
+	#endif
 	}
 
 	bool AudioManager::getAudioState()
 	{
+	#ifdef RMX_USE_SDL3
+		if (nullptr != mAudioStream)
+		{
+			const SDL_AudioDeviceID audioDeviceId = SDL_GetAudioStreamDevice(mAudioStream);
+			if (audioDeviceId != 0)
+			{
+				return SDL_AudioDevicePaused(audioDeviceId);
+			}
+		}
+		return false;
+	#else
 		return (SDL_GetAudioStatus() == SDL_AUDIO_PLAYING);
+	#endif
 	}
 
 	void AudioManager::lockAudio()
 	{
+		// Not required any more in SDL3, function can be removed
+	#ifndef RMX_USE_SDL3
 		if (mAudioLocks == 0)
 		{
 			SDL_LockAudioDevice(mAudioDeviceID);
 		}
 		++mAudioLocks;
+	#endif
 	}
 
 	void AudioManager::unlockAudio()
 	{
+		// Not required any more in SDL3, function can be removed
+	#ifndef RMX_USE_SDL3
 		RMX_ASSERT(mAudioLocks > 0, "Called 'AudioManager::unlockAudio' without locking");
 		--mAudioLocks;
 		if (mAudioLocks == 0)
 		{
 			SDL_UnlockAudioDevice(mAudioDeviceID);
 		}
+	#endif
 	}
 
 	void AudioManager::regularUpdate(float deltaSeconds)
@@ -383,18 +446,36 @@ namespace rmx
 		parent->addChild(audioMixer);
 	}
 
+#ifdef RMX_USE_SDL3
+	void AudioManager::mixAudioStatic(void* userdata, SDL_AudioStream* audioStream, int additionalAmount, int totalAmount)
+	{
+		// TODO: This is just simple migration from SDL2 to SDL3
+		//  -> Better avoid the stack allow and directly write into the stream
+		if (additionalAmount > 0)
+		{
+			uint8* data = SDL_stack_alloc(uint8, additionalAmount);
+			if (nullptr != data)
+			{
+				FTX::Audio->mixAudio(data, additionalAmount);
+				SDL_PutAudioStreamData(audioStream, data, additionalAmount);
+				SDL_stack_free(data);
+			}
+		}
+	}
+#else
 	void AudioManager::mixAudioStatic(void* _userdata, uint8* outputStream, int outputBytes)
 	{
 		FTX::Audio->mixAudio(outputStream, outputBytes);
 	}
+#endif
 
 	void AudioManager::mixAudio(uint8* outputStream, int outputBytes)
 	{
-		const size_t outputSamples = outputBytes / (mFormat.channels * sizeof(short));
+		const size_t outputSamples = outputBytes / (getOutputChannels() * sizeof(short));
 		const constexpr size_t MAX_SAMPLES = 2048;
 
 		RMX_ASSERT(outputSamples <= MAX_SAMPLES, "Mixing more than " << MAX_SAMPLES << " samples at once is not supported");
-		RMX_ASSERT(mFormat.channels <= 2, "More than 2 channels is not supported");
+		RMX_ASSERT(getOutputChannels() <= 2, "More than 2 channels is not supported");
 
 		// Setup intermediate buffer
 		static int32 fullOutputBuffer[MAX_SAMPLES * 2];
@@ -461,29 +542,43 @@ namespace rmx
 			return false;
 
 		// Just use SDL for this
-		SDL_AudioSpec wave;
-		unsigned char* wave_data;
-		unsigned int wave_length;
-		if (!SDL_LoadWAV(*source, &wave, &wave_data, &wave_length))
+		SDL_AudioSpec waveFormat;
+		unsigned char* waveData = nullptr;
+		unsigned int waveLength = 0;
+		if (!SDL_LoadWAV(*source, &waveFormat, &waveData, &waveLength))
 			return false;
 
 		// Rebuild audio buffer
-		int frequency = 44100;
-		int channels = 2;
-		outBuffer.clear(frequency, channels);
+		SDL_AudioSpec targetFormat;
+		targetFormat.freq = 44100;
+		targetFormat.channels = 2;
+		outBuffer.clear(targetFormat.freq, targetFormat.channels);
 
 		// Convert format
+	#ifdef RMX_USE_SDL3
+		targetFormat.format = SDL_AUDIO_S16LE;
+		uint8* outputBuffer = nullptr;
+		int outputLength = 0;
+		if (!SDL_ConvertAudioSamples(&waveFormat, waveData, waveLength, &targetFormat, &outputBuffer, &outputLength))
+			return false;
+
+		// Write data
+		const short* data = (short*)outputBuffer;
+		const int length = outputLength / (targetFormat.channels * sizeof(short));
+	#else
 		SDL_AudioCVT cvt;
-		SDL_BuildAudioCVT(&cvt, wave.format, wave.channels, wave.freq, AUDIO_S16LSB, channels, frequency);
-		cvt.buf = new unsigned char[wave_length * cvt.len_mult];
-		memcpy(cvt.buf, wave_data, wave_length);
-		cvt.len = wave_length;
+		SDL_BuildAudioCVT(&cvt, waveFormat.format, waveFormat.channels, waveFormat.freq, AUDIO_S16LSB, targetFormat.channels, targetFormat.freq);
+		cvt.buf = new unsigned char[waveLength * cvt.len_mult];
+		memcpy(cvt.buf, waveData, waveLength);
+		cvt.len = waveLength;
 		SDL_ConvertAudio(&cvt);
-		SDL_FreeWAV(wave_data);
+		SDL_FreeWAV(waveData);
 
 		// Write data
 		const short* data = (short*)cvt.buf;
-		const int length = cvt.len_cvt / (channels * sizeof(short));
+		const int length = cvt.len_cvt / (targetFormat.channels * sizeof(short));
+	#endif
+
 		short buf0[2048];
 		short buf1[2048];
 		short* buf[2] = { buf0, buf1 };

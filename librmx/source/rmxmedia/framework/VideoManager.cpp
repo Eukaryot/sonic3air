@@ -42,50 +42,50 @@ namespace rmx
 		SDL_DestroyWindow(mMainWindow);
 	}
 
-	bool VideoManager::setVideoMode(const VideoConfig& videoconfig)
+	bool VideoManager::setVideoMode(const VideoConfig& videoConfig)
 	{
 		// Change video mode
 		uint32 flags = 0;
 	#ifdef RMX_WITH_OPENGL_SUPPORT
-		if (videoconfig.mRenderer == VideoConfig::Renderer::OPENGL)
+		if (videoConfig.mRenderer == VideoConfig::Renderer::OPENGL)
 		{
 			flags |= SDL_WINDOW_OPENGL;
 		}
 	#endif
-		if (videoconfig.mFullscreen)
+		if (videoConfig.mFullscreen)
 		{
 			flags |= SDL_WINDOW_FULLSCREEN;
 		}
 		else
 		{
-			if (videoconfig.mBorderless)
+			if (videoConfig.mBorderless)
 				flags |= SDL_WINDOW_BORDERLESS;
-			if (videoconfig.mResizeable)
+			if (videoConfig.mResizeable)
 				flags |= SDL_WINDOW_RESIZABLE;
 		}
 
-		int startX = SDL_WINDOWPOS_CENTERED_DISPLAY(videoconfig.mDisplayIndex);
-		int startY = SDL_WINDOWPOS_CENTERED_DISPLAY(videoconfig.mDisplayIndex);
-		if (videoconfig.mPositioning)
+		int startX = SDL_WINDOWPOS_CENTERED_DISPLAY(videoConfig.mDisplayIndex);
+		int startY = SDL_WINDOWPOS_CENTERED_DISPLAY(videoConfig.mDisplayIndex);
+		if (videoConfig.mPositioning)
 		{
-			startX = videoconfig.mStartPos.x;
-			startY = videoconfig.mStartPos.y;
+			startX = videoConfig.mStartPos.x;
+			startY = videoConfig.mStartPos.y;
 		}
 
 	#ifdef RMX_USE_SDL3
 		{
 			SDL_PropertiesID props = SDL_CreateProperties();
-			SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, *videoconfig.mCaption);
+			SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, *videoConfig.mCaption);
 			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, startX);
 			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, startY);
-			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, videoconfig.mWindowRect.width);
-			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, videoconfig.mWindowRect.height);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, videoConfig.mWindowRect.width);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, videoConfig.mWindowRect.height);
 			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, flags);
 			mMainWindow = SDL_CreateWindowWithProperties(props);
 			SDL_DestroyProperties(props);
 		}
 	#else
-		mMainWindow = SDL_CreateWindow(*videoconfig.mCaption, startX, startY, videoconfig.mWindowRect.width, videoconfig.mWindowRect.height, flags);
+		mMainWindow = SDL_CreateWindow(*videoConfig.mCaption, startX, startY, videoConfig.mWindowRect.width, videoConfig.mWindowRect.height, flags);
 	#endif
 
 		// Success so far?
@@ -93,21 +93,21 @@ namespace rmx
 			return false;
 
 	#ifdef RMX_WITH_OPENGL_SUPPORT
-		if (videoconfig.mRenderer == VideoConfig::Renderer::OPENGL)
+		if (videoConfig.mRenderer == VideoConfig::Renderer::OPENGL)
 		{
 			SDL_GL_CreateContext(mMainWindow);
-			SDL_GL_SetSwapInterval(videoconfig.mVSync ? 1 : 0);
+			SDL_GL_SetSwapInterval(videoConfig.mVSync ? 1 : 0);
 		}
 	#endif
 
 		// Copy video config
-		mVideoConfig = videoconfig;
+		mVideoConfig = videoConfig;
 
 		SDL_GetWindowSize(mMainWindow, &mVideoConfig.mWindowRect.width, &mVideoConfig.mWindowRect.height);
-		SDL_ShowCursor(!videoconfig.mHideCursor);
+		SDL_ShowCursor(!videoConfig.mHideCursor);
 
 	#ifdef RMX_WITH_OPENGL_SUPPORT
-		if (videoconfig.mRenderer == VideoConfig::Renderer::OPENGL)
+		if (videoConfig.mRenderer == VideoConfig::Renderer::OPENGL)
 		{
 			// Defaults for OpenGL
 			glEnable(GL_BLEND);

@@ -31,9 +31,15 @@ namespace softwaredrawer
 			case SDL_PIXELFORMAT_INDEX4MSB:		return "SDL_PIXELFORMAT_INDEX4MSB";
 			case SDL_PIXELFORMAT_INDEX8:		return "SDL_PIXELFORMAT_INDEX8";
 			case SDL_PIXELFORMAT_RGB332:		return "SDL_PIXELFORMAT_RGB332";
+		#ifdef RMX_USE_SDL3
+			case SDL_PIXELFORMAT_XRGB4444:		return "SDL_PIXELFORMAT_XRGB4444";
+			case SDL_PIXELFORMAT_XRGB1555:		return "SDL_PIXELFORMAT_XRGB1555";
+			case SDL_PIXELFORMAT_XBGR1555:		return "SDL_PIXELFORMAT_XBGR1555";
+		#else
 			case SDL_PIXELFORMAT_RGB444:		return "SDL_PIXELFORMAT_RGB444";
 			case SDL_PIXELFORMAT_RGB555:		return "SDL_PIXELFORMAT_RGB555";
 			case SDL_PIXELFORMAT_BGR555:		return "SDL_PIXELFORMAT_BGR555";
+		#endif
 			case SDL_PIXELFORMAT_ARGB4444:		return "SDL_PIXELFORMAT_ARGB4444";
 			case SDL_PIXELFORMAT_RGBA4444:		return "SDL_PIXELFORMAT_RGBA4444";
 			case SDL_PIXELFORMAT_ABGR4444:		return "SDL_PIXELFORMAT_ABGR4444";
@@ -46,9 +52,17 @@ namespace softwaredrawer
 			case SDL_PIXELFORMAT_BGR565:		return "SDL_PIXELFORMAT_BGR565";
 			case SDL_PIXELFORMAT_RGB24:			return "SDL_PIXELFORMAT_RGB24";
 			case SDL_PIXELFORMAT_BGR24:			return "SDL_PIXELFORMAT_BGR24";
+		#ifdef RMX_USE_SDL3
+			case SDL_PIXELFORMAT_XRGB8888:		return "SDL_PIXELFORMAT_XRGB8888";
+		#else
 			case SDL_PIXELFORMAT_RGB888:		return "SDL_PIXELFORMAT_RGB888";
+		#endif
 			case SDL_PIXELFORMAT_RGBX8888:		return "SDL_PIXELFORMAT_RGBX88881";
-			case SDL_PIXELFORMAT_BGR888	:		return "SDL_PIXELFORMAT_BGR888";
+		#ifdef RMX_USE_SDL3
+			case SDL_PIXELFORMAT_XBGR8888:		return "SDL_PIXELFORMAT_XBGR8888";
+		#else
+			case SDL_PIXELFORMAT_BGR888:		return "SDL_PIXELFORMAT_BGR888";
+		#endif
 			case SDL_PIXELFORMAT_BGRX8888:		return "SDL_PIXELFORMAT_BGRX8888";
 			case SDL_PIXELFORMAT_ARGB8888:		return "SDL_PIXELFORMAT_ARGB8888";
 			case SDL_PIXELFORMAT_RGBA8888:		return "SDL_PIXELFORMAT_RGBA8888";
@@ -126,9 +140,17 @@ namespace softwaredrawer
 			RMX_CHECK(nullptr != mScreenSurface, "Could not get SDL screen surface", return);
 
 			bool formatSupported = false;
+		#ifdef RMX_USE_SDL3
+			switch (mScreenSurface->format)
+		#else
 			switch (mScreenSurface->format->format)
+		#endif
 			{
-				case SDL_PIXELFORMAT_RGB888:		// Used in my Windows 10
+			#ifdef RMX_USE_SDL3
+				case SDL_PIXELFORMAT_XRGB8888:		// Used in my Windows 10
+			#else
+				case SDL_PIXELFORMAT_RGB888:
+			#endif
 				case SDL_PIXELFORMAT_ARGB8888:		// Used in my Linux Mint
 				{
 					formatSupported = true;
@@ -136,7 +158,11 @@ namespace softwaredrawer
 					break;
 				}
 
+			#ifdef RMX_USE_SDL3
+				case SDL_PIXELFORMAT_XBGR8888:
+			#else
 				case SDL_PIXELFORMAT_BGR888:
+			#endif
 				case SDL_PIXELFORMAT_ABGR8888:
 				{
 					formatSupported = true;
@@ -157,7 +183,11 @@ namespace softwaredrawer
 				// Fallback when not able to use the SDL surface directly
 				if (!mDisplayedFormatWarning)
 				{
+				#ifdef RMX_USE_SDL3
+					RMX_ERROR("Unsupported screen surface format " << getSDLPixelFormatText(mScreenSurface->format) << " (" << rmx::hexString(mScreenSurface->format, 8) << ")", );
+				#else
 					RMX_ERROR("Unsupported screen surface format " << getSDLPixelFormatText(mScreenSurface->format->format) << " (" << rmx::hexString(mScreenSurface->format->format, 8) << ")", );
+				#endif
 					mDisplayedFormatWarning = true;
 				}
 

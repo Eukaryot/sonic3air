@@ -15,16 +15,16 @@ class RumbleEffectQueue
 {
 public:
 	void reset();
-	bool addEffect(float lowFrequencyRumble, float highFrequencyRumble, uint32 endTicks);
-	bool removeExpiredEffects(uint32 currentTicks);
+	bool addEffect(float lowFrequencyRumble, float highFrequencyRumble, uint64 endTicks);
+	bool removeExpiredEffects(uint64 currentTicks);
 
-	inline float getCurrentLowFreqIntensity() const	{ return getCurrentIntensity(mLowFreqEffects); }
+	inline float getCurrentLowFreqIntensity() const		{ return getCurrentIntensity(mLowFreqEffects); }
 	inline float getCurrentHighFreqIntensity() const	{ return getCurrentIntensity(mHighFreqEffects); }
 
 private:
-	float getCurrentIntensity(const std::map<uint32, float>& effects) const;
+	float getCurrentIntensity(const std::map<uint64, float>& effects) const;
 
 private:
-	std::map<uint32, float> mLowFreqEffects;	// Key is a timestamp in milliseconds (see "SDL_GetTicks()") when this effect ends, value is the rumble intensity
-	std::map<uint32, float> mHighFreqEffects;	// Same here
+	std::map<uint64, float> mLowFreqEffects;	// Key is a timestamp in milliseconds (see "SDL_GetTicks()") when this effect ends, value is the rumble intensity
+	std::map<uint64, float> mHighFreqEffects;	// Same here
 };

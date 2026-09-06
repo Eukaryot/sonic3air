@@ -41,7 +41,11 @@ void EngineMain::earlySetup()
 #ifdef PLATFORM_WINDOWS
 	// This fixes some audio issues with SDL 2.0.9 that some people faced
 	// (possibly introduced earlier, only 2.0.4 is known to have worked)
-	SDL_setenv("SDL_AUDIODRIVER", "directsound", true);
+	#ifdef RMX_USE_SDL3
+		SDL_setenv_unsafe("SDL_AUDIODRIVER", "directsound", true);
+	#else
+		SDL_setenv("SDL_AUDIODRIVER", "directsound", true);
+	#endif
 #endif
 
 	SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "0");
@@ -191,11 +195,19 @@ Vec2i EngineMain::getDisplaySize(int displayIndex) const
 	}
 	else
 	{
+	#ifdef RMX_USE_SDL3
+		const SDL_DisplayMode* dm = SDL_GetDesktopDisplayMode(displayIndex);
+		if (nullptr != dm)
+		{
+			return Vec2i(dm->w, dm->h);
+		}
+	#else
 		SDL_DisplayMode dm;
 		if (SDL_GetDesktopDisplayMode(displayIndex, &dm) == 0)
 		{
 			return Vec2i(dm.w, dm.h);
 		}
+	#endif
 	}
 
 	// Return some fallback size in case everything failed... how about Full HD?
@@ -221,8 +233,10 @@ bool EngineMain::startupEngine()
 	const EngineDelegateInterface::AppMetaData& appMetaData = mDelegate.getAppMetaData();
 	Configuration& config = Configuration::instance();
 
+#ifndef RMX_USE_SDL3
 	// Don't use the accelerometer as a joystick on mobile devices, that's just confusing
 	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+#endif
 
 	// Disable the screen saver and hopefully also system sleep (which makes especially sense when playing with a game controller)
 	//  -> It should be disabled by default according to the SDL2 docs, but that does not seem to be always the case
@@ -753,7 +767,21 @@ bool EngineMain::createWindow()
 		}
 
 		RMX_LOG_INFO("Creating window...");
+	#ifdef RMX_USE_SDL3
+		{
+			SDL_PropertiesID props = SDL_CreateProperties();
+			SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, *videoConfig.mCaption);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex));
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex));
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, videoConfig.mWindowRect.width);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, videoConfig.mWindowRect.height);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, flags);
+			mSDLWindow = SDL_CreateWindowWithProperties(props);
+			SDL_DestroyProperties(props);
+		}
+	#else
 		mSDLWindow = SDL_CreateWindow(*videoConfig.mCaption, SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), videoConfig.mWindowRect.width, videoConfig.mWindowRect.height, flags);
+	#endif
 		if (nullptr == mSDLWindow)
 		{
 			return false;
@@ -830,7 +858,11 @@ bool EngineMain::createWindow()
 		if (nullptr != bitmap)
 		{
 			bitmap->rescale(32, 32);
+		#ifdef RMX_USE_SDL3
+			SDL_Surface* icon = SDL_CreateSurfaceFrom(32, 32, SDL_PIXELFORMAT_ABGR8888, bitmap->getData(), bitmap->getWidth() * sizeof(uint32));
+		#else
 			SDL_Surface* icon = SDL_CreateRGBSurfaceFrom(bitmap->getData(), 32, 32, 32, bitmap->getWidth() * sizeof(uint32), 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+		#endif
 			SDL_SetWindowIcon(mSDLWindow, icon);
 			SDL_FreeSurface(icon);
 		}

@@ -52,7 +52,7 @@ namespace rmx
 		SDL_Window* getMainWindow() const { return mMainWindow; }
 
 	private:
-		bool setVideoMode(const VideoConfig& videoconfig);
+		bool setVideoMode(const VideoConfig& videoConfig);
 
 	private:
 		bool mInitialized = false;

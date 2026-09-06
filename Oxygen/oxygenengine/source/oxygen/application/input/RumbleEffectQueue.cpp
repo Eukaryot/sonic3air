@@ -16,7 +16,7 @@ void RumbleEffectQueue::reset()
 	mHighFreqEffects.clear();
 }
 
-bool RumbleEffectQueue::addEffect(float lowFrequencyRumble, float highFrequencyRumble, uint32 endTicks)
+bool RumbleEffectQueue::addEffect(float lowFrequencyRumble, float highFrequencyRumble, uint64 endTicks)
 {
 	bool anyCurrentIntensityChanged = false;
 	for (int pass = 0; pass < 2; ++pass)
@@ -26,7 +26,7 @@ bool RumbleEffectQueue::addEffect(float lowFrequencyRumble, float highFrequencyR
 		if (intensity <= 0.0f)
 			continue;
 
-		std::map<uint32, float>& effects = (pass == 0) ? mLowFreqEffects : mHighFreqEffects;
+		std::map<uint64, float>& effects = (pass == 0) ? mLowFreqEffects : mHighFreqEffects;
 		bool shouldBeAdded = true;
 		if (effects.empty())
 		{
@@ -84,12 +84,12 @@ bool RumbleEffectQueue::addEffect(float lowFrequencyRumble, float highFrequencyR
 	return anyCurrentIntensityChanged;
 }
 
-bool RumbleEffectQueue::removeExpiredEffects(uint32 currentTicks)
+bool RumbleEffectQueue::removeExpiredEffects(uint64 currentTicks)
 {
 	bool anyChange = false;
 	for (int pass = 0; pass < 2; ++pass)
 	{
-		std::map<uint32, float>& effects = (pass == 0) ? mLowFreqEffects : mHighFreqEffects;
+		std::map<uint64, float>& effects = (pass == 0) ? mLowFreqEffects : mHighFreqEffects;
 		while (!effects.empty() && effects.begin()->first <= currentTicks)
 		{
 			effects.erase(effects.begin());
@@ -99,7 +99,7 @@ bool RumbleEffectQueue::removeExpiredEffects(uint32 currentTicks)
 	return anyChange;
 }
 
-float RumbleEffectQueue::getCurrentIntensity(const std::map<uint32, float>& effects) const
+float RumbleEffectQueue::getCurrentIntensity(const std::map<uint64, float>& effects) const
 {
 	return effects.empty() ? 0.0f : effects.begin()->second;
 }

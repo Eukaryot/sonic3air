@@ -47,5 +47,5 @@ public:
 
 private:
 	std::unordered_map<uint64, CacheItem> mCacheItems;
-	uint32 mNextCheckTicks = 0;
+	SDL_TicksType mNextCheckTicks = 0;
 };

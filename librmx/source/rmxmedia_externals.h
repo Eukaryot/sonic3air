@@ -45,7 +45,6 @@
 	#else
 		#include <SDL/SDL.h>
 	#endif
-	#include "rmxmedia_sdl3_compat.h"
 
 #else
 
@@ -64,6 +63,8 @@
 	#endif
 
 #endif
+
+#include "rmxmedia_sdl3_compat.h"
 
 
 // OpenGL

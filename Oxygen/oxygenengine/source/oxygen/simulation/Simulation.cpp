@@ -300,8 +300,8 @@ void Simulation::update(float timeElapsed)
 
 	if (mFrameNumber < requiredFrameNumber)
 	{
-		const uint32 startTime = SDL_GetTicks();
-		const uint32 limitTime = startTime + 200;
+		const SDL_TicksType startTime = SDL_GetTicks();
+		const SDL_TicksType limitTime = startTime + 200;
 
 		while (mFrameNumber < requiredFrameNumber)
 		{

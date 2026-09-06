@@ -31,7 +31,11 @@ namespace rmx
 			return true;
 
 		// Initialize SDL video
+	#ifdef RMX_USE_SDL3
+		if (!SDL_Init(SDL_INIT_VIDEO))
+	#else
 		if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	#endif
 		{
 			std::cout << "SDL_Init(SDL_INIT_VIDEO) failed with error: " << SDL_GetError() << "\n";
 			return false;
@@ -93,7 +97,11 @@ namespace rmx
 					break;
 
 				case SDL_MOUSEMOTION:
+				#ifdef RMX_USE_SDL3
+					mInputContext.applyMousePos(roundToInt(evnt.motion.x), roundToInt(evnt.motion.y));
+				#else
 					mInputContext.applyMousePos(evnt.motion.x, evnt.motion.y);
+				#endif
 					break;
 			}
 
@@ -149,7 +157,11 @@ namespace rmx
 		MouseEvent ev;
 		ev.button = (evnt.button <= 3) ? buttonMap[evnt.button-1] : (MouseButton)(evnt.button-3);
 		ev.state = (evnt.type == SDL_MOUSEBUTTONDOWN);
+	#ifdef RMX_USE_SDL3
+		ev.position.set(roundToInt(evnt.x), roundToInt(evnt.y));
+	#else
 		ev.position.set(evnt.x, evnt.y);
+	#endif
 		mInputContext.applyEvent(ev);
 
 		mCurrentEventConsumed = false;
@@ -159,15 +171,19 @@ namespace rmx
 	void SystemManager::mousewheel(const SDL_MouseWheelEvent& evnt)
 	{
 		// Mouse wheel
+	#ifdef RMX_USE_SDL3
+		mInputContext.applyMouseWheel(roundToInt(evnt.y));
+	#else
 		mInputContext.applyMouseWheel(evnt.y);
+	#endif
 	}
 
 	void SystemManager::update()
 	{
 		// Update timing
-		unsigned int oldTicks = mTicks;
+		const SDL_TicksType oldTicks = mTicks;
 		mTicks = SDL_GetTicks();
-		mTimeDifference = (float)(mTicks - oldTicks) * 0.001f;
+		mTimeDifference = (float)(signed)(mTicks - oldTicks) * 0.001f;
 		mTotalTime += mTimeDifference;
 
 		const float dt = clamp(mTimeDifference, 0.0001f, 1.0f);
@@ -252,7 +268,11 @@ namespace rmx
 
 	void SystemManager::warpMouse(int x, int y)
 	{
+	#ifdef RMX_USE_SDL3
+		SDL_WarpMouseInWindow(FTX::Video->mMainWindow, (float)x, (float)y);
+	#else
 		SDL_WarpMouseInWindow(FTX::Video->mMainWindow, x, y);
+	#endif
 		mInputContext.applyMousePos(x, y);
 	}
 

@@ -9,6 +9,10 @@
 #define RMX_LIB
 #include "../source/rmxmedia.h"
 
+#ifdef RMX_USE_SDL3
+	#include <SDL3/SDL_main.h>
+#endif
+
 
 class App : public GuiBase
 {
