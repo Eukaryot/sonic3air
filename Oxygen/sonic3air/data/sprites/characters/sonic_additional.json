@@ -3,6 +3,9 @@
 	// Sonic drop dash sprites
 	"sonic_dropdash_0": { "File": "sonic_dropdash.bmp", "Rect":  "0,0,32,32", "Center": "16,16" },
 	"sonic_dropdash_1": { "File": "sonic_dropdash.bmp", "Rect": "32,0,32,32", "Center": "16,16" },
+	"sonic_dropdash_2": { "File": "sonic_dropdash.bmp", "Rect": "64,0,32,32", "Center": "16,16" },
+	"sonic_dropdash_3": { "File": "sonic_dropdash.bmp", "Rect": "96,0,32,32", "Center": "16,16" },
+	"sonic_dropdash_4": { "File": "sonic_dropdash.bmp", "Rect": "128,0,32,32", "Center": "16,16" },
 
 	// Sonic super peel-out sprites
 	"sonic_peelout_0": { "File": "sonic_peelout.bmp", "Rect":  "0,0,40,40", "Center": "20,20" },
