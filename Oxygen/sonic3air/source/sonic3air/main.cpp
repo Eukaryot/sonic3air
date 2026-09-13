@@ -15,6 +15,10 @@
 #include "oxygen/platform/CommandForwarder.h"
 #include "oxygen/platform/PlatformFunctions.h"
 
+#ifdef RMX_USE_SDL3
+	#include <SDL3/SDL_main.h>
+#endif
+
 
 // [Added for Switch platform] HJW: I know it's sloppy to put this here... it'll get moved afterwards
 // Building with my env (msys2,gcc) requires this stub for some reason

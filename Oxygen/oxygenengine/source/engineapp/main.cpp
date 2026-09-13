@@ -14,6 +14,10 @@
 #include "oxygen/platform/CommandForwarder.h"
 #include "oxygen/platform/PlatformFunctions.h"
 
+#ifdef RMX_USE_SDL3
+	#include <SDL3/SDL_main.h>
+#endif
+
 
 #if defined(PLATFORM_WINDOWS) && !defined(__GNUC__)
 extern "C"

@@ -19,6 +19,15 @@
 
 namespace
 {
+	struct AutoFree
+	{
+		AutoFree(void* mem) : mMemory(mem) {}
+		~AutoFree() { SDL_free(mMemory); }
+
+	private:
+		void* mMemory = nullptr;
+	};
+
 
 	const char* getJoystickName(SDL_Joystick* joystick)
 	{
@@ -82,6 +91,28 @@ namespace
 
 	bool getControlAssignmentBySDLBinding(InputConfig::Assignment& output, const SDL_GameControllerButtonBind& binding, int axisDirection)
 	{
+	#ifdef RMX_USE_SDL3
+		switch (binding.input_type)
+		{
+			case SDL_CONTROLLER_BINDTYPE_NONE:
+				return false;
+
+			case SDL_CONTROLLER_BINDTYPE_AXIS:
+				output.mType = InputConfig::Assignment::Type::AXIS;
+				output.mIndex = binding.input.axis.axis * 2 + axisDirection;
+				return true;
+
+			case SDL_CONTROLLER_BINDTYPE_BUTTON:
+				output.mType = InputConfig::Assignment::Type::BUTTON;
+				output.mIndex = binding.input.button;
+				return true;
+
+			case SDL_CONTROLLER_BINDTYPE_HAT:
+				output.mType = InputConfig::Assignment::Type::POV;
+				output.mIndex = (binding.input.hat.hat * 0x100) + binding.input.hat.hat_mask;
+				return true;
+		}
+	#else
 		switch (binding.bindType)
 		{
 			case SDL_CONTROLLER_BINDTYPE_NONE:
@@ -102,6 +133,7 @@ namespace
 				output.mIndex = (binding.value.hat.hat * 0x100) + binding.value.hat.hat_mask;
 				return true;
 		}
+	#endif
 		return false;
 	}
 
@@ -117,26 +149,100 @@ namespace
 	void setupRealDeviceInputMapping(InputManager::RealDevice& device, SDL_GameController& gameController)
 	{
 		using Button = InputConfig::DeviceDefinition::Button;
+
+	#ifdef RMX_USE_SDL3
+
+		int numSdlBindings = 0;
+		SDL_GamepadBinding** sdlBindings = SDL_GetGamepadBindings(&gameController, &numSdlBindings);
+		if (nullptr == sdlBindings)
+			return;
+
+		struct GamepadBinding
+		{
+			Button mButton;
+			SDL_GamepadBindingType mType;
+			uint32 mIndex = 0;
+
+			bool matches(const SDL_GamepadBinding& sdlBinding) const
+			{
+				if (sdlBinding.input_type == mType)
+				{
+					switch (mType)
+					{
+						case SDL_GAMEPAD_BINDTYPE_AXIS:		return (sdlBinding.input.axis.axis == mIndex);
+						case SDL_GAMEPAD_BINDTYPE_BUTTON:	return (sdlBinding.input.button == mIndex);
+						case SDL_GAMEPAD_BINDTYPE_HAT:		return (sdlBinding.input.hat.hat == mIndex);
+					}
+				}
+				return false;
+			}
+		};
+
+		std::vector<GamepadBinding> gamepadBindings;
+		{
+			gamepadBindings.emplace_back( GamepadBinding { Button::UP,	  SDL_GAMEPAD_BINDTYPE_AXIS,   SDL_GAMEPAD_AXIS_LEFTY } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::UP,	  SDL_GAMEPAD_BINDTYPE_BUTTON, SDL_GAMEPAD_BUTTON_DPAD_UP } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::DOWN,  SDL_GAMEPAD_BINDTYPE_AXIS,   SDL_GAMEPAD_AXIS_LEFTY } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::DOWN,  SDL_GAMEPAD_BINDTYPE_BUTTON, SDL_GAMEPAD_BUTTON_DPAD_DOWN } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::LEFT,  SDL_GAMEPAD_BINDTYPE_AXIS,   SDL_GAMEPAD_AXIS_LEFTX } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::LEFT,  SDL_GAMEPAD_BINDTYPE_BUTTON, SDL_GAMEPAD_BUTTON_DPAD_LEFT } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::RIGHT, SDL_GAMEPAD_BINDTYPE_AXIS,   SDL_GAMEPAD_AXIS_LEFTX } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::RIGHT, SDL_GAMEPAD_BINDTYPE_BUTTON, SDL_GAMEPAD_BUTTON_DPAD_RIGHT } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::A,	  SDL_GAMEPAD_BINDTYPE_BUTTON, SDL_GAMEPAD_BUTTON_SOUTH } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::B,	  SDL_GAMEPAD_BINDTYPE_BUTTON, SDL_GAMEPAD_BUTTON_EAST } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::X,	  SDL_GAMEPAD_BINDTYPE_BUTTON, SDL_GAMEPAD_BUTTON_WEST } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::Y,	  SDL_GAMEPAD_BINDTYPE_BUTTON, SDL_GAMEPAD_BUTTON_NORTH } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::START, SDL_GAMEPAD_BINDTYPE_BUTTON, SDL_GAMEPAD_BUTTON_START } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::START, SDL_GAMEPAD_BINDTYPE_BUTTON, SDL_GAMEPAD_BUTTON_GUIDE } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::BACK,  SDL_GAMEPAD_BINDTYPE_BUTTON, SDL_GAMEPAD_BUTTON_BACK } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::L,	  SDL_GAMEPAD_BINDTYPE_BUTTON, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER } );
+			gamepadBindings.emplace_back( GamepadBinding { Button::R,	  SDL_GAMEPAD_BINDTYPE_BUTTON, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER } );
+		}
+
+		device.mControlMappings.resize(InputConfig::DeviceDefinition::NUM_BUTTONS);
+		for (size_t controlIndex = 0; controlIndex < device.mControlMappings.size(); ++controlIndex)
+		{
+			std::vector<InputConfig::Assignment>& assignments = device.mControlMappings[controlIndex].mAssignments;
+			for (const GamepadBinding& gamepadBinding : gamepadBindings)
+			{
+				for (int k = 0; k < numSdlBindings; ++k)
+				{
+					const SDL_GamepadBinding* sdlBinding = sdlBindings[k];
+					if (nullptr != sdlBinding && gamepadBinding.matches(*sdlBinding))
+					{
+						InputConfig::Assignment assignment;
+						if (getControlAssignmentBySDLBinding(assignment, *sdlBinding, controlIndex % 2))
+						{
+							assignments.emplace_back(assignment);
+						}
+					}
+				}
+			}
+		}
+
+		SDL_free(sdlBindings);
+
+	#else
 		std::vector<SDL_GameControllerButtonBind> bindings[InputConfig::DeviceDefinition::NUM_BUTTONS];
-
-		bindings[(size_t)Button::UP]   .emplace_back(SDL_GameControllerGetBindForAxis  (&gameController, SDL_CONTROLLER_AXIS_LEFTY));
-		bindings[(size_t)Button::UP]   .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_DPAD_UP));
-		bindings[(size_t)Button::DOWN] .emplace_back(SDL_GameControllerGetBindForAxis  (&gameController, SDL_CONTROLLER_AXIS_LEFTY));
-		bindings[(size_t)Button::DOWN] .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_DPAD_DOWN));
-		bindings[(size_t)Button::LEFT] .emplace_back(SDL_GameControllerGetBindForAxis  (&gameController, SDL_CONTROLLER_AXIS_LEFTX));
-		bindings[(size_t)Button::LEFT] .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_DPAD_LEFT));
-		bindings[(size_t)Button::RIGHT].emplace_back(SDL_GameControllerGetBindForAxis  (&gameController, SDL_CONTROLLER_AXIS_LEFTX));
-		bindings[(size_t)Button::RIGHT].emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
-
-		bindings[(size_t)Button::A]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_A));
-		bindings[(size_t)Button::B]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_B));
-		bindings[(size_t)Button::X]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_X));
-		bindings[(size_t)Button::Y]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_Y));
-		bindings[(size_t)Button::START].emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_START));
-		bindings[(size_t)Button::START].emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_GUIDE));
-		bindings[(size_t)Button::BACK] .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_BACK));
-		bindings[(size_t)Button::L]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
-		bindings[(size_t)Button::R]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
+		{
+			bindings[(size_t)Button::UP]   .emplace_back(SDL_GameControllerGetBindForAxis  (&gameController, SDL_CONTROLLER_AXIS_LEFTY));
+			bindings[(size_t)Button::UP]   .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_DPAD_UP));
+			bindings[(size_t)Button::DOWN] .emplace_back(SDL_GameControllerGetBindForAxis  (&gameController, SDL_CONTROLLER_AXIS_LEFTY));
+			bindings[(size_t)Button::DOWN] .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_DPAD_DOWN));
+			bindings[(size_t)Button::LEFT] .emplace_back(SDL_GameControllerGetBindForAxis  (&gameController, SDL_CONTROLLER_AXIS_LEFTX));
+			bindings[(size_t)Button::LEFT] .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_DPAD_LEFT));
+			bindings[(size_t)Button::RIGHT].emplace_back(SDL_GameControllerGetBindForAxis  (&gameController, SDL_CONTROLLER_AXIS_LEFTX));
+			bindings[(size_t)Button::RIGHT].emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
+			bindings[(size_t)Button::A]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_A));
+			bindings[(size_t)Button::B]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_B));
+			bindings[(size_t)Button::X]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_X));
+			bindings[(size_t)Button::Y]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_Y));
+			bindings[(size_t)Button::START].emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_START));
+			bindings[(size_t)Button::START].emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_GUIDE));
+			bindings[(size_t)Button::BACK] .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_BACK));
+			bindings[(size_t)Button::L]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
+			bindings[(size_t)Button::R]    .emplace_back(SDL_GameControllerGetBindForButton(&gameController, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
+		}
 
 		device.mControlMappings.resize(InputConfig::DeviceDefinition::NUM_BUTTONS);
 		for (size_t controlIndex = 0; controlIndex < device.mControlMappings.size(); ++controlIndex)
@@ -151,10 +257,13 @@ namespace
 				}
 			}
 		}
+	#endif
 	}
 
 	void processGamepadInputMapping(InputConfig::DeviceDefinition& inputDeviceDefinition, SDL_GameController& gameController)
 	{
+		// Left out for SDL3
+	#ifndef RMX_USE_SDL3
 		// Special handling for L/R buttons (which got added later than the rest): Manually add the bindings, if none were set before
 		if (inputDeviceDefinition.mMappings[(size_t)InputConfig::DeviceDefinition::Button::L].mAssignments.empty() &&
 			inputDeviceDefinition.mMappings[(size_t)InputConfig::DeviceDefinition::Button::R].mAssignments.empty())
@@ -166,6 +275,7 @@ namespace
 			inputDeviceDefinition.mMappings[(size_t)InputConfig::DeviceDefinition::Button::L].mAssignments.emplace_back(assignmentL);
 			inputDeviceDefinition.mMappings[(size_t)InputConfig::DeviceDefinition::Button::R].mAssignments.emplace_back(assignmentR);
 		}
+	#endif
 	}
 
 	void getMatchingInputDeviceDefinition(const InputManager::RealDevice& device, int index, std::vector<InputConfig::DeviceDefinition>& definitions, InputConfig::DeviceDefinition*& outMatchingDefinition, InputConfig::DeviceDefinition*& outFallbackDefinition)
@@ -338,6 +448,31 @@ void InputManager::updateInput(float timeElapsed)
 	{
 		if (mTouchInputEnabled)
 		{
+		#ifdef RMX_USE_SDL3
+			int numSdlTouchDevices = 0;
+			SDL_TouchID* sdlTouchDevices = SDL_GetTouchDevices(&numSdlTouchDevices);
+			if (nullptr != sdlTouchDevices)
+			{
+				for (int k = 0; k < numSdlTouchDevices; ++k)
+				{
+					int numSdlFingers = 0;
+					SDL_Finger** sdlFingers = SDL_GetTouchFingers(sdlTouchDevices[k], &numSdlFingers);
+					if (nullptr != sdlFingers)
+					{
+						for (int i = 0; i < numSdlFingers; ++i)
+						{
+							const SDL_Finger* finger = sdlFingers[i];
+							if (nullptr == finger)
+								break;
+
+							vectorAdd(mActiveTouches).mPosition.set(finger->x, finger->y);
+						}
+						SDL_free(sdlFingers);
+					}
+				}
+				SDL_free(sdlTouchDevices);
+			}
+		#else
 			const int touchDevices = SDL_GetNumTouchDevices();
 			for (int k = 0; k < touchDevices; ++k)
 			{
@@ -352,6 +487,7 @@ void InputManager::updateInput(float timeElapsed)
 					}
 				}
 			}
+		#endif
 		}
 
 		// Also consider left mouse click
@@ -555,11 +691,23 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 	result.mGamepadsFound = result.mPreviousGamepadsFound;
 
 	// Anything changed at all?
-	const int joysticks = SDL_NumJoysticks();
-	if (joysticks == mLastCheckJoysticks && !mKeyboards.empty())
+#ifdef RMX_USE_SDL3
+	int numJoysticks = 0;
+	SDL_JoystickID* sdlJoysticks = SDL_GetJoysticks(&numJoysticks);
+	if (nullptr == sdlJoysticks)
 		return result;
 
-	mLastCheckJoysticks = joysticks;
+	AutoFree af(sdlJoysticks);
+	if (numJoysticks == mLastCheckJoysticks && !mKeyboards.empty())
+		return result;
+#else
+	const int numJoysticks = SDL_NumJoysticks();
+	if (numJoysticks == mLastCheckJoysticks && !mKeyboards.empty())
+		return result;
+#endif
+
+	mLastCheckJoysticks = numJoysticks;
+
 	Configuration& config = Configuration::instance();
 	++mGamepadsChangeCounter;
 
@@ -596,15 +744,23 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 	{
 		gamepad.mDirty = true;
 	}
-	for (int i = 0; i < joysticks; ++i)
+
+	for (int i = 0; i < numJoysticks; ++i)
 	{
 		// Respect the fixed limit of gamepads
 		if (mGamepads.size() >= mGamepads.capacity())
 			break;
 
 		// Is this gamepad already in our list?
+	#ifdef RMX_USE_SDL3
+		SDL_JoystickID joystickInstanceId = sdlJoysticks[i];
+		SDL_Joystick* joystick = SDL_OpenJoystick(joystickInstanceId);
+	#else
 		SDL_Joystick* joystick = SDL_JoystickOpen(i);
 		const int32 joystickInstanceId = SDL_JoystickInstanceID(joystick);
+	#endif
+
+		// Check if already known
 		{
 			RealDevice* existingGamepad = findGamepadBySDLJoystickInstanceId(joystickInstanceId);
 			if (nullptr != existingGamepad)
@@ -629,7 +785,9 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 		device.mSDLJoystick = joystick;
 		device.mSDLGameController = controller;
 		device.mSDLJoystickInstanceId = joystickInstanceId;
-	#if SDL_VERSION_ATLEAST(2, 0, 18)
+	#ifdef RMX_USE_SDL3
+		device.mSupportsRumble = SDL_GetBooleanProperty(SDL_GetJoystickProperties(joystick), SDL_PROP_JOYSTICK_CAP_RUMBLE_BOOLEAN, false);
+	#elif SDL_VERSION_ATLEAST(2, 0, 18)
 		device.mSupportsRumble = SDL_JoystickHasRumble(joystick);
 	#endif
 
@@ -647,7 +805,7 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 		}
 		else if (nullptr != device.mSDLGameController)
 		{
-			// Use SDL2 game controller lookup
+			// Use SDL3 game controller lookup
 			::setupRealDeviceInputMapping(device, *device.mSDLGameController);
 		}
 		else if (nullptr != fallbackInputDeviceDefinition)

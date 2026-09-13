@@ -807,7 +807,11 @@ void Application::setWindowMode(WindowMode windowMode, bool force)
 			if (mWindowMode >= WindowMode::FULLSCREEN_DESKTOP)
 			{
 				// Exit fullscreen first
+			#ifdef RMX_USE_SDL3
+				SDL_SetWindowFullscreen(window, false);
+			#else
 				SDL_SetWindowFullscreen(window, 0);
+			#endif
 			}
 
 			SDL_SetWindowSize(window, Configuration::instance().mWindowSize.x, Configuration::instance().mWindowSize.y);
@@ -822,7 +826,11 @@ void Application::setWindowMode(WindowMode windowMode, bool force)
 			if (mWindowMode >= WindowMode::FULLSCREEN_DESKTOP)
 			{
 				// Exit fullscreen first
+			#ifdef RMX_USE_SDL3
+				SDL_SetWindowFullscreen(window, false);
+			#else
 				SDL_SetWindowFullscreen(window, 0);
+			#endif
 			}
 
 			SDL_Rect rect;
@@ -860,13 +868,31 @@ void Application::setWindowMode(WindowMode windowMode, bool force)
 
 		case WindowMode::FULLSCREEN_DESKTOP:
 		{
+		#ifdef RMX_USE_SDL3
+			SDL_SetWindowFullscreenMode(window, nullptr);
+			SDL_SetWindowFullscreen(window, true);
+		#else
 			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		#endif
 			break;
 		}
 
 		case WindowMode::FULLSCREEN_EXCLUSIVE:
 		{
+		#ifdef RMX_USE_SDL3
+			const SDL_DisplayID displayID = SDL_GetDisplayForWindow(window);
+			if (displayID != 0)
+			{
+				const SDL_DisplayMode* desktopMode = SDL_GetDesktopDisplayMode(displayID);
+				if (nullptr != desktopMode)
+				{
+					SDL_SetWindowFullscreenMode(window, desktopMode);
+					SDL_SetWindowFullscreen(window, true);
+				}
+			}
+		#else
 			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+		#endif
 			break;
 		}
 	}

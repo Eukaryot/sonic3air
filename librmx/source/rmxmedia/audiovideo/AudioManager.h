@@ -58,7 +58,7 @@ namespace rmx
 		AudioManager();
 		~AudioManager();
 
-		void initialize(int sampleFrequency = 44100, int numChannels = 2, int audioBufferSamples = 1024);
+		void initialize(int sampleFrequency = 44100, int numChannels = 2, int audioBufferSamples = 1024);	// Note: Last parameter is unused with SDL3
 		void exit();
 
 		void clear();
@@ -99,9 +99,7 @@ namespace rmx
 
 		inline int getChangeCounter() const  { return mChangeCounter; }
 
-	#ifndef RMX_USE_SDL3
-		inline int getOutputBufferSize() const		  { return mFormat.samples; }
-	#endif
+		inline int getOutputBufferSize() const		  { return mOutputBufferSize; }
 		inline int getOutputFrequency() const		  { return mFormat.freq; }
 		inline int getOutputChannels() const		  { return mFormat.channels; }
 		inline uint32 getGlobalPlayedSamples() const  { return mPlayedSamples; }
@@ -128,6 +126,7 @@ namespace rmx
 		uint32 mAudioLocks = 0;						// Set if audio device is locked right now (needed to allow for nested audio locking)
 	#endif
 		SDL_AudioSpec mFormat;						// Audio format
+		int mOutputBufferSize = 0;
 
 		std::map<int, AudioInstance> mInstances;	// Map of all active audio instances by their ID
 		std::vector<int> mRemoveIDs;				// Audio instance IDs that got invalid during audio mixing

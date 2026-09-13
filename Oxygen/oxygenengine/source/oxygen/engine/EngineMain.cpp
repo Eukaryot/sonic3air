@@ -345,8 +345,8 @@ void EngineMain::shutdown()
 	// Cleanup system
 	RMX_LOG_INFO("System shutdown");
 	FTX::Audio->exit();
-	FTX::System->exit();
 	FTX::JobManager->~JobManager();
+	FTX::System->exit();
 
 	mSystems.mModManager.copyModSettingsToConfig();
 	Configuration::instance().saveSettings();
@@ -727,6 +727,10 @@ bool EngineMain::createWindow()
 
 	// Create window
 	{
+		// TODO:
+		//  - All of this needs a refactoring in general, as there's quite some overlap with "Application::setWindowMode"
+		//  - There should also be a rework for the SDL3 behavior, which is kind of hacky right now
+
 		const int displayIndex = config.mDisplayIndex;
 
 		uint32 flags = useOpenGL ? SDL_WINDOW_OPENGL : 0;
@@ -753,7 +757,11 @@ bool EngineMain::createWindow()
 				// Fullscreen window at desktop resolution
 				//  -> According to https://wiki.libsdl.org/SDL_SetWindowFullscreen, this is not really an exclusive fullscreen mode, but that's fine
 				videoConfig.mWindowRect.setSize(getDisplaySize(displayIndex));
+			#ifdef RMX_USE_SDL3
+				flags |= SDL_WINDOW_FULLSCREEN;
+			#else
 				flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+			#endif
 				break;
 			}
 
@@ -778,14 +786,28 @@ bool EngineMain::createWindow()
 			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, flags);
 			mSDLWindow = SDL_CreateWindowWithProperties(props);
 			SDL_DestroyProperties(props);
+
+			if (nullptr == mSDLWindow)
+				return false;
+
+			if (config.mWindowMode == Configuration::WindowMode::FULLSCREEN_EXCLUSIVE)
+			{
+				const SDL_DisplayID displayID = SDL_GetDisplayForWindow(mSDLWindow);
+				const SDL_DisplayMode* mode = SDL_GetDesktopDisplayMode(displayID);
+				if (nullptr != mode)
+				{
+					SDL_SetWindowFullscreenMode(mSDLWindow, mode);
+					SDL_SetWindowFullscreen(mSDLWindow, true);
+				}
+			}
 		}
 	#else
 		mSDLWindow = SDL_CreateWindow(*videoConfig.mCaption, SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), videoConfig.mWindowRect.width, videoConfig.mWindowRect.height, flags);
-	#endif
 		if (nullptr == mSDLWindow)
 		{
 			return false;
 		}
+	#endif
 
 		RMX_LOG_INFO("Retrieving actual window size...");
 		SDL_GetWindowSize(mSDLWindow, &videoConfig.mWindowRect.width, &videoConfig.mWindowRect.height);

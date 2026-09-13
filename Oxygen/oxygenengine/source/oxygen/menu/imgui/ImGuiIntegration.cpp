@@ -16,7 +16,11 @@
 
 #include "imgui.h"
 #include "backends/imgui_impl_opengl3.h"
-#include "backends/imgui_impl_sdl2.h"
+#ifdef RMX_USE_SDL3
+	#include "backends/imgui_impl_sdl3.h"
+#else
+	#include "backends/imgui_impl_sdl2.h"
+#endif
 
 
 namespace
@@ -73,12 +77,20 @@ void ImGuiIntegration::startup()
 	SDL_Window* window = FTX::Video->getMainWindow();
 	if (mUsingOpenGL)
 	{
+	#ifdef RMX_USE_SDL3
+		ImGui_ImplSDL3_InitForOpenGL(window, SDL_GL_GetCurrentContext());
+	#else
 		ImGui_ImplSDL2_InitForOpenGL(window, SDL_GL_GetCurrentContext());
+	#endif
 		ImGui_ImplOpenGL3_Init();
 	}
 	else
 	{
+	#ifdef RMX_USE_SDL3
+		ImGui_ImplSDL3_InitForOther(window);
+	#else
 		ImGui_ImplSDL2_InitForOther(window);
+	#endif
 		mImGuiSoftwareRenderer.initBackend();
 	}
 
@@ -134,8 +146,11 @@ void ImGuiIntegration::shutdown()
 	{
 		ImGui_ImplOpenGL3_Shutdown();
 	}
+#ifdef RMX_USE_SDL3
+	ImGui_ImplSDL3_Shutdown();
+#else
 	ImGui_ImplSDL2_Shutdown();
-	ImGui::DestroyContext();
+#endif
 
 	mRunning = false;
 }
@@ -155,7 +170,11 @@ void ImGuiIntegration::processSdlEvent(const SDL_Event& ev)
 				SDL_Event newEvent = ev;
 				newEvent.motion.x -= mGlobalScreenOffset.x;
 				newEvent.motion.y -= mGlobalScreenOffset.y;
+			#ifdef RMX_USE_SDL3
+				ImGui_ImplSDL3_ProcessEvent(&newEvent);
+			#else
 				ImGui_ImplSDL2_ProcessEvent(&newEvent);
+			#endif
 				return;
 			}
 
@@ -165,14 +184,22 @@ void ImGuiIntegration::processSdlEvent(const SDL_Event& ev)
 				SDL_Event newEvent = ev;
 				newEvent.button.x -= mGlobalScreenOffset.x;
 				newEvent.button.y -= mGlobalScreenOffset.y;
+			#ifdef RMX_USE_SDL3
+				ImGui_ImplSDL3_ProcessEvent(&newEvent);
+			#else
 				ImGui_ImplSDL2_ProcessEvent(&newEvent);
+			#endif
 				return;
 			}
 		}
 	}
 
 	// Forward to ImGui backend
+#ifdef RMX_USE_SDL3
+	ImGui_ImplSDL3_ProcessEvent(&ev);
+#else
 	ImGui_ImplSDL2_ProcessEvent(&ev);
+#endif
 }
 
 void ImGuiIntegration::startFrame()
@@ -198,7 +225,11 @@ void ImGuiIntegration::startFrame()
 	{
 		mImGuiSoftwareRenderer.newFrame();
 	}
+#ifdef RMX_USE_SDL3
+	ImGui_ImplSDL3_NewFrame();
+#else
 	ImGui_ImplSDL2_NewFrame();
+#endif
 	ImGui::NewFrame();
 
 	ImGuiHelpers::resetForNextFrame();

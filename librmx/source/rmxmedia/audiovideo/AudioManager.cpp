@@ -78,11 +78,21 @@ namespace rmx
 			RMX_ERROR("SDL_OpenAudioDeviceStream failed with error: '" << SDL_GetError() << "'", );
 			return;
 		}
+
+		const SDL_AudioDeviceID audioDeviceID = SDL_GetAudioStreamDevice(mAudioStream);
+		if (audioDeviceID == 0)
+		{
+			RMX_ERROR("SDL_GetAudioStreamDevice failed with error: '" << SDL_GetError() << "'", );
+			return;
+		}
+		SDL_GetAudioDeviceFormat(audioDeviceID, &mFormat, &mOutputBufferSize);
+
 	#else
 		mFormat.format = AUDIO_S16LSB;
 		mFormat.samples = audioBufferSamples;
 		mFormat.callback = AudioManager::mixAudioStatic;
 		mFormat.userdata = 0;
+		mOutputBufferSize = mFormat.samples;
 
 		// Open audio device
 		SDL_AudioSpec requested = mFormat;
