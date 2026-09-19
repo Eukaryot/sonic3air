@@ -512,6 +512,9 @@ bool NetConnection::sendPacketInternal(const std::vector<uint8>& content)
 		{
 			return mWebSocketClient.sendPacket(content);
 		}
+
+		default:
+			return false;
 	}
 	return false;
 }

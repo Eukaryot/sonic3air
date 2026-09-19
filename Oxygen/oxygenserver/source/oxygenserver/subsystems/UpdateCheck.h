@@ -9,6 +9,7 @@
 #pragma once
 
 #include "oxygen_netcore/network/ConnectionListener.h"
+#include <chrono>
 
 
 class UpdateCheck
@@ -54,5 +55,13 @@ private:
 	static ReleaseChannel getReleaseChannelFromString(const std::string& releaseChannelString);
 
 private:
+	bool loadSourceJsonFile();
+	void checkSourceJsonFileChanges();
+
+private:
 	std::vector<UpdateDefinition> mUpdateDefinitions;
+
+	std::wstring mSourceJsonFileName;
+	time_t mSourceJsonFileTime = 0;
+	std::chrono::steady_clock::time_point mLastSourceJsonCheckTime;
 };

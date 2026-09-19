@@ -150,6 +150,9 @@ void OxygenMenu::update(float deltaSeconds)
 				mSideBar->grantFocus();
 				break;
 			}
+
+			default:
+				break;
 		}
 
 		mTriggeredAction = TriggeredAction::NONE;

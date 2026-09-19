@@ -1,0 +1,75 @@
+{
+	"Updates":
+	[
+		// Stable version
+		{
+			"Version": "0x26032800",
+			"ReleaseChannel": "stable",
+			"Platforms": [
+				"windows",
+				"mac",
+				"linux",
+				"android",
+				"web"
+			],
+			"UpdateURL": "https://sonic3air.org"
+		},
+		
+		// Preview version
+		{
+			"Version": "0x26022800",
+			"ReleaseChannel": "preview",
+			"Platforms": [
+				"windows",
+				"mac",
+				"linux",
+				"android",
+				"web"
+			],
+			"UpdateURL": "https://sonic3air.org"
+		},
+		
+		// Test build (Windows)
+		{
+			"Version": "0x26081500",
+			"ReleaseChannel": "test",
+			"Platforms": [
+				"windows"
+			],
+			"UpdateURL": "https://github.com/Eukaryot/sonic3air/releases"
+		},
+		
+		// Test build (Windows, Android)
+		{
+			"Version": "0x25123100",
+			"ReleaseChannel": "test",
+			"Platforms": [
+				"windows",
+				"android"
+			],
+			"UpdateURL": "https://github.com/Eukaryot/sonic3air/releases"
+		},
+		
+		// Test build (Windows, Mac, Linux)
+		{
+			"Version": "0x24120500",
+			"ReleaseChannel": "test",
+			"Platforms": [
+				"windows",
+				"mac",
+				"linux"
+			],
+			"UpdateURL": "https://github.com/Eukaryot/sonic3air/releases"
+		},
+		
+		// Old Switch version (actually unused, as the update check was not implemented back then)
+		{
+			"Version": "0x21091200",
+			"ReleaseChannel": "stable",
+			"Platforms": [
+				"switch"
+			],
+			"UpdateURL": "https://sonic3air.org"
+		}
+	]
+}

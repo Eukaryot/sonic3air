@@ -16,70 +16,8 @@
 
 UpdateCheck::UpdateCheck()
 {
-	// Stable version
-	{
-		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x26032800;
-		definition.mReleaseChannel = ReleaseChannel::STABLE;
-		definition.addPlatform(Platform::WINDOWS);
-		definition.addPlatform(Platform::MAC);
-		definition.addPlatform(Platform::LINUX);
-		definition.addPlatform(Platform::ANDROID);
-		definition.addPlatform(Platform::WEB);
-		definition.mUpdateURL = "https://sonic3air.org";
-	}
-
-	// Preview version
-	{
-		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x26022800;
-		definition.mReleaseChannel = ReleaseChannel::PREVIEW;
-		definition.addPlatform(Platform::WINDOWS);
-		definition.addPlatform(Platform::MAC);
-		definition.addPlatform(Platform::LINUX);
-		definition.addPlatform(Platform::ANDROID);
-		definition.addPlatform(Platform::WEB);
-		definition.mUpdateURL = "https://sonic3air.org";
-	}
-
-	// Test build (Windows)
-	{
-		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x26013100;
-		definition.mReleaseChannel = ReleaseChannel::TEST;
-		definition.addPlatform(Platform::WINDOWS);
-		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";
-	}
-
-	// Test build (Windows, Android)
-	{
-		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x25123100;
-		definition.mReleaseChannel = ReleaseChannel::TEST;
-		definition.addPlatform(Platform::WINDOWS);
-		definition.addPlatform(Platform::ANDROID);
-		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";
-	}
-
-	// Test build (Windows, Mac, Linux)
-	{
-		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x24120500;
-		definition.mReleaseChannel = ReleaseChannel::TEST;
-		definition.addPlatform(Platform::WINDOWS);
-		definition.addPlatform(Platform::MAC);
-		definition.addPlatform(Platform::LINUX);
-		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";
-	}
-
-	// Old Switch version (actually unused, as the update check was not implemented back then)
-	{
-		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x21091200;
-		definition.mReleaseChannel = ReleaseChannel::STABLE;
-		definition.addPlatform(Platform::SWITCH);
-		definition.mUpdateURL = "https://sonic3air.org";
-	}
+	mSourceJsonFileName = L"update_definitions.json";
+	loadSourceJsonFile();
 }
 
 UpdateCheck::Platform UpdateCheck::getPlatformFromString(const std::string& platformString)
@@ -102,6 +40,84 @@ UpdateCheck::ReleaseChannel UpdateCheck::getReleaseChannelFromString(const std::
 	return ReleaseChannel::UNKNOWN;
 }
 
+bool UpdateCheck::loadSourceJsonFile()
+{
+	Json::Value root = rmx::JsonHelper::loadFile(mSourceJsonFileName);
+	if (!root.isObject() || !root["Updates"].isArray())
+		return false;
+
+	// Load definitions
+	std::vector<UpdateDefinition> updateDefinitions;
+	for (const Json::Value& jsonDefinition : root["Updates"])
+	{
+		if (!jsonDefinition.isObject())
+			continue;
+
+		const Json::Value& version = jsonDefinition["Version"];
+		const Json::Value& releaseChannel = jsonDefinition["ReleaseChannel"];
+		const Json::Value& platforms = jsonDefinition["Platforms"];
+		const Json::Value& updateURL = jsonDefinition["UpdateURL"];
+
+		if (!version.isString() || !releaseChannel.isString() || !platforms.isArray() || !updateURL.isString())
+			continue;
+
+		UpdateDefinition newDefinition;
+
+		// Version number
+		newDefinition.mVersionNumber = (uint32)rmx::parseInteger(version.asString());
+
+		// Release channel
+		newDefinition.mReleaseChannel = getReleaseChannelFromString(releaseChannel.asString());
+		if (newDefinition.mReleaseChannel == ReleaseChannel::UNKNOWN)
+			continue;
+
+		// Platforms
+		for (const Json::Value& jsonPlatform : platforms)
+		{
+			if (jsonPlatform.isString())
+			{
+				const Platform platform = getPlatformFromString(jsonPlatform.asString());
+				if (platform != Platform::UNKNOWN)
+					newDefinition.addPlatform(platform);
+			}
+		}
+
+		// At least one valid platform is required
+		if (newDefinition.mPlatforms == 0)
+			continue;
+
+		newDefinition.mUpdateURL = updateURL.asString();
+
+		updateDefinitions.push_back(std::move(newDefinition));
+	}
+
+	if (updateDefinitions.empty())
+		return false;
+
+	// Only apply if the read definitions were valid and there was no error
+	mUpdateDefinitions = std::move(updateDefinitions);
+
+	mSourceJsonFileTime = FTX::FileSystem->getFileTime(mSourceJsonFileName);
+	return true;
+}
+
+void UpdateCheck::checkSourceJsonFileChanges()
+{
+	// Check for changes only every 10 seconds
+	const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+	const uint64 milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now - mLastSourceJsonCheckTime).count();
+	if (milliseconds > 10000)
+	{
+		const time_t fileTime = FTX::FileSystem->getFileTime(mSourceJsonFileName);
+		if (fileTime != mSourceJsonFileTime)
+		{
+			loadSourceJsonFile();
+		}
+
+		mLastSourceJsonCheckTime = now;
+	}
+}
+
 bool UpdateCheck::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 {
 	LAG_STOPWATCH("UpdateCheck::onReceivedRequestQuery", 1000);
@@ -117,6 +133,8 @@ bool UpdateCheck::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 
 			ServerNetConnection& connection = static_cast<ServerNetConnection&>(evaluation.mConnection);
 			RMX_LOG_INFO("AppUpdateCheckRequest: " << request.mQuery.mAppName << ", " << request.mQuery.mPlatform << ", " << request.mQuery.mReleaseChannel << ", " << rmx::hexString(request.mQuery.mInstalledAppVersion, 8) << " (from " << connection.getHexPlayerID() << ")");
+
+			checkSourceJsonFileChanges();
 
 			request.mResponse.mHasUpdate = false;
 			if (request.mQuery.mAppName == "sonic3air")
