@@ -367,7 +367,11 @@ void EngineMain::initDirectories()
 	#if defined(PLATFORM_ANDROID)
 		// Android
 		// TODO: Use internal storage path as a fallback?
+	#ifdef RMX_USE_SDL3
+		WString storagePath = String(SDL_GetAndroidExternalStoragePath()).toWString();
+	#else
 		WString storagePath = String(SDL_AndroidGetExternalStoragePath()).toWString();
+	#endif
 		config.mAppDataPath = *(storagePath + L'/');
 	#elif defined(PLATFORM_VITA)
 		// Vita

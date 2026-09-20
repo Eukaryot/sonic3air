@@ -130,7 +130,11 @@ namespace rmx
 		{
 			if (nullptr == gAssetManager)
 			{
+			#ifdef RMX_USE_SDL3
+				JNIEnv* env = (JNIEnv*)SDL_GetAndroidJNIEnv();
+			#else
 				JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+			#endif
 				jclass sdlActivityJavaClass = env->FindClass("org/libsdl/app/SDLActivity");
 
 				jmethodID getContextMethodID = env->GetStaticMethodID(sdlActivityJavaClass, "getContext", "()Landroid/content/Context;");

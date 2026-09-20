@@ -99,8 +99,13 @@
 
 	AndroidJNIHelper::AndroidJNIHelper()
 	{
+	#ifdef RMX_USE_SDL3
+		mEnv = (JNIEnv*)SDL_GetAndroidJNIEnv();
+		mActivity = (jobject)SDL_GetAndroidActivity();
+	#else
 		mEnv = (JNIEnv*)SDL_AndroidGetJNIEnv();
 		mActivity = (jobject)SDL_AndroidGetActivity();
+	#endif
 		mActivityClass = mEnv->GetObjectClass(mActivity);
 	}
 

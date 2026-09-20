@@ -10,8 +10,7 @@
 
 
 // Use SDL3 instead of SDL2
-//  -> This is work in progress and probably won't compile yet!
-//  -> Also note that you will need to adjust the "framework/build/externals.props" file accordingly
+//  -> This is work in progress and isn't supported on all platforms
 //#define RMX_USE_SDL3
 
 
@@ -40,10 +39,10 @@
 #ifdef RMX_USE_SDL3
 
 	// SDL3
-	#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
+	#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX) || defined(PLATFORM_ANDROID)
 		#include <SDL3/SDL.h>
 	#else
-		#include <SDL/SDL.h>
+		#include <SDL.h>
 	#endif
 
 #else
