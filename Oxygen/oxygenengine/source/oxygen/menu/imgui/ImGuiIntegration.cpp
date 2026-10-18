@@ -424,7 +424,7 @@ void ImGuiIntegration::onWindowRecreated(bool useOpenGL)  {}
 void ImGuiIntegration::buildContents()  {}
 bool ImGuiIntegration::isCapturingMouse()  { return false; }
 bool ImGuiIntegration::isCapturingKeyboard()  { return false; }
-bool ImGuiIntegration::hasBlockingImGuiWindow()  { return false; }
+bool ImGuiIntegration::hasBlockingImGuiWindow() const  { return false; }
 void ImGuiIntegration::refreshImGuiStyle()  {}
 void ImGuiIntegration::saveIniSettings()  {}
 
