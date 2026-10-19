@@ -1,0 +1,35 @@
+{
+	// Turntable sprites for crouching and looking up (CNZ)
+	
+	"character_sonic_turncrouch_0": { "File": "sonic_turntable.bmp", "Rect":  "8,1,33,40",   "Center": "16,20" },
+	"character_sonic_turncrouch_1": { "File": "sonic_turntable.bmp", "Rect": "64,1,35,40",   "Center": "18,20" },
+	"character_sonic_turncrouch_2": { "File": "sonic_turntable.bmp", "Rect": "120,1,32,40",  "Center": "16,20" },
+	"character_sonic_turncrouch_3": { "File": "sonic_turntable.bmp", "Rect": "180,1,24,40",  "Center": "13,20" },
+	"character_sonic_turncrouch_4": { "File": "sonic_turntable.bmp", "Rect": "232,1,32,40",  "Center": "16,20" },
+	"character_sonic_turncrouch_5": { "File": "sonic_turntable.bmp", "Rect": "288,1,32,40",  "Center": "18,20" },
+	"character_sonic_turncrouch_6": { "File": "sonic_turntable.bmp", "Rect": "348,1,24,40",  "Center": "13,20" },
+	
+	"character_sonic_turnlook_0":   { "File": "sonic_turntable.bmp", "Rect": "4,43,32,40",   "Center": "20,20" },
+	"character_sonic_turnlook_1":   { "File": "sonic_turntable.bmp", "Rect": "61,43,35,40",  "Center": "20,20" },
+	"character_sonic_turnlook_2":   { "File": "sonic_turntable.bmp", "Rect": "120,43,32,40", "Center": "16,20" },
+	"character_sonic_turnlook_3":   { "File": "sonic_turntable.bmp", "Rect": "180,43,24,40", "Center": "13,20" },
+	"character_sonic_turnlook_4":   { "File": "sonic_turntable.bmp", "Rect": "232,43,34,40", "Center": "16,20" },
+	"character_sonic_turnlook_5":   { "File": "sonic_turntable.bmp", "Rect": "288,43,32,40", "Center": "18,20" },
+	"character_sonic_turnlook_6":   { "File": "sonic_turntable.bmp", "Rect": "348,43,32,40", "Center": "13,20" },
+
+	"character_knuckles_turncrouch_0": { "File": "knuckles_turntable.bmp", "Rect":  "8,1,33,40",   "Center": "12,20" },
+	"character_knuckles_turncrouch_1": { "File": "knuckles_turntable.bmp", "Rect": "64,1,35,40",   "Center": "12,20" },
+	"character_knuckles_turncrouch_2": { "File": "knuckles_turntable.bmp", "Rect": "120,1,32,40",  "Center": "12,20" },
+	"character_knuckles_turncrouch_3": { "File": "knuckles_turntable.bmp", "Rect": "178,1,26,40",  "Center": "15,20" },
+	"character_knuckles_turncrouch_4": { "File": "knuckles_turntable.bmp", "Rect": "230,1,34,40",  "Center": "15,20" },
+	"character_knuckles_turncrouch_5": { "File": "knuckles_turntable.bmp", "Rect": "288,1,32,40",  "Center": "19,20" },
+	"character_knuckles_turncrouch_6": { "File": "knuckles_turntable.bmp", "Rect": "348,1,24,40",  "Center": "13,20" },
+	
+	"character_knuckles_turnlook_0":   { "File": "knuckles_turntable.bmp", "Rect": "4,43,32,40",   "Center": "20,20" },
+	"character_knuckles_turnlook_1":   { "File": "knuckles_turntable.bmp", "Rect": "61,43,35,40",  "Center": "20,20" },
+	"character_knuckles_turnlook_2":   { "File": "knuckles_turntable.bmp", "Rect": "120,43,32,40", "Center": "16,20" },
+	"character_knuckles_turnlook_3":   { "File": "knuckles_turntable.bmp", "Rect": "180,43,24,40", "Center": "13,20" },
+	"character_knuckles_turnlook_4":   { "File": "knuckles_turntable.bmp", "Rect": "232,43,34,40", "Center": "16,20" },
+	"character_knuckles_turnlook_5":   { "File": "knuckles_turntable.bmp", "Rect": "288,43,32,40", "Center": "18,20" },
+	"character_knuckles_turnlook_6":   { "File": "knuckles_turntable.bmp", "Rect": "348,43,32,40", "Center": "13,20" },
+}
