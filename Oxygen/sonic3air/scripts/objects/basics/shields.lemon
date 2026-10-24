@@ -226,8 +226,10 @@ function void LightningShield.Update()
 		{
 			objA0.update_address = addressof(LightningShield.ResetWaterPalette)
 
+		#if !STANDALONE // Unnecessary with new code in standalone/enginecallbacks.lemon
 			copyMemory(0xfffff000, 0xfffff080, 0x80)
 			fillMemory_u32(0xfffff080, 0x80, 0x0eee0eee)	// Fill palette with white color
+		#endif
 
 			u16[0xfffff0c0] = 0
 			objA0.animation.timer = 3
@@ -333,7 +335,9 @@ function void LightningShield.ResetWaterPalette()
 	if (s8(objA0.animation.timer) < 0)
 	{
 		objA0.update_address = addressof(InstaShield.Init)		// Insta-Shield
+	#if !STANDALONE // Unnecessary with new code in standalone/enginecallbacks.lemon
 		copyMemory(0xfffff080, 0xfffff000, 0x80)
+	#endif
 	}
 }
 
