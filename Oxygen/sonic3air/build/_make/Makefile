@@ -120,6 +120,7 @@ SOURCES	+=	\
 			Oxygen/lemonscript/source/lemon/compiler/TokenHelper \
 			Oxygen/lemonscript/source/lemon/compiler/TypeCasting \
 			Oxygen/lemonscript/source/lemon/compiler/backend/FunctionCompiler \
+			Oxygen/lemonscript/source/lemon/compiler/backend/OpcodeOptimization \
 			Oxygen/lemonscript/source/lemon/compiler/frontend/CompilerFrontend \
 			Oxygen/lemonscript/source/lemon/compiler/frontend/TokenProcessing \
 			Oxygen/lemonscript/source/lemon/compiler/parser/Parser \
@@ -128,8 +129,10 @@ SOURCES	+=	\
 			Oxygen/lemonscript/source/lemon/program/ConstantArray \
 			Oxygen/lemonscript/source/lemon/program/DataType \
 			Oxygen/lemonscript/source/lemon/program/Define \
-			Oxygen/lemonscript/source/lemon/program/Function \
-			Oxygen/lemonscript/source/lemon/program/FunctionWrapper \
+			Oxygen/lemonscript/source/lemon/program/function/Function \
+			Oxygen/lemonscript/source/lemon/program/function/FunctionWrapper \
+			Oxygen/lemonscript/source/lemon/program/function/ScriptFunction \
+			Oxygen/lemonscript/source/lemon/program/function/NativeFunction \
 			Oxygen/lemonscript/source/lemon/program/GlobalsLookup \
 			Oxygen/lemonscript/source/lemon/program/Module \
 			Oxygen/lemonscript/source/lemon/program/ModuleSerializer \
@@ -153,6 +156,7 @@ SOURCES	+=	\
 			Oxygen/lemonscript/source/lemon/utility/PragmaSplitter \
 			Oxygen/lemonscript/source/lemon/utility/StringFormatter \
 			Oxygen/lemonscript/source/lemon/utility/StringFormatterLegacy \
+			Oxygen/lemonscript/source/lemon/utility/DataTypeHelper \
 			Oxygen/oxygenengine/source/oxygen/pch \
 			Oxygen/oxygenengine/source/oxygen/application/Application \
 			Oxygen/oxygenengine/source/oxygen/application/Configuration \
@@ -187,8 +191,8 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/application/overlays/SaveStateMenu \
 			Oxygen/oxygenengine/source/oxygen/application/overlays/TouchControlsOverlay \
 			Oxygen/oxygenengine/source/oxygen/application/video/VideoOut \
-			Oxygen/oxygenengine/source/oxygen/devmode/ImGuiHelpers \
-			Oxygen/oxygenengine/source/oxygen/devmode/ImGuiIntegration \
+			Oxygen/oxygenengine/source/oxygen/menu/imgui/ImGuiHelpers \
+			Oxygen/oxygenengine/source/oxygen/menu/imgui/ImGuiIntegration \
 			Oxygen/oxygenengine/source/oxygen/download/Downloader \
 			Oxygen/oxygenengine/source/oxygen/download/DownloadManager \
 			Oxygen/oxygenengine/source/oxygen/drawing/DrawCollection \
@@ -200,7 +204,7 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/drawing/opengl/OpenGLDrawerTexture \
 			Oxygen/oxygenengine/source/oxygen/drawing/opengl/OpenGLSpriteTextureManager \
 			Oxygen/oxygenengine/source/oxygen/drawing/opengl/OpenGLTexture \
-			Oxygen/oxygenengine/source/oxygen/drawing/opengl/Upscaler \
+			Oxygen/oxygenengine/source/oxygen/drawing/opengl/OpenGLUpscaler \
 			Oxygen/oxygenengine/source/oxygen/drawing/software/Blitter \
 			Oxygen/oxygenengine/source/oxygen/drawing/software/SoftwareDrawer \
 			Oxygen/oxygenengine/source/oxygen/drawing/software/SoftwareDrawerTexture \
@@ -225,7 +229,7 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/network/netplay/NetplayClient \
 			Oxygen/oxygenengine/source/oxygen/network/netplay/NetplayHost \
 			Oxygen/oxygenengine/source/oxygen/network/netplay/NetplayManager \
-			Oxygen/oxygenengine/source/oxygen/platform/AndroidJavaInterface \
+			Oxygen/oxygenengine/source/oxygen/platform/android/AndroidJavaInterface \
 			Oxygen/oxygenengine/source/oxygen/platform/CrashHandler \
 			Oxygen/oxygenengine/source/oxygen/platform/PlatformFunctions \
 			Oxygen/oxygenengine/source/oxygen/rendering/Geometry \
