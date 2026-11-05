@@ -375,6 +375,8 @@ function bool useAfterImages(bool isPlayer1, u32 characterAddress)
 			}
 		}
 	}
+
+	return false
 }
 
 function void RenderAfterImages(u32 characterAddress, u64 key, u8 atex, u8 flags, u32 renderQueue, u8 angle)
