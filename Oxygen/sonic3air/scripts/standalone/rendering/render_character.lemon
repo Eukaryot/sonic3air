@@ -352,24 +352,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 
 	if (useAfterImages(isPlayer1, characterAddress))
 	{
-		// Additional offset for Sonic charging a Super Peel-Out (either Hyper Sonic or with Speed Shoes)
-		s16 afterImagesOffsetX = 0
-		if (char.character == CHARACTER_SONIC && char.spindash == 0x80)
-		{
-			afterImagesOffsetX = (char.groundspeed >> 7) * ((char.flags & char.flag.FACING_LEFT) ? 1 : -1)
-		}
-
-		for (s8 i = 3; i > 0; --i)
-		{
-			A1 = 0xffffe500 + u8(posbackup.offset.player1 - (i * 8 + 4))
-			s16 px0 = u16[A1] - camera.foreground.x.u16 + (i * afterImagesOffsetX / 4)
-			s16 py0 = u16[A1+2] - camera.foreground.y.u16
-			if (level.vertical_wrap == 0xff00)	// Consider vertical level wrap
-				py0 &= level.height.bitmask
-
-			Renderer.setSpriteTagWithPosition(characterAddress + 0x10 + i, px0, py0)
-			Renderer.drawCustomSprite(key, px0, py0, atex, flags, renderQueue - i, angle, 192 - i * 32)
-		}
+		RenderAfterImages(characterAddress, key, atex, flags, renderQueue, angle)
 	}
 
 	// Prevent emulator-like rendering
@@ -392,6 +375,28 @@ function bool useAfterImages(bool isPlayer1, u32 characterAddress)
 			}
 		}
 	}
+}
+
+function void RenderAfterImages(u32 characterAddress, u64 key, u8 atex, u8 flags, u32 renderQueue, u8 angle)
+{
+    // Additional offset for Sonic charging a Super Peel-Out (either Hyper Sonic or with Speed Shoes)
+    s16 afterImagesOffsetX = 0
+    if (char.character == CHARACTER_SONIC && char.spindash == 0x80)
+    {
+        afterImagesOffsetX = (char.groundspeed >> 7) * ((char.flags & char.flag.FACING_LEFT) ? 1 : -1)
+    }
+
+    for (s8 i = 3; i > 0; --i)
+    {
+        A1 = 0xffffe500 + u8(posbackup.offset.player1 - (i * 8 + 4))
+        s16 px0 = u16[A1] - camera.foreground.x.u16 + (i * afterImagesOffsetX / 4)
+        s16 py0 = u16[A1+2] - camera.foreground.y.u16
+        if (level.vertical_wrap == 0xff00)	// Consider vertical level wrap
+            py0 &= level.height.bitmask
+
+        Renderer.setSpriteTagWithPosition(characterAddress + 0x10 + i, px0, py0)
+        Renderer.drawCustomSprite(key, px0, py0, atex, flags, renderQueue - i, angle, 192 - i * 32)
+    }
 }
 
 // Helper functions
