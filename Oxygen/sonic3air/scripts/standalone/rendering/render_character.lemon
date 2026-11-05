@@ -350,23 +350,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 		Renderer.drawCustomSprite(key, px, py, atex, flags, renderQueue, angle, 255)
 	}
 
-	bool useAfterImages
-	if (isPlayer1)
-	{
-		if ((super.active == 0xff) || (super.active.tails == 0xff))
-		{
-			useAfterImages = true
-		}
-		else
-		{
-			if (Game.getSetting(SETTING_SPEEDUP_AFTERIMGS))
-			{
-				useAfterImages = ((u8[characterAddress + 0x2b] & char.bonus.SPEED_UP) != 0)
-			}
-		}
-	}
-
-	if (useAfterImages)
+	if (useAfterImages(isPlayer1, characterAddress))
 	{
 		// Additional offset for Sonic charging a Super Peel-Out (either Hyper Sonic or with Speed Shoes)
 		s16 afterImagesOffsetX = 0
@@ -392,7 +376,23 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 	return true
 }
 
-
+function bool useAfterImages(bool isPlayer1, u32 characterAddress)
+{
+	if (isPlayer1)
+	{
+		if ((super.active == 0xff) || (super.active.tails == 0xff))
+		{
+			return true
+		}
+		else
+		{
+			if (Game.getSetting(SETTING_SPEEDUP_AFTERIMGS))
+			{
+				return ((u8[characterAddress + 0x2b] & char.bonus.SPEED_UP) != 0)
+			}
+		}
+	}
+}
 
 // Helper functions
 
