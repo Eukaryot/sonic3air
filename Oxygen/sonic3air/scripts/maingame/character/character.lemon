@@ -4242,7 +4242,7 @@ function bool Character.updateSuperPeelout()
 
 			char.flags &= ~char.flag.PUSHING
 			if (abs(char.groundspeed) >= 0x0a00)
-				sonic.fastrunanim.timer = 30
+				sonic.fastrunanim.timer = 2000
 
 		#if STANDALONE
 			Input.setControllerRumbleByAddress(A0, 0.0f, 0.25f, 100)
