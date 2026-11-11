@@ -19,6 +19,7 @@ public:
 	std::wstring mProjectPath;
 	std::string mUrl;
 	std::string mForwardedCommand;
+	std::wstring mRomPath;
 	bool mStop = false;
 	int mDisplayIndex = -1;
 
@@ -65,6 +66,14 @@ protected:
 		else if (rmx::startsWith(parameter, "-forward="))
 		{
 			mForwardedCommand = parameter.substr(9);
+		}
+		else if (rmx::startsWith(parameter, "-game="))
+		{
+			// Meant for launchers and scripts that already know where the player's ROM is
+			//  -> Use an absolute path, as the working directory gets changed to the executable's directory before the ROM is loaded
+			std::wstring path = String(parameter.substr(6)).toStdWString();
+			FTX::FileSystem->normalizePath(path, false);
+			mRomPath = path;
 		}
 		else if (parameter == "-stop")
 		{
