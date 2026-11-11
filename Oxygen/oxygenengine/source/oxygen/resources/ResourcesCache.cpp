@@ -27,6 +27,16 @@ bool ResourcesCache::loadRom()
 	bool loaded = false;
 	bool saveRom = false;
 
+	// A ROM given on the command line is tried first, and kept in the app data like one picked in the dialog
+	if (!config.mCommandLineRomPath.empty())
+	{
+		romPath = config.mCommandLineRomPath;
+		loaded = loadRomFile(romPath);
+		saveRom = loaded;
+		if (!loaded)
+			RMX_LOG_INFO("ROM given on the command line could not be loaded, falling back to the usual search");
+	}
+
 	// First have a look at the game's app data, where the ROM gets copied to after it was found once
 	if (!loaded && !config.mAppDataPath.empty())
 	{
