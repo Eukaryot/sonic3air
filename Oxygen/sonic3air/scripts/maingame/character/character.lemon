@@ -4187,9 +4187,9 @@ function void releaseDropDash()
 		}
 	}
 
-	if (super.active)
+	if (super.active == 0xff)
 	{
-		// Using upper byte to signal the difference between Hyper Knuckles hitting the wall and Super/Hyper Sonic's drop dash
+		// Using upper byte to signal the difference between Hyper Knuckles hitting the wall and Hyper Sonic's drop dash
 		camera.hyper_knux_shake = 0x0114
 
 		Character.ClearEnemiesOnScreen()

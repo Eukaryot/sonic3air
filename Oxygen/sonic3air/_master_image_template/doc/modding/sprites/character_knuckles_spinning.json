@@ -1,0 +1,17 @@
+{
+	"character_knuckles_turncrouch_0": { "File": "character_knuckles_spinning.bmp", "Rect":  "8,1,33,40",   "Center": "12,20" },
+	"character_knuckles_turncrouch_1": { "File": "character_knuckles_spinning.bmp", "Rect": "64,1,35,40",   "Center": "12,20" },
+	"character_knuckles_turncrouch_2": { "File": "character_knuckles_spinning.bmp", "Rect": "120,1,32,40",  "Center": "12,20" },
+	"character_knuckles_turncrouch_3": { "File": "character_knuckles_spinning.bmp", "Rect": "178,1,26,40",  "Center": "15,20" },
+	"character_knuckles_turncrouch_4": { "File": "character_knuckles_spinning.bmp", "Rect": "230,1,34,40",  "Center": "15,20" },
+	"character_knuckles_turncrouch_5": { "File": "character_knuckles_spinning.bmp", "Rect": "288,1,32,40",  "Center": "19,20" },
+	"character_knuckles_turncrouch_6": { "File": "character_knuckles_spinning.bmp", "Rect": "348,1,24,40",  "Center": "13,20" },
+	
+	"character_knuckles_turnlook_0":   { "File": "character_knuckles_spinning.bmp", "Rect": "4,43,32,40",   "Center": "20,20" },
+	"character_knuckles_turnlook_1":   { "File": "character_knuckles_spinning.bmp", "Rect": "61,43,35,40",  "Center": "20,20" },
+	"character_knuckles_turnlook_2":   { "File": "character_knuckles_spinning.bmp", "Rect": "120,43,32,40", "Center": "16,20" },
+	"character_knuckles_turnlook_3":   { "File": "character_knuckles_spinning.bmp", "Rect": "180,43,24,40", "Center": "13,20" },
+	"character_knuckles_turnlook_4":   { "File": "character_knuckles_spinning.bmp", "Rect": "232,43,34,40", "Center": "16,20" },
+	"character_knuckles_turnlook_5":   { "File": "character_knuckles_spinning.bmp", "Rect": "288,43,32,40", "Center": "18,20" },
+	"character_knuckles_turnlook_6":   { "File": "character_knuckles_spinning.bmp", "Rect": "348,43,32,40", "Center": "13,20" },
+}
