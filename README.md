@@ -4,6 +4,8 @@ Source code incl. dependencies for "Sonic 3 - Angel Island Revisited", a fan-mad
 
 Project homepage: https://sonic3air.org/
 
+<a href="https://recomplauncher.com/game/sonic3air"><picture><source media="(prefers-color-scheme: dark)" srcset="https://recomplauncher.com/assets/press/launcher/badge-light.svg"><img alt="Get it on RecompLauncher" src="https://recomplauncher.com/assets/press/launcher/badge-dark.svg" height="48"></picture></a>
+
 
 ### Disclaimer
 

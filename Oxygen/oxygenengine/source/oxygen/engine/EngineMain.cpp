@@ -480,6 +480,9 @@ bool EngineMain::initConfigAndSettings()
 		config.mDisplayIndex = mArguments.mDisplayIndex;
 	}
 
+	// Respect ROM path if set on the command line
+	config.mCommandLineRomPath = mArguments.mRomPath;
+
 	// Enable dev mode if requested
 	config.mDevMode.mEnabled = config.mDevMode.mEnableAtStartup;
 

@@ -176,6 +176,7 @@ public:
 	std::wstring mEngineDataPath;
 	std::wstring mGameDataPath;
 	std::wstring mRomPath;					// From configuration
+	std::wstring mCommandLineRomPath;		// From command line ("-game=")
 	std::wstring mLastRomPath;				// From settings
 	std::wstring mScriptsDir;
 	lemon::PreprocessorDefinitionMap mPreprocessorDefinitions;

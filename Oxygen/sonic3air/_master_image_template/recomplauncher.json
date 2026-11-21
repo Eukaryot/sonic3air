@@ -1,0 +1,88 @@
+{
+	"$schema": "https://recomplauncher.com/schema/recomplauncher.json",
+	"format": 1,
+	"name": "Sonic 3 A.I.R.",
+	"repo": "Eukaryot/sonic3air",
+
+	"inputs": [
+		{
+			"id": "rom",
+			"label": "Your Sonic 3 & Knuckles ROM: Sonic_Knuckles_wSonic3.bin, the 4 MB file from the Steam version.",
+			"role": "game",
+			"formats": [{ "type": "file", "extensions": ["bin"] }]
+		}
+	],
+
+	"start": {
+		"program": ["Sonic3AIR.exe", "sonic3air_linux"],
+		"args": ["-game={input:rom}"]
+	},
+
+	"config": [
+		{
+			"id": "main",
+			"format": "json",
+			"file": [
+				{ "path": "{install}/savedata/settings.json", "if": "{install}/savedata" },
+				{ "path": "{local}/Sonic3AIR/settings.json", "if": "{local}/Sonic3AIR" },
+				{ "path": "{config}/Sonic3AIR/settings.json" }
+			]
+		}
+	],
+
+	"folders": {
+		"data": [
+			{ "path": "{install}/savedata", "if": "{install}/savedata" },
+			{ "path": "{local}/Sonic3AIR", "if": "{local}/Sonic3AIR" },
+			{ "path": "{config}/Sonic3AIR" }
+		]
+	},
+
+	"saves": [
+		"{install}/savedata/storage",
+		"{install}/savedata/timeattack",
+		"{install}/savedata/playerprogress.bin",
+		"{install}/savedata/settings.json",
+		"{install}/savedata/settings_input.json",
+		"{local}/Sonic3AIR/storage",
+		"{local}/Sonic3AIR/timeattack",
+		"{local}/Sonic3AIR/playerprogress.bin",
+		"{local}/Sonic3AIR/settings.json",
+		"{local}/Sonic3AIR/settings_input.json",
+		"{config}/Sonic3AIR/storage",
+		"{config}/Sonic3AIR/timeattack",
+		"{config}/Sonic3AIR/playerprogress.bin",
+		"{config}/Sonic3AIR/settings.json",
+		"{config}/Sonic3AIR/settings_input.json"
+	],
+
+	"settings": [
+		{
+			"id": "frame_sync",
+			"label": "Frame sync",
+			"help": "V-Sync matches your screen's refresh rate. The FPS cap option adds a limit on top of V-Sync.",
+			"choices": [
+				{ "label": "V-Sync off", "set": { "Display/FrameSync": "0" } },
+				{ "label": "V-Sync on", "set": { "Display/FrameSync": "1" } },
+				{ "label": "V-Sync + FPS cap", "set": { "Display/FrameSync": "2" } }
+			],
+			"defaults": { "Display/FrameSync": "1" }
+		},
+		{
+			"id": "upscaling",
+			"label": "Scaling",
+			"help": "How the picture fits your window. Aspect Fit keeps the original shape, Integer Scale keeps every pixel the same size, and Stretch fills more of a wide screen.",
+			"choices": [
+				{ "label": "Aspect Fit", "set": { "Display/Upscaling": "0" } },
+				{ "label": "Integer Scale", "set": { "Display/Upscaling": "1" } },
+				{ "label": "Stretch 50%", "set": { "Display/Upscaling": "2" } },
+				{ "label": "Stretch 100%", "set": { "Display/Upscaling": "3" } }
+			],
+			"defaults": { "Display/Upscaling": "0" }
+		}
+	],
+
+	"actions": [
+		{ "id": "data", "label": "Saves and settings", "help": "The folder with your saves, progress, settings and mods.", "open": "data" }
+	]
+}
