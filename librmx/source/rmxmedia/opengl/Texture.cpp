@@ -21,7 +21,13 @@ Texture::Texture(const Bitmap& bitmap)
 	load(bitmap);
 }
 
-Texture::Texture(const String& filename)
+Texture::Texture(std::string_view filename)
+{
+	initialize();
+	load(filename);
+}
+
+Texture::Texture(std::wstring_view filename)
 {
 	initialize();
 	load(filename);
@@ -204,25 +210,37 @@ void Texture::load(const Bitmap& bitmap)
 	load(bitmap.getData(), bitmap.getWidth(), bitmap.getHeight());
 }
 
-void Texture::load(const String& filename)
+bool Texture::load(std::string_view filename)
 {
-	if (filename.includes("??"))
-	{
-		loadCubemap(filename);
-		return;
-	}
+	if (String(filename).includes("??"))
+		return loadCubemap(filename);
+
 	Bitmap bitmap;
-	if (bitmap.load(filename.toWString()))
-		load(bitmap.getData(), bitmap.getWidth(), bitmap.getHeight());
+	if (!bitmap.load(String(filename).toWString()))
+		return false;
+
+	load(bitmap.getData(), bitmap.getWidth(), bitmap.getHeight());
+	return true;
 }
 
-void Texture::loadCubemap(const String& filename)
+bool Texture::load(std::wstring_view filename)
+{
+	Bitmap bitmap;
+	if (!bitmap.load(filename))
+		return false;
+
+	load(bitmap.getData(), bitmap.getWidth(), bitmap.getHeight());
+	return true;
+}
+
+bool Texture::loadCubemap(const String& filename)
 {
 	createCubemap();
 	int pos = -1;
 	if (!filename.includes("??", pos))
-		return;
+		return false;
 
+	bool allLoaded = true;
 	String fname(filename);
 	fname.makeDynamic();
 	Bitmap bitmap;
@@ -231,9 +249,14 @@ void Texture::loadCubemap(const String& filename)
 		fname[pos] = (i%2) ? 'n' : 'p';
 		fname[pos+1] = 'x' + (i/2);
 		if (!bitmap.load(fname.toWString()))
+		{
+			allLoaded = false;
 			continue;
+		}
+
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mFormat, bitmap.getWidth(), bitmap.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, bitmap.getData());
 	}
+	return allLoaded;
 }
 
 void Texture::updateAll(const void* data)

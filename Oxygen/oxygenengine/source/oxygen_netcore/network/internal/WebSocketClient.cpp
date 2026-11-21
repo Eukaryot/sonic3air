@@ -78,7 +78,7 @@ bool WebSocketClient::connectTo(const SocketAddress& remoteAddress)
 bool WebSocketClient::sendPacket(const std::vector<uint8>& content)
 {
 #ifdef PLATFORM_WEB
-	if (mWebSocket == 0)
+	if (mWebSocket == 0 || content.empty())
 		return false;
 
 	const EMSCRIPTEN_RESULT result = emscripten_websocket_send_binary(mWebSocket, (void*)&content[0], (uint32_t)content.size());

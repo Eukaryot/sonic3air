@@ -192,7 +192,7 @@ void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 			const Entry& entry = pair.second;
 			String filename(0, "%s/%02x.bmp", *path, entry.mSpriteNumber);
 			buffer.clear();
-			if (FTX::FileSystem->readFile(*filename, buffer))
+			if (FTX::FileSystem->readFile(*filename, buffer) && !buffer.empty())
 			{
 				// Add bitmap
 				bitmaps.emplace_back(PaletteBitmap(), &entry);

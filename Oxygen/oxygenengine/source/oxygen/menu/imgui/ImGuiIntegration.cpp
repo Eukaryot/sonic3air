@@ -33,6 +33,10 @@ namespace
 		{
 			RMX_ERROR("Could not find font file: '" << filename << "'", );
 		}
+		else if (content.empty())
+		{
+			RMX_ERROR("Font file is empty: '" << filename << "'", );
+		}
 		else
 		{
 			uint8* buffer = new uint8[content.size()];

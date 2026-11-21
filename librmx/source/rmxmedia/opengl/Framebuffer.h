@@ -43,7 +43,7 @@ public:
 
 	void create();
 	void create(int width, int height);
-	void finishCreation();
+	bool finishCreation();
 	void destroy();
 	void setSize(int width, int height);
 

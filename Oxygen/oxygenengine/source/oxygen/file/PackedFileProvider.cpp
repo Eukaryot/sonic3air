@@ -189,7 +189,8 @@ bool PackedFileProvider::readFile(const std::wstring& filename, std::vector<uint
 		{
 			// Copy over the already cache content
 			outData.resize(packedFile->mContent.size());
-			memcpy(&outData[0], &packedFile->mContent[0], packedFile->mContent.size());
+			if (!outData.empty())
+				memcpy(&outData[0], &packedFile->mContent[0], packedFile->mContent.size());
 		}
 		else
 		{
@@ -202,7 +203,8 @@ bool PackedFileProvider::readFile(const std::wstring& filename, std::vector<uint
 			{
 				loadPackedFile(*packedFile);
 				outData.resize(packedFile->mContent.size());
-				memcpy(&outData[0], &packedFile->mContent[0], packedFile->mContent.size());
+				if (!outData.empty())
+					memcpy(&outData[0], &packedFile->mContent[0], packedFile->mContent.size());
 			}
 		}
 		return true;
@@ -291,7 +293,7 @@ bool PackedFileProvider::loadPackedFile(PackedFile& packedFile, std::vector<uint
 
 	outData.resize((size_t)packedFile.mSizeInFile);
 	inputStream->setPosition(packedFile.mPositionInFile);
-	const size_t bytesRead = inputStream->read(&outData[0], outData.size());
+	const size_t bytesRead = outData.empty() ? 0 : inputStream->read(&outData[0], outData.size());
 	delete inputStream;
 
 	RMX_CHECK(packedFile.mSizeInFile == bytesRead, "Failed to load entry '" << WString(packedFile.mPath).toStdString() << "' from package '" << WString(mPackageFilename).toStdString() << "'", return false);

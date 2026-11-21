@@ -305,8 +305,11 @@ namespace
 
 		const size_t size = (size_t)bytes;
 		std::vector<uint8> data;
-		data.resize(size);
-		memcpy(&data[0], src, size);
+		if (size > 0)
+		{
+			data.resize(size);
+			memcpy(&data[0], src, size);
+		}
 
 		const Mod* mod = localFile ? detail::getModForCurrentFunction() : nullptr;
 		if (nullptr != mod)

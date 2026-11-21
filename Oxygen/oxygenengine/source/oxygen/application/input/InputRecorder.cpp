@@ -108,6 +108,8 @@ bool InputRecorder::loadRecording(const std::wstring& filename)
 	const std::wstring completeFilename = Configuration::instance().mSaveStatesDir + L"/" + filename + L".inputrec";
 	if (!FTX::FileSystem->readFile(completeFilename, dump))
 		return false;
+	if (dump.empty())
+		return false;
 
 	return loadRecording(dump);
 }

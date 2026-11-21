@@ -253,7 +253,7 @@ void PersistentData::setDataInternal(std::string_view filePath, uint64 filePathH
 	else
 	{
 		// Check for changes
-		const bool anyChange = (entry->mData.size() != data.size()) || (memcmp(&entry->mData[0], &data[0], data.size()) != 0);
+		const bool anyChange = (entry->mData.size() != data.size()) || (!data.empty() && memcmp(&entry->mData[0], &data[0], data.size()) != 0);
 		if (!anyChange)
 			return;
 		entry->mData = data;

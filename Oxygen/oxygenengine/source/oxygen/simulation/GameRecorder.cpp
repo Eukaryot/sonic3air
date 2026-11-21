@@ -145,7 +145,7 @@ bool GameRecorder::loadRecording(const std::wstring& filename)
 	clear();
 
 	std::vector<uint8> dump;
-	if (!FTX::FileSystem->readFile(filename, dump))
+	if (!FTX::FileSystem->readFile(filename, dump) || dump.empty())
 		return false;
 
 	VectorBinarySerializer serializer(true, dump);

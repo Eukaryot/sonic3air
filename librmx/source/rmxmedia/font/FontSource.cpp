@@ -98,6 +98,11 @@ FontSourceBitmap::FontSourceBitmap(const std::wstring& jsonFilename, bool showEr
 			RMX_CHECK(showErrors, "Failed to load bitmap font JSON file at '" << WString(jsonFilename).toStdString() << "': File not found", );
 			return;
 		}
+		if (content.empty())
+		{
+			RMX_CHECK(showErrors, "Failed to load bitmap font JSON file at '" << WString(jsonFilename).toStdString() << "': File is empty", );
+			return;
+		}
 
 		root = rmx::JsonHelper::loadFromMemory(content);
 		if (root.isNull())

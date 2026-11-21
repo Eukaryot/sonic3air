@@ -72,21 +72,29 @@ namespace
 			if (result == UNZ_OK)
 			{
 				std::vector<uint8> fileContent;
-				fileContent.resize((size_t)fileInfo.uncompressed_size);
-
-				const int readResult = unzReadCurrentFile(zipFile, &fileContent[0], (int)fileContent.capacity());
-				if (readResult <= 0)
+				if (fileInfo.uncompressed_size == 0)
 				{
-					result = readResult;
+					// Save empty file
+					FTX::FileSystem->saveFile(outputBasePath + String(localFilename).toStdWString(), fileContent);
 				}
 				else
 				{
-					fileContent.resize(readResult);
-					FTX::FileSystem->saveFile(outputBasePath + String(localFilename).toStdWString(), fileContent);
-				}
+					fileContent.resize((size_t)fileInfo.uncompressed_size);
 
-				// TODO: Setting the file date is a nice to have
-				//change_file_date(write_filename, fileInfo.dosDate, fileInfo.tmu_date);
+					const int readResult = unzReadCurrentFile(zipFile, &fileContent[0], (int)fileContent.capacity());
+					if (readResult <= 0)
+					{
+						result = readResult;
+					}
+					else
+					{
+						fileContent.resize(readResult);
+						FTX::FileSystem->saveFile(outputBasePath + String(localFilename).toStdWString(), fileContent);
+					}
+
+					// TODO: Setting the file date is a nice to have
+					//change_file_date(write_filename, fileInfo.dosDate, fileInfo.tmu_date);
+				}
 			}
 			return (unzCloseCurrentFile(zipFile) == UNZ_OK) && (result == UNZ_OK);
 		}
@@ -100,6 +108,11 @@ bool FileHelper::loadPaletteBitmap(PaletteBitmap& bitmap, const std::wstring& fi
 	if (!FTX::FileSystem->readFile(filename, content))
 	{
 		RMX_CHECK(!showError, "Failed to load image file '" << *WString(filename).toString() << "': File not found", );
+		return false;
+	}
+	if (content.empty())
+	{
+		RMX_CHECK(!showError, "Failed to load image file '" << *WString(filename).toString() << "': File is empty", );
 		return false;
 	}
 
@@ -117,6 +130,11 @@ bool FileHelper::loadBitmap(Bitmap& bitmap, const std::wstring& filename, bool s
 	if (!FTX::FileSystem->readFile(filename, content))
 	{
 		RMX_CHECK(!showError, "Failed to load image file '" << *WString(filename).toString() << "': File not found", );
+		return false;
+	}
+	if (content.empty())
+	{
+		RMX_CHECK(!showError, "Failed to load image file '" << *WString(filename).toString() << "': File is empty", );
 		return false;
 	}
 
@@ -158,6 +176,11 @@ bool FileHelper::loadBitmap(Bitmap& bitmap, const std::wstring& filename, bool s
 		if (!FTX::FileSystem->readFile(filename, content))
 		{
 			RMX_ERROR("Shader file not found: '" << WString(filename).toStdString() << "'", );
+			return false;
+		}
+		if (content.empty())
+		{
+			RMX_ERROR("Shader file is empty: '" << WString(filename).toStdString() << "'", );
 			return false;
 		}
 	#else

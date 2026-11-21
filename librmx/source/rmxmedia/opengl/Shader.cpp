@@ -299,6 +299,9 @@ bool ShaderEffect::load(const String& filename)
 
 bool ShaderEffect::load(const std::vector<uint8>& content)
 {
+	if (content.empty())
+		return false;
+
 	String filecontents;
 	filecontents.add((char*)&content[0], (int)content.size());
 

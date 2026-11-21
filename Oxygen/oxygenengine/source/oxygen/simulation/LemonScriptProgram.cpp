@@ -450,12 +450,12 @@ bool LemonScriptProgram::loadBaseScriptFromBinary(lemon::GlobalsLookup& globalsL
 {
 	// Deserialize from compiled scripts
 	std::vector<uint8> buffer;
-	bool loaded = FTX::FileSystem->readFile(filename, buffer);
+	bool loaded = (FTX::FileSystem->readFile(filename, buffer) && !buffer.empty());
 
 	Configuration& config = Configuration::instance();
 	if (!loaded && !config.mCompiledScriptSavePath.empty())
 	{
-		loaded = FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer);
+		loaded = (FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer) && !buffer.empty());
 	}
 
 	if (!loaded)
@@ -471,7 +471,7 @@ bool LemonScriptProgram::loadBaseScriptFromCache(lemon::GlobalsLookup& globalsLo
 {
 	std::vector<uint8> buffer;
 	Configuration& config = Configuration::instance();
-	if (!FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer))
+	if (!FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer) || buffer.empty())
 		return false;
 
 	VectorBinarySerializer serializer(true, buffer);

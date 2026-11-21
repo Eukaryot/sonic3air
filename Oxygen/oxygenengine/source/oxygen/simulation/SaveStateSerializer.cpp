@@ -60,7 +60,7 @@ bool SaveStateSerializer::loadState(const std::wstring& filename, StateType* out
 
 	// Load file
 	std::vector<uint8> state;
-	if (!FTX::FileSystem->readFile(filename, state))
+	if (!FTX::FileSystem->readFile(filename, state) || state.empty())
 		return false;
 
 	// Deserialize

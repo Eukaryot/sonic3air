@@ -39,6 +39,11 @@ bool ChipWritesAudioSource::load(std::wstring_view filename)
 		RMX_ERROR("Failed to load audio file '" << *WString(filename).toString() << "': File not found", );
 		return false;
 	}
+	if (content.empty())
+	{
+		RMX_ERROR("Failed to load audio file '" << *WString(filename).toString() << "': File is empty", );
+		return false;
+	}
 
 	VectorBinarySerializer serializer(true, content);
 	mSoundChipWritesByFrame.emplace_back();

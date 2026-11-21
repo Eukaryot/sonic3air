@@ -93,11 +93,12 @@ void Framebuffer::create(int width, int height)
 	setSize(width, height);
 }
 
-void Framebuffer::finishCreation()
+bool Framebuffer::finishCreation()
 {
 	// Just do some final checks
 	const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	RMX_CHECK(status == GL_FRAMEBUFFER_COMPLETE, "Failed to create framebuffer with error: " << rmx::hexString(status, 4) << " (OpenGL error: " << getGLErrorDescription(glGetError()) << ")", );
+	RMX_CHECK(status == GL_FRAMEBUFFER_COMPLETE, "Failed to create framebuffer with error: " << rmx::hexString(status, 4) << " (OpenGL error: " << getGLErrorDescription(glGetError()) << ")", return false);
+	return true;
 }
 
 void Framebuffer::destroy()

@@ -64,6 +64,11 @@ void PaletteCollection::loadPalettesInDirectory(const std::wstring& path, bool i
 			RMX_ERROR("Failed to load PNG at '" << *WString(fileEntry.mPath + fileEntry.mFilename).toString() << "': File loading failed", );
 			continue;
 		}
+		if (content.empty())
+		{
+			RMX_ERROR("Failed to load PNG at '" << *WString(fileEntry.mPath + fileEntry.mFilename).toString() << "': File is empty", );
+			continue;
+		}
 
 		Bitmap bitmap;
 		if (!bitmap.load(fileEntry.mPath + fileEntry.mFilename))

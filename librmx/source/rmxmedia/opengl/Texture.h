@@ -19,8 +19,9 @@ class Texture
 {
 public:
 	Texture();
-	Texture(const Bitmap& bitmap);
-	Texture(const String& filename);
+	explicit Texture(const Bitmap& bitmap);
+	explicit Texture(std::string_view filename);
+	explicit Texture(std::wstring_view filename);
 	Texture(const Texture& other) = delete;
 	Texture(Texture&& other);
 	~Texture();
@@ -38,8 +39,9 @@ public:
 	void load(const void* data, int width, int height);
 	void load(const void* data, const Vec2i& size);
 	void load(const Bitmap& bitmap);
-	void load(const String& filename);
-	void loadCubemap(const String& filename);
+	bool load(std::string_view filename);
+	bool load(std::wstring_view filename);
+	bool loadCubemap(const String& filename);
 
 	void updateAll(const void* data);
 	void updateRect(const void* data, const Recti& rect);

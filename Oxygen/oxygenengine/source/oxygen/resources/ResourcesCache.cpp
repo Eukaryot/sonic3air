@@ -233,12 +233,15 @@ bool ResourcesCache::applyRomModifications(const GameProfile::RomInfo& romInfo)
 		if (content->size() != mRom.size())
 			return false;
 
-		uint64* ptr = (uint64*)&mRom[0];
-		uint64* diff = (uint64*)&(*content)[0];
-		const size_t count = content->size() / 8;
-		for (size_t i = 0; i < count; ++i)
+		if (!mRom.empty())
 		{
-			ptr[i] ^= diff[i];
+			uint64* ptr = (uint64*)&mRom[0];
+			uint64* diff = (uint64*)&(*content)[0];
+			const size_t count = content->size() / 8;
+			for (size_t i = 0; i < count; ++i)
+			{
+				ptr[i] ^= diff[i];
+			}
 		}
 	}
 
@@ -271,7 +274,7 @@ bool ResourcesCache::checkRomContent()
 
 	if (romCheck.mChecksum != 0)
 	{
-		const uint64 checksum = rmx::getMurmur2_64(&mRom[0], mRom.size());
+		const uint64 checksum = mRom.empty() ? 0 : rmx::getMurmur2_64(&mRom[0], mRom.size());
 		if (checksum != romCheck.mChecksum)
 			return false;
 	}
