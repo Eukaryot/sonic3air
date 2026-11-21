@@ -8,6 +8,9 @@
 
 #pragma once
 
+template<typename TYPE> class Vec2;
+template<typename TYPE> class Vec4;
+
 
 // Shortcut for a for-loop over all components
 #define FORi(_statement_) \
@@ -35,6 +38,7 @@ public:
 
 	Vec3(const Vec3& source) : x(source.x), y(source.y), z(source.z) {}
 	Vec3(const Vec2<TYPE>& source, TYPE z_) : x(source.x), y(source.y), z(z_) {}
+	explicit Vec3(const Vec4<TYPE>& source) : x(source.x), y(source.y), z(source.z) {}
 	Vec3(TYPE x_, TYPE y_, TYPE z_) : x(x_), y(y_), z(z_) {}
 
 	template<typename T> explicit Vec3(const Vec3<T>& source)

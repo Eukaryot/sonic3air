@@ -8,17 +8,16 @@
 
 #pragma once
 
+template<typename TYPE> class Vec3;
+template<typename TYPE> class Mat4;
+
 
 // Shortcut for a for-loop over all components
 #define FORi(_statement_) \
-	{ for (int i = 0; i < 3; ++i) { _statement_; } }
+	{ for (int i = 0; i < COLS; ++i) { _statement_; } }
 
-#define FORi2(_statement_) \
-	{ for (int i = 0; i < 9; ++i) { _statement_; } }
-
-#define FORij(_statement_) \
-	{ for (int i = 0; i < 3; ++i) { for (int j = 0; j < 3; ++j) { _statement_; } } }
-
+#define FOR_ALL(_statement_) \
+	{ for (int i = 0; i < COLS * ROWS; ++i) { _statement_; } }
 
 
 template<typename TYPE> class Mat3
@@ -26,132 +25,179 @@ template<typename TYPE> class Mat3
 public:
 	union
 	{
+		// Stored as a row-major matrix:
+		//  ( [0] [1] [2] )    <->    ( m11 m12 m13 )
+		//  ( [3] [4] [5] )    <->    ( m21 m22 m23 )
+		//  ( [6] [7] [8] )    <->    ( m31 m32 m33 )
+
 		TYPE data[9];
 		struct { TYPE m11, m12, m13, m21, m22, m23, m31, m32, m33; };
 	};
 
+	enum class Initialization { NONE };
+	static const Initialization Uninitialized = Initialization::NONE;
+
+	static constexpr int COLS = 3;
+	static constexpr int ROWS = 3;
+
 public:
 	Mat3()							{ setIdentity(); }
-	explicit Mat3(bool undefined)	{}
-	explicit Mat3(TYPE value)		{ FORi2(data[i] = value); }
+	explicit Mat3(Initialization)	{}
+	explicit Mat3(TYPE value)		{ FOR_ALL(data[i] = value); }
 
-	Mat3(const TYPE* mat)			{ FORi2(data[i] = mat[i]); }
-	Mat3(const Mat3& source)		{ FORi2(data[i] = source.data[i]); }
+	Mat3(const Mat3& source)		{ FOR_ALL(data[i] = source.data[i]); }
+	explicit Mat3(const TYPE* mat)	{ FOR_ALL(data[i] = mat[i]); }
 
-	void set(const TYPE* mat)		{ FORi2(data[i] = mat[i]); }
-	void set(const Mat3& source)	{ FORi2(data[i] = source.data[i]); }
+	explicit Mat3(const Mat4<TYPE>& source)
+	{
+		setIdentity();
+		for (int col = 0; col < 3; ++col)
+		{
+			for (int row = 0; row < 3; ++row)
+			{
+				set(col, row, source.get(col, row));
+			}
+		}
+	}
+
+	void set(const Mat3& source)	{ FOR_ALL(data[i] = source.data[i]); }
+	void set(const TYPE* mat)		{ FOR_ALL(data[i] = mat[i]); }
 
 	void setZero()
 	{
-		FORi2(data[i] = 0);
+		FOR_ALL(data[i] = 0);
 	}
 
 	void setIdentity()
 	{
-		FORi2(data[i] = 0);
-		for (int i = 0; i < 3; ++i)
-			data[i*(3+1)] = 1;
+		setZero();
+		for (int i = 0; i < ROWS; ++i)
+		{
+			set(i, i, 1);
+		}
+	}
+
+	TYPE get(int col, int row) const		{ return data[col + row * COLS]; }
+	TYPE& access(int col, int row)			{ return data[col + row * COLS]; }
+	void set(int col, int row, TYPE value)	{ data[col + row * COLS] = value; }
+
+	Vec3<TYPE> getRow(int num) const
+	{
+		Vec3<TYPE> output;
+		FORi(output.data[i] = get(i, num));
+		return output;
+	}
+
+	Vec3<TYPE> getColumn(int num) const
+	{
+		Vec3<TYPE> output;
+		FORi(output.data[i] = get(num, i));
+		return output;
+	}
+
+	void setRow(int num, const Vec3<TYPE>& input)
+	{
+		FORi(set(i, num, input.data[i]));
+	}
+
+	void setColumn(int num, const Vec3<TYPE>& input)
+	{
+		FORi(set(num, i, input.data[i]));
 	}
 
 	void transpose()
 	{
-		for (int i = 0; i < 3-1; ++i)
-			for (int j = i+1; j < 3; ++j)
-			{
-				TYPE temp = data[i+j*3];
-				data[i+j*3] = data[j+i*3];
-				data[j+i*3] = temp;
-			}
-	}
-
-	void transpose(const Mat3& source)
-	{
-		if (&source == this)
+		for (int col = 0; col < COLS - 1; ++col)
 		{
-			transpose();
-			return;
+			for (int row = col + 1; row < ROWS; ++row)
+			{
+				std::swap(access(col, row), access(row, col));
+			}
 		}
-		FORij(data[i*3+j] = source.data[i+j*3]);
 	}
 
-	void add(const Mat3& source)	{ FORi2(data[i] += source.data[i]); }
-	void sub(const Mat3& source)	{ FORi2(data[i] -= source.data[i]); }
-	void mul(TYPE factor)			{ FORi2(data[i] *= factor); }
+	Mat3 transposed() const
+	{
+		Mat3 result(Uninitialized);
+		for (int col = 0; col < COLS; ++col)
+		{
+			for (int row = 0; row < ROWS; ++row)
+			{
+				result.set(col, row, get(row, col));
+			}
+		}
+		return result;
+	}
+
+	void add(const Mat3& source)	{ FOR_ALL(data[i] += source.data[i]); }
+	void sub(const Mat3& source)	{ FOR_ALL(data[i] -= source.data[i]); }
+	void mul(TYPE factor)			{ FOR_ALL(data[i] *= factor); }
 
 	Vec3<TYPE> mul(const Vec3<TYPE>& vec) const
 	{
-		Vec3<TYPE> output;
-		FORij(output.data[i] += data[i*3+j] * vec.data[j]);
+		Vec3<TYPE> output(Vec3<TYPE>::Uninitialized);
+		for (int row = 0; row < ROWS; ++row)
+		{
+			TYPE value = 0;
+			for (int col = 0; col < COLS; ++col)
+			{
+				value += get(col, row) * vec.data[col];
+			}
+			output.data[row] = value;
+		}
 		return output;
 	}
 
 	Mat3 mul(const Mat3& source) const
 	{
-		Mat3 result((TYPE)0);
-		for (int i = 0; i < 3; ++i)
-			for (int j = 0; j < 3; ++j)
-				for (int k = 0; k < 3; ++k)
-					result.data[j+i*3] += data[k+i*3] * source.data[j+k*3];
+		Mat3 result(Uninitialized);
+		for (int row = 0; row < ROWS; ++row)
+		{
+			for (int col = 0; col < COLS; ++col)
+			{
+				TYPE value = 0;
+				for (int k = 0; k < COLS; ++k)
+				{
+					value += get(k, row) * source.get(col, k);
+				}
+				result.set(col, row, value);
+			}
+		}
 		return result;
-	}
-
-	void mul(const Mat3& source1, const Mat3& source2)
-	{
-		setZero();
-		for (int i = 0; i < 3; ++i)
-			for (int j = 0; j < 3; ++j)
-				for (int k = 0; k < 3; ++k)
-					data[j+i*3] += source1.data[k+i*3] * source2.data[j+k*3];
-	}
-
-	Vec3<TYPE> getRow(int num) const
-	{
-		Vec3<TYPE> output;
-		FORi(output.data[i] = data[i*3+num]);
-		return output;
-	}
-
-	Vec3<TYPE> getLine(int num) const
-	{
-		Vec3<TYPE> output;
-		FORi(output.data[i] = data[num*3+i]);
-		return output;
-	}
-
-	void setRow(const Vec3<TYPE>& input, int num)
-	{
-		FORi(data[i*3+num] = input.data[i]);
-	}
-
-	void setLine(const Vec3<TYPE>& input, int num)
-	{
-		FORi(data[num*3+i] = input.data[i]);
 	}
 
 	void setScale(TYPE scale)
 	{
 		setZero();
-		FORi(data[i*(3+1)] = scale);
+		for (int i = 0; i < COLS; ++i)
+		{
+			set(i, i, scale);
+		}
 	}
 
 	void setScale(const Vec3<TYPE>& scale)
 	{
 		setZero();
-		FORi(data[i*(3+1)] = scale.data[i]);
+		for (int i = 0; i < COLS; ++i)
+		{
+			set(i, i, scale);
+		}
 	}
 
 	void setRotation2D(TYPE angle)
 	{
+		// TODO: This needs review / testing
 		setIdentity();
 		angle = deg2rad(angle);
-		TYPE _cos = cos(angle);
-		TYPE _sin = sin(angle);
+		const TYPE _cos = cos(angle);
+		const TYPE _sin = sin(angle);
 		data[0] = _cos;	data[1] = -_sin;
 		data[3] = _sin;	data[3+1] = _cos;
 	}
 
 	void setRotation3D(TYPE angle, const Vec3<TYPE>& axis_)
 	{
+		// TODO: This needs review / testing
 		angle = deg2rad(angle);
 		const TYPE _cos = cos(angle);
 		const TYPE _sin = sin(angle);
@@ -169,10 +215,11 @@ public:
 
 	void setRotation3D(TYPE angle, int axis)
 	{
+		// TODO: This needs review / testing
 		setIdentity();
 		angle = deg2rad(angle);
-		TYPE _cos = cos(angle);
-		TYPE _sin = sin(angle);
+		const TYPE _cos = cos(angle);
+		const TYPE _sin = sin(angle);
 		if (axis == 0)
 		{
 			data[3+1]   = _cos;
@@ -198,22 +245,16 @@ public:
 
 	void setTransformation(const Vec3<TYPE>& dir0, const Vec3<TYPE>& dir1, const Vec3<TYPE>& dir2)
 	{
-		for (int i = 0; i < 3; ++i)
-		{
-			data[i*3+0] = dir0.data[i];
-			data[i*3+1] = dir1.data[i];
-			data[i*3+2] = dir2.data[i];
-		}
+		setColumn(0, dir0);
+		setColumn(1, dir1);
+		setColumn(2, dir2);
 	}
 
 	void setTransformationInv(const Vec3<TYPE>& dir0, const Vec3<TYPE>& dir1, const Vec3<TYPE>& dir2)
 	{
-		for (int i = 0; i < 3; ++i)
-		{
-			data[i]     = dir0.data[i];
-			data[3+i]   = dir1.data[i];
-			data[2*3+i] = dir2.data[i];
-		}
+		setRow(0, dir0);
+		setRow(1, dir1);
+		setRow(2, dir2);
 	}
 
 	void setOrthonormal(const Vec3<TYPE>& dir0)
@@ -227,76 +268,88 @@ public:
 		setIdentity();
 		if (dir0.sqrLen() == 0)
 			return;
-		Vec3<TYPE> out0(dir0);
-		out0.normalize();
-		Vec3<TYPE> out1(dir1);
-		Vec3<TYPE> out2 = Vec3<TYPE>::crossProduct(out0, out1);
-		if (out2.sqrLen() == 0)
+		Vec3<TYPE> localX(dir0);
+		localX.normalize();
+		Vec3<TYPE> localY(dir1);
+		Vec3<TYPE> localZ = Vec3<TYPE>::crossProduct(localX, localY);
+		if (localZ.sqrLen() == 0)
 		{
-			out1 = Vec3<TYPE>::UNIT_Z;
-			out2 = Vec3<TYPE>::crossProduct(out0, out1);
-			if (out2.sqrLen() == 0)
+			localY = Vec3<TYPE>::UNIT_Z;
+			localZ = Vec3<TYPE>::crossProduct(localX, localY);
+			if (localZ.sqrLen() == 0)
 			{
-				out1 = Vec3<TYPE>::UNIT_Y;
-				out2 = Vec3<TYPE>::crossProduct(out0, out1);
+				localY = Vec3<TYPE>::UNIT_Y;
+				localZ = Vec3<TYPE>::crossProduct(localX, localY);
 			}
 		}
-		out2.normalize();
-		out1 = Vec3<TYPE>::crossProduct(out2, out0);
+		localZ.normalize();
+		localY = Vec3<TYPE>::crossProduct(localZ, localX);
 		for (int i = 0; i < 3; ++i)
 		{
-			data[i*3+0] = out0.data[i];
-			data[i*3+1] = out1.data[i];
-			data[i*3+2] = out2.data[i];
+			data[i*COLS+0] = localX.data[i];
+			data[i*COLS+1] = localY.data[i];
+			data[i*COLS+2] = localZ.data[i];
 		}
+	}
+
+	void getEulerAngles(TYPE& yaw, TYPE& pitch, TYPE& roll) const
+	{
+		// Coordinate system used (right-handed):
+		//  - forward = positive y-axis
+		//  - right   = positive x-axis
+		//  - up      = positive z-axis
+
+		// Euler angles:
+		//  - yaw   (range 0 to 360)    = rotation around the global up axis (z)
+		//  - pitch (range -90 to 90)   = rotation around the local right axis (x)
+		//  - roll  (range -180 to 180) = rotation around the local forward axis (y)
+
+		Vec3<TYPE> right = getColumn(0);	// Local x-axis
+		Vec3<TYPE> forward = getColumn(1);	// Local y-axis
+
+		// Get yaw from forward vector
+		yaw = std::atan2(forward.y, forward.x) - (TYPE)PI_DOUBLE / 2;
+		if (yaw < 0)
+			yaw += (TYPE)PI_DOUBLE * 2;
+		const Vec3<TYPE> flatForward(std::cos(yaw), std::sin(yaw), 0);
+		yaw = rad2deg(yaw);
+
+		// Get pitch also from forward vector
+		pitch = rad2deg(std::asin(forward.z));
+
+		// Get roll from right vector
+		const TYPE dot = clamp(flatForward.dot(right), (TYPE)-1, (TYPE)1);
+		roll = rad2deg(std::acos(dot));
+		Vec3<TYPE> tmp = Vec3<TYPE>::crossProduct(flatForward, right);
+		if (tmp.dot(forward) < 0)
+			roll = -roll;
+	}
+
+	Vec3<TYPE> getEulerAngles() const
+	{
+		Vec3<TYPE> angles;
+		getEulerAngles(angles[0], angles[1], angles[2]);
+		return angles;
+	}
+
+	void setEulerAngles(TYPE yaw, TYPE pitch, TYPE roll)
+	{
+		Vec3<TYPE> localX = Vec3<TYPE>::UNIT_X;
+		Vec3<TYPE> localY = Vec3<TYPE>::UNIT_Y;
+		Vec3<TYPE> localZ = Vec3<TYPE>::UNIT_Z;
+		localX.rotate(yaw, 2);
+		localY.rotate(yaw, 2);
+		localY.rotate(pitch, localX);
+		localZ.rotate(pitch, localX);
+		localX.rotate(roll, localY);
+		localZ.rotate(roll, localY);
+
+		setTransformation(localX, localY, localZ);
 	}
 
 	void setEulerAngles(const Vec3<TYPE>& angles)
 	{
 		setEulerAngles(angles[0], angles[1], angles[2]);
-	}
-
-	void setEulerAngles(TYPE alpha, TYPE beta, TYPE gamma)
-	{
-		setIdentity();
-		Vec3<TYPE> out0 = Vec3<TYPE>::UNIT_X;
-		Vec3<TYPE> out1 = Vec3<TYPE>::UNIT_Y;
-		Vec3<TYPE> out2 = Vec3<TYPE>::UNIT_Z;
-		out0.rotate(alpha, 2);
-		out1.rotate(alpha, 2);
-		out1.rotate(beta, out0);
-		out2.rotate(beta, out0);
-		out0.rotate(gamma, out1);
-		out2.rotate(gamma, out1);
-		for (int i = 0; i < 3; ++i)
-		{
-			data[i*3+0] = out0.data[i];
-			data[i*3+1] = out1.data[i];
-			data[i*3+2] = out2.data[i];
-		}
-	}
-
-	void getEulerAngles(Vec3<TYPE>& angles) const
-	{
-		getEulerAngles(angles[0], angles[1], angles[2]);
-	}
-
-	void getEulerAngles(TYPE& alpha, TYPE& beta, TYPE& gamma) const
-	{
-		Vec3<TYPE> in1(data[0], data[3+0], data[3*2+0]);
-		Vec3<TYPE> in2(data[1], data[3+1], data[3*2+1]);
-		alpha = atan2(in2.data[1], in2.data[0]) - (TYPE)PI_DOUBLE / 2;
-		if (alpha < 0)
-			alpha += (TYPE)PI_DOUBLE * 2;
-		Vec3<TYPE> gam0(cos(alpha), sin(alpha), 0);
-		alpha = rad2deg(alpha);
-		beta = rad2deg(asin(in2[2]));
-		TYPE dot = gam0.dot(in1);
-		dot = (dot < -1) ? -1 : ((dot > +1) ? +1 : dot);
-		gamma = rad2deg(acos(dot));
-		Vec3<TYPE> tmp = Vec3<TYPE>::crossProduct(gam0, in1);
-		if (tmp.dot(in2) < 0)
-			gamma = -gamma;
 	}
 
 	Mat3& operator=(const Mat3& source)
@@ -323,8 +376,7 @@ template<typename TYPE> const Mat3<TYPE> Mat3<TYPE>::ZERO(0);
 
 
 #undef FORi
-#undef FORi2
-#undef FORij
+#undef FOR_ALL
 
 
 typedef Mat3<float> Mat3f;

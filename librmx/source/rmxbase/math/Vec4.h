@@ -8,6 +8,8 @@
 
 #pragma once
 
+template<typename TYPE> class Vec3;
+
 
 // Shortcut for a for-loop over all components
 #define FORi(_statement_) \
