@@ -384,8 +384,11 @@ void SoftwareRenderer::renderPlane(const PlaneGeometry& geometry)
 		if (geometry.mPlaneIndex == PlaneManager::PLANE_W)
 		{
 			static uint16 wScrollOffsetX;
+			static uint16 wScrollOffsetY;
 			wScrollOffsetX = (uint16)scrollOffsetsManager.getPlaneWScrollOffset().x;
+			wScrollOffsetY = (uint16)scrollOffsetsManager.getPlaneWScrollOffset().y;
 			scrollOffsetsH = &wScrollOffsetX;
+			scrollOffsetsV = &wScrollOffsetY;
 			scrollMaskH = 0;
 		}
 		else
